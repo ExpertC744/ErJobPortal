@@ -363,19 +363,11 @@ MigrationBackup/
 FodyWeavers.xsd
 
 
-# ============================================
-# ASP.NET Core Configuration Files
-# ============================================
-
+# Sensitive ASP.NET Core configuration
 appsettings.json
-appsettings.Development.json
-appsettings.Production.json
-appsettings.Staging.json
-
-# Optional: Ignore all environment appsettings files
 appsettings.*.json
 
-# Keep template/example files in Git
+# Keep configuration templates
 !appsettings.example.json
 !appsettings.template.json
 
