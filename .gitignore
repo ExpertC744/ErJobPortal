@@ -361,3 +361,22 @@ MigrationBackup/
 
 # Fody - auto-generated XML schema
 FodyWeavers.xsd
+
+
+# ============================================
+# ASP.NET Core Configuration Files
+# ============================================
+
+appsettings.json
+appsettings.Development.json
+appsettings.Production.json
+appsettings.Staging.json
+
+# Optional: Ignore all environment appsettings files
+appsettings.*.json
+
+# Keep template/example files in Git
+!appsettings.example.json
+!appsettings.template.json
+
+
