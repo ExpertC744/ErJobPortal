@@ -1,0 +1,1775 @@
+﻿@model ErJobPortal.Models.CandidateProfileViewModel
+
+@using Microsoft.AspNetCore.Mvc.Rendering
+
+@{
+    Layout = "~/Views/Shared/_DashboardLayout.cshtml";
+    ViewData["Title"] = "Candidate Profile";
+    ViewData["Panel"] = "Candidate";
+    ViewData["UserName"] = "Candidate";
+}
+
+<div class="container-fluid mt-4">
+
+    @if (TempData["Success"] != null)
+    {
+        <div class="alert alert-success">
+            @TempData["Success"]
+        </div>
+    }
+
+    <!-- ================================================= -->
+    <!-- PROFILE HEADER -->
+    <!-- ================================================= -->
+
+    <div class="card mb-4">
+        <div class="card-header">
+            <h4 class="mb-0">Candidate Profile</h4>
+        </div>
+    </div>
+
+
+    <!-- ================================================= -->
+    <!-- ADDRESS -->
+    <!-- ================================================= -->
+
+    <div class="card mb-4">
+
+        <div class="card-header">
+            <h5 class="mb-0">Address</h5>
+        </div>
+
+        <div class="card-body">
+
+            <form asp-action="UpdateAddress"
+                  asp-controller="Candidate"
+                  method="post">
+
+                @Html.AntiForgeryToken()
+
+                <input type="hidden"
+                       asp-for="Profile.CandidateID" />
+
+                <div class="row">
+
+                    <div class="col-md-3 mb-3">
+
+                        <label class="form-label">Country</label>
+
+                        <select asp-for="Profile.CountryID"
+                                class="form-control"
+                                id="CountryID">
+
+                            <option value="">
+                                -- Select Country --
+                            </option>
+
+                        </select>
+
+                    </div>
+
+
+                    <div class="col-md-3 mb-3">
+
+                        <label class="form-label">State</label>
+
+                        <select asp-for="Profile.StateID"
+                                class="form-control"
+                                id="StateID"
+                                disabled>
+
+                            <option value="">
+                                -- Select State --
+                            </option>
+
+                        </select>
+
+                    </div>
+
+
+                    <div class="col-md-3 mb-3">
+
+                        <label class="form-label">City</label>
+
+                        <select asp-for="Profile.CityID"
+                                class="form-control"
+                                id="CityID"
+                                disabled>
+
+                            <option value="">
+                                -- Select City --
+                            </option>
+
+                        </select>
+
+                    </div>
+
+
+                    <div class="col-md-3 mb-3">
+
+                        <label class="form-label">Pincode</label>
+
+                        <input asp-for="Profile.Pincode"
+                               class="form-control"
+                               placeholder="Enter Pincode" />
+
+                    </div>
+
+                </div>
+
+
+                <div class="text-end">
+
+                    <button type="submit"
+                            class="btn btn-primary">
+
+                        Update Address
+
+                    </button>
+
+                </div>
+
+            </form>
+
+        </div>
+
+    </div>
+
+
+    <!-- ================================================= -->
+    <!-- EDUCATION -->
+    <!-- ================================================= -->
+
+    <div class="card mb-4">
+
+        <div class="card-header">
+            <h5 class="mb-0">Education</h5>
+        </div>
+
+        <div class="card-body">
+
+            <form asp-action="UpdateEducation"
+                  asp-controller="Candidate"
+                  method="post">
+
+                @Html.AntiForgeryToken()
+
+                <input type="hidden"
+                       asp-for="Profile.CandidateID" />
+
+
+                <!-- SSC -->
+
+                <h6 class="border-bottom pb-2">
+                    SSC / 10th
+                </h6>
+
+                <div class="row">
+
+                    <div class="col-md-3 mb-3">
+
+                        <label>SSC Year</label>
+
+                        <input asp-for="Profile.SSC_YEAR"
+                               type="number"
+                               class="form-control" />
+
+                    </div>
+
+
+                    <div class="col-md-3 mb-3">
+
+                        <label>SSC Division</label>
+
+                        <select asp-for="Profile.SSC_DIVISION"
+                                class="form-control"
+                                asp-items="@(new SelectList(Model.Divisions, "ID", "Name"))">
+
+                            <option value="">
+                                -- Select Division --
+                            </option>
+
+                        </select>
+
+                    </div>
+
+                </div>
+
+
+                <!-- HSC -->
+
+                <h6 class="border-bottom pb-2 mt-3">
+                    HSC / Diploma
+                </h6>
+
+                <div class="row">
+
+                    <div class="col-md-3 mb-3">
+
+                        <label>HSC / Diploma Year</label>
+
+                        <input asp-for="Profile.HSC_DIPLOMA_YEAR"
+                               type="number"
+                               class="form-control" />
+
+                    </div>
+
+
+                    <div class="col-md-3 mb-3">
+
+                        <label>HSC / Diploma Division</label>
+
+                        <select asp-for="Profile.HSC_DIPLOMA_DIVISION"
+                                class="form-control"
+                                asp-items="@(new SelectList(Model.Divisions, "ID", "Name"))">
+
+                            <option value="">
+                                -- Select Division --
+                            </option>
+
+                        </select>
+
+                    </div>
+
+                </div>
+
+
+                <!-- GRADUATION -->
+
+                <h6 class="border-bottom pb-2 mt-3">
+                    Graduation
+                </h6>
+
+                <div class="row">
+
+                    <div class="col-md-3 mb-3">
+
+                        <label>Graduation Year</label>
+
+                        <input asp-for="Profile.Graduation_Year"
+                               type="number"
+                               class="form-control" />
+
+                    </div>
+
+
+                    <div class="col-md-3 mb-3">
+
+                        <label>Graduation Division</label>
+
+                        <select asp-for="Profile.Graduation_Division"
+                                class="form-control"
+                                asp-items="@(new SelectList(Model.Divisions, "ID", "Name"))">
+
+                            <option value="">
+                                -- Select Division --
+                            </option>
+
+                        </select>
+
+                    </div>
+
+
+                    <div class="col-md-3 mb-3">
+
+                        <label>Graduation Stream</label>
+
+                        <select asp-for="Profile.Graduation_Stream"
+                                class="form-control"
+                                asp-items="@(new SelectList(Model.Streams, "ID", "Name"))">
+
+                            <option value="">
+                                -- Select Stream --
+                            </option>
+
+                        </select>
+
+                    </div>
+
+
+                    <div class="col-md-3 mb-3">
+
+                        <label>Other Stream</label>
+
+                        <input asp-for="Profile.Other_Stream"
+                               class="form-control" />
+
+                    </div>
+
+                </div>
+
+
+                <!-- PG -->
+
+                <h6 class="border-bottom pb-2 mt-3">
+                    Post Graduation
+                </h6>
+
+                <div class="row">
+
+                    <div class="col-md-3 mb-3">
+
+                        <label>PG Year</label>
+
+                        <input asp-for="Profile.PG_Year"
+                               type="number"
+                               class="form-control" />
+
+                    </div>
+
+
+                    <div class="col-md-3 mb-3">
+
+                        <label>PG Division</label>
+
+                        <select asp-for="Profile.PG_Division"
+                                class="form-control"
+                                asp-items="@(new SelectList(Model.Divisions, "ID", "Name"))">
+
+                            <option value="">
+                                -- Select Division --
+                            </option>
+
+                        </select>
+
+                    </div>
+
+
+                    <div class="col-md-3 mb-3">
+
+                        <label>PG Stream</label>
+
+                        <select asp-for="Profile.PG_Stream"
+                                class="form-control"
+                                asp-items="@(new SelectList(Model.Streams, "ID", "Name"))">
+
+                            <option value="">
+                                -- Select Stream --
+                            </option>
+
+                        </select>
+
+                    </div>
+
+
+                    <div class="col-md-3 mb-3">
+
+                        <label>Other Specialization</label>
+
+                        <input asp-for="Profile.Other_Specialization"
+                               class="form-control" />
+
+                    </div>
+
+                </div>
+
+
+                <!-- PHD -->
+
+                <h6 class="border-bottom pb-2 mt-3">
+                    PhD
+                </h6>
+
+                <div class="row">
+
+                    <div class="col-md-3 mb-3">
+
+                        <label>PhD Year</label>
+
+                        <input asp-for="Profile.PhD_Year"
+                               type="number"
+                               class="form-control" />
+
+                    </div>
+
+
+                    <div class="col-md-3 mb-3">
+
+                        <label>PhD Status</label>
+
+                        <select asp-for="Profile.PhD_Status"
+                                class="form-control"
+                                asp-items="@(new SelectList(Model.GraduationStatuses, "ID", "Name"))">
+
+                            <option value="">
+                                -- Select Status --
+                            </option>
+
+                        </select>
+
+                    </div>
+
+
+                    <div class="col-md-3 mb-3">
+
+                        <label>PhD Topic</label>
+
+                        <input asp-for="Profile.PhD_Topic"
+                               class="form-control" />
+
+                    </div>
+
+
+                    <div class="col-md-3 mb-3">
+
+                        <label>Previous PhD Topic / Year</label>
+
+                        <input asp-for="Profile.Previous_PhD_Topic_Year"
+                               class="form-control" />
+
+                    </div>
+
+                </div>
+
+
+                <div class="text-end">
+
+                    <button type="submit"
+                            class="btn btn-primary">
+
+                        Update Education
+
+                    </button>
+
+                </div>
+
+            </form>
+
+        </div>
+
+    </div>
+
+
+    <!-- ================================================= -->
+    <!-- INTERNSHIP / FELLOWSHIP PREFERENCE -->
+    <!-- ================================================= -->
+
+    <div class="card mb-4">
+
+        <div class="card-header">
+            <h5 class="mb-0">
+                Internship / Fellowship Preference
+            </h5>
+        </div>
+
+        <div class="card-body">
+
+            <form asp-action="UpdateInternshipPreference"
+                  asp-controller="Candidate"
+                  method="post">
+
+                @Html.AntiForgeryToken()
+
+                <input type="hidden"
+                       asp-for="Profile.CandidateID" />
+
+                <div class="row">
+
+                    <div class="col-md-3 mb-3">
+
+                        <label>Internship / Fellowship Type</label>
+
+                        <select asp-for="Profile.Internship_FellowshipType"
+                                class="form-control"
+                                asp-items="@(new SelectList(Model.InternshipFellowshipType, "ID", "Name"))">
+
+                            <option value="">
+                                -- Select Type --
+                            </option>
+
+                        </select>
+
+                    </div>
+
+
+                    <div class="col-md-3 mb-3">
+
+                        <label>Preferred Country</label>
+
+                        <input asp-for="Profile.Preferred_Country"
+                               class="form-control" />
+
+                    </div>
+
+
+                    <div class="col-md-3 mb-3">
+
+                        <label>Preferred State</label>
+
+                        <input asp-for="Profile.Preferred_State"
+                               class="form-control" />
+
+                    </div>
+
+
+                    <div class="col-md-3 mb-3">
+
+                        <label>Preferred City</label>
+
+                        <input asp-for="Profile.Preferred_City"
+                               class="form-control" />
+
+                    </div>
+
+                </div>
+
+
+                <div class="text-end">
+
+                    <button type="submit"
+                            class="btn btn-primary">
+
+                        Update Preference
+
+                    </button>
+
+                </div>
+
+            </form>
+
+        </div>
+
+    </div>
+
+
+    <!-- ================================================= -->
+    <!-- DOCUMENTS -->
+    <!-- ================================================= -->
+
+    <div class="card mb-4">
+
+        <div class="card-header">
+            <h5 class="mb-0">
+                Documents & Personal Details
+            </h5>
+        </div>
+
+        <div class="card-body">
+
+            <form asp-action="UpdateDocuments"
+                  asp-controller="Candidate"
+                  method="post">
+
+                @Html.AntiForgeryToken()
+
+                <input type="hidden"
+                       asp-for="Profile.CandidateID" />
+
+                <div class="row">
+
+                    <div class="col-md-4 mb-3">
+
+                        <label>Resume</label>
+
+                        <input asp-for="Profile.sResume"
+                               class="form-control"
+                               placeholder="Resume Path" />
+
+                    </div>
+
+
+                    <div class="col-md-4 mb-3">
+
+                        <label>Photo</label>
+
+                        <input asp-for="Profile.sPhoto"
+                               class="form-control"
+                               placeholder="Photo Path" />
+
+                    </div>
+
+
+                    <div class="col-md-4 mb-3">
+
+                        <label>Signature</label>
+
+                        <input asp-for="Profile.sSignature"
+                               class="form-control"
+                               placeholder="Signature Path" />
+
+                    </div>
+
+
+                    <div class="col-md-6 mb-3">
+
+                        <label>Divyang</label>
+
+                        <select asp-for="Profile.sDivyang"
+                                class="form-control">
+
+                            <option value="">
+                                -- Select --
+                            </option>
+
+                            <option value="Yes">
+                                Yes
+                            </option>
+
+                            <option value="No">
+                                No
+                            </option>
+
+                        </select>
+
+                    </div>
+
+
+                    <div class="col-md-6 mb-3">
+
+                        <label>Hobbies</label>
+
+                        <input asp-for="Profile.sHobbies"
+                               class="form-control"
+                               placeholder="Reading, Cricket, Music" />
+
+                    </div>
+
+                </div>
+
+
+                <div class="text-end">
+
+                    <button type="submit"
+                            class="btn btn-primary">
+
+                        Update Documents
+
+                    </button>
+
+                </div>
+
+            </form>
+
+        </div>
+
+    </div>
+
+
+    <!-- ================================================= -->
+    <!-- INTERNSHIP DETAILS -->
+    <!-- ================================================= -->
+
+    <div class="card mb-4">
+
+        <div class="card-header">
+            <h5 class="mb-0">
+                Internship Details
+            </h5>
+        </div>
+
+        <div class="card-body">
+
+            <form asp-action="UpdateInternshipDetails"
+                  asp-controller="Candidate"
+                  method="post">
+
+                @Html.AntiForgeryToken()
+
+                <input type="hidden"
+                       asp-for="Profile.CandidateID" />
+
+
+                <!-- INTERNSHIP 1 -->
+
+                <h6>Internship 1</h6>
+
+                <div class="row">
+
+                    <div class="col-md-3 mb-3">
+
+                        <label>Organization Name</label>
+
+                        <input asp-for="Profile.sOrgName1"
+                               class="form-control" />
+
+                    </div>
+
+                    <div class="col-md-3 mb-3">
+
+                        <label>Internship Title</label>
+
+                        <select asp-for="Profile.sOrgIntTitle1"
+                                class="form-control"
+                                asp-items="@(new SelectList(Model.InternshipTitles, "ID", "Name"))">
+
+                            <option value="">-- Select Title --</option>
+
+                        </select>
+
+                    </div>
+
+                    <div class="col-md-3 mb-3">
+
+                        <label>Duration</label>
+
+                        <select asp-for="Profile.sOrgIntDuration1"
+                                class="form-control"
+                                asp-items="@(new SelectList(Model.InternshipDurations, "ID", "Name"))">
+
+                            <option value="">-- Select Duration --</option>
+
+                        </select>
+
+                    </div>
+
+                    <div class="col-md-3 mb-3">
+
+                        <label>Status</label>
+
+                        <select asp-for="Profile.sOrgIntStatus1"
+                                class="form-control"
+                                asp-items="@(new SelectList(Model.InternshipStatuses, "ID", "Name"))">
+
+                            <option value="">-- Select Status --</option>
+
+                        </select>
+
+                    </div>
+
+                </div>
+
+
+                <!-- INTERNSHIP 2 -->
+
+                <h6 class="mt-3">Internship 2</h6>
+
+                <div class="row">
+
+                    <div class="col-md-3 mb-3">
+                        <label>Organization Name</label>
+                        <input asp-for="Profile.sOrgName2" class="form-control" />
+                    </div>
+
+                    <div class="col-md-3 mb-3">
+                        <label>Internship Title</label>
+
+                        <select asp-for="Profile.sOrgIntTitle2"
+                                class="form-control"
+                                asp-items="@(new SelectList(Model.InternshipTitles, "ID", "Name"))">
+
+                            <option value="">-- Select Title --</option>
+
+                        </select>
+                    </div>
+
+                    <div class="col-md-3 mb-3">
+                        <label>Duration</label>
+
+                        <select asp-for="Profile.sOrgIntDuration2"
+                                class="form-control"
+                                asp-items="@(new SelectList(Model.InternshipDurations, "ID", "Name"))">
+
+                            <option value="">-- Select Duration --</option>
+
+                        </select>
+                    </div>
+
+                    <div class="col-md-3 mb-3">
+                        <label>Status</label>
+
+                        <select asp-for="Profile.sOrgIntStatus2"
+                                class="form-control"
+                                asp-items="@(new SelectList(Model.InternshipStatuses, "ID", "Name"))">
+
+                            <option value="">-- Select Status --</option>
+
+                        </select>
+                    </div>
+
+                </div>
+
+
+                <!-- INTERNSHIP 3 -->
+
+                <h6 class="mt-3">Internship 3</h6>
+
+                <div class="row">
+
+                    <div class="col-md-3 mb-3">
+                        <label>Organization Name</label>
+                        <input asp-for="Profile.sOrgName3" class="form-control" />
+                    </div>
+
+                    <div class="col-md-3 mb-3">
+
+                        <label>Internship Title</label>
+
+                        <select asp-for="Profile.sOrgIntTitle3"
+                                class="form-control"
+                                asp-items="@(new SelectList(Model.InternshipTitles, "ID", "Name"))">
+
+                            <option value="">-- Select Title --</option>
+
+                        </select>
+
+                    </div>
+
+                    <div class="col-md-3 mb-3">
+
+                        <label>Duration</label>
+
+                        <select asp-for="Profile.sOrgIntDuration3"
+                                class="form-control"
+                                asp-items="@(new SelectList(Model.InternshipDurations, "ID", "Name"))">
+
+                            <option value="">-- Select Duration --</option>
+
+                        </select>
+
+                    </div>
+
+                    <div class="col-md-3 mb-3">
+
+                        <label>Status</label>
+
+                        <select asp-for="Profile.sOrgIntStatus3"
+                                class="form-control"
+                                asp-items="@(new SelectList(Model.InternshipStatuses, "ID", "Name"))">
+
+                            <option value="">-- Select Status --</option>
+
+                        </select>
+
+                    </div>
+
+                </div>
+
+
+                <!-- INTERNSHIP 4 -->
+
+                <h6 class="mt-3">Internship 4</h6>
+
+                <div class="row">
+
+                    <div class="col-md-3 mb-3">
+                        <label>Organization Name</label>
+                        <input asp-for="Profile.sOrgName4" class="form-control" />
+                    </div>
+
+                    <div class="col-md-3 mb-3">
+
+                        <label>Internship Title</label>
+
+                        <select asp-for="Profile.sOrgIntTitle4"
+                                class="form-control"
+                                asp-items="@(new SelectList(Model.InternshipTitles, "ID", "Name"))">
+
+                            <option value="">-- Select Title --</option>
+
+                        </select>
+
+                    </div>
+
+                    <div class="col-md-3 mb-3">
+
+                        <label>Duration</label>
+
+                        <select asp-for="Profile.sOrgIntDuration4"
+                                class="form-control"
+                                asp-items="@(new SelectList(Model.InternshipDurations, "ID", "Name"))">
+
+                            <option value="">-- Select Duration --</option>
+
+                        </select>
+
+                    </div>
+
+                    <div class="col-md-3 mb-3">
+
+                        <label>Status</label>
+
+                        <select asp-for="Profile.sOrgIntStatus4"
+                                class="form-control"
+                                asp-items="@(new SelectList(Model.InternshipStatuses, "ID", "Name"))">
+
+                            <option value="">-- Select Status --</option>
+
+                        </select>
+
+                    </div>
+
+                </div>
+
+
+                <div class="text-end">
+
+                    <button type="submit"
+                            class="btn btn-primary">
+
+                        Update Internship Details
+
+                    </button>
+
+                </div>
+
+            </form>
+
+        </div>
+
+    </div>
+
+
+    <!-- ================================================= -->
+    <!-- LANGUAGES -->
+    <!-- ================================================= -->
+
+    <div class="card mb-4">
+
+        <div class="card-header">
+            <h5 class="mb-0">Languages Known</h5>
+        </div>
+
+        <div class="card-body">
+
+            <form asp-action="UpdateLanguages"
+                  asp-controller="Candidate"
+                  method="post">
+
+                @Html.AntiForgeryToken()
+
+                <input type="hidden"
+                       asp-for="Profile.CandidateID" />
+
+                <div class="row">
+
+                    @for (int i = 1; i <= 8; i++)
+                    {
+                        var languageProperty = $"Profile.sLanguage{i}";
+                        var starProperty = $"Profile.sLanguageStar{i}";
+
+                        <div class="col-md-3 mb-3">
+
+                            <label>Language @i</label>
+
+                            <input name="@languageProperty"
+                                   value="@ViewData.Eval(languageProperty)"
+                                   class="form-control"
+                                   placeholder="Language" />
+
+                        </div>
+
+                        <div class="col-md-3 mb-3">
+
+                            <label>Rating</label>
+
+                            <select name="@starProperty"
+                                    class="form-control">
+
+                                <option value="">-- Rating --</option>
+                                <option value="1">1 Star</option>
+                                <option value="2">2 Stars</option>
+                                <option value="3">3 Stars</option>
+                                <option value="4">4 Stars</option>
+                                <option value="5">5 Stars</option>
+
+                            </select>
+
+                        </div>
+                    }
+
+                </div>
+
+
+                <div class="text-end">
+
+                    <button type="submit"
+                            class="btn btn-primary">
+
+                        Update Languages
+
+                    </button>
+
+                </div>
+
+            </form>
+
+        </div>
+
+    </div>
+
+
+    <!-- ================================================= -->
+    <!-- REFERENCES -->
+    <!-- ================================================= -->
+
+    <div class="card mb-4">
+
+        <div class="card-header">
+            <h5 class="mb-0">References</h5>
+        </div>
+
+        <div class="card-body">
+
+            <form asp-action="UpdateReferences"
+                  asp-controller="Candidate"
+                  method="post">
+
+                @Html.AntiForgeryToken()
+
+                <input type="hidden"
+                       asp-for="Profile.CandidateID" />
+
+                <div class="row">
+
+                    <div class="col-md-6">
+
+                        <h6>Reference 1</h6>
+
+                        <div class="mb-3">
+
+                            <label>Name</label>
+
+                            <input asp-for="Profile.sRefName1"
+                                   class="form-control" />
+
+                        </div>
+
+                        <div class="mb-3">
+
+                            <label>Relationship</label>
+
+                            <select asp-for="Profile.sRefRelationName1"
+                                    class="form-control"
+                                    asp-items="@(new SelectList(Model.Relationships, "ID", "Name"))">
+
+                                <option value="">
+                                    -- Select Relationship --
+                                </option>
+
+                            </select>
+
+                        </div>
+
+                        <div class="mb-3">
+
+                            <label>Location</label>
+
+                            <input asp-for="Profile.sLocation1"
+                                   class="form-control" />
+
+                        </div>
+
+                        <div class="mb-3">
+
+                            <label>Mobile</label>
+
+                            <input asp-for="Profile.sMobile1"
+                                   class="form-control" />
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="col-md-6">
+
+                        <h6>Reference 2</h6>
+
+                        <div class="mb-3">
+
+                            <label>Name</label>
+
+                            <input asp-for="Profile.sRefName2"
+                                   class="form-control" />
+
+                        </div>
+
+                        <div class="mb-3">
+
+                            <label>Relationship</label>
+
+                            <select asp-for="Profile.sRefRelationName2"
+                                    class="form-control"
+                                    asp-items="@(new SelectList(Model.Relationships, "ID", "Name"))">
+
+                                <option value="">
+                                    -- Select Relationship --
+                                </option>
+
+                            </select>
+
+                        </div>
+
+                        <div class="mb-3">
+
+                            <label>Location</label>
+
+                            <input asp-for="Profile.sLocation2"
+                                   class="form-control" />
+
+                        </div>
+
+                        <div class="mb-3">
+
+                            <label>Mobile</label>
+
+                            <input asp-for="Profile.sMobile2"
+                                   class="form-control" />
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <div class="text-end">
+
+                    <button type="submit"
+                            class="btn btn-primary">
+
+                        Update References
+
+                    </button>
+
+                </div>
+
+            </form>
+
+        </div>
+
+    </div>
+
+
+    <!-- ================================================= -->
+    <!-- ACHIEVEMENTS -->
+    <!-- ================================================= -->
+
+    <div class="card mb-4">
+
+        <div class="card-header">
+            <h5 class="mb-0">
+                Achievements / Certifications
+            </h5>
+        </div>
+
+        <div class="card-body">
+
+            <form asp-action="UpdateAchievements"
+                  asp-controller="Candidate"
+                  method="post">
+
+                @Html.AntiForgeryToken()
+
+                <input type="hidden"
+                       asp-for="Profile.CandidateID" />
+
+                <div class="row">
+
+                    <div class="col-md-4 mb-3">
+
+                        <label>Achievement / Certificate 1</label>
+
+                        <textarea asp-for="Profile.Achievements_Certification1"
+                                  class="form-control"
+                                  rows="3"></textarea>
+
+                    </div>
+
+                    <div class="col-md-4 mb-3">
+
+                        <label>Achievement / Certificate 2</label>
+
+                        <textarea asp-for="Profile.Achievements_Certification2"
+                                  class="form-control"
+                                  rows="3"></textarea>
+
+                    </div>
+
+                    <div class="col-md-4 mb-3">
+
+                        <label>Achievement / Certificate 3</label>
+
+                        <textarea asp-for="Profile.Achievements_Certification3"
+                                  class="form-control"
+                                  rows="3"></textarea>
+
+                    </div>
+
+                </div>
+
+
+                <div class="text-end">
+
+                    <button type="submit"
+                            class="btn btn-primary">
+
+                        Update Achievements
+
+                    </button>
+
+                </div>
+
+            </form>
+
+        </div>
+
+    </div>
+
+
+    <!-- ================================================= -->
+    <!-- SOCIAL LINKS -->
+    <!-- ================================================= -->
+
+    <div class="card mb-4">
+
+        <div class="card-header">
+            <h5 class="mb-0">Social Links</h5>
+        </div>
+
+        <div class="card-body">
+
+            <form asp-action="UpdateSocialLinks"
+                  asp-controller="Candidate"
+                  method="post">
+
+                @Html.AntiForgeryToken()
+
+                <input type="hidden"
+                       asp-for="Profile.CandidateID" />
+
+                <div class="row">
+
+                    <div class="col-md-6 mb-3">
+
+                        <label>GitHub</label>
+
+                        <input asp-for="Profile.GitHub"
+                               class="form-control"
+                               placeholder="GitHub URL" />
+
+                    </div>
+
+                    <div class="col-md-6 mb-3">
+
+                        <label>LinkedIn</label>
+
+                        <input asp-for="Profile.Linkedin"
+                               class="form-control"
+                               placeholder="LinkedIn URL" />
+
+                    </div>
+
+                </div>
+
+
+                <div class="text-end">
+
+                    <button type="submit"
+                            class="btn btn-primary">
+
+                        Update Links
+
+                    </button>
+
+                </div>
+
+            </form>
+
+        </div>
+
+    </div>
+
+
+    <!-- ================================================= -->
+    <!-- OBJECTIVE -->
+    <!-- ================================================= -->
+
+    <div class="card mb-4">
+
+        <div class="card-header">
+            <h5 class="mb-0">Career Objective</h5>
+        </div>
+
+        <div class="card-body">
+
+            <form asp-action="UpdateObjective"
+                  asp-controller="Candidate"
+                  method="post">
+
+                @Html.AntiForgeryToken()
+
+                <input type="hidden"
+                       asp-for="Profile.CandidateID" />
+
+                <div class="row">
+
+                    <div class="col-md-9 mb-3">
+
+                        <label>Objective</label>
+
+                        <textarea asp-for="Profile.Objective"
+                                  class="form-control"
+                                  rows="5"></textarea>
+
+                    </div>
+
+
+                    <div class="col-md-3 mb-3">
+
+                        <label>Resume Profile</label>
+
+                        <input asp-for="Profile.Resume_Profile"
+                               type="number"
+                               class="form-control" />
+
+                    </div>
+
+                </div>
+
+
+                <div class="text-end">
+
+                    <button type="submit"
+                            class="btn btn-primary">
+
+                        Update Objective
+
+                    </button>
+
+                </div>
+
+            </form>
+
+        </div>
+
+    </div>
+
+
+    <!-- ================================================= -->
+    <!-- SKILLS -->
+    <!-- ================================================= -->
+
+    <div class="card mb-4">
+
+        <div class="card-header">
+            <h5 class="mb-0">Skills</h5>
+        </div>
+
+        <div class="card-body">
+
+            <form asp-action="UpdateSkills"
+                  asp-controller="Candidate"
+                  method="post">
+
+                @Html.AntiForgeryToken()
+
+                <input type="hidden"
+                       asp-for="Profile.CandidateID" />
+
+                <div class="row">
+
+                    <div class="col-md-6 mb-3">
+
+                        <label>Medical Skill IDs</label>
+
+                        <input asp-for="Profile.sMedicalSkillIDs"
+                               class="form-control"
+                               placeholder="Example: 1,3,6,7" />
+
+                    </div>
+
+                    <div class="col-md-6 mb-3">
+
+                        <label>Medical Skill Star IDs</label>
+
+                        <input asp-for="Profile.sMedicalSkillStarIDs"
+                               class="form-control"
+                               placeholder="Example: 4" />
+
+                    </div>
+
+
+                    <div class="col-md-6 mb-3">
+
+                        <label>Technical Skill IDs</label>
+
+                        <input asp-for="Profile.sTechnicalSkillIDs"
+                               class="form-control"
+                               placeholder="Example: 1,5,7,9" />
+
+                    </div>
+
+                    <div class="col-md-6 mb-3">
+
+                        <label>Technical Skill Star IDs</label>
+
+                        <input asp-for="Profile.sTechnicalSkillStarIDs"
+                               class="form-control"
+                               placeholder="Example: 1" />
+
+                    </div>
+
+
+                    <div class="col-md-6 mb-3">
+
+                        <label>Non Technical Skill IDs</label>
+
+                        <input asp-for="Profile.sNonTechnicalSkillIDs"
+                               class="form-control"
+                               placeholder="Example: 7,9" />
+
+                    </div>
+
+                    <div class="col-md-6 mb-3">
+
+                        <label>Non Technical Skill Star IDs</label>
+
+                        <input asp-for="Profile.sNonTechnicalSkillStarIDs"
+                               class="form-control"
+                               placeholder="Example: 5" />
+
+                    </div>
+
+                </div>
+
+
+                <div class="text-end">
+
+                    <button type="submit"
+                            class="btn btn-primary">
+
+                        Update Skills
+
+                    </button>
+
+                </div>
+
+            </form>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+@section Scripts {
+
+    <script>
+
+        $(document).ready(function () {
+
+            var selectedCountryID = '@Model.Profile.CountryID';
+            var selectedStateID = '@Model.Profile.StateID';
+            var selectedCityID = '@Model.Profile.CityID';
+
+
+            // ============================================
+            // IMPORTANT:
+            // Disabled select values are not submitted.
+            // Enable them before Address form submit.
+            // ============================================
+
+            $('form[action*="UpdateAddress"]').submit(function () {
+
+                $('#StateID').prop('disabled', false);
+                $('#CityID').prop('disabled', false);
+
+            });
+
+
+            // ============================================
+            // LOAD COUNTRIES
+            // ============================================
+
+            function loadCountries() {
+
+                $.ajax({
+
+                    url: '/Location/GetCountries',
+
+                    type: 'GET',
+
+                    success: function (data) {
+
+                        $('#CountryID').empty();
+
+                        $('#CountryID').append(
+                            '<option value="">-- Select Country --</option>'
+                        );
+
+
+                        $.each(data, function (index, item) {
+
+                            $('#CountryID').append(
+
+                                $('<option>', {
+
+                                    value: item.id,
+                                    text: item.name
+
+                                }).attr(
+                                    'data-code',
+                                    item.iso2
+                                )
+
+                            );
+
+                        });
+
+
+                        if (selectedCountryID !== '') {
+
+                            $('#CountryID')
+                                .val(selectedCountryID)
+                                .trigger('change');
+
+                        }
+
+                    },
+
+                    error: function (xhr) {
+
+                        console.log(
+                            "Country Error:",
+                            xhr.responseText
+                        );
+
+                    }
+
+                });
+
+            }
+
+
+            // ============================================
+            // COUNTRY CHANGE
+            // ============================================
+
+            $('#CountryID').change(function () {
+
+                var countryID = $(this).val();
+
+                var countryCode =
+                    $('#CountryID option:selected')
+                        .attr('data-code');
+
+
+                $('#StateID').empty();
+
+                $('#StateID').append(
+                    '<option value="">-- Select State --</option>'
+                );
+
+
+                $('#CityID').empty();
+
+                $('#CityID').append(
+                    '<option value="">-- Select City --</option>'
+                );
+
+                $('#CityID').prop('disabled', true);
+
+
+                if (!countryID || !countryCode) {
+
+                    $('#StateID').prop('disabled', true);
+
+                    return;
+
+                }
+
+
+                $('#StateID').prop('disabled', false);
+
+
+                $.ajax({
+
+                    url: '/Location/GetStates',
+
+                    type: 'GET',
+
+                    data: {
+
+                        countryCode: countryCode
+
+                    },
+
+                    success: function (data) {
+
+                        $('#StateID').empty();
+
+                        $('#StateID').append(
+                            '<option value="">-- Select State --</option>'
+                        );
+
+
+                        $.each(data, function (index, item) {
+
+                            var stateCode = item.stateCode;
+
+                            if (!stateCode && item.id) {
+
+                                var parts =
+                                    item.id.split(':');
+
+                                stateCode =
+                                    parts.length > 1
+                                        ? parts[1]
+                                        : item.id;
+
+                            }
+
+
+                            $('#StateID').append(
+
+                                $('<option>', {
+
+                                    value: item.id,
+                                    text: item.name
+
+                                }).attr(
+                                    'data-code',
+                                    stateCode
+                                )
+
+                            );
+
+                        });
+
+
+                        if (selectedStateID !== '') {
+
+                            $('#StateID')
+                                .val(selectedStateID)
+                                .trigger('change');
+
+                            selectedStateID = '';
+
+                        }
+
+                    },
+
+                    error: function (xhr) {
+
+                        console.log(
+                            "State Error:",
+                            xhr.responseText
+                        );
+
+                    }
+
+                });
+
+            });
+
+
+            // ============================================
+            // STATE CHANGE
+            // ============================================
+
+            $('#StateID').change(function () {
+
+                var stateID = $(this).val();
+
+                var stateCode =
+                    $('#StateID option:selected')
+                        .attr('data-code');
+
+                var countryCode =
+                    $('#CountryID option:selected')
+                        .attr('data-code');
+
+
+                $('#CityID').empty();
+
+                $('#CityID').append(
+                    '<option value="">-- Select City --</option>'
+                );
+
+
+                if (!stateID ||
+                    !stateCode ||
+                    !countryCode) {
+
+                    $('#CityID').prop(
+                        'disabled',
+                        true
+                    );
+
+                    return;
+
+                }
+
+
+                $('#CityID').prop(
+                    'disabled',
+                    false
+                );
+
+
+                $.ajax({
+
+                    url: '/Location/GetCities',
+
+                    type: 'GET',
+
+                    data: {
+
+                        countryCode: countryCode,
+                        stateCode: stateCode
+
+                    },
+
+                    success: function (data) {
+
+                        $('#CityID').empty();
+
+                        $('#CityID').append(
+                            '<option value="">-- Select City --</option>'
+                        );
+
+
+                        $.each(data, function (index, item) {
+
+                            $('#CityID').append(
+
+                                $('<option>', {
+
+                                    value: item.id,
+                                    text: item.name
+
+                                })
+
+                            );
+
+                        });
+
+
+                        if (selectedCityID) {
+
+                            $('#CityID')
+                                .val(selectedCityID);
+
+                            selectedCityID = '';
+
+                        }
+
+                    },
+
+                    error: function (xhr) {
+
+                        console.log(
+                            "City Error:",
+                            xhr.responseText
+                        );
+
+                    }
+
+                });
+
+            });
+
+
+            // ============================================
+            // INITIAL LOAD
+            // ============================================
+
+            loadCountries();
+
+        });
+
+    </script>
+
+}

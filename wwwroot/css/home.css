@@ -1,0 +1,42 @@
+﻿body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background: #f8f9fa;
+}
+
+.home-footer {
+    background: #212529;
+    color: white;
+    padding: 40px 0;
+    margin-top: 50px;
+}
+
+    .home-footer a {
+        color: white;
+        text-decoration: none;
+    }
+
+        .home-footer a:hover {
+            text-decoration: underline;
+        }
+
+.home-hero {
+    min-height: 500px;
+    display: flex;
+    align-items: center;
+    background: linear-gradient(135deg, #0d6efd, #6610f2);
+    color: white;
+}
+
+    .home-hero h1 {
+        font-size: 48px;
+        font-weight: bold;
+    }
+
+.job-card {
+    background: white;
+    padding: 25px;
+    border-radius: 10px;
+    margin-bottom: 20px;
+    box-shadow: 0 3px 15px rgba(0,0,0,0.08);
+}

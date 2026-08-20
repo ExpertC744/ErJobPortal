@@ -1,0 +1,1464 @@
+﻿using ErJobPortal.Data;
+using ErJobPortal.Models;
+using Microsoft.Data.SqlClient;
+using System.Data;
+
+namespace ErJobPortal.Repositories
+{
+    public class CandidateProfileRepository
+    {
+        private readonly DbConnection _db;
+
+        public CandidateProfileRepository(DbConnection db)
+        {
+            _db = db;
+        }
+
+
+        // =========================================================
+        // ENSURE PROFILE EXISTS
+        // =========================================================
+
+        private void EnsureProfileExists(
+            SqlConnection con,
+            int candidateId)
+        {
+            string sql = @"
+IF NOT EXISTS
+(
+    SELECT 1
+    FROM tblCandidateProfile
+    WHERE CandidateID = @CandidateID
+)
+BEGIN
+    INSERT INTO tblCandidateProfile
+    (
+        CandidateID,
+        RegDate,
+        ModDate
+    )
+    VALUES
+    (
+        @CandidateID,
+        GETDATE(),
+        GETDATE()
+    )
+END";
+
+            using SqlCommand cmd =
+                new SqlCommand(sql, con);
+
+            cmd.Parameters.Add(
+                "@CandidateID",
+                SqlDbType.Int
+            ).Value = candidateId;
+
+            cmd.ExecuteNonQuery();
+        }
+
+
+        // =========================================================
+        // GET PROFILE
+        // =========================================================
+
+        public CandidateProfileModel? GetProfile(
+            int candidateId)
+        {
+            using SqlConnection con =
+                _db.GetConnection();
+
+            string sql = @"
+SELECT *
+
+FROM tblCandidateProfile
+
+WHERE CandidateID = @CandidateID";
+
+            using SqlCommand cmd =
+                new SqlCommand(sql, con);
+
+            cmd.Parameters.Add(
+                "@CandidateID",
+                SqlDbType.Int
+            ).Value = candidateId;
+
+            con.Open();
+
+            using SqlDataReader reader =
+                cmd.ExecuteReader();
+
+            if (!reader.Read())
+                return null;
+
+            return new CandidateProfileModel
+            {
+                nID = GetNullableInt(reader, "nID") ?? 0,
+                CandidateID =
+                    GetNullableInt(reader, "CandidateID") ?? 0,
+
+                // ADDRESS
+                CountryID =
+                    GetNullableInt(reader, "CountryID"),
+
+                StateID =
+                    GetNullableInt(reader, "StateID"),
+
+                CityID =
+                    GetNullableInt(reader, "CityID"),
+
+                Pincode =
+                    GetNullableString(reader, "Pincode"),
+
+
+                // EDUCATION
+
+                SSC_YEAR =
+                    GetNullableInt(reader, "SSC_YEAR"),
+
+                SSC_DIVISION =
+                    GetNullableInt(reader, "SSC_DIVISION"),
+
+                HSC_DIPLOMA_YEAR =
+                    GetNullableInt(reader, "HSC_DIPLOMA_YEAR"),
+
+                HSC_DIPLOMA_DIVISION =
+                    GetNullableInt(reader, "HSC_DIPLOMA_DIVISION"),
+
+                Graduation_Year =
+                    GetNullableInt(reader, "Graduation_Year"),
+
+                Graduation_Division =
+                    GetNullableInt(reader, "Graduation_Division"),
+
+                Graduation_Stream =
+                    GetNullableInt(reader, "Graduation_Stream"),
+
+                Other_Stream =
+                    GetNullableString(reader, "Other_Stream"),
+
+                PG_Year =
+                    GetNullableInt(reader, "PG_Year"),
+
+                PG_Division =
+                    GetNullableInt(reader, "PG_Division"),
+
+                PG_Stream =
+                    GetNullableInt(reader, "PG_Stream"),
+
+                Other_Specialization =
+                    GetNullableString(reader, "Other_Specialization"),
+
+                PhD_Year =
+                    GetNullableInt(reader, "PhD_Year"),
+
+                PhD_Status =
+                    GetNullableInt(reader, "PhD_Status"),
+
+                PhD_Topic =
+                    GetNullableString(reader, "PhD_Topic"),
+
+                Previous_PhD_Topic_Year =
+                    GetNullableString(
+                        reader,
+                        "Previous_PhD_Topic_Year"
+                    ),
+
+
+                // INTERNSHIP PREFERENCE
+
+                Internship_FellowshipType =
+                    GetNullableInt(
+                        reader,
+                        "Internship_FellowshipType"
+                    ),
+
+                Preferred_Country =
+                    GetNullableString(
+                        reader,
+                        "Preferred_Country"
+                    ),
+
+                Preferred_State =
+                    GetNullableString(
+                        reader,
+                        "Preferred_State"
+                    ),
+
+                Preferred_City =
+                    GetNullableString(
+                        reader,
+                        "Preferred_City"
+                    ),
+
+
+                // DOCUMENTS
+
+                sResume =
+                    GetNullableString(reader, "sResume"),
+
+                sPhoto =
+                    GetNullableString(reader, "sPhoto"),
+
+                sSignature =
+                    GetNullableString(reader, "sSignature"),
+
+                sDivyang =
+                    GetNullableString(reader, "sDivyang"),
+
+                sHobbies =
+                    GetNullableString(reader, "sHobbies"),
+
+
+                // INTERNSHIP 1
+
+                sOrgName1 =
+                    GetNullableString(reader, "sOrgName1"),
+
+                sOrgIntTitle1 =
+                    GetNullableInt(reader, "sOrgIntTitle1"),
+
+                sOrgIntDuration1 =
+                    GetNullableInt(reader, "sOrgIntDuration1"),
+
+                sOrgIntStatus1 =
+                    GetNullableInt(reader, "sOrgIntStatus1"),
+
+
+                // INTERNSHIP 2
+
+                sOrgName2 =
+                    GetNullableString(reader, "sOrgName2"),
+
+                sOrgIntTitle2 =
+                    GetNullableInt(reader, "sOrgIntTitle2"),
+
+                sOrgIntDuration2 =
+                    GetNullableInt(reader, "sOrgIntDuration2"),
+
+                sOrgIntStatus2 =
+                    GetNullableInt(reader, "sOrgIntStatus2"),
+
+
+                // INTERNSHIP 3
+
+                sOrgName3 =
+                    GetNullableString(reader, "sOrgName3"),
+
+                sOrgIntTitle3 =
+                    GetNullableInt(reader, "sOrgIntTitle3"),
+
+                sOrgIntDuration3 =
+                    GetNullableInt(reader, "sOrgIntDuration3"),
+
+                sOrgIntStatus3 =
+                    GetNullableInt(reader, "sOrgIntStatus3"),
+
+
+                // INTERNSHIP 4
+
+                sOrgName4 =
+                    GetNullableString(reader, "sOrgName4"),
+
+                sOrgIntTitle4 =
+                    GetNullableInt(reader, "sOrgIntTitle4"),
+
+                sOrgIntDuration4 =
+                    GetNullableInt(reader, "sOrgIntDuration4"),
+
+                sOrgIntStatus4 =
+                    GetNullableInt(reader, "sOrgIntStatus4"),
+
+
+                // LANGUAGES
+
+                sLanguage1 =
+                    GetNullableString(reader, "sLanguage1"),
+
+                sLanguage2 =
+                    GetNullableString(reader, "sLanguage2"),
+
+                sLanguage3 =
+                    GetNullableString(reader, "sLanguage3"),
+
+                sLanguage4 =
+                    GetNullableString(reader, "sLanguage4"),
+
+                sLanguage5 =
+                    GetNullableString(reader, "sLanguage5"),
+
+                sLanguage6 =
+                    GetNullableString(reader, "sLanguage6"),
+
+                sLanguage7 =
+                    GetNullableString(reader, "sLanguage7"),
+
+                sLanguage8 =
+                    GetNullableString(reader, "sLanguage8"),
+
+                sLanguageStar1 =
+                    GetNullableInt(reader, "sLanguageStar1"),
+
+                sLanguageStar2 =
+                    GetNullableInt(reader, "sLanguageStar2"),
+
+                sLanguageStar3 =
+                    GetNullableInt(reader, "sLanguageStar3"),
+
+                sLanguageStar4 =
+                    GetNullableInt(reader, "sLanguageStar4"),
+
+                sLanguageStar5 =
+                    GetNullableInt(reader, "sLanguageStar5"),
+
+                sLanguageStar6 =
+                    GetNullableInt(reader, "sLanguageStar6"),
+
+                sLanguageStar7 =
+                    GetNullableInt(reader, "sLanguageStar7"),
+
+                sLanguageStar8 =
+                    GetNullableInt(reader, "sLanguageStar8"),
+
+
+                // REFERENCES
+
+                sRefName1 =
+                    GetNullableString(reader, "sRefName1"),
+
+                sRefName2 =
+                    GetNullableString(reader, "sRefName2"),
+
+                sRefRelationName1 =
+                    GetNullableInt(
+                        reader,
+                        "sRefRelationName1"
+                    ),
+
+                sRefRelationName2 =
+                    GetNullableInt(
+                        reader,
+                        "sRefRelationName2"
+                    ),
+
+                sLocation1 =
+                    GetNullableString(reader, "sLocation1"),
+
+                sLocation2 =
+                    GetNullableString(reader, "sLocation2"),
+
+                sMobile1 =
+                    GetNullableString(reader, "sMobile1"),
+
+                sMobile2 =
+                    GetNullableString(reader, "sMobile2"),
+
+
+                // ACHIEVEMENTS
+
+                Achievements_Certification1 =
+                    GetNullableString(
+                        reader,
+                        "Achievements_Certification1"
+                    ),
+
+                Achievements_Certification2 =
+                    GetNullableString(
+                        reader,
+                        "Achievements_Certification2"
+                    ),
+
+                Achievements_Certification3 =
+                    GetNullableString(
+                        reader,
+                        "Achievements_Certification3"
+                    ),
+
+
+                // LINKS
+
+                GitHub =
+                    GetNullableString(reader, "GitHub"),
+
+                Linkedin =
+                    GetNullableString(reader, "Linkedin"),
+
+
+                // OBJECTIVE
+
+                Objective =
+                    GetNullableString(reader, "Objective"),
+
+                Resume_Profile =
+                    GetNullableInt(reader, "Resume_Profile"),
+
+
+                // SKILLS
+
+                sMedicalSkillIDs =
+                    GetNullableString(
+                        reader,
+                        "sMedicalSkillIDs"
+                    ),
+
+                sMedicalSkillStarIDs =
+                    GetNullableString(
+                        reader,
+                        "sMedicalSkillStarIDs"
+                    ),
+
+                sTechnicalSkillIDs =
+                    GetNullableString(
+                        reader,
+                        "sTechnicalSkillIDs"
+                    ),
+
+                sTechnicalSkillStarIDs =
+                    GetNullableString(
+                        reader,
+                        "sTechnicalSkillStarIDs"
+                    ),
+
+                sNonTechnicalSkillIDs =
+                    GetNullableString(
+                        reader,
+                        "sNonTechnicalSkillIDs"
+                    ),
+
+                sNonTechnicalSkillStarIDs =
+                    GetNullableString(
+                        reader,
+                        "sNonTechnicalSkillStarIDs"
+                    )
+            };
+        }
+
+
+        // =========================================================
+        // UPDATE ADDRESS
+        // =========================================================
+
+        public void UpdateAddress(
+            CandidateProfileModel model)
+        {
+            using SqlConnection con =
+                _db.GetConnection();
+
+            con.Open();
+
+            EnsureProfileExists(
+                con,
+                model.CandidateID
+            );
+
+            string sql = @"
+UPDATE tblCandidateProfile
+SET
+    CountryID = @CountryID,
+    StateID = @StateID,
+    CityID = @CityID,
+    Pincode = @Pincode,
+    ModDate = GETDATE()
+
+WHERE CandidateID = @CandidateID";
+
+            using SqlCommand cmd =
+                new SqlCommand(sql, con);
+
+            cmd.Parameters.Add(
+                "@CandidateID",
+                SqlDbType.Int
+            ).Value = model.CandidateID;
+
+            cmd.Parameters.Add(
+                "@CountryID",
+                SqlDbType.Int
+            ).Value =
+                (object?)model.CountryID ?? DBNull.Value;
+
+            cmd.Parameters.Add(
+                "@StateID",
+                SqlDbType.Int
+            ).Value =
+                (object?)model.StateID ?? DBNull.Value;
+
+            cmd.Parameters.Add(
+                "@CityID",
+                SqlDbType.Int
+            ).Value =
+                (object?)model.CityID ?? DBNull.Value;
+
+            cmd.Parameters.Add(
+                "@Pincode",
+                SqlDbType.NVarChar,
+                20
+            ).Value =
+                (object?)model.Pincode ?? DBNull.Value;
+
+            cmd.ExecuteNonQuery();
+        }
+
+
+        // =========================================================
+        // UPDATE EDUCATION
+        // =========================================================
+
+        public void UpdateEducation(
+            CandidateProfileModel model)
+        {
+            using SqlConnection con =
+                _db.GetConnection();
+
+            con.Open();
+
+            EnsureProfileExists(
+                con,
+                model.CandidateID
+            );
+
+            string sql = @"
+UPDATE tblCandidateProfile
+SET
+
+    SSC_YEAR = @SSC_YEAR,
+    SSC_DIVISION = @SSC_DIVISION,
+
+    HSC_DIPLOMA_YEAR = @HSC_DIPLOMA_YEAR,
+    HSC_DIPLOMA_DIVISION = @HSC_DIPLOMA_DIVISION,
+
+    Graduation_Year = @Graduation_Year,
+    Graduation_Division = @Graduation_Division,
+    Graduation_Stream = @Graduation_Stream,
+    Other_Stream = @Other_Stream,
+
+    PG_Year = @PG_Year,
+    PG_Division = @PG_Division,
+    PG_Stream = @PG_Stream,
+    Other_Specialization = @Other_Specialization,
+
+    PhD_Year = @PhD_Year,
+    PhD_Status = @PhD_Status,
+    PhD_Topic = @PhD_Topic,
+    Previous_PhD_Topic_Year = @Previous_PhD_Topic_Year,
+
+    ModDate = GETDATE()
+
+WHERE CandidateID = @CandidateID";
+
+            using SqlCommand cmd =
+                new SqlCommand(sql, con);
+
+            cmd.Parameters.Add("@CandidateID", SqlDbType.Int)
+                .Value = model.CandidateID;
+
+            AddNullableInt(
+                cmd,
+                "@SSC_YEAR",
+                model.SSC_YEAR
+            );
+
+            AddNullableInt(
+                cmd,
+                "@SSC_DIVISION",
+                model.SSC_DIVISION
+            );
+
+            AddNullableInt(
+                cmd,
+                "@HSC_DIPLOMA_YEAR",
+                model.HSC_DIPLOMA_YEAR
+            );
+
+            AddNullableInt(
+                cmd,
+                "@HSC_DIPLOMA_DIVISION",
+                model.HSC_DIPLOMA_DIVISION
+            );
+
+            AddNullableInt(
+                cmd,
+                "@Graduation_Year",
+                model.Graduation_Year
+            );
+
+            AddNullableInt(
+                cmd,
+                "@Graduation_Division",
+                model.Graduation_Division
+            );
+
+            AddNullableInt(
+                cmd,
+                "@Graduation_Stream",
+                model.Graduation_Stream
+            );
+
+            AddNullableString(
+                cmd,
+                "@Other_Stream",
+                model.Other_Stream,
+                100
+            );
+
+            AddNullableInt(
+                cmd,
+                "@PG_Year",
+                model.PG_Year
+            );
+
+            AddNullableInt(
+                cmd,
+                "@PG_Division",
+                model.PG_Division
+            );
+
+            AddNullableInt(
+                cmd,
+                "@PG_Stream",
+                model.PG_Stream
+            );
+
+            AddNullableString(
+                cmd,
+                "@Other_Specialization",
+                model.Other_Specialization,
+                100
+            );
+
+            AddNullableInt(
+                cmd,
+                "@PhD_Year",
+                model.PhD_Year
+            );
+
+            AddNullableInt(
+                cmd,
+                "@PhD_Status",
+                model.PhD_Status
+            );
+
+            AddNullableString(
+                cmd,
+                "@PhD_Topic",
+                model.PhD_Topic,
+                200
+            );
+
+            AddNullableString(
+                cmd,
+                "@Previous_PhD_Topic_Year",
+                model.Previous_PhD_Topic_Year,
+                200
+            );
+
+            cmd.ExecuteNonQuery();
+        }
+
+
+        // =========================================================
+        // UPDATE INTERNSHIP PREFERENCE
+        // =========================================================
+
+        public void UpdateInternshipPreference(
+            CandidateProfileModel model)
+        {
+            using SqlConnection con =
+                _db.GetConnection();
+
+            con.Open();
+
+            EnsureProfileExists(
+                con,
+                model.CandidateID
+            );
+
+            string sql = @"
+UPDATE tblCandidateProfile
+SET
+
+    Internship_FellowshipType =
+        @Internship_FellowshipType,
+
+    Preferred_Country =
+        @Preferred_Country,
+
+    Preferred_State =
+        @Preferred_State,
+
+    Preferred_City =
+        @Preferred_City,
+
+    ModDate = GETDATE()
+
+WHERE CandidateID = @CandidateID";
+
+            using SqlCommand cmd =
+                new SqlCommand(sql, con);
+
+            cmd.Parameters.Add("@CandidateID", SqlDbType.Int)
+                .Value = model.CandidateID;
+
+            AddNullableInt(
+                cmd,
+                "@Internship_FellowshipType",
+                model.Internship_FellowshipType
+            );
+
+            AddNullableString(
+                cmd,
+                "@Preferred_Country",
+                model.Preferred_Country,
+                100
+            );
+
+            AddNullableString(
+                cmd,
+                "@Preferred_State",
+                model.Preferred_State,
+                100
+            );
+
+            AddNullableString(
+                cmd,
+                "@Preferred_City",
+                model.Preferred_City,
+                100
+            );
+
+            cmd.ExecuteNonQuery();
+        }
+
+
+        // =========================================================
+        // UPDATE INTERNSHIP DETAILS
+        // =========================================================
+
+        public void UpdateInternshipDetails(
+            CandidateProfileModel model)
+        {
+            using SqlConnection con =
+                _db.GetConnection();
+
+            con.Open();
+
+            EnsureProfileExists(
+                con,
+                model.CandidateID
+            );
+
+            string sql = @"
+UPDATE tblCandidateProfile
+SET
+
+    sOrgName1 = @sOrgName1,
+    sOrgIntTitle1 = @sOrgIntTitle1,
+    sOrgIntDuration1 = @sOrgIntDuration1,
+    sOrgIntStatus1 = @sOrgIntStatus1,
+
+    sOrgName2 = @sOrgName2,
+    sOrgIntTitle2 = @sOrgIntTitle2,
+    sOrgIntDuration2 = @sOrgIntDuration2,
+    sOrgIntStatus2 = @sOrgIntStatus2,
+
+    sOrgName3 = @sOrgName3,
+    sOrgIntTitle3 = @sOrgIntTitle3,
+    sOrgIntDuration3 = @sOrgIntDuration3,
+    sOrgIntStatus3 = @sOrgIntStatus3,
+
+    sOrgName4 = @sOrgName4,
+    sOrgIntTitle4 = @sOrgIntTitle4,
+    sOrgIntDuration4 = @sOrgIntDuration4,
+    sOrgIntStatus4 = @sOrgIntStatus4,
+
+    ModDate = GETDATE()
+
+WHERE CandidateID = @CandidateID";
+
+            using SqlCommand cmd =
+                new SqlCommand(sql, con);
+
+            cmd.Parameters.Add("@CandidateID", SqlDbType.Int)
+                .Value = model.CandidateID;
+
+            AddNullableString(cmd, "@sOrgName1", model.sOrgName1, 300);
+            AddNullableInt(cmd, "@sOrgIntTitle1", model.sOrgIntTitle1);
+            AddNullableInt(cmd, "@sOrgIntDuration1", model.sOrgIntDuration1);
+            AddNullableInt(cmd, "@sOrgIntStatus1", model.sOrgIntStatus1);
+
+            AddNullableString(cmd, "@sOrgName2", model.sOrgName2, 300);
+            AddNullableInt(cmd, "@sOrgIntTitle2", model.sOrgIntTitle2);
+            AddNullableInt(cmd, "@sOrgIntDuration2", model.sOrgIntDuration2);
+            AddNullableInt(cmd, "@sOrgIntStatus2", model.sOrgIntStatus2);
+
+            AddNullableString(cmd, "@sOrgName3", model.sOrgName3, 300);
+            AddNullableInt(cmd, "@sOrgIntTitle3", model.sOrgIntTitle3);
+            AddNullableInt(cmd, "@sOrgIntDuration3", model.sOrgIntDuration3);
+            AddNullableInt(cmd, "@sOrgIntStatus3", model.sOrgIntStatus3);
+
+            AddNullableString(cmd, "@sOrgName4", model.sOrgName4, 300);
+            AddNullableInt(cmd, "@sOrgIntTitle4", model.sOrgIntTitle4);
+            AddNullableInt(cmd, "@sOrgIntDuration4", model.sOrgIntDuration4);
+            AddNullableInt(cmd, "@sOrgIntStatus4", model.sOrgIntStatus4);
+
+            cmd.ExecuteNonQuery();
+        }
+
+
+        // =========================================================
+        // UPDATE LANGUAGES
+        // =========================================================
+
+        public void UpdateLanguages(
+            CandidateProfileModel model)
+        {
+            using SqlConnection con =
+                _db.GetConnection();
+
+            con.Open();
+
+            EnsureProfileExists(con, model.CandidateID);
+
+            string sql = @"
+UPDATE tblCandidateProfile
+SET
+
+    sLanguage1 = @sLanguage1,
+    sLanguage2 = @sLanguage2,
+    sLanguage3 = @sLanguage3,
+    sLanguage4 = @sLanguage4,
+    sLanguage5 = @sLanguage5,
+    sLanguage6 = @sLanguage6,
+    sLanguage7 = @sLanguage7,
+    sLanguage8 = @sLanguage8,
+
+    sLanguageStar1 = @sLanguageStar1,
+    sLanguageStar2 = @sLanguageStar2,
+    sLanguageStar3 = @sLanguageStar3,
+    sLanguageStar4 = @sLanguageStar4,
+    sLanguageStar5 = @sLanguageStar5,
+    sLanguageStar6 = @sLanguageStar6,
+    sLanguageStar7 = @sLanguageStar7,
+    sLanguageStar8 = @sLanguageStar8,
+
+    ModDate = GETDATE()
+
+WHERE CandidateID = @CandidateID";
+
+            using SqlCommand cmd =
+                new SqlCommand(sql, con);
+
+            cmd.Parameters.Add("@CandidateID", SqlDbType.Int)
+                .Value = model.CandidateID;
+
+            AddNullableString(cmd, "@sLanguage1", model.sLanguage1, 100);
+            AddNullableString(cmd, "@sLanguage2", model.sLanguage2, 100);
+            AddNullableString(cmd, "@sLanguage3", model.sLanguage3, 100);
+            AddNullableString(cmd, "@sLanguage4", model.sLanguage4, 100);
+            AddNullableString(cmd, "@sLanguage5", model.sLanguage5, 100);
+            AddNullableString(cmd, "@sLanguage6", model.sLanguage6, 100);
+            AddNullableString(cmd, "@sLanguage7", model.sLanguage7, 100);
+            AddNullableString(cmd, "@sLanguage8", model.sLanguage8, 100);
+
+            AddNullableInt(cmd, "@sLanguageStar1", model.sLanguageStar1);
+            AddNullableInt(cmd, "@sLanguageStar2", model.sLanguageStar2);
+            AddNullableInt(cmd, "@sLanguageStar3", model.sLanguageStar3);
+            AddNullableInt(cmd, "@sLanguageStar4", model.sLanguageStar4);
+            AddNullableInt(cmd, "@sLanguageStar5", model.sLanguageStar5);
+            AddNullableInt(cmd, "@sLanguageStar6", model.sLanguageStar6);
+            AddNullableInt(cmd, "@sLanguageStar7", model.sLanguageStar7);
+            AddNullableInt(cmd, "@sLanguageStar8", model.sLanguageStar8);
+
+            cmd.ExecuteNonQuery();
+        }
+
+
+        // =========================================================
+        // UPDATE REFERENCES
+        // =========================================================
+
+        public void UpdateReferences(
+            CandidateProfileModel model)
+        {
+            using SqlConnection con =
+                _db.GetConnection();
+
+            con.Open();
+
+            EnsureProfileExists(con, model.CandidateID);
+
+            string sql = @"
+UPDATE tblCandidateProfile
+SET
+
+    sRefName1 = @sRefName1,
+    sRefName2 = @sRefName2,
+
+    sRefRelationName1 = @sRefRelationName1,
+    sRefRelationName2 = @sRefRelationName2,
+
+    sLocation1 = @sLocation1,
+    sLocation2 = @sLocation2,
+
+    sMobile1 = @sMobile1,
+    sMobile2 = @sMobile2,
+
+    ModDate = GETDATE()
+
+WHERE CandidateID = @CandidateID";
+
+            using SqlCommand cmd =
+                new SqlCommand(sql, con);
+
+            cmd.Parameters.Add("@CandidateID", SqlDbType.Int)
+                .Value = model.CandidateID;
+
+            AddNullableString(cmd, "@sRefName1", model.sRefName1, 200);
+            AddNullableString(cmd, "@sRefName2", model.sRefName2, 200);
+
+            AddNullableInt(cmd,
+                "@sRefRelationName1",
+                model.sRefRelationName1);
+
+            AddNullableInt(cmd,
+                "@sRefRelationName2",
+                model.sRefRelationName2);
+
+            AddNullableString(cmd,
+                "@sLocation1",
+                model.sLocation1,
+                300);
+
+            AddNullableString(cmd,
+                "@sLocation2",
+                model.sLocation2,
+                300);
+
+            AddNullableString(cmd,
+                "@sMobile1",
+                model.sMobile1,
+                20);
+
+            AddNullableString(cmd,
+                "@sMobile2",
+                model.sMobile2,
+                20);
+
+            cmd.ExecuteNonQuery();
+        }
+
+
+        // =========================================================
+        // UPDATE ACHIEVEMENTS
+        // =========================================================
+
+        public void UpdateAchievements(
+            CandidateProfileModel model)
+        {
+            using SqlConnection con =
+                _db.GetConnection();
+
+            con.Open();
+
+            EnsureProfileExists(con, model.CandidateID);
+
+            string sql = @"
+UPDATE tblCandidateProfile
+SET
+
+    Achievements_Certification1 =
+        @Achievements_Certification1,
+
+    Achievements_Certification2 =
+        @Achievements_Certification2,
+
+    Achievements_Certification3 =
+        @Achievements_Certification3,
+
+    ModDate = GETDATE()
+
+WHERE CandidateID = @CandidateID";
+
+            using SqlCommand cmd =
+                new SqlCommand(sql, con);
+
+            cmd.Parameters.Add("@CandidateID", SqlDbType.Int)
+                .Value = model.CandidateID;
+
+            AddNullableString(
+                cmd,
+                "@Achievements_Certification1",
+                model.Achievements_Certification1,
+                500
+            );
+
+            AddNullableString(
+                cmd,
+                "@Achievements_Certification2",
+                model.Achievements_Certification2,
+                500
+            );
+
+            AddNullableString(
+                cmd,
+                "@Achievements_Certification3",
+                model.Achievements_Certification3,
+                500
+            );
+
+            cmd.ExecuteNonQuery();
+        }
+
+
+        // =========================================================
+        // UPDATE LINKS
+        // =========================================================
+
+        public void UpdateLinks(
+            CandidateProfileModel model)
+        {
+            using SqlConnection con =
+                _db.GetConnection();
+
+            con.Open();
+
+            EnsureProfileExists(con, model.CandidateID);
+
+            string sql = @"
+UPDATE tblCandidateProfile
+SET
+
+    GitHub = @GitHub,
+    Linkedin = @Linkedin,
+
+    ModDate = GETDATE()
+
+WHERE CandidateID = @CandidateID";
+
+            using SqlCommand cmd =
+                new SqlCommand(sql, con);
+
+            cmd.Parameters.Add("@CandidateID", SqlDbType.Int)
+                .Value = model.CandidateID;
+
+            AddNullableString(
+                cmd,
+                "@GitHub",
+                model.GitHub,
+                500
+            );
+
+            AddNullableString(
+                cmd,
+                "@Linkedin",
+                model.Linkedin,
+                500
+            );
+
+            cmd.ExecuteNonQuery();
+        }
+
+
+        // =========================================================
+        // UPDATE OBJECTIVE
+        // =========================================================
+
+        public void UpdateObjective(
+            CandidateProfileModel model)
+        {
+            using SqlConnection con =
+                _db.GetConnection();
+
+            con.Open();
+
+            EnsureProfileExists(con, model.CandidateID);
+
+            string sql = @"
+UPDATE tblCandidateProfile
+SET
+
+    Objective = @Objective,
+    Resume_Profile = @Resume_Profile,
+
+    ModDate = GETDATE()
+
+WHERE CandidateID = @CandidateID";
+
+            using SqlCommand cmd =
+                new SqlCommand(sql, con);
+
+            cmd.Parameters.Add("@CandidateID", SqlDbType.Int)
+                .Value = model.CandidateID;
+
+            AddNullableString(
+                cmd,
+                "@Objective",
+                model.Objective,
+                400
+            );
+
+            AddNullableInt(
+                cmd,
+                "@Resume_Profile",
+                model.Resume_Profile
+            );
+
+            cmd.ExecuteNonQuery();
+        }
+
+
+        // =========================================================
+        // UPDATE SKILLS
+        // =========================================================
+
+        public void UpdateSkills(
+            CandidateProfileModel model)
+        {
+            using SqlConnection con =
+                _db.GetConnection();
+
+            con.Open();
+
+            EnsureProfileExists(con, model.CandidateID);
+
+            string sql = @"
+UPDATE tblCandidateProfile
+SET
+
+    sMedicalSkillIDs =
+        @sMedicalSkillIDs,
+
+    sMedicalSkillStarIDs =
+        @sMedicalSkillStarIDs,
+
+    sTechnicalSkillIDs =
+        @sTechnicalSkillIDs,
+
+    sTechnicalSkillStarIDs =
+        @sTechnicalSkillStarIDs,
+
+    sNonTechnicalSkillIDs =
+        @sNonTechnicalSkillIDs,
+
+    sNonTechnicalSkillStarIDs =
+        @sNonTechnicalSkillStarIDs,
+
+    ModDate = GETDATE()
+
+WHERE CandidateID = @CandidateID";
+
+            using SqlCommand cmd =
+                new SqlCommand(sql, con);
+
+            cmd.Parameters.Add("@CandidateID", SqlDbType.Int)
+                .Value = model.CandidateID;
+
+            AddNullableString(
+                cmd,
+                "@sMedicalSkillIDs",
+                model.sMedicalSkillIDs,
+                500
+            );
+
+            AddNullableString(
+                cmd,
+                "@sMedicalSkillStarIDs",
+                model.sMedicalSkillStarIDs,
+                100
+            );
+
+            AddNullableString(
+                cmd,
+                "@sTechnicalSkillIDs",
+                model.sTechnicalSkillIDs,
+                500
+            );
+
+            AddNullableString(
+                cmd,
+                "@sTechnicalSkillStarIDs",
+                model.sTechnicalSkillStarIDs,
+                100
+            );
+
+            AddNullableString(
+                cmd,
+                "@sNonTechnicalSkillIDs",
+                model.sNonTechnicalSkillIDs,
+                500
+            );
+
+            AddNullableString(
+                cmd,
+                "@sNonTechnicalSkillStarIDs",
+                model.sNonTechnicalSkillStarIDs,
+                100
+            );
+
+            cmd.ExecuteNonQuery();
+        }
+
+
+        // =========================================================
+        // UPDATE DOCUMENTS
+        // =========================================================
+
+        public void UpdateDocuments(
+            CandidateProfileModel model)
+        {
+            using SqlConnection con =
+                _db.GetConnection();
+
+            con.Open();
+
+            EnsureProfileExists(con, model.CandidateID);
+
+            string sql = @"
+UPDATE tblCandidateProfile
+SET
+
+    sResume = @sResume,
+    sPhoto = @sPhoto,
+    sSignature = @sSignature,
+    sDivyang = @sDivyang,
+    sHobbies = @sHobbies,
+
+    ModDate = GETDATE()
+
+WHERE CandidateID = @CandidateID";
+
+            using SqlCommand cmd =
+                new SqlCommand(sql, con);
+
+            cmd.Parameters.Add("@CandidateID", SqlDbType.Int)
+                .Value = model.CandidateID;
+
+            AddNullableString(
+                cmd,
+                "@sResume",
+                model.sResume,
+                300
+            );
+
+            AddNullableString(
+                cmd,
+                "@sPhoto",
+                model.sPhoto,
+                300
+            );
+
+            AddNullableString(
+                cmd,
+                "@sSignature",
+                model.sSignature,
+                300
+            );
+
+            AddNullableString(
+                cmd,
+                "@sDivyang",
+                model.sDivyang,
+                20
+            );
+
+            AddNullableString(
+                cmd,
+                "@sHobbies",
+                model.sHobbies,
+                300
+            );
+
+            cmd.ExecuteNonQuery();
+        }
+
+
+        // =========================================================
+        // GET DIVISIONS
+        // =========================================================
+
+        public List<DropdownModel> GetDivisions()
+        {
+            return GetDropdownData(
+                "SELECT nID AS ID, sName AS Name FROM tblDivision ORDER BY nID"
+            );
+        }
+
+
+        // =========================================================
+        // GET STREAMS
+        // =========================================================
+
+        public List<DropdownModel> GetStreams()
+        {
+            return GetDropdownData(
+                "SELECT nID AS ID, sName AS Name FROM tblStream ORDER BY nID"
+            );
+        }
+
+
+        // =========================================================
+        // GET GRADUATION STATUS
+        // =========================================================
+
+        public List<DropdownModel> GetGraduationStatuses()
+        {
+            return GetDropdownData(
+                "SELECT nID AS ID, sName AS Name FROM tblGraduationstatus ORDER BY nID"
+            );
+        }
+
+
+        // =========================================================
+        // GET INTERNSHIP FELLOWSHIP TYPE
+        // =========================================================
+
+        public List<DropdownModel> GetInternshipFellowshipType()
+        {
+            return GetDropdownData(
+                "SELECT nID AS ID, sName AS Name FROM tblInternshipFellowshipType ORDER BY nID"
+            );
+        }
+
+
+        // =========================================================
+        // GET INTERNSHIP TITLES
+        // =========================================================
+
+        public List<DropdownModel> GetInternshipTitles()
+        {
+            return GetDropdownData(
+                "SELECT nID AS ID, sName AS Name FROM tblInternshipTitle ORDER BY nID"
+            );
+        }
+
+
+        // =========================================================
+        // GET INTERNSHIP DURATIONS
+        // =========================================================
+
+        public List<DropdownModel> GetInternshipDurations()
+        {
+            return GetDropdownData(
+                "SELECT nID AS ID, sName AS Name FROM tblInternshipsDoneDuration ORDER BY nID"
+            );
+        }
+
+
+        // =========================================================
+        // GET INTERNSHIP STATUS
+        // =========================================================
+
+        public List<DropdownModel> GetInternshipStatuses()
+        {
+            return GetDropdownData(
+                "SELECT nID AS ID, sName AS Name FROM tblInternshipStatus ORDER BY nID"
+            );
+        }
+
+
+        // =========================================================
+        // GET RELATIONSHIPS
+        // =========================================================
+
+        public List<DropdownModel> GetRelationships()
+        {
+            return GetDropdownData(
+                "SELECT nID AS ID, sName AS Name FROM tblRelationship ORDER BY nID"
+            );
+        }
+
+
+        // =========================================================
+        // COMMON DROPDOWN METHOD
+        // =========================================================
+
+        private List<DropdownModel> GetDropdownData(
+            string sql)
+        {
+            List<DropdownModel> list = new();
+
+            using SqlConnection con =
+                _db.GetConnection();
+
+            using SqlCommand cmd =
+                new SqlCommand(sql, con);
+
+            con.Open();
+
+            using SqlDataReader reader =
+                cmd.ExecuteReader();
+
+            while (reader.Read())
+            {
+                list.Add(new DropdownModel
+                {
+                    ID =
+                        Convert.ToInt32(reader["ID"]),
+
+                    Name =
+                        reader["Name"]?.ToString() ?? ""
+                });
+            }
+
+            return list;
+        }
+
+
+        // =========================================================
+        // PARAMETER HELPERS
+        // =========================================================
+
+        private void AddNullableInt(
+            SqlCommand cmd,
+            string parameterName,
+            int? value)
+        {
+            cmd.Parameters.Add(
+                parameterName,
+                SqlDbType.Int
+            ).Value =
+                (object?)value ?? DBNull.Value;
+        }
+
+
+        private void AddNullableString(
+            SqlCommand cmd,
+            string parameterName,
+            string? value,
+            int size)
+        {
+            cmd.Parameters.Add(
+                parameterName,
+                SqlDbType.NVarChar,
+                size
+            ).Value =
+                (object?)value ?? DBNull.Value;
+        }
+
+
+        // =========================================================
+        // DATA READER HELPERS
+        // =========================================================
+
+        private int? GetNullableInt(
+            SqlDataReader reader,
+            string column)
+        {
+            if (reader[column] == DBNull.Value)
+                return null;
+
+            return Convert.ToInt32(
+                reader[column]
+            );
+        }
+
+
+        private string? GetNullableString(
+            SqlDataReader reader,
+            string column)
+        {
+            if (reader[column] == DBNull.Value)
+                return null;
+
+            return reader[column]?.ToString();
+        }
+    }
+}

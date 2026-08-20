@@ -1,0 +1,244 @@
+﻿/* ============================================
+   MASTER TABLE
+   ============================================ */
+
+.master-table-container {
+    background: #ffffff;
+    padding: 25px;
+    border-radius: 20px;
+    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.08);
+}
+
+
+/* ============================================
+   TABLE TITLE
+   ============================================ */
+
+.master-table-title {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+    .master-table-title h2 {
+        color: #252b48;
+        font-size: 28px;
+        font-weight: 600;
+        margin-bottom: 5px;
+    }
+
+    .master-table-title p {
+        color: #777;
+        margin-bottom: 0;
+    }
+
+
+/* ============================================
+   DATATABLE
+   ============================================ */
+
+table.master-data-table {
+    width: 100% !important;
+    border-collapse: separate !important;
+    border-spacing: 0 8px !important;
+}
+
+
+    /* ============================================
+   TABLE HEADER
+   ============================================ */
+
+    table.master-data-table thead th {
+        background: #5b5ce2 !important;
+        color: white !important;
+        padding: 15px !important;
+        font-size: 14px;
+        font-weight: 600;
+        border: none !important;
+        white-space: nowrap;
+    }
+
+        table.master-data-table thead th:first-child {
+            border-radius: 10px 0 0 10px;
+        }
+
+        table.master-data-table thead th:last-child {
+            border-radius: 0 10px 10px 0;
+        }
+
+
+    /* ============================================
+   TABLE BODY
+   ============================================ */
+
+    table.master-data-table tbody tr {
+        background: #f8f9ff;
+        transition: all 0.3s ease;
+    }
+
+        table.master-data-table tbody tr:hover {
+            background: #ececff;
+            transform: scale(1.005);
+            box-shadow: 0 5px 15px rgba(91, 92, 226, 0.12);
+        }
+
+    table.master-data-table tbody td {
+        padding: 14px !important;
+        border: none !important;
+        color: #444;
+        vertical-align: middle;
+    }
+
+
+/* ============================================
+   ID
+   ============================================ */
+
+.master-id {
+    font-weight: bold;
+    color: #5b5ce2;
+}
+
+
+/* ============================================
+   SEARCH
+   ============================================ */
+
+.master-table-container .dt-search {
+    margin-bottom: 10px;
+}
+
+    .master-table-container .dt-search label {
+        font-weight: 500;
+        color: #444;
+    }
+
+    .master-table-container .dt-search input {
+        border: 1px solid #ddd !important;
+        border-radius: 10px !important;
+        padding: 9px 15px !important;
+        outline: none !important;
+        margin-left: 8px !important;
+    }
+
+        .master-table-container .dt-search input:focus {
+            border-color: #5b5ce2 !important;
+            box-shadow: 0 0 0 3px rgba(91, 92, 226, 0.10) !important;
+        }
+
+
+/* ============================================
+   SHOW ENTRIES
+   ============================================ */
+
+.master-table-container .dt-length {
+    margin-bottom: 10px;
+}
+
+    .master-table-container .dt-length select {
+        border: 1px solid #ddd !important;
+        border-radius: 8px !important;
+        padding: 7px 30px 7px 10px !important;
+        outline: none;
+    }
+
+        .master-table-container .dt-length select:focus {
+            border-color: #5b5ce2 !important;
+        }
+
+
+/* ============================================
+   PAGINATION
+   ============================================ */
+
+.master-table-container .dt-paging-button {
+    border-radius: 8px !important;
+    margin: 2px !important;
+}
+
+    .master-table-container .dt-paging-button.current {
+        background: #5b5ce2 !important;
+        color: white !important;
+        border: none !important;
+    }
+
+    .master-table-container .dt-paging-button:hover {
+        background: #ececff !important;
+        color: #5b5ce2 !important;
+        border: none !important;
+    }
+
+
+/* ============================================
+   PAGE INFORMATION
+   ============================================ */
+
+.master-page-info {
+    color: #555;
+    font-size: 14px;
+    font-weight: 500;
+    margin-top: 10px;
+}
+
+
+/* ============================================
+   VIEW BUTTON
+   ============================================ */
+
+.master-view-btn {
+    background: #5b5ce2;
+    color: white;
+    border: none;
+    padding: 7px 15px;
+    border-radius: 7px;
+    font-size: 13px;
+    transition: 0.3s;
+    cursor: pointer;
+}
+
+    .master-view-btn:hover {
+        background: #4546c4;
+        color: white;
+    }
+
+
+/* ============================================
+   LINK
+   ============================================ */
+
+.master-link {
+    color: #5b5ce2;
+    font-weight: 600;
+    text-decoration: none;
+}
+
+    .master-link:hover {
+        color: #4546c4;
+        text-decoration: underline;
+    }
+
+
+/* ============================================
+   MOBILE
+   ============================================ */
+
+@media (max-width: 768px) {
+
+    .master-table-container {
+        padding: 15px;
+        border-radius: 15px;
+    }
+
+    .master-table-title h2 {
+        font-size: 22px;
+    }
+
+    table.master-data-table thead th {
+        padding: 12px !important;
+    }
+
+    table.master-data-table tbody td {
+        padding: 12px !important;
+    }
+}

@@ -1,0 +1,500 @@
+﻿@model ErJobPortal.Models.CandidateRegister
+
+@{
+    ViewData["Title"] = "Candidate Registration";
+}
+
+<link rel="stylesheet" href="~/css/CandidateRegister.css" />
+
+<div class="candidate-register-page">
+
+    <div class="candidate-register-card">
+
+        <!-- =========================================
+             REGISTRATION SWITCH
+        ========================================== -->
+
+        <div class="registration-switch">
+
+            <a asp-controller="Account"
+               asp-action="Register"
+               class="switch-btn active">
+                Trainee
+            </a>
+
+            <a asp-controller="Account"
+               asp-action="OrganizationRegister"
+               class="switch-btn">
+                Organization
+            </a>
+
+        </div>
+
+
+        <!-- =========================================
+             HEADER
+        ========================================== -->
+
+        <div class="register-icon">
+            👤
+        </div>
+
+        <div class="register-heading">
+
+            <h2>Create Account</h2>
+
+            <p>
+                Register as a student and start your journey
+            </p>
+
+        </div>
+
+
+        <!-- =========================================
+             FORM
+        ========================================== -->
+
+        <form asp-controller="Account"
+              asp-action="Register"
+              method="post"
+              enctype="multipart/form-data">
+
+            @Html.AntiForgeryToken()
+
+
+            <!-- VALIDATION -->
+
+            <div asp-validation-summary="All"
+                 class="text-danger register-summary">
+            </div>
+
+
+            <!-- =====================================
+                 FIRST NAME + LAST NAME
+            ====================================== -->
+
+            <div class="register-form-row">
+
+                <div class="register-form-group">
+
+                    <label class="register-label">
+                        First Name
+                    </label>
+
+                    <input asp-for="sFName"
+                           type="text"
+                           class="register-input"
+                           placeholder="Enter first name" />
+
+                    <span asp-validation-for="sFName"
+                          class="text-danger register-validation">
+                    </span>
+
+                </div>
+
+
+                <div class="register-form-group">
+
+                    <label class="register-label">
+                        Last Name
+                    </label>
+
+                    <input asp-for="sLName"
+                           type="text"
+                           class="register-input"
+                           placeholder="Enter last name" />
+
+                    <span asp-validation-for="sLName"
+                          class="text-danger register-validation">
+                    </span>
+
+                </div>
+
+            </div>
+
+
+            <!-- =====================================
+                 GENDER + DOB
+            ====================================== -->
+
+            <div class="register-form-row">
+
+                <div class="register-form-group">
+
+                    <label class="register-label">
+                        Gender
+                    </label>
+
+                    <select asp-for="nGender"
+                            class="register-select">
+
+                        <option value="0">
+                            Select gender
+                        </option>
+
+                        <option value="1">
+                            Female
+                        </option>
+
+                        <option value="2">
+                            Male
+                        </option>
+
+                        <option value="3">
+                            Other
+                        </option>
+
+                    </select>
+
+                    <span asp-validation-for="nGender"
+                          class="text-danger register-validation">
+                    </span>
+
+                </div>
+
+
+                <div class="register-form-group">
+
+                    <label class="register-label">
+                        Date of Birth
+                    </label>
+
+                    <input asp-for="DOB"
+                           type="date"
+                           class="register-input" />
+
+                    <span asp-validation-for="DOB"
+                          class="text-danger register-validation">
+                    </span>
+
+                </div>
+
+            </div>
+
+
+            <!-- =====================================
+                 MOBILE + EMAIL
+            ====================================== -->
+
+            <div class="register-form-row">
+
+                <div class="register-form-group">
+
+                    <label class="register-label">
+                        Mobile Number
+                    </label>
+
+                    <input asp-for="sMobile"
+                           type="tel"
+                           class="register-input"
+                           placeholder="Enter mobile number"
+                           maxlength="10" />
+
+                    <span asp-validation-for="sMobile"
+                          class="text-danger register-validation">
+                    </span>
+
+                </div>
+
+
+                <div class="register-form-group">
+
+                    <label class="register-label">
+                        Email
+                    </label>
+
+                    <input asp-for="sEmail"
+                           type="email"
+                           class="register-input"
+                           placeholder="Enter email" />
+
+                    <span asp-validation-for="sEmail"
+                          class="text-danger register-validation">
+                    </span>
+
+                </div>
+
+            </div>
+
+
+            <!-- =====================================
+                 OTP
+            ====================================== -->
+
+            <div class="otp-section">
+
+                <label class="otp-label">
+                    OTP Verification
+                </label>
+
+                <div class="otp-content">
+
+                    <div class="otp-options">
+
+                        <label class="radio-option">
+
+                            <input type="radio"
+                                   name="OTPType"
+                                   value="Mobile"
+                                   checked />
+
+                            <span>
+                                Mobile No.
+                            </span>
+
+                        </label>
+
+
+                        <label class="radio-option">
+
+                            <input type="radio"
+                                   name="OTPType"
+                                   value="Email" />
+
+                            <span>
+                                Email
+                            </span>
+
+                        </label>
+
+
+                        <button type="button"
+                                class="send-otp-btn"
+                                id="btnSendOTP">
+
+                            Send OTP
+
+                        </button>
+
+                    </div>
+
+
+                    <div class="otp-input-container">
+
+                        <input asp-for="sOTP"
+                               type="text"
+                               class="otp-input"
+                               placeholder="Enter OTP"
+                               maxlength="6" />
+
+                        <span asp-validation-for="sOTP"
+                              class="text-danger register-validation">
+                        </span>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <!-- =====================================
+                 COLLEGE + BRANCH
+            ====================================== -->
+
+            <div class="register-form-row">
+
+                <div class="register-form-group">
+
+                    <label class="register-label">
+                        College
+                    </label>
+
+                    <select asp-for="nCollegeCode"
+                            class="register-select">
+
+                        <option value="0">
+                            Select College
+                        </option>
+
+                    </select>
+
+                    <span asp-validation-for="nCollegeCode"
+                          class="text-danger register-validation">
+                    </span>
+
+                </div>
+
+
+                <div class="register-form-group">
+
+                    <label class="register-label">
+                        Branch
+                    </label>
+
+                    <select asp-for="nBranch"
+                            class="register-select">
+
+                        <option value="0">
+                            Select Branch
+                        </option>
+
+                    </select>
+
+                    <span asp-validation-for="nBranch"
+                          class="text-danger register-validation">
+                    </span>
+
+                </div>
+
+            </div>
+
+
+            <!-- =====================================
+                 PASSOUT YEAR + PROFILE
+            ====================================== -->
+
+            <div class="register-form-row">
+
+                <div class="register-form-group">
+
+                    <label class="register-label">
+                        Passout Year
+                    </label>
+
+                    <select asp-for="nPassoutYear"
+                            class="register-select">
+
+                        <option value="0">
+                            Select Passout Year
+                        </option>
+
+                        <option value="1">
+                            2026
+                        </option>
+
+                    </select>
+
+                    <span asp-validation-for="nPassoutYear"
+                          class="text-danger register-validation">
+                    </span>
+
+                </div>
+
+
+                <div class="register-form-group">
+
+                    <label class="register-label">
+                        Profile Image
+                    </label>
+
+                    <input type="file"
+                           name="profileImage"
+                           accept="image/*"
+                           class="register-input register-file" />
+
+                </div>
+
+            </div>
+
+
+            <!-- =====================================
+                 PASSWORD
+            ====================================== -->
+
+            <div class="register-form-row">
+
+                <div class="register-form-group">
+
+                    <label class="register-label">
+                        Password
+                    </label>
+
+                    <input asp-for="sPassword"
+                           type="password"
+                           class="register-input"
+                           placeholder="Create password" />
+
+                    <span asp-validation-for="sPassword"
+                          class="text-danger register-validation">
+                    </span>
+
+                </div>
+
+            </div>
+
+
+            <!-- =====================================
+                 REGISTER BUTTON
+            ====================================== -->
+
+            <button type="submit"
+                    class="register-main-btn">
+
+                Register
+
+            </button>
+
+
+            <!-- =====================================
+                 LOGIN
+            ====================================== -->
+
+            <div class="register-bottom-text">
+
+                Already have an account?
+
+                <a asp-controller="Account"
+                   asp-action="CandidateLogin">
+
+                    Sign In
+
+                </a>
+
+            </div>
+
+        </form>
+
+    </div>
+
+</div>
+
+
+@section Scripts
+{
+    @{
+        await Html.RenderPartialAsync(
+            "_ValidationScriptsPartial"
+        );
+    }
+}
+
+
+<script>
+
+    document.addEventListener("DOMContentLoaded", function () {
+
+        document.querySelectorAll(
+            'input[type="text"], input[type="email"], input[type="tel"], input[type="password"]'
+        ).forEach(function (input) {
+
+            input.addEventListener("keydown", function (e) {
+
+                if (
+                    e.key === " " &&
+                    this.value.length === 0
+                ) {
+                    e.preventDefault();
+                }
+
+            });
+
+            input.addEventListener("input", function () {
+
+                this.value =
+                    this.value.replace(/^\s+/, "");
+
+            });
+
+            input.addEventListener("blur", function () {
+
+                this.value =
+                    this.value.trim();
+
+            });
+
+        });
+
+    });
+
+</script>

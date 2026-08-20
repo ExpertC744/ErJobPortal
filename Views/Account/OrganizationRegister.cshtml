@@ -1,0 +1,1339 @@
+﻿@model ErJobPortal.Models.OrganizationRegister
+
+@{
+    ViewData["Title"] = "Organization Registration";
+}
+
+<!-- Font Awesome 6 -->
+<link rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
+
+<style>
+
+    * {
+        box-sizing: border-box;
+    }
+
+    .organization-register-page {
+        width: 100%;
+        min-height: calc(100vh - 60px);
+        padding: 35px 20px;
+        background: #f7faf9;
+        color: #344054;
+        font-family: "Inter", "Segoe UI", Arial, sans-serif;
+    }
+
+    .register-wrapper {
+        width: 100%;
+        max-width: 1050px;
+        margin: 0 auto;
+    }
+
+    /* =========================================================
+               TOP HEADER
+            ========================================================= */
+
+    .register-top {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 20px;
+        margin-bottom: 22px;
+    }
+
+    .brand-area {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    }
+
+    .brand-logo {
+        width: 42px;
+        height: 42px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 12px;
+        background: #1e7b67;
+        color: #ffffff;
+        font-size: 19px;
+        font-weight: 800;
+        box-shadow: 0 7px 18px rgba(30,123,103,.16);
+    }
+
+    .brand-text strong {
+        display: block;
+        color: #1f2937;
+        font-size: 18px;
+        font-weight: 750;
+    }
+
+    .brand-text span {
+        display: block;
+        margin-top: 2px;
+        color: #98a2b3;
+        font-size: 12px;
+    }
+
+    /* =========================================================
+               ACCOUNT SWITCH
+            ========================================================= */
+
+    .account-switch {
+        display: flex;
+        align-items: center;
+        gap: 3px;
+        padding: 4px;
+        background: #ffffff;
+        border: 1px solid #e4ebe8;
+        border-radius: 10px;
+    }
+
+    .switch-link {
+        padding: 7px 12px;
+        border-radius: 7px;
+        color: #667085;
+        text-decoration: none;
+        font-size: 12px;
+        font-weight: 600;
+        transition: .2s ease;
+        white-space: nowrap;
+    }
+
+        .switch-link:hover {
+            color: #1e7b67;
+            background: #f3f9f6;
+        }
+
+        .switch-link.active {
+            background: #1e7b67;
+            color: #ffffff;
+        }
+
+    /* =========================================================
+               PROGRESS
+            ========================================================= */
+
+    .registration-progress {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        margin-bottom: 18px;
+        padding: 18px 22px;
+        background: #ffffff;
+        border: 1px solid #e5ece9;
+        border-radius: 14px;
+    }
+
+    .progress-item {
+        position: relative;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+        .progress-item:not(:last-child)::after {
+            content: "";
+            position: absolute;
+            top: 50%;
+            left: 42px;
+            right: 20px;
+            height: 1px;
+            background: #e1ebe7;
+        }
+
+    .progress-number {
+        position: relative;
+        z-index: 2;
+        width: 30px;
+        height: 30px;
+        min-width: 30px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 50%;
+        background: #e9f5f1;
+        color: #1e7b67;
+        font-size: 13px;
+        font-weight: 700;
+    }
+
+    .progress-item.active .progress-number {
+        background: #1e7b67;
+        color: #ffffff;
+    }
+
+    .progress-text {
+        position: relative;
+        z-index: 2;
+    }
+
+        .progress-text strong {
+            display: block;
+            color: #344054;
+            font-size: 13px;
+            font-weight: 700;
+        }
+
+        .progress-text span {
+            display: block;
+            margin-top: 2px;
+            color: #98a2b3;
+            font-size: 11px;
+        }
+
+    /* =========================================================
+               MAIN CARD
+            ========================================================= */
+
+    .register-card {
+        background: #ffffff;
+        border: 1px solid #e5ece9;
+        border-radius: 18px;
+        overflow: hidden;
+        box-shadow: 0 12px 40px rgba(30,123,103,.06);
+    }
+
+    /* =========================================================
+               CARD HEADER
+            ========================================================= */
+
+    .card-heading {
+        padding: 25px 30px;
+        border-bottom: 1px solid #edf1ef;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 20px;
+    }
+
+    .heading-content h1 {
+        margin: 0;
+        color: #1f2937;
+        font-size: 24px;
+        font-weight: 750;
+    }
+
+    .heading-content p {
+        margin: 6px 0 0;
+        color: #98a2b3;
+        font-size: 13px;
+        line-height: 1.5;
+    }
+
+    .heading-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 7px 10px;
+        border-radius: 20px;
+        background: #edf8f4;
+        color: #1e7b67;
+        font-size: 11px;
+        font-weight: 700;
+        white-space: nowrap;
+    }
+
+        .heading-badge i {
+            font-size: 11px;
+        }
+
+    /* =========================================================
+               FORM
+            ========================================================= */
+
+    .register-form {
+        padding: 28px 30px 30px;
+    }
+
+    .form-section {
+        margin-bottom: 28px;
+    }
+
+        .form-section:last-of-type {
+            margin-bottom: 22px;
+        }
+
+    /* =========================================================
+               SECTION HEADER
+            ========================================================= */
+
+    .section-heading {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin-bottom: 16px;
+    }
+
+    .section-icon {
+        width: 30px;
+        height: 30px;
+        min-width: 30px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 8px;
+        background: #eaf6f2;
+        color: #1e7b67;
+        font-size: 13px;
+    }
+
+    .section-title h3 {
+        margin: 0;
+        color: #344054;
+        font-size: 15px;
+        font-weight: 750;
+    }
+
+    .section-title p {
+        margin: 2px 0 0;
+        color: #98a2b3;
+        font-size: 11px;
+    }
+
+    /* =========================================================
+               FORM GRID
+            ========================================================= */
+
+    .form-grid {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 17px;
+    }
+
+    .form-field.full {
+        grid-column: 1 / -1;
+    }
+
+    /* =========================================================
+               INPUT
+            ========================================================= */
+
+    .form-field label {
+        display: block;
+        margin-bottom: 6px;
+        color: #475467;
+        font-size: 12px;
+        font-weight: 650;
+    }
+
+    .required {
+        color: #d92d20;
+    }
+
+    .input-wrap {
+        position: relative;
+    }
+
+        .input-wrap i {
+            position: absolute;
+            left: 13px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #98a2b3;
+            font-size: 13px;
+            pointer-events: none;
+            transition: .2s ease;
+            z-index: 2;
+        }
+
+    .form-field input {
+        width: 100%;
+        height: 43px;
+        padding: 0 13px 0 36px;
+        border: 1px solid #dfe7e4;
+        border-radius: 9px;
+        outline: none;
+        background: #ffffff;
+        color: #344054;
+        font-size: 13px;
+        transition: all .2s ease;
+    }
+
+        .form-field input::placeholder {
+            color: #a4adb8;
+        }
+
+        .form-field input:hover {
+            border-color: #bfd8d0;
+        }
+
+        .form-field input:focus {
+            border-color: #1e7b67;
+            box-shadow: 0 0 0 3px rgba(30,123,103,.07);
+        }
+
+            .form-field input:focus ~ i {
+                color: #1e7b67;
+            }
+
+    /* =========================================================
+               VALIDATION
+            ========================================================= */
+
+    .text-danger {
+        display: block;
+        margin-top: 5px;
+        color: #d92d20 !important;
+        font-size: 11px;
+        line-height: 1.4;
+    }
+
+    /* =========================================================
+               SECURITY NOTE
+            ========================================================= */
+
+    .security-note {
+        display: flex;
+        align-items: flex-start;
+        gap: 10px;
+        margin-top: 10px;
+        padding: 11px 13px;
+        border-radius: 9px;
+        background: #f7faf9;
+        border: 1px solid #e7efec;
+    }
+
+        .security-note i {
+            margin-top: 2px;
+            color: #1e7b67;
+            font-size: 13px;
+        }
+
+        .security-note span {
+            color: #667085;
+            font-size: 11px;
+            line-height: 1.5;
+        }
+
+    /* =========================================================
+               FOOTER
+            ========================================================= */
+
+    .form-footer {
+        padding-top: 20px;
+        border-top: 1px solid #edf1ef;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 20px;
+    }
+
+    .login-text {
+        color: #98a2b3;
+        font-size: 12px;
+    }
+
+        .login-text a {
+            color: #1e7b67;
+            text-decoration: none;
+            font-weight: 700;
+        }
+
+            .login-text a:hover {
+                text-decoration: underline;
+            }
+
+    /* =========================================================
+               REGISTER BUTTON
+            ========================================================= */
+
+    .register-button {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        min-width: 170px;
+        height: 42px;
+        padding: 0 18px;
+        border: 0;
+        border-radius: 9px;
+        background: #1e7b67;
+        color: #ffffff;
+        font-size: 13px;
+        font-weight: 700;
+        cursor: pointer;
+        box-shadow: 0 7px 18px rgba(30,123,103,.17);
+        transition: all .25s ease;
+    }
+
+        .register-button:hover {
+            background: #176553;
+            transform: translateY(-2px);
+            box-shadow: 0 10px 23px rgba(30,123,103,.22);
+        }
+
+        .register-button:active {
+            transform: translateY(0);
+        }
+
+    /* =========================================================
+               TABLET
+            ========================================================= */
+
+    @@media (max-width: 991px) {
+
+        .organization-register-page {
+            padding: 25px 15px;
+        }
+
+        .register-wrapper {
+            max-width: 850px;
+        }
+
+        .register-form {
+            padding: 25px;
+        }
+
+        .card-heading {
+            padding: 22px 25px;
+        }
+
+        .registration-progress {
+            padding: 15px 18px;
+        }
+    }
+
+    /* =========================================================
+               MOBILE TABLET
+            ========================================================= */
+
+    @@media (max-width: 767px) {
+
+        .organization-register-page {
+            padding: 18px 12px;
+        }
+
+        .registration-progress {
+            grid-template-columns: 1fr;
+            gap: 12px;
+            padding: 14px;
+        }
+
+        .progress-item:not(:last-child)::after {
+            display: none;
+        }
+
+        .progress-item {
+            padding: 2px 0;
+        }
+
+        .register-card {
+            border-radius: 15px;
+        }
+
+        .card-heading {
+            align-items: flex-start;
+            flex-direction: column;
+            padding: 20px;
+        }
+
+        .heading-content h1 {
+            font-size: 22px;
+        }
+
+        .register-form {
+            padding: 22px 20px;
+        }
+
+        .form-grid {
+            grid-template-columns: 1fr;
+            gap: 14px;
+        }
+
+        .form-field.full {
+            grid-column: auto;
+        }
+
+        .form-footer {
+            align-items: stretch;
+            flex-direction: column-reverse;
+            gap: 15px;
+        }
+
+        .register-button {
+            width: 100%;
+        }
+
+        .login-text {
+            text-align: center;
+        }
+    }
+
+    /* =========================================================
+               MOBILE
+            ========================================================= */
+
+    @@media (max-width: 576px) {
+
+        .organization-register-page {
+            padding: 10px;
+        }
+
+        .register-top {
+            flex-direction: column;
+            align-items: stretch;
+            gap: 12px;
+        }
+
+        .account-switch {
+            align-self: flex-start;
+        }
+
+        .registration-progress {
+            margin-bottom: 12px;
+        }
+
+        .card-heading {
+            padding: 18px;
+        }
+
+        .heading-content h1 {
+            font-size: 21px;
+        }
+
+        .heading-content p {
+            font-size: 12px;
+        }
+
+        .heading-badge {
+            font-size: 10px;
+        }
+
+        .register-form {
+            padding: 20px 17px;
+        }
+
+        .form-section {
+            margin-bottom: 23px;
+        }
+
+        .section-heading {
+            margin-bottom: 13px;
+        }
+
+        .section-title h3 {
+            font-size: 14px;
+        }
+
+        .form-field input {
+            height: 42px;
+            font-size: 13px;
+        }
+
+        .security-note {
+            padding: 10px;
+        }
+    }
+
+    /* =========================================================
+               VERY SMALL MOBILE
+            ========================================================= */
+
+    @@media (max-width: 400px) {
+
+        .organization-register-page {
+            padding: 6px;
+        }
+
+        .register-form {
+            padding: 17px 13px;
+        }
+
+        .card-heading {
+            padding: 16px;
+        }
+
+        .account-switch {
+            width: 100%;
+        }
+
+        .switch-link {
+            flex: 1;
+            text-align: center;
+        }
+
+        .progress-text span {
+            display: none;
+        }
+
+        .form-field input {
+            height: 40px;
+            padding-left: 33px;
+            font-size: 13px;
+        }
+
+        .register-button {
+            height: 40px;
+            font-size: 12px;
+        }
+    }
+
+</style>
+
+
+<div class="organization-register-page">
+
+    <div class="register-wrapper">
+
+        <!-- =====================================================
+             TOP BAR
+        ====================================================== -->
+
+        <div class="register-top">
+
+            <div class="account-switch">
+
+                <a asp-controller="Account"
+                   asp-action="Register"
+                   class="switch-link">
+
+                    <i class="fa-solid fa-user-graduate"></i>
+                    Trainee
+
+                </a>
+
+                <a asp-controller="Account"
+                   asp-action="OrganizationRegister"
+                   class="switch-link active">
+
+                    <i class="fa-solid fa-building"></i>
+                    Organization
+
+                </a>
+
+            </div>
+
+        </div>
+
+
+        <!-- =====================================================
+             PROGRESS
+        ====================================================== -->
+
+        <div class="registration-progress">
+
+            <div class="progress-item active">
+
+                <div class="progress-number">
+                    1
+                </div>
+
+                <div class="progress-text">
+
+                    <strong>
+                        Organization
+                    </strong>
+
+                    <span>
+                        Company information
+                    </span>
+
+                </div>
+
+            </div>
+
+
+            <div class="progress-item active">
+
+                <div class="progress-number">
+                    2
+                </div>
+
+                <div class="progress-text">
+
+                    <strong>
+                        Contact
+                    </strong>
+
+                    <span>
+                        Contact information
+                    </span>
+
+                </div>
+
+            </div>
+
+
+            <div class="progress-item active">
+
+                <div class="progress-number">
+                    3
+                </div>
+
+                <div class="progress-text">
+
+                    <strong>
+                        Account
+                    </strong>
+
+                    <span>
+                        Secure your account
+                    </span>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- =====================================================
+             MAIN CARD
+        ====================================================== -->
+
+        <div class="register-card">
+
+            <!-- CARD HEADER -->
+
+            <div class="card-heading">
+
+                <div class="heading-content">
+
+                    <h1>
+                        Create Organization Account
+                    </h1>
+
+                    <p>
+                        Set up your organization profile and start connecting
+                        with talented candidates.
+                    </p>
+
+                </div>
+
+                <div class="heading-badge">
+
+                    <i class="fa-solid fa-building"></i>
+
+                    Organization Registration
+
+                </div>
+
+            </div>
+
+
+            <!-- =================================================
+                 FORM
+            ================================================== -->
+
+            <form asp-controller="Account"
+                  asp-action="OrganizationRegister"
+                  method="post"
+                  class="register-form">
+
+                @Html.AntiForgeryToken()
+
+
+                <!-- VALIDATION -->
+
+                <div asp-validation-summary="All"
+                     class="text-danger">
+                </div>
+
+
+                <!-- =================================================
+                     ORGANIZATION INFORMATION
+                ================================================== -->
+
+                <div class="form-section">
+
+                    <div class="section-heading">
+
+                        <div class="section-icon">
+
+                            <i class="fa-solid fa-building"></i>
+
+                        </div>
+
+                        <div class="section-title">
+
+                            <h3>
+                                Organization Information
+                            </h3>
+
+                            <p>
+                                Tell us about your organization
+                            </p>
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="form-grid">
+
+                        <!-- Organization Name -->
+
+                        <div class="form-field">
+
+                            <label>
+                                Organization Name
+                                <span class="required">*</span>
+                            </label>
+
+                            <div class="input-wrap">
+
+                                <input asp-for="sOrgName"
+                                       type="text"
+                                       placeholder="Enter organization name"
+                                       autocomplete="organization" />
+
+                                <i class="fa-solid fa-building"></i>
+
+                            </div>
+
+                            <span asp-validation-for="sOrgName"
+                                  class="text-danger">
+                            </span>
+
+                        </div>
+
+
+                        <!-- Organization URL -->
+
+                        <div class="form-field">
+
+                            <label>
+                                Organization Website
+                            </label>
+
+                            <div class="input-wrap">
+
+                                <input asp-for="sOrgUrl"
+                                       type="url"
+                                       placeholder="https://example.com"
+                                       autocomplete="url" />
+
+                                <i class="fa-solid fa-globe"></i>
+
+                            </div>
+
+                            <span asp-validation-for="sOrgUrl"
+                                  class="text-danger">
+                            </span>
+
+                        </div>
+
+
+                        <!-- College Code -->
+
+                        <div class="form-field">
+
+                            <label>
+                                College Code
+                            </label>
+
+                            <div class="input-wrap">
+
+                                <input asp-for="nCollegeCode"
+                                       type="number"
+                                       placeholder="Enter college code" />
+
+                                <i class="fa-solid fa-hashtag"></i>
+
+                            </div>
+
+                            <span asp-validation-for="nCollegeCode"
+                                  class="text-danger">
+                            </span>
+
+                        </div>
+
+
+                        <!-- College Name -->
+
+                        <div class="form-field">
+
+                            <label>
+                                College Name
+                            </label>
+
+                            <div class="input-wrap">
+
+                                <input asp-for="nCollegeName"
+                                       type="text"
+                                       placeholder="Enter college name" />
+
+                                <i class="fa-solid fa-school"></i>
+
+                            </div>
+
+                            <span asp-validation-for="nCollegeName"
+                                  class="text-danger">
+                            </span>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <!-- =================================================
+                     CONTACT INFORMATION
+                ================================================== -->
+
+                <div class="form-section">
+
+                    <div class="section-heading">
+
+                        <div class="section-icon">
+
+                            <i class="fa-solid fa-address-card"></i>
+
+                        </div>
+
+                        <div class="section-title">
+
+                            <h3>
+                                Contact Information
+                            </h3>
+
+                            <p>
+                                Add the primary organization contact
+                            </p>
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="form-grid">
+
+                        <!-- Contact Name -->
+
+                        <div class="form-field">
+
+                            <label>
+                                Contact Person
+                                <span class="required">*</span>
+                            </label>
+
+                            <div class="input-wrap">
+
+                                <input asp-for="sName"
+                                       type="text"
+                                       placeholder="Enter contact person"
+                                       autocomplete="name" />
+
+                                <i class="fa-solid fa-user"></i>
+
+                            </div>
+
+                            <span asp-validation-for="sName"
+                                  class="text-danger">
+                            </span>
+
+                        </div>
+
+
+                        <!-- Designation -->
+
+                        <div class="form-field">
+
+                            <label>
+                                Designation
+                            </label>
+
+                            <div class="input-wrap">
+
+                                <input asp-for="sDesignation"
+                                       type="text"
+                                       placeholder="e.g. HR Manager" />
+
+                                <i class="fa-solid fa-id-badge"></i>
+
+                            </div>
+
+                            <span asp-validation-for="sDesignation"
+                                  class="text-danger">
+                            </span>
+
+                        </div>
+
+
+                        <!-- Mobile -->
+
+                        <div class="form-field">
+
+                            <label>
+                                Mobile Number
+                                <span class="required">*</span>
+                            </label>
+
+                            <div class="input-wrap">
+
+                                <input asp-for="sMobile"
+                                       type="tel"
+                                       maxlength="10"
+                                       inputmode="numeric"
+                                       placeholder="Enter mobile number"
+                                       autocomplete="tel" />
+
+                                <i class="fa-solid fa-mobile-screen-button"></i>
+
+                            </div>
+
+                            <span asp-validation-for="sMobile"
+                                  class="text-danger">
+                            </span>
+
+                        </div>
+
+
+                        <!-- Email -->
+
+                        <div class="form-field">
+
+                            <label>
+                                Email Address
+                                <span class="required">*</span>
+                            </label>
+
+                            <div class="input-wrap">
+
+                                <input asp-for="sEmail"
+                                       type="email"
+                                       placeholder="Enter email address"
+                                       autocomplete="email" />
+
+                                <i class="fa-solid fa-envelope"></i>
+
+                            </div>
+
+                            <span asp-validation-for="sEmail"
+                                  class="text-danger">
+                            </span>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <!-- =================================================
+                     ACCOUNT SECURITY
+                ================================================== -->
+
+                <div class="form-section">
+
+                    <div class="section-heading">
+
+                        <div class="section-icon">
+
+                            <i class="fa-solid fa-lock"></i>
+
+                        </div>
+
+                        <div class="section-title">
+
+                            <h3>
+                                Account Security
+                            </h3>
+
+                            <p>
+                                Create your secure organization login
+                            </p>
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="form-grid">
+
+                        <!-- Password -->
+
+                        <div class="form-field">
+
+                            <label>
+                                Password
+                                <span class="required">*</span>
+                            </label>
+
+                            <div class="input-wrap">
+
+                                <input asp-for="sPassword"
+                                       type="password"
+                                       placeholder="Create a password"
+                                       autocomplete="new-password" />
+
+                                <i class="fa-solid fa-lock"></i>
+
+                            </div>
+
+                            <span asp-validation-for="sPassword"
+                                  class="text-danger">
+                            </span>
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- SECURITY NOTE -->
+
+                    <div class="security-note">
+
+                        <i class="fa-solid fa-shield-halved"></i>
+
+                        <span>
+                            Your organization account information is protected
+                            and will only be used for recruitment and platform
+                            related activities.
+                        </span>
+
+                    </div>
+
+                </div>
+
+
+                <!-- =================================================
+                     FOOTER
+                ================================================== -->
+
+                <div class="form-footer">
+
+                    <div class="login-text">
+
+                        Already registered?
+
+                        <a asp-controller="Account"
+                           asp-action="OrganizationLogin">
+
+                            Sign in to your organization account
+
+                        </a>
+
+                    </div>
+
+
+                    <button type="submit"
+                            class="register-button">
+
+                        <i class="fa-solid fa-user-plus"></i>
+
+                        Submit
+
+                    </button>
+
+                </div>
+
+            </form>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+@section Scripts
+{
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}
+
+
+<script>
+
+    document.addEventListener("DOMContentLoaded", function () {
+
+        /* =====================================================
+           SPACE ALLOWED FIELDS
+        ===================================================== */
+
+        const allowSpaceFields = [
+            'input[name="sOrgName"]',
+            'input[name="sName"]',
+            'input[name="sDesignation"]'
+        ];
+
+        document
+            .querySelectorAll(allowSpaceFields.join(","))
+            .forEach(function (input) {
+
+                input.addEventListener("keydown", function (e) {
+
+                    if (e.key === " " && this.value.length === 0) {
+                        e.preventDefault();
+                    }
+
+                });
+
+                input.addEventListener("input", function () {
+
+                    this.value = this.value.replace(/^\s+/, "");
+
+                });
+
+                input.addEventListener("blur", function () {
+
+                    this.value = this.value.trim();
+
+                });
+
+            });
+
+
+        /* =====================================================
+           NO SPACE FIELDS
+        ===================================================== */
+
+        const noSpaceFields = [
+            'input[name="sOrgUrl"]',
+            'input[name="sMobile"]',
+            'input[name="sEmail"]',
+            'input[name="nCollegeCode"]',
+            'input[name="sPassword"]'
+        ];
+
+        document
+            .querySelectorAll(noSpaceFields.join(","))
+            .forEach(function (input) {
+
+                input.addEventListener("keydown", function (e) {
+
+                    if (e.key === " ") {
+                        e.preventDefault();
+                    }
+
+                });
+
+                input.addEventListener("input", function () {
+
+                    this.value = this.value.replace(/\s/g, "");
+
+                });
+
+            });
+
+
+        /* =====================================================
+           MOBILE NUMBER
+        ===================================================== */
+
+        const mobileInput =
+            document.querySelector('input[name="sMobile"]');
+
+        if (mobileInput) {
+
+            mobileInput.addEventListener("input", function () {
+
+                this.value = this.value.replace(/\D/g, "");
+
+                if (this.value.length > 10) {
+
+                    this.value =
+                        this.value.substring(0, 10);
+
+                }
+
+            });
+
+        }
+
+    });
+
+</script>

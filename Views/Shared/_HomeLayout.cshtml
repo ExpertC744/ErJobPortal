@@ -1,0 +1,213 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="utf-8" />
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0" />
+
+    <title>@ViewData["Title"] - Job Portal</title>
+
+    <link rel="stylesheet"
+          href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+
+    <link rel="stylesheet"
+          href="~/css/home.css" />
+
+</head>
+
+<body>
+
+    <!-- HOME HEADER -->
+
+    <header>
+
+        <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+
+            <div class="container">
+
+                <a class="navbar-brand"
+                   asp-controller="Home"
+                   asp-action="Index">
+
+                    JobPortal
+
+                </a>
+
+                <button class="navbar-toggler"
+                        type="button"
+                        data-bs-toggle="collapse"
+                        data-bs-target="#homeMenu">
+
+                    <span class="navbar-toggler-icon"></span>
+
+                </button>
+
+                <div class="collapse navbar-collapse"
+                     id="homeMenu">
+
+                    <ul class="navbar-nav ms-auto">
+
+                        <li class="nav-item">
+
+                            <a class="nav-link"
+                               asp-controller="Home"
+                               asp-action="Index">
+
+                                Home
+
+                            </a>
+
+                        </li>
+
+                        <li class="nav-item">
+
+                            <a class="nav-link"
+                               asp-controller="Home"
+                               asp-action="About">
+
+                                About
+
+                            </a>
+
+                        </li>
+
+                        <li class="nav-item">
+
+                            <a class="nav-link"
+                               href="#jobs">
+
+                                Jobs
+
+                            </a>
+
+                        </li>
+
+                        <li class="nav-item">
+
+                            <a class="nav-link"
+                               asp-controller="Home"
+                               asp-action="Contact">
+
+                                Contact
+
+                            </a>
+
+                        </li>
+
+                    </ul>
+
+                    <div class="ms-3">
+
+                        <a asp-controller="Account"
+                           asp-action="CandidateLogin"
+                           class="btn btn-light me-2">
+
+                            Candidate Login
+
+                        </a>
+
+                        <a asp-controller="Account"
+                           asp-action="OrganizationLogin"
+                           class="btn btn-warning">
+
+                            Employer Login
+
+                        </a>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </nav>
+
+    </header>
+
+
+    <!-- PAGE CONTENT -->
+
+    <main>
+
+        @RenderBody()
+
+    </main>
+
+
+    <!-- HOME FOOTER -->
+
+    <footer class="home-footer">
+
+        <div class="container">
+
+            <div class="row">
+
+                <div class="col-md-4">
+
+                    <h5>JobPortal</h5>
+
+                    <p>
+                        Find your dream job and build your career.
+                    </p>
+
+                </div>
+
+                <div class="col-md-4">
+
+                    <h5>Quick Links</h5>
+
+                    <a asp-controller="Home"
+                       asp-action="Index">
+
+                        Home
+
+                    </a>
+
+                    <br />
+
+                    <a asp-controller="Home"
+                       asp-action="About">
+
+                        About
+
+                    </a>
+
+                </div>
+
+                <div class="col-md-4">
+
+                    <h5>Contact</h5>
+
+                    <p>support@jobportal.com</p>
+
+                </div>
+
+            </div>
+
+            <hr />
+
+            <div class="text-center">
+
+                © @DateTime.Now.Year JobPortal
+
+            </div>
+
+        </div>
+
+    </footer>
+
+
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script src="~/js/home.js"></script>
+
+    @await RenderSectionAsync("Scripts", required: false)
+
+</body>
+
+</html>
