@@ -29,14 +29,12 @@
     </div>
 
 
-    <!-- ================================================= -->
-    <!-- ADDRESS -->
-    <!-- ================================================= -->
+    <!-- ================= ADDRESS ================= -->
 
     <div class="card mb-4">
 
         <div class="card-header">
-            <h5 class="mb-0">Address</h5>
+            <h4 class="mb-0">Address</h4>
         </div>
 
         <div class="card-body">
@@ -46,9 +44,6 @@
                   method="post">
 
                 @Html.AntiForgeryToken()
-
-                <input type="hidden"
-                       asp-for="Profile.CandidateID" />
 
                 <div class="row">
 
@@ -107,7 +102,9 @@
 
                     <div class="col-md-3 mb-3">
 
-                        <label class="form-label">Pincode</label>
+                        <label class="form-label">
+                            Pincode
+                        </label>
 
                         <input asp-for="Profile.Pincode"
                                class="form-control"
@@ -136,15 +133,18 @@
     </div>
 
 
-    <!-- ================================================= -->
-    <!-- EDUCATION -->
-    <!-- ================================================= -->
+    <!-- ================= EDUCATION ================= -->
 
     <div class="card mb-4">
 
         <div class="card-header">
-            <h5 class="mb-0">Education</h5>
+
+            <h4 class="mb-0">
+                Education
+            </h4>
+
         </div>
+
 
         <div class="card-body">
 
@@ -154,15 +154,10 @@
 
                 @Html.AntiForgeryToken()
 
-                <input type="hidden"
-                       asp-for="Profile.CandidateID" />
 
+                <!-- ================= SSC ================= -->
 
-                <!-- SSC -->
-
-                <h6 class="border-bottom pb-2">
-                    SSC / 10th
-                </h6>
+                <h5>SSC / 10th</h5>
 
                 <div class="row">
 
@@ -196,11 +191,12 @@
                 </div>
 
 
-                <!-- HSC -->
+                <hr />
 
-                <h6 class="border-bottom pb-2 mt-3">
-                    HSC / Diploma
-                </h6>
+
+                <!-- ================= HSC ================= -->
+
+                <h5>HSC / Diploma</h5>
 
                 <div class="row">
 
@@ -234,11 +230,12 @@
                 </div>
 
 
-                <!-- GRADUATION -->
+                <hr />
 
-                <h6 class="border-bottom pb-2 mt-3">
-                    Graduation
-                </h6>
+
+                <!-- ================= GRADUATION ================= -->
+
+                <h5>Graduation</h5>
 
                 <div class="row">
 
@@ -299,11 +296,12 @@
                 </div>
 
 
-                <!-- PG -->
+                <hr />
 
-                <h6 class="border-bottom pb-2 mt-3">
-                    Post Graduation
-                </h6>
+
+                <!-- ================= PG ================= -->
+
+                <h5>Post Graduation</h5>
 
                 <div class="row">
 
@@ -364,11 +362,12 @@
                 </div>
 
 
-                <!-- PHD -->
+                <hr />
 
-                <h6 class="border-bottom pb-2 mt-3">
-                    PhD
-                </h6>
+
+                <!-- ================= PHD ================= -->
+
+                <h5>PhD</h5>
 
                 <div class="row">
 
@@ -460,18 +459,21 @@
 
                 @Html.AntiForgeryToken()
 
-                <input type="hidden"
-                       asp-for="Profile.CandidateID" />
-
                 <div class="row">
 
                     <div class="col-md-3 mb-3">
 
-                        <label>Internship / Fellowship Type</label>
+                        <label class="form-label">
+                            Internship / Fellowship Type
+                        </label>
 
                         <select asp-for="Profile.Internship_FellowshipType"
                                 class="form-control"
-                                asp-items="@(new SelectList(Model.InternshipFellowshipType, "ID", "Name"))">
+                                asp-items="@(new SelectList(
+                                                        Model.InternshipFellowshipType,
+                                                        "ID",
+                                                        "Name"
+                                                    ))">
 
                             <option value="">
                                 -- Select Type --
@@ -484,7 +486,9 @@
 
                     <div class="col-md-3 mb-3">
 
-                        <label>Preferred Country</label>
+                        <label class="form-label">
+                            Preferred Country
+                        </label>
 
                         <input asp-for="Profile.Preferred_Country"
                                class="form-control" />
@@ -494,7 +498,9 @@
 
                     <div class="col-md-3 mb-3">
 
-                        <label>Preferred State</label>
+                        <label class="form-label">
+                            Preferred State
+                        </label>
 
                         <input asp-for="Profile.Preferred_State"
                                class="form-control" />
@@ -504,7 +510,9 @@
 
                     <div class="col-md-3 mb-3">
 
-                        <label>Preferred City</label>
+                        <label class="form-label">
+                            Preferred City
+                        </label>
 
                         <input asp-for="Profile.Preferred_City"
                                class="form-control" />
@@ -526,7 +534,6 @@
                 </div>
 
             </form>
-
         </div>
 
     </div>
@@ -552,62 +559,42 @@
 
                 @Html.AntiForgeryToken()
 
-                <input type="hidden"
-                       asp-for="Profile.CandidateID" />
-
                 <div class="row">
 
                     <div class="col-md-4 mb-3">
-
-                        <label>Resume</label>
+                        <label class="form-label">Resume</label>
 
                         <input asp-for="Profile.sResume"
-                               class="form-control"
-                               placeholder="Resume Path" />
-
+                               class="form-control" />
                     </div>
 
 
                     <div class="col-md-4 mb-3">
-
-                        <label>Photo</label>
+                        <label class="form-label">Photo</label>
 
                         <input asp-for="Profile.sPhoto"
-                               class="form-control"
-                               placeholder="Photo Path" />
-
+                               class="form-control" />
                     </div>
 
 
                     <div class="col-md-4 mb-3">
-
-                        <label>Signature</label>
+                        <label class="form-label">Signature</label>
 
                         <input asp-for="Profile.sSignature"
-                               class="form-control"
-                               placeholder="Signature Path" />
-
+                               class="form-control" />
                     </div>
 
 
                     <div class="col-md-6 mb-3">
 
-                        <label>Divyang</label>
+                        <label class="form-label">Divyang</label>
 
                         <select asp-for="Profile.sDivyang"
                                 class="form-control">
 
-                            <option value="">
-                                -- Select --
-                            </option>
-
-                            <option value="Yes">
-                                Yes
-                            </option>
-
-                            <option value="No">
-                                No
-                            </option>
+                            <option value="">-- Select --</option>
+                            <option value="Yes">Yes</option>
+                            <option value="No">No</option>
 
                         </select>
 
@@ -616,11 +603,10 @@
 
                     <div class="col-md-6 mb-3">
 
-                        <label>Hobbies</label>
+                        <label class="form-label">Hobbies</label>
 
                         <input asp-for="Profile.sHobbies"
-                               class="form-control"
-                               placeholder="Reading, Cricket, Music" />
+                               class="form-control" />
 
                     </div>
 
@@ -1445,7 +1431,17 @@
 
 
 @section Scripts {
+    <script>
 
+        $('#addressForm').on('submit', function () {
+
+            $('#StateID').prop('disabled', false);
+
+            $('#CityID').prop('disabled', false);
+
+        });
+
+    </script>
     <script>
 
         $(document).ready(function () {

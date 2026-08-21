@@ -1818,6 +1818,182 @@
         .candidate-sidebar .menu-icon {
             color: #1e7b67;
         }
+        /* =========================================================
+            SUPER ADMIN SIDEBAR
+            ========================================================= */
+
+        .superadmin-sidebar {
+            width: 100%;
+        }
+
+
+            /* =========================================================
+            MAIN SIDEBAR MENU
+            ========================================================= */
+
+            .superadmin-sidebar .sidebar-link {
+                display: flex;
+                align-items: center;
+                width: 100%;
+                color: #16816d;
+                text-decoration: none;
+                cursor: pointer;
+            }
+
+
+            /* Remove default link styling */
+
+            .superadmin-sidebar a.sidebar-link,
+            .superadmin-sidebar a.sidebar-link:visited,
+            .superadmin-sidebar a.sidebar-link:hover,
+            .superadmin-sidebar a.sidebar-link:active {
+                color: #16816d;
+                text-decoration: none;
+            }
+
+
+            /* =========================================================
+            ICON
+            ========================================================= */
+
+            .superadmin-sidebar .menu-icon {
+                color: #16816d;
+                min-width: 45px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            }
+
+
+            /* =========================================================
+            MENU TEXT
+            ========================================================= */
+
+            .superadmin-sidebar .menu-text {
+                color: #16816d;
+                font-size: 20px;
+                font-weight: 500;
+                flex: 1;
+            }
+
+
+            /* =========================================================
+            ARROW
+            ========================================================= */
+
+            .superadmin-sidebar .menu-arrow {
+                color: #16816d;
+                margin-left: auto;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            }
+
+
+            /* =========================================================
+            DROPDOWN MENU
+            ========================================================= */
+
+            .superadmin-sidebar .sidebar-submenu {
+                width: 100%;
+                padding-left: 50px;
+                padding-top: 5px;
+                padding-bottom: 8px;
+            }
+
+
+                /* =========================================================
+            DROPDOWN LINKS
+            IMPORTANT:
+            No sidebar-sublink class is required
+            ========================================================= */
+
+                .superadmin-sidebar .sidebar-submenu a {
+                    display: block;
+                    width: 100%;
+                    color: #16816d;
+                    text-decoration: none;
+                    font-size: 18px;
+                    font-weight: 400;
+                    line-height: 1.5;
+                    padding: 6px 0;
+                    margin: 0;
+                }
+
+
+                    /* =========================================================
+            VISITED LINK
+            Prevent purple/blue browser link
+            ========================================================= */
+
+                    .superadmin-sidebar .sidebar-submenu a:visited {
+                        color: #16816d;
+                        text-decoration: none;
+                    }
+
+
+                    /* =========================================================
+            HOVER
+            ========================================================= */
+
+                    .superadmin-sidebar .sidebar-submenu a:hover {
+                        color: #16816d;
+                        text-decoration: none;
+                    }
+
+
+                    /* =========================================================
+            ACTIVE SUBMENU
+            ========================================================= */
+
+                    .superadmin-sidebar .sidebar-submenu a.active {
+                        color: #16816d;
+                        font-weight: 500;
+                    }
+
+
+            /* =========================================================
+            DROPDOWN SPACING
+            ========================================================= */
+
+            .superadmin-sidebar .sidebar-menu {
+                width: 105%;
+                margin-bottom: 4px;
+            }
+
+
+            /* =========================================================
+            DROPDOWN HEADER
+            ========================================================= */
+
+            .superadmin-sidebar .sidebar-dropdown {
+                min-height: 55px;
+                padding: 10px 15px;
+                border-radius: 0;
+            }
+
+
+                /* =========================================================
+            HOVER MAIN MENU
+            ========================================================= */
+
+                .superadmin-sidebar .sidebar-dropdown:hover {
+                    color: #16816d;
+                }
+
+                l
+            /* =========================================================
+            ACTIVE DASHBOARD
+            ========================================================= */
+
+            .superadmin-sidebar .sidebar-link.active {
+                color: #16816d;
+            }
+
+                .superadmin-sidebar .sidebar-link.active .menu-icon,
+                .superadmin-sidebar .sidebar-link.active .menu-text {
+                    color: #16816d;
+                }
     </style>
 
     @* data-table css *@
@@ -2426,13 +2602,11 @@
             <!-- ================= SUPER ADMIN ================= -->
             @if (ViewData["Panel"]?.ToString() == "SuperAdmin")
             {
-                <div class="sidebar-section">
+                <div class="sidebar-section superadmin-sidebar">
 
-                    <div class="sidebar-title">
-                        <span>Administration</span>
-                    </div>
-
-
+                    <!-- =========================================================
+                         DASHBOARD
+                    ========================================================== -->
                     <a asp-controller="SuperAdmin"
                        asp-action="Dashboard"
                        class="sidebar-link active">
@@ -2448,73 +2622,290 @@
                     </a>
 
 
-                    <a href="#" class="sidebar-link">
+                    <!-- =========================================================
+                         TRAINEE
+                    ========================================================== -->
+                    <div class="sidebar-menu">
 
-                        <span class="menu-icon">
-                            <i class="fas fa-user-group"></i>
-                        </span>
+                        <div class="sidebar-link sidebar-dropdown"
+                             data-bs-toggle="collapse"
+                             data-bs-target="#traineeMenu"
+                             aria-expanded="false">
 
-                        <span class="menu-text">
-                            Candidates
-                        </span>
+                            <span class="menu-icon">
+                                <i class="fas fa-user-graduate"></i>
+                            </span>
 
-                    </a>
+                            <span class="menu-text">
+                                Trainee
+                            </span>
 
+                            <span class="menu-arrow">
+                                <i class="fas fa-chevron-down"></i>
+                            </span>
 
-                    <a href="#" class="sidebar-link">
-
-                        <span class="menu-icon">
-                            <i class="fas fa-building"></i>
-                        </span>
-
-                        <span class="menu-text">
-                            Organizations
-                        </span>
-
-                    </a>
-
-
-                    <a href="#" class="sidebar-link">
-
-                        <span class="menu-icon">
-                            <i class="fas fa-briefcase"></i>
-                        </span>
-
-                        <span class="menu-text">
-                            Jobs
-                        </span>
-
-                    </a>
+                        </div>
 
 
-                    <a href="#" class="sidebar-link">
+                        <div id="traineeMenu"
+                             class="sidebar-submenu collapse">
 
-                        <span class="menu-icon">
-                            <i class="fas fa-chart-column"></i>
-                        </span>
+                            <a asp-controller="Trainee"
+                               asp-action="Registrations">
+                                Trainee Registrations
+                            </a>
 
-                        <span class="menu-text">
-                            Reports
-                        </span>
+                            <a asp-controller="Trainee"
+                               asp-action="Profiles">
+                                Trainee Profiles
+                            </a>
 
-                    </a>
+                            <a asp-controller="Trainee"
+                               asp-action="Status">
+                                Trainee Status
+                            </a>
+
+                        </div>
+
+                    </div>
 
 
-                    <a href="#" class="sidebar-link">
+                    <!-- =========================================================
+                         ORGANIZATION
+                    ========================================================== -->
+                    <div class="sidebar-menu">
 
-                        <span class="menu-icon">
-                            <i class="fas fa-gear"></i>
-                        </span>
+                        <div class="sidebar-link sidebar-dropdown"
+                             data-bs-toggle="collapse"
+                             data-bs-target="#organizationMenu"
+                             aria-expanded="false">
 
-                        <span class="menu-text">
-                            Settings
-                        </span>
+                            <span class="menu-icon">
+                                <i class="fas fa-building"></i>
+                            </span>
 
-                    </a>
+                            <span class="menu-text">
+                                Organization
+                            </span>
+
+                            <span class="menu-arrow">
+                                <i class="fas fa-chevron-down"></i>
+                            </span>
+
+                        </div>
+
+
+                        <div id="organizationMenu"
+                             class="sidebar-submenu collapse">
+
+                            <a asp-controller="Organization"
+                               asp-action="Registration">
+                                Org Registration
+                            </a>
+
+                            <a asp-controller="Organization"
+                               asp-action="Profiles">
+                                Org Profiles
+                            </a>
+
+                            <a asp-controller="Organization"
+                               asp-action="Posts">
+                                Org Posts
+                            </a>
+
+                            <a asp-controller="Organization"
+                               asp-action="FinalSelectionDetails">
+                                Final Selection Details
+                            </a>
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- =========================================================
+                         CHARTS
+                    ========================================================== -->
+                    <div class="sidebar-menu">
+
+                        <div class="sidebar-link sidebar-dropdown"
+                             data-bs-toggle="collapse"
+                             data-bs-target="#chartsMenu"
+                             aria-expanded="false">
+
+                            <span class="menu-icon">
+                                <i class="fas fa-chart-area"></i>
+                            </span>
+
+                            <span class="menu-text">
+                                Charts
+                            </span>
+
+                            <span class="menu-arrow">
+                                <i class="fas fa-chevron-down"></i>
+                            </span>
+
+                        </div>
+
+
+                        <div id="chartsMenu"
+                             class="sidebar-submenu collapse">
+
+                            <a asp-controller="Charts"
+                               asp-action="Index">
+                                Charts
+                            </a>
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- =========================================================
+                         ADVERTISEMENT
+                    ========================================================== -->
+                    <div class="sidebar-menu">
+
+                        <div class="sidebar-link sidebar-dropdown"
+                             data-bs-toggle="collapse"
+                             data-bs-target="#advertisementMenu"
+                             aria-expanded="false">
+
+                            <span class="menu-icon">
+                                <i class="fas fa-bullhorn"></i>
+                            </span>
+
+                            <span class="menu-text">
+                                Advertisement
+                            </span>
+
+                            <span class="menu-arrow">
+                                <i class="fas fa-chevron-down"></i>
+                            </span>
+
+                        </div>
+
+
+                        <div id="advertisementMenu"
+                             class="sidebar-submenu collapse">
+
+                            <a asp-controller="Advertisement"
+                               asp-action="AddAdv">
+                                Add Adv
+                            </a>
+
+                            <a asp-controller="Advertisement"
+                               asp-action="Index">
+                                View All Adv
+                            </a>
+
+                            <a asp-controller="Advertisement"
+                               asp-action="Receipt">
+                                Receipt
+                            </a>
+
+                            <a asp-controller="Advertisement"
+                               asp-action="Invoice">
+                                Invoice
+                            </a>
+
+                            <a asp-controller="Advertisement"
+                               asp-action="BillingController">
+                                Billing Controller
+                            </a>
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- =========================================================
+                         CREATE FEEDBACK
+                    ========================================================== -->
+                    <div class="sidebar-menu">
+
+                        <div class="sidebar-link sidebar-dropdown"
+                             data-bs-toggle="collapse"
+                             data-bs-target="#createFeedbackMenu"
+                             aria-expanded="false">
+
+                            <span class="menu-icon">
+                                <i class="fas fa-comment-medical"></i>
+                            </span>
+
+                            <span class="menu-text">
+                                Create Feedback
+                            </span>
+
+                            <span class="menu-arrow">
+                                <i class="fas fa-chevron-down"></i>
+                            </span>
+
+                        </div>
+
+
+                        <div id="createFeedbackMenu"
+                             class="sidebar-submenu collapse">
+
+                            <a asp-controller="SuperAdmin"
+                               asp-action="SAFeedback">
+                                Trainee
+                            </a>
+
+                            <a asp-controller="SuperAdmin"
+                               asp-action="SAOrgFeedback">
+                                Organization
+                            </a>
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- =========================================================
+                         VIEW FEEDBACK
+                    ========================================================== -->
+                    <div class="sidebar-menu">
+
+                        <div class="sidebar-link sidebar-dropdown"
+                             data-bs-toggle="collapse"
+                             data-bs-target="#viewFeedbackMenu"
+                             aria-expanded="false">
+
+                            <span class="menu-icon">
+                                <i class="fas fa-comments"></i>
+                            </span>
+
+                            <span class="menu-text">
+                                View Feedback
+                            </span>
+
+                            <span class="menu-arrow">
+                                <i class="fas fa-chevron-down"></i>
+                            </span>
+
+                        </div>
+
+
+                        <div id="viewFeedbackMenu"
+                             class="sidebar-submenu collapse">
+
+                            <a asp-controller="Feedback"
+                               asp-action="TraineeFeedback">
+                                Trainee
+                            </a>
+
+                            <a asp-controller="Feedback"
+                               asp-action="OrganizationFeedback">
+                                Organization
+                            </a>
+
+                        </div>
+
+                    </div>
 
                 </div>
             }
-
 
             <!-- ================= SIDEBAR BOTTOM ================= -->
 

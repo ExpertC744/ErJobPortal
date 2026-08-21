@@ -8,16 +8,15 @@ namespace ErJobPortal.Controllers
 {
     public class CandidateController : Controller
     {
-        private readonly CandidateProfileRepository repo;
+        private readonly CandidateProfileRepository _repo;
         private readonly IConfiguration _configuration;
         private readonly AccountRepository _repository;
 
-        public CandidateController(
-    IConfiguration configuration,
-    AccountRepository repository)
+        public CandidateController(IConfiguration configuration, AccountRepository repository, CandidateProfileRepository repo)
         {
             _configuration = configuration;
             _repository = repository;
+            _repo = repo;
         }
 
         // =========================================================
@@ -25,9 +24,7 @@ namespace ErJobPortal.Controllers
         // =========================================================
 
         [HttpGet]
-        [ResponseCache(
-NoStore = true,
-Location = ResponseCacheLocation.None)]
+        [ResponseCache(NoStore = true, Location = ResponseCacheLocation.None)]
         public IActionResult Dashboard()
         {
             int? candidateId = HttpContext.Session.GetInt32("CandidateID");
@@ -96,7 +93,7 @@ Location = ResponseCacheLocation.None)]
                 return RedirectToAction("CandidateLogin", "Account");
             }
 
-            CandidateProfileModel? profile = repo.GetProfile(candidateId.Value);
+            CandidateProfileModel? profile = _repo.GetProfile(candidateId.Value);
 
             if (profile == null)
             {
@@ -106,8 +103,7 @@ Location = ResponseCacheLocation.None)]
                 };
             }
 
-            CandidateProfileViewModel vm =
-                LoadProfileDropdowns(profile);
+            CandidateProfileViewModel vm = LoadProfileDropdowns(profile);
 
             return View(vm);
         }
@@ -117,128 +113,135 @@ Location = ResponseCacheLocation.None)]
         // LOAD ALL DROPDOWNS
         // =========================================================
 
-        private CandidateProfileViewModel LoadProfileDropdowns(
-            CandidateProfileModel profile)
+        private CandidateProfileViewModel LoadProfileDropdowns(CandidateProfileModel profile)
         {
             return new CandidateProfileViewModel
             {
                 Profile = profile,
 
-                Divisions = repo.GetDivisions(),
-                Streams = repo.GetStreams(),
-
-                GraduationStatuses =
-                    repo.GetGraduationStatuses(),
-
-                InternshipFellowshipType =
-                    repo.GetInternshipFellowshipType(),
-
-                InternshipTitles =
-                    repo.GetInternshipTitles(),
-
-                InternshipDurations =
-                    repo.GetInternshipDurations(),
-
-                InternshipStatuses =
-                    repo.GetInternshipStatuses(),
-
-                Relationships =
-                    repo.GetRelationships()
+                Divisions = _repo.GetDivisions(),
+                Streams = _repo.GetStreams(),
+                GraduationStatuses = _repo.GetGraduationStatuses(),
+                InternshipFellowshipType = _repo.GetInternshipFellowshipType(),
+                InternshipTitles = _repo.GetInternshipTitles(),
+                InternshipDurations = _repo.GetInternshipDurations(),
+                InternshipStatuses = _repo.GetInternshipStatuses(),
+                Relationships = _repo.GetRelationships()
             };
         }
 
 
-        // =========================================================
+        // =====================================================
         // UPDATE ADDRESS
-        // =========================================================
+        // =====================================================
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult UpdateAddress(
-            CandidateProfileModel model)
+        public IActionResult UpdateAddress(CandidateProfileModel model)
         {
-            int? candidateId =
-                HttpContext.Session.GetInt32("CandidateID");
+            int? candidateId = HttpContext.Session.GetInt32("CandidateID");
 
             if (candidateId == null)
             {
-                return RedirectToAction(
-                    "CandidateLogin",
-                    "Account"
-                );
+                return RedirectToAction("CandidateLogin", "Account");
             }
 
-            model.CandidateID = candidateId.Value;
+            _repo.UpdateAddress(
+                candidateId.Value,
+                model.CountryID,
+                model.StateID,
+                model.CityID,
+                model.Pincode
+            );
 
-            repo.UpdateAddress(model);
-
-            TempData["Success"] =
-                "Address updated successfully.";
+            TempData["Success"] = "Address updated successfully.";
 
             return RedirectToAction("Profile");
         }
 
 
-        // =========================================================
+
+        // =====================================================
         // UPDATE EDUCATION
-        // =========================================================
+        // =====================================================
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult UpdateEducation(
-            CandidateProfileModel model)
+        public IActionResult UpdateEducation(CandidateProfileModel model)
         {
-            int? candidateId =
-                HttpContext.Session.GetInt32("CandidateID");
+            int? candidateId = HttpContext.Session.GetInt32("CandidateID");
 
             if (candidateId == null)
             {
-                return RedirectToAction(
-                    "CandidateLogin",
-                    "Account"
-                );
+                return RedirectToAction("CandidateLogin", "Account");
             }
 
             model.CandidateID = candidateId.Value;
 
-            repo.UpdateEducation(model);
+            _repo.UpdateEducation(model);
 
-            TempData["Success"] =
-                "Education details updated successfully.";
+            TempData["Success"] = "Education updated successfully.";
 
             return RedirectToAction("Profile");
         }
 
 
-        // =========================================================
-        // UPDATE INTERNSHIP PREFERENCE
-        // =========================================================
+        // =====================================================
+        // UPDATE INTERNSHIP / FELLOWSHIP PREFERENCE
+        // =====================================================
 
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public IActionResult UpdateInternshipPreference(
-            CandidateProfileModel model)
-        {
-            int? candidateId =
-                HttpContext.Session.GetInt32("CandidateID");
+        //[HttpPost]
+        //[ValidateAntiForgeryToken]
+        //public IActionResult UpdateInternshipPreference(CandidateProfileModel model)
+        //{
+        //    int? candidateId = HttpContext.Session.GetInt32("CandidateID");
 
-            if (candidateId == null)
-            {
-                return RedirectToAction(
-                    "CandidateLogin",
-                    "Account"
-                );
-            }
+        //    if (candidateId == null)
+        //    {
+        //        return RedirectToAction("CandidateLogin", "Account");
+        //    }
 
-            model.CandidateID = candidateId.Value;
+        //    _repo.UpdateInternshipPreference(
+        //        candidateId.Value,
+        //        model.Internship_FellowshipType,
+        //        model.Preferred_Country,
+        //        model.Preferred_State,
+        //        model.Preferred_City
+        //    );
 
-            repo.UpdateInternshipPreference(model);
+        //    TempData["Success"] = "Internship / Fellowship Preference updated successfully.";
 
-            TempData["Success"] =
-                "Internship / Fellowship preference updated successfully.";
+        //    return RedirectToAction("Profile");
+        //}
 
-            return RedirectToAction("Profile");
-        }
+        // =====================================================
+        // UPDATE DOCUMENTS
+        // =====================================================
+
+        //[HttpPost]
+        //[ValidateAntiForgeryToken]
+        //public IActionResult UpdateDocuments(CandidateProfileModel model)
+        //{
+        //    int? candidateId = HttpContext.Session.GetInt32("CandidateID");
+
+        //    if (candidateId == null)
+        //    {
+        //        return RedirectToAction("CandidateLogin", "Account");
+        //    }
+
+        //    _repo.UpdateDocuments(
+        //        candidateId.Value,
+        //        model.sResume,
+        //        model.sPhoto,
+        //        model.sSignature,
+        //        model.sDivyang,
+        //        model.sHobbies
+        //    );
+
+        //    TempData["Success"] = "Documents updated successfully.";
+
+        //    return RedirectToAction("Profile");
+        //}
 
 
         // =========================================================
@@ -247,26 +250,20 @@ Location = ResponseCacheLocation.None)]
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult UpdateInternshipDetails(
-            CandidateProfileModel model)
+        public IActionResult UpdateInternshipDetails(CandidateProfileModel model)
         {
-            int? candidateId =
-                HttpContext.Session.GetInt32("CandidateID");
+            int? candidateId = HttpContext.Session.GetInt32("CandidateID");
 
             if (candidateId == null)
             {
-                return RedirectToAction(
-                    "CandidateLogin",
-                    "Account"
-                );
+                return RedirectToAction("CandidateLogin", "Account");
             }
 
             model.CandidateID = candidateId.Value;
 
-            repo.UpdateInternshipDetails(model);
+            _repo.UpdateInternshipDetails(model);
 
-            TempData["Success"] =
-                "Internship details updated successfully.";
+            TempData["Success"] = "Internship details updated successfully.";
 
             return RedirectToAction("Profile");
         }
@@ -278,26 +275,20 @@ Location = ResponseCacheLocation.None)]
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult UpdateLanguages(
-            CandidateProfileModel model)
+        public IActionResult UpdateLanguages(CandidateProfileModel model)
         {
-            int? candidateId =
-                HttpContext.Session.GetInt32("CandidateID");
+            int? candidateId = HttpContext.Session.GetInt32("CandidateID");
 
             if (candidateId == null)
             {
-                return RedirectToAction(
-                    "CandidateLogin",
-                    "Account"
-                );
+                return RedirectToAction("CandidateLogin", "Account");
             }
 
             model.CandidateID = candidateId.Value;
 
-            repo.UpdateLanguages(model);
+            _repo.UpdateLanguages(model);
 
-            TempData["Success"] =
-                "Languages updated successfully.";
+            TempData["Success"] = "Languages updated successfully.";
 
             return RedirectToAction("Profile");
         }
@@ -309,26 +300,20 @@ Location = ResponseCacheLocation.None)]
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult UpdateReferences(
-            CandidateProfileModel model)
+        public IActionResult UpdateReferences(CandidateProfileModel model)
         {
-            int? candidateId =
-                HttpContext.Session.GetInt32("CandidateID");
+            int? candidateId = HttpContext.Session.GetInt32("CandidateID");
 
             if (candidateId == null)
             {
-                return RedirectToAction(
-                    "CandidateLogin",
-                    "Account"
-                );
+                return RedirectToAction("CandidateLogin", "Account");
             }
 
             model.CandidateID = candidateId.Value;
 
-            repo.UpdateReferences(model);
+            _repo.UpdateReferences(model);
 
-            TempData["Success"] =
-                "References updated successfully.";
+            TempData["Success"] = "References updated successfully.";
 
             return RedirectToAction("Profile");
         }
@@ -340,26 +325,20 @@ Location = ResponseCacheLocation.None)]
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult UpdateAchievements(
-            CandidateProfileModel model)
+        public IActionResult UpdateAchievements(CandidateProfileModel model)
         {
-            int? candidateId =
-                HttpContext.Session.GetInt32("CandidateID");
+            int? candidateId = HttpContext.Session.GetInt32("CandidateID");
 
             if (candidateId == null)
             {
-                return RedirectToAction(
-                    "CandidateLogin",
-                    "Account"
-                );
+                return RedirectToAction("CandidateLogin", "Account");
             }
 
             model.CandidateID = candidateId.Value;
 
-            repo.UpdateAchievements(model);
+            _repo.UpdateAchievements(model);
 
-            TempData["Success"] =
-                "Achievements updated successfully.";
+            TempData["Success"] = "Achievements updated successfully.";
 
             return RedirectToAction("Profile");
         }
@@ -371,26 +350,20 @@ Location = ResponseCacheLocation.None)]
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult UpdateLinks(
-            CandidateProfileModel model)
+        public IActionResult UpdateLinks(CandidateProfileModel model)
         {
-            int? candidateId =
-                HttpContext.Session.GetInt32("CandidateID");
+            int? candidateId = HttpContext.Session.GetInt32("CandidateID");
 
             if (candidateId == null)
             {
-                return RedirectToAction(
-                    "CandidateLogin",
-                    "Account"
-                );
+                return RedirectToAction("CandidateLogin", "Account");
             }
 
             model.CandidateID = candidateId.Value;
 
-            repo.UpdateLinks(model);
+            _repo.UpdateLinks(model);
 
-            TempData["Success"] =
-                "Links updated successfully.";
+            TempData["Success"] = "Links updated successfully.";
 
             return RedirectToAction("Profile");
         }
@@ -402,26 +375,20 @@ Location = ResponseCacheLocation.None)]
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult UpdateObjective(
-            CandidateProfileModel model)
+        public IActionResult UpdateObjective(CandidateProfileModel model)
         {
-            int? candidateId =
-                HttpContext.Session.GetInt32("CandidateID");
+            int? candidateId = HttpContext.Session.GetInt32("CandidateID");
 
             if (candidateId == null)
             {
-                return RedirectToAction(
-                    "CandidateLogin",
-                    "Account"
-                );
+                return RedirectToAction("CandidateLogin", "Account");
             }
 
             model.CandidateID = candidateId.Value;
 
-            repo.UpdateObjective(model);
+            _repo.UpdateObjective(model);
 
-            TempData["Success"] =
-                "Career objective updated successfully.";
+            TempData["Success"] = "Career objective updated successfully.";
 
             return RedirectToAction("Profile");
         }
@@ -433,26 +400,20 @@ Location = ResponseCacheLocation.None)]
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult UpdateSkills(
-            CandidateProfileModel model)
+        public IActionResult UpdateSkills(CandidateProfileModel model)
         {
-            int? candidateId =
-                HttpContext.Session.GetInt32("CandidateID");
+            int? candidateId = HttpContext.Session.GetInt32("CandidateID");
 
             if (candidateId == null)
             {
-                return RedirectToAction(
-                    "CandidateLogin",
-                    "Account"
-                );
+                return RedirectToAction("CandidateLogin", "Account");
             }
 
             model.CandidateID = candidateId.Value;
 
-            repo.UpdateSkills(model);
+            _repo.UpdateSkills(model);
 
-            TempData["Success"] =
-                "Skills updated successfully.";
+            TempData["Success"] = "Skills updated successfully.";
 
             return RedirectToAction("Profile");
         }
@@ -464,29 +425,27 @@ Location = ResponseCacheLocation.None)]
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult UpdateDocuments(
-            CandidateProfileModel model)
+        public IActionResult UpdateDocuments(CandidateProfileModel model)
         {
-            int? candidateId =
-                HttpContext.Session.GetInt32("CandidateID");
+            int? candidateId = HttpContext.Session.GetInt32("CandidateID");
 
             if (candidateId == null)
             {
-                return RedirectToAction(
-                    "CandidateLogin",
-                    "Account"
-                );
+                return RedirectToAction("CandidateLogin", "Account");
             }
 
             model.CandidateID = candidateId.Value;
 
-            repo.UpdateDocuments(model);
+            _repo.UpdateDocuments(model);
 
-            TempData["Success"] =
-                "Documents and personal details updated successfully.";
+            TempData["Success"] = "Documents and personal details updated successfully.";
 
             return RedirectToAction("Profile");
         }
+
+        // =========================================================
+        // UPDATE INTERNSHIP / FELLOWSHIP PREFERENCE
+        // =========================================================
 
         [HttpPost]
         [ValidateAntiForgeryToken]
@@ -495,13 +454,17 @@ Location = ResponseCacheLocation.None)]
             int? candidateId = HttpContext.Session.GetInt32("CandidateID");
 
             if (candidateId == null)
+            {
                 return RedirectToAction("CandidateLogin", "Account");
+            }
 
+            // Never trust CandidateID from form
             model.Profile.CandidateID = candidateId.Value;
 
-            repo.UpdateInternshipPreference(model.Profile);
+            _repo.UpdateInternshipPreference(model.Profile);
 
-            TempData["Success"] = "Internship Preference Updated Successfully.";
+            TempData["Success"] =
+                "Internship Preference Updated Successfully.";
 
             return RedirectToAction("Profile");
         }
@@ -535,17 +498,12 @@ Location = ResponseCacheLocation.None)]
         {
             // Clear all session data
             HttpContext.Session.Clear();
-
             // Delete session cookie
             Response.Cookies.Delete(".AspNetCore.Session");
-
             // Prevent browser from caching the previous page
             SetNoCacheHeaders();
-
             // Go to Home page
-            return RedirectToAction(
-                "Index",
-                "Home");
+            return RedirectToAction("Index", "Home");
         }
 
 
@@ -555,14 +513,9 @@ Location = ResponseCacheLocation.None)]
 
         private void SetNoCacheHeaders()
         {
-            Response.Headers["Cache-Control"] =
-                "no-cache, no-store, must-revalidate";
-
-            Response.Headers["Pragma"] =
-                "no-cache";
-
-            Response.Headers["Expires"] =
-                "0";
+            Response.Headers["Cache-Control"] = "no-cache, no-store, must-revalidate";
+            Response.Headers["Pragma"] = "no-cache";
+            Response.Headers["Expires"] = "0";
         }
     }
 }

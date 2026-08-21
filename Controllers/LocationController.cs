@@ -114,8 +114,7 @@ namespace ErJobPortal.Controllers
                 Console.WriteLine("STATE API RESPONSE: " + json);
 
 
-                Console.WriteLine(
-                    "========================================");
+                Console.WriteLine("========================================");
 
 
                 // =====================================================
@@ -178,9 +177,7 @@ namespace ErJobPortal.Controllers
         // GET CITIES BY COUNTRY + STATE
         // =========================================================
         [HttpGet]
-        public async Task<IActionResult> GetCities(
-    string countryCode,
-    string stateCode)
+        public async Task<IActionResult> GetCities(string countryCode, string stateCode)
         {
             try
             {
