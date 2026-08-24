@@ -1085,6 +1085,566 @@ namespace ErJobPortal.Controllers
             return View(model);
         }
 
+        [HttpGet]
+        public IActionResult CandidateFeedback()
+        {
+            List<SACandidateFeedbackM> feedbackList = new List<SACandidateFeedbackM>();
 
+            string connectionString =
+                _configuration.GetConnectionString("DefaultConnection");
+
+            using (SqlConnection con = new SqlConnection(connectionString))
+            {
+                con.Open();
+
+                string query = @"
+    WITH LatestFeedback AS
+    (
+        SELECT
+            CF.nID AS FeedbackID,
+            CF.nAdminID,
+            CF.nSABit,
+            ROW_NUMBER() OVER
+            (
+                PARTITION BY CF.nAdminID
+                ORDER BY CF.nID DESC
+            ) AS RowNum
+        FROM tblCandidateFeedback CF
+    )
+
+    SELECT
+        CR.nID,
+        CR.sFName,
+        CR.sLName,
+        LF.FeedbackID,
+        LF.nAdminID,
+        ISNULL(LF.nSABit, 0) AS nSABit
+
+    FROM tblCandidateRegister CR
+
+    INNER JOIN LatestFeedback LF
+        ON CR.nID = LF.nAdminID
+
+    WHERE LF.RowNum = 1
+
+    ORDER BY LF.FeedbackID DESC";
+
+                using (SqlCommand cmd = new SqlCommand(query, con))
+                {
+                    using (SqlDataReader dr = cmd.ExecuteReader())
+                    {
+                        while (dr.Read())
+                        {
+                            SACandidateFeedbackM model = new SACandidateFeedbackM();
+
+                            model.nID = Convert.ToInt32(dr["nID"]);
+                            model.sFName = dr["sFName"]?.ToString();
+                            model.sLName = dr["sLName"]?.ToString();
+
+                            if (dr["nAdminID"] != DBNull.Value)
+                            {
+                                model.nAdminID = Convert.ToInt32(dr["nAdminID"]);
+                            }
+
+                            model.nSABit = Convert.ToInt32(dr["nSABit"]);
+
+                            model.Status =
+                                model.nSABit == 1 ? "Enabled" : "Disabled";
+
+                            feedbackList.Add(model);
+                        }
+                    }
+                }
+            }
+
+            return View(feedbackList);
+        }
+
+        //Enable / Disable Method
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public IActionResult ToggleCandidateFeedback(int id)
+        {
+            string connectionString =
+                _configuration.GetConnectionString("DefaultConnection");
+
+            using (SqlConnection con = new SqlConnection(connectionString))
+            {
+                con.Open();
+
+                string query = @"
+            UPDATE tblCandidateFeedback
+            SET
+                nSABit = CASE
+                            WHEN ISNULL(nSABit, 0) = 1
+                                THEN 0
+                            ELSE 1
+                         END,
+                ModDate = GETDATE()
+            WHERE nAdminID = @id";
+
+                using (SqlCommand cmd = new SqlCommand(query, con))
+                {
+                    cmd.Parameters.Add("@id", SqlDbType.Int).Value = id;
+
+                    int result = cmd.ExecuteNonQuery();
+
+                    if (result == 0)
+                    {
+                        TempData["Error"] =
+                            "Feedback record not found.";
+                    }
+                }
+            }
+
+            return RedirectToAction("CandidateFeedback");
+        }
+
+
+        [HttpGet]
+        public IActionResult DetailsCandidateFeedback(int id)
+        {
+            SACandidateFeedbackDetailsM model =
+                new SACandidateFeedbackDetailsM();
+
+            string connectionString =
+                _configuration.GetConnectionString("DefaultConnection");
+
+            using (SqlConnection con = new SqlConnection(connectionString))
+            {
+                con.Open();
+
+                string query = @"
+            SELECT
+                CR.nID,
+                CR.sFName,
+                CR.sLName,
+                CR.sProfileImage,
+
+                CF.nAdminID,
+                CF.sQue1,
+                CF.sQue2,
+                CF.sQue3,
+                CF.sQue4,
+                CF.sQue5,
+                CF.nSABit,
+                CF.RegDate,
+                CF.ModDate
+
+            FROM tblCandidateRegister CR
+
+            INNER JOIN tblCandidateFeedback CF
+                ON CR.nID = CF.nAdminID
+
+            WHERE CR.nID = @nID
+        ";
+
+                using (SqlCommand cmd = new SqlCommand(query, con))
+                {
+                    cmd.Parameters.AddWithValue("@nID", id);
+
+                    using (SqlDataReader dr = cmd.ExecuteReader())
+                    {
+                        if (dr.Read())
+                        {
+                            // Candidate details
+                            model.nID =
+                                Convert.ToInt32(dr["nID"]);
+
+                            model.sFName =
+                                dr["sFName"] == DBNull.Value
+                                ? ""
+                                : dr["sFName"].ToString();
+
+                            model.sLName =
+                                dr["sLName"] == DBNull.Value
+                                ? ""
+                                : dr["sLName"].ToString();
+
+                            model.sProfileImage =
+                                dr["sProfileImage"] == DBNull.Value
+                                ? ""
+                                : dr["sProfileImage"].ToString();
+
+
+                            // Feedback details
+                            model.nAdminID =
+                                Convert.ToInt32(dr["nAdminID"]);
+
+                            model.sQue1 =
+                                Convert.ToInt32(dr["sQue1"]);
+
+                            model.sQue2 =
+                                Convert.ToInt32(dr["sQue2"]);
+
+                            model.sQue3 =
+                                Convert.ToInt32(dr["sQue3"]);
+
+                            model.sQue4 =
+                                Convert.ToInt32(dr["sQue4"]);
+
+                            model.sQue5 =
+                                dr["sQue5"] == DBNull.Value
+                                ? ""
+                                : dr["sQue5"].ToString();
+
+
+                            // Super Admin status
+                            model.nSABit =
+                                dr["nSABit"] != DBNull.Value &&
+                                Convert.ToBoolean(dr["nSABit"]);
+
+
+                            // Dates
+                            if (dr["RegDate"] != DBNull.Value)
+                            {
+                                model.RegDate =
+                                    Convert.ToDateTime(dr["RegDate"]);
+                            }
+
+                            if (dr["ModDate"] != DBNull.Value)
+                            {
+                                model.ModDate =
+                                    Convert.ToDateTime(dr["ModDate"]);
+                            }
+                        }
+                        else
+                        {
+                            return NotFound();
+                        }
+                    }
+                }
+            }
+
+            return View(model);
+        }
+
+
+        [HttpGet]
+        public IActionResult OrganizationFeedback()
+        {
+            List<SAOrganizationFeedbackM> feedbackList =
+                new List<SAOrganizationFeedbackM>();
+
+            string connectionString = _configuration.GetConnectionString("DefaultConnection");
+
+            using (SqlConnection con = new SqlConnection(connectionString))
+            {
+                con.Open();
+
+                string query = @"
+WITH LatestFeedback AS
+(
+    SELECT
+        F.nID AS FeedbackID,
+        F.nSAID,
+        F.nSABit,
+
+        ROW_NUMBER() OVER
+        (
+            PARTITION BY F.nSAID
+            ORDER BY F.nID DESC
+        ) AS RowNum
+
+    FROM tblSAOrgFeedback F
+)
+
+SELECT
+    O.nID,
+    O.sOrgName,
+    LF.FeedbackID,
+    ISNULL(LF.nSABit, 0) AS nSABit
+
+FROM tblOrgRegistration O
+
+INNER JOIN LatestFeedback LF
+    ON O.nID = LF.nSAID
+
+WHERE LF.RowNum = 1
+
+ORDER BY LF.FeedbackID DESC";
+
+                using (SqlCommand cmd = new SqlCommand(query, con))
+                {
+                    using (SqlDataReader dr = cmd.ExecuteReader())
+                    {
+                        while (dr.Read())
+                        {
+                            SAOrganizationFeedbackM model =
+                                new SAOrganizationFeedbackM();
+
+                            model.nID =
+                                Convert.ToInt32(dr["nID"]);
+
+                            model.sOrgName =
+                                dr["sOrgName"] == DBNull.Value
+                                    ? ""
+                                    : dr["sOrgName"].ToString();
+
+                            model.nSABit =
+                                Convert.ToInt32(dr["nSABit"]);
+
+                            model.Status =
+                                model.nSABit == 1
+                                    ? "Enabled"
+                                    : "Disabled";
+
+                            feedbackList.Add(model);
+                        }
+                    }
+                }
+            }
+
+            return View(feedbackList);
+        }
+
+
+        // Enable / Disable Organization Feedback
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public IActionResult ToggleOrganizationFeedback(int id)
+        {
+            string connectionString =
+                _configuration.GetConnectionString("DefaultConnection");
+
+            using (SqlConnection con = new SqlConnection(connectionString))
+            {
+                con.Open();
+
+                string query = @"
+            UPDATE tblSAOrgFeedback
+            SET 
+                nSABit = CASE
+                            WHEN ISNULL(nSABit, 0) = 1 THEN 0
+                            ELSE 1
+                         END,
+                dModDate = GETDATE()
+            WHERE nID = @id";
+
+                using (SqlCommand cmd = new SqlCommand(query, con))
+                {
+                    cmd.Parameters.Add("@id", SqlDbType.Int).Value = id;
+
+                    int result = cmd.ExecuteNonQuery();
+
+                    if (result > 0)
+                    {
+                        TempData["Success"] =
+                            "Organization feedback status updated successfully.";
+                    }
+                    else
+                    {
+                        TempData["Error"] =
+                            "Organization feedback record not found.";
+                    }
+                }
+            }
+
+            return RedirectToAction("OrganizationFeedback");
+        }
+
+        [HttpGet]
+        public IActionResult DetailsOrgFeedback(int id)
+        {
+            SAOrgFeedbackDetailsM model = new SAOrgFeedbackDetailsM();
+
+            string connectionString =
+                _configuration.GetConnectionString("DefaultConnection");
+
+            using (SqlConnection con = new SqlConnection(connectionString))
+            {
+                con.Open();
+
+                string query = @"
+SELECT TOP 1
+
+    /* ================= ORGANIZATION ================= */
+    ORG.nID,
+    ORG.sOrgName,
+
+    /* ================= ORGANIZATION PROFILE ================= */
+    OP.sCompanyLogo,
+
+    /* ================= SA FEEDBACK QUESTIONS ================= */
+    SAF.nID AS FeedbackID,
+    SAF.nSAID,
+
+    SAF.Que1,
+    SAF.Que2,
+    SAF.Que3,
+    SAF.Que4,
+    SAF.Que5,
+
+    /* ================= ORGANIZATION ANSWERS ================= */
+    OFB.sQue1 AS Ans1,
+    OFB.sQue2 AS Ans2,
+    OFB.sQue3 AS Ans3,
+    OFB.sQue4 AS Ans4,
+    OFB.sQue5 AS Ans5,
+
+    /* ================= STATUS ================= */
+    OFB.nSABit,
+
+    /* ================= DATES ================= */
+    OFB.RegDate,
+    OFB.ModDate
+
+FROM tblOrgRegistration ORG
+
+/* Organization Profile */
+LEFT JOIN tblOrgProfile OP
+    ON OP.nOrgID = ORG.nID
+
+/* SA defined feedback questions */
+INNER JOIN tblSAOrgFeedback SAF
+    ON SAF.nSAID = ORG.nID
+
+/* Organization submitted answers */
+INNER JOIN tblOrgFeedback OFB
+    ON OFB.nAdminID = ORG.nID
+
+WHERE ORG.nID = @OrgID
+
+ORDER BY SAF.nID DESC, OFB.nID DESC;
+";
+
+                using (SqlCommand cmd = new SqlCommand(query, con))
+                {
+                    cmd.Parameters.Add("@OrgID", SqlDbType.Int).Value = id;
+
+                    using (SqlDataReader dr = cmd.ExecuteReader())
+                    {
+                        if (!dr.Read())
+                        {
+                            return NotFound();
+                        }
+
+                        // =========================================
+                        // ORGANIZATION
+                        // =========================================
+
+                        model.nID = dr["nID"] == DBNull.Value
+                            ? 0
+                            : Convert.ToInt32(dr["nID"]);
+
+                        model.sOrgName = dr["sOrgName"] == DBNull.Value
+                            ? ""
+                            : dr["sOrgName"].ToString();
+
+                        // =========================================
+                        // ORGANIZATION LOGO
+                        // =========================================
+
+                        model.sOrgLogo = dr["sCompanyLogo"] == DBNull.Value
+                            ? ""
+                            : dr["sCompanyLogo"].ToString();
+
+                        // =========================================
+                        // FEEDBACK ID
+                        // =========================================
+
+                        model.FeedbackID = dr["FeedbackID"] == DBNull.Value
+                            ? 0
+                            : Convert.ToInt32(dr["FeedbackID"]);
+
+                        model.nSAID = dr["nSAID"] == DBNull.Value
+                            ? 0
+                            : Convert.ToInt32(dr["nSAID"]);
+
+                        // =========================================
+                        // QUESTION 1
+                        // Question comes from tblSAOrgFeedback
+                        // Answer comes from tblOrgFeedback
+                        // =========================================
+
+                        model.sQue1 = dr["Que1"] == DBNull.Value
+                            ? ""
+                            : dr["Que1"].ToString();
+
+                        model.sAns1 = dr["Ans1"] == DBNull.Value
+                            ? ""
+                            : dr["Ans1"].ToString();
+
+                        // =========================================
+                        // QUESTION 2
+                        // =========================================
+
+                        model.sQue2 = dr["Que2"] == DBNull.Value
+                            ? ""
+                            : dr["Que2"].ToString();
+
+                        model.sAns2 = dr["Ans2"] == DBNull.Value
+                            ? ""
+                            : dr["Ans2"].ToString();
+
+                        // =========================================
+                        // QUESTION 3
+                        // =========================================
+
+                        model.sQue3 = dr["Que3"] == DBNull.Value
+                            ? ""
+                            : dr["Que3"].ToString();
+
+                        model.sAns3 = dr["Ans3"] == DBNull.Value
+                            ? ""
+                            : dr["Ans3"].ToString();
+
+                        // =========================================
+                        // QUESTION 4
+                        // =========================================
+
+                        model.sQue4 = dr["Que4"] == DBNull.Value
+                            ? ""
+                            : dr["Que4"].ToString();
+
+                        model.sAns4 = dr["Ans4"] == DBNull.Value
+                            ? ""
+                            : dr["Ans4"].ToString();
+
+                        // =========================================
+                        // QUESTION 5
+                        // =========================================
+
+                        model.sQue5 = dr["Que5"] == DBNull.Value
+                            ? ""
+                            : dr["Que5"].ToString();
+
+                        model.sAns5 = dr["Ans5"] == DBNull.Value
+                            ? ""
+                            : dr["Ans5"].ToString();
+
+                        // =========================================
+                        // STATUS
+                        // =========================================
+
+                        model.nSABit =
+                            dr["nSABit"] != DBNull.Value &&
+                            Convert.ToBoolean(dr["nSABit"]);
+
+                        // =========================================
+                        // REG DATE
+                        // =========================================
+
+                        if (dr["RegDate"] != DBNull.Value)
+                        {
+                            model.RegDate =
+                                Convert.ToDateTime(dr["RegDate"]);
+                        }
+
+                        // =========================================
+                        // MOD DATE
+                        // =========================================
+
+                        if (dr["ModDate"] != DBNull.Value)
+                        {
+                            model.ModDate =
+                                Convert.ToDateTime(dr["ModDate"]);
+                        }
+                    }
+                }
+            }
+
+            return View(model);
+        }
     }
 }
