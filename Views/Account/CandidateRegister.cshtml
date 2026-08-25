@@ -3,7 +3,19 @@
 @{
     ViewData["Title"] = "Candidate Registration";
 }
+@if (TempData["Success"] != null)
+{
+    <div class="alert alert-success">
+        @TempData["Success"]
+    </div>
+}
 
+@if (TempData["Error"] != null)
+{
+    <div class="alert alert-danger">
+        @TempData["Error"]
+    </div>
+}
 <link rel="stylesheet" href="~/css/CandidateRegister.css" />
 
 <div class="candidate-register-page">
@@ -17,7 +29,7 @@
         <div class="registration-switch">
 
             <a asp-controller="Account"
-               asp-action="Register"
+               asp-action="CandidateRegister"
                class="switch-btn active">
                 Trainee
             </a>
@@ -55,7 +67,7 @@
         ========================================== -->
 
         <form asp-controller="Account"
-              asp-action="Register"
+              asp-action="CandidateRegister"
               method="post"
               enctype="multipart/form-data">
 
@@ -300,12 +312,11 @@
                         College
                     </label>
 
-                    <select asp-for="nCollegeCode"
-                            class="register-select">
+                    <select asp-for="nCollegeCode" class="register-select">
 
-                        <option value="0">
-                            Select College
-                        </option>
+                        <option value="0">Select College</option>
+                        <option value="1">GH</option>
+                        <option value="2">JD</option>
 
                     </select>
 
@@ -328,7 +339,15 @@
                         <option value="0">
                             Select Branch
                         </option>
-
+                        <option value="1">
+                            CSE
+                        </option>
+                        <option value="2">
+                            ETC
+                        </option>
+                        <option value="3">
+                            IT
+                        </option>
                     </select>
 
                     <span asp-validation-for="nBranch"

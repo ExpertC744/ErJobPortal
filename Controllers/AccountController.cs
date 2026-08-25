@@ -22,33 +22,57 @@ namespace ErJobPortal.Controllers
         }
 
 
+        // ==============================
+        // CANDIDATE REGISTER - POST
+        // ==============================
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public IActionResult CandidateRegister(CandidateRegister model)
         {
+            // STATIC OTP FOR NOW
+            if (model.sOTP != "123456")
+            {
+                ModelState.AddModelError(
+                    "sOTP",
+                    "Invalid OTP. Please enter 123456."
+                );
+            }
+
             if (!ModelState.IsValid)
             {
-                foreach (var item in ModelState)
-                {
-                    foreach (var error in item.Value.Errors)
-                    {
-                        Console.WriteLine($"Field: {item.Key}, Error: {error.ErrorMessage}");
-                    }
-                }
                 return View(model);
             }
 
-            int result = _accountRepository.Register(model);
-
-            if (result > 0)
+            try
             {
-                TempData["Success"] = "Registration Successfully";
-                return RedirectToAction("Register");
+                int result = _accountRepository.Register(model);
+
+                if (result > 0)
+                {
+                    TempData["Success"] =
+                        "Registration successful. Please login.";
+
+                    return RedirectToAction("CandidateLogin");
+                }
+
+                ModelState.AddModelError(
+                    "",
+                    "Registration failed."
+                );
+
+                return View(model);
             }
+            catch (Exception ex)
+            {
+                ModelState.AddModelError(
+                    "",
+                    ex.Message
+                );
 
-            TempData["Error"] = "Registration Failed";
-
-            return View(model);
+                return View(model);
+            }
         }
+
 
 
         // Organization Registration
