@@ -963,6 +963,20 @@
 
                         </div>
 
+
+                        <div class="otp-input-container">
+
+                            <input asp-for="sOTP"
+                                   type="text"
+                                   class="otp-input"
+                                   placeholder="Enter OTP"
+                                   maxlength="6" />
+
+                            <span asp-validation-for="sOTP"
+                                  class="text-danger register-validation">
+                            </span>
+
+                        </div>
                     </div>
 
                 </div>

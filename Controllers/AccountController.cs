@@ -83,25 +83,63 @@ namespace ErJobPortal.Controllers
         }
 
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public IActionResult OrganizationRegister(OrganizationRegister model)
         {
-            if (!ModelState.IsValid)
+            try
             {
+                // STATIC OTP FOR NOW
+                if (model.sOTP != "123456")
+                {
+                    ModelState.AddModelError(
+                        "sOTP",
+                        "Invalid OTP. Please enter 123456."
+                    );
+                }
+
+                // Check validation errors
+                if (!ModelState.IsValid)
+                {
+                    foreach (var item in ModelState)
+                    {
+                        foreach (var error in item.Value.Errors)
+                        {
+                            Console.WriteLine(
+                                $"Field: {item.Key}, Error: {error.ErrorMessage}"
+                            );
+                        }
+                    }
+
+                    return View(model);
+                }
+
+                int result = _accountRepository.RegisterOrganization(model);
+
+                if (result > 0)
+                {
+                    TempData["Success"] =
+                        "Organization Registration Successfully.";
+
+                    return RedirectToAction("OrganizationRegister");
+                }
+
+                TempData["Error"] =
+                    "Organization Registration Failed.";
+
                 return View(model);
             }
-
-            int result = _accountRepository.RegisterOrganization(model);
-
-            if (result > 0)
+            catch (Exception ex)
             {
-                TempData["Success"] = "Organization Registration Successfully";
+                Console.WriteLine("Organization Register Error:");
+                Console.WriteLine(ex.ToString());
 
-                return RedirectToAction("OrganizationRegister");
+                ModelState.AddModelError(
+                    "",
+                    ex.Message
+                );
+
+                return View(model);
             }
-
-            TempData["Error"] = "Organization Registration Failed";
-
-            return View(model);
         }
 
         [HttpGet]

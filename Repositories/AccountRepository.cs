@@ -47,31 +47,74 @@ namespace ErJobPortal.Repositories
         #endregion
 
         // Org Register
-        #region "Organization Register"
+        #region Organization Register
+
         public int RegisterOrganization(OrganizationRegister model)
         {
             using (SqlConnection cn = _db.GetConnection())
             {
-                using (SqlCommand cmd = new SqlCommand("SP_RegisterOrganization", cn))
+                using (SqlCommand cmd =
+                    new SqlCommand("SP_RegisterOrganization", cn))
                 {
                     cmd.CommandType = CommandType.StoredProcedure;
 
-                    cmd.Parameters.AddWithValue("@sOrgName", model.sOrgName ?? "");
-                    cmd.Parameters.AddWithValue("@sOrgUrl", model.sOrgUrl ?? "");
-                    cmd.Parameters.AddWithValue("@sName", model.sName ?? "");
-                    cmd.Parameters.AddWithValue("@sDesignation", model.sDesignation ?? "");
-                    cmd.Parameters.AddWithValue("@sMobile", model.sMobile ?? "");
-                    cmd.Parameters.AddWithValue("@sEmail", model.sEmail ?? "");
-                    cmd.Parameters.AddWithValue("@nCollegeCode", model.nCollegeCode);
-                    cmd.Parameters.AddWithValue("@nCollegeName", model.nCollegeName);
-                    cmd.Parameters.AddWithValue("@sPassword", model.sPassword ?? "");
-                    cmd.Parameters.AddWithValue("@sOTP", model.sOTP ?? "");
+                    cmd.Parameters.AddWithValue(
+                        "@sOrgName",
+                        (object?)model.sOrgName ?? DBNull.Value
+                    );
+
+                    cmd.Parameters.AddWithValue(
+                        "@sOrgUrl",
+                        (object?)model.sOrgUrl ?? DBNull.Value
+                    );
+
+                    cmd.Parameters.AddWithValue(
+                        "@sName",
+                        (object?)model.sName ?? DBNull.Value
+                    );
+
+                    cmd.Parameters.AddWithValue(
+                        "@sDesignation",
+                        (object?)model.sDesignation ?? DBNull.Value
+                    );
+
+                    cmd.Parameters.AddWithValue(
+                        "@sMobile",
+                        (object?)model.sMobile ?? DBNull.Value
+                    );
+
+                    cmd.Parameters.AddWithValue(
+                        "@sEmail",
+                        (object?)model.sEmail ?? DBNull.Value
+                    );
+
+                    cmd.Parameters.AddWithValue(
+                        "@nCollegeCode",
+                        model.nCollegeCode
+                    );
+
+                    cmd.Parameters.AddWithValue(
+                        "@nCollegeName",
+                        (object?)model.nCollegeName ?? DBNull.Value
+                    );
+
+                    cmd.Parameters.AddWithValue(
+                        "@sPassword",
+                        (object?)model.sPassword ?? DBNull.Value
+                    );
+
+                    cmd.Parameters.AddWithValue(
+                        "@sOTP",
+                        (object?)model.sOTP ?? DBNull.Value
+                    );
+
                     cn.Open();
 
                     return cmd.ExecuteNonQuery();
                 }
             }
         }
+
         #endregion
 
         #region "Org Login"
