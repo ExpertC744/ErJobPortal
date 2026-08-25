@@ -82,9 +82,9 @@ namespace ErJobPortal.Repositories
                 CandidateID = GetNullableInt(reader, "CandidateID") ?? 0,
 
                 // ADDRESS
-                CountryID = GetNullableInt(reader, "CountryID"),
-                StateID = GetNullableInt(reader, "StateID"),
-                CityID = GetNullableInt(reader, "CityID"),
+                CountryID = GetNullableString(reader, "CountryID"),
+                StateID = GetNullableString(reader, "StateID"),
+                CityID = GetNullableString(reader, "CityID"),
                 Pincode = GetNullableString(reader, "Pincode"),
 
                 // EDUCATION
@@ -309,11 +309,15 @@ namespace ErJobPortal.Repositories
         // UPDATE ADDRESS
         // =========================================================
 
+        // =========================================================
+        // UPDATE ADDRESS
+        // =========================================================
+
         public void UpdateAddress(
             int candidateId,
-            int? countryId,
-            int? stateId,
-            int? cityId,
+            string? countryId,
+            string? stateId,
+            string? cityId,
             string? pincode)
         {
             using SqlConnection con = _db.GetConnection();
@@ -332,16 +336,40 @@ namespace ErJobPortal.Repositories
             ModDate = GETDATE()
         WHERE CandidateID = @CandidateID";
 
-            using SqlCommand cmd = new SqlCommand(sql, con);
+            using SqlCommand cmd =
+                new SqlCommand(sql, con);
 
-            cmd.Parameters.Add("@CandidateID", SqlDbType.Int).Value = candidateId;
-            cmd.Parameters.Add("@CountryID", SqlDbType.Int).Value = (object?)countryId ?? DBNull.Value;
-            cmd.Parameters.Add("@StateID", SqlDbType.Int).Value = (object?)stateId ?? DBNull.Value;
-            cmd.Parameters.Add("@CityID", SqlDbType.Int).Value = (object?)cityId ?? DBNull.Value;
-            cmd.Parameters.Add("@Pincode", SqlDbType.NVarChar, 20).Value = (object?)pincode ?? DBNull.Value;
+            cmd.Parameters.Add(
+                "@CandidateID",
+                SqlDbType.Int
+            ).Value = candidateId;
+
+            cmd.Parameters.Add(
+                "@CountryID",
+                SqlDbType.NVarChar,
+                100
+            ).Value = (object?)countryId ?? DBNull.Value;
+
+            cmd.Parameters.Add(
+                "@StateID",
+                SqlDbType.NVarChar,
+                100
+            ).Value = (object?)stateId ?? DBNull.Value;
+
+            cmd.Parameters.Add(
+                "@CityID",
+                SqlDbType.NVarChar,
+                100
+            ).Value = (object?)cityId ?? DBNull.Value;
+
+            cmd.Parameters.Add(
+                "@Pincode",
+                SqlDbType.NVarChar,
+                20
+            ).Value = (object?)pincode ?? DBNull.Value;
+
             cmd.ExecuteNonQuery();
         }
-
 
         // =========================================================
         // UPDATE EDUCATION

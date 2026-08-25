@@ -6,9 +6,9 @@
         public int CandidateID { get; set; }
 
         // Address
-        public int? CountryID { get; set; }
-        public int? StateID { get; set; }
-        public int? CityID { get; set; }
+        public string? CountryID { get; set; }
+        public string? StateID { get; set; }
+        public string? CityID { get; set; }
         public string? Pincode { get; set; }
 
         // Education

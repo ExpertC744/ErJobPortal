@@ -38,8 +38,110 @@
         </div>
 
         <div class="card-body">
+            <form id="addressForm"
+                  asp-action="UpdateAddress"
+                  asp-controller="Candidate"
+                  method="post">
 
-            <form asp-action="UpdateAddress"
+                @Html.AntiForgeryToken()
+
+                <div class="row">
+
+                    <!-- COUNTRY -->
+
+                    <div class="col-md-3 mb-3">
+
+                        <label class="form-label">
+                            Country
+                        </label>
+
+                        <select asp-for="Profile.CountryID"
+                                class="form-control"
+                                id="CountryID">
+
+                            <option value="">
+                                -- Select Country --
+                            </option>
+
+                        </select>
+
+                    </div>
+
+
+                    <!-- STATE -->
+
+                    <div class="col-md-3 mb-3">
+
+                        <label class="form-label">
+                            State
+                        </label>
+
+                        <select asp-for="Profile.StateID"
+                                class="form-control"
+                                id="StateID"
+                                disabled>
+
+                            <option value="">
+                                -- Select State --
+                            </option>
+
+                        </select>
+
+                    </div>
+
+
+                    <!-- CITY -->
+
+                    <div class="col-md-3 mb-3">
+
+                        <label class="form-label">
+                            City
+                        </label>
+
+                        <select asp-for="Profile.CityID"
+                                class="form-control"
+                                id="CityID"
+                                disabled>
+
+                            <option value="">
+                                -- Select City --
+                            </option>
+
+                        </select>
+
+                    </div>
+
+
+                    <!-- PINCODE -->
+
+                    <div class="col-md-3 mb-3">
+
+                        <label class="form-label">
+                            Pincode
+                        </label>
+
+                        <input asp-for="Profile.Pincode"
+                               class="form-control"
+                               placeholder="Enter Pincode" />
+
+                    </div>
+
+                </div>
+
+
+                <div class="text-end">
+
+                    <button type="submit"
+                            class="btn btn-primary">
+
+                        Update Address
+
+                    </button>
+
+                </div>
+
+            </form>
+            @* <form asp-action="UpdateAddress"
                   asp-controller="Candidate"
                   method="post">
 
@@ -126,7 +228,7 @@
 
                 </div>
 
-            </form>
+            </form> *@
 
         </div>
 
@@ -470,10 +572,10 @@
                         <select asp-for="Profile.Internship_FellowshipType"
                                 class="form-control"
                                 asp-items="@(new SelectList(
-                                                        Model.InternshipFellowshipType,
-                                                        "ID",
-                                                        "Name"
-                                                    ))">
+                                                                                                                        Model.InternshipFellowshipType,
+                                                                                                                        "ID",
+                                                                                                                        "Name"
+                                                                                                                    ))">
 
                             <option value="">
                                 -- Select Type --
@@ -1465,6 +1567,19 @@
             });
 
 
+            $('#addressForm').on('submit', function () {
+
+                console.log("CountryID:", $('#CountryID').val());
+                console.log("StateID:", $('#StateID').val());
+                console.log("CityID:", $('#CityID').val());
+                console.log("Pincode:", $('#Profile_Pincode').val());
+
+                // Disabled controls are NOT submitted.
+                $('#StateID').prop('disabled', false);
+
+                $('#CityID').prop('disabled', false);
+
+            });
             // ============================================
             // LOAD COUNTRIES
             // ============================================
@@ -1590,39 +1705,68 @@
                             '<option value="">-- Select State --</option>'
                         );
 
+                                $.each(data, function (index, item) {
 
-                        $.each(data, function (index, item) {
+            var stateCode = item.stateCode;
 
-                            var stateCode = item.stateCode;
+            if (!stateCode && item.id) {
 
-                            if (!stateCode && item.id) {
+                var parts = item.id.split(':');
 
-                                var parts =
-                                    item.id.split(':');
+                stateCode =
+                    parts.length > 1
+                        ? parts[1]
+                        : item.id;
+            }
 
-                                stateCode =
-                                    parts.length > 1
-                                        ? parts[1]
-                                        : item.id;
+            $('#StateID').append(
 
-                            }
+                $('<option>', {
+
+                    value: item.id,
+                    text: item.name
+
+                }).attr(
+                    'data-code',
+                    stateCode
+                )
+
+            );
+
+        });
+
+                        // $.each(data, function (index, item) {
+
+                        //     var stateCode = item.stateCode;
+
+                        //     if (!stateCode && item.id) {
+
+                        //         var parts =
+                        //             item.id.split(':');
+
+                        //         stateCode =
+                        //             parts.length > 1
+                        //                 ? parts[1]
+                        //                 : item.id;
+
+                        //     }
 
 
-                            $('#StateID').append(
+                        //     $('#StateID').append(
 
-                                $('<option>', {
+                        //         $('<option>', {
 
-                                    value: item.id,
-                                    text: item.name
+                        //             value: item.id,
+                        //             text: item.name
 
-                                }).attr(
-                                    'data-code',
-                                    stateCode
-                                )
+                        //         }).attr(
+                        //             'data-code',
+                        //             stateCode
+                        //         )
 
-                            );
+                        //     );
 
-                        });
+                        // });
 
 
                         if (selectedStateID !== '') {
@@ -1765,7 +1909,10 @@
             loadCountries();
 
         });
+        //         $(document).ready(function () {
 
+
+        // });
     </script>
 
 }

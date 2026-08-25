@@ -131,31 +131,35 @@ namespace ErJobPortal.Controllers
             };
         }
 
-
         // =====================================================
         // UPDATE ADDRESS
         // =====================================================
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult UpdateAddress(CandidateProfileModel model)
+        public IActionResult UpdateAddress(CandidateProfileViewModel model)
         {
-            int? candidateId = HttpContext.Session.GetInt32("CandidateID");
+            int? candidateId =
+                HttpContext.Session.GetInt32("CandidateID");
 
             if (candidateId == null)
             {
-                return RedirectToAction("CandidateLogin", "Account");
+                return RedirectToAction(
+                    "CandidateLogin",
+                    "Account"
+                );
             }
 
             _repo.UpdateAddress(
                 candidateId.Value,
-                model.CountryID,
-                model.StateID,
-                model.CityID,
-                model.Pincode
+                model.Profile.CountryID,
+                model.Profile.StateID,
+                model.Profile.CityID,
+                model.Profile.Pincode
             );
 
-            TempData["Success"] = "Address updated successfully.";
+            TempData["Success"] =
+                "Address updated successfully.";
 
             return RedirectToAction("Profile");
         }
