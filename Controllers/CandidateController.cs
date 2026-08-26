@@ -157,22 +157,16 @@ namespace ErJobPortal.Controllers
                 model.Profile.CityID,
                 model.Profile.Pincode
             );
-
-            TempData["Success"] =
-                "Address updated successfully.";
-
+            TempData["Success"] = "Address updated successfully.";
             return RedirectToAction("Profile");
         }
-
-
-
         // =====================================================
         // UPDATE EDUCATION
         // =====================================================
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult UpdateEducation(CandidateProfileModel model)
+        public IActionResult UpdateEducation([Bind(Prefix = "Profile")] CandidateProfileModel model)
         {
             int? candidateId = HttpContext.Session.GetInt32("CandidateID");
 
@@ -255,7 +249,7 @@ namespace ErJobPortal.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult UpdateInternshipDetails(CandidateProfileModel model)
+        public IActionResult UpdateInternshipPreference([Bind(Prefix = "Profile")] CandidateProfileModel model)
         {
             int? candidateId = HttpContext.Session.GetInt32("CandidateID");
 
@@ -266,21 +260,17 @@ namespace ErJobPortal.Controllers
 
             model.CandidateID = candidateId.Value;
 
-            _repo.UpdateInternshipDetails(model);
+            _repo.UpdateInternshipPreference(model);
 
-            TempData["Success"] = "Internship details updated successfully.";
+            TempData["Success"] =
+                "Internship / Fellowship Preference updated successfully.";
 
             return RedirectToAction("Profile");
         }
 
-
-        // =========================================================
-        // UPDATE LANGUAGES
-        // =========================================================
-
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult UpdateLanguages(CandidateProfileModel model)
+        public IActionResult UpdateLanguages([Bind(Prefix = "Profile")] CandidateProfileModel model)
         {
             int? candidateId = HttpContext.Session.GetInt32("CandidateID");
 
@@ -305,7 +295,7 @@ namespace ErJobPortal.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult UpdateReferences(CandidateProfileModel model)
+        public IActionResult UpdateReferences([Bind(Prefix = "Profile")] CandidateProfileModel model)
         {
             int? candidateId = HttpContext.Session.GetInt32("CandidateID");
 
@@ -330,7 +320,7 @@ namespace ErJobPortal.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult UpdateAchievements(CandidateProfileModel model)
+        public IActionResult UpdateAchievements([Bind(Prefix = "Profile")] CandidateProfileModel model)
         {
             int? candidateId = HttpContext.Session.GetInt32("CandidateID");
 
@@ -355,7 +345,7 @@ namespace ErJobPortal.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult UpdateLinks(CandidateProfileModel model)
+        public IActionResult UpdateLinks([Bind(Prefix = "Profile")] CandidateProfileModel model)
         {
             int? candidateId = HttpContext.Session.GetInt32("CandidateID");
 
@@ -405,7 +395,7 @@ namespace ErJobPortal.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult UpdateSkills(CandidateProfileModel model)
+        public IActionResult UpdateSkills([Bind(Prefix = "Profile")] CandidateProfileModel model)
         {
             int? candidateId = HttpContext.Session.GetInt32("CandidateID");
 
@@ -430,7 +420,7 @@ namespace ErJobPortal.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult UpdateDocuments(CandidateProfileModel model)
+        public IActionResult UpdateDocuments([Bind(Prefix = "Profile")] CandidateProfileModel model)
         {
             int? candidateId = HttpContext.Session.GetInt32("CandidateID");
 
@@ -454,7 +444,7 @@ namespace ErJobPortal.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult UpdateInternshipPreference(CandidateProfileViewModel model)
+        public IActionResult UpdateInternshipPreference([Bind(Prefix = "Profile")] CandidateProfileViewModel model)
         {
             int? candidateId = HttpContext.Session.GetInt32("CandidateID");
 

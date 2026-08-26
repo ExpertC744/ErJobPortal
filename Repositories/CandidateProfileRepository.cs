@@ -528,18 +528,11 @@ namespace ErJobPortal.Repositories
         // UPDATE INTERNSHIP DETAILS
         // =========================================================
 
-        public void UpdateInternshipDetails(
-            CandidateProfileModel model)
+        public void UpdateInternshipDetails(CandidateProfileModel model)
         {
-            using SqlConnection con =
-                _db.GetConnection();
-
+            using SqlConnection con = _db.GetConnection();
             con.Open();
-
-            EnsureProfileExists(
-                con,
-                model.CandidateID
-            );
+            EnsureProfileExists(con, model.CandidateID);
 
             string sql = @"
 UPDATE tblCandidateProfile
