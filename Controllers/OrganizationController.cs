@@ -27,6 +27,11 @@ namespace JobPortalTrainee.Controllers
         // =========================================================
 
 
+        // =========================================================
+        // DASHBOARD
+        // =========================================================
+
+
         [HttpGet]
         [ResponseCache(
       NoStore = true,
@@ -71,13 +76,13 @@ namespace JobPortalTrainee.Controllers
                 // =========================================================
 
                 string query = @"
-        SELECT
-            (SELECT COUNT(nID)
-             FROM tblCandidateRegister) AS CandidateCount,
+    SELECT
+        (SELECT COUNT(nID)
+         FROM tblCandidateRegister) AS CandidateCount,
 
-            (SELECT COUNT(nID)
-             FROM tblOrgRegistration) AS OrganizationCount;
-    ";
+        (SELECT COUNT(nID)
+         FROM tblOrgRegistration) AS OrganizationCount;
+";
 
                 using (SqlCommand cmd = new SqlCommand(query, con))
                 {
@@ -112,10 +117,10 @@ namespace JobPortalTrainee.Controllers
                 // =========================================================
 
                 string eligibleQuery = @"
-        SELECT COUNT(nID)
-        FROM tblCandidateRegister
-        WHERE ISNULL(nBit, 1) = 1;
-    ";
+    SELECT COUNT(nID)
+    FROM tblCandidateRegister
+    WHERE ISNULL(nBit, 1) = 1;
+";
 
                 using (SqlCommand cmd = new SqlCommand(eligibleQuery, con))
                 {
@@ -135,14 +140,14 @@ namespace JobPortalTrainee.Controllers
                 // =========================================================
 
                 string monthlyQuery = @"
-        SELECT
-            MONTH(RegDate) AS RegistrationMonth,
-            COUNT(nID) AS RegistrationCount
-        FROM tblCandidateRegister
-        WHERE YEAR(RegDate) = YEAR(GETDATE())
-        GROUP BY MONTH(RegDate)
-        ORDER BY MONTH(RegDate);
-    ";
+    SELECT
+        MONTH(RegDate) AS RegistrationMonth,
+        COUNT(nID) AS RegistrationCount
+    FROM tblCandidateRegister
+    WHERE YEAR(RegDate) = YEAR(GETDATE())
+    GROUP BY MONTH(RegDate)
+    ORDER BY MONTH(RegDate);
+";
 
                 using (SqlCommand cmd =
                        new SqlCommand(monthlyQuery, con))

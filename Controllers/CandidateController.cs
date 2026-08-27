@@ -24,6 +24,10 @@ namespace ErJobPortal.Controllers
         // DASHBOARD
         // =========================================================
 
+        // =========================================================
+        // DASHBOARD
+        // =========================================================
+
         [HttpGet]
         [ResponseCache(NoStore = true, Location = ResponseCacheLocation.None)]
         public IActionResult Dashboard()
