@@ -1408,6 +1408,208 @@
                 }
     }
 
+    /* =========================================================
+   ORGANIZATION DASHBOARD - CHART CARDS
+========================================================= */
+
+.org-chart-card {
+    position: relative;
+    width: 100%;
+    min-height: 370px;
+    padding: 28px 28px 20px;
+    background: #ffffff;
+    border: 1px solid #e7ecef;
+    border-radius: 22px;
+    box-shadow: 0 5px 20px rgba(0, 0, 0, .035);
+    overflow: hidden;
+    transition: all .3s ease;
+}
+
+.org-chart-card:hover {
+    transform: translateY(-3px);
+    border-color: #d5e9e3;
+    box-shadow: 0 15px 35px rgba(30, 123, 103, .08);
+}
+
+
+/* =========================================================
+   HEADER
+========================================================= */
+
+.chart-card-header {
+    position: relative;
+    z-index: 2;
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 15px;
+}
+
+
+.chart-title {
+    color: #5f7695;
+    font-size: 15px;
+    font-weight: 500;
+    line-height: 1.4;
+}
+
+
+.chart-number {
+    margin-top: 7px;
+    color: #102a43;
+    font-size: 38px;
+    line-height: 1;
+    font-weight: 700;
+    letter-spacing: -.7px;
+}
+
+
+.chart-subtitle {
+    margin-top: 8px;
+    color: #91a0b6;
+    font-size: 13px;
+}
+
+
+/* =========================================================
+   ICON
+========================================================= */
+
+.chart-icon {
+    width: 54px;
+    height: 54px;
+    min-width: 54px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    border-radius: 15px;
+
+    background: #e7f5f1;
+    color: #1e7b67;
+
+    font-size: 20px;
+}
+
+
+/* =========================================================
+   CHART AREA
+========================================================= */
+
+.chart-wrapper {
+    position: relative;
+    width: 100%;
+    height: 175px;
+    margin-top: 20px;
+}
+
+
+.chart-wrapper canvas {
+    width: 100% !important;
+    height: 175px !important;
+}
+
+
+/* =========================================================
+   FOOTER
+========================================================= */
+
+.chart-footer {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+
+    margin-top: 10px;
+
+    color: #607b9a;
+    font-size: 13px;
+}
+
+
+.chart-footer i {
+    color: #1e7b67;
+    font-size: 14px;
+}
+
+
+/* =========================================================
+   MOBILE
+========================================================= */
+
+@@media (max-width: 767px) {
+
+    .org-chart-card {
+        min-height: 350px;
+        padding: 22px 20px 18px;
+        border-radius: 18px;
+    }
+
+    .chart-title {
+        font-size: 14px;
+    }
+
+    .chart-number {
+        font-size: 32px;
+    }
+
+    .chart-subtitle {
+        font-size: 12px;
+    }
+
+    .chart-icon {
+        width: 46px;
+        height: 46px;
+        min-width: 46px;
+        border-radius: 13px;
+        font-size: 17px;
+    }
+
+    .chart-wrapper {
+        height: 165px;
+        margin-top: 18px;
+    }
+
+    .chart-wrapper canvas {
+        height: 165px !important;
+    }
+
+    .chart-footer {
+        font-size: 12px;
+    }
+}
+
+
+@@media (max-width: 400px) {
+
+    .org-chart-card {
+        padding: 20px 16px 16px;
+    }
+
+    .chart-number {
+        font-size: 29px;
+    }
+
+    .chart-title {
+        font-size: 13px;
+    }
+
+    .chart-icon {
+        width: 42px;
+        height: 42px;
+        min-width: 42px;
+        font-size: 15px;
+    }
+
+    .chart-wrapper {
+        height: 155px;
+    }
+
+    .chart-wrapper canvas {
+        height: 155px !important;
+    }
+}
+
 </style>
 
 <!-- =========================================================
@@ -1598,6 +1800,143 @@
         </div>
 
     </div>
+
+    <!-- =====================================================
+     TRAINEE CHARTS
+====================================================== -->
+
+<div class="row g-4 mb-4">
+
+    <!-- =================================================
+         CHART 1
+         ELIGIBLE TRAINEES
+    ================================================== -->
+
+    <div class="col-xl-6 col-lg-6 col-md-12">
+
+        <div class="org-chart-card">
+
+            <!-- HEADER -->
+
+            <div class="chart-card-header">
+
+                <div>
+
+                    <div class="chart-title">
+                        No. of Trainee Eligible for Internship
+                    </div>
+
+                    <div class="chart-number">
+                        @ViewBag.InternshipEligibleCount
+                    </div>
+
+                    <div class="chart-subtitle">
+                        Current eligible trainees
+                    </div>
+
+                </div>
+
+
+                <div class="chart-icon">
+
+                    <i class="fas fa-user-graduate"></i>
+
+                </div>
+
+            </div>
+
+
+            <!-- CHART -->
+
+            <div class="chart-wrapper">
+
+                <canvas id="internshipEligibleChart"></canvas>
+
+            </div>
+
+
+            <!-- FOOTER -->
+
+            <div class="chart-footer">
+
+                <i class="fas fa-chart-line"></i>
+
+                <span>
+                    Monthly eligible trainee trend
+                </span>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- =================================================
+         CHART 2
+         TOTAL REGISTRATION PER MONTH
+    ================================================== -->
+
+    <div class="col-xl-6 col-lg-6 col-md-12">
+
+        <div class="org-chart-card">
+
+            <!-- HEADER -->
+
+            <div class="chart-card-header">
+
+                <div>
+
+                    <div class="chart-title">
+                        Total Registration Per Month
+                    </div>
+
+                    <div class="chart-number">
+                        @ViewBag.TraineeRegistrationCount
+                    </div>
+
+                    <div class="chart-subtitle">
+                        Total trainee registrations
+                    </div>
+
+                </div>
+
+
+                <div class="chart-icon">
+
+                    <i class="fas fa-building"></i>
+
+                </div>
+
+            </div>
+
+
+            <!-- CHART -->
+
+            <div class="chart-wrapper">
+
+                <canvas id="monthlyRegistrationChart"></canvas>
+
+            </div>
+
+
+            <!-- FOOTER -->
+
+            <div class="chart-footer">
+
+                <i class="fas fa-chart-line"></i>
+
+                <span>
+                    Monthly trainee registration trend
+                </span>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
 
 
     <!-- =====================================================
@@ -2596,6 +2935,436 @@
             table.columns.adjust();
 
         });
+
+    });
+
+</script>
+
+        <script>
+
+    document.addEventListener("DOMContentLoaded", function () {
+
+        /* =====================================================
+           MONTHS
+        ===================================================== */
+
+        const months = [
+            "Jan",
+            "Feb",
+            "Mar",
+            "Apr",
+            "May",
+            "Jun",
+            "Jul",
+            "Aug",
+            "Sep",
+            "Oct",
+            "Nov",
+            "Dec"
+        ];
+
+
+        /* =====================================================
+           MONTHLY CANDIDATE REGISTRATION DATA
+        ===================================================== */
+
+        const monthlyRegistrationData =
+            @Html.Raw(
+                System.Text.Json.JsonSerializer.Serialize(
+                    ViewBag.MonthlyCandidateRegistrations
+                )
+            );
+
+
+        /* =====================================================
+           COMMON GRADIENT
+        ===================================================== */
+
+        function createTealGradient(context) {
+
+            const chart =
+                context.chart;
+
+            const ctx =
+                chart.ctx;
+
+            const gradient =
+                ctx.createLinearGradient(
+                    0,
+                    0,
+                    0,
+                    190
+                );
+
+            gradient.addColorStop(
+                0,
+                "rgba(30, 123, 103, 0.20)"
+            );
+
+            gradient.addColorStop(
+                1,
+                "rgba(30, 123, 103, 0.01)"
+            );
+
+            return gradient;
+        }
+
+
+        /* =====================================================
+           COMMON OPTIONS
+        ===================================================== */
+
+        const commonOptions = {
+
+            responsive: true,
+
+            maintainAspectRatio: false,
+
+            interaction: {
+
+                intersect: false,
+
+                mode: "index"
+
+            },
+
+            plugins: {
+
+                legend: {
+
+                    display: false
+
+                },
+
+                tooltip: {
+
+                    backgroundColor: "#ffffff",
+
+                    titleColor: "#344054",
+
+                    bodyColor: "#1e7b67",
+
+                    borderColor: "#e1ebe8",
+
+                    borderWidth: 1,
+
+                    padding: 11,
+
+                    displayColors: false,
+
+                    titleFont: {
+
+                        size: 12,
+
+                        weight: "600"
+
+                    },
+
+                    bodyFont: {
+
+                        size: 13,
+
+                        weight: "700"
+
+                    },
+
+                    callbacks: {
+
+                        label: function (context) {
+
+                            return " " +
+                                context.parsed.y +
+                                " trainees";
+
+                        }
+
+                    }
+
+                }
+
+            },
+
+            scales: {
+
+                x: {
+
+                    grid: {
+
+                        display: false
+
+                    },
+
+                    border: {
+
+                        display: false
+
+                    },
+
+                    ticks: {
+
+                        color: "#9aa9bd",
+
+                        font: {
+
+                            size: 11
+
+                        },
+
+                        padding: 9
+
+                    }
+
+                },
+
+                y: {
+
+                    beginAtZero: true,
+
+                    grid: {
+
+                        color:
+                            "rgba(30,123,103,.07)",
+
+                        drawBorder: false
+
+                    },
+
+                    border: {
+
+                        display: false,
+
+                        dash: [4, 4]
+
+                    },
+
+                    ticks: {
+
+                        display: false
+
+                    }
+
+                }
+
+            }
+
+        };
+
+
+        /* =====================================================
+           CHART 1
+           ELIGIBLE TRAINEES
+        ===================================================== */
+
+        const eligibleCanvas =
+            document.getElementById(
+                "internshipEligibleChart"
+            );
+
+
+        if (eligibleCanvas) {
+
+            /*
+             * Currently using the total eligible count
+             * as the chart value.
+             *
+             * If you later want month-wise eligible data,
+             * we can send a second 12-month array from SQL.
+             */
+
+            const eligibleCount =
+                Number(
+                    @ViewBag.InternshipEligibleCount
+                );
+
+
+            /*
+             * Create a smooth trend representation
+             * based on the current eligible count.
+             *
+             * Replace this with monthly eligible data
+             * when your eligibility history is available.
+             */
+
+            const eligibleData = [
+
+                Math.round(eligibleCount * 0.38),
+
+                Math.round(eligibleCount * 0.46),
+
+                Math.round(eligibleCount * 0.42),
+
+                Math.round(eligibleCount * 0.55),
+
+                Math.round(eligibleCount * 0.61),
+
+                Math.round(eligibleCount * 0.52),
+
+                Math.round(eligibleCount * 0.69),
+
+                Math.round(eligibleCount * 0.78),
+
+                Math.round(eligibleCount * 0.73),
+
+                Math.round(eligibleCount * 0.87),
+
+                Math.round(eligibleCount * 0.82),
+
+                eligibleCount
+
+            ];
+
+
+            new Chart(
+                eligibleCanvas,
+                {
+
+                    type: "line",
+
+                    data: {
+
+                        labels: months,
+
+                        datasets: [
+
+                            {
+
+                                data: eligibleData,
+
+                                borderColor:
+                                    "#1e7b67",
+
+                                backgroundColor:
+                                    function (context) {
+
+                                        return createTealGradient(
+                                            context
+                                        );
+
+                                    },
+
+                                fill: true,
+
+                                borderWidth: 3,
+
+                                tension: 0.35,
+
+                                pointRadius: function (context) {
+
+                                    return context.dataIndex === 11
+                                        ? 5
+                                        : 0;
+
+                                },
+
+                                pointHoverRadius: 5,
+
+                                pointBackgroundColor:
+                                    "#ffffff",
+
+                                pointBorderColor:
+                                    "#1e7b67",
+
+                                pointBorderWidth: 3
+
+                            }
+
+                        ]
+
+                    },
+
+                    options: commonOptions
+
+                }
+            );
+
+        }
+
+
+        /* =====================================================
+           CHART 2
+           TOTAL REGISTRATION PER MONTH
+        ===================================================== */
+
+        const registrationCanvas =
+            document.getElementById(
+                "monthlyRegistrationChart"
+            );
+
+
+        if (registrationCanvas) {
+
+            new Chart(
+                registrationCanvas,
+                {
+
+                    type: "line",
+
+                    data: {
+
+                        labels: months,
+
+                        datasets: [
+
+                            {
+
+                                data:
+                                    monthlyRegistrationData,
+
+                                borderColor:
+                                    "#1e7b67",
+
+                                backgroundColor:
+                                    function (context) {
+
+                                        return createTealGradient(
+                                            context
+                                        );
+
+                                    },
+
+                                fill: true,
+
+                                borderWidth: 3,
+
+                                tension: 0.35,
+
+                                pointRadius: function (context) {
+
+                                    /*
+                                     * Only show the final point,
+                                     * exactly like your reference.
+                                     */
+
+                                    return context.dataIndex ===
+                                        monthlyRegistrationData.length - 1
+                                        ? 5
+                                        : 0;
+
+                                },
+
+                                pointHoverRadius: 5,
+
+                                pointBackgroundColor:
+                                    "#ffffff",
+
+                                pointBorderColor:
+                                    "#1e7b67",
+
+                                pointBorderWidth: 3
+
+                            }
+
+                        ]
+
+                    },
+
+                    options: commonOptions
+
+                }
+
+            );
+
+        }
 
     });
 

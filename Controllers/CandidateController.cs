@@ -79,6 +79,11 @@ namespace ErJobPortal.Controllers
             return View(organization);
         }
 
+        public IActionResult EditProfile()
+        {
+
+            return View();
+        }
 
         // =========================================================
         // GET PROFILE
