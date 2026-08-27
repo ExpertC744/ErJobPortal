@@ -2003,7 +2003,8 @@
 
     <link rel="stylesheet"
           href="~/css/master-table.css" />
-    @* data-table css end *@
+    @* Page Specific CSS *@
+    @await RenderSectionAsync("Styles", required: false)
 </head>
 
 <body>
@@ -3393,7 +3394,7 @@
         }
         });
     </script>
-
+    @* Page Specific JavaScript *@
     @await RenderSectionAsync("Scripts", required: false)
 
 </body>

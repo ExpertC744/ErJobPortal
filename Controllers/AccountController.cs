@@ -101,6 +101,120 @@ namespace ErJobPortal.Controllers
 
             try
             {
+
+                // ==========================================
+                // PROFILE IMAGE UPLOAD
+                // ==========================================
+
+                if (model.ProfileImageFile != null &&
+                    model.ProfileImageFile.Length > 0)
+                {
+                    // ==========================================
+                    // ALLOWED IMAGE TYPES
+                    // ==========================================
+
+                    string[] allowedExtensions =
+                    {
+    ".png",
+    ".jpg",
+    ".jpeg"
+};
+
+                    string extension =
+                        Path.GetExtension(
+                            model.ProfileImageFile.FileName
+                        ).ToLowerInvariant();
+
+                    // ==========================================
+                    // CHECK IMAGE EXTENSION
+                    // ==========================================
+
+                    if (!allowedExtensions.Contains(extension))
+                    {
+                        ModelState.AddModelError(
+                            "ProfileImageFile",
+                            "Only PNG, JPG and JPEG images are allowed."
+                        );
+
+                        return View(model);
+                    }
+
+                    // ==========================================
+                    // MAXIMUM 5 MB
+                    // ==========================================
+
+                    if (model.ProfileImageFile.Length > 5 * 1024 * 1024)
+                    {
+                        ModelState.AddModelError(
+                            "ProfileImageFile",
+                            "Image size must be less than 5 MB."
+                        );
+
+                        return View(model);
+                    }
+
+                    // ==========================================
+                    // CREATE UPLOAD FOLDER
+                    // ==========================================
+
+                    string uploadFolder = Path.Combine(
+                        Directory.GetCurrentDirectory(),
+                        "wwwroot",
+                        "uploads",
+                        "candidates"
+                    );
+
+                    if (!Directory.Exists(uploadFolder))
+                    {
+                        Directory.CreateDirectory(uploadFolder);
+                    }
+
+                    // ==========================================
+                    // GENERATE IMAGE NAME: 1, 2, 3, 4...
+                    // ==========================================
+
+                    int nextNumber = 1;
+
+                    while (Directory.GetFiles(
+                        uploadFolder,
+                        nextNumber + ".*"
+                    ).Length > 0)
+                    {
+                        nextNumber++;
+                    }
+
+                    // Example: 1.jpg, 2.png, 3.jpeg
+                    string imageName =
+                        nextNumber + extension;
+
+                    // ==========================================
+                    // SAVE IMAGE
+                    // ==========================================
+
+                    string filePath = Path.Combine(
+                        uploadFolder,
+                        imageName
+                    );
+
+                    using (FileStream stream =
+                           new FileStream(
+                               filePath,
+                               FileMode.Create))
+                    {
+                        model.ProfileImageFile.CopyTo(stream);
+                    }
+
+                    // ==========================================
+                    // ONLY IMAGE NAME GOES TO DATABASE
+                    // ==========================================
+
+                    model.sProfileImage = imageName;
+                }
+                else
+                {
+                    model.sProfileImage = "";
+                }
+
                 int result = _accountRepository.Register(model);
 
                 if (result > 0)
