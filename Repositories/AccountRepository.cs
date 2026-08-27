@@ -18,7 +18,7 @@ namespace ErJobPortal.Repositories
 
         // Candidate Register 
         #region "Candidate Register"
-        public int Register(CandidateRegister model) 
+        public int Register(CandidateRegister model)
         {
             using (SqlConnection cn = _db.GetConnection())
             {
@@ -37,6 +37,7 @@ namespace ErJobPortal.Repositories
                     cmd.Parameters.AddWithValue("@sCollegeName", model.sCollegeName);
                     cmd.Parameters.AddWithValue("@sPassword", model.sPassword);
                     cmd.Parameters.AddWithValue("@sOTP", model.sOTP ?? "");
+                    cmd.Parameters.AddWithValue("@nDepartment", model.nDepartment);
                     cmd.Parameters.AddWithValue("@nBranch", model.nBranch);
                     cmd.Parameters.AddWithValue("@nPassoutYear", model.nPassoutYear);
                     cn.Open();
@@ -78,6 +79,18 @@ namespace ErJobPortal.Repositories
                         (object?)model.sDesignation ?? DBNull.Value
                     );
 
+                    // Department
+                    cmd.Parameters.AddWithValue(
+                        "@nDepartment",
+                        model.nDepartment
+                    );
+
+                    // Branch
+                    cmd.Parameters.AddWithValue(
+                        "@nBranch",
+                        model.nBranch
+                    );
+
                     cmd.Parameters.AddWithValue(
                         "@sMobile",
                         (object?)model.sMobile ?? DBNull.Value
@@ -116,6 +129,145 @@ namespace ErJobPortal.Repositories
         }
 
         #endregion
+
+        public List<DepartmentM> GetDepartments()
+        {
+            List<DepartmentM> departments = new List<DepartmentM>();
+
+            using (SqlConnection cn = _db.GetConnection())
+            {
+                using (SqlCommand cmd = new SqlCommand(
+                    "SP_GetDepartment", cn))
+                {
+                    cmd.CommandType = CommandType.StoredProcedure;
+
+                    cn.Open();
+
+                    using (SqlDataReader dr = cmd.ExecuteReader())
+                    {
+                        while (dr.Read())
+                        {
+                            departments.Add(new DepartmentM
+                            {
+                                nID = Convert.ToInt32(dr["nID"]),
+
+                                sDepartment =
+                                    dr["sDepartment"] != DBNull.Value
+                                        ? dr["sDepartment"].ToString()
+                                        : ""
+                            });
+                        }
+                    }
+                }
+            }
+
+            return departments;
+        }
+
+
+        public List<BranchM> GetBranches(int departmentId)
+        {
+            List<BranchM> branches = new List<BranchM>();
+
+            using (SqlConnection cn = _db.GetConnection())
+            {
+                using (SqlCommand cmd = new SqlCommand(
+                    "SP_GetBranch", cn))
+                {
+                    cmd.CommandType = CommandType.StoredProcedure;
+
+                    cmd.Parameters.Add(
+                        "@nDepartmentID",
+                        SqlDbType.Int).Value = departmentId;
+
+                    cn.Open();
+
+                    using (SqlDataReader dr = cmd.ExecuteReader())
+                    {
+                        while (dr.Read())
+                        {
+                            branches.Add(new BranchM
+                            {
+                                nID = Convert.ToInt32(dr["nID"]),
+
+                                nDepartmentID =
+                                    Convert.ToInt32(
+                                        dr["nDepartmentID"]),
+
+                                sBranch =
+                                    dr["sBranch"] != DBNull.Value
+                                        ? dr["sBranch"].ToString()
+                                        : ""
+                            });
+                        }
+                    }
+                }
+            }
+
+            return branches;
+        }
+        public List<CollegeM> GetColleges()
+        {
+            List<CollegeM> colleges = new List<CollegeM>();
+
+            using (SqlConnection cn = _db.GetConnection())
+            {
+                using (SqlCommand cmd = new SqlCommand("SP_GetCollege", cn))
+                {
+                    cmd.CommandType = CommandType.StoredProcedure;
+
+                    cn.Open();
+
+                    using (SqlDataReader dr = cmd.ExecuteReader())
+                    {
+                        while (dr.Read())
+                        {
+                            colleges.Add(new CollegeM
+                            {
+                                nID = Convert.ToInt32(dr["nID"]),
+                                sCollegeName = dr["sCollegeName"].ToString()
+                            });
+                        }
+                    }
+                }
+            }
+
+            return colleges;
+        }
+
+
+        public List<CollegeCodeM> GetCollegeCodes(int collegeId)
+        {
+            List<CollegeCodeM> codes = new List<CollegeCodeM>();
+
+            using (SqlConnection cn = _db.GetConnection())
+            {
+                using (SqlCommand cmd = new SqlCommand("SP_GetCollegeCode", cn))
+                {
+                    cmd.CommandType = CommandType.StoredProcedure;
+
+                    cmd.Parameters.AddWithValue("@nCollegeID", collegeId);
+
+                    cn.Open();
+
+                    using (SqlDataReader dr = cmd.ExecuteReader())
+                    {
+                        while (dr.Read())
+                        {
+                            codes.Add(new CollegeCodeM
+                            {
+                                nID = Convert.ToInt32(dr["nID"]),
+                                nCollegeID = Convert.ToInt32(dr["nCollegeID"]),
+                                nCode = dr["nCode"].ToString()
+                            });
+                        }
+                    }
+                }
+            }
+
+            return codes;
+        }
+
 
         #region "Org Login"
         public OrganizationLogin? OrganizationLogin(OrganizationLogin model)

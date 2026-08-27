@@ -1,4 +1,6 @@
-﻿namespace ErJobPortal.Models
+﻿using Microsoft.AspNetCore.Http;
+
+namespace ErJobPortal.Models
 {
     public class CandidateRegister
     {
@@ -14,30 +16,37 @@
 
         public int nGender { get; set; }
 
+        // Profile Image
         public string? sProfileImage { get; set; }
 
+        public IFormFile? ProfileImageFile { get; set; }
+
+        // College
         public int nCollegeCode { get; set; }
 
+        // College ID
         public int sCollegeName { get; set; }
 
-        public string? sPassword { get; set; }
+        // Department ID
+        public int nDepartment { get; set; }
 
+        // Branch ID
+        public int nBranch { get; set; }
 
-        // Additional Registration Fields
+        // Broad Group
+        public int nBroadGroup { get; set; }
 
-        public string? nBranch { get; set; }
-
+        // Passout Year
         public int? nPassoutYear { get; set; }
 
+        // Password
+        public string? sPassword { get; set; }
+
+        // OTP
         public string? sOTP { get; set; }
 
         public string? sConfirmPassword { get; set; }
 
-
-        // Registration Type
-
         public string? RegistrationType { get; set; }
-
-
     }
 }

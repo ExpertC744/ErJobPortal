@@ -1,6 +1,7 @@
 ﻿/* =====================================================
                    GLOBAL
-                ===================================================== */
+===================================================== */
+
 * {
     box-sizing: border-box;
 }
@@ -13,7 +14,7 @@ body {
 }
 
 body {
-    font-family: "Segoe UI", Arial, sans-serif;
+    font-family: "Inter", "Segoe UI", Arial, sans-serif;
     background: #f5faf8;
     color: #344054;
 }
@@ -21,7 +22,7 @@ body {
 
 /* =====================================================
                    LOGIN PAGE
-                ===================================================== */
+===================================================== */
 
 .candidate-login-page {
     min-height: 100vh;
@@ -38,7 +39,7 @@ body {
 
 /* =====================================================
                    BACKGROUND DECORATION
-                ===================================================== */
+===================================================== */
 
 .candidate-bg-circle {
     position: absolute;
@@ -65,7 +66,7 @@ body {
 
 /* =====================================================
                    LOGIN WRAPPER
-                ===================================================== */
+===================================================== */
 
 .candidate-login-wrapper {
     width: 100%;
@@ -77,31 +78,31 @@ body {
 
 /* =====================================================
                    LOGIN CARD
-                ===================================================== */
+===================================================== */
 
 .candidate-login-card {
     width: 100%;
     background: #ffffff;
     border: 1px solid #e5eeeb;
-    border-radius: 18px;
+    border-radius: 20px;
     padding: 28px 30px 25px;
-    box-shadow: 0 15px 45px rgba(30, 123, 103, .10), 0 3px 12px rgba(0, 0, 0, .03);
+    box-shadow: 0 20px 55px rgba(30, 123, 103, .11), 0 5px 18px rgba(0, 0, 0, .035);
 }
 
 
 /* =====================================================
                    BRAND
-                ===================================================== */
+===================================================== */
 
 .candidate-login-brand {
     text-align: center;
-    margin-bottom: 22px;
+    margin-bottom: 20px;
 }
 
 
 /* =====================================================
                    USER ICON
-                ===================================================== */
+===================================================== */
 
 .candidate-login-icon {
     width: 58px;
@@ -110,17 +111,17 @@ body {
     display: flex;
     align-items: center;
     justify-content: center;
-    border-radius: 16px;
+    border-radius: 17px;
     background: linear-gradient( 135deg, #1e7b67, #2d927d );
     color: #ffffff;
     font-size: 22px;
-    box-shadow: 0 8px 20px rgba(30, 123, 103, .22);
+    box-shadow: 0 9px 22px rgba(30, 123, 103, .22);
 }
 
 
 /* =====================================================
                    TITLE
-                ===================================================== */
+===================================================== */
 
 .candidate-login-brand h2 {
     margin: 0;
@@ -138,8 +139,110 @@ body {
 
 
 /* =====================================================
+             CANDIDATE / ORGANIZATION SWITCH
+===================================================== */
+
+.candidate-account-switch {
+    position: relative;
+    width: 100%;
+    display: flex;
+    align-items: center;
+    padding: 5px;
+    margin: 0 0 20px;
+    gap: 4px;
+    background: #f3f8f6;
+    border: 1px solid #e0ebe7;
+    border-radius: 14px;
+    box-shadow: inset 0 1px 2px rgba(30, 123, 103, .04);
+    overflow: hidden;
+}
+
+
+/* =====================================================
+                   SWITCH LINKS
+===================================================== */
+
+.candidate-switch-link {
+    position: relative;
+    flex: 1;
+    min-width: 0;
+    height: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 0 12px;
+    border-radius: 10px;
+    background: transparent;
+    color: #7b8794;
+    text-decoration: none !important;
+    font-family: "Inter", "Segoe UI", sans-serif;
+    font-size: 13px;
+    font-weight: 600;
+    white-space: nowrap;
+    transition: color .25s ease, background .25s ease, box-shadow .25s ease, transform .25s ease;
+}
+
+
+    /* =====================================================
+                   SWITCH ICON
+===================================================== */
+
+    .candidate-switch-link i {
+        font-size: 14px;
+        transition: transform .25s ease, color .25s ease;
+    }
+
+
+    /* =====================================================
+                   ACTIVE SWITCH
+===================================================== */
+
+    .candidate-switch-link.active {
+        color: #ffffff !important;
+        background: linear-gradient( 135deg, #1e7b67 0%, #197861 50%, #2d927d 100% );
+        box-shadow: 0 6px 16px rgba(30, 123, 103, .28), inset 0 1px 0 rgba(255, 255, 255, .18);
+        transform: translateY(-1px);
+    }
+
+
+        /* ACTIVE ICON */
+
+        .candidate-switch-link.active i {
+            color: #ffffff;
+            transform: scale(1.05);
+        }
+
+
+    /* =====================================================
+                   NON ACTIVE HOVER
+===================================================== */
+
+    .candidate-switch-link:not(.active):hover {
+        color: #1e7b67 !important;
+        background: #ffffff;
+        box-shadow: 0 3px 10px rgba(30, 123, 103, .08);
+    }
+
+        .candidate-switch-link:not(.active):hover i {
+            color: #1e7b67;
+            transform: translateY(-1px) scale(1.04);
+        }
+
+
+    /* =====================================================
+                   SWITCH FOCUS
+===================================================== */
+
+    .candidate-switch-link:focus-visible {
+        outline: 2px solid rgba(30, 123, 103, .35);
+        outline-offset: 2px;
+    }
+
+
+/* =====================================================
                    SECURITY BADGE
-                ===================================================== */
+===================================================== */
 
 .candidate-security-badge {
     width: fit-content;
@@ -147,7 +250,8 @@ body {
     display: flex;
     align-items: center;
     gap: 6px;
-    padding: 5px 10px;
+    padding: 6px 11px;
+    border: 1px solid #d9eee7;
     border-radius: 20px;
     background: #eef8f5;
     color: #1e7b67;
@@ -162,7 +266,7 @@ body {
 
 /* =====================================================
                    ERROR MESSAGE
-                ===================================================== */
+===================================================== */
 
 .candidate-login-error {
     display: flex;
@@ -184,7 +288,7 @@ body {
 
 /* =====================================================
                    SUCCESS MESSAGE
-                ===================================================== */
+===================================================== */
 
 .candidate-login-success {
     display: flex;
@@ -206,7 +310,7 @@ body {
 
 /* =====================================================
                    FORM GROUP
-                ===================================================== */
+===================================================== */
 
 .candidate-form-group {
     margin-bottom: 16px;
@@ -215,7 +319,7 @@ body {
 
 /* =====================================================
                    LABEL
-                ===================================================== */
+===================================================== */
 
 .candidate-form-label {
     display: block;
@@ -228,7 +332,7 @@ body {
 
 /* =====================================================
                    INPUT WRAPPER
-                ===================================================== */
+===================================================== */
 
 .candidate-input-wrapper {
     position: relative;
@@ -238,7 +342,7 @@ body {
 
 /* =====================================================
                    INPUT ICON
-                ===================================================== */
+===================================================== */
 
 .candidate-input-icon {
     position: absolute;
@@ -248,7 +352,7 @@ body {
     color: #98a2b3;
     font-size: 12px;
     pointer-events: none;
-    transition: .2s ease;
+    transition: color .2s ease;
 }
 
 .candidate-input-wrapper:focus-within
@@ -259,19 +363,20 @@ body {
 
 /* =====================================================
                    INPUT
-                ===================================================== */
+===================================================== */
 
 .candidate-input {
     width: 100%;
-    height: 40px;
+    height: 42px;
     border: 1px solid #dfe7e4;
-    border-radius: 8px;
+    border-radius: 9px;
     background: #ffffff;
-    padding: 7px 38px 7px 34px;
+    padding: 7px 40px 7px 34px;
     color: #344054;
+    font-family: "Inter", "Segoe UI", sans-serif;
     font-size: 12px;
     outline: none;
-    transition: all .2s ease;
+    transition: border-color .2s ease, box-shadow .2s ease, background .2s ease;
 }
 
     .candidate-input::placeholder {
@@ -285,35 +390,44 @@ body {
 
     .candidate-input:focus {
         border-color: #1e7b67;
+        background: #ffffff;
         box-shadow: 0 0 0 3px rgba(30, 123, 103, .08);
     }
 
 
 /* =====================================================
                    PASSWORD TOGGLE
-                ===================================================== */
+===================================================== */
 
 .candidate-password-toggle {
     position: absolute;
-    right: 11px;
+    right: 10px;
     top: 50%;
     transform: translateY(-50%);
+    width: 28px;
+    height: 28px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
     border: 0;
+    border-radius: 6px;
     background: transparent;
     color: #98a2b3;
-    padding: 3px;
+    padding: 0;
     cursor: pointer;
     font-size: 12px;
+    transition: color .2s ease, background .2s ease;
 }
 
     .candidate-password-toggle:hover {
         color: #1e7b67;
+        background: #eef8f5;
     }
 
 
 /* =====================================================
                    VALIDATION
-                ===================================================== */
+===================================================== */
 
 .candidate-field-validation {
     display: block;
@@ -330,47 +444,64 @@ body {
 
 /* =====================================================
                    LOGIN BUTTON
-                ===================================================== */
+===================================================== */
 
 .candidate-login-button {
-    width: auto;
-    min-width: 135px;
-    height: 38px;
-    margin: 5px auto 0;
+    height: 45px;
+    margin: 7px 0 0;
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 7px;
-    border: 0;
-    border-radius: 8px;
-    background: #1e7b67;
+    gap: 8px;
+    border: none;
+    border-radius: 10px;
+    background: linear-gradient( 135deg, #1e7b67 0%, #197861 50%, #2d927d 100% );
     color: #ffffff;
-    padding: 0 18px;
-    font-size: 12px;
+    padding: 0 20px;
+    font-family: "Inter", "Segoe UI", sans-serif;
+    font-size: 13px;
     font-weight: 700;
+    letter-spacing: .1px;
     cursor: pointer;
-    box-shadow: 0 6px 15px rgba(30, 123, 103, .18);
-    transition: all .2s ease;
+    box-shadow: 0 8px 20px rgba(30, 123, 103, .25), inset 0 1px 0 rgba(255, 255, 255, .15);
+    transition: transform .2s ease, box-shadow .2s ease, filter .2s ease;
+    margin:auto
 }
 
+
+    /* LOGIN BUTTON HOVER */
+
     .candidate-login-button:hover {
-        background: #176653;
-        transform: translateY(-1px);
-        box-shadow: 0 8px 18px rgba(30, 123, 103, .23);
+        color: #ffffff;
+        filter: brightness(.96);
+        transform: translateY(-2px);
+        box-shadow: 0 12px 25px rgba(30, 123, 103, .32), inset 0 1px 0 rgba(255, 255, 255, .18);
     }
+
+
+    /* LOGIN BUTTON ACTIVE */
 
     .candidate-login-button:active {
         transform: translateY(0);
+        box-shadow: 0 5px 12px rgba(30, 123, 103, .22);
     }
 
+
+    /* LOGIN BUTTON ICON */
+
     .candidate-login-button i {
-        font-size: 11px;
+        font-size: 12px;
+        transition: transform .2s ease;
+    }
+
+    .candidate-login-button:hover i {
+        transform: translateX(2px);
     }
 
 
 /* =====================================================
                    REGISTER FOOTER
-                ===================================================== */
+===================================================== */
 
 .candidate-login-footer {
     margin-top: 20px;
@@ -391,6 +522,7 @@ body {
     font-weight: 700;
     text-decoration: none;
     margin-left: 4px;
+    transition: color .2s ease;
 }
 
     .candidate-register-link:hover {
@@ -401,9 +533,9 @@ body {
 
 /* =====================================================
                    TABLET
-                ===================================================== */
+===================================================== */
 
-@@media (max-width: 767px) {
+@media (max-width: 767px) {
 
     .candidate-login-page {
         padding: 20px 15px;
@@ -415,20 +547,24 @@ body {
 
     .candidate-login-card {
         padding: 25px 25px 22px;
-        border-radius: 16px;
+        border-radius: 17px;
     }
 
     .candidate-login-brand h2 {
         font-size: 21px;
+    }
+
+    .candidate-account-switch {
+        margin-bottom: 18px;
     }
 }
 
 
 /* =====================================================
                    MOBILE
-                ===================================================== */
+===================================================== */
 
-@@media (max-width: 480px) {
+@media (max-width: 480px) {
 
     .candidate-login-page {
         padding: 15px;
@@ -440,8 +576,11 @@ body {
 
     .candidate-login-card {
         padding: 23px 20px 20px;
-        border-radius: 14px;
+        border-radius: 15px;
     }
+
+
+    /* BRAND */
 
     .candidate-login-icon {
         width: 52px;
@@ -462,31 +601,65 @@ body {
             font-size: 11px;
         }
 
+
+    /* ACCOUNT SWITCH */
+
+    .candidate-account-switch {
+        margin-bottom: 18px;
+        padding: 4px;
+        border-radius: 12px;
+        gap: 3px;
+    }
+
+    .candidate-switch-link {
+        height: 42px;
+        padding: 0 8px;
+        gap: 6px;
+        border-radius: 9px;
+        font-size: 12px;
+    }
+
+        .candidate-switch-link i {
+            font-size: 13px;
+        }
+
+
+    /* SECURITY */
+
     .candidate-security-badge {
         margin-bottom: 18px;
     }
+
+
+    /* LABEL */
 
     .candidate-form-label {
         font-size: 11px;
     }
 
+
+    /* INPUT */
+
     .candidate-input {
-        height: 39px;
+        height: 40px;
+        font-size: 11px;
     }
 
+
+    /* LOGIN */
+
     .candidate-login-button {
-        height: 37px;
-        min-width: 125px;
-        font-size: 11px;
+        height: 43px;
+        font-size: 12px;
     }
 }
 
 
 /* =====================================================
                    VERY SMALL MOBILE
-                ===================================================== */
+===================================================== */
 
-@@media (max-width: 360px) {
+@media (max-width: 360px) {
 
     .candidate-login-page {
         padding: 10px;
@@ -504,14 +677,38 @@ body {
         font-size: 10px;
     }
 
+
+    /* ACCOUNT SWITCH */
+
+    .candidate-account-switch {
+        padding: 3px;
+        margin-bottom: 16px;
+    }
+
+    .candidate-switch-link {
+        height: 40px;
+        padding: 0 6px;
+        font-size: 11px;
+        gap: 5px;
+    }
+
+        .candidate-switch-link i {
+            font-size: 12px;
+        }
+
+
+    /* INPUT */
+
     .candidate-input {
         height: 38px;
         font-size: 11px;
     }
 
+
+    /* LOGIN BUTTON */
+
     .candidate-login-button {
-        min-width: 115px;
-        height: 36px;
+        height: 41px;
+        font-size: 11px;
     }
 }
-

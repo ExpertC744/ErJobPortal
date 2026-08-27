@@ -3,28 +3,16 @@
 @{
     ViewData["Title"] = "Candidate Registration";
 }
-@if (TempData["Success"] != null)
-{
-    <div class="alert alert-success">
-        @TempData["Success"]
-    </div>
-}
 
-@if (TempData["Error"] != null)
-{
-    <div class="alert alert-danger">
-        @TempData["Error"]
-    </div>
-}
 <link rel="stylesheet" href="~/css/CandidateRegister.css" />
 
 <div class="candidate-register-page">
 
     <div class="candidate-register-card">
 
-        <!-- =========================================
+        <!-- =====================================================
              REGISTRATION SWITCH
-        ========================================== -->
+        ====================================================== -->
 
         <div class="registration-switch">
 
@@ -43,12 +31,12 @@
         </div>
 
 
-        <!-- =========================================
+        <!-- =====================================================
              HEADER
-        ========================================== -->
+        ====================================================== -->
 
         <div class="register-icon">
-            👤
+            <i class="fa-solid fa-user"></i>
         </div>
 
         <div class="register-heading">
@@ -62,9 +50,27 @@
         </div>
 
 
-        <!-- =========================================
+        <!-- =====================================================
+             SUCCESS / ERROR MESSAGE
+        ====================================================== -->
+        @if (TempData["Success"] != null)
+        {
+            <div class="alert alert-success register-alert">
+                @TempData["Success"]
+            </div>
+        }
+
+        @if (TempData["Error"] != null)
+        {
+            <div class="alert alert-danger register-alert">
+                @TempData["Error"]
+            </div>
+        }
+
+
+        <!-- =====================================================
              FORM
-        ========================================== -->
+        ====================================================== -->
 
         <form asp-controller="Account"
               asp-action="CandidateRegister"
@@ -74,29 +80,35 @@
             @Html.AntiForgeryToken()
 
 
-            <!-- VALIDATION -->
+            <!-- =================================================
+                 VALIDATION SUMMARY
+            ================================================== -->
 
             <div asp-validation-summary="All"
                  class="text-danger register-summary">
             </div>
 
 
-            <!-- =====================================
+            <!-- =================================================
                  FIRST NAME + LAST NAME
-            ====================================== -->
+            ================================================== -->
 
             <div class="register-form-row">
 
+                <!-- First Name -->
+
                 <div class="register-form-group">
 
-                    <label class="register-label">
+                    <label asp-for="sFName"
+                           class="register-label">
                         First Name
                     </label>
 
                     <input asp-for="sFName"
                            type="text"
                            class="register-input"
-                           placeholder="Enter first name" />
+                           placeholder="Enter first name"
+                           autocomplete="given-name" />
 
                     <span asp-validation-for="sFName"
                           class="text-danger register-validation">
@@ -105,16 +117,20 @@
                 </div>
 
 
+                <!-- Last Name -->
+
                 <div class="register-form-group">
 
-                    <label class="register-label">
+                    <label asp-for="sLName"
+                           class="register-label">
                         Last Name
                     </label>
 
                     <input asp-for="sLName"
                            type="text"
                            class="register-input"
-                           placeholder="Enter last name" />
+                           placeholder="Enter last name"
+                           autocomplete="family-name" />
 
                     <span asp-validation-for="sLName"
                           class="text-danger register-validation">
@@ -125,15 +141,18 @@
             </div>
 
 
-            <!-- =====================================
-                 GENDER + DOB
-            ====================================== -->
+            <!-- =================================================
+                 GENDER + DATE OF BIRTH
+            ================================================== -->
 
             <div class="register-form-row">
 
+                <!-- Gender -->
+
                 <div class="register-form-group">
 
-                    <label class="register-label">
+                    <label asp-for="nGender"
+                           class="register-label">
                         Gender
                     </label>
 
@@ -141,7 +160,7 @@
                             class="register-select">
 
                         <option value="0">
-                            Select gender
+                            -- Select Gender --
                         </option>
 
                         <option value="1">
@@ -165,9 +184,12 @@
                 </div>
 
 
+                <!-- Date of Birth -->
+
                 <div class="register-form-group">
 
-                    <label class="register-label">
+                    <label asp-for="DOB"
+                           class="register-label">
                         Date of Birth
                     </label>
 
@@ -184,15 +206,18 @@
             </div>
 
 
-            <!-- =====================================
+            <!-- =================================================
                  MOBILE + EMAIL
-            ====================================== -->
+            ================================================== -->
 
             <div class="register-form-row">
 
+                <!-- Mobile -->
+
                 <div class="register-form-group">
 
-                    <label class="register-label">
+                    <label asp-for="sMobile"
+                           class="register-label">
                         Mobile Number
                     </label>
 
@@ -200,7 +225,8 @@
                            type="tel"
                            class="register-input"
                            placeholder="Enter mobile number"
-                           maxlength="10" />
+                           maxlength="10"
+                           autocomplete="tel" />
 
                     <span asp-validation-for="sMobile"
                           class="text-danger register-validation">
@@ -209,16 +235,20 @@
                 </div>
 
 
+                <!-- Email -->
+
                 <div class="register-form-group">
 
-                    <label class="register-label">
+                    <label asp-for="sEmail"
+                           class="register-label">
                         Email
                     </label>
 
                     <input asp-for="sEmail"
                            type="email"
                            class="register-input"
-                           placeholder="Enter email" />
+                           placeholder="Enter email"
+                           autocomplete="email" />
 
                     <span asp-validation-for="sEmail"
                           class="text-danger register-validation">
@@ -229,9 +259,9 @@
             </div>
 
 
-            <!-- =====================================
-                 OTP
-            ====================================== -->
+            <!-- =================================================
+                 OTP VERIFICATION
+            ================================================== -->
 
             <div class="otp-section">
 
@@ -240,6 +270,8 @@
                 </label>
 
                 <div class="otp-content">
+
+                    <!-- OTP Options -->
 
                     <div class="otp-options">
 
@@ -281,13 +313,16 @@
                     </div>
 
 
+                    <!-- OTP Input -->
+
                     <div class="otp-input-container">
 
                         <input asp-for="sOTP"
                                type="text"
                                class="otp-input"
                                placeholder="Enter OTP"
-                               maxlength="6" />
+                               maxlength="6"
+                               autocomplete="one-time-code" />
 
                         <span asp-validation-for="sOTP"
                               class="text-danger register-validation">
@@ -300,25 +335,68 @@
             </div>
 
 
-            <!-- =====================================
-                 COLLEGE + BRANCH
-            ====================================== -->
+            <!-- =================================================
+                 COLLEGE NAME + COLLEGE CODE
+            ================================================== -->
 
             <div class="register-form-row">
 
+                <!-- College Name -->
+
                 <div class="register-form-group">
 
-                    <label class="register-label">
-                        College
+                    <label asp-for="sCollegeName"
+                           class="register-label">
+                        College Name
                     </label>
 
-                    <select asp-for="nCollegeCode" class="register-select">
+                    <div class="register-input-box">
 
-                        <option value="0">Select College</option>
-                        <option value="1">GH</option>
-                        <option value="2">JD</option>
+                        <select asp-for="sCollegeName"
+                                id="sCollegeName"
+                                class="register-select">
 
-                    </select>
+                            <option value="0">
+                                -- Select College Name --
+                            </option>
+
+                        </select>
+
+                        @*  <i class="fa-solid fa-building register-input-icon"></i> *@
+
+                    </div>
+
+                    <span asp-validation-for="sCollegeName"
+                          class="text-danger register-validation">
+                    </span>
+
+                </div>
+
+
+                <!-- College Code -->
+
+                <div class="register-form-group">
+
+                    <label asp-for="nCollegeCode"
+                           class="register-label">
+                        College Code
+                    </label>
+
+                    <div class="register-input-box">
+
+                        <select asp-for="nCollegeCode"
+                                id="nCollegeCode"
+                                class="register-select">
+
+                            <option value="0">
+                                -- Select College Code --
+                            </option>
+
+                        </select>
+
+                        @* <i class="fa-solid fa-hashtag register-input-icon"></i> *@
+
+                    </div>
 
                     <span asp-validation-for="nCollegeCode"
                           class="text-danger register-validation">
@@ -326,29 +404,71 @@
 
                 </div>
 
+            </div>
+
+
+            <!-- =================================================
+                 DEPARTMENT + BRANCH
+            ================================================== -->
+
+            <div class="register-form-row">
+
+                <!-- Department -->
 
                 <div class="register-form-group">
 
-                    <label class="register-label">
+                    <label asp-for="nDepartment"
+                           class="register-label">
+                        Department
+                    </label>
+
+                    <div class="register-input-box">
+
+                        <select asp-for="nDepartment"
+                                id="departmentSelect"
+                                class="register-select">
+
+                            <option value="0">
+                                -- Select Department --
+                            </option>
+
+                        </select>
+
+                        @*  <i class="fa-solid fa-building-columns register-input-icon"></i> *@
+
+                    </div>
+
+                    <span asp-validation-for="nDepartment"
+                          class="text-danger register-validation">
+                    </span>
+
+                </div>
+
+
+                <!-- Branch -->
+
+                <div class="register-form-group">
+
+                    <label asp-for="nBranch"
+                           class="register-label">
                         Branch
                     </label>
 
-                    <select asp-for="nBranch"
-                            class="register-select">
+                    <div class="register-input-box">
 
-                        <option value="0">
-                            Select Branch
-                        </option>
-                        <option value="1">
-                            CSE
-                        </option>
-                        <option value="2">
-                            ETC
-                        </option>
-                        <option value="3">
-                            IT
-                        </option>
-                    </select>
+                        <select asp-for="nBranch"
+                                id="branchSelect"
+                                class="register-select">
+
+                            <option value="0">
+                                -- Select Branch --
+                            </option>
+
+                        </select>
+
+                        @*   <i class="fa-solid fa-code-branch register-input-icon"></i> *@
+
+                    </div>
 
                     <span asp-validation-for="nBranch"
                           class="text-danger register-validation">
@@ -359,15 +479,16 @@
             </div>
 
 
-            <!-- =====================================
-                 PASSOUT YEAR + PROFILE
-            ====================================== -->
+            <!-- =================================================
+                 PASSOUT YEAR
+            ================================================== -->
 
             <div class="register-form-row">
 
                 <div class="register-form-group">
 
-                    <label class="register-label">
+                    <label asp-for="nPassoutYear"
+                           class="register-label">
                         Passout Year
                     </label>
 
@@ -375,12 +496,20 @@
                             class="register-select">
 
                         <option value="0">
-                            Select Passout Year
+                            -- Select Passout Year --
                         </option>
 
-                        <option value="1">
-                            2026
-                        </option>
+                        <option value="2020">2020</option>
+                        <option value="2021">2021</option>
+                        <option value="2022">2022</option>
+                        <option value="2023">2023</option>
+                        <option value="2024">2024</option>
+                        <option value="2025">2025</option>
+                        <option value="2026">2026</option>
+                        <option value="2027">2027</option>
+                        <option value="2028">2028</option>
+                        <option value="2029">2029</option>
+                        <option value="2030">2030</option>
 
                     </select>
 
@@ -391,31 +520,45 @@
                 </div>
 
 
+
+                <!-- =================================================
+                     PROFILE IMAGE
+                ================================================== -->
+
                 <div class="register-form-group">
 
-                    <label class="register-label">
+                    <label asp-for="ProfileImageFile"
+                           class="register-label">
                         Profile Image
                     </label>
 
-                    <input type="file"
-                           name="profileImage"
-                           accept="image/*"
+                    <input asp-for="ProfileImageFile"
+                           type="file"
+                           accept=".jpg,.jpeg,.png"
                            class="register-input register-file" />
+
+                    <span asp-validation-for="ProfileImageFile"
+                          class="text-danger register-validation">
+                    </span>
 
                 </div>
 
             </div>
 
 
-            <!-- =====================================
-                 PASSWORD
-            ====================================== -->
+
+            <!-- =================================================
+                 PASSWORD + CONFIRM PASSWORD
+            ================================================== -->
 
             <div class="register-form-row">
 
+                <!-- Password -->
+
                 <div class="register-form-group">
 
-                    <label class="register-label">
+                    <label asp-for="sPassword"
+                           class="register-label">
                         Password
                     </label>
 
@@ -430,24 +573,46 @@
 
                 </div>
 
+
+                <!-- Confirm Password -->
+                @*  <div class="register-form-group">
+
+                    <label asp-for="sConfirmPassword"
+                           class="register-label">
+                        Confirm Password
+                    </label>
+
+                    <input asp-for="sConfirmPassword"
+                           type="password"
+                           class="register-input"
+                           placeholder="Confirm password" />
+
+                    <span asp-validation-for="sConfirmPassword"
+                          class="text-danger register-validation">
+                    </span>
+
+                </div> *@
+
             </div>
 
 
-            <!-- =====================================
+            <!-- =================================================
                  REGISTER BUTTON
-            ====================================== -->
+            ================================================== -->
 
             <button type="submit"
                     class="register-main-btn">
+
+                <i class="fa-solid fa-user-plus"></i>
 
                 Register
 
             </button>
 
 
-            <!-- =====================================
-                 LOGIN
-            ====================================== -->
+            <!-- =================================================
+                 LOGIN LINK
+            ================================================== -->
 
             <div class="register-bottom-text">
 
@@ -455,9 +620,7 @@
 
                 <a asp-controller="Account"
                    asp-action="CandidateLogin">
-
                     Sign In
-
                 </a>
 
             </div>
@@ -472,48 +635,377 @@
 @section Scripts
 {
     @{
-        await Html.RenderPartialAsync(
-            "_ValidationScriptsPartial"
-        );
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
     }
-}
+
+    <script>
+
+        $(document).ready(function () {
+
+            // =====================================================
+            // BASIC INPUT SPACE HANDLING
+            // =====================================================
+
+            $('input[type="text"], input[type="email"], input[type="tel"], input[type="password"]')
+                .on('keydown', function (e) {
+
+                    if (e.key === " " && this.value.length === 0) {
+                        e.preventDefault();
+                    }
+
+                })
+                .on('input', function () {
+
+                    this.value = this.value.replace(/^\s+/, '');
+
+                })
+                .on('blur', function () {
+
+                    this.value = this.value.trim();
+
+                });
 
 
-<script>
+            // =====================================================
+            // ELEMENTS
+            // =====================================================
 
-    document.addEventListener("DOMContentLoaded", function () {
+            const collegeNameSelect =
+                $('#sCollegeName');
 
-        document.querySelectorAll(
-            'input[type="text"], input[type="email"], input[type="tel"], input[type="password"]'
-        ).forEach(function (input) {
+            const collegeCodeSelect =
+                $('#nCollegeCode');
 
-            input.addEventListener("keydown", function (e) {
+            const departmentSelect =
+                $('#departmentSelect');
 
-                if (
-                    e.key === " " &&
-                    this.value.length === 0
-                ) {
-                    e.preventDefault();
+            const branchSelect =
+                $('#branchSelect');
+
+
+            // =====================================================
+            // LOAD COLLEGES
+            // =====================================================
+
+            $.ajax({
+
+                url: '@Url.Action("GetColleges", "Account")',
+
+                type: 'GET',
+
+                success: function (data) {
+
+                    console.log("Colleges:", data);
+
+                    collegeNameSelect.empty();
+
+                    collegeNameSelect.append(
+                        $('<option>', {
+                            value: '0',
+                            text: '-- Select College Name --'
+                        })
+                    );
+
+                    $.each(data, function (index, college) {
+
+                        collegeNameSelect.append(
+                            $('<option>', {
+
+                                value: college.nID,
+
+                                text: college.sCollegeName
+
+                            })
+                        );
+
+                    });
+
+                },
+
+                error: function (xhr, status, error) {
+
+                    console.error(
+                        "College loading failed:",
+                        error
+                    );
+
                 }
 
             });
 
-            input.addEventListener("input", function () {
 
-                this.value =
-                    this.value.replace(/^\s+/, "");
+            // =====================================================
+            // COLLEGE NAME CHANGE
+            // LOAD COLLEGE CODE
+            // =====================================================
+
+            collegeNameSelect.on('change', function () {
+
+                const collegeId = $(this).val();
+
+                collegeCodeSelect.empty();
+
+                collegeCodeSelect.append(
+                    $('<option>', {
+
+                        value: '0',
+
+                        text: '-- Select College Code --'
+
+                    })
+                );
+
+
+                if (!collegeId ||
+                    collegeId === '0') {
+
+                    return;
+
+                }
+
+
+                $.ajax({
+
+                    url: '@Url.Action("GetCollegeCodes", "Account")',
+
+                    type: 'GET',
+
+                    data: {
+
+                        collegeId: collegeId
+
+                    },
+
+                    success: function (data) {
+
+                        console.log(
+                            "College Codes:",
+                            data
+                        );
+
+                        if (!data ||
+                            data.length === 0) {
+
+                            collegeCodeSelect.append(
+                                $('<option>', {
+
+                                    value: '0',
+
+                                    text: 'No College Code Available'
+
+                                })
+                            );
+
+                            return;
+
+                        }
+
+
+                        $.each(data, function (index, code) {
+
+                            collegeCodeSelect.append(
+                                $('<option>', {
+
+                                    value: code.nCode,
+
+                                    text: code.nCode
+
+                                })
+                            );
+
+                        });
+
+                    },
+
+                    error: function (xhr, status, error) {
+
+                        console.error(
+                            "College code loading failed:",
+                            error
+                        );
+
+                    }
+
+                });
 
             });
 
-            input.addEventListener("blur", function () {
 
-                this.value =
-                    this.value.trim();
+            // =====================================================
+            // LOAD DEPARTMENTS
+            // =====================================================
+
+            $.ajax({
+
+                url: '@Url.Action("GetDepartments", "Account")',
+
+                type: 'GET',
+
+                success: function (data) {
+
+                    console.log(
+                        "Departments:",
+                        data
+                    );
+
+                    departmentSelect.empty();
+
+                    departmentSelect.append(
+                        $('<option>', {
+
+                            value: '0',
+
+                            text: '-- Select Department --'
+
+                        })
+                    );
+
+
+                    $.each(data, function (index, item) {
+
+                        departmentSelect.append(
+                            $('<option>', {
+
+                                value: item.nID,
+
+                                text: item.sDepartment
+
+                            })
+                        );
+
+                    });
+
+                },
+
+                error: function (xhr, status, error) {
+
+                    console.error(
+                        "Department loading failed:",
+                        error
+                    );
+
+                }
 
             });
+
+
+            // =====================================================
+            // DEPARTMENT CHANGE
+            // LOAD BRANCHES
+            // =====================================================
+
+            departmentSelect.on('change', function () {
+
+                const departmentId = $(this).val();
+
+                console.log(
+                    "Selected Department ID:",
+                    departmentId
+                );
+
+
+                branchSelect.empty();
+
+                branchSelect.append(
+                    $('<option>', {
+
+                        value: '0',
+
+                        text: '-- Select Branch --'
+
+                    })
+                );
+
+
+                if (!departmentId ||
+                    departmentId === '0') {
+
+                    return;
+
+                }
+
+
+                $.ajax({
+
+                    url: '@Url.Action("GetBranches", "Account")',
+
+                    type: 'GET',
+
+                    data: {
+
+                        departmentId: departmentId
+
+                    },
+
+                    success: function (data) {
+
+                        console.log(
+                            "Branches:",
+                            data
+                        );
+
+
+                        if (!data ||
+                            data.length === 0) {
+
+                            branchSelect.append(
+                                $('<option>', {
+
+                                    value: '0',
+
+                                    text: 'No Branch Available'
+
+                                })
+                            );
+
+                            return;
+
+                        }
+
+
+                        $.each(data, function (index, item) {
+
+                            branchSelect.append(
+                                $('<option>', {
+
+                                    value: item.nID,
+
+                                    text: item.sBranch
+
+                                })
+                            );
+
+                        });
+
+                    },
+
+                    error: function (xhr, status, error) {
+
+                        console.error(
+                            "Branch loading failed:",
+                            error
+                        );
+
+                        branchSelect.empty();
+
+                        branchSelect.append(
+                            $('<option>', {
+
+                                value: '0',
+
+                                text: 'Unable to load branches'
+
+                            })
+                        );
+
+                    }
+
+                });
+
+            });
+
 
         });
 
-    });
-
-</script>
+    </script>
+}

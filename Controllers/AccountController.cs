@@ -21,6 +21,62 @@ namespace ErJobPortal.Controllers
             return View();
         }
 
+        // ==========================================
+        // GET DEPARTMENTS
+        // ==========================================
+
+        [HttpGet]
+        public IActionResult GetCandidateDepartments()
+        {
+            var departments =
+                _accountRepository.GetDepartments();
+
+            return Json(departments);
+        }
+
+
+        // ==========================================
+        // GET BRANCHES BY DEPARTMENT
+        // ==========================================
+
+        [HttpGet]
+        public IActionResult GetCandidateBranches(int departmentId)
+        {
+            var branches =
+                _accountRepository.GetBranches(departmentId);
+
+            return Json(branches);
+        }
+
+
+        // ==========================================
+        // COLLEGE
+        // ==========================================
+
+        [HttpGet]
+        public IActionResult GetCandidateColleges()
+        {
+            var colleges =
+                _accountRepository.GetColleges();
+
+            return Json(colleges);
+        }
+
+
+        // ==========================================
+        // COLLEGE CODE BY COLLEGE
+        // ==========================================
+
+        [HttpGet]
+        public IActionResult GetCandidateCollegeCodes(int collegeId)
+        {
+            var codes =
+                _accountRepository.GetCollegeCodes(collegeId);
+
+            return Json(codes);
+        }
+
+
 
         // ==============================
         // CANDIDATE REGISTER - POST
@@ -30,13 +86,13 @@ namespace ErJobPortal.Controllers
         public IActionResult CandidateRegister(CandidateRegister model)
         {
             // STATIC OTP FOR NOW
-            if (model.sOTP != "123456")
-            {
-                ModelState.AddModelError(
-                    "sOTP",
-                    "Invalid OTP. Please enter 123456."
-                );
-            }
+            //if (model.sOTP != "123456")
+            //{
+            //    ModelState.AddModelError(
+            //        "sOTP",
+            //        "Invalid OTP. Please enter 123456."
+            //    );
+            //}
 
             if (!ModelState.IsValid)
             {
@@ -79,8 +135,56 @@ namespace ErJobPortal.Controllers
         [HttpGet]
         public IActionResult OrganizationRegister()
         {
+            OrganizationRegister model = new OrganizationRegister();
             return View();
         }
+
+        // ==========================================
+        // GET DEPARTMENTS BY COLLEGE
+        // ==========================================
+
+        [HttpGet]
+        public IActionResult GetDepartments()
+        {
+            var departments =
+                _accountRepository.GetDepartments();
+
+            return Json(departments);
+        }
+
+        [HttpGet]
+        public IActionResult GetBranches(int departmentId)
+        {
+            var branches =
+                _accountRepository.GetBranches(departmentId);
+
+            return Json(branches);
+        }
+
+        #region "College"
+
+        [HttpGet]
+        public IActionResult GetColleges()
+        {
+            var colleges = _accountRepository.GetColleges();
+
+            return Json(colleges);
+        }
+
+        #endregion
+
+
+        #region "College Code"
+
+        [HttpGet]
+        public IActionResult GetCollegeCodes(int collegeId)
+        {
+            var codes = _accountRepository.GetCollegeCodes(collegeId);
+
+            return Json(codes);
+        }
+
+        #endregion
 
         [HttpPost]
         [ValidateAntiForgeryToken]

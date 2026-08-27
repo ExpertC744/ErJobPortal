@@ -18,6 +18,52 @@ namespace ErJobPortal.Controllers
             return View();
         }
 
+        public IActionResult About()
+        {
+            return View();
+        }
+        public IActionResult Organization()
+        {
+            return View();
+        }
+        public IActionResult TeamInvolved()
+        {
+            return View();
+        }
+        public IActionResult Terms_Cond()
+        {
+            return View();
+        }
+        public IActionResult Org_blog()
+        {
+            return View();
+        }
+        public IActionResult Benefits()
+        {
+            return View();
+        }
+        public IActionResult Tips()
+        {
+            return View();
+        }
+        public IActionResult TopCarriers()
+        {
+            return View();
+        }
+        public IActionResult Transformation()
+        {
+            return View();
+        }
+        public IActionResult Embracing_change()
+        {
+            return View();
+        }
+        public IActionResult Contact()
+        {
+            return View();
+        }
+
+
         public IActionResult Privacy()
         {
             return View();

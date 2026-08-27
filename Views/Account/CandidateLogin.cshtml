@@ -17,38 +17,76 @@
 
     <title>Candidate Login</title>
 
-    <!-- Bootstrap -->
+
+    <!-- =========================================================
+         BOOTSTRAP
+    ========================================================== -->
+
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
           rel="stylesheet" />
 
-    <!-- Font Awesome -->
+
+    <!-- =========================================================
+         FONT AWESOME
+    ========================================================== -->
+
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"
           rel="stylesheet" />
 
-    <link rel="stylesheet" href="~/css/CandidateLogin.css" />
 
+    <!-- =========================================================
+         GOOGLE FONT
+    ========================================================== -->
+
+    <link rel="preconnect"
+          href="https://fonts.googleapis.com" />
+
+    <link rel="preconnect"
+          href="https://fonts.gstatic.com"
+          crossorigin />
+
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
+          rel="stylesheet" />
+
+
+    <!-- =========================================================
+         CANDIDATE LOGIN CSS
+    ========================================================== -->
+
+    <link rel="stylesheet"
+          href="~/css/CandidateLogin.css" />
 
 </head>
 
 
 <body>
 
+    <!-- =========================================================
+         MAIN LOGIN PAGE
+    ========================================================== -->
+
     <div class="candidate-login-page">
 
-        <!-- =================================================
+
+        <!-- =====================================================
              BACKGROUND DECORATION
-        ================================================== -->
+        ====================================================== -->
 
         <div class="candidate-bg-circle candidate-bg-circle-one"></div>
 
         <div class="candidate-bg-circle candidate-bg-circle-two"></div>
 
 
-        <!-- =================================================
+        <!-- =====================================================
              LOGIN WRAPPER
-        ================================================== -->
+        ====================================================== -->
 
         <div class="candidate-login-wrapper">
+
+
+            <!-- =================================================
+                 LOGIN CARD
+            ================================================== -->
 
             <div class="candidate-login-card">
 
@@ -65,15 +103,61 @@
 
                     </div>
 
+
                     <h2>
                         Candidate Login
                     </h2>
 
+
                     <p>
-                        Sign in to access your candidate account
+                        Sign in to access candidate account
                     </p>
 
                 </div>
+
+                <!-- =================================================
+                     ACCOUNT TYPE SWITCH
+                ================================================== -->
+
+                <div class="candidate-account-switch">
+
+
+                    <!-- =================================================
+                         CANDIDATE
+                    ================================================== -->
+
+                    <a asp-controller="Account"
+                       asp-action="CandidateLogin"
+                       class="candidate-switch-link active">
+
+                        <i class="fa-solid fa-user-graduate"></i>
+
+                        <span>
+                            Candidate
+                        </span>
+
+                    </a>
+
+
+                    <!-- =================================================
+                         ORGANIZATION
+                    ================================================== -->
+
+                    <a asp-controller="Account"
+                       asp-action="OrganizationLogin"
+                       class="candidate-switch-link">
+
+                        <i class="fa-solid fa-building"></i>
+
+                        <span>
+                            Organization
+                        </span>
+
+                    </a>
+
+
+                </div>
+
 
 
                 <!-- =================================================
@@ -132,7 +216,9 @@
                       method="post">
 
 
-                    <!-- VALIDATION SUMMARY -->
+                    <!-- =================================================
+                         VALIDATION SUMMARY
+                    ================================================== -->
 
                     <div asp-validation-summary="All"
                          class="text-danger candidate-validation-summary">
@@ -152,17 +238,22 @@
 
                         </label>
 
+
                         <div class="candidate-input-wrapper">
 
+
                             <i class="fas fa-envelope candidate-input-icon"></i>
+
 
                             <input asp-for="sEmail"
                                    class="candidate-input"
                                    type="email"
-                                   placeholder="Enter your email address"
+                                   placeholder="Email address"
                                    autocomplete="username" />
 
+
                         </div>
+
 
                         <span asp-validation-for="sEmail"
                               class="candidate-field-validation">
@@ -184,16 +275,22 @@
 
                         </label>
 
+
                         <div class="candidate-input-wrapper">
 
+
                             <i class="fas fa-lock candidate-input-icon"></i>
+
 
                             <input asp-for="sPassword"
                                    id="candidatePassword"
                                    class="candidate-input"
                                    type="password"
-                                   placeholder="Enter your password"
+                                   placeholder="Password"
                                    autocomplete="current-password" />
+
+
+                            <!-- PASSWORD TOGGLE -->
 
                             <button type="button"
                                     class="candidate-password-toggle"
@@ -204,7 +301,9 @@
 
                             </button>
 
+
                         </div>
+
 
                         <span asp-validation-for="sPassword"
                               class="candidate-field-validation">
@@ -238,19 +337,24 @@
 
                 <div class="candidate-login-footer">
 
+
                     <div>
+
                         <i class="fas fa-user-check"></i>
 
-                        Registered candidate?
+                        Don't have an Candidate account?
+
 
                         <a asp-controller="Account"
                            asp-action="CandidateRegister"
                            class="candidate-register-link">
 
-                            Create Account
+                            Register
 
                         </a>
+
                     </div>
+
 
                 </div>
 
@@ -263,15 +367,17 @@
 
 
     <!-- =========================================================
-         PASSWORD TOGGLE
-    ========================================================= -->
+         PASSWORD TOGGLE SCRIPT
+    ========================================================== -->
 
     <script>
 
         document.addEventListener("DOMContentLoaded", function () {
 
+
             const passwordInput =
                 document.getElementById("candidatePassword");
+
 
             const toggleButton =
                 document.getElementById("candidateTogglePassword");
@@ -284,31 +390,39 @@
 
             toggleButton.addEventListener("click", function () {
 
+
                 const icon =
                     this.querySelector("i");
 
 
                 if (passwordInput.type === "password") {
 
+
                     passwordInput.type = "text";
+
 
                     icon.classList.remove("fa-eye");
 
                     icon.classList.add("fa-eye-slash");
+
 
                     this.setAttribute(
                         "aria-label",
                         "Hide password"
                     );
 
+
                 }
                 else {
 
+
                     passwordInput.type = "password";
+
 
                     icon.classList.remove("fa-eye-slash");
 
                     icon.classList.add("fa-eye");
+
 
                     this.setAttribute(
                         "aria-label",
@@ -323,6 +437,10 @@
 
     </script>
 
+
+    <!-- =========================================================
+         VALIDATION
+    ========================================================== -->
 
     <partial name="_ValidationScriptsPartial" />
 

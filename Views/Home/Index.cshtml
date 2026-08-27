@@ -3,15 +3,32 @@
 	ViewData["BodyClass"] = "home-page";
 }
 
+<link rel="stylesheet" href="~/css/home-modern.css" asp-append-version="true">
 
 <!-- START PRELOADER -->
 <div class="preloaders">
-	<span class="loader"></span>
+	<div class="trainee-loader">
+
+		<div class="trainee-orbit orbit-one"></div>
+		<div class="trainee-orbit orbit-two"></div>
+
+		<!-- CENTER BRAND NAME -->
+		<div class="trainee-core">
+			<span>1Trainee</span>
+		</div>
+
+		<div class="trainee-dot dot-one"></div>
+		<div class="trainee-dot dot-two"></div>
+		<div class="trainee-dot dot-three"></div>
+		<div class="trainee-dot dot-four"></div>
+
+	</div>
 </div>
+
 <!-- END PRELOADER -->
 <!-- START HOME -->
-<section class="home_bg hb_height" style="background-image: url(assets/img/bg/home-bg.jpg);  background-size:cover; background-position: center center;">
-	<div class="container">
+<section class="home_bg hb_height">
+	<div class="container p-5">
 		<div class="row">
 			<div class="col-lg-6 col-sm-12 col-xs-12">
 				<div class="hero-text ht_top">
@@ -20,7 +37,7 @@
 				</div>
 				<div class="home_sb">
 					<form action="#" class="banner_subs">
-						<input type="text" class="form-control home_si" placeholder="Search your course here" required="required">
+						<input type="text" class="form-control home_si" placeholder="Search  course here" required="required">
 						<button type="button" class="subscribe__btn">Search <i class="fa fa-paper-plane-o"></i></button>
 					</form>
 				</div>
@@ -79,7 +96,7 @@
 <section class="top_cat__area section-padding" style="background-image: url(assets/img/bg/shape-1.png);  background-size:cover; background-position: center center;">
 	<div class="container">
 		<div class="section-title text-center">
-			<h2>Start your journey With us</h2>
+			<h2>Start  journey With us</h2>
 			<p>We offer a brand new approach to the most basic learning paradigms. Choose from a wide range of learning options and gain new skills! Our school is know.</p>
 		</div>
 		<div class="row">
@@ -187,85 +204,266 @@
 			</div><!--- END COL -->
 		</div><!--- END ROW -->
 		<div class="row">
+
+			<!-- COURSE 1 -->
 			<div class="col-lg-4 col-sm-6 col-xs-12">
 				<div class="single_course">
+
 					<div class="single_c_img">
-						<img src="assets/img/course/1.png" class="img-fluid" alt="course-image" />
+						<img src="assets/img/course/1.png"
+							 class="img-fluid"
+							 alt="course-image" />
 						<span>Education</span>
 					</div>
-					<i class="fa fa-star"></i><i class="fa fa-star"></i><i class="fa fa-star"></i><i class="fa fa-star"></i><i class="fa fa-star"></i>
-					<h4><a href="course.html">Complete User fundamentals beginners to advanced</a></h4>
-					<p><span class="ti-book"> </span> 12 Course</p>
-					<p><span class="ti-alarm-clock"> </span>2 Hrs 32 Min</p>
-					<div class="price">Course Fee - 99$</div>
+
+					<div class="course-rating">
+						<i class="fa fa-star"></i>
+						<i class="fa fa-star"></i>
+						<i class="fa fa-star"></i>
+						<i class="fa fa-star"></i>
+						<i class="fa fa-star"></i>
+					</div>
+
+					<h4>
+						<a href="course.html">
+							Complete User fundamentals beginners to advanced
+						</a>
+					</h4>
+
+					<p>
+						<span class="ti-book"></span>
+						12 Course
+					</p>
+
+					<p>
+						<span class="ti-alarm-clock"></span>
+						2 Hrs 32 Min
+					</p>
+
+					<div class="price">
+						Course Fee - 99$
+					</div>
+
 				</div>
-			</div><!-- END COL -->
+			</div>
+
+
+			<!-- COURSE 2 -->
 			<div class="col-lg-4 col-sm-6 col-xs-12">
 				<div class="single_course">
+
 					<div class="single_c_img">
-						<img src="assets/img/course/2.png" class="img-fluid" alt="course-image" />
+						<img src="assets/img/course/2.png"
+							 class="img-fluid"
+							 alt="course-image" />
 						<span>UI/UX</span>
 					</div>
-					<i class="fa fa-star"></i><i class="fa fa-star"></i><i class="fa fa-star"></i><i class="fa fa-star"></i><i class="fa fa-star"></i>
-					<h4><a href="course.html">Advanced Android 12 & Kotlin Development Course</a></h4>
-					<p><span class="ti-book"> </span> 41 Course</p>
-					<p><span class="ti-alarm-clock"> </span>3 Hrs 32 Min</p>
-					<div class="price">Course Fee - 49$</div>
+
+					<div class="course-rating">
+						<i class="fa fa-star"></i>
+						<i class="fa fa-star"></i>
+						<i class="fa fa-star"></i>
+						<i class="fa fa-star"></i>
+						<i class="fa fa-star"></i>
+					</div>
+
+					<h4>
+						<a href="course.html">
+							Advanced Android 12 &amp; Kotlin Development Course
+						</a>
+					</h4>
+
+					<p>
+						<span class="ti-book"></span>
+						41 Course
+					</p>
+
+					<p>
+						<span class="ti-alarm-clock"></span>
+						3 Hrs 32 Min
+					</p>
+
+					<div class="price">
+						Course Fee - 49$
+					</div>
+
 				</div>
-			</div><!-- END COL -->
+			</div>
+
+
+			<!-- COURSE 3 -->
 			<div class="col-lg-4 col-sm-6 col-xs-12">
 				<div class="single_course">
+
 					<div class="single_c_img">
-						<img src="assets/img/course/3.png" class="img-fluid" alt="course-image" />
+						<img src="assets/img/course/3.png"
+							 class="img-fluid"
+							 alt="course-image" />
 						<span>Lifestyle</span>
 					</div>
-					<i class="fa fa-star"></i><i class="fa fa-star"></i><i class="fa fa-star"></i><i class="fa fa-star"></i><i class="fa fa-star"></i>
-					<h4><a href="course.html">Complete HTML, CSS and Javascript Course</a></h4>
-					<p><span class="ti-book"> </span> 32 Course</p>
-					<p><span class="ti-alarm-clock"> </span>2 Hrs 32 Min</p>
-					<div class="price">Course Fee - Free</div>
+
+					<div class="course-rating">
+						<i class="fa fa-star"></i>
+						<i class="fa fa-star"></i>
+						<i class="fa fa-star"></i>
+						<i class="fa fa-star"></i>
+						<i class="fa fa-star"></i>
+					</div>
+
+					<h4>
+						<a href="course.html">
+							Complete HTML, CSS and Javascript Course
+						</a>
+					</h4>
+
+					<p>
+						<span class="ti-book"></span>
+						32 Course
+					</p>
+
+					<p>
+						<span class="ti-alarm-clock"></span>
+						2 Hrs 32 Min
+					</p>
+
+					<div class="price">
+						Course Fee - Free
+					</div>
+
 				</div>
-			</div><!-- END COL -->
+			</div>
+
+
+			<!-- COURSE 4 -->
 			<div class="col-lg-4 col-sm-6 col-xs-12">
 				<div class="single_course">
+
 					<div class="single_c_img">
-						<img src="assets/img/course/4.png" class="img-fluid" alt="course-image" />
+						<img src="assets/img/course/4.png"
+							 class="img-fluid"
+							 alt="course-image" />
 						<span>Science</span>
 					</div>
-					<i class="fa fa-star"></i><i class="fa fa-star"></i><i class="fa fa-star"></i><i class="fa fa-star"></i><i class="fa fa-star"></i>
-					<h4><a href="course.html">IOS and Swift Complete iOS Application Development</a></h4>
-					<p><span class="ti-book"> </span> 19 Course</p>
-					<p><span class="ti-alarm-clock"> </span>2 Hrs 32 Min</p>
-					<div class="price">Course Fee - 59$</div>
+
+					<div class="course-rating">
+						<i class="fa fa-star"></i>
+						<i class="fa fa-star"></i>
+						<i class="fa fa-star"></i>
+						<i class="fa fa-star"></i>
+						<i class="fa fa-star"></i>
+					</div>
+
+					<h4>
+						<a href="course.html">
+							IOS and Swift Complete iOS Application Development
+						</a>
+					</h4>
+
+					<p>
+						<span class="ti-book"></span>
+						19 Course
+					</p>
+
+					<p>
+						<span class="ti-alarm-clock"></span>
+						2 Hrs 32 Min
+					</p>
+
+					<div class="price">
+						Course Fee - 59$
+					</div>
+
 				</div>
-			</div><!-- END COL -->
+			</div>
+
+
+			<!-- COURSE 5 -->
 			<div class="col-lg-4 col-sm-6 col-xs-12">
 				<div class="single_course">
+
 					<div class="single_c_img">
-						<img src="assets/img/course/5.png" class="img-fluid" alt="course-image" />
+						<img src="assets/img/course/5.png"
+							 class="img-fluid"
+							 alt="course-image" />
 						<span>Modern</span>
 					</div>
-					<i class="fa fa-star"></i><i class="fa fa-star"></i><i class="fa fa-star"></i><i class="fa fa-star"></i><i class="fa fa-star"></i>
-					<h4><a href="course.html">Learn graphics design with a best IT Trainer</a></h4>
-					<p><span class="ti-book"> </span> 22 Course</p>
-					<p><span class="ti-alarm-clock"> </span>2 Hrs 32 Min</p>
-					<div class="price">Course Fee - 79$</div>
+
+					<div class="course-rating">
+						<i class="fa fa-star"></i>
+						<i class="fa fa-star"></i>
+						<i class="fa fa-star"></i>
+						<i class="fa fa-star"></i>
+						<i class="fa fa-star"></i>
+					</div>
+
+					<h4>
+						<a href="course.html">
+							Learn graphics design with a best IT Trainer
+						</a>
+					</h4>
+
+					<p>
+						<span class="ti-book"></span>
+						22 Course
+					</p>
+
+					<p>
+						<span class="ti-alarm-clock"></span>
+						2 Hrs 32 Min
+					</p>
+
+					<div class="price">
+						Course Fee - 79$
+					</div>
+
 				</div>
-			</div><!-- END COL -->
+			</div>
+
+
+			<!-- COURSE 6 -->
 			<div class="col-lg-4 col-sm-6 col-xs-12">
 				<div class="single_course">
+
 					<div class="single_c_img">
-						<img src="assets/img/course/6.png" class="img-fluid" alt="course-image" />
+						<img src="assets/img/course/6.png"
+							 class="img-fluid"
+							 alt="course-image" />
 						<span>Marketing</span>
 					</div>
-					<i class="fa fa-star"></i><i class="fa fa-star"></i><i class="fa fa-star"></i><i class="fa fa-star"></i><i class="fa fa-star"></i>
-					<h4><a href="course.html">Complete data science for your next business</a></h4>
-					<p><span class="ti-book"> </span> 11 Course</p>
-					<p><span class="ti-alarm-clock"> </span>2 Hrs 32 Min</p>
-					<div class="price">Course Fee - 39$</div>
+
+					<div class="course-rating">
+						<i class="fa fa-star"></i>
+						<i class="fa fa-star"></i>
+						<i class="fa fa-star"></i>
+						<i class="fa fa-star"></i>
+						<i class="fa fa-star"></i>
+					</div>
+
+					<h4>
+						<a href="course.html">
+							Complete data science for  next business
+						</a>
+					</h4>
+
+					<p>
+						<span class="ti-book"></span>
+						11 Course
+					</p>
+
+					<p>
+						<span class="ti-alarm-clock"></span>
+						2 Hrs 32 Min
+					</p>
+
+					<div class="price">
+						Course Fee - 39$
+					</div>
+
 				</div>
-			</div><!-- END COL -->
-		</div><!--- END ROW -->
+			</div>
+
+		</div>
+		<!--- END ROW -->
 	</div><!--- END CONTAINER -->
 </section>
 <!-- END COURSE -->

@@ -20,6 +20,10 @@
 
         public int nCollegeName { get; set; }
 
+        public int nDepartment { get; set; }
+
+        public int nBranch { get; set; }
+
         public string? sPassword { get; set; }
     }
 }
