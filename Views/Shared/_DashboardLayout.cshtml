@@ -3124,13 +3124,13 @@
                         <div class="profile-submenu" id="postSubmenu">
 
                             <a asp-controller="Organization"
-                               asp-action="CreatePost"
+                               asp-action="CreatePostNew"
                                class="profile-submenu-link">
                                 Create New Post
                             </a>
 
                             <a asp-controller="Organization"
-                               asp-action="ViewAllPost"
+                               asp-action="PostDetails"
                                class="profile-submenu-link">
                                 View All Post
                             </a>
@@ -3210,7 +3210,7 @@
                             </a>
 
                         </div>
-
+                       
                     </div>
 
 
@@ -3302,6 +3302,8 @@
                     </div>
 
                 </div>
+                //session
+                int? orgID = Context.Session.GetInt32("OrgID");
             }
 
 
