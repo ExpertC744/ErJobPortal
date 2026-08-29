@@ -169,6 +169,7 @@ namespace ErJobPortal.Controllers
             TempData["Success"] = "Address updated successfully.";
             return RedirectToAction("Profile");
         }
+
         // =====================================================
         // UPDATE EDUCATION
         // =====================================================
@@ -1169,5 +1170,37 @@ namespace ErJobPortal.Controllers
             // Return to Profile
             return RedirectToAction("Profile");
         }
+
+        // =========================================================
+        // VIEW PROFILE (READ-ONLY RESUME VIEW) RADHIKA
+        // =========================================================
+
+        [HttpGet]
+        [ResponseCache(NoStore = true, Location = ResponseCacheLocation.None)]
+        public IActionResult ViewProfile()
+        {
+            int? candidateId = HttpContext.Session.GetInt32("CandidateID");
+
+            if (candidateId == null)
+            {
+                return RedirectToAction("CandidateLogin", "Account");
+            }
+
+            CandidateProfileModel? profile = _repo.GetProfile(candidateId.Value);
+
+            if (profile == null)
+            {
+                profile = new CandidateProfileModel
+                {
+                    CandidateID = candidateId.Value
+                };
+            }
+
+            CandidateProfileViewModel vm = LoadProfileDropdowns(profile);
+
+            return View(vm);
+        }
+
+
     }
 }
