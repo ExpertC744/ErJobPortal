@@ -7,211 +7,46 @@
     ViewData["UserName"] = "Organization";
 }
 
-@section Styles
-{
-  
-    <style>
-
-        /* Main Table Container */
-        .candidate-table-container {
-            background: #ffffff;
-            padding: 25px;
-            border-radius: 20px;
-            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.08);
-        }
-
-        /* Table Header Area */
-        .candidate-table-title {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 20px;
-        }
-
-            .candidate-table-title h2 {
-                color: #252b48;
-                font-size: 28px;
-                font-weight: 600;
-                margin-bottom: 5px;
-            }
-
-            .candidate-table-title p {
-                color: #777;
-                margin-bottom: 0;
-            }
-
-        /* DataTable */
-        table.dataTable {
-            width: 100% !important;
-            border-collapse: separate !important;
-            border-spacing: 0 8px !important;
-        }
-
-            /* Header */
-            table.dataTable thead th {
-                background: #5b5ce2 !important;
-                color: white !important;
-                padding: 15px !important;
-                font-size: 14px;
-                font-weight: 600;
-                border: none !important;
-            }
-
-                table.dataTable thead th:first-child {
-                    border-radius: 10px 0 0 10px;
-                }
-
-                table.dataTable thead th:last-child {
-                    border-radius: 0 10px 10px 0;
-                }
-
-            /* Body */
-            table.dataTable tbody tr {
-                background: #f8f9ff;
-                transition: all 0.3s ease;
-            }
-
-                table.dataTable tbody tr:hover {
-                    background: #ececff;
-                    transform: scale(1.005);
-                    box-shadow: 0 5px 15px rgba(91, 92, 226, 0.12);
-                }
-
-            table.dataTable tbody td {
-                padding: 14px !important;
-                border: none !important;
-                color: #444;
-                vertical-align: middle;
-            }
-
-        /* ID */
-        .candidate-id {
-            font-weight: bold;
-            color: #5b5ce2;
-        }
-
-        /* Search */
-        .dt-search {
-            margin-bottom: 10px;
-        }
-
-            .dt-search label {
-                font-weight: 500;
-                color: #444;
-            }
-
-            .dt-search input {
-                border: 1px solid #ddd !important;
-                border-radius: 10px !important;
-                padding: 9px 15px !important;
-                outline: none !important;
-                margin-left: 8px !important;
-            }
-
-                .dt-search input:focus {
-                    border-color: #5b5ce2 !important;
-                    box-shadow: 0 0 0 3px rgba(91, 92, 226, 0.10) !important;
-                }
-
-        /* Show Entries */
-        .dt-length {
-            margin-bottom: 10px;
-        }
-
-            .dt-length select {
-                border: 1px solid #ddd !important;
-                border-radius: 8px !important;
-                padding: 7px 30px 7px 10px !important;
-                outline: none;
-            }
-
-                .dt-length select:focus {
-                    border-color: #5b5ce2 !important;
-                }
-
-        /* Pagination */
-        .dt-paging-button {
-            border-radius: 8px !important;
-            margin: 2px !important;
-        }
-
-            .dt-paging-button.current {
-                background: #5b5ce2 !important;
-                color: white !important;
-                border: none !important;
-            }
-
-            .dt-paging-button:hover {
-                background: #ececff !important;
-                color: #5b5ce2 !important;
-                border: none !important;
-            }
-
-        /* Page Count */
-        #candidatePageInfo {
-            color: #555;
-            font-size: 14px;
-            font-weight: 500;
-            margin-top: 10px;
-        }
-
-        /* Action Button */
-        .view-btn {
-            background: #5b5ce2;
-            color: white;
-            border: none;
-            padding: 7px 15px;
-            border-radius: 7px;
-            font-size: 13px;
-            transition: 0.3s;
-        }
-
-            .view-btn:hover {
-                background: #4546c4;
-                color: white;
-            }
-
-    </style>
-}
 
 <div class="container-fluid">
 
-    <!-- Page Heading -->
+    <!-- MASTER TABLE CARD -->
 
-    <div class="d-flex justify-content-between align-items-center mb-4">
+    <div class="master-table-container">
 
-        <div>
-            <h2 class="mb-1">
-                Candidate Registration List
-            </h2>
+        <!-- MASTER TABLE HEADER -->
 
-            <p class="text-muted mb-0">
-                View and manage registered candidates
-            </p>
+        <div class="master-table-title">
+
+            <div>
+
+                <h2>
+                    Candidate Registration List
+                </h2>
+
+                <p>
+                    View and manage registered candidates
+                </p>
+
+            </div>
+
+            <a asp-controller="SuperAdmin"
+               asp-action="Dashboard"
+               class="btn btn-secondary">
+
+                Back to Dashboard
+
+            </a>
+
         </div>
 
-        <a asp-controller="SuperAdmin"
-           asp-action="Dashboard"
-           class="btn btn-secondary">
 
-            Back to Dashboard
-
-        </a>
-
-    </div>
-
-
-    <!-- Table Container -->
-
-    <div class="candidate-table-container">
-
-       
-
+        <!-- MASTER TABLE -->
 
         <div class="table-responsive">
 
             <table id="candidateTable"
-                   class="display">
+                   class="master-data-table">
 
                 <thead>
 
@@ -242,7 +77,7 @@
                         {
                             <tr>
 
-                                <td class="candidate-id">
+                                <td class="master-id">
                                     @item.nID
                                 </td>
 
@@ -265,7 +100,8 @@
                                 <td>
 
                                     <button type="button"
-                                            class="view-btn">
+                                            class="master-view-btn"
+                                            data-id="@item.nID">
 
                                         View
 
@@ -297,139 +133,12 @@
         </div>
 
 
-        <!-- Custom Page Count -->
+        <!-- MASTER PAGE INFO -->
 
         <div id="candidatePageInfo"
-             class="text-center">
+             class="master-page-info text-center">
         </div>
 
     </div>
 
 </div>
-
-
-@section Scripts
-{
-    <script src="~/js/datatables.min.js"></script>
-
-    <script>
-
-        $(document).ready(function () {
-
-        // Initialize DataTable
-
-        var candidateTable = $('#candidateTable').DataTable({
-
-        // Records per page
-
-        pageLength: 5,
-
-        // Page size dropdown
-
-        lengthMenu: [
-        [5, 10, 25, 50, 100],
-        [5, 10, 25, 50, 100]
-        ],
-
-        // Default sorting by ID
-
-        order: [
-        [0, 'asc']
-        ],
-
-        // Enable searching
-
-        searching: true,
-
-        // Enable pagination
-
-        paging: true,
-
-        // Show information
-
-        info: true,
-
-        // Language / labels
-
-        language: {
-
-        search: "Search:",
-
-        lengthMenu: "Show _MENU_ entries",
-
-        info: "Showing _START_ to _END_ of _TOTAL_ candidates",
-
-        infoEmpty: "Showing 0 to 0 of 0 candidates",
-
-        zeroRecords: "No matching candidates found",
-
-        emptyTable: "No candidate registrations found",
-
-        paginate: {
-
-        first: "First",
-
-        last: "Last",
-
-        next: "Next",
-
-        previous: "Previous"
-
-        }
-
-        }
-
-        });
-
-
-        // ------------------------------------------
-        // Display Page X of Y
-        // ------------------------------------------
-
-        function updateCandidatePageInfo() {
-
-        var pageInfo = candidateTable.page.info();
-
-        var currentPage = pageInfo.page + 1;
-
-        var totalPages = pageInfo.pages;
-
-        if (totalPages === 0) {
-
-        $('#candidatePageInfo').text(
-        'Page 0 of 0'
-        );
-
-        }
-        else {
-
-        $('#candidatePageInfo').text(
-        'Page ' +
-        currentPage +
-        ' of ' +
-        totalPages
-        );
-
-        }
-
-        }
-
-
-        // Initial page count
-
-        updateCandidatePageInfo();
-
-
-        // Update page count whenever
-        // DataTable changes
-
-        candidateTable.on('draw', function () {
-
-        updateCandidatePageInfo();
-
-        });
-
-        });
-
-    </script>
-}

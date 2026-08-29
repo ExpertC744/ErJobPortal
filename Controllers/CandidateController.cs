@@ -49,7 +49,7 @@ namespace ErJobPortal.Controllers
             using (SqlConnection con = new SqlConnection(connectionString))
             {
                 con.Open();
-                string query = @"SELECT (SELECT COUNT(nID)  FROM tblOrgRegistration) AS OrganizationCount;";
+                string query = @"SELECT (SELECT COUNT(nID) FROM tblOrgRegistration) AS OrganizationCount;";
 
                 using (SqlCommand cmd = new SqlCommand(query, con))
                 {
@@ -277,25 +277,25 @@ namespace ErJobPortal.Controllers
             return RedirectToAction("Profile");
         }
 
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public IActionResult UpdateLanguages([Bind(Prefix = "Profile")] CandidateProfileModel model)
-        {
-            int? candidateId = HttpContext.Session.GetInt32("CandidateID");
+        //[HttpPost]
+        //[ValidateAntiForgeryToken]
+        //public IActionResult UpdateLanguages([Bind(Prefix = "Profile")] CandidateProfileModel model)
+        //{
+        //    int? candidateId = HttpContext.Session.GetInt32("CandidateID");
 
-            if (candidateId == null)
-            {
-                return RedirectToAction("CandidateLogin", "Account");
-            }
+        //    if (candidateId == null)
+        //    {
+        //        return RedirectToAction("CandidateLogin", "Account");
+        //    }
 
-            model.CandidateID = candidateId.Value;
+        //    model.CandidateID = candidateId.Value;
 
-            _repo.UpdateLanguages(model);
+        //    _repo.UpdateLanguages(model);
 
-            TempData["Success"] = "Languages updated successfully.";
+        //    TempData["Success"] = "Languages updated successfully.";
 
-            return RedirectToAction("Profile");
-        }
+        //    return RedirectToAction("Profile");
+        //}
 
 
         // =========================================================
@@ -863,6 +863,311 @@ namespace ErJobPortal.Controllers
 
             return RedirectToAction(
                 "CreateFeedback");
+        }
+
+
+
+        // shrirang 27/08/26
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public IActionResult UpdateDocuments([Bind(Prefix = "Profile")] CandidateProfileModel model, IFormFile? ResumeFile, IFormFile? PhotoFile, IFormFile? SignatureFile)
+        {
+            int? candidateId =
+                HttpContext.Session.GetInt32("CandidateID");
+
+            if (candidateId == null || candidateId <= 0)
+            {
+                return RedirectToAction(
+                    "CandidateLogin",
+                    "Account");
+            }
+
+            model.CandidateID = candidateId.Value;
+
+            // Get existing profile
+            CandidateProfileModel? existingProfile =
+                _repo.GetProfile(candidateId.Value);
+
+            if (existingProfile != null)
+            {
+                // Keep old files if user does not select a new file
+                model.sResume = existingProfile.sResume;
+                model.sPhoto = existingProfile.sPhoto;
+                model.sSignature = existingProfile.sSignature;
+            }
+
+            // Upload folder
+            string uploadFolder = Path.Combine(
+                Directory.GetCurrentDirectory(),
+                "wwwroot",
+                "uploads",
+                "candidates");
+
+            if (!Directory.Exists(uploadFolder))
+            {
+                Directory.CreateDirectory(uploadFolder);
+            }
+
+
+            // =====================================================
+            // RESUME
+            // =====================================================
+
+            if (ResumeFile != null && ResumeFile.Length > 0)
+            {
+                string extension =
+                    Path.GetExtension(ResumeFile.FileName)
+                        .ToLowerInvariant();
+
+                if (extension != ".pdf" &&
+                    extension != ".doc" &&
+                    extension != ".docx")
+                {
+                    TempData["Error"] =
+                        "Resume must be PDF, DOC or DOCX.";
+
+                    return RedirectToAction("Profile");
+                }
+
+                string fileName =
+                    $"{candidateId}_Resume{extension}";
+
+                string filePath =
+                    Path.Combine(uploadFolder, fileName);
+
+                using (FileStream stream =
+                       new FileStream(filePath, FileMode.Create))
+                {
+                    ResumeFile.CopyTo(stream);
+                }
+
+                model.sResume =
+                    $"/uploads/candidates/{fileName}";
+            }
+
+
+            // =====================================================
+            // PHOTO
+            // =====================================================
+
+            if (PhotoFile != null && PhotoFile.Length > 0)
+            {
+                string extension =
+                    Path.GetExtension(PhotoFile.FileName)
+                        .ToLowerInvariant();
+
+                if (extension != ".jpg" &&
+                    extension != ".jpeg" &&
+                    extension != ".png")
+                {
+                    TempData["Error"] =
+                        "Photo must be JPG, JPEG or PNG.";
+
+                    return RedirectToAction("Profile");
+                }
+
+                string fileName =
+                    $"{candidateId}_Photo{extension}";
+
+                string filePath =
+                    Path.Combine(uploadFolder, fileName);
+
+                using (FileStream stream =
+                       new FileStream(filePath, FileMode.Create))
+                {
+                    PhotoFile.CopyTo(stream);
+                }
+
+                model.sPhoto =
+                    $"/uploads/candidates/{fileName}";
+            }
+
+
+            // =====================================================
+            // SIGNATURE
+            // =====================================================
+
+            if (SignatureFile != null && SignatureFile.Length > 0)
+            {
+                string extension =
+                    Path.GetExtension(SignatureFile.FileName)
+                        .ToLowerInvariant();
+
+                if (extension != ".jpg" &&
+                    extension != ".jpeg" &&
+                    extension != ".png")
+                {
+                    TempData["Error"] =
+                        "Signature must be JPG, JPEG or PNG.";
+
+                    return RedirectToAction("Profile");
+                }
+
+                string fileName =
+                    $"{candidateId}_Signature{extension}";
+
+                string filePath =
+                    Path.Combine(uploadFolder, fileName);
+
+                using (FileStream stream =
+                       new FileStream(filePath, FileMode.Create))
+                {
+                    SignatureFile.CopyTo(stream);
+                }
+
+                model.sSignature =
+                    $"/uploads/candidates/{fileName}";
+            }
+
+
+            // =====================================================
+            // UPDATE EVERYTHING TOGETHER
+            // =====================================================
+
+            _repo.UpdateDocuments(model);
+
+            TempData["Success"] =
+                "Personal details updated successfully.";
+
+            return RedirectToAction("Profile");
+        }
+
+        // =========================================================
+        // UPDATE INTERNSHIP DETAILS
+        // =========================================================
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public IActionResult UpdateInternshipDetails(
+            [Bind(Prefix = "Profile")] CandidateProfileModel model)
+        {
+            // =====================================================
+            // GET CANDIDATE ID FROM SESSION
+            // =====================================================
+
+            int? candidateId =
+                HttpContext.Session.GetInt32("CandidateID");
+
+            if (candidateId == null || candidateId <= 0)
+            {
+                return RedirectToAction(
+                    "CandidateLogin",
+                    "Account");
+            }
+
+
+            // =====================================================
+            // NEVER TRUST CANDIDATE ID FROM FORM
+            // =====================================================
+
+            model.CandidateID =
+                candidateId.Value;
+
+
+            // =====================================================
+            // UPDATE INTERNSHIP DETAILS
+            // =====================================================
+
+            _repo.UpdateInternshipDetails(model);
+
+
+            // =====================================================
+            // SUCCESS MESSAGE
+            // =====================================================
+
+            TempData["Success"] =
+                "Internship details updated successfully.";
+
+
+            // =====================================================
+            // REDIRECT
+            // =====================================================
+
+            return RedirectToAction("Profile");
+        }
+
+        // =========================================================
+        // UPDATE LANGUAGES
+        // =========================================================
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public IActionResult UpdateLanguages([Bind(Prefix = "Profile")] CandidateProfileModel model)
+        {
+            // =====================================================
+            // GET CANDIDATE ID FROM SESSION
+            // =====================================================
+
+            int? candidateId =
+                HttpContext.Session.GetInt32("CandidateID");
+
+            if (candidateId == null || candidateId <= 0)
+            {
+                return RedirectToAction(
+                    "CandidateLogin",
+                    "Account");
+            }
+
+
+            // =====================================================
+            // NEVER TRUST CANDIDATE ID FROM FORM
+            // =====================================================
+
+            model.CandidateID = candidateId.Value;
+
+
+            // =====================================================
+            // UPDATE LANGUAGES
+            // =====================================================
+
+            _repo.UpdateLanguages(model);
+
+
+            // =====================================================
+            // SUCCESS MESSAGE
+            // =====================================================
+
+            TempData["Success"] =
+                "Languages updated successfully.";
+
+
+            // =====================================================
+            // REDIRECT
+            // =====================================================
+
+            return RedirectToAction("Profile");
+        }
+
+
+        // =========================================================
+        // UPDATE SOCIAL LINKS
+        // =========================================================
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public IActionResult UpdateSocialLinks([Bind(Prefix = "Profile")] CandidateProfileModel model)
+        {
+            // Get Candidate ID from session
+            int? candidateId = HttpContext.Session.GetInt32("CandidateID");
+
+            // Check login
+            if (candidateId == null || candidateId <= 0)
+            {
+                return RedirectToAction("CandidateLogin", "Account");
+            }
+
+            // Never trust CandidateID coming from the form
+            model.CandidateID = candidateId.Value;
+
+            // Update GitHub and LinkedIn
+            _repo.UpdateSocialLinks(model);
+
+            // Success message
+            TempData["Success"] = "Social links updated successfully.";
+
+            // Return to Profile
+            return RedirectToAction("Profile");
         }
     }
 }

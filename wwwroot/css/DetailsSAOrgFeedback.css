@@ -1,0 +1,152 @@
+﻿
+
+.feedback-details-container {
+    width: 100%;
+    padding: 0;
+    margin: 0;
+    box-sizing: border-box;
+}
+
+.feedback-details-card {
+    width: 870px;
+    max-width: 100%;
+    margin: 0 auto;
+    background: #f4faf8;
+    border: 1px solid #d7e8e3;
+    border-top: 4px solid #0f5d52;
+    border-radius: 0 0 20px 20px;
+    padding: 38px 35px 42px 35px;
+    box-sizing: border-box;
+    box-shadow: 0 5px 18px rgba(15, 93, 82, 0.10);
+}
+
+.feedback-title {
+    font-size: 42px;
+    font-weight: 400;
+    color: #0f5d52;
+    margin: 0 0 35px 0;
+}
+
+.feedback-section {
+    margin-bottom: 28px;
+}
+
+.question-label {
+    display: block;
+    font-size: 24px;
+    color: #0f5d52;
+    margin-bottom: 14px;
+}
+
+.question-box {
+    width: 100%;
+    min-height: 80px;
+    background: #ffffff;
+    border: 1px solid #b9d6cd;
+    border-radius: 6px;
+    padding: 12px 18px;
+    font-size: 23px;
+    line-height: 1.45;
+    color: #111827;
+    box-sizing: border-box;
+}
+
+.answer-label {
+    font-size: 21px;
+    color: #0f5d52;
+    margin: 15px 0 7px 23px;
+}
+
+.answer-box {
+    margin-left: 23px;
+    font-size: 25px;
+    color: #333;
+}
+
+/* TRUE / FALSE */
+
+.answer-radio {
+    display: inline-flex;
+    align-items: center;
+    margin-right: 12px;
+    color: #333;
+}
+
+    .answer-radio input {
+        width: 18px;
+        height: 18px;
+        margin-right: 5px;
+        accent-color: #0f5d52;
+    }
+
+/* STARS */
+
+.detail-stars {
+    display: flex;
+    gap: 5px;
+    margin-left: 23px;
+}
+
+.detail-star {
+    font-size: 32px;
+    color: #17a589;
+}
+
+/* EMOJI */
+
+.detail-emojis {
+    display: flex;
+    gap: 16px;
+    margin-left: 23px;
+}
+
+.detail-emoji {
+    font-size: 30px;
+    opacity: .35;
+    filter: grayscale(100%);
+}
+
+    .detail-emoji.active {
+        opacity: 1;
+        filter: grayscale(0%);
+    }
+
+/* DESCRIPTION */
+
+.description-box {
+    margin-left: 23px;
+    width: calc(100% - 23px);
+    background: #ffffff;
+    border: 1px solid #b9d6cd;
+    border-radius: 6px;
+    padding: 12px 18px;
+    min-height: 80px;
+    font-size: 23px;
+    line-height: 1.45;
+    box-sizing: border-box;
+}
+
+/* BUTTON */
+
+.button-area {
+    margin: 35px 0 0 23px;
+}
+
+.back-button {
+    display: inline-block;
+    padding: 9px 18px;
+    background: #0f5d52;
+    color: #fff;
+    border: 1px solid #0f5d52;
+    border-radius: 6px;
+    text-decoration: none;
+    font-size: 19px;
+}
+
+    .back-button:hover {
+        background: #0c4b42;
+        border-color: #0c4b42;
+        color: #fff;
+        text-decoration: none;
+    }
+

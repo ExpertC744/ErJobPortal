@@ -11,28 +11,44 @@
 
 <div class="container-fluid">
 
-    <div class="d-flex justify-content-between align-items-center mb-4">
+    <!-- MASTER TABLE CARD -->
 
-        <h2>
-            Organization Registration List
-        </h2>
+    <div class="master-table-container">
 
-        <a asp-controller="SuperAdmin"
-           asp-action="Dashboard"
-           class="btn btn-secondary">
+        <!-- MASTER TABLE HEADER -->
 
-            Back to Dashboard
+        <div class="master-table-title">
 
-        </a>
+            <div>
 
-    </div>
+                <h2>
+                    Organization Registration List
+                </h2>
+
+                <p>
+                    View and manage registered organizations
+                </p>
+
+            </div>
 
 
-    <div class="dashboard-card">
+            <a asp-controller="SuperAdmin"
+               asp-action="Dashboard"
+               class="btn btn-secondary">
+
+                Back to Dashboard
+
+            </a>
+
+        </div>
+
+
+        <!-- MASTER TABLE -->
 
         <div class="table-responsive">
 
-            <table class="table table-bordered table-hover">
+            <table id="organizationTable"
+                   class="master-data-table">
 
                 <thead>
 
@@ -69,20 +85,23 @@
 
                     @if (Model != null && Model.Count > 0)
                     {
-
                         foreach (var item in Model)
                         {
                             <tr>
-                                <td>
-                                    <input type="hidden"
-                                           name="nID"
-                                           value="@item.nID" />
+
+                                <td class="master-id">
+
+                                    @item.nID
+
                                 </td>
+
 
                                 <td>
 
                                     @item.sOrgName
+
                                 </td>
+
 
                                 <td>
 
@@ -98,38 +117,60 @@
 
                                 </td>
 
+
                                 <td>
+
                                     @item.sName
+
                                 </td>
 
+
                                 <td>
+
                                     @item.sDesignation
+
                                 </td>
 
+
                                 <td>
+
                                     @item.sMobile
+
                                 </td>
 
+
                                 <td>
+
                                     @item.sEmail
+
                                 </td>
 
+
                                 <td>
+
                                     @item.nCollegeCode
+
                                 </td>
 
+
                                 <td>
+
                                     @item.nCollegeName
+
                                 </td>
 
+
                                 <td>
+
                                     @item.RegDate?.ToString("dd-MM-yyyy")
+
                                 </td>
+
 
                                 <td>
 
                                     <button type="button"
-                                            class="btn btn-primary btn-sm"
+                                            class="master-view-btn"
                                             data-id="@item.nID">
 
                                         View
@@ -159,6 +200,13 @@
 
             </table>
 
+        </div>
+
+
+        <!-- MASTER PAGE INFO -->
+
+        <div id="organizationPageInfo"
+             class="master-page-info text-center">
         </div>
 
     </div>

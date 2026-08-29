@@ -9,6 +9,13 @@
 
     ViewData["UserName"] = "Super Admin";
 }
+@section Styles {
+
+    <link rel="stylesheet"
+          href="~/css/SAFeedback.css"
+          asp-append-version="true" />
+
+}
 
 @{
 
@@ -19,7 +26,7 @@
 <link rel="stylesheet"
       href="https://cdn.datatables.net/1.13.8/css/jquery.dataTables.min.css" />
 
-<style>
+@* <style>
 
     /* =========================================================
                MAIN CONTAINER
@@ -380,7 +387,7 @@
         }
     }
 
-</style>
+</style> *@
 
 
 <div class="feedback-container">
@@ -723,7 +730,7 @@
 <script src="https://cdn.datatables.net/1.13.8/js/jquery.dataTables.min.js"></script>
 
 
-<script>
+@* <script>
 
     $(document).ready(function () {
 
@@ -760,4 +767,49 @@
 
     });
 
-</script>
+</script> *@
+@section Scripts {
+
+    <link rel="stylesheet"
+          href="https://cdn.datatables.net/1.13.8/css/jquery.dataTables.min.css" />
+
+    <script src="https://cdn.datatables.net/1.13.8/js/jquery.dataTables.min.js"></script>
+
+    <script>
+
+        $(document).ready(function () {
+
+        $('#feedbackTable').DataTable({
+
+        pageLength: 25,
+
+        lengthMenu: [
+        [10, 25, 50, 100, -1],
+        [10, 25, 50, 100, "All"]
+        ],
+
+        ordering: true,
+
+        searching: true,
+
+        paging: true,
+
+        info: true,
+
+        autoWidth: false,
+
+        language: {
+
+        search: "",
+
+        searchPlaceholder: "Search..."
+
+        }
+
+        });
+
+        });
+
+    </script>
+
+}

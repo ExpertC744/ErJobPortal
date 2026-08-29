@@ -2,35 +2,53 @@
 
 @{
     Layout = "~/Views/Shared/_DashboardLayout.cshtml";
+
     ViewData["Title"] = "Candidate Dashboard";
     ViewData["Panel"] = "Candidate";
     ViewData["UserName"] = "Candidate";
 }
 
+
 <div class="container-fluid">
 
-    <div class="d-flex justify-content-between align-items-center mb-4">
+    <!-- MASTER TABLE CARD -->
 
-        <h2>
-            Organization Registration List
-        </h2>
+    <div class="master-table-container">
 
-        <a asp-controller="SuperAdmin"
-           asp-action="Dashboard"
-           class="btn btn-secondary">
+        <!-- MASTER TABLE HEADER -->
 
-            Back to Dashboard
+        <div class="master-table-title">
 
-        </a>
+            <div>
 
-    </div>
+                <h2>
+                    Organization Registration List
+                </h2>
+
+                <p>
+                    View and manage registered organizations
+                </p>
+
+            </div>
 
 
-    <div class="dashboard-card">
+            <a asp-controller="SuperAdmin"
+               asp-action="Dashboard"
+               class="btn btn-secondary">
+
+                Back to Dashboard
+
+            </a>
+
+        </div>
+
+
+        <!-- MASTER TABLE -->
 
         <div class="table-responsive">
 
-            <table class="table table-bordered table-hover">
+            <table id="candidateTable"
+                   class="master-data-table">
 
                 <thead>
 
@@ -67,27 +85,37 @@
 
                     @if (Model != null && Model.Count > 0)
                     {
-
                         foreach (var item in Model)
                         {
                             <tr>
-                                <td>
-                                    <input type="hidden"
-                                           name="nID"
-                                           value="@item.nID" />
+
+                                <!-- ID -->
+
+                                <td class="master-id">
+
+                                    @item.nID
+
                                 </td>
+
+
+                                <!-- ORGANIZATION -->
 
                                 <td>
 
                                     @item.sOrgName
+
                                 </td>
+
+
+                                <!-- URL -->
 
                                 <td>
 
                                     @if (!string.IsNullOrEmpty(item.sOrgUrl))
                                     {
                                         <a href="@item.sOrgUrl"
-                                           target="_blank">
+                                           target="_blank"
+                                           class="master-link">
 
                                             Visit
 
@@ -96,38 +124,76 @@
 
                                 </td>
 
+
+                                <!-- NAME -->
+
                                 <td>
+
                                     @item.sName
+
                                 </td>
 
+
+                                <!-- DESIGNATION -->
+
                                 <td>
+
                                     @item.sDesignation
+
                                 </td>
 
+
+                                <!-- MOBILE -->
+
                                 <td>
+
                                     @item.sMobile
+
                                 </td>
 
+
+                                <!-- EMAIL -->
+
                                 <td>
+
                                     @item.sEmail
+
                                 </td>
 
+
+                                <!-- COLLEGE CODE -->
+
                                 <td>
+
                                     @item.nCollegeCode
+
                                 </td>
 
+
+                                <!-- COLLEGE NAME -->
+
                                 <td>
+
                                     @item.nCollegeName
+
                                 </td>
 
+
+                                <!-- REGISTRATION DATE -->
+
                                 <td>
+
                                     @item.RegDate?.ToString("dd-MM-yyyy")
+
                                 </td>
+
+
+                                <!-- ACTION -->
 
                                 <td>
 
                                     <button type="button"
-                                            class="btn btn-primary btn-sm"
+                                            class="master-view-btn"
                                             data-id="@item.nID">
 
                                         View
@@ -157,6 +223,13 @@
 
             </table>
 
+        </div>
+
+
+        <!-- MASTER PAGE INFO -->
+
+        <div id="candidatePageInfo"
+             class="master-page-info text-center">
         </div>
 
     </div>

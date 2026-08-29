@@ -63,6 +63,56 @@ namespace ErJobPortal.Controllers
             return View();
         }
 
+        public IActionResult Interview_Preparation()
+        {
+            return View();
+        }
+
+        public IActionResult IndustryNews()
+        {
+            return View();
+        }
+
+        public IActionResult MarketInsight()
+        {
+            return View();
+        }
+
+        public IActionResult EmergingTechnologies()
+        {
+            return View();
+        }
+
+        public IActionResult CareerTrends()
+        {
+            return View();
+        }
+
+        public IActionResult ExpertOpinion()
+        {
+            return View();
+        }
+
+        public IActionResult SectorSpecificNews()
+        {
+            return View();
+        }
+
+        public ActionResult SuccessStories()
+        {
+
+            return View();
+        }
+
+        public ActionResult CoverLetter()
+        {
+            return View();
+        }
+        public ActionResult FAQ()
+        {
+            return View();
+        }
+
 
         public IActionResult Privacy()
         {

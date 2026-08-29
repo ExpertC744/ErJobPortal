@@ -9,13 +9,19 @@
 
     ViewData["UserName"] = "Super Admin";
 }
+@section Styles {
 
+    <link rel="stylesheet"
+          href="~/css/DetailsSAFeedback.css"
+          asp-append-version="true" />
+
+}
 @{
 
     ViewData["Title"] = "Trainee Feedback";
 }
 
-<style>
+@* <style>
 
     .feedback-page {
         width: 100%;
@@ -167,7 +173,7 @@
             color: white;
         }
 
-</style>
+</style> *@
 
 
 <div class="feedback-page">

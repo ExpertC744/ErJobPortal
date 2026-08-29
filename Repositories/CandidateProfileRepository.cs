@@ -128,17 +128,9 @@ namespace ErJobPortal.Repositories
 
                 Preferred_Country = GetNullableString(reader, "Preferred_Country"),
 
-                Preferred_State =
-                    GetNullableString(
-                        reader,
-                        "Preferred_State"
-                    ),
+                Preferred_State = GetNullableString(reader, "Preferred_State"),
 
-                Preferred_City =
-                    GetNullableString(
-                        reader,
-                        "Preferred_City"
-                    ),
+                Preferred_City = GetNullableString(reader, "Preferred_City"),
 
 
                 // DOCUMENTS
@@ -1226,6 +1218,49 @@ WHERE CandidateID = @CandidateID";
                 return null;
 
             return reader[column]?.ToString();
+        }
+
+        // =========================================================
+        // UPDATE SOCIAL LINKS
+        // =========================================================
+
+        public void UpdateSocialLinks(CandidateProfileModel model)
+        {
+            using SqlConnection con = _db.GetConnection();
+
+            con.Open();
+
+            // Make sure profile exists
+            EnsureProfileExists(con, model.CandidateID);
+
+            string sql = @"
+ UPDATE tblCandidateProfile
+ SET
+     GitHub = @GitHub,
+     Linkedin = @Linkedin,
+     ModDate = GETDATE()
+ WHERE CandidateID = @CandidateID";
+
+            using SqlCommand cmd = new SqlCommand(sql, con);
+
+            cmd.Parameters.Add("@CandidateID", SqlDbType.Int)
+                .Value = model.CandidateID;
+
+            AddNullableString(
+                cmd,
+                "@GitHub",
+                model.GitHub,
+                500
+            );
+
+            AddNullableString(
+                cmd,
+                "@Linkedin",
+                model.Linkedin,
+                500
+            );
+
+            cmd.ExecuteNonQuery();
         }
     }
 }
