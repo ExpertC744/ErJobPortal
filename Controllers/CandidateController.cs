@@ -259,13 +259,18 @@ namespace ErJobPortal.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult UpdateInternshipPreference([Bind(Prefix = "Profile")] CandidateProfileModel model)
+        public IActionResult UpdateInternshipPreference(
+    [Bind(Prefix = "Profile")] CandidateProfileModel model)
         {
-            int? candidateId = HttpContext.Session.GetInt32("CandidateID");
+            int? candidateId =
+                HttpContext.Session.GetInt32("CandidateID");
 
             if (candidateId == null)
             {
-                return RedirectToAction("CandidateLogin", "Account");
+                return RedirectToAction(
+                    "CandidateLogin",
+                    "Account"
+                );
             }
 
             model.CandidateID = candidateId.Value;
