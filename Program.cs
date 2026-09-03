@@ -39,7 +39,7 @@ if (!app.Environment.IsDevelopment())
     app.UseHsts();
 }
 // Middleware
-app.UseHttpsRedirection();
+//app.UseHttpsRedirection();
 
 app.UseStaticFiles();
 
