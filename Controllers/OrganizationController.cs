@@ -424,6 +424,14 @@ namespace JobPortalTrainee.Controllers
         }
 
 
+        public IActionResult ViewOrgProfile()
+        {
+            return View();
+        }
+        public IActionResult ViewOrgPost()
+        {
+            return View();
+        }
 
 
         [HttpPost]
