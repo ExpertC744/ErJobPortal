@@ -24,51 +24,149 @@ namespace ErJobPortal.Controllers
         // DASHBOARD
         // =========================================================
 
-        // =========================================================
-        // DASHBOARD
-        // =========================================================
-
         [HttpGet]
         [ResponseCache(NoStore = true, Location = ResponseCacheLocation.None)]
-        public IActionResult Dashboard()
+        public IActionResult Dashboard(string? id)
         {
-            int? candidateId = HttpContext.Session.GetInt32("CandidateID");
+            int? candidateId =
+                HttpContext.Session.GetInt32("CandidateID");
 
             if (candidateId == null)
             {
-                return RedirectToAction("CandidateLogin", "Account");
+                return RedirectToAction(
+                    "CandidateLogin",
+                    "Account");
             }
 
-            ViewBag.CandidateID = candidateId;
-            ViewBag.CandidateName = HttpContext.Session.GetString("CandidateName");
-            ViewBag.CandidateEmail = HttpContext.Session.GetString("CandidateEmail");
+            // =========================================================
+            // GET CANDIDATE REGISTRATION DETAILS
+            // =========================================================
+
+            var candidate =
+                _repository.GetCandidateRegistrationDetails(
+                    candidateId.Value);
+
+            if (candidate == null)
+            {
+                return NotFound("Candidate registration not found.");
+            }
+
+            // =========================================================
+            // CHECK DOB AND REGISTRATION DATE
+            // =========================================================
+
+            if (candidate.Value.DOB == null ||
+                candidate.Value.RegDate == null)
+            {
+                return BadRequest(
+                    "Candidate DOB or Registration Date is missing.");
+            }
+
+            // =========================================================
+            // CREATE CANDIDATE CODE
+            // =========================================================
+            //
+            // CD
+            // + DOB ddMMyy
+            // + Registration Date MMdd
+            // + Candidate ID 2 digits
+            //
+            // Example:
+            // DOB      = 08/05/1999
+            // RegDate  = 26/07/2026
+            // nID      = 1
+            //
+            // CD080599072601
+            // =========================================================
+
+            string candidateCode =
+                "CD" +
+                candidate.Value.DOB.Value.ToString("ddMMyy") +
+                candidate.Value.RegDate.Value.ToString("MMdd") +
+                candidate.Value.CandidateID.ToString("D2");
+
+            // =========================================================
+            // IF NORMAL URL IS OPENED
+            // REDIRECT TO CODE URL
+            // =========================================================
+
+            if (string.IsNullOrEmpty(id))
+            {
+                return RedirectToAction(
+                    "Dashboard",
+                    "Candidate",
+                    new { id = candidateCode });
+            }
+
+            // =========================================================
+            // OPTIONAL: CHECK THAT URL CODE BELONGS TO LOGGED-IN
+            // CANDIDATE
+            // =========================================================
+
+            if (id != candidateCode)
+            {
+                return NotFound();
+            }
+
+            // =========================================================
+            // EXISTING DASHBOARD CODE
+            // =========================================================
+
+            ViewBag.CandidateID =
+                candidateId;
+
+            ViewBag.CandidateName =
+                HttpContext.Session.GetString(
+                    "CandidateName");
+
+            ViewBag.CandidateEmail =
+                HttpContext.Session.GetString(
+                    "CandidateEmail");
+
+            ViewBag.CandidateCode =
+                candidateCode;
+
+            // =========================================================
+            // ORGANIZATION COUNT
+            // =========================================================
+
             int organizationRegistrationCount = 0;
 
-            string connectionString = _configuration.GetConnectionString("DefaultConnection");
+            string connectionString =
+                _configuration.GetConnectionString(
+                    "DefaultConnection");
 
-            using (SqlConnection con = new SqlConnection(connectionString))
+            using (SqlConnection con =
+                   new SqlConnection(connectionString))
             {
                 con.Open();
-                string query = @"SELECT (SELECT COUNT(nID) FROM tblOrgRegistration) AS OrganizationCount;";
 
-                using (SqlCommand cmd = new SqlCommand(query, con))
+                string query = @"
+     SELECT COUNT(nID)
+     FROM tblOrgRegistration;";
+
+                using (SqlCommand cmd =
+                       new SqlCommand(query, con))
                 {
-                    using (SqlDataReader dr = cmd.ExecuteReader())
-                    {
-                        if (dr.Read())
-                        {
-
-                            organizationRegistrationCount = Convert.ToInt32(dr["OrganizationCount"]);
-                        }
-                    }
+                    organizationRegistrationCount =
+                        Convert.ToInt32(
+                            cmd.ExecuteScalar());
                 }
-
             }
 
-            // Get complete trainee list
-            List<OrganizationUser> organizations = _repository.GetAllOrganizationList();
-            ViewBag.OrganizationRegistrationCount = organizationRegistrationCount;
-            ViewBag.Organizations = organizations;
+            // =========================================================
+            // ORGANIZATION LIST
+            // =========================================================
+
+            List<OrganizationUser> organizations =
+                _repository.GetAllOrganizationList();
+
+            ViewBag.OrganizationRegistrationCount =
+                organizationRegistrationCount;
+
+            ViewBag.Organizations =
+                organizations;
+
             return View();
         }
 

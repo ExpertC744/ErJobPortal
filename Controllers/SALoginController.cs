@@ -7,11 +7,13 @@ namespace ErJobPortal.Controllers
     public class SALoginController : Controller
     {
         private readonly AccountRepository _repository;
+
         public SALoginController(AccountRepository repository)
         {
             _repository = repository;
         }
 
+        [HttpGet]
         public IActionResult Index()
         {
             return View();
@@ -26,12 +28,29 @@ namespace ErJobPortal.Controllers
             var user = _repository.Login(model.sEmail, model.sPassword);
 
             if (user != null)
-            { 
-                HttpContext.Session.SetString("SAID", user.nID.ToString());
-                HttpContext.Session.SetString("SAName", user.sFName);
-                HttpContext.Session.SetString("SARole", user.sRole);
+            {
+                // Store Super Admin details in session
+                HttpContext.Session.SetString(
+                    "SAID",
+                    user.nID.ToString()
+                );
 
-                return RedirectToAction("Dashboard", "SuperAdmin");
+                HttpContext.Session.SetString(
+                    "SAName",
+                    user.sFName
+                );
+
+                HttpContext.Session.SetString(
+                    "SARole",
+                    user.sRole
+                );
+
+                // Pass nID to Dashboard URL
+                return RedirectToAction(
+                    "Dashboard",
+                    "SuperAdmin",
+                    new { id = user.nID }
+                );
             }
 
             ViewBag.Error = "Invalid Email or Password";

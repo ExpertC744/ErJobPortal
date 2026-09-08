@@ -18,38 +18,64 @@ namespace ErJobPortal.Controllers
         }
 
         [HttpGet]
-        public IActionResult Dashboard()
+        [Route("SuperAdmin/Dashboard/{id:int}")]
+        public IActionResult Dashboard(int id)
         {
+            if (id != 1)
+            {
+                return NotFound();
+            }
+
             int traineeRegistrationCount = 0;
             int organizationRegistrationCount = 0;
 
-            string connectionString = _configuration.GetConnectionString("DefaultConnection");
+            string connectionString =
+                _configuration.GetConnectionString("DefaultConnection");
 
             using (SqlConnection con = new SqlConnection(connectionString))
             {
                 con.Open();
-                string query = @"SELECT (SELECT COUNT(nID) FROM tblCandidateRegister) AS CandidateCount, (SELECT COUNT(nID)  FROM tblOrgRegistration) AS OrganizationCount;";
+
+                string query = @"
+     SELECT
+         (SELECT COUNT(nID)
+          FROM tblCandidateRegister) AS CandidateCount,
+
+         (SELECT COUNT(nID)
+          FROM tblOrgRegistration) AS OrganizationCount;";
 
                 using (SqlCommand cmd = new SqlCommand(query, con))
+                using (SqlDataReader dr = cmd.ExecuteReader())
                 {
-                    using (SqlDataReader dr = cmd.ExecuteReader())
+                    if (dr.Read())
                     {
-                        if (dr.Read())
-                        {
-                            traineeRegistrationCount = Convert.ToInt32(dr["CandidateCount"]);
-                            organizationRegistrationCount = Convert.ToInt32(dr["OrganizationCount"]);
-                        }
+                        traineeRegistrationCount =
+                            Convert.ToInt32(dr["CandidateCount"]);
+
+                        organizationRegistrationCount =
+                            Convert.ToInt32(dr["OrganizationCount"]);
                     }
                 }
             }
 
-            // Get complete trainee list
-            List<SATraineeListM> trainees = _repository.GetAllTrainees();
-            List<OrganizationUser> organizations = _repository.GetAllOrganizationList();
-            ViewBag.TraineeRegistrationCount = traineeRegistrationCount;
-            ViewBag.OrganizationRegistrationCount = organizationRegistrationCount;
+            List<SATraineeListM> trainees =
+                _repository.GetAllTrainees();
+
+            List<OrganizationUser> organizations =
+                _repository.GetAllOrganizationList();
+
+            ViewBag.TraineeRegistrationCount =
+                traineeRegistrationCount;
+
+            ViewBag.OrganizationRegistrationCount =
+                organizationRegistrationCount;
+
             ViewBag.Trainees = trainees;
+
             ViewBag.Organizations = organizations;
+
+            ViewBag.SuperAdminID = id;
+
             return View();
         }
 

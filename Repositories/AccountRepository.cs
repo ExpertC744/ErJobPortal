@@ -47,6 +47,49 @@ namespace ErJobPortal.Repositories
         }
         #endregion
 
+        public (int CandidateID, DateTime? DOB, DateTime? RegDate)? GetCandidateRegistrationDetails(int candidateId)
+        {
+            using (SqlConnection cn = _db.GetConnection())
+            {
+                string query = @"
+        SELECT
+            nID,
+            DOB,
+            RegDate
+        FROM tblCandidateRegister
+        WHERE nID = @nID";
+
+                using (SqlCommand cmd = new SqlCommand(query, cn))
+                {
+                    cmd.Parameters.AddWithValue("@nID", candidateId);
+
+                    cn.Open();
+
+                    using (SqlDataReader dr = cmd.ExecuteReader())
+                    {
+                        if (dr.Read())
+                        {
+                            int id = Convert.ToInt32(dr["nID"]);
+
+                            DateTime? dob =
+                                dr["DOB"] == DBNull.Value
+                                    ? null
+                                    : Convert.ToDateTime(dr["DOB"]);
+
+                            DateTime? regDate =
+                                dr["RegDate"] == DBNull.Value
+                                    ? null
+                                    : Convert.ToDateTime(dr["RegDate"]);
+
+                            return (id, dob, regDate);
+                        }
+                    }
+                }
+            }
+
+            return null;
+        }
+
         // Org Register
         #region Organization Register
 
@@ -129,6 +172,54 @@ namespace ErJobPortal.Repositories
         }
 
         #endregion
+
+        public (int OrganizationID, DateTime? RegDate)?
+GetOrganizationRegistrationDetails(int orgId)
+        {
+            using (SqlConnection cn = _db.GetConnection())
+            {
+                string query = @"
+       SELECT
+           nID,
+           RegDate
+       FROM tblOrgRegistration
+       WHERE nID = @nID";
+
+                using (SqlCommand cmd =
+                       new SqlCommand(query, cn))
+                {
+                    cmd.Parameters.AddWithValue(
+                        "@nID",
+                        orgId);
+
+                    cn.Open();
+
+                    using (SqlDataReader dr =
+                           cmd.ExecuteReader())
+                    {
+                        if (dr.Read())
+                        {
+                            int organizationId =
+                                Convert.ToInt32(
+                                    dr["nID"]);
+
+                            DateTime? regDate =
+                                dr["RegDate"] == DBNull.Value
+                                    ? null
+                                    : Convert.ToDateTime(
+                                        dr["RegDate"]);
+
+                            return (
+                                organizationId,
+                                regDate
+                            );
+                        }
+                    }
+                }
+            }
+
+            return null;
+        }
 
         public List<DepartmentM> GetDepartments()
         {

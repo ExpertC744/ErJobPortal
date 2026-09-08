@@ -27,155 +27,47 @@ namespace JobPortalTrainee.Controllers
         // DASHBOARD
         // =========================================================
 
-
-        // =========================================================
-        // DASHBOARD
-        // =========================================================
-
-
         [HttpGet]
-        [ResponseCache(
-      NoStore = true,
-      Location = ResponseCacheLocation.None)]
-        public IActionResult Dashboard()
+        [Route("SuperAdmin/Dashboard/{id:int}")]
+        public IActionResult Dashboard(int id)
         {
-            int? orgId = HttpContext.Session.GetInt32("OrgID");
-
-            if (orgId == null)
+            if (id != 1)
             {
-                return RedirectToAction("OrganizationLogin", "Account");
+                return NotFound();
             }
 
-            ViewBag.OrgID = orgId.Value;
-
-            ViewBag.OrgName = HttpContext.Session.GetString("OrgName");
-
-            ViewBag.OrgEmail = HttpContext.Session.GetString("OrgEmail");
             int traineeRegistrationCount = 0;
             int organizationRegistrationCount = 0;
 
-            // =========================================================
-            // CHART DATA
-            // =========================================================
-
-            int internshipEligibleCount = 0;
-
-            List<int> monthlyCandidateRegistrations =
-                Enumerable.Repeat(0, 12).ToList();
-
-
-
             string connectionString =
-      _configuration.GetConnectionString("DefaultConnection");
+                _configuration.GetConnectionString("DefaultConnection");
 
             using (SqlConnection con = new SqlConnection(connectionString))
             {
                 con.Open();
 
-                // =========================================================
-                // TOTAL TRAINEES + TOTAL ORGANIZATIONS
-                // =========================================================
-
                 string query = @"
-    SELECT
-        (SELECT COUNT(nID)
-         FROM tblCandidateRegister) AS CandidateCount,
+     SELECT
+         (SELECT COUNT(nID)
+          FROM tblCandidateRegister) AS CandidateCount,
 
-        (SELECT COUNT(nID)
-         FROM tblOrgRegistration) AS OrganizationCount;
-";
+         (SELECT COUNT(nID)
+          FROM tblOrgRegistration) AS OrganizationCount;";
 
                 using (SqlCommand cmd = new SqlCommand(query, con))
+                using (SqlDataReader dr = cmd.ExecuteReader())
                 {
-                    using (SqlDataReader dr = cmd.ExecuteReader())
+                    if (dr.Read())
                     {
-                        if (dr.Read())
-                        {
-                            traineeRegistrationCount =
-                                Convert.ToInt32(dr["CandidateCount"]);
+                        traineeRegistrationCount =
+                            Convert.ToInt32(dr["CandidateCount"]);
 
-                            organizationRegistrationCount =
-                                Convert.ToInt32(dr["OrganizationCount"]);
-                        }
-                    }
-                }
-
-
-                // =========================================================
-                // ELIGIBLE TRAINEES FOR INTERNSHIP
-                // =========================================================
-                //
-                // IMPORTANT:
-                // Change the WHERE condition according to your actual
-                // internship eligibility column/logic.
-                //
-                // Example:
-                // WHERE nBit = 1
-                //
-                // If every registered trainee is eligible, simply use:
-                // SELECT COUNT(nID) FROM tblCandidateRegister
-                //
-                // =========================================================
-
-                string eligibleQuery = @"
-    SELECT COUNT(nID)
-    FROM tblCandidateRegister
-    WHERE ISNULL(nBit, 1) = 1;
-";
-
-                using (SqlCommand cmd = new SqlCommand(eligibleQuery, con))
-                {
-                    object result = cmd.ExecuteScalar();
-
-                    if (result != null && result != DBNull.Value)
-                    {
-                        internshipEligibleCount =
-                            Convert.ToInt32(result);
-                    }
-                }
-
-
-                // =========================================================
-                // MONTHLY TRAINEE REGISTRATION
-                // CURRENT YEAR
-                // =========================================================
-
-                string monthlyQuery = @"
-    SELECT
-        MONTH(RegDate) AS RegistrationMonth,
-        COUNT(nID) AS RegistrationCount
-    FROM tblCandidateRegister
-    WHERE YEAR(RegDate) = YEAR(GETDATE())
-    GROUP BY MONTH(RegDate)
-    ORDER BY MONTH(RegDate);
-";
-
-                using (SqlCommand cmd =
-                       new SqlCommand(monthlyQuery, con))
-                {
-                    using (SqlDataReader dr =
-                           cmd.ExecuteReader())
-                    {
-                        while (dr.Read())
-                        {
-                            int month =
-                                Convert.ToInt32(
-                                    dr["RegistrationMonth"]);
-
-                            int count =
-                                Convert.ToInt32(
-                                    dr["RegistrationCount"]);
-
-                            if (month >= 1 && month <= 12)
-                            {
-                                monthlyCandidateRegistrations[month - 1] =
-                                    count;
-                            }
-                        }
+                        organizationRegistrationCount =
+                            Convert.ToInt32(dr["OrganizationCount"]);
                     }
                 }
             }
-            // Get complete trainee list
+
             List<SATraineeListM> trainees =
                 _repository.GetAllTrainees();
 
@@ -188,27 +80,13 @@ namespace JobPortalTrainee.Controllers
             ViewBag.OrganizationRegistrationCount =
                 organizationRegistrationCount;
 
-            ViewBag.Trainees =
-                trainees;
+            ViewBag.Trainees = trainees;
 
-            ViewBag.Organizations =
-                organizations;
+            ViewBag.Organizations = organizations;
 
-
-            // =========================================================
-            // CHART DATA
-            // =========================================================
-
-            ViewBag.InternshipEligibleCount =
-                internshipEligibleCount;
-
-            ViewBag.MonthlyCandidateRegistrations =
-                monthlyCandidateRegistrations;
-
+            ViewBag.SuperAdminID = id;
 
             return View();
-
-
         }
 
 
