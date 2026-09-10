@@ -22,57 +22,300 @@ namespace JobPortalTrainee.Controllers
             _repository = repository;
         }
 
+        // =========================================================
+        // GET LOGGED-IN ORGANIZATION CODE
+        // =========================================================
+
+        private string? GetOrganizationCode()
+        {
+            int? orgId = HttpContext.Session.GetInt32("OrgID");
+
+            if (orgId == null || orgId <= 0)
+                return null;
+
+            var organization =
+                _repository.GetOrganizationRegistrationDetails(orgId.Value);
+
+            if (organization == null ||
+                organization.Value.RegDate == null)
+                return null;
+
+            return "OR" +
+                   organization.Value.RegDate.Value.ToString("ddMMyy") +
+                   organization.Value.OrganizationID.ToString("D2");
+        }
+
+        // =========================================================
+        // VALIDATE ORGANIZATION CODE
+        // =========================================================
+
+        private bool IsValidOrganizationCode(string? id)
+        {
+            if (string.IsNullOrWhiteSpace(id))
+                return false;
+
+            string? organizationCode = GetOrganizationCode();
+
+            return !string.IsNullOrWhiteSpace(organizationCode) &&
+                   string.Equals(
+                       id,
+                       organizationCode,
+                       StringComparison.OrdinalIgnoreCase);
+        }
 
         // =========================================================
         // DASHBOARD
         // =========================================================
 
         [HttpGet]
-        [Route("SuperAdmin/Dashboard/{id:int}")]
-        public IActionResult Dashboard(int id)
+        [Route("Organization/Dashboard/{id?}")]
+        [ResponseCache(
+            NoStore = true,
+            Location = ResponseCacheLocation.None)]
+        public IActionResult Dashboard(string? id)
         {
-            if (id != 1)
+            // =====================================================
+            // GET ORGANIZATION ID FROM SESSION
+            // =====================================================
+
+            int? orgId = HttpContext.Session.GetInt32("OrgID");
+
+            if (orgId == null)
+            {
+                return RedirectToAction(
+                    "OrganizationLogin",
+                    "Account");
+            }
+
+            // =====================================================
+            // GET ORGANIZATION REGISTRATION DETAILS
+            // =====================================================
+
+            var organization =
+                _repository.GetOrganizationRegistrationDetails(
+                    orgId.Value);
+
+            if (organization == null)
+            {
+                return NotFound(
+                    "Organization registration not found.");
+            }
+
+            // =====================================================
+            // CHECK REGISTRATION DATE
+            // =====================================================
+
+            if (organization.Value.RegDate == null)
+            {
+                return BadRequest(
+                    "Organization Registration Date is missing.");
+            }
+
+            // =====================================================
+            // CREATE ORGANIZATION CODE
+            //
+            // Example:
+            // RegDate = 26/07/2026
+            // nID     = 1
+            //
+            // Result = OR26072601
+            // =====================================================
+
+            string organizationCode =
+                "OR" +
+                organization.Value.RegDate.Value
+                    .ToString("ddMMyy") +
+                organization.Value.OrganizationID
+                    .ToString("D2");
+
+            // =====================================================
+            // IF ID IS NOT PRESENT
+            // REDIRECT TO CODE URL
+            // =====================================================
+
+            if (string.IsNullOrEmpty(id))
+            {
+                return RedirectToAction(
+                    "Dashboard",
+                    "Organization",
+                    new
+                    {
+                        id = organizationCode
+                    });
+            }
+
+            // =====================================================
+            // CHECK ORGANIZATION CODE
+            // =====================================================
+
+            if (!string.Equals(
+                    id,
+                    organizationCode,
+                    StringComparison.OrdinalIgnoreCase))
             {
                 return NotFound();
             }
 
+            // =====================================================
+            // SESSION DATA
+            // =====================================================
+
+            ViewBag.OrgID =
+                orgId.Value;
+
+            ViewBag.OrgName =
+                HttpContext.Session.GetString("OrgName");
+
+            ViewBag.OrgEmail =
+                HttpContext.Session.GetString("OrgEmail");
+
+            ViewBag.OrgCode =
+                organizationCode;
+
+            // =====================================================
+            // DASHBOARD COUNTS
+            // =====================================================
+
             int traineeRegistrationCount = 0;
             int organizationRegistrationCount = 0;
 
-            string connectionString =
-                _configuration.GetConnectionString("DefaultConnection");
+            int internshipEligibleCount = 0;
 
-            using (SqlConnection con = new SqlConnection(connectionString))
+            List<int> monthlyCandidateRegistrations =
+                Enumerable.Repeat(0, 12).ToList();
+
+            string connectionString =
+                _configuration.GetConnectionString(
+                    "DefaultConnection");
+
+            using (SqlConnection con =
+                   new SqlConnection(connectionString))
             {
                 con.Open();
 
+                // =================================================
+                // TOTAL CANDIDATE & ORGANIZATION COUNT
+                // =================================================
+
                 string query = @"
-     SELECT
-         (SELECT COUNT(nID)
-          FROM tblCandidateRegister) AS CandidateCount,
+            SELECT
+                (SELECT COUNT(nID)
+                 FROM tblCandidateRegister)
+                    AS CandidateCount,
 
-         (SELECT COUNT(nID)
-          FROM tblOrgRegistration) AS OrganizationCount;";
+                (SELECT COUNT(nID)
+                 FROM tblOrgRegistration)
+                    AS OrganizationCount;";
 
-                using (SqlCommand cmd = new SqlCommand(query, con))
-                using (SqlDataReader dr = cmd.ExecuteReader())
+                using (SqlCommand cmd =
+                       new SqlCommand(query, con))
+                using (SqlDataReader dr =
+                       cmd.ExecuteReader())
                 {
                     if (dr.Read())
                     {
                         traineeRegistrationCount =
-                            Convert.ToInt32(dr["CandidateCount"]);
+                            Convert.ToInt32(
+                                dr["CandidateCount"]);
 
                         organizationRegistrationCount =
-                            Convert.ToInt32(dr["OrganizationCount"]);
+                            Convert.ToInt32(
+                                dr["OrganizationCount"]);
+                    }
+                }
+
+                // =================================================
+                // INTERNSHIP ELIGIBLE CANDIDATES
+                // =================================================
+
+                string eligibleQuery = @"
+            SELECT COUNT(nID)
+            FROM tblCandidateRegister
+            WHERE ISNULL(nBit, 1) = 1;";
+
+                using (SqlCommand cmd =
+                       new SqlCommand(
+                           eligibleQuery,
+                           con))
+                {
+                    object result =
+                        cmd.ExecuteScalar();
+
+                    if (result != null &&
+                        result != DBNull.Value)
+                    {
+                        internshipEligibleCount =
+                            Convert.ToInt32(result);
+                    }
+                }
+
+                // =================================================
+                // MONTHLY CANDIDATE REGISTRATIONS
+                // =================================================
+
+                string monthlyQuery = @"
+            SELECT
+                MONTH(RegDate)
+                    AS RegistrationMonth,
+
+                COUNT(nID)
+                    AS RegistrationCount
+
+            FROM tblCandidateRegister
+
+            WHERE YEAR(RegDate) =
+                  YEAR(GETDATE())
+
+            GROUP BY
+                MONTH(RegDate)
+
+            ORDER BY
+                MONTH(RegDate);";
+
+                using (SqlCommand cmd =
+                       new SqlCommand(
+                           monthlyQuery,
+                           con))
+                using (SqlDataReader dr =
+                       cmd.ExecuteReader())
+                {
+                    while (dr.Read())
+                    {
+                        int month =
+                            Convert.ToInt32(
+                                dr["RegistrationMonth"]);
+
+                        int count =
+                            Convert.ToInt32(
+                                dr["RegistrationCount"]);
+
+                        if (month >= 1 &&
+                            month <= 12)
+                        {
+                            monthlyCandidateRegistrations[
+                                month - 1] = count;
+                        }
                     }
                 }
             }
 
+            // =====================================================
+            // GET TRAINEES
+            // =====================================================
+
             List<SATraineeListM> trainees =
                 _repository.GetAllTrainees();
 
+            // =====================================================
+            // GET ORGANIZATIONS
+            // =====================================================
+
             List<OrganizationUser> organizations =
                 _repository.GetAllOrganizationList();
+
+            // =====================================================
+            // SEND DATA TO VIEW
+            // =====================================================
 
             ViewBag.TraineeRegistrationCount =
                 traineeRegistrationCount;
@@ -80,11 +323,21 @@ namespace JobPortalTrainee.Controllers
             ViewBag.OrganizationRegistrationCount =
                 organizationRegistrationCount;
 
-            ViewBag.Trainees = trainees;
+            ViewBag.Trainees =
+                trainees;
 
-            ViewBag.Organizations = organizations;
+            ViewBag.Organizations =
+                organizations;
 
-            ViewBag.SuperAdminID = id;
+            ViewBag.InternshipEligibleCount =
+                internshipEligibleCount;
+
+            ViewBag.MonthlyCandidateRegistrations =
+                monthlyCandidateRegistrations;
+
+            // =====================================================
+            // RETURN VIEW
+            // =====================================================
 
             return View();
         }
@@ -99,19 +352,36 @@ namespace JobPortalTrainee.Controllers
         // CANDIDATE LIST
         // ==========================================
         [HttpGet]
-        public IActionResult TraineeList()
+        [Route("Organization/TraineeList/{id}")]
+        public IActionResult TraineeList(string id)
         {
-            List<SATraineeListM> trainees = _repository.GetSATraineeList();
+            if (!IsValidOrganizationCode(id))
+                return NotFound();
+
+            ViewBag.OrgCode = id;
+
+            List<SATraineeListM> trainees =
+                _repository.GetSATraineeList();
+
             return View(trainees);
         }
 
         // ==========================================
         // ORGANIZATION LIST
         // ==========================================
+        // Organization List
         [HttpGet]
-        public IActionResult OrgList()
+        [Route("Organization/OrgList/{id}")]
+        public IActionResult OrgList(string id)
         {
-            List<OrganizationUser> organization = _repository.GetAllOrganizationList();
+            if (!IsValidOrganizationCode(id))
+                return NotFound();
+
+            ViewBag.OrgCode = id;
+
+            List<OrganizationUser> organization =
+                _repository.GetAllOrganizationList();
+
             return View(organization);
         }
 
@@ -120,7 +390,8 @@ namespace JobPortalTrainee.Controllers
         // =========================================================
 
         [HttpGet]
-        public IActionResult EditProfile()
+        [Route("Organization/EditProfile/{id}")]
+        public IActionResult EditProfile(string id)
         {
             int? orgId = HttpContext.Session.GetInt32("OrgID");
 
@@ -131,17 +402,19 @@ namespace JobPortalTrainee.Controllers
                     "Account");
             }
 
+            // Validate Organization Code
+            if (!IsValidOrganizationCode(id))
+            {
+                return NotFound();
+            }
 
             OrgProfile model = new OrgProfile
             {
                 nOrgID = orgId.Value
             };
 
-
             string connectionString =
-                _configuration.GetConnectionString(
-                    "DefaultConnection")!;
-
+                _configuration.GetConnectionString("DefaultConnection")!;
 
             using (SqlConnection cn =
                    new SqlConnection(connectionString))
@@ -154,158 +427,130 @@ namespace JobPortalTrainee.Controllers
                     cmd.CommandType =
                         CommandType.StoredProcedure;
 
-
                     cmd.Parameters.Add(
                         "@nOrgID",
                         SqlDbType.Int).Value =
                         orgId.Value;
 
-
                     cn.Open();
-
 
                     using (SqlDataReader dr =
                            cmd.ExecuteReader())
                     {
                         if (dr.Read())
                         {
-
-
                             model.nID =
                                 dr["nID"] != DBNull.Value
-                                    ? Convert.ToInt32(
-                                        dr["nID"])
+                                    ? Convert.ToInt32(dr["nID"])
                                     : 0;
-
 
                             model.nOrgID =
                                 dr["nOrgID"] != DBNull.Value
-                                    ? Convert.ToInt32(
-                                        dr["nOrgID"])
+                                    ? Convert.ToInt32(dr["nOrgID"])
                                     : orgId.Value;
-
-
-
-                            // Database column = sName
-                            // Model property = sOrganizationName
 
                             model.sOrganizationName =
                                 dr["sName"] != DBNull.Value
                                     ? dr["sName"].ToString()!
                                     : string.Empty;
 
-
-                            // Database column = sEmail
-                            // Model property = sOrganizationEmail
-
                             model.sOrganizationEmail =
                                 dr["sEmail"] != DBNull.Value
                                     ? dr["sEmail"].ToString()!
                                     : string.Empty;
-
 
                             model.sMobile =
                                 dr["sMobile"] != DBNull.Value
                                     ? dr["sMobile"].ToString()!
                                     : string.Empty;
 
-
                             model.sDesignation =
                                 dr["sDesignation"] != DBNull.Value
                                     ? dr["sDesignation"].ToString()!
                                     : string.Empty;
 
-
                             model.dDateOfBirth =
                                 dr["dDateOfBirth"] != DBNull.Value
-                                    ? Convert.ToDateTime(
-                                        dr["dDateOfBirth"])
+                                    ? Convert.ToDateTime(dr["dDateOfBirth"])
                                     : null;
-
 
                             model.sCompanyLogo =
                                 dr["sCompanyLogo"] != DBNull.Value
                                     ? dr["sCompanyLogo"].ToString()!
                                     : string.Empty;
 
-
                             model.sCompanyAddress =
                                 dr["sCompanyAddress"] != DBNull.Value
                                     ? dr["sCompanyAddress"].ToString()!
                                     : string.Empty;
 
-
                             model.nEstablishmentYear =
                                 dr["nEstablishmentYear"] != DBNull.Value
-                                    ? Convert.ToInt32(
-                                        dr["nEstablishmentYear"])
+                                    ? Convert.ToInt32(dr["nEstablishmentYear"])
                                     : 0;
-
 
                             model.sGSTNo =
                                 dr["sGSTNo"] != DBNull.Value
                                     ? dr["sGSTNo"].ToString()!
                                     : string.Empty;
 
-
                             model.sCINNo =
                                 dr["sCINNo"] != DBNull.Value
                                     ? dr["sCINNo"].ToString()!
                                     : string.Empty;
-
 
                             model.nEmployeeStrength =
                                 dr["nEmployeeStrength"] != DBNull.Value
                                     ? dr["nEmployeeStrength"].ToString()!
                                     : string.Empty;
 
-
                             model.dCreatedDate =
                                 dr["dCreatedDate"] != DBNull.Value
-                                    ? Convert.ToDateTime(
-                                        dr["dCreatedDate"])
+                                    ? Convert.ToDateTime(dr["dCreatedDate"])
                                     : DateTime.MinValue;
-
 
                             model.dModifiedDate =
                                 dr["dModifiedDate"] != DBNull.Value
-                                    ? Convert.ToDateTime(
-                                        dr["dModifiedDate"])
+                                    ? Convert.ToDateTime(dr["dModifiedDate"])
                                     : null;
-
 
                             model.nBit =
                                 dr["nBit"] != DBNull.Value &&
-                                Convert.ToBoolean(
-                                    dr["nBit"]);
-
+                                Convert.ToBoolean(dr["nBit"]);
 
                             model.nSABit =
                                 dr["nSABit"] != DBNull.Value
-                                    ? Convert.ToBoolean(
-                                        dr["nSABit"])
+                                    ? Convert.ToBoolean(dr["nSABit"])
                                     : null;
-                        }
-                        else
-                        {
-
-
-                            model.nOrgID =
-                                orgId.Value;
                         }
                     }
                 }
             }
 
+            // Send ID to View
+            ViewBag.OrgCode = id;
+            ViewBag.OrgID = orgId.Value;
+            ViewBag.OrgName =
+                HttpContext.Session.GetString("OrgName");
+            ViewBag.OrgEmail =
+                HttpContext.Session.GetString("OrgEmail");
 
             return View(model);
         }
 
 
-        public IActionResult ViewOrgProfile()
+        [HttpGet]
+        [Route("Organization/ViewProfile/{id}")]
+        public IActionResult ViewOrgProfile(string id)
         {
+            if (!IsValidOrganizationCode(id))
+                return NotFound();
+
+            ViewBag.OrgCode = id;
+
             return View();
         }
+
         public IActionResult ViewOrgPost()
         {
             return View();
@@ -503,7 +748,8 @@ namespace JobPortalTrainee.Controllers
         // CANDIDATE CREATE FEEDBACK - GET
         // =========================================================
         [HttpGet]
-        public IActionResult CreateFeedback()
+        [Route("Organization/CreateFeedback/{id}")]
+        public IActionResult CreateFeedback(string id)
         {
             // =====================================================
             // GET CANDIDATE ID
@@ -598,7 +844,7 @@ namespace JobPortalTrainee.Controllers
             {
                 return NotFound("Feedback questions not found.");
             }
-
+            ViewBag.OrgCode = id;
             return View(feedback);
         }
 
@@ -836,9 +1082,16 @@ namespace JobPortalTrainee.Controllers
                 "Organization");
         }
 
+        // Create Post
         [HttpGet]
-        public IActionResult CreatePostNew()
+        [Route("Organization/CreatePost/{id}")]
+        public IActionResult CreatePostNew(string id)
         {
+            if (!IsValidOrganizationCode(id))
+                return NotFound();
+
+            ViewBag.OrgCode = id;
+
             return View();
         }
 
@@ -1828,7 +2081,8 @@ namespace JobPortalTrainee.Controllers
         }
 
         [HttpGet]
-        public IActionResult PostDetails()
+        [Route("Organization/PostDetails/{id}")]
+        public IActionResult PostDetails(string id)
         {
             int? sessionOrgID = HttpContext.Session.GetInt32("OrgID");
 
@@ -1838,6 +2092,7 @@ namespace JobPortalTrainee.Controllers
             }
 
             int orgID = sessionOrgID.Value;
+
 
             List<OrgPostM> posts = new List<OrgPostM>();
 
@@ -1961,14 +2216,16 @@ namespace JobPortalTrainee.Controllers
                     }
                 }
             }
-
+            ViewBag.OrgCode = id;
             return View(posts);
         }
 
         [HttpPost]
+        [Route("Organization/CreatePost/{id}")]
         public IActionResult DisablePost(int id)
         {
             int? orgID = HttpContext.Session.GetInt32("OrgID");
+
 
             if (orgID == null)
             {
@@ -1993,6 +2250,7 @@ namespace JobPortalTrainee.Controllers
                 }
             }
 
+            ViewBag.OrgCode = id;
             return RedirectToAction("PostDetails");
         }
 

@@ -20,6 +20,33 @@ namespace ErJobPortal.Controllers
             _repo = repo;
         }
 
+
+        private string? GetCandidateCode()
+        {
+            int? candidateId = HttpContext.Session.GetInt32("CandidateID");
+
+            if (candidateId == null || candidateId <= 0)
+                return null;
+
+            var candidate =
+                _repository.GetCandidateRegistrationDetails(candidateId.Value);
+
+            if (candidate == null ||
+                candidate.Value.DOB == null ||
+                candidate.Value.RegDate == null)
+            {
+                return null;
+            }
+
+            string candidateCode =
+                "CD" +
+                candidate.Value.DOB.Value.ToString("ddMMyy") +
+                candidate.Value.RegDate.Value.ToString("MMdd") +
+                candidate.Value.CandidateID.ToString("D2");
+
+            return candidateCode;
+        }
+
         // =========================================================
         // DASHBOARD
         // =========================================================
@@ -175,14 +202,103 @@ namespace ErJobPortal.Controllers
         // ORGANIZATION LIST
         // ==========================================
         [HttpGet]
-        public IActionResult OrgList()
+        [Route("Candidate/OrgList/{id?}")]
+        public IActionResult OrgList(string? id)
         {
-            List<OrganizationUser> organization = _repository.GetAllOrganizationList();
+            int? candidateId =
+                HttpContext.Session.GetInt32("CandidateID");
+
+            if (candidateId == null || candidateId <= 0)
+            {
+                return RedirectToAction(
+                    "CandidateLogin",
+                    "Account");
+            }
+
+            string? candidateCode = GetCandidateCode();
+
+            if (string.IsNullOrEmpty(candidateCode))
+            {
+                return NotFound("Candidate code could not be generated.");
+            }
+
+            // If URL does not contain candidate code, add it
+            if (string.IsNullOrEmpty(id))
+            {
+                return RedirectToAction(
+                    "OrgList",
+                    "Candidate",
+                    new { id = candidateCode });
+            }
+
+            // Prevent another/wrong candidate code
+            if (id != candidateCode)
+            {
+                return NotFound();
+            }
+
+            List<OrganizationUser> organization =
+                _repository.GetAllOrganizationList();
+
+            ViewBag.CandidateCode = candidateCode;
+            ViewBag.CandidateID = candidateId.Value;
+
             return View(organization);
         }
 
-        public IActionResult EditProfile()
+        [HttpGet]
+        [Route("Candidate/EditProfile/{id?}")]
+        public IActionResult EditProfile(string? id)
         {
+            // =========================================================
+            // GET CANDIDATE ID FROM SESSION
+            // =========================================================
+            int? candidateId =
+                HttpContext.Session.GetInt32("CandidateID");
+
+            if (candidateId == null || candidateId <= 0)
+            {
+                return RedirectToAction(
+                    "CandidateLogin",
+                    "Account");
+            }
+
+            // =========================================================
+            // GET CANDIDATE CODE
+            // =========================================================
+            string? candidateCode = GetCandidateCode();
+
+            if (string.IsNullOrEmpty(candidateCode))
+            {
+                return NotFound(
+                    "Candidate code could not be generated.");
+            }
+
+            // =========================================================
+            // IF URL DOES NOT HAVE ID
+            // REDIRECT TO CODE URL
+            // =========================================================
+            if (string.IsNullOrEmpty(id))
+            {
+                return RedirectToAction(
+                    "EditProfile",
+                    "Candidate",
+                    new { id = candidateCode });
+            }
+
+            // =========================================================
+            // VALIDATE URL ID
+            // =========================================================
+            if (id != candidateCode)
+            {
+                return NotFound();
+            }
+
+            // =========================================================
+            // SEND CODE TO VIEW / LAYOUT
+            // =========================================================
+            ViewBag.CandidateCode = candidateCode;
+            ViewBag.CandidateID = candidateId.Value;
 
             return View();
         }
@@ -190,18 +306,58 @@ namespace ErJobPortal.Controllers
         // =========================================================
         // GET PROFILE
         // =========================================================
-
         [HttpGet]
-        public IActionResult Profile()
+        public IActionResult Profile(string id)
         {
-            int? candidateId = HttpContext.Session.GetInt32("CandidateID");
+            // =========================================================
+            // GET CANDIDATE ID FROM SESSION
+            // =========================================================
+            int? candidateId =
+                HttpContext.Session.GetInt32("CandidateID");
 
-            if (candidateId == null)
+            if (candidateId == null || candidateId <= 0)
             {
-                return RedirectToAction("CandidateLogin", "Account");
+                return RedirectToAction(
+                    "CandidateLogin",
+                    "Account");
             }
 
-            CandidateProfileModel? profile = _repo.GetProfile(candidateId.Value);
+            // =========================================================
+            // GET CANDIDATE CODE
+            // =========================================================
+            string? candidateCode = GetCandidateCode();
+
+            if (string.IsNullOrEmpty(candidateCode))
+            {
+                return NotFound(
+                    "Candidate code could not be generated.");
+            }
+
+            // =========================================================
+            // IF URL DOES NOT CONTAIN ID
+            // REDIRECT TO CODE URL
+            // =========================================================
+            if (string.IsNullOrEmpty(id))
+            {
+                return RedirectToAction(
+                    "Profile",
+                    "Candidate",
+                    new { id = candidateCode });
+            }
+
+            // =========================================================
+            // VALIDATE CANDIDATE CODE
+            // =========================================================
+            if (id != candidateCode)
+            {
+                return NotFound();
+            }
+
+            // =========================================================
+            // GET PROFILE
+            // =========================================================
+            CandidateProfileModel? profile =
+                _repo.GetProfile(candidateId.Value);
 
             if (profile == null)
             {
@@ -211,7 +367,16 @@ namespace ErJobPortal.Controllers
                 };
             }
 
-            CandidateProfileViewModel vm = LoadProfileDropdowns(profile);
+            // =========================================================
+            // LOAD DROPDOWNS
+            // =========================================================
+            CandidateProfileViewModel vm =
+                LoadProfileDropdowns(profile);
+
+            // =========================================================
+            // SEND CODE TO VIEW / LAYOUT
+            // =========================================================
+            ViewBag.CandidateCode = candidateCode;
 
             return View(vm);
         }
@@ -578,24 +743,141 @@ namespace ErJobPortal.Controllers
         }
 
         // =========================================================
-        // OTHER PAGES
+        // SEARCH JOBS
         // =========================================================
-
-        public IActionResult SearchJobs()
+        [HttpGet]
+        [Route("Candidate/SearchJobs/{id?}")]
+        public IActionResult SearchJobs(string? id)
         {
+            int? candidateId =
+                HttpContext.Session.GetInt32("CandidateID");
+
+            if (candidateId == null || candidateId <= 0)
+            {
+                return RedirectToAction(
+                    "CandidateLogin",
+                    "Account");
+            }
+
+            string? candidateCode = GetCandidateCode();
+
+            if (string.IsNullOrEmpty(candidateCode))
+            {
+                return NotFound("Candidate code could not be generated.");
+            }
+
+            // If ID is missing, add it to URL
+            if (string.IsNullOrEmpty(id))
+            {
+                return RedirectToAction(
+                    "SearchJobs",
+                    "Candidate",
+                    new { id = candidateCode });
+            }
+
+            // Validate ID
+            if (id != candidateCode)
+            {
+                return NotFound();
+            }
+
+            ViewBag.CandidateCode = candidateCode;
+            ViewBag.CandidateID = candidateId.Value;
+
             return View();
         }
 
-        public IActionResult MyApplications()
+
+        // =========================================================
+        // MY APPLICATIONS
+        // =========================================================
+        [HttpGet]
+        [Route("Candidate/MyApplications/{id?}")]
+        public IActionResult MyApplications(string? id)
         {
+            int? candidateId =
+                HttpContext.Session.GetInt32("CandidateID");
+
+            if (candidateId == null || candidateId <= 0)
+            {
+                return RedirectToAction(
+                    "CandidateLogin",
+                    "Account");
+            }
+
+            string? candidateCode = GetCandidateCode();
+
+            if (string.IsNullOrEmpty(candidateCode))
+            {
+                return NotFound("Candidate code could not be generated.");
+            }
+
+            // If ID is missing, add it to URL
+            if (string.IsNullOrEmpty(id))
+            {
+                return RedirectToAction(
+                    "MyApplications",
+                    "Candidate",
+                    new { id = candidateCode });
+            }
+
+            // Validate ID
+            if (id != candidateCode)
+            {
+                return NotFound();
+            }
+
+            ViewBag.CandidateCode = candidateCode;
+            ViewBag.CandidateID = candidateId.Value;
+
             return View();
         }
 
-        public IActionResult ChangePassword()
+
+        // =========================================================
+        // CHANGE PASSWORD
+        // =========================================================
+        [HttpGet]
+        [Route("Candidate/ChangePassword/{id?}")]
+        public IActionResult ChangePassword(string? id)
         {
+            int? candidateId =
+                HttpContext.Session.GetInt32("CandidateID");
+
+            if (candidateId == null || candidateId <= 0)
+            {
+                return RedirectToAction(
+                    "CandidateLogin",
+                    "Account");
+            }
+
+            string? candidateCode = GetCandidateCode();
+
+            if (string.IsNullOrEmpty(candidateCode))
+            {
+                return NotFound("Candidate code could not be generated.");
+            }
+
+            // If ID is missing, add it to URL
+            if (string.IsNullOrEmpty(id))
+            {
+                return RedirectToAction(
+                    "ChangePassword",
+                    "Candidate",
+                    new { id = candidateCode });
+            }
+
+            // Validate ID
+            if (id != candidateCode)
+            {
+                return NotFound();
+            }
+
+            ViewBag.CandidateCode = candidateCode;
+            ViewBag.CandidateID = candidateId.Value;
+
             return View();
         }
-
 
         // =========================================================
         // LOGOUT
@@ -1302,6 +1584,21 @@ namespace ErJobPortal.Controllers
             CandidateProfileViewModel vm = LoadProfileDropdowns(profile);
 
             return View(vm);
+        }
+
+        [HttpGet]
+        public IActionResult InternshipDetails(string id)
+        {
+            // id = CD080900080701
+
+            if (string.IsNullOrEmpty(id))
+            {
+                return RedirectToAction("Dashboard");
+            }
+
+            // Your code to get internship details using id
+
+            return View();
         }
 
 
