@@ -520,31 +520,31 @@ namespace ErJobPortal.Controllers
         // UPDATE INTERNSHIP DETAILS
         // =========================================================
 
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public IActionResult UpdateInternshipPreference(
-    [Bind(Prefix = "Profile")] CandidateProfileModel model)
-        {
-            int? candidateId =
-                HttpContext.Session.GetInt32("CandidateID");
+    //    [HttpPost]
+    //    [ValidateAntiForgeryToken]
+    //    public IActionResult UpdateInternshipPreference(
+    //[Bind(Prefix = "Profile")] CandidateProfileModel model)
+    //    {
+    //        int? candidateId =
+    //            HttpContext.Session.GetInt32("CandidateID");
 
-            if (candidateId == null)
-            {
-                return RedirectToAction(
-                    "CandidateLogin",
-                    "Account"
-                );
-            }
+    //        if (candidateId == null)
+    //        {
+    //            return RedirectToAction(
+    //                "CandidateLogin",
+    //                "Account"
+    //            );
+    //        }
 
-            model.CandidateID = candidateId.Value;
+    //        model.CandidateID = candidateId.Value;
 
-            _repo.UpdateInternshipPreference(model);
+    //        _repo.UpdateInternshipPreference(model);
 
-            TempData["Success"] =
-                "Internship / Fellowship Preference updated successfully.";
+    //        TempData["Success"] =
+    //            "Internship / Fellowship Preference updated successfully.";
 
-            return RedirectToAction("Profile");
-        }
+    //        return RedirectToAction("Profile");
+    //    }
 
         //[HttpPost]
         //[ValidateAntiForgeryToken]
@@ -696,25 +696,25 @@ namespace ErJobPortal.Controllers
         // UPDATE DOCUMENTS / HOBBIES
         // =========================================================
 
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public IActionResult UpdateDocuments([Bind(Prefix = "Profile")] CandidateProfileModel model)
-        {
-            int? candidateId = HttpContext.Session.GetInt32("CandidateID");
+        //[HttpPost]
+        //[ValidateAntiForgeryToken]
+        //public IActionResult UpdateDocuments([Bind(Prefix = "Profile")] CandidateProfileModel model)
+        //{
+        //    int? candidateId = HttpContext.Session.GetInt32("CandidateID");
 
-            if (candidateId == null)
-            {
-                return RedirectToAction("CandidateLogin", "Account");
-            }
+        //    if (candidateId == null)
+        //    {
+        //        return RedirectToAction("CandidateLogin", "Account");
+        //    }
 
-            model.CandidateID = candidateId.Value;
+        //    model.CandidateID = candidateId.Value;
 
-            _repo.UpdateDocuments(model);
+        //    _repo.UpdateDocuments(model);
 
-            TempData["Success"] = "Documents and personal details updated successfully.";
+        //    TempData["Success"] = "Documents and personal details updated successfully.";
 
-            return RedirectToAction("Profile");
-        }
+        //    return RedirectToAction("Profile");
+        //}
 
         // =========================================================
         // UPDATE INTERNSHIP / FELLOWSHIP PREFERENCE
@@ -1255,169 +1255,169 @@ namespace ErJobPortal.Controllers
 
         // shrirang 27/08/26
 
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public IActionResult UpdateDocuments([Bind(Prefix = "Profile")] CandidateProfileModel model, IFormFile? ResumeFile, IFormFile? PhotoFile, IFormFile? SignatureFile)
-        {
-            int? candidateId =
-                HttpContext.Session.GetInt32("CandidateID");
+        //[HttpPost]
+        //[ValidateAntiForgeryToken]
+        //public IActionResult UpdateDocuments([Bind(Prefix = "Profile")] CandidateProfileModel model, IFormFile? ResumeFile, IFormFile? PhotoFile, IFormFile? SignatureFile)
+        //{
+        //    int? candidateId =
+        //        HttpContext.Session.GetInt32("CandidateID");
 
-            if (candidateId == null || candidateId <= 0)
-            {
-                return RedirectToAction(
-                    "CandidateLogin",
-                    "Account");
-            }
+        //    if (candidateId == null || candidateId <= 0)
+        //    {
+        //        return RedirectToAction(
+        //            "CandidateLogin",
+        //            "Account");
+        //    }
 
-            model.CandidateID = candidateId.Value;
+        //    model.CandidateID = candidateId.Value;
 
-            // Get existing profile
-            CandidateProfileModel? existingProfile =
-                _repo.GetProfile(candidateId.Value);
+        //    // Get existing profile
+        //    CandidateProfileModel? existingProfile =
+        //        _repo.GetProfile(candidateId.Value);
 
-            if (existingProfile != null)
-            {
-                // Keep old files if user does not select a new file
-                model.sResume = existingProfile.sResume;
-                model.sPhoto = existingProfile.sPhoto;
-                model.sSignature = existingProfile.sSignature;
-            }
+        //    if (existingProfile != null)
+        //    {
+        //        // Keep old files if user does not select a new file
+        //        model.sResume = existingProfile.sResume;
+        //        model.sPhoto = existingProfile.sPhoto;
+        //        model.sSignature = existingProfile.sSignature;
+        //    }
 
-            // Upload folder
-            string uploadFolder = Path.Combine(
-                Directory.GetCurrentDirectory(),
-                "wwwroot",
-                "uploads",
-                "candidates");
+        //    // Upload folder
+        //    string uploadFolder = Path.Combine(
+        //        Directory.GetCurrentDirectory(),
+        //        "wwwroot",
+        //        "uploads",
+        //        "candidates");
 
-            if (!Directory.Exists(uploadFolder))
-            {
-                Directory.CreateDirectory(uploadFolder);
-            }
-
-
-            // =====================================================
-            // RESUME
-            // =====================================================
-
-            if (ResumeFile != null && ResumeFile.Length > 0)
-            {
-                string extension =
-                    Path.GetExtension(ResumeFile.FileName)
-                        .ToLowerInvariant();
-
-                if (extension != ".pdf" &&
-                    extension != ".doc" &&
-                    extension != ".docx")
-                {
-                    TempData["Error"] =
-                        "Resume must be PDF, DOC or DOCX.";
-
-                    return RedirectToAction("Profile");
-                }
-
-                string fileName =
-                    $"{candidateId}_Resume{extension}";
-
-                string filePath =
-                    Path.Combine(uploadFolder, fileName);
-
-                using (FileStream stream =
-                       new FileStream(filePath, FileMode.Create))
-                {
-                    ResumeFile.CopyTo(stream);
-                }
-
-                model.sResume =
-                    $"/uploads/candidates/{fileName}";
-            }
+        //    if (!Directory.Exists(uploadFolder))
+        //    {
+        //        Directory.CreateDirectory(uploadFolder);
+        //    }
 
 
-            // =====================================================
-            // PHOTO
-            // =====================================================
+        //    // =====================================================
+        //    // RESUME
+        //    // =====================================================
 
-            if (PhotoFile != null && PhotoFile.Length > 0)
-            {
-                string extension =
-                    Path.GetExtension(PhotoFile.FileName)
-                        .ToLowerInvariant();
+        //    if (ResumeFile != null && ResumeFile.Length > 0)
+        //    {
+        //        string extension =
+        //            Path.GetExtension(ResumeFile.FileName)
+        //                .ToLowerInvariant();
 
-                if (extension != ".jpg" &&
-                    extension != ".jpeg" &&
-                    extension != ".png")
-                {
-                    TempData["Error"] =
-                        "Photo must be JPG, JPEG or PNG.";
+        //        if (extension != ".pdf" &&
+        //            extension != ".doc" &&
+        //            extension != ".docx")
+        //        {
+        //            TempData["Error"] =
+        //                "Resume must be PDF, DOC or DOCX.";
 
-                    return RedirectToAction("Profile");
-                }
+        //            return RedirectToAction("Profile");
+        //        }
 
-                string fileName =
-                    $"{candidateId}_Photo{extension}";
+        //        string fileName =
+        //            $"{candidateId}_Resume{extension}";
 
-                string filePath =
-                    Path.Combine(uploadFolder, fileName);
+        //        string filePath =
+        //            Path.Combine(uploadFolder, fileName);
 
-                using (FileStream stream =
-                       new FileStream(filePath, FileMode.Create))
-                {
-                    PhotoFile.CopyTo(stream);
-                }
+        //        using (FileStream stream =
+        //               new FileStream(filePath, FileMode.Create))
+        //        {
+        //            ResumeFile.CopyTo(stream);
+        //        }
 
-                model.sPhoto =
-                    $"/uploads/candidates/{fileName}";
-            }
-
-
-            // =====================================================
-            // SIGNATURE
-            // =====================================================
-
-            if (SignatureFile != null && SignatureFile.Length > 0)
-            {
-                string extension =
-                    Path.GetExtension(SignatureFile.FileName)
-                        .ToLowerInvariant();
-
-                if (extension != ".jpg" &&
-                    extension != ".jpeg" &&
-                    extension != ".png")
-                {
-                    TempData["Error"] =
-                        "Signature must be JPG, JPEG or PNG.";
-
-                    return RedirectToAction("Profile");
-                }
-
-                string fileName =
-                    $"{candidateId}_Signature{extension}";
-
-                string filePath =
-                    Path.Combine(uploadFolder, fileName);
-
-                using (FileStream stream =
-                       new FileStream(filePath, FileMode.Create))
-                {
-                    SignatureFile.CopyTo(stream);
-                }
-
-                model.sSignature =
-                    $"/uploads/candidates/{fileName}";
-            }
+        //        model.sResume =
+        //            $"/uploads/candidates/{fileName}";
+        //    }
 
 
-            // =====================================================
-            // UPDATE EVERYTHING TOGETHER
-            // =====================================================
+        //    // =====================================================
+        //    // PHOTO
+        //    // =====================================================
 
-            _repo.UpdateDocuments(model);
+        //    if (PhotoFile != null && PhotoFile.Length > 0)
+        //    {
+        //        string extension =
+        //            Path.GetExtension(PhotoFile.FileName)
+        //                .ToLowerInvariant();
 
-            TempData["Success"] =
-                "Personal details updated successfully.";
+        //        if (extension != ".jpg" &&
+        //            extension != ".jpeg" &&
+        //            extension != ".png")
+        //        {
+        //            TempData["Error"] =
+        //                "Photo must be JPG, JPEG or PNG.";
 
-            return RedirectToAction("Profile");
-        }
+        //            return RedirectToAction("Profile");
+        //        }
+
+        //        string fileName =
+        //            $"{candidateId}_Photo{extension}";
+
+        //        string filePath =
+        //            Path.Combine(uploadFolder, fileName);
+
+        //        using (FileStream stream =
+        //               new FileStream(filePath, FileMode.Create))
+        //        {
+        //            PhotoFile.CopyTo(stream);
+        //        }
+
+        //        model.sPhoto =
+        //            $"/uploads/candidates/{fileName}";
+        //    }
+
+
+        //    // =====================================================
+        //    // SIGNATURE
+        //    // =====================================================
+
+        //    if (SignatureFile != null && SignatureFile.Length > 0)
+        //    {
+        //        string extension =
+        //            Path.GetExtension(SignatureFile.FileName)
+        //                .ToLowerInvariant();
+
+        //        if (extension != ".jpg" &&
+        //            extension != ".jpeg" &&
+        //            extension != ".png")
+        //        {
+        //            TempData["Error"] =
+        //                "Signature must be JPG, JPEG or PNG.";
+
+        //            return RedirectToAction("Profile");
+        //        }
+
+        //        string fileName =
+        //            $"{candidateId}_Signature{extension}";
+
+        //        string filePath =
+        //            Path.Combine(uploadFolder, fileName);
+
+        //        using (FileStream stream =
+        //               new FileStream(filePath, FileMode.Create))
+        //        {
+        //            SignatureFile.CopyTo(stream);
+        //        }
+
+        //        model.sSignature =
+        //            $"/uploads/candidates/{fileName}";
+        //    }
+
+
+        //    // =====================================================
+        //    // UPDATE EVERYTHING TOGETHER
+        //    // =====================================================
+
+        //    _repo.UpdateDocuments(model);
+
+        //    TempData["Success"] =
+        //        "Personal details updated successfully.";
+
+        //    return RedirectToAction("Profile");
+        //}
 
         // =========================================================
         // UPDATE INTERNSHIP DETAILS
@@ -1599,6 +1599,376 @@ namespace ErJobPortal.Controllers
             // Your code to get internship details using id
 
             return View();
+        }
+
+        // shrirang 14/09/26
+        // shrirang 12/09/26
+
+
+        // =========================================================
+        // UPDATE INTERNSHIP / FELLOWSHIP PREFERENCE
+        // =========================================================
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public IActionResult UpdateInternshipPreference(
+            [Bind(Prefix = "Profile")] CandidateProfileModel model)
+        {
+            // =====================================================
+            // GET CANDIDATE ID FROM SESSION
+            // =====================================================
+
+            int? candidateId =
+                HttpContext.Session.GetInt32("CandidateID");
+
+            if (candidateId == null || candidateId <= 0)
+            {
+                return RedirectToAction(
+                    "CandidateLogin",
+                    "Account");
+            }
+
+            // =====================================================
+            // NEVER TRUST CANDIDATE ID FROM FORM
+            // =====================================================
+
+            model.CandidateID = candidateId.Value;
+
+            // =====================================================
+            // VALIDATE INTERNSHIP / FELLOWSHIP TYPE
+            // =====================================================
+
+            if (model.Internship_FellowshipType == null)
+            {
+                ModelState.AddModelError(
+                    "Internship_FellowshipType",
+                    "Please select Internship / Fellowship Type.");
+
+                // Reload dropdowns because the view needs them
+                CandidateProfileViewModel vm =
+                    LoadProfileDropdowns(model);
+
+                return View("Profile", vm);
+            }
+
+            // =====================================================
+            // UPDATE DATABASE
+            // =====================================================
+
+            _repo.UpdateInternshipPreference(model);
+
+            // =====================================================
+            // SUCCESS MESSAGE
+            // =====================================================
+
+            TempData["Success"] =
+                "Internship / Fellowship Preference updated successfully.";
+
+            // =====================================================
+            // REDIRECT
+            // =====================================================
+
+            return RedirectToAction("Profile");
+        }
+
+        // =========================================================
+        // UPDATE DOCUMENTS / PERSONAL DETAILS
+        // =========================================================
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public IActionResult UpdateDocuments(
+            [Bind(Prefix = "Profile")] CandidateProfileModel model,
+            IFormFile? ResumeFile,
+            IFormFile? PhotoFile,
+            IFormFile? SignatureFile)
+        {
+            // =====================================================
+            // GET CANDIDATE ID FROM SESSION
+            // =====================================================
+
+            int? candidateId =
+                HttpContext.Session.GetInt32("CandidateID");
+
+            if (candidateId == null || candidateId <= 0)
+            {
+                return RedirectToAction(
+                    "CandidateLogin",
+                    "Account");
+            }
+
+            // Never trust CandidateID from browser
+            model.CandidateID = candidateId.Value;
+
+            // =====================================================
+            // GET EXISTING PROFILE
+            // =====================================================
+
+            CandidateProfileModel? existingProfile =
+                _repo.GetProfile(candidateId.Value);
+
+            if (existingProfile != null)
+            {
+                // Preserve existing documents
+                // if no new file is selected.
+
+                if (string.IsNullOrEmpty(model.sResume))
+                {
+                    model.sResume = existingProfile.sResume;
+                }
+
+                if (string.IsNullOrEmpty(model.sPhoto))
+                {
+                    model.sPhoto = existingProfile.sPhoto;
+                }
+
+                if (string.IsNullOrEmpty(model.sSignature))
+                {
+                    model.sSignature = existingProfile.sSignature;
+                }
+            }
+
+            // =====================================================
+            // UPLOAD DIRECTORY
+            // =====================================================
+
+            string uploadFolder = Path.Combine(
+                Directory.GetCurrentDirectory(),
+                "wwwroot",
+                "uploads",
+                "candidates");
+
+            if (!Directory.Exists(uploadFolder))
+            {
+                Directory.CreateDirectory(uploadFolder);
+            }
+
+            // =====================================================
+            // RESUME
+            // =====================================================
+
+            if (ResumeFile != null &&
+                ResumeFile.Length > 0)
+            {
+                string extension =
+                    Path.GetExtension(
+                        ResumeFile.FileName)
+                        .ToLowerInvariant();
+
+                if (extension != ".pdf" &&
+                    extension != ".doc" &&
+                    extension != ".docx")
+                {
+                    TempData["Error"] =
+                        "Resume must be PDF, DOC or DOCX.";
+
+                    return RedirectToAction("Profile");
+                }
+
+                string fileName =
+                    $"{candidateId.Value}_Resume{extension}";
+
+                string filePath =
+                    Path.Combine(
+                        uploadFolder,
+                        fileName);
+
+                using (FileStream stream =
+                       new FileStream(
+                           filePath,
+                           FileMode.Create))
+                {
+                    ResumeFile.CopyTo(stream);
+                }
+
+                model.sResume =
+                    $"/uploads/candidates/{fileName}";
+            }
+
+            // =====================================================
+            // PHOTO
+            // =====================================================
+
+            if (PhotoFile != null &&
+                PhotoFile.Length > 0)
+            {
+                string extension =
+                    Path.GetExtension(
+                        PhotoFile.FileName)
+                        .ToLowerInvariant();
+
+                if (extension != ".jpg" &&
+                    extension != ".jpeg" &&
+                    extension != ".png")
+                {
+                    TempData["Error"] =
+                        "Photo must be JPG, JPEG or PNG.";
+
+                    return RedirectToAction("Profile");
+                }
+
+                string fileName =
+                    $"{candidateId.Value}_Photo{extension}";
+
+                string filePath =
+                    Path.Combine(
+                        uploadFolder,
+                        fileName);
+
+                using (FileStream stream =
+                       new FileStream(
+                           filePath,
+                           FileMode.Create))
+                {
+                    PhotoFile.CopyTo(stream);
+                }
+
+                model.sPhoto =
+                    $"/uploads/candidates/{fileName}";
+            }
+
+            // =====================================================
+            // SIGNATURE
+            // =====================================================
+
+            if (SignatureFile != null &&
+                SignatureFile.Length > 0)
+            {
+                string extension =
+                    Path.GetExtension(
+                        SignatureFile.FileName)
+                        .ToLowerInvariant();
+
+                if (extension != ".jpg" &&
+                    extension != ".jpeg" &&
+                    extension != ".png")
+                {
+                    TempData["Error"] =
+                        "Signature must be JPG, JPEG or PNG.";
+
+                    return RedirectToAction("Profile");
+                }
+
+                string fileName =
+                    $"{candidateId.Value}_Signature{extension}";
+
+                string filePath =
+                    Path.Combine(
+                        uploadFolder,
+                        fileName);
+
+                using (FileStream stream =
+                       new FileStream(
+                           filePath,
+                           FileMode.Create))
+                {
+                    SignatureFile.CopyTo(stream);
+                }
+
+                model.sSignature =
+                    $"/uploads/candidates/{fileName}";
+            }
+
+            // =====================================================
+            // DEBUG / VALIDATION
+            // =====================================================
+
+            // At this point model should contain:
+            //
+            // model.CandidateID
+            // model.sResume
+            // model.sPhoto
+            // model.sSignature
+            // model.sDivyang
+            // model.sHobbies
+
+            // =====================================================
+            // UPDATE DATABASE
+            // =====================================================
+
+            _repo.UpdateDocuments(model);
+
+            TempData["Success"] =
+                "Documents and personal details updated successfully.";
+
+            return RedirectToAction("Profile");
+        }
+
+        public void UpdateDocuments(CandidateProfileModel model)
+        {
+            string connectionString =
+                _configuration.GetConnectionString(
+                    "DefaultConnection");
+
+            using (SqlConnection con =
+                   new SqlConnection(connectionString))
+            {
+                string query = @"
+            UPDATE tblCandidateProfile
+            SET
+                sResume = @sResume,
+                sPhoto = @sPhoto,
+                sSignature = @sSignature,
+                sDivyang = @sDivyang,
+                sHobbies = @sHobbies,
+                ModDate = GETDATE()
+            WHERE CandidateID = @CandidateID";
+
+                using (SqlCommand cmd =
+                       new SqlCommand(query, con))
+                {
+                    cmd.Parameters.Add(
+                        "@CandidateID",
+                        SqlDbType.Int).Value =
+                            model.CandidateID;
+
+                    cmd.Parameters.Add(
+                        "@sResume",
+                        SqlDbType.NVarChar,
+                        500).Value =
+                            (object?)model.sResume ??
+                            DBNull.Value;
+
+                    cmd.Parameters.Add(
+                        "@sPhoto",
+                        SqlDbType.NVarChar,
+                        500).Value =
+                            (object?)model.sPhoto ??
+                            DBNull.Value;
+
+                    cmd.Parameters.Add(
+                        "@sSignature",
+                        SqlDbType.NVarChar,
+                        500).Value =
+                            (object?)model.sSignature ??
+                            DBNull.Value;
+
+                    cmd.Parameters.Add(
+                        "@sDivyang",
+                        SqlDbType.NVarChar,
+                        50).Value =
+                            (object?)model.sDivyang ??
+                            DBNull.Value;
+
+                    cmd.Parameters.Add(
+                        "@sHobbies",
+                        SqlDbType.NVarChar,
+                        -1).Value =
+                            (object?)model.sHobbies ??
+                            DBNull.Value;
+
+                    con.Open();
+
+                    int rows = cmd.ExecuteNonQuery();
+
+                    if (rows == 0)
+                    {
+                        throw new Exception(
+                            "No candidate record found for CandidateID: "
+                            + model.CandidateID);
+                    }
+                }
+            }
         }
 
 

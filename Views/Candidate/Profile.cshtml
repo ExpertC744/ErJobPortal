@@ -934,16 +934,19 @@
                         <select asp-for="Profile.Internship_FellowshipType"
                                 class="form-control"
                                 asp-items="@(new SelectList(
-                                                                                                                                                                                        Model.InternshipFellowshipType,
-                                                                                                                                                                                        "ID",
-                                                                                                                                                                                        "Name"
-                                                                                                                                                                                    ))">
+                                                                                         Model.InternshipFellowshipType,
+                                                                                         "ID",
+                                                                                         "Name"
+                                                                                     ))">
 
                             <option value="">
                                 -- Select Type --
                             </option>
 
                         </select>
+
+                        <span asp-validation-for="Profile.Internship_FellowshipType"
+                              class="text-danger"></span>
 
                     </div>
 
@@ -998,11 +1001,10 @@
                 </div>
 
             </form>
+
         </div>
 
     </div>
-
-
     <!-- ================================================= -->
     <!-- DOCUMENTS -->
     <!-- ================================================= -->
@@ -1028,9 +1030,7 @@
 
                     <!-- Resume -->
                     <div class="col-md-4 mb-3">
-                        <label class="form-label fw-bold">
-                            Resume
-                        </label>
+                        <label class="form-label fw-bold">Resume</label>
 
                         <input type="file"
                                name="ResumeFile"
@@ -1051,12 +1051,9 @@
                         }
                     </div>
 
-
                     <!-- Photo -->
                     <div class="col-md-4 mb-3">
-                        <label class="form-label fw-bold">
-                            Photo
-                        </label>
+                        <label class="form-label fw-bold">Photo</label>
 
                         <input type="file"
                                name="PhotoFile"
@@ -1072,18 +1069,13 @@
                             <img src="@Model.Profile.sPhoto"
                                  alt="Photo"
                                  class="mt-1"
-                                 style="width:80px;
-                                    height:80px;
-                                    object-fit:cover;" />
+                                 style="width:80px;height:80px;object-fit:cover;" />
                         }
                     </div>
 
-
                     <!-- Signature -->
                     <div class="col-md-4 mb-3">
-                        <label class="form-label fw-bold">
-                            Signature
-                        </label>
+                        <label class="form-label fw-bold">Signature</label>
 
                         <input type="file"
                                name="SignatureFile"
@@ -1102,12 +1094,11 @@
                                  alt="Signature"
                                  class="mt-1"
                                  style="width:150px;
-                                    height:60px;
-                                    object-fit:contain;
-                                    border:1px solid #ddd;" />
+                              height:60px;
+                              object-fit:contain;
+                              border:1px solid #ddd;" />
                         }
                     </div>
-
 
                     <!-- Divyang -->
                     <div class="col-md-6 mb-3">
@@ -1120,22 +1111,13 @@
                         <select asp-for="Profile.sDivyang"
                                 class="form-select">
 
-                            <option value="">
-                                -- Select --
-                            </option>
-
-                            <option value="Yes">
-                                Yes
-                            </option>
-
-                            <option value="No">
-                                No
-                            </option>
+                            <option value="">-- Select --</option>
+                            <option value="Yes">Yes</option>
+                            <option value="No">No</option>
 
                         </select>
 
                     </div>
-
 
                     <!-- Hobbies -->
                     <div class="col-md-6 mb-3">
@@ -1153,8 +1135,6 @@
 
                 </div>
 
-
-                <!-- ONE UPDATE BUTTON -->
                 <div class="text-end mt-3">
 
                     <button type="submit"
