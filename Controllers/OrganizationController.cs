@@ -413,41 +413,25 @@ namespace JobPortalTrainee.Controllers
                 nOrgID = orgId.Value
             };
 
-            string connectionString =
-                _configuration.GetConnectionString("DefaultConnection")!;
+            string connectionString = _configuration.GetConnectionString("DefaultConnection")!;
 
-            using (SqlConnection cn =
-                   new SqlConnection(connectionString))
+            using (SqlConnection cn = new SqlConnection(connectionString))
             {
-                using (SqlCommand cmd =
-                       new SqlCommand(
-                           "SP_GetOrganizationProfile",
-                           cn))
+                using (SqlCommand cmd = new SqlCommand("SP_GetOrganizationProfile", cn))
                 {
-                    cmd.CommandType =
-                        CommandType.StoredProcedure;
+                    cmd.CommandType = CommandType.StoredProcedure;
 
-                    cmd.Parameters.Add(
-                        "@nOrgID",
-                        SqlDbType.Int).Value =
-                        orgId.Value;
+                    cmd.Parameters.Add("@nOrgID", SqlDbType.Int).Value = orgId.Value;
 
                     cn.Open();
 
-                    using (SqlDataReader dr =
-                           cmd.ExecuteReader())
+                    using (SqlDataReader dr = cmd.ExecuteReader())
                     {
                         if (dr.Read())
                         {
-                            model.nID =
-                                dr["nID"] != DBNull.Value
-                                    ? Convert.ToInt32(dr["nID"])
-                                    : 0;
+                            model.nID = dr["nID"] != DBNull.Value ? Convert.ToInt32(dr["nID"]) : 0;
 
-                            model.nOrgID =
-                                dr["nOrgID"] != DBNull.Value
-                                    ? Convert.ToInt32(dr["nOrgID"])
-                                    : orgId.Value;
+                            model.nOrgID = dr["nOrgID"] != DBNull.Value ? Convert.ToInt32(dr["nOrgID"]) : orgId.Value;
 
                             model.sOrganizationName =
                                 dr["sName"] != DBNull.Value

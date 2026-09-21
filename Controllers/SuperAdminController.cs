@@ -83,6 +83,7 @@ namespace ErJobPortal.Controllers
         // CANDIDATE LIST
         // ==========================================
         [HttpGet]
+        [Route("SuperAdmin/SATrainees/{id:int}")]
         public IActionResult SATrainees()
         {
             List<SATraineeListM> trainees = _repository.GetSATraineeList();
@@ -93,6 +94,7 @@ namespace ErJobPortal.Controllers
         // ORGANIZATION LIST
         // ==========================================
         [HttpGet]
+        [Route("SuperAdmin/SAOrganizations/{id:int}")]
         public IActionResult SAOrganizations()
         {
             List<OrganizationUser> organization = _repository.GetAllOrganizationList();
@@ -100,12 +102,14 @@ namespace ErJobPortal.Controllers
         }
 
         [HttpGet]
+        [Route("SuperAdmin/AddObjective/{id:int}")]
         public IActionResult AddObjective()
         {
             return View();
         }
 
         [HttpGet]
+        [Route("SuperAdmin/ViewObjective/{id:int}")]
         public IActionResult ViewObjective()
         {
             List<SAObjectiveM> objectives = new List<SAObjectiveM>();
@@ -280,6 +284,7 @@ namespace ErJobPortal.Controllers
 
 
         [HttpGet]
+        [Route("SuperAdmin/SAFeedback/{id:int}")]
         public IActionResult SAFeedback()
         {
             List<SAFeedbackM> feedbackList = new List<SAFeedbackM>();
@@ -399,6 +404,7 @@ namespace ErJobPortal.Controllers
         // =========================================================
 
         [HttpGet]
+        [Route("SuperAdmin/EditSAFeedback/{id:int}")]
         public IActionResult EditSAFeedback(int id)
         {
             SAFeedbackM model = new SAFeedbackM();
@@ -590,6 +596,7 @@ namespace ErJobPortal.Controllers
         // EDIT FEEDBACK - POST
         // =========================================================
         [HttpGet]
+        [Route("SuperAdmin/DetailsSAFeedback/{id:int}")]
         public IActionResult DetailsSAFeedback(int id)
         {
             SAFeedbackM model = new SAFeedbackM();
@@ -682,6 +689,7 @@ namespace ErJobPortal.Controllers
         // SA ORGANIZATION FEEDBACK - GET
         // =========================================================
         [HttpGet]
+        [Route("SuperAdmin/SAOrgFeedback/{id:int}")]
         public IActionResult SAOrgFeedback()
         {
             List<SAOrgFeedbackM> feedbackList =
@@ -816,6 +824,7 @@ namespace ErJobPortal.Controllers
         }
 
         [HttpGet]
+        [Route("SuperAdmin/EditSAOrgFeedback/{id:int}")]
         public IActionResult EditSAOrgFeedback(int id)
         {
             SAOrgFeedbackM model = null;
@@ -1000,6 +1009,7 @@ namespace ErJobPortal.Controllers
 
 
         [HttpGet]
+        [Route("SuperAdmin/DetailsSAOrgFeedback/{id:int}")]
         public IActionResult DetailsSAOrgFeedback(int id)
         {
             SAOrgFeedbackM model = null;
@@ -1112,6 +1122,7 @@ namespace ErJobPortal.Controllers
         }
 
         [HttpGet]
+        [Route("SuperAdmin/CandidateFeedback/{id:int}")]
         public IActionResult CandidateFeedback()
         {
             List<SACandidateFeedbackM> feedbackList = new List<SACandidateFeedbackM>();
@@ -1191,8 +1202,7 @@ namespace ErJobPortal.Controllers
         [ValidateAntiForgeryToken]
         public IActionResult ToggleCandidateFeedback(int id)
         {
-            string connectionString =
-                _configuration.GetConnectionString("DefaultConnection");
+            string connectionString =  _configuration.GetConnectionString("DefaultConnection");
 
             using (SqlConnection con = new SqlConnection(connectionString))
             {
@@ -1228,6 +1238,7 @@ namespace ErJobPortal.Controllers
 
 
         [HttpGet]
+        [Route("SuperAdmin/DetailsCandidateFeedback/{id:int}")]
         public IActionResult DetailsCandidateFeedback(int id)
         {
             SACandidateFeedbackDetailsM model =
@@ -1347,6 +1358,7 @@ namespace ErJobPortal.Controllers
 
 
         [HttpGet]
+        [Route("SuperAdmin/OrganizationFeedback/{id:int}")]
         public IActionResult OrganizationFeedback()
         {
             List<SAOrganizationFeedbackM> feedbackList =
@@ -1470,6 +1482,7 @@ ORDER BY LF.FeedbackID DESC";
         }
 
         [HttpGet]
+        [Route("SuperAdmin/DetailsOrgFeedback/{id:int}")]
         public IActionResult DetailsOrgFeedback(int id)
         {
             SAOrgFeedbackDetailsM model = new SAOrgFeedbackDetailsM();
@@ -1675,7 +1688,7 @@ ORDER BY SAF.nID DESC, OFB.nID DESC;
 
 
         [HttpGet]
-        [Route("SuperAdmin/ContactList")]
+        [Route("SuperAdmin/ContactList/{id:int}")]
         public IActionResult ContactList()
         {
             List<ViewModelTrainee> contactList = new List<ViewModelTrainee>();

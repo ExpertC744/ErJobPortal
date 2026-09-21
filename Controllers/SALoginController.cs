@@ -10,14 +10,11 @@ namespace ErJobPortal.Controllers
         private readonly AccountRepository _repository;
         private readonly EmailService _emailService;
 
-        public SALoginController(
-            AccountRepository repository,
-            EmailService emailService)
+        public SALoginController(AccountRepository repository, EmailService emailService)
         {
             _repository = repository;
             _emailService = emailService;
         }
-
 
         // ==========================================================
         // SUPER ADMIN LOGIN - GET
