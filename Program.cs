@@ -1,11 +1,14 @@
 using ErJobPortal.Repositories;
 using ErJobPortal.Data;
+using ErJobPortal.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 // MVC
 builder.Services.AddControllersWithViews();
+// shrirang 15/09/26
+builder.Services.AddScoped<EmailService>();
 //Database
 builder.Services.AddScoped<DbConnection>();
 

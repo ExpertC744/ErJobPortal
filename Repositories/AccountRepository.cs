@@ -5,16 +5,13 @@ using Microsoft.AspNetCore.Routing.Matching;
 using Microsoft.Data.SqlClient;
 using System.Data;
 
+
+
 namespace ErJobPortal.Repositories
 {
     public class AccountRepository
     {
-        private readonly DbConnection _db;
-
-        public AccountRepository(DbConnection db)
-        {
-            _db = db;
-        }
+        private readonly DbConnection _db; public AccountRepository(DbConnection db) { _db = db; }
 
         // Candidate Register 
         #region "Candidate Register"
@@ -1210,6 +1207,159 @@ GetOrganizationRegistrationDetails(int orgId)
         }
 
         #endregion
+
+        // shrirang 15/09/26
+
+        #region "Candidate Forgotpass"
+
+        // ==========================================================
+        // GET CANDIDATE LOGIN DETAILS BY EMAIL
+        // ==========================================================
+
+        public CandidateLogin? GetCandidateLoginDetails(string email)
+        {
+            using (SqlConnection cn = _db.GetConnection())
+            {
+                string query = @"
+            SELECT
+                sEmail,
+                sPassword
+            FROM tblCandidateRegister
+            WHERE sEmail = @Email
+              AND nBit = 1";
+
+                using (SqlCommand cmd = new SqlCommand(query, cn))
+                {
+                    cmd.Parameters.Add(
+                        "@Email",
+                        SqlDbType.NVarChar,
+                        200
+                    ).Value = email.Trim();
+
+                    cn.Open();
+
+                    using (SqlDataReader reader = cmd.ExecuteReader())
+                    {
+                        if (reader.Read())
+                        {
+                            return new CandidateLogin
+                            {
+                                sEmail = reader["sEmail"] == DBNull.Value
+                                    ? ""
+                                    : reader["sEmail"].ToString(),
+
+                                sPassword = reader["sPassword"] == DBNull.Value
+                                    ? ""
+                                    : reader["sPassword"].ToString()
+                            };
+                        }
+                    }
+                }
+            }
+
+            return null;
+        }
+
+        #endregion
+
+
+        public bool ResetCandidatePassword(string email, string newPassword) { using (SqlConnection cn = _db.GetConnection()) { string query = @" UPDATE tblCandidateRegister SET sPassword = @NewPassword, ModDate = GETDATE() WHERE sEmail = @Email AND nBit = 1"; using (SqlCommand cmd = new SqlCommand(query, cn)) { cmd.Parameters.Add("@NewPassword", SqlDbType.NVarChar, 300).Value = newPassword; cmd.Parameters.Add("@Email", SqlDbType.NVarChar, 150).Value = email.Trim(); cn.Open(); int rowsAffected = cmd.ExecuteNonQuery(); return rowsAffected > 0; } } }
+
+
+       
+// ==========================================================
+// ORGANIZATION RESET PASSWORD
+// ==========================================================
+
+public OrganizationLogin? GetOrganizationLoginDetails(string email)
+        {
+            using (SqlConnection cn = _db.GetConnection())
+            {
+                string query = @"
+            SELECT
+                sEmail,
+                sPassword
+            FROM tblOrgRegistration
+            WHERE sEmail = @Email
+              AND nBit = 1";
+
+                using (SqlCommand cmd = new SqlCommand(query, cn))
+                {
+                    cmd.Parameters.Add(
+                        "@Email",
+                        SqlDbType.NVarChar,
+                        200
+                    ).Value = email.Trim();
+
+                    cn.Open();
+
+                    using (SqlDataReader reader = cmd.ExecuteReader())
+                    {
+                        if (reader.Read())
+                        {
+                            return new OrganizationLogin
+                            {
+                                sEmail = reader["sEmail"] == DBNull.Value
+                                    ? ""
+                                    : reader["sEmail"].ToString(),
+
+                                sPassword = reader["sPassword"] == DBNull.Value
+                                    ? ""
+                                    : reader["sPassword"].ToString()
+                            };
+                        }
+                    }
+                }
+            }
+
+            return null;
+        }
+
+
+        // ==========================================================
+        // UPDATE ORGANIZATION PASSWORD
+        // ==========================================================
+
+        public bool ResetOrganizationPassword(
+            string email,
+            string newPassword)
+        {
+            using (SqlConnection cn = _db.GetConnection())
+            {
+                string query = @"
+            UPDATE tblOrgRegistration
+            SET
+                sPassword = @NewPassword,
+                ModDate = GETDATE()
+            WHERE sEmail = @Email
+              AND nBit = 1";
+
+                using (SqlCommand cmd = new SqlCommand(query, cn))
+                {
+                    cmd.Parameters.Add(
+                        "@NewPassword",
+                        SqlDbType.NVarChar,
+                        300
+                    ).Value = newPassword;
+
+                    cmd.Parameters.Add(
+                        "@Email",
+                        SqlDbType.NVarChar,
+                        150
+                    ).Value = email.Trim();
+
+                    cn.Open();
+
+                    int rowsAffected = cmd.ExecuteNonQuery();
+
+                    return rowsAffected > 0;
+                }
+            }
+        }
+
+        // sa reset pass
+        public SALoginModel? GetSuperAdminLoginDetails(string email) { using (SqlConnection cn = _db.GetConnection()) { string query = @" SELECT sEmail, sPassword FROM tblSuperAdmin WHERE sEmail = @Email AND nBit = 1"; using (SqlCommand cmd = new SqlCommand(query, cn)) { cmd.Parameters.Add("@Email", SqlDbType.NVarChar, 200).Value = email.Trim(); cn.Open(); using (SqlDataReader reader = cmd.ExecuteReader()) { if (reader.Read()) { return new SALoginModel { sEmail = reader["sEmail"] == DBNull.Value ? "" : reader["sEmail"].ToString(), sPassword = reader["sPassword"] == DBNull.Value ? "" : reader["sPassword"].ToString() }; } } } } return null; }
+        public bool ResetSuperAdminPassword(string email, string newPassword) { using (SqlConnection cn = _db.GetConnection()) { string query = @" UPDATE tblSuperAdmin SET sPassword = @NewPassword, ModDate = GETDATE() WHERE sEmail = @Email AND nBit = 1"; using (SqlCommand cmd = new SqlCommand(query, cn)) { cmd.Parameters.Add("@NewPassword", SqlDbType.NVarChar, 300).Value = newPassword; cmd.Parameters.Add("@Email", SqlDbType.NVarChar, 200).Value = email.Trim(); cn.Open(); int rowsAffected = cmd.ExecuteNonQuery(); return rowsAffected > 0; } } }
 
     }
 }

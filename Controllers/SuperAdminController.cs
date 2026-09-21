@@ -1673,6 +1673,7 @@ ORDER BY SAF.nID DESC, OFB.nID DESC;
             return View(model);
         }
 
+
         [HttpGet]
         [Route("SuperAdmin/ContactList")]
         public IActionResult ContactList()
@@ -1689,14 +1690,14 @@ ORDER BY SAF.nID DESC, OFB.nID DESC;
                     con.Open();
 
                     string query = @"
-                SELECT
-                    FullName,
-                    Email,
-                    MobileNo,
-                    Subject,
-                    Description
-                FROM tblContactUs
-                ORDER BY nID DESC";
+         SELECT
+             FullName,
+             Email,
+             MobileNo,
+             Subject,
+             Description
+         FROM tblContactUs
+         ORDER BY nID DESC";
 
                     using (SqlCommand cmd = new SqlCommand(query, con))
                     {

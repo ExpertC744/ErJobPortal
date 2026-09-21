@@ -60,240 +60,350 @@ namespace ErJobPortal.Repositories
         // GET PROFILE
         // =========================================================
 
+        // =========================================================
+        // GET PROFILE
+        // =========================================================
+
         public CandidateProfileModel? GetProfile(int candidateId)
         {
+            CandidateProfileModel? profile = null;
+
             using SqlConnection con = _db.GetConnection();
 
-            string sql = @"SELECT * FROM tblCandidateProfile WHERE CandidateID = @CandidateID";
-            using SqlCommand cmd = new SqlCommand(sql, con);
+            string query = @"
+        SELECT *
+        FROM tblCandidateProfile
+        WHERE CandidateID = @CandidateID
+          AND ISNULL(nBit, 1) = 1";
 
-            cmd.Parameters.Add("@CandidateID", SqlDbType.Int).Value = candidateId;
+            using SqlCommand cmd = new SqlCommand(query, con);
+
+            cmd.Parameters.Add("@CandidateID", SqlDbType.Int)
+                .Value = candidateId;
 
             con.Open();
 
-            using SqlDataReader reader = cmd.ExecuteReader();
+            using SqlDataReader dr = cmd.ExecuteReader();
 
-            if (!reader.Read())
-                return null;
-
-            return new CandidateProfileModel
+            if (!dr.Read())
             {
-                nID = GetNullableInt(reader, "nID") ?? 0,
-                CandidateID = GetNullableInt(reader, "CandidateID") ?? 0,
+                return null;
+            }
 
+            profile = new CandidateProfileModel
+            {
+                CandidateID = candidateId,
+
+                // =====================================================
                 // ADDRESS
-                CountryID = GetNullableString(reader, "CountryID"),
-                StateID = GetNullableString(reader, "StateID"),
-                CityID = GetNullableString(reader, "CityID"),
-                Pincode = GetNullableString(reader, "Pincode"),
+                // =====================================================
 
+                CountryID = GetString(dr, "CountryID"),
+                StateID = GetString(dr, "StateID"),
+                CityID = GetString(dr, "CityID"),
+                Pincode = GetString(dr, "Pincode"),
+
+
+                // =====================================================
+                // INTERNSHIP / FELLOWSHIP PREFERENCE
+                // =====================================================
+
+                Internship_FellowshipType =
+                    GetNullableInt(dr, "Internship_FellowshipType"),
+
+                Preferred_Country =
+                    GetString(dr, "Preferred_Country"),
+
+                Preferred_State =
+                    GetString(dr, "Preferred_State"),
+
+                Preferred_City =
+                    GetString(dr, "Preferred_City"),
+
+
+                // =====================================================
                 // EDUCATION
+                // =====================================================
 
-                SSC_YEAR = GetNullableInt(reader, "SSC_YEAR"),
+                SSC_YEAR =
+                    GetNullableInt(dr, "SSC_YEAR"),
 
-                SSC_DIVISION = GetNullableInt(reader, "SSC_DIVISION"),
+                SSC_DIVISION =
+                    GetNullableInt(dr, "SSC_DIVISION"),
 
-                HSC_DIPLOMA_YEAR = GetNullableInt(reader, "HSC_DIPLOMA_YEAR"),
+                HSC_DIPLOMA_YEAR =
+                    GetNullableInt(dr, "HSC_DIPLOMA_YEAR"),
 
-                HSC_DIPLOMA_DIVISION = GetNullableInt(reader, "HSC_DIPLOMA_DIVISION"),
+                HSC_DIPLOMA_DIVISION =
+                    GetNullableInt(dr, "HSC_DIPLOMA_DIVISION"),
 
-                Graduation_Year = GetNullableInt(reader, "Graduation_Year"),
+                Graduation_Year =
+                    GetNullableInt(dr, "Graduation_Year"),
 
-                Graduation_Division = GetNullableInt(reader, "Graduation_Division"),
+                Graduation_Stream =
+                    GetNullableInt(dr, "Graduation_Stream"),
 
-                Graduation_Stream = GetNullableInt(reader, "Graduation_Stream"),
+                Graduation_Division =
+                    GetNullableInt(dr, "Graduation_Division"),
 
-                Other_Stream = GetNullableString(reader, "Other_Stream"),
+                Other_Stream =
+                    GetString(dr, "Other_Stream"),
 
-                PG_Year = GetNullableInt(reader, "PG_Year"),
+                PG_Year =
+                    GetNullableInt(dr, "PG_Year"),
 
-                PG_Division = GetNullableInt(reader, "PG_Division"),
+                PG_Stream =
+                    GetNullableInt(dr, "PG_Stream"),
 
-                PG_Stream = GetNullableInt(reader, "PG_Stream"),
+                PG_Division =
+                    GetNullableInt(dr, "PG_Division"),
 
-                Other_Specialization = GetNullableString(reader, "Other_Specialization"),
+                Other_Specialization =
+                    GetString(dr, "Other_Specialization"),
 
-                PhD_Year = GetNullableInt(reader, "PhD_Year"),
+                PhD_Year =
+                    GetNullableInt(dr, "PhD_Year"),
 
-                PhD_Status = GetNullableInt(reader, "PhD_Status"),
+                PhD_Status =
+                    GetNullableInt(dr, "PhD_Status"),
 
-                PhD_Topic = GetNullableString(reader, "PhD_Topic"),
+                PhD_Topic =
+                    GetString(dr, "PhD_Topic"),
 
-                Previous_PhD_Topic_Year = GetNullableString(reader, "Previous_PhD_Topic_Year"),
-
-
-                // INTERNSHIP PREFERENCE
-
-                Internship_FellowshipType = GetNullableInt(reader, "Internship_FellowshipType"),
-
-                Preferred_Country = GetNullableString(reader, "Preferred_Country"),
-
-                Preferred_State = GetNullableString(reader, "Preferred_State"),
-
-                Preferred_City = GetNullableString(reader, "Preferred_City"),
-
-
-                // DOCUMENTS
-                sResume = GetNullableString(reader, "sResume"),
-                sPhoto = GetNullableString(reader, "sPhoto"),
-                sSignature = GetNullableString(reader, "sSignature"),
-                sDivyang = GetNullableString(reader, "sDivyang"),
-                sHobbies = GetNullableString(reader, "sHobbies"),
-
-                // INTERNSHIP 1
-                sOrgName1 = GetNullableString(reader, "sOrgName1"),
-                sOrgIntTitle1 = GetNullableInt(reader, "sOrgIntTitle1"),
-                sOrgIntDuration1 = GetNullableInt(reader, "sOrgIntDuration1"),
-                sOrgIntStatus1 = GetNullableInt(reader, "sOrgIntStatus1"),
-
-                // INTERNSHIP 2
-                sOrgName2 = GetNullableString(reader, "sOrgName2"),
-                sOrgIntTitle2 = GetNullableInt(reader, "sOrgIntTitle2"),
-                sOrgIntDuration2 = GetNullableInt(reader, "sOrgIntDuration2"),
-                sOrgIntStatus2 = GetNullableInt(reader, "sOrgIntStatus2"),
-
-                // INTERNSHIP 3
-                sOrgName3 = GetNullableString(reader, "sOrgName3"),
-                sOrgIntTitle3 = GetNullableInt(reader, "sOrgIntTitle3"),
-                sOrgIntDuration3 = GetNullableInt(reader, "sOrgIntDuration3"),
-                sOrgIntStatus3 = GetNullableInt(reader, "sOrgIntStatus3"),
-
-                // INTERNSHIP 4
-                sOrgName4 = GetNullableString(reader, "sOrgName4"),
-                sOrgIntTitle4 = GetNullableInt(reader, "sOrgIntTitle4"),
-                sOrgIntDuration4 = GetNullableInt(reader, "sOrgIntDuration4"),
-                sOrgIntStatus4 = GetNullableInt(reader, "sOrgIntStatus4"),
+                Previous_PhD_Topic_Year =
+                    GetString(dr, "Previous_PhD_Topic_Year"),
 
 
-                // LANGUAGES
-                sLanguage1 = GetNullableString(reader, "sLanguage1"),
-                sLanguage2 = GetNullableString(reader, "sLanguage2"),
-                sLanguage3 = GetNullableString(reader, "sLanguage3"),
-                sLanguage4 = GetNullableString(reader, "sLanguage4"),
-                sLanguage5 = GetNullableString(reader, "sLanguage5"),
-                sLanguage6 = GetNullableString(reader, "sLanguage6"),
-                sLanguage7 = GetNullableString(reader, "sLanguage7"),
-                sLanguage8 = GetNullableString(reader, "sLanguage8"),
-                sLanguageStar1 = GetNullableInt(reader, "sLanguageStar1"),
-                sLanguageStar2 = GetNullableInt(reader, "sLanguageStar2"),
-                sLanguageStar3 = GetNullableInt(reader, "sLanguageStar3"),
-                sLanguageStar4 = GetNullableInt(reader, "sLanguageStar4"),
-                sLanguageStar5 = GetNullableInt(reader, "sLanguageStar5"),
-                sLanguageStar6 = GetNullableInt(reader, "sLanguageStar6"),
-                sLanguageStar7 = GetNullableInt(reader, "sLanguageStar7"),
-                sLanguageStar8 = GetNullableInt(reader, "sLanguageStar8"),
-
-
-                // REFERENCES
-
-                sRefName1 =
-                    GetNullableString(reader, "sRefName1"),
-
-                sRefName2 =
-                    GetNullableString(reader, "sRefName2"),
-
-                sRefRelationName1 =
-                    GetNullableInt(
-                        reader,
-                        "sRefRelationName1"
-                    ),
-
-                sRefRelationName2 =
-                    GetNullableInt(
-                        reader,
-                        "sRefRelationName2"
-                    ),
-
-                sLocation1 =
-                    GetNullableString(reader, "sLocation1"),
-
-                sLocation2 =
-                    GetNullableString(reader, "sLocation2"),
-
-                sMobile1 =
-                    GetNullableString(reader, "sMobile1"),
-
-                sMobile2 =
-                    GetNullableString(reader, "sMobile2"),
-
-
-                // ACHIEVEMENTS
-
-                Achievements_Certification1 =
-                    GetNullableString(
-                        reader,
-                        "Achievements_Certification1"
-                    ),
-
-                Achievements_Certification2 =
-                    GetNullableString(
-                        reader,
-                        "Achievements_Certification2"
-                    ),
-
-                Achievements_Certification3 =
-                    GetNullableString(
-                        reader,
-                        "Achievements_Certification3"
-                    ),
-
-
-                // LINKS
-
-                GitHub =
-                    GetNullableString(reader, "GitHub"),
-
-                Linkedin =
-                    GetNullableString(reader, "Linkedin"),
-
-
-                // OBJECTIVE
-
-                Objective =
-                    GetNullableString(reader, "Objective"),
-
-                Resume_Profile =
-                    GetNullableInt(reader, "Resume_Profile"),
-
-
+                // =====================================================
                 // SKILLS
+                // =====================================================
 
                 sMedicalSkillIDs =
-                    GetNullableString(
-                        reader,
-                        "sMedicalSkillIDs"
-                    ),
+                    GetString(dr, "sMedicalSkillIDs"),
 
                 sMedicalSkillStarIDs =
-                    GetNullableString(
-                        reader,
-                        "sMedicalSkillStarIDs"
-                    ),
+                    GetString(dr, "sMedicalSkillStarIDs"),
 
                 sTechnicalSkillIDs =
-                    GetNullableString(
-                        reader,
-                        "sTechnicalSkillIDs"
-                    ),
+                    GetString(dr, "sTechnicalSkillIDs"),
 
                 sTechnicalSkillStarIDs =
-                    GetNullableString(
-                        reader,
-                        "sTechnicalSkillStarIDs"
-                    ),
+                    GetString(dr, "sTechnicalSkillStarIDs"),
 
                 sNonTechnicalSkillIDs =
-                    GetNullableString(
-                        reader,
-                        "sNonTechnicalSkillIDs"
-                    ),
+                    GetString(dr, "sNonTechnicalSkillIDs"),
 
                 sNonTechnicalSkillStarIDs =
-                    GetNullableString(
-                        reader,
-                        "sNonTechnicalSkillStarIDs"
-                    )
+                    GetString(dr, "sNonTechnicalSkillStarIDs"),
+
+
+                // =====================================================
+                // LANGUAGES
+                // =====================================================
+
+                sLanguage1 =
+                    GetString(dr, "sLanguage1"),
+
+                sLanguageStar1 =
+                    GetNullableInt(dr, "sLanguageStar1"),
+
+                sLanguage2 =
+                    GetString(dr, "sLanguage2"),
+
+                sLanguageStar2 =
+                    GetNullableInt(dr, "sLanguageStar2"),
+
+                sLanguage3 =
+                    GetString(dr, "sLanguage3"),
+
+                sLanguageStar3 =
+                    GetNullableInt(dr, "sLanguageStar3"),
+
+                sLanguage4 =
+                    GetString(dr, "sLanguage4"),
+
+                sLanguageStar4 =
+                    GetNullableInt(dr, "sLanguageStar4"),
+
+                sLanguage5 =
+                    GetString(dr, "sLanguage5"),
+
+                sLanguageStar5 =
+                    GetNullableInt(dr, "sLanguageStar5"),
+
+                sLanguage6 =
+                    GetString(dr, "sLanguage6"),
+
+                sLanguageStar6 =
+                    GetNullableInt(dr, "sLanguageStar6"),
+
+                sLanguage7 =
+                    GetString(dr, "sLanguage7"),
+
+                sLanguageStar7 =
+                    GetNullableInt(dr, "sLanguageStar7"),
+
+                sLanguage8 =
+                    GetString(dr, "sLanguage8"),
+
+                sLanguageStar8 =
+                    GetNullableInt(dr, "sLanguageStar8"),
+
+
+                // =====================================================
+                // REFERENCES
+                // =====================================================
+
+                sRefName1 =
+                    GetString(dr, "sRefName1"),
+
+                sRefRelationName1 =
+                    GetNullableInt(dr, "sRefRelationName1"),
+
+                sLocation1 =
+                    GetString(dr, "sLocation1"),
+
+                sMobile1 =
+                    GetString(dr, "sMobile1"),
+
+                sRefName2 =
+                    GetString(dr, "sRefName2"),
+
+                sRefRelationName2 =
+                    GetNullableInt(dr, "sRefRelationName2"),
+
+                sLocation2 =
+                    GetString(dr, "sLocation2"),
+
+                sMobile2 =
+                    GetString(dr, "sMobile2"),
+
+
+                // =====================================================
+                // SOCIAL LINKS
+                // =====================================================
+
+                GitHub =
+                    GetString(dr, "GitHub"),
+
+                Linkedin =
+                    GetString(dr, "Linkedin"),
+
+
+                // =====================================================
+                // INTERNSHIP 1
+                // =====================================================
+
+                sOrgName1 =
+                    GetString(dr, "sOrgName1"),
+
+                sOrgIntTitle1 =
+                    GetNullableInt(dr, "sOrgIntTitle1"),
+
+                sOrgIntDuration1 =
+                    GetNullableInt(dr, "sOrgIntDuration1"),
+
+                sOrgIntStatus1 =
+                    GetNullableInt(dr, "sOrgIntStatus1"),
+
+
+                // =====================================================
+                // INTERNSHIP 2
+                // =====================================================
+
+                sOrgName2 =
+                    GetString(dr, "sOrgName2"),
+
+                sOrgIntTitle2 =
+                    GetNullableInt(dr, "sOrgIntTitle2"),
+
+                sOrgIntDuration2 =
+                    GetNullableInt(dr, "sOrgIntDuration2"),
+
+                sOrgIntStatus2 =
+                    GetNullableInt(dr, "sOrgIntStatus2"),
+
+
+                // =====================================================
+                // INTERNSHIP 3
+                // =====================================================
+
+                sOrgName3 =
+                    GetString(dr, "sOrgName3"),
+
+                sOrgIntTitle3 =
+                    GetNullableInt(dr, "sOrgIntTitle3"),
+
+                sOrgIntDuration3 =
+                    GetNullableInt(dr, "sOrgIntDuration3"),
+
+                sOrgIntStatus3 =
+                    GetNullableInt(dr, "sOrgIntStatus3"),
+
+
+                // =====================================================
+                // INTERNSHIP 4
+                // =====================================================
+
+                sOrgName4 =
+                    GetString(dr, "sOrgName4"),
+
+                sOrgIntTitle4 =
+                    GetNullableInt(dr, "sOrgIntTitle4"),
+
+                sOrgIntDuration4 =
+                    GetNullableInt(dr, "sOrgIntDuration4"),
+
+                sOrgIntStatus4 =
+                    GetNullableInt(dr, "sOrgIntStatus4"),
+
+
+                // =====================================================
+                // DOCUMENTS
+                // =====================================================
+
+                sResume =
+                    GetString(dr, "sResume"),
+
+                sPhoto =
+                    GetString(dr, "sPhoto"),
+
+                sSignature =
+                    GetString(dr, "sSignature"),
+
+                sDivyang =
+                    GetString(dr, "sDivyang"),
+
+                sHobbies =
+                    GetString(dr, "sHobbies"),
+
+
+                // =====================================================
+                // OBJECTIVE
+                // =====================================================
+
+                Objective =
+                    GetString(dr, "Objective"),
+
+                Resume_Profile =
+                    GetNullableInt(dr, "Resume_Profile"),
+
+
+                // =====================================================
+                // ACHIEVEMENTS
+                // =====================================================
+
+                Achievements_Certification1 =
+                    GetString(dr, "Achievements_Certification1"),
+
+                Achievements_Certification2 =
+                    GetString(dr, "Achievements_Certification2"),
+
+                Achievements_Certification3 =
+                    GetString(dr, "Achievements_Certification3")
             };
+
+            return profile;
         }
 
 
@@ -1197,28 +1307,20 @@ WHERE CandidateID = @CandidateID";
         // DATA READER HELPERS
         // =========================================================
 
-        private int? GetNullableInt(
-            SqlDataReader reader,
-            string column)
-        {
-            if (reader[column] == DBNull.Value)
-                return null;
+        //private int? GetNullableInt(
+        //    SqlDataReader reader,
+        //    string column)
+        //{
+        //    if (reader[column] == DBNull.Value)
+        //        return null;
 
-            return Convert.ToInt32(
-                reader[column]
-            );
-        }
+        //    return Convert.ToInt32(
+        //        reader[column]
+        //    );
+        //}
 
 
-        private string? GetNullableString(
-            SqlDataReader reader,
-            string column)
-        {
-            if (reader[column] == DBNull.Value)
-                return null;
-
-            return reader[column]?.ToString();
-        }
+       
 
         // =========================================================
         // UPDATE SOCIAL LINKS
@@ -1261,6 +1363,81 @@ WHERE CandidateID = @CandidateID";
             );
 
             cmd.ExecuteNonQuery();
+        }
+
+        // =========================================================
+        // DATA READER HELPERS
+        // =========================================================
+
+        private string GetString(
+            SqlDataReader reader,
+            string column)
+        {
+            int index = reader.GetOrdinal(column);
+
+            if (reader.IsDBNull(index))
+            {
+                return string.Empty;
+            }
+
+            return reader.GetValue(index)?.ToString() ?? string.Empty;
+        }
+
+
+        private int GetInt(
+            SqlDataReader reader,
+            string column)
+        {
+            int index = reader.GetOrdinal(column);
+
+            if (reader.IsDBNull(index))
+            {
+                return 0;
+            }
+
+            return Convert.ToInt32(reader.GetValue(index));
+        }
+
+
+        private int? GetNullableInt(
+            SqlDataReader reader,
+            string column)
+        {
+            int index = reader.GetOrdinal(column);
+
+            if (reader.IsDBNull(index))
+            {
+                return null;
+            }
+
+            object value = reader.GetValue(index);
+
+            if (value == null)
+            {
+                return null;
+            }
+
+            if (int.TryParse(value.ToString(), out int result))
+            {
+                return result;
+            }
+
+            return null;
+        }
+
+
+        private string? GetNullableString(
+            SqlDataReader reader,
+            string column)
+        {
+            int index = reader.GetOrdinal(column);
+
+            if (reader.IsDBNull(index))
+            {
+                return null;
+            }
+
+            return reader.GetValue(index)?.ToString();
         }
     }
 }

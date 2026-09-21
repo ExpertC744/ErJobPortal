@@ -4,9 +4,9 @@
 
 <style>
     /* =========================================================
-           CONTACT PAGE
-           1TRAINEE - TEAL & WHITE
-           ========================================================= */
+               CONTACT PAGE
+               1TRAINEE - TEAL & WHITE
+               ========================================================= */
 
     body.site-modern .contact-page {
         margin-top: 100px;
@@ -16,8 +16,8 @@
     }
 
     /* =========================================================
-           HERO
-           ========================================================= */
+               HERO
+               ========================================================= */
 
     body.site-modern .contact-hero {
         position: relative;
@@ -72,8 +72,8 @@
     }
 
     /* =========================================================
-           MAIN CONTAINER
-           ========================================================= */
+               MAIN CONTAINER
+               ========================================================= */
 
     body.site-modern .contact-container {
         width: 100%;
@@ -92,8 +92,8 @@
     }
 
     /* =========================================================
-           LEFT INFORMATION CARD
-           ========================================================= */
+               LEFT INFORMATION CARD
+               ========================================================= */
 
     body.site-modern .contact-info {
         background: #fff;
@@ -125,8 +125,8 @@
         }
 
     /* =========================================================
-           CONTACT ITEM
-           ========================================================= */
+               CONTACT ITEM
+               ========================================================= */
 
     body.site-modern .contact-item {
         display: flex;
@@ -188,8 +188,8 @@
             }
 
     /* =========================================================
-           GET IN TOUCH DESCRIPTION
-           ========================================================= */
+               GET IN TOUCH DESCRIPTION
+               ========================================================= */
 
     body.site-modern .contact-description {
         margin-top: 28px;
@@ -214,8 +214,8 @@
         }
 
     /* =========================================================
-           FORM CARD
-           ========================================================= */
+               FORM CARD
+               ========================================================= */
 
     body.site-modern .contact-form-card {
         background: #fff;
@@ -254,8 +254,8 @@
         }
 
     /* =========================================================
-           FORM GRID
-           ========================================================= */
+               FORM GRID
+               ========================================================= */
 
     body.site-modern .contact-form-row {
         display: grid;
@@ -317,11 +317,11 @@
             }
 
     /* =========================================================
-           SUBMIT BUTTON
-           ========================================================= */
+               SUBMIT BUTTON
+               ========================================================= */
     /* =========================================================
-       SMALL CENTERED SUBMIT BUTTON
-       ========================================================= */
+           SMALL CENTERED SUBMIT BUTTON
+           ========================================================= */
 
     body.site-modern .contact-submit {
         width: 150px;
@@ -348,8 +348,8 @@
             box-shadow: 0 10px 20px rgba(13,148,136,.25);
         }
     /* =========================================================
-           BOTTOM NOTE
-           ========================================================= */
+               BOTTOM NOTE
+               ========================================================= */
 
     body.site-modern .contact-form-note {
         margin-top: 15px;
@@ -359,8 +359,8 @@
     }
 
     /* =========================================================
-           TABLET
-           ========================================================= */
+               TABLET
+               ========================================================= */
 
     @@media only screen and (max-width: 991px) {
 
@@ -384,8 +384,8 @@
     }
 
     /* =========================================================
-           MOBILE
-           ========================================================= */
+               MOBILE
+               ========================================================= */
 
     @@media only screen and (max-width: 767px) {
 
@@ -448,8 +448,8 @@
     }
 
     /* =========================================================
-           SMALL MOBILE
-           ========================================================= */
+               SMALL MOBILE
+               ========================================================= */
 
     @@media only screen and (max-width: 480px) {
 
@@ -496,7 +496,7 @@
 
             <p>
                 Get in touch with us and discover how we can support
-                 technology, training, internship, and career needs.
+                technology, training, internship, and career needs.
             </p>
 
         </div>
@@ -668,8 +668,9 @@
 
                 <form method="post"
                       asp-controller="Home"
-                      asp-action="Contact">
+                      asp-action="ContactUs">
 
+                    @Html.AntiForgeryToken()
                     <div class="contact-form-row">
 
 
@@ -677,13 +678,13 @@
 
                         <div class="contact-form-group">
 
-                            <label for="Name">
+                            <label for="FullName">
                                 Full Name
                             </label>
 
                             <input type="text"
-                                   id="Name"
-                                   name="Name"
+                                   id="FullName"
+                                   name="FullName"
                                    placeholder="Full Name"
                                    required />
 
@@ -711,13 +712,13 @@
 
                         <div class="contact-form-group">
 
-                            <label for="Phone">
+                            <label for="MobileNo">
                                 Phone Number
                             </label>
 
                             <input type="tel"
-                                   id="Phone"
-                                   name="Phone"
+                                   id="MobileNo"
+                                   name="MobileNo"
                                    placeholder="Phone Number" />
 
                         </div>
@@ -748,9 +749,9 @@
                                 Message
                             </label>
 
-                            <textarea id="Message"
-                                      name="Message"
-                                      placeholder="Write  message here..."
+                            <textarea id="Description"
+                                      name="Description"
+                                      placeholder="Write message here..."
                                       required></textarea>
 
                         </div>
@@ -783,3 +784,349 @@
     </main>
 
 </div>
+
+<script>
+
+    document.addEventListener("DOMContentLoaded", function () {
+
+        var contactForm = document.getElementById("contactForm");
+
+        var FullName1 = document.getElementById("FullName");
+        var Email1 = document.getElementById("Email");
+        var MobileNo1 = document.getElementById("MobileNo");
+        var Subject1 = document.getElementById("Subject");
+        var Description1 = document.getElementById("Description");
+
+
+        /* =====================================================
+           FULL NAME VALIDATION
+           ===================================================== */
+
+        FullName1.addEventListener("input", function () {
+
+            var value = FullName1.value;
+
+            // Remove leading spaces
+            value = value.trimStart();
+
+            // Allow letters and spaces only
+            value = value.replace(/[^a-zA-Z ]/g, "");
+
+            // Capitalize first letter after every space
+            value = value.replace(/\b\w/g, function (char) {
+                return char.toUpperCase();
+            });
+
+            // Maximum 50 characters
+            if (value.length > 50) {
+                value = value.substring(0, 50);
+            }
+
+            FullName1.value = value;
+
+            document.getElementById("fullNameError").innerText = "";
+        });
+
+
+        /* =====================================================
+           EMAIL VALIDATION
+           ===================================================== */
+
+        Email1.addEventListener("input", function () {
+
+            // Convert email to lowercase
+            Email1.value = Email1.value.toLowerCase();
+
+            // Remove leading spaces
+            Email1.value = Email1.value.trimStart();
+
+            var email = Email1.value;
+
+            var emailPattern =
+                /^[^\s@@]+@@[^\s@@]+\.[^\s@@]+$/;
+
+            if (email === "") {
+
+                document.getElementById("emailError").innerText =
+                    "Email is required.";
+
+            }
+            else if (!emailPattern.test(email)) {
+
+                document.getElementById("emailError").innerText =
+                    "Please enter a valid email.";
+
+            }
+            else {
+
+                document.getElementById("emailError").innerText = "";
+
+            }
+
+        });
+
+
+        /* =====================================================
+           MOBILE NUMBER VALIDATION
+           ===================================================== */
+
+        MobileNo1.addEventListener("input", function () {
+
+            // Numbers only
+            MobileNo1.value =
+                MobileNo1.value.replace(/\D/g, "");
+
+            // Maximum 20 digits
+            if (MobileNo1.value.length > 20) {
+
+                MobileNo1.value =
+                    MobileNo1.value.substring(0, 20);
+
+            }
+
+            var mobile = MobileNo1.value;
+
+            if (mobile !== "" &&
+                (mobile.length < 6 || mobile.length > 20)) {
+
+                document.getElementById("mobileError").innerText =
+                    "Phone number must contain 6 to 20 digits.";
+
+            }
+            else {
+
+                document.getElementById("mobileError").innerText = "";
+
+            }
+
+        });
+
+
+        /* =====================================================
+           SUBJECT VALIDATION
+           ===================================================== */
+
+        Subject1.addEventListener("input", function () {
+
+            var value = Subject1.value;
+
+            // Remove leading spaces
+            value = value.trimStart();
+
+            // Maximum 50 characters
+            if (value.length > 50) {
+
+                value = value.substring(0, 50);
+
+            }
+
+            // Capitalize first letter
+            if (value.length > 0) {
+
+                value =
+                    value.charAt(0).toUpperCase() +
+                    value.slice(1);
+
+            }
+
+            Subject1.value = value;
+
+            document.getElementById("subjectError").innerText = "";
+
+        });
+
+
+        /* =====================================================
+           DESCRIPTION VALIDATION
+           ===================================================== */
+
+        Description1.addEventListener("input", function () {
+
+            var value = Description1.value;
+
+            // Remove leading spaces
+            value = value.trimStart();
+
+            // Maximum 200 characters
+            if (value.length > 200) {
+
+                value = value.substring(0, 200);
+
+            }
+
+            // Capitalize first letter
+            if (value.length > 0) {
+
+                value =
+                    value.charAt(0).toUpperCase() +
+                    value.slice(1);
+
+            }
+
+            Description1.value = value;
+
+            if (value.length > 0 && value.length < 15) {
+
+                document.getElementById("descriptionError").innerText =
+                    "Message must be at least 15 characters.";
+
+            }
+            else {
+
+                document.getElementById("descriptionError").innerText = "";
+
+            }
+
+        });
+
+
+        /* =====================================================
+           FORM SUBMIT VALIDATION
+           ===================================================== */
+
+        contactForm.addEventListener("submit", function (event) {
+
+            var isValid = true;
+
+
+            /* ---------- FULL NAME ---------- */
+
+            var fullName = FullName1.value.trim();
+
+            if (fullName === "") {
+
+                document.getElementById("fullNameError").innerText =
+                    "Full Name is required.";
+
+                isValid = false;
+
+            }
+            else if (fullName.length < 2) {
+
+                document.getElementById("fullNameError").innerText =
+                    "Please enter a valid name.";
+
+                isValid = false;
+
+            }
+
+
+            /* ---------- EMAIL ---------- */
+
+            var email = Email1.value.trim();
+
+            var emailPattern =
+                /^[^\s@@]+@@[^\s@@]+\.[^\s@@]+$/;
+
+            if (email === "") {
+
+                document.getElementById("emailError").innerText =
+                    "Email is required.";
+
+                isValid = false;
+
+            }
+            else if (!emailPattern.test(email)) {
+
+                document.getElementById("emailError").innerText =
+                    "Please enter a valid email.";
+
+                isValid = false;
+
+            }
+
+
+            /* ---------- MOBILE ---------- */
+
+            var mobile = MobileNo1.value.trim();
+
+            if (mobile !== "" &&
+                (mobile.length < 6 || mobile.length > 20)) {
+
+                document.getElementById("mobileError").innerText =
+                    "Phone number must contain 6 to 20 digits.";
+
+                isValid = false;
+
+            }
+
+
+            /* ---------- SUBJECT ---------- */
+
+            var subject = Subject1.value.trim();
+
+            if (subject === "") {
+
+                document.getElementById("subjectError").innerText =
+                    "Subject is required.";
+
+                isValid = false;
+
+            }
+
+
+            /* ---------- DESCRIPTION ---------- */
+
+            var description = Description1.value.trim();
+
+            if (description === "") {
+
+                document.getElementById("descriptionError").innerText =
+                    "Message is required.";
+
+                isValid = false;
+
+            }
+            else if (description.length < 15) {
+
+                document.getElementById("descriptionError").innerText =
+                    "Message must be at least 15 characters.";
+
+                isValid = false;
+
+            }
+            else if (description.length > 200) {
+
+                document.getElementById("descriptionError").innerText =
+                    "Message must be within 200 characters.";
+
+                isValid = false;
+
+            }
+
+
+            /* =================================================
+               STOP FORM IF INVALID
+               ================================================= */
+
+            if (!isValid) {
+
+                event.preventDefault();
+
+                return false;
+
+            }
+
+
+            /* =================================================
+               PREVENT DOUBLE SUBMIT
+               ================================================= */
+
+            var submitButton =
+                contactForm.querySelector('button[type="submit"]');
+
+            if (submitButton) {
+
+                submitButton.disabled = true;
+
+                submitButton.innerHTML =
+                    'Sending...';
+
+            }
+
+        });
+
+    });
+
+</script>
+

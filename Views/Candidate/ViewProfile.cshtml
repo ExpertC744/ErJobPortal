@@ -696,14 +696,28 @@
                 </div>
             }
 
-            @* -------- HOBBIES -------- *@
-            @if (Has(p.sHobbies))
-            {
-                <div class="resume-sidebar-section">
-                    <div class="resume-sidebar-title">Hobbies</div>
-                    <div class="resume-sidebar-item muted">@p.sHobbies</div>
-                </div>
-            }
+            @* -------- DIVYANG -------- *@
+@if (Has(p.sDivyang))
+{
+    <div class="resume-sidebar-section">
+        <div class="resume-sidebar-title">Divyang</div>
+
+        <div class="resume-sidebar-item">
+            <i class="fa fa-wheelchair resume-accent"></i>
+            <span class="muted">@p.sDivyang</span>
+        </div>
+    </div>
+}
+
+
+@* -------- HOBBIES -------- *@
+@if (Has(p.sHobbies))
+{
+    <div class="resume-sidebar-section">
+        <div class="resume-sidebar-title">Hobbies</div>
+        <div class="resume-sidebar-item muted">@p.sHobbies</div>
+    </div>
+}
 
         </div>
 

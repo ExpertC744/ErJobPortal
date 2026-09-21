@@ -1,6 +1,7 @@
 ﻿using ErJobPortal.Models;
 using ErJobPortal.Repositories;
 using Microsoft.AspNetCore.Mvc;
+using ErJobPortal.Services;
 
 
 namespace ErJobPortal.Controllers
@@ -8,10 +9,14 @@ namespace ErJobPortal.Controllers
     public class AccountController : Controller
     {
         private readonly AccountRepository _accountRepository;
+        private readonly EmailService _emailService;
 
-        public AccountController(AccountRepository accountRepository)
+        public AccountController(
+    AccountRepository accountRepository,
+    EmailService emailService)
         {
             _accountRepository = accountRepository;
+            _emailService = emailService;
         }
 
         // Candidate Registration
@@ -396,6 +401,7 @@ namespace ErJobPortal.Controllers
             return View();
         }
 
+
         [HttpPost]
         public IActionResult CandidateLogin(CandidateLogin model)
         {
@@ -452,5 +458,316 @@ namespace ErJobPortal.Controllers
             // Go to Home/Index
             return RedirectToAction("Index", "Home");
         }
+
+        // shrirang 15/09/26
+
+        // ==========================================================
+        // Candidate Forgot Password
+        // ==========================================================
+
+        [HttpGet]
+        public IActionResult CandidateForgotPassword()
+        {
+            return View();
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> CandidateForgotPassword(
+            CandidateForgotPassword model)
+        {
+            if (!ModelState.IsValid)
+            {
+                return View(model);
+            }
+
+            try
+            {
+                string email = model.sEmail.Trim();
+
+                CandidateLogin? candidate =
+                    _accountRepository.GetCandidateLoginDetails(email);
+
+                if (candidate == null)
+                {
+                    ModelState.AddModelError(
+                        "sEmail",
+                        "No candidate account was found with this email address."
+                    );
+
+                    return View(model);
+                }
+
+                if (string.IsNullOrWhiteSpace(candidate.sPassword))
+                {
+                    ModelState.AddModelError(
+                        "",
+                        "Password information is not available for this account."
+                    );
+
+                    return View(model);
+                }
+
+                await _emailService.SendCandidateLoginDetailsAsync(
+                    candidate.sEmail,
+                    candidate.sPassword
+                );
+
+                TempData["Success"] =
+                    "Your login details have been sent to your registered email address.";
+
+                return RedirectToAction("CandidateLogin");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("========================================");
+                Console.WriteLine("Candidate Forgot Password Error");
+                Console.WriteLine(ex.ToString());
+                Console.WriteLine("========================================");
+
+                ModelState.AddModelError(
+                    "",
+                    "Email Error: " + ex.Message
+                );
+
+                return View(model);
+            }
+
+           
+        }
+
+        
+// ==========================================================
+// Candidate Reset Password
+// ==========================================================
+
+[HttpGet]
+public IActionResult CandidateResetPassword()
+        {
+            return View();
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public IActionResult CandidateResetPassword(
+            CandidateResetPassword model)
+        {
+            if (!ModelState.IsValid)
+            {
+                return View(model);
+            }
+
+            try
+            {
+                string email = model.sEmail.Trim();
+
+                // Check whether candidate exists
+                CandidateLogin? candidate =
+                    _accountRepository.GetCandidateLoginDetails(email);
+
+                if (candidate == null)
+                {
+                    ModelState.AddModelError(
+                        "sEmail",
+                        "No candidate account was found with this email address."
+                    );
+
+                    return View(model);
+                }
+
+                // Update password
+                bool updated =
+                    _accountRepository.ResetCandidatePassword(
+                        email,
+                        model.NewPassword
+                    );
+
+                if (!updated)
+                {
+                    ModelState.AddModelError(
+                        "",
+                        "Unable to reset password. Please try again."
+                    );
+
+                    return View(model);
+                }
+
+                TempData["Success"] =
+                    "Your password has been reset successfully. Please login with your new password.";
+
+                return RedirectToAction("CandidateLogin");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(
+                    "Candidate Reset Password Error: "
+                    + ex.ToString()
+                );
+
+                ModelState.AddModelError(
+                    "",
+                    "Unable to reset password. Please try again later."
+                );
+
+                return View(model);
+            }
+        }
+
+      
+// ==========================================================
+// ORGANIZATION RESET PASSWORD
+// ==========================================================
+
+[HttpGet]
+public IActionResult OrganizationResetPassword()
+        {
+            return View();
+        }
+
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public IActionResult OrganizationResetPassword(
+            OrganizationResetPassword model)
+        {
+            if (!ModelState.IsValid)
+            {
+                return View(model);
+            }
+
+            try
+            {
+                string email = model.sEmail.Trim();
+
+                // Check whether organization email exists
+                OrganizationLogin? organization =
+                    _accountRepository.GetOrganizationLoginDetails(email);
+
+                if (organization == null)
+                {
+                    ModelState.AddModelError(
+                        "sEmail",
+                        "No organization account was found with this email address."
+                    );
+
+                    return View(model);
+                }
+
+                // Update password
+                bool updated =
+                    _accountRepository.ResetOrganizationPassword(
+                        email,
+                        model.NewPassword
+                    );
+
+                if (!updated)
+                {
+                    ModelState.AddModelError(
+                        "",
+                        "Unable to reset password. Please try again."
+                    );
+
+                    return View(model);
+                }
+
+                TempData["Success"] =
+                    "Your password has been reset successfully. Please login with your new password.";
+
+                return RedirectToAction("OrganizationLogin");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(
+                    "Organization Reset Password Error: "
+                    + ex.ToString()
+                );
+
+                ModelState.AddModelError(
+                    "",
+                    "Unable to reset password. Please try again later."
+                );
+
+                return View(model);
+            }
+        }
+
+        // ==========================================================
+        // Organization Forgot Password
+        // ==========================================================
+
+        [HttpGet]
+        public IActionResult OrganizationForgotPassword()
+        {
+            return View();
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> OrganizationForgotPassword(
+            OrganizationForgotPassword model)
+        {
+            if (!ModelState.IsValid)
+            {
+                return View(model);
+            }
+
+            try
+            {
+                string email = model.sEmail.Trim();
+
+                // Check whether organization exists
+                OrganizationLogin? organization =
+                    _accountRepository.GetOrganizationLoginDetails(email);
+
+                if (organization == null)
+                {
+                    ModelState.AddModelError(
+                        "sEmail",
+                        "No organization account was found with this email address."
+                    );
+
+                    return View(model);
+                }
+
+                if (string.IsNullOrWhiteSpace(organization.sPassword))
+                {
+                    ModelState.AddModelError(
+                        "",
+                        "Password information is not available for this account."
+                    );
+
+                    return View(model);
+                }
+
+                // Send login details to registered email
+                await _emailService.SendOrganizationLoginDetailsAsync(
+                    organization.sEmail,
+                    organization.sPassword
+                );
+
+                TempData["Success"] =
+                    "Your login details have been sent to your registered email address.";
+
+                return RedirectToAction("OrganizationLogin");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("========================================");
+                Console.WriteLine("Organization Forgot Password Error");
+                Console.WriteLine(ex.ToString());
+                Console.WriteLine("========================================");
+
+                ModelState.AddModelError(
+                    "",
+                    "Email Error: " + ex.Message
+                );
+
+                return View(model);
+            }
+        }
+
+
+
+
     }
 }

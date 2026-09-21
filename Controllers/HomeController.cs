@@ -1,113 +1,31 @@
-using ErJobPortal.Data;
 using ErJobPortal.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Data.SqlClient;
-using System.Data;
 using System.Diagnostics;
+using ErJobPortal.Data;
+using ErJobPortal.Services;
 
 namespace ErJobPortal.Controllers
 {
     public class HomeController : Controller
     {
+        private readonly EmailService _emailService;
         private readonly ILogger<HomeController> _logger;
         private readonly DbConnection _dbConnection;
 
-        public HomeController(ILogger<HomeController> logger, DbConnection dbConnection)
+        public HomeController(
+    ILogger<HomeController> logger,
+    DbConnection dbConnection,
+    EmailService emailService)
         {
             _logger = logger;
             _dbConnection = dbConnection;
+            _emailService = emailService;
         }
 
-        [HttpGet]
         public IActionResult Index()
         {
-            int traineeCount = 0;
-            int organizationCount = 0;
-            int postCount = 0;
-            int stateCount = 0;
-            int countryCount = 0;
-
-            using (SqlConnection con = _dbConnection.GetConnection())
-            {
-                con.Open();
-
-                // =====================================================
-                // TRAINEE, ORGANIZATION AND POST COUNT
-                // =====================================================
-
-                string query = @"
-      SELECT
-          (SELECT COUNT(nID)
-           FROM tblCandidateRegister) AS CandidateCount,
-
-          (SELECT COUNT(nID)
-           FROM tblOrgRegistration) AS OrganizationCount,
-
-          (SELECT COUNT(nID)
-           FROM tblPost) AS PostCount;";
-
-                using (SqlCommand cmd = new SqlCommand(query, con))
-                using (SqlDataReader dr = cmd.ExecuteReader())
-                {
-                    if (dr.Read())
-                    {
-                        traineeCount =
-                            Convert.ToInt32(dr["CandidateCount"]);
-
-                        organizationCount =
-                            Convert.ToInt32(dr["OrganizationCount"]);
-
-                        postCount =
-                            Convert.ToInt32(dr["PostCount"]);
-                    }
-                }
-
-                // =====================================================
-                // STATE COUNT
-                // =====================================================
-
-                using (SqlCommand cmdState =
-                       new SqlCommand("SP_CountState", con))
-                {
-                    cmdState.CommandType = CommandType.StoredProcedure;
-
-                    object? result = cmdState.ExecuteScalar();
-
-                    if (result != null && result != DBNull.Value)
-                    {
-                        stateCount = Convert.ToInt32(result);
-                    }
-                }
-
-                // =====================================================
-                // COUNTRY COUNT
-                // =====================================================
-
-                using (SqlCommand cmdCountry =
-                       new SqlCommand("SP_CountCountry", con))
-                {
-                    cmdCountry.CommandType = CommandType.StoredProcedure;
-
-                    object? result = cmdCountry.ExecuteScalar();
-
-                    if (result != null && result != DBNull.Value)
-                    {
-                        countryCount = Convert.ToInt32(result);
-                    }
-                }
-            }
-
-            // =====================================================
-            // SEND COUNTS TO VIEW
-            // =====================================================
-
-            ViewBag.TraineeCount = traineeCount;
-            ViewBag.OrganizationCount = organizationCount;
-            ViewBag.PostCount = postCount;
-            ViewBag.StateCount = stateCount;
-            ViewBag.CountryCount = countryCount;
-
-            return View("Index");
+            return View();
         }
 
         public IActionResult About()
@@ -152,7 +70,161 @@ namespace ErJobPortal.Controllers
         }
         public IActionResult Contact()
         {
+            ViewBag.Message = "Your contact page.";
             return View();
+        }
+
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> ContactUs(ViewModelTrainee rg)
+        {
+            try
+            {
+                // ==========================================
+                // VALIDATION
+                // ==========================================
+
+                if (rg == null)
+                {
+                    TempData["ContactUs"] =
+                        "Please enter valid contact details.";
+
+                    return RedirectToAction("Contact");
+                }
+
+                if (string.IsNullOrWhiteSpace(rg.FullName) ||
+                    string.IsNullOrWhiteSpace(rg.Email) ||
+                    string.IsNullOrWhiteSpace(rg.Subject) ||
+                    string.IsNullOrWhiteSpace(rg.Description))
+                {
+                    TempData["ContactUs"] =
+                        "Please fill all required fields.";
+
+                    return RedirectToAction("Contact");
+                }
+
+                // ==========================================
+                // TRIM VALUES
+                // ==========================================
+
+                rg.FullName = rg.FullName.Trim();
+                rg.Email = rg.Email.Trim();
+                rg.MobileNo = rg.MobileNo?.Trim();
+                rg.Subject = rg.Subject.Trim();
+                rg.Description = rg.Description.Trim();
+
+                // ==========================================
+                // SAVE CONTACT DATA
+                // ==========================================
+
+                using (SqlConnection con =
+                    _dbConnection.GetConnection())
+                {
+                    await con.OpenAsync();
+
+                    string query = @"
+                INSERT INTO tblContactUs
+                (
+                    FullName,
+                    Email,
+                    MobileNo,
+                    Subject,
+                    Description
+                )
+                VALUES
+                (
+                    @FullName,
+                    @Email,
+                    @MobileNo,
+                    @Subject,
+                    @Description
+                )";
+
+                    using (SqlCommand cmd =
+                        new SqlCommand(query, con))
+                    {
+                        cmd.Parameters.AddWithValue(
+                            "@FullName",
+                            (object?)rg.FullName ?? DBNull.Value);
+
+                        cmd.Parameters.AddWithValue(
+                            "@Email",
+                            (object?)rg.Email ?? DBNull.Value);
+
+                        cmd.Parameters.AddWithValue(
+                            "@MobileNo",
+                            (object?)rg.MobileNo ?? DBNull.Value);
+
+                        cmd.Parameters.AddWithValue(
+                            "@Subject",
+                            (object?)rg.Subject ?? DBNull.Value);
+
+                        cmd.Parameters.AddWithValue(
+                            "@Description",
+                            (object?)rg.Description ?? DBNull.Value);
+
+                        await cmd.ExecuteNonQueryAsync();
+                    }
+                }
+
+                // ==========================================
+                // SEND THANK-YOU EMAIL
+                // TO USER-ENTERED EMAIL ADDRESS
+                // ==========================================
+
+                try
+                {
+                    await _emailService.SendContactThankYouEmailAsync(
+                        rg.FullName,
+                        rg.Email,
+                        rg.Subject,
+                        rg.Description);
+
+                    _logger.LogInformation(
+                        "Contact thank-you email sent successfully to {Email}",
+                        rg.Email);
+                }
+                catch (Exception emailEx)
+                {
+                    // Contact data is already saved.
+                    // Log email failure separately.
+
+                    _logger.LogError(
+                        emailEx,
+                        "Contact saved but thank-you email failed. Recipient: {Email}",
+                        rg.Email);
+
+                    TempData["ContactUs"] =
+                        "Your message was saved, but the confirmation email " +
+                        "could not be sent. Please try again.";
+
+                    return RedirectToAction("Contact");
+                }
+
+                // ==========================================
+                // SUCCESS
+                // ==========================================
+
+                ModelState.Clear();
+
+                TempData["ContactUs"] =
+                    "Thank you for contacting us! " +
+                    "Your message has been sent successfully.";
+
+                return RedirectToAction("Index", "Home");
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(
+                    ex,
+                    "Error while saving Contact Us form.");
+
+                TempData["ContactUs"] =
+                    "Something went wrong. Please try again.";
+
+                return RedirectToAction("Contact");
+            }
         }
 
         public IActionResult Interview_Preparation()

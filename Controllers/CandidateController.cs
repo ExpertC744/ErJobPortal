@@ -386,20 +386,36 @@ namespace ErJobPortal.Controllers
         // LOAD ALL DROPDOWNS
         // =========================================================
 
-        private CandidateProfileViewModel LoadProfileDropdowns(CandidateProfileModel profile)
+        private CandidateProfileViewModel LoadProfileDropdowns(
+    CandidateProfileModel profile)
         {
             return new CandidateProfileViewModel
             {
                 Profile = profile,
 
-                Divisions = _repo.GetDivisions(),
-                Streams = _repo.GetStreams(),
-                GraduationStatuses = _repo.GetGraduationStatuses(),
-                InternshipFellowshipType = _repo.GetInternshipFellowshipType(),
-                InternshipTitles = _repo.GetInternshipTitles(),
-                InternshipDurations = _repo.GetInternshipDurations(),
-                InternshipStatuses = _repo.GetInternshipStatuses(),
-                Relationships = _repo.GetRelationships()
+                Divisions =
+                    _repo.GetDivisions(),
+
+                Streams =
+                    _repo.GetStreams(),
+
+                GraduationStatuses =
+                    _repo.GetGraduationStatuses(),
+
+                InternshipFellowshipType =
+                    _repo.GetInternshipFellowshipType(),
+
+                InternshipTitles =
+                    _repo.GetInternshipTitles(),
+
+                InternshipDurations =
+                    _repo.GetInternshipDurations(),
+
+                InternshipStatuses =
+                    _repo.GetInternshipStatuses(),
+
+                Relationships =
+                    _repo.GetRelationships()
             };
         }
 
@@ -716,31 +732,31 @@ namespace ErJobPortal.Controllers
         //    return RedirectToAction("Profile");
         //}
 
-        // =========================================================
-        // UPDATE INTERNSHIP / FELLOWSHIP PREFERENCE
-        // =========================================================
+        //// =========================================================
+        //// UPDATE INTERNSHIP / FELLOWSHIP PREFERENCE
+        //// =========================================================
 
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public IActionResult UpdateInternshipPreference([Bind(Prefix = "Profile")] CandidateProfileViewModel model)
-        {
-            int? candidateId = HttpContext.Session.GetInt32("CandidateID");
+        //[HttpPost]
+        //[ValidateAntiForgeryToken]
+        //public IActionResult UpdateInternshipPreference([Bind(Prefix = "Profile")] CandidateProfileViewModel model)
+        //{
+        //    int? candidateId = HttpContext.Session.GetInt32("CandidateID");
 
-            if (candidateId == null)
-            {
-                return RedirectToAction("CandidateLogin", "Account");
-            }
+        //    if (candidateId == null)
+        //    {
+        //        return RedirectToAction("CandidateLogin", "Account");
+        //    }
 
-            // Never trust CandidateID from form
-            model.Profile.CandidateID = candidateId.Value;
+        //    // Never trust CandidateID from form
+        //    model.Profile.CandidateID = candidateId.Value;
 
-            _repo.UpdateInternshipPreference(model.Profile);
+        //    _repo.UpdateInternshipPreference(model.Profile);
 
-            TempData["Success"] =
-                "Internship Preference Updated Successfully.";
+        //    TempData["Success"] =
+        //        "Internship Preference Updated Successfully.";
 
-            return RedirectToAction("Profile");
-        }
+        //    return RedirectToAction("Profile");
+        //}
 
         // =========================================================
         // SEARCH JOBS
@@ -1559,19 +1575,42 @@ namespace ErJobPortal.Controllers
         // =========================================================
         // VIEW PROFILE (READ-ONLY RESUME VIEW) RADHIKA
         // =========================================================
+        // shrirang 19/09/26
+
+        // =========================================================
+        // VIEW PROFILE
+        // =========================================================
 
         [HttpGet]
-        [ResponseCache(NoStore = true, Location = ResponseCacheLocation.None)]
+        [ResponseCache(
+            NoStore = true,
+            Location = ResponseCacheLocation.None)]
         public IActionResult ViewProfile()
         {
-            int? candidateId = HttpContext.Session.GetInt32("CandidateID");
+            // -----------------------------------------------------
+            // GET LOGGED-IN CANDIDATE
+            // -----------------------------------------------------
 
-            if (candidateId == null)
+            int? candidateId =
+                HttpContext.Session.GetInt32("CandidateID");
+
+            if (candidateId == null || candidateId <= 0)
             {
-                return RedirectToAction("CandidateLogin", "Account");
+                return RedirectToAction(
+                    "CandidateLogin",
+                    "Account");
             }
 
-            CandidateProfileModel? profile = _repo.GetProfile(candidateId.Value);
+            // -----------------------------------------------------
+            // ALWAYS LOAD FRESH DATA FROM DATABASE
+            // -----------------------------------------------------
+
+            CandidateProfileModel? profile =
+                _repo.GetProfile(candidateId.Value);
+
+            // -----------------------------------------------------
+            // IF PROFILE DOES NOT EXIST
+            // -----------------------------------------------------
 
             if (profile == null)
             {
@@ -1581,7 +1620,38 @@ namespace ErJobPortal.Controllers
                 };
             }
 
-            CandidateProfileViewModel vm = LoadProfileDropdowns(profile);
+            // -----------------------------------------------------
+            // LOAD PROFILE + ALL LOOKUP LISTS
+            // -----------------------------------------------------
+
+            CandidateProfileViewModel vm =
+                LoadProfileDropdowns(profile);
+
+            // -----------------------------------------------------
+            // CANDIDATE INFORMATION
+            // -----------------------------------------------------
+
+            ViewBag.CandidateID =
+                candidateId.Value;
+
+            ViewBag.CandidateName =
+                HttpContext.Session.GetString("CandidateName");
+
+            ViewBag.CandidateEmail =
+                HttpContext.Session.GetString("CandidateEmail");
+
+            // -----------------------------------------------------
+            // PREVENT BROWSER CACHE
+            // -----------------------------------------------------
+
+            Response.Headers["Cache-Control"] =
+                "no-cache, no-store, must-revalidate";
+
+            Response.Headers["Pragma"] =
+                "no-cache";
+
+            Response.Headers["Expires"] =
+                "0";
 
             return View(vm);
         }
