@@ -397,9 +397,7 @@ namespace JobPortalTrainee.Controllers
 
             if (orgId == null)
             {
-                return RedirectToAction(
-                    "OrganizationLogin",
-                    "Account");
+                return RedirectToAction("OrganizationLogin", "Account");
             }
 
             // Validate Organization Code
@@ -543,35 +541,106 @@ namespace JobPortalTrainee.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult EditProfile(OrgProfile model, IFormFile? CompanyLogo)
+        public IActionResult EditProfile(
+OrgProfile model,
+IFormFile? CompanyLogo)
         {
-            int? orgId = HttpContext.Session.GetInt32("OrgID");
+            // =====================================================
+            // ORGANIZATION SESSION
+            // =====================================================
 
-            if (orgId == null)
+            int? orgId =
+                HttpContext.Session.GetInt32("OrgID");
+
+            if (orgId == null || orgId <= 0)
             {
-                return RedirectToAction("OrganizationLogin", "Account");
+                return RedirectToAction(
+                    "OrganizationLogin",
+                    "Account"
+                );
             }
+
+
+            // =====================================================
+            // SET ORGANIZATION ID
+            // =====================================================
+
             model.nOrgID = orgId.Value;
+
+
+            // =====================================================
+            // MODEL VALIDATION
+            // =====================================================
 
             if (!ModelState.IsValid)
             {
                 return View(model);
             }
 
-            string connectionString = _configuration.GetConnectionString("DefaultConnection")!;
 
-            string logoPath = model.sCompanyLogo ?? string.Empty;
+            // =====================================================
+            // CONNECTION STRING
+            // =====================================================
 
-            if (CompanyLogo != null && CompanyLogo.Length > 0)
+            string connectionString =
+                _configuration.GetConnectionString(
+                    "DefaultConnection"
+                )!;
+
+
+            // =====================================================
+            // EXISTING LOGO
+            // =====================================================
+
+            string logoPath =
+                model.sCompanyLogo ?? string.Empty;
+
+
+            // =====================================================
+            // COMPANY LOGO UPLOAD
+            // =====================================================
+
+            if (CompanyLogo != null &&
+                CompanyLogo.Length > 0)
             {
-                string uploadsFolder = Path.Combine(_environment.WebRootPath, "uploads", "organization");
+                // =============================================
+                // wwwroot/uploads/organization
+                // =============================================
+
+                string uploadsFolder =
+                    Path.Combine(
+                        Directory.GetCurrentDirectory(),
+                        "wwwroot",
+                        "uploads",
+                        "organization"
+                    );
+
+
+                // =============================================
+                // CREATE FOLDER IF NOT EXISTS
+                // =============================================
 
                 if (!Directory.Exists(uploadsFolder))
                 {
-                    Directory.CreateDirectory(uploadsFolder);
+                    Directory.CreateDirectory(
+                        uploadsFolder
+                    );
                 }
 
-                string extension = Path.GetExtension(CompanyLogo.FileName).ToLowerInvariant();
+
+                // =============================================
+                // FILE EXTENSION
+                // =============================================
+
+                string extension =
+                    Path.GetExtension(
+                        CompanyLogo.FileName
+                    ).ToLowerInvariant();
+
+
+                // =============================================
+                // ALLOWED FILE TYPES
+                // =============================================
 
                 string[] allowedExtensions =
                 {
@@ -581,109 +650,241 @@ namespace JobPortalTrainee.Controllers
         ".webp"
     };
 
+
                 if (!allowedExtensions.Contains(extension))
                 {
-                    ModelState.AddModelError("CompanyLogo", "Only JPG, JPEG, PNG and WEBP files are allowed.");
+                    ModelState.AddModelError(
+                        "CompanyLogo",
+                        "Only JPG, JPEG, PNG and WEBP files are allowed."
+                    );
+
                     return View(model);
                 }
 
-                if (CompanyLogo.Length > 5 * 1024 * 1024)
+
+                // =============================================
+                // FILE SIZE - MAX 5 MB
+                // =============================================
+
+                if (CompanyLogo.Length >
+                    5 * 1024 * 1024)
                 {
-                    ModelState.AddModelError("CompanyLogo", "Company logo size cannot exceed 5 MB.");
+                    ModelState.AddModelError(
+                        "CompanyLogo",
+                        "Company logo size cannot exceed 5 MB."
+                    );
+
                     return View(model);
                 }
 
 
-                string fileName = Path.GetFileName(CompanyLogo.FileName);
+                // =============================================
+                // UNIQUE FILE NAME
+                // =============================================
 
-                string filePath = Path.Combine(uploadsFolder, fileName);
+                string fileName =
+                    Guid.NewGuid().ToString("N")
+                    + extension;
 
-                using (FileStream stream = new FileStream(filePath, FileMode.Create))
+
+                // =============================================
+                // COMPLETE FILE PATH
+                // =============================================
+
+                string filePath =
+                    Path.Combine(
+                        uploadsFolder,
+                        fileName
+                    );
+
+
+                // =============================================
+                // SAVE FILE
+                // =============================================
+
+                using (FileStream stream =
+                       new FileStream(
+                           filePath,
+                           FileMode.Create))
                 {
                     CompanyLogo.CopyTo(stream);
                 }
 
 
+                // =============================================
+                // SAVE FILE NAME
+                // =============================================
+
                 logoPath = fileName;
             }
 
 
-            using (SqlConnection cn = new SqlConnection(connectionString))
+            // =====================================================
+            // DATABASE
+            // =====================================================
+
+            using (SqlConnection cn =
+                   new SqlConnection(connectionString))
             {
-                using (SqlCommand cmd = new SqlCommand("SP_AddOrganizationProfile", cn))
+                using (SqlCommand cmd =
+                       new SqlCommand(
+                           "SP_AddOrganizationProfile",
+                           cn))
                 {
-                    cmd.CommandType = CommandType.StoredProcedure;
+                    cmd.CommandType =
+                        CommandType.StoredProcedure;
+
+
+                    // =============================================
+                    // ORGANIZATION ID
+                    // =============================================
+
                     cmd.Parameters.Add(
                         "@nOrgID",
-                        SqlDbType.Int).Value =
+                        SqlDbType.Int
+                    ).Value =
                         model.nOrgID;
 
 
+                    // =============================================
+                    // DATE OF BIRTH
+                    // =============================================
+
                     cmd.Parameters.Add(
                         "@dDateOfBirth",
-                        SqlDbType.DateTime).Value =
+                        SqlDbType.DateTime
+                    ).Value =
                         model.dDateOfBirth.HasValue
                             ? model.dDateOfBirth.Value
                             : DBNull.Value;
 
 
+                    // =============================================
+                    // COMPANY LOGO
+                    // =============================================
+
                     cmd.Parameters.Add(
                         "@sCompanyLogo",
                         SqlDbType.NVarChar,
-                        500).Value =
+                        500
+                    ).Value =
                         string.IsNullOrWhiteSpace(
                             logoPath)
                             ? DBNull.Value
                             : logoPath;
 
 
+                    // =============================================
+                    // COMPANY ADDRESS
+                    // =============================================
 
                     cmd.Parameters.Add(
                         "@sCompanyAddress",
                         SqlDbType.NVarChar,
-                        -1).Value =
+                        -1
+                    ).Value =
                         string.IsNullOrWhiteSpace(
                             model.sCompanyAddress)
                             ? DBNull.Value
                             : model.sCompanyAddress;
 
 
+                    // =============================================
+                    // ESTABLISHMENT YEAR
+                    // =============================================
+
                     cmd.Parameters.Add(
                         "@nEstablishmentYear",
-                        SqlDbType.Int).Value =
+                        SqlDbType.Int
+                    ).Value =
                         model.nEstablishmentYear;
 
 
+                    // =============================================
+                    // GST NUMBER
+                    // =============================================
 
                     cmd.Parameters.Add(
                         "@sGSTNo",
                         SqlDbType.NVarChar,
-                        50).Value =
+                        50
+                    ).Value =
                         string.IsNullOrWhiteSpace(
                             model.sGSTNo)
                             ? DBNull.Value
                             : model.sGSTNo;
 
 
+                    // =============================================
+                    // CIN NUMBER
+                    // =============================================
 
                     cmd.Parameters.Add(
                         "@sCINNo",
                         SqlDbType.NVarChar,
-                        50).Value =
+                        50
+                    ).Value =
                         string.IsNullOrWhiteSpace(
                             model.sCINNo)
                             ? DBNull.Value
                             : model.sCINNo;
 
-                    cmd.Parameters.Add("@nEmployeeStrength", SqlDbType.NVarChar, 100).Value = string.IsNullOrWhiteSpace(model.nEmployeeStrength) ? DBNull.Value : model.nEmployeeStrength;
+
+                    // =============================================
+                    // EMPLOYEE STRENGTH
+                    // =============================================
+
+                    cmd.Parameters.Add(
+                        "@nEmployeeStrength",
+                        SqlDbType.NVarChar,
+                        100
+                    ).Value =
+                        string.IsNullOrWhiteSpace(
+                            model.nEmployeeStrength)
+                            ? DBNull.Value
+                            : model.nEmployeeStrength;
+
+
+                    // =============================================
+                    // EXECUTE
+                    // =============================================
+
                     cn.Open();
 
                     cmd.ExecuteNonQuery();
                 }
             }
 
-            TempData["SuccessMessage"] = "Organization profile updated successfully.";
-            return RedirectToAction("EditProfile");
+
+            // =====================================================
+            // SUCCESS
+            // =====================================================
+
+            TempData["SuccessMessage"] =
+                "Organization profile updated successfully.";
+
+
+            // =====================================================
+            // GET ORGANIZATION CODE FROM SESSION
+            // =====================================================
+
+            string? orgCode =
+                HttpContext.Session.GetString("OrgCode");
+
+
+            if (!string.IsNullOrWhiteSpace(orgCode))
+            {
+                return RedirectToAction(
+                    "EditProfile"
+                //new { id = orgCode }
+                );
+            }
+
+
+            return RedirectToAction(
+                "EditProfile"
+            //new { id = model.nOrgID }
+            );
         }
 
 

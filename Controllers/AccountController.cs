@@ -11,9 +11,7 @@ namespace ErJobPortal.Controllers
         private readonly AccountRepository _accountRepository;
         private readonly EmailService _emailService;
 
-        public AccountController(
-    AccountRepository accountRepository,
-    EmailService emailService)
+        public AccountController(AccountRepository accountRepository, EmailService emailService)
         {
             _accountRepository = accountRepository;
             _emailService = emailService;
@@ -33,9 +31,7 @@ namespace ErJobPortal.Controllers
         [HttpGet]
         public IActionResult GetCandidateDepartments()
         {
-            var departments =
-                _accountRepository.GetDepartments();
-
+            var departments = _accountRepository.GetDepartments();
             return Json(departments);
         }
 
@@ -47,12 +43,9 @@ namespace ErJobPortal.Controllers
         [HttpGet]
         public IActionResult GetCandidateBranches(int departmentId)
         {
-            var branches =
-                _accountRepository.GetBranches(departmentId);
-
+            var branches = _accountRepository.GetBranches(departmentId);
             return Json(branches);
         }
-
 
         // ==========================================
         // COLLEGE
@@ -61,9 +54,7 @@ namespace ErJobPortal.Controllers
         [HttpGet]
         public IActionResult GetCandidateColleges()
         {
-            var colleges =
-                _accountRepository.GetColleges();
-
+            var colleges = _accountRepository.GetColleges();
             return Json(colleges);
         }
 
@@ -75,13 +66,9 @@ namespace ErJobPortal.Controllers
         [HttpGet]
         public IActionResult GetCandidateCollegeCodes(int collegeId)
         {
-            var codes =
-                _accountRepository.GetCollegeCodes(collegeId);
-
+            var codes = _accountRepository.GetCollegeCodes(collegeId);
             return Json(codes);
         }
-
-
 
         // ==============================
         // CANDIDATE REGISTER - POST
@@ -111,8 +98,7 @@ namespace ErJobPortal.Controllers
                 // PROFILE IMAGE UPLOAD
                 // ==========================================
 
-                if (model.ProfileImageFile != null &&
-                    model.ProfileImageFile.Length > 0)
+                if (model.ProfileImageFile != null && model.ProfileImageFile.Length > 0)
                 {
                     // ==========================================
                     // ALLOWED IMAGE TYPES
@@ -125,8 +111,7 @@ namespace ErJobPortal.Controllers
     ".jpeg"
 };
 
-                    string extension =
-                        Path.GetExtension(
+                    string extension = Path.GetExtension(
                             model.ProfileImageFile.FileName
                         ).ToLowerInvariant();
 

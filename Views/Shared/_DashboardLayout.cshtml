@@ -3,16 +3,19 @@
 
 <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0" />
     <title>
         @ViewData["Title"] - 1Trainee
     </title>
 
     <!-- Bootstrap -->
-    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet"
+          href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
 
     <!-- Font Awesome -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
+    <link rel="stylesheet"
+          href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
 
     @*   @model ErJobPortal.Models.SAFeedbackM *@
 
@@ -27,7 +30,9 @@
     } *@
     @section Styles {
 
-        <link rel="stylesheet" href="~/css/EditSAFeedback.css" asp-append-version="true" />
+        <link rel="stylesheet"
+              href="~/css/EditSAFeedback.css"
+              asp-append-version="true" />
 
     }
     @*     @{
@@ -370,12 +375,361 @@
             }
         }
     </style>
-    
+    @* 
+<style>
+
+    .feedback-edit-container {
+        width: 100%;
+        display: flex;
+        justify-content: center;
+        padding: 0;
+        margin: 0;
+        box-sizing: border-box;
+    }
+
+    .feedback-edit-card {
+        width: 870px;
+        max-width: 100%;
+        background: #eef4ff;
+        border: 1px solid #d9d9d9;
+        border-radius: 0 0 20px 20px;
+        padding: 38px 35px 42px 35px;
+        box-sizing: border-box;
+        box-shadow: 0 5px 18px rgba(0, 0, 0, 0.08);
+    }
+
+    .feedback-edit-title {
+        margin: 0 0 24px 0;
+        font-family: Arial, Helvetica, sans-serif;
+        font-size: 30px;
+        font-weight: 400;
+        color: #111;
+    }
+
+    .feedback-question {
+        margin-bottom: 18px;
+    }
+
+    .question-label {
+        display: block;
+        margin-bottom: 10px;
+        font-family: Arial, Helvetica, sans-serif;
+        font-size: 17px;
+        font-weight: 400;
+        color: #111;
+    }
+
+    .question-textarea {
+        display: block;
+        width: 100%;
+        min-height: 58px;
+        padding: 7px 12px;
+        border: 1px solid #999;
+        border-radius: 2px;
+        background: #fff;
+        color: #111;
+        font-family: Arial, Helvetica, sans-serif;
+        font-size: 16px;
+        line-height: 1.45;
+        resize: vertical;
+        box-sizing: border-box;
+        outline: none;
+    }
+
+        .question-textarea:focus {
+            border-color: #777;
+            box-shadow: none;
+        }
+
+    .answer-area {
+        margin-left: 23px;
+        margin-top: 10px;
+        margin-bottom: 13px;
+    }
+
+    .radio-options {
+        display: flex;
+        align-items: center;
+        gap: 5px;
+        font-family: Arial, Helvetica, sans-serif;
+        font-size: 17px;
+        color: #555;
+    }
+
+        .radio-options label {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            margin-right: 4px;
+            cursor: pointer;
+        }
+
+        .radio-options input[type="radio"] {
+            width: 14px;
+            height: 14px;
+            margin: 0;
+            cursor: pointer;
+            accent-color: #555;
+        }
+
+    .star-options {
+        display: flex;
+        align-items: center;
+        gap: 3px;
+    }
+
+        .star-options label {
+            position: relative;
+            width: 35px;
+            height: 35px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+        }
+
+        .star-options input[type="radio"] {
+            position: absolute;
+            opacity: 0;
+            pointer-events: none;
+        }
+
+    .star {
+        display: inline-block;
+        font-size: 30px;
+        line-height: 1;
+        color: #c7c7c7;
+        transition: all 0.15s ease;
+        cursor: pointer;
+    }
+
+        .star.active {
+            color: #ffc107;
+        }
+
+    .star-options label:hover .star {
+        color: #ffc107;
+        transform: scale(1.15);
+    }
+
+    .emoji-options {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    }
+
+        .emoji-options label {
+            position: relative;
+            width: 43px;
+            height: 43px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .emoji-options input[type="radio"] {
+            position: absolute;
+            opacity: 0;
+            pointer-events: none;
+        }
+
+    .emoji {
+        display: inline-block;
+        font-family: "Segoe UI Emoji", "Apple Color Emoji", "Noto Color Emoji", sans-serif;
+        font-size: 27px;
+        filter: grayscale(100%);
+        opacity: 0.55;
+        transition: all 0.2s ease;
+        cursor: pointer;
+    }
+
+    .emoji-options label:hover {
+        background: #ffffff;
+        transform: translateY(-2px);
+        box-shadow: 0 2px 7px rgba(0, 0, 0, 0.08);
+    }
+
+        .emoji-options label:hover .emoji {
+            filter: grayscale(0%);
+            opacity: 1;
+            transform: scale(1.15);
+        }
+
+    .emoji-options label.selected {
+        background: #ffffff;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.14);
+        transform: translateY(-2px);
+    }
+
+        .emoji-options label.selected .emoji {
+            filter: grayscale(0%);
+            opacity: 1;
+            transform: scale(1.2);
+        }
+
+    .description-label {
+        display: block;
+        margin-left: 23px;
+        margin-top: 3px;
+        margin-bottom: 7px;
+        font-family: Arial, Helvetica, sans-serif;
+        font-size: 17px;
+        color: #111;
+    }
+
+    .description-textarea {
+        display: block;
+        width: calc(100% - 46px);
+        min-height: 72px;
+        margin-left: 23px;
+        padding: 8px 12px;
+        border: 1px solid #999;
+        border-radius: 2px;
+        background: #fff;
+        color: #111;
+        font-family: Arial, Helvetica, sans-serif;
+        font-size: 16px;
+        line-height: 1.4;
+        resize: vertical;
+        box-sizing: border-box;
+        outline: none;
+    }
+
+        .description-textarea:focus {
+            border-color: #777;
+            box-shadow: none;
+        }
+
+    .save-area {
+        margin-left: 23px;
+        margin-top: 20px;
+    }
+
+    .save-button {
+        background: #fff;
+        color: #111;
+        border: 1px solid #777;
+        border-radius: 3px;
+        padding: 7px 15px;
+        font-family: Arial, Helvetica, sans-serif;
+        font-size: 14px;
+        cursor: pointer;
+        transition: all 0.15s ease;
+    }
+
+        .save-button:hover {
+            background: #f2f2f2;
+            border-color: #555;
+        }
+
+    .validation-message {
+        display: block;
+        margin-left: 23px;
+        margin-top: 3px;
+        color: #dc3545;
+        font-size: 12px;
+    }
+
+    @@media (max-width: 900px) {
+
+        .feedback-edit-card {
+            width: 100%;
+            padding: 30px 25px 35px 25px;
+        }
+
+        .feedback-edit-title {
+            font-size: 28px;
+        }
+
+        .question-textarea {
+            font-size: 15px;
+        }
+
+        .answer-area,
+        .description-label,
+        .save-area {
+            margin-left: 15px;
+        }
+
+        .description-textarea {
+            width: calc(100% - 30px);
+            margin-left: 15px;
+        }
+
+        .star {
+            font-size: 27px;
+        }
+
+        .emoji {
+            font-size: 24px;
+        }
+    }
+
+    @@media (max-width: 500px) {
+
+        .feedback-edit-card {
+            padding: 25px 18px 30px 18px;
+        }
+
+        .feedback-edit-title {
+            font-size: 24px;
+        }
+
+        .question-label {
+            font-size: 16px;
+        }
+
+        .answer-area,
+        .description-label,
+        .save-area {
+            margin-left: 10px;
+        }
+
+        .description-textarea {
+            width: calc(100% - 20px);
+            margin-left: 10px;
+        }
+
+        .star-options {
+            gap: 1px;
+        }
+
+            .star-options label {
+                width: 32px;
+            }
+
+        .star {
+            font-size: 24px;
+        }
+
+        .emoji-options {
+            gap: 7px;
+        }
+
+            .emoji-options label {
+                width: 39px;
+                height: 39px;
+            }
+
+        .emoji {
+            font-size: 21px;
+        }
+    }
+
+</style> *@
 
 
 
 
     <style>
+        /* =========================================================
+                                           JOB PORTAL DASHBOARD
+                                           PROFESSIONAL CANDIDATE DASHBOARD
+                                           Theme: #1e7b67 + #ffffff
+                                        ========================================================= */
 
         :root {
             --primary: #1e7b67;
@@ -2429,18 +2783,19 @@
                         <div class="profile-submenu"
                              id="candidateProfileSubmenu">
 
+                             @* Radhika 21-09 *@
+
+                          <a asp-controller="Resume"
+   asp-action="Resume"
+   asp-route-id="@Context.Session.GetInt32("CandidateID")"
+   class="profile-submenu-link">
+
+    View Profile
+
+</a>
+
                             <a asp-controller="Candidate"
                                asp-action="Profile"
-                               asp-route-id="@candidateCode"
-                               class="profile-submenu-link">
-
-                                View Profile
-
-                            </a>
-
-                            <a asp-controller="Candidate"
-                               asp-action="EditProfile"
-                               asp-route-id="@ViewBag.CandidateCode"
                                class="profile-submenu-link">
 
                                 Edit Profile
@@ -2738,12 +3093,12 @@
 
                         <div class="profile-submenu" id="profileSubmenu">
 
-                            <a asp-controller="Organization"
-                               asp-action="Profile"
-                               asp-route-id="@orgCode"
-                               class="profile-submenu-link">
-                                View Profile
-                            </a>
+                          <a asp-controller="Resume"
+   asp-action="OrganizationResume"
+   asp-route-id="@Context.Session.GetInt32("OrgID")"
+   class="profile-submenu-link">
+    View Profile
+</a>
 
                             <a asp-controller="Organization"
                                asp-action="EditProfile"
