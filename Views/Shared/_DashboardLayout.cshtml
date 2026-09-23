@@ -2743,12 +2743,12 @@
 
                         <div class="profile-submenu" id="profileSubmenu">
 
-                          <a asp-controller="Resume"
-   asp-action="OrganizationResume"
-   asp-route-id="@Context.Session.GetInt32("OrgID")"
-   class="profile-submenu-link">
-    View Profile
-</a>
+                            <a asp-controller="Organization"
+                               asp-action="ViewOrgProfile"
+                               asp-route-id="@orgCode"
+                               class="profile-submenu-link">
+                                View Profile
+                            </a>
 
                             <a asp-controller="Organization"
                                asp-action="EditProfile"
