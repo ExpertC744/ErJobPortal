@@ -361,6 +361,7 @@
         font-weight: 500;
     }
 </style>
+
 @using Microsoft.AspNetCore.Mvc.Rendering
 
 @{
@@ -370,15 +371,22 @@
     ViewData["UserName"] = "Candidate";
 }
 
-
 <div class="container-fluid mt-4">
 
     @if (TempData["Success"] != null)
     {
-        <div class="alert alert-success">
+        <div class="alert alert-success alert-dismissible fade show">
             @TempData["Success"]
+            <button type="button"
+                    class="btn-close"
+                    data-bs-dismiss="alert"></button>
         </div>
     }
+
+    <div asp-validation-summary="ModelOnly"
+         class="alert alert-danger"
+         role="alert">
+    </div>
 
     <!-- ================================================= -->
     <!-- PROFILE HEADER -->
@@ -391,7 +399,9 @@
     </div>
 
 
-    <!-- ================= ADDRESS ================= -->
+    <!-- ================================================= -->
+    <!-- ADDRESS -->
+    <!-- ================================================= -->
 
     <div class="card mb-4">
 
@@ -400,6 +410,7 @@
         </div>
 
         <div class="card-body">
+
             <form id="addressForm"
                   asp-action="UpdateAddress"
                   asp-controller="Candidate"
@@ -410,81 +421,110 @@
                 <div class="row">
 
                     <!-- COUNTRY -->
-
                     <div class="col-md-3 mb-3">
 
-                        <label class="form-label">
-                            Country
+                        <label asp-for="Profile.CountryID"
+                               class="form-label">
+                            Country <span class="text-danger">*</span>
                         </label>
 
                         <select asp-for="Profile.CountryID"
                                 class="form-control"
-                                id="CountryID">
+                                id="CountryID"
+                                required>
 
                             <option value="">
                                 -- Select Country --
                             </option>
 
                         </select>
+
+                        <span asp-validation-for="Profile.CountryID"
+                              class="text-danger">
+                        </span>
 
                     </div>
 
 
                     <!-- STATE -->
-
                     <div class="col-md-3 mb-3">
 
-                        <label class="form-label">
-                            State
+                        <label asp-for="Profile.StateID"
+                               class="form-label">
+                            State <span class="text-danger">*</span>
                         </label>
 
                         <select asp-for="Profile.StateID"
                                 class="form-control"
                                 id="StateID"
-                                disabled>
+                                disabled
+                                required>
 
                             <option value="">
                                 -- Select State --
                             </option>
 
                         </select>
+
+                        <span asp-validation-for="Profile.StateID"
+                              class="text-danger">
+                        </span>
 
                     </div>
 
 
                     <!-- CITY -->
-
                     <div class="col-md-3 mb-3">
 
-                        <label class="form-label">
-                            City
+                        <label asp-for="Profile.CityID"
+                               class="form-label">
+                            City <span class="text-danger">*</span>
                         </label>
 
                         <select asp-for="Profile.CityID"
                                 class="form-control"
                                 id="CityID"
-                                disabled>
+                                disabled
+                                required>
 
                             <option value="">
                                 -- Select City --
                             </option>
 
                         </select>
+
+                        <span asp-validation-for="Profile.CityID"
+                              class="text-danger">
+                        </span>
 
                     </div>
 
 
                     <!-- PINCODE -->
-
                     <div class="col-md-3 mb-3">
 
-                        <label class="form-label">
-                            Pincode
+                        <label asp-for="Profile.Pincode"
+                               class="form-label">
+                            Pincode <span class="text-danger">*</span>
                         </label>
 
                         <input asp-for="Profile.Pincode"
+                               id="Pincode"
                                class="form-control"
-                               placeholder="Enter Pincode" />
+                               placeholder="Enter 6 digit Pincode"
+                               maxlength="6"
+                               minlength="6"
+                               pattern="[0-9]{6}"
+                               inputmode="numeric"
+                               required />
+
+                        <span asp-validation-for="Profile.Pincode"
+                              class="text-danger">
+                        </span>
+
+                        @*  <small class="text-muted">
+                            Enter a valid 6-digit pincode.
+                        </small> *@
 
                     </div>
 
@@ -495,131 +535,39 @@
 
                     <button type="submit"
                             class="btn btn-primary">
-
                         Update Address
-
                     </button>
 
                 </div>
 
             </form>
-            @* <form asp-action="UpdateAddress"
-                  asp-controller="Candidate"
-                  method="post">
-
-                @Html.AntiForgeryToken()
-
-                <div class="row">
-
-                    <div class="col-md-3 mb-3">
-
-                        <label class="form-label">Country</label>
-
-                        <select asp-for="Profile.CountryID"
-                                class="form-control"
-                                id="CountryID">
-
-                            <option value="">
-                                -- Select Country --
-                            </option>
-
-                        </select>
-
-                    </div>
-
-
-                    <div class="col-md-3 mb-3">
-
-                        <label class="form-label">State</label>
-
-                        <select asp-for="Profile.StateID"
-                                class="form-control"
-                                id="StateID"
-                                disabled>
-
-                            <option value="">
-                                -- Select State --
-                            </option>
-
-                        </select>
-
-                    </div>
-
-
-                    <div class="col-md-3 mb-3">
-
-                        <label class="form-label">City</label>
-
-                        <select asp-for="Profile.CityID"
-                                class="form-control"
-                                id="CityID"
-                                disabled>
-
-                            <option value="">
-                                -- Select City --
-                            </option>
-
-                        </select>
-
-                    </div>
-
-
-                    <div class="col-md-3 mb-3">
-
-                        <label class="form-label">
-                            Pincode
-                        </label>
-
-                        <input asp-for="Profile.Pincode"
-                               class="form-control"
-                               placeholder="Enter Pincode" />
-
-                    </div>
-
-                </div>
-
-
-                <div class="text-end">
-
-                    <button type="submit"
-                            class="btn btn-primary">
-
-                        Update Address
-
-                    </button>
-
-                </div>
-
-            </form> *@
 
         </div>
 
     </div>
 
 
-    <!-- ================= EDUCATION ================= -->
+    <!-- ================================================= -->
+    <!-- EDUCATION -->
+    <!-- ================================================= -->
 
     <div class="card mb-4">
 
         <div class="card-header">
-
-            <h4 class="mb-0">
-                Education
-            </h4>
-
+            <h4 class="mb-0">Education</h4>
         </div>
-
 
         <div class="card-body">
 
-            <form asp-action="UpdateEducation"
+            <form id="educationForm"
+                  asp-action="UpdateEducation"
                   asp-controller="Candidate"
                   method="post">
 
                 @Html.AntiForgeryToken()
 
 
-                <!-- ================= SSC ================= -->
+                <!-- SSC -->
 
                 <h5>SSC / 10th</h5>
 
@@ -627,18 +575,31 @@
 
                     <div class="col-md-3 mb-3">
 
-                        <label>SSC Year</label>
+                        <label asp-for="Profile.SSC_YEAR"
+                               class="form-label">
+                            SSC Year
+                        </label>
 
                         <input asp-for="Profile.SSC_YEAR"
                                type="number"
-                               class="form-control" />
+                               class="form-control education-year"
+                               min="1950"
+                               max="2099"
+                               placeholder="YYYY" />
+
+                        <span asp-validation-for="Profile.SSC_YEAR"
+                              class="text-danger">
+                        </span>
 
                     </div>
 
 
                     <div class="col-md-3 mb-3">
 
-                        <label>SSC Division</label>
+                        <label asp-for="Profile.SSC_DIVISION"
+                               class="form-label">
+                            SSC Division
+                        </label>
 
                         <select asp-for="Profile.SSC_DIVISION"
                                 class="form-control"
@@ -650,6 +611,10 @@
 
                         </select>
 
+                        <span asp-validation-for="Profile.SSC_DIVISION"
+                              class="text-danger">
+                        </span>
+
                     </div>
 
                 </div>
@@ -658,7 +623,7 @@
                 <hr />
 
 
-                <!-- ================= HSC ================= -->
+                <!-- HSC -->
 
                 <h5>HSC / Diploma</h5>
 
@@ -666,18 +631,31 @@
 
                     <div class="col-md-3 mb-3">
 
-                        <label>HSC / Diploma Year</label>
+                        <label asp-for="Profile.HSC_DIPLOMA_YEAR"
+                               class="form-label">
+                            HSC / Diploma Year
+                        </label>
 
                         <input asp-for="Profile.HSC_DIPLOMA_YEAR"
                                type="number"
-                               class="form-control" />
+                               class="form-control education-year"
+                               min="1950"
+                               max="2099"
+                               placeholder="YYYY" />
+
+                        <span asp-validation-for="Profile.HSC_DIPLOMA_YEAR"
+                              class="text-danger">
+                        </span>
 
                     </div>
 
 
                     <div class="col-md-3 mb-3">
 
-                        <label>HSC / Diploma Division</label>
+                        <label asp-for="Profile.HSC_DIPLOMA_DIVISION"
+                               class="form-label">
+                            HSC / Diploma Division
+                        </label>
 
                         <select asp-for="Profile.HSC_DIPLOMA_DIVISION"
                                 class="form-control"
@@ -689,6 +667,10 @@
 
                         </select>
 
+                        <span asp-validation-for="Profile.HSC_DIPLOMA_DIVISION"
+                              class="text-danger">
+                        </span>
+
                     </div>
 
                 </div>
@@ -697,7 +679,7 @@
                 <hr />
 
 
-                <!-- ================= GRADUATION ================= -->
+                <!-- GRADUATION -->
 
                 <h5>Graduation</h5>
 
@@ -705,18 +687,31 @@
 
                     <div class="col-md-3 mb-3">
 
-                        <label>Graduation Year</label>
+                        <label asp-for="Profile.Graduation_Year"
+                               class="form-label">
+                            Graduation Year
+                        </label>
 
                         <input asp-for="Profile.Graduation_Year"
                                type="number"
-                               class="form-control" />
+                               class="form-control education-year"
+                               min="1950"
+                               max="2099"
+                               placeholder="YYYY" />
+
+                        <span asp-validation-for="Profile.Graduation_Year"
+                              class="text-danger">
+                        </span>
 
                     </div>
 
 
                     <div class="col-md-3 mb-3">
 
-                        <label>Graduation Division</label>
+                        <label asp-for="Profile.Graduation_Division"
+                               class="form-label">
+                            Graduation Division
+                        </label>
 
                         <select asp-for="Profile.Graduation_Division"
                                 class="form-control"
@@ -728,12 +723,19 @@
 
                         </select>
 
+                        <span asp-validation-for="Profile.Graduation_Division"
+                              class="text-danger">
+                        </span>
+
                     </div>
 
 
                     <div class="col-md-3 mb-3">
 
-                        <label>Graduation Stream</label>
+                        <label asp-for="Profile.Graduation_Stream"
+                               class="form-label">
+                            Graduation Stream
+                        </label>
 
                         <select asp-for="Profile.Graduation_Stream"
                                 class="form-control"
@@ -745,15 +747,27 @@
 
                         </select>
 
+                        <span asp-validation-for="Profile.Graduation_Stream"
+                              class="text-danger">
+                        </span>
+
                     </div>
 
 
                     <div class="col-md-3 mb-3">
 
-                        <label>Other Stream</label>
+                        <label asp-for="Profile.Other_Stream"
+                               class="form-label">
+                            Other Stream
+                        </label>
 
                         <input asp-for="Profile.Other_Stream"
-                               class="form-control" />
+                               class="form-control"
+                               maxlength="100" />
+
+                        <span asp-validation-for="Profile.Other_Stream"
+                              class="text-danger">
+                        </span>
 
                     </div>
 
@@ -763,7 +777,7 @@
                 <hr />
 
 
-                <!-- ================= PG ================= -->
+                <!-- PG -->
 
                 <h5>Post Graduation</h5>
 
@@ -771,18 +785,31 @@
 
                     <div class="col-md-3 mb-3">
 
-                        <label>PG Year</label>
+                        <label asp-for="Profile.PG_Year"
+                               class="form-label">
+                            PG Year
+                        </label>
 
                         <input asp-for="Profile.PG_Year"
                                type="number"
-                               class="form-control" />
+                               class="form-control education-year"
+                               min="1950"
+                               max="2099"
+                               placeholder="YYYY" />
+
+                        <span asp-validation-for="Profile.PG_Year"
+                              class="text-danger">
+                        </span>
 
                     </div>
 
 
                     <div class="col-md-3 mb-3">
 
-                        <label>PG Division</label>
+                        <label asp-for="Profile.PG_Division"
+                               class="form-label">
+                            PG Division
+                        </label>
 
                         <select asp-for="Profile.PG_Division"
                                 class="form-control"
@@ -794,12 +821,19 @@
 
                         </select>
 
+                        <span asp-validation-for="Profile.PG_Division"
+                              class="text-danger">
+                        </span>
+
                     </div>
 
 
                     <div class="col-md-3 mb-3">
 
-                        <label>PG Stream</label>
+                        <label asp-for="Profile.PG_Stream"
+                               class="form-label">
+                            PG Stream
+                        </label>
 
                         <select asp-for="Profile.PG_Stream"
                                 class="form-control"
@@ -811,15 +845,27 @@
 
                         </select>
 
+                        <span asp-validation-for="Profile.PG_Stream"
+                              class="text-danger">
+                        </span>
+
                     </div>
 
 
                     <div class="col-md-3 mb-3">
 
-                        <label>Other Specialization</label>
+                        <label asp-for="Profile.Other_Specialization"
+                               class="form-label">
+                            Other Specialization
+                        </label>
 
                         <input asp-for="Profile.Other_Specialization"
-                               class="form-control" />
+                               class="form-control"
+                               maxlength="150" />
+
+                        <span asp-validation-for="Profile.Other_Specialization"
+                              class="text-danger">
+                        </span>
 
                     </div>
 
@@ -829,7 +875,7 @@
                 <hr />
 
 
-                <!-- ================= PHD ================= -->
+                <!-- PHD -->
 
                 <h5>PhD</h5>
 
@@ -837,18 +883,31 @@
 
                     <div class="col-md-3 mb-3">
 
-                        <label>PhD Year</label>
+                        <label asp-for="Profile.PhD_Year"
+                               class="form-label">
+                            PhD Year
+                        </label>
 
                         <input asp-for="Profile.PhD_Year"
                                type="number"
-                               class="form-control" />
+                               class="form-control education-year"
+                               min="1950"
+                               max="2099"
+                               placeholder="YYYY" />
+
+                        <span asp-validation-for="Profile.PhD_Year"
+                              class="text-danger">
+                        </span>
 
                     </div>
 
 
                     <div class="col-md-3 mb-3">
 
-                        <label>PhD Status</label>
+                        <label asp-for="Profile.PhD_Status"
+                               class="form-label">
+                            PhD Status
+                        </label>
 
                         <select asp-for="Profile.PhD_Status"
                                 class="form-control"
@@ -860,25 +919,45 @@
 
                         </select>
 
+                        <span asp-validation-for="Profile.PhD_Status"
+                              class="text-danger">
+                        </span>
+
                     </div>
 
 
                     <div class="col-md-3 mb-3">
 
-                        <label>PhD Topic</label>
+                        <label asp-for="Profile.PhD_Topic"
+                               class="form-label">
+                            PhD Topic
+                        </label>
 
                         <input asp-for="Profile.PhD_Topic"
-                               class="form-control" />
+                               class="form-control"
+                               maxlength="200" />
+
+                        <span asp-validation-for="Profile.PhD_Topic"
+                              class="text-danger">
+                        </span>
 
                     </div>
 
 
                     <div class="col-md-3 mb-3">
 
-                        <label>Previous PhD Topic / Year</label>
+                        <label asp-for="Profile.Previous_PhD_Topic_Year"
+                               class="form-label">
+                            Previous PhD Topic / Year
+                        </label>
 
                         <input asp-for="Profile.Previous_PhD_Topic_Year"
-                               class="form-control" />
+                               class="form-control"
+                               maxlength="200" />
+
+                        <span asp-validation-for="Profile.Previous_PhD_Topic_Year"
+                              class="text-danger">
+                        </span>
 
                     </div>
 
@@ -889,9 +968,7 @@
 
                     <button type="submit"
                             class="btn btn-primary">
-
                         Update Education
-
                     </button>
 
                 </div>
@@ -917,7 +994,8 @@
 
         <div class="card-body">
 
-            <form asp-action="UpdateInternshipPreference"
+            <form id="preferenceForm"
+                  asp-action="UpdateInternshipPreference"
                   asp-controller="Candidate"
                   method="post">
 
@@ -927,17 +1005,16 @@
 
                     <div class="col-md-3 mb-3">
 
-                        <label class="form-label">
+                        <label asp-for="Profile.Internship_FellowshipType"
+                               class="form-label">
                             Internship / Fellowship Type
+                            <span class="text-danger">*</span>
                         </label>
 
                         <select asp-for="Profile.Internship_FellowshipType"
                                 class="form-control"
-                                asp-items="@(new SelectList(
-                                                                                         Model.InternshipFellowshipType,
-                                                                                         "ID",
-                                                                                         "Name"
-                                                                                     ))">
+                                asp-items="@(new SelectList(Model.InternshipFellowshipType, "ID", "Name"))"
+                                required>
 
                             <option value="">
                                 -- Select Type --
@@ -946,43 +1023,62 @@
                         </select>
 
                         <span asp-validation-for="Profile.Internship_FellowshipType"
-                              class="text-danger"></span>
+                              class="text-danger">
+                        </span>
 
                     </div>
 
 
                     <div class="col-md-3 mb-3">
 
-                        <label class="form-label">
+                        <label asp-for="Profile.Preferred_Country"
+                               class="form-label">
                             Preferred Country
                         </label>
 
                         <input asp-for="Profile.Preferred_Country"
-                               class="form-control" />
+                               class="form-control"
+                               maxlength="100" />
+
+                        <span asp-validation-for="Profile.Preferred_Country"
+                              class="text-danger">
+                        </span>
 
                     </div>
 
 
                     <div class="col-md-3 mb-3">
 
-                        <label class="form-label">
+                        <label asp-for="Profile.Preferred_State"
+                               class="form-label">
                             Preferred State
                         </label>
 
                         <input asp-for="Profile.Preferred_State"
-                               class="form-control" />
+                               class="form-control"
+                               maxlength="100" />
+
+                        <span asp-validation-for="Profile.Preferred_State"
+                              class="text-danger">
+                        </span>
 
                     </div>
 
 
                     <div class="col-md-3 mb-3">
 
-                        <label class="form-label">
+                        <label asp-for="Profile.Preferred_City"
+                               class="form-label">
                             Preferred City
                         </label>
 
                         <input asp-for="Profile.Preferred_City"
-                               class="form-control" />
+                               class="form-control"
+                               maxlength="100" />
+
+                        <span asp-validation-for="Profile.Preferred_City"
+                              class="text-danger">
+                        </span>
 
                     </div>
 
@@ -993,9 +1089,7 @@
 
                     <button type="submit"
                             class="btn btn-primary">
-
                         Update Preference
-
                     </button>
 
                 </div>
@@ -1005,6 +1099,8 @@
         </div>
 
     </div>
+
+
     <!-- ================================================= -->
     <!-- DOCUMENTS -->
     <!-- ================================================= -->
@@ -1019,7 +1115,8 @@
 
         <div class="card-body">
 
-            <form asp-controller="Candidate"
+            <form id="documentsForm"
+                  asp-controller="Candidate"
                   asp-action="UpdateDocuments"
                   method="post"
                   enctype="multipart/form-data">
@@ -1029,13 +1126,26 @@
                 <div class="row">
 
                     <!-- Resume -->
+
                     <div class="col-md-4 mb-3">
-                        <label class="form-label fw-bold">Resume</label>
+
+                        <label class="form-label fw-bold">
+                            Resume
+                        </label>
 
                         <input type="file"
                                name="ResumeFile"
+                               id="ResumeFile"
                                class="form-control"
                                accept=".pdf,.doc,.docx" />
+
+                        <small class="text-muted">
+                            Allowed: PDF, DOC, DOCX. Maximum 5 MB.
+                        </small>
+
+                        <div id="resumeError"
+                             class="text-danger">
+                        </div>
 
                         @if (!string.IsNullOrEmpty(Model.Profile?.sResume))
                         {
@@ -1049,16 +1159,31 @@
                                 View Resume
                             </a>
                         }
+
                     </div>
 
+
                     <!-- Photo -->
+
                     <div class="col-md-4 mb-3">
-                        <label class="form-label fw-bold">Photo</label>
+
+                        <label class="form-label fw-bold">
+                            Photo
+                        </label>
 
                         <input type="file"
                                name="PhotoFile"
+                               id="PhotoFile"
                                class="form-control"
                                accept=".jpg,.jpeg,.png" />
+
+                        <small class="text-muted">
+                            Allowed: JPG, JPEG, PNG. Maximum 5 MB.
+                        </small>
+
+                        <div id="photoError"
+                             class="text-danger">
+                        </div>
 
                         @if (!string.IsNullOrEmpty(Model.Profile?.sPhoto))
                         {
@@ -1071,16 +1196,31 @@
                                  class="mt-1"
                                  style="width:80px;height:80px;object-fit:cover;" />
                         }
+
                     </div>
 
+
                     <!-- Signature -->
+
                     <div class="col-md-4 mb-3">
-                        <label class="form-label fw-bold">Signature</label>
+
+                        <label class="form-label fw-bold">
+                            Signature
+                        </label>
 
                         <input type="file"
                                name="SignatureFile"
+                               id="SignatureFile"
                                class="form-control"
                                accept=".jpg,.jpeg,.png" />
+
+                        <small class="text-muted">
+                            Allowed: JPG, JPEG, PNG. Maximum 5 MB.
+                        </small>
+
+                        <div id="signatureError"
+                             class="text-danger">
+                        </div>
 
                         @if (!string.IsNullOrEmpty(Model.Profile?.sSignature))
                         {
@@ -1088,38 +1228,54 @@
                                 ✓ Signature already uploaded
                             </small>
 
-                            <br />
-
                             <img src="@Model.Profile.sSignature"
                                  alt="Signature"
                                  class="mt-1"
                                  style="width:150px;
-                              height:60px;
-                              object-fit:contain;
-                              border:1px solid #ddd;" />
+                                            height:60px;
+                                            object-fit:contain;
+                                            border:1px solid #ddd;" />
                         }
+
                     </div>
 
-                    <!-- Divyang -->
+
+                    <!-- DIVYANG -->
+
                     <div class="col-md-6 mb-3">
 
                         <label asp-for="Profile.sDivyang"
                                class="form-label">
-                            Divyang
+                            Divyang <span class="text-danger">*</span>
                         </label>
 
                         <select asp-for="Profile.sDivyang"
-                                class="form-select">
+                                class="form-select"
+                                required>
 
-                            <option value="">-- Select --</option>
-                            <option value="Yes">Yes</option>
-                            <option value="No">No</option>
+                            <option value="">
+                                -- Select --
+                            </option>
+
+                            <option value="Yes">
+                                Yes
+                            </option>
+
+                            <option value="No">
+                                No
+                            </option>
 
                         </select>
 
+                        <span asp-validation-for="Profile.sDivyang"
+                              class="text-danger">
+                        </span>
+
                     </div>
 
-                    <!-- Hobbies -->
+
+                    <!-- HOBBIES -->
+
                     <div class="col-md-6 mb-3">
 
                         <label asp-for="Profile.sHobbies"
@@ -1129,11 +1285,17 @@
 
                         <input asp-for="Profile.sHobbies"
                                class="form-control"
+                               maxlength="300"
                                placeholder="Enter your hobbies" />
+
+                        <span asp-validation-for="Profile.sHobbies"
+                              class="text-danger">
+                        </span>
 
                     </div>
 
                 </div>
+
 
                 <div class="text-end mt-3">
 
@@ -1154,9 +1316,6 @@
     <!-- ================================================= -->
     <!-- INTERNSHIP DETAILS -->
     <!-- ================================================= -->
-    <!-- =========================================================
-     INTERNSHIP DETAILS
-     ========================================================= -->
 
     <div class="card mb-4">
 
@@ -1170,7 +1329,8 @@
 
             <form asp-controller="Candidate"
                   asp-action="UpdateInternshipDetails"
-                  method="post">
+                  method="post"
+                  id="internshipDetailsForm">
 
                 @Html.AntiForgeryToken()
 
@@ -1178,9 +1338,7 @@
                        asp-for="Profile.CandidateID" />
 
 
-                <!-- =====================================================
-                 INTERNSHIP 1
-                 ===================================================== -->
+                <!-- INTERNSHIP 1 -->
 
                 <h6 class="mt-2 mb-3">
                     Internship 1
@@ -1188,7 +1346,6 @@
 
                 <div class="row">
 
-                    <!-- Organization -->
                     <div class="col-md-3 mb-3">
 
                         <label asp-for="Profile.sOrgName1"
@@ -1198,12 +1355,16 @@
 
                         <input asp-for="Profile.sOrgName1"
                                class="form-control"
+                               maxlength="150"
                                placeholder="Organization Name" />
+
+                        <span asp-validation-for="Profile.sOrgName1"
+                              class="text-danger">
+                        </span>
 
                     </div>
 
 
-                    <!-- Title -->
                     <div class="col-md-3 mb-3">
 
                         <label asp-for="Profile.sOrgIntTitle1"
@@ -1221,10 +1382,13 @@
 
                         </select>
 
+                        <span asp-validation-for="Profile.sOrgIntTitle1"
+                              class="text-danger">
+                        </span>
+
                     </div>
 
 
-                    <!-- Duration -->
                     <div class="col-md-3 mb-3">
 
                         <label asp-for="Profile.sOrgIntDuration1"
@@ -1242,10 +1406,13 @@
 
                         </select>
 
+                        <span asp-validation-for="Profile.sOrgIntDuration1"
+                              class="text-danger">
+                        </span>
+
                     </div>
 
 
-                    <!-- Status -->
                     <div class="col-md-3 mb-3">
 
                         <label asp-for="Profile.sOrgIntStatus1"
@@ -1263,14 +1430,16 @@
 
                         </select>
 
+                        <span asp-validation-for="Profile.sOrgIntStatus1"
+                              class="text-danger">
+                        </span>
+
                     </div>
 
                 </div>
 
 
-                <!-- =====================================================
-                 INTERNSHIP 2
-                 ===================================================== -->
+                <!-- INTERNSHIP 2 -->
 
                 <h6 class="mt-3 mb-3">
                     Internship 2
@@ -1278,7 +1447,6 @@
 
                 <div class="row">
 
-                    <!-- Organization -->
                     <div class="col-md-3 mb-3">
 
                         <label asp-for="Profile.sOrgName2"
@@ -1288,12 +1456,16 @@
 
                         <input asp-for="Profile.sOrgName2"
                                class="form-control"
+                               maxlength="150"
                                placeholder="Organization Name" />
+
+                        <span asp-validation-for="Profile.sOrgName2"
+                              class="text-danger">
+                        </span>
 
                     </div>
 
 
-                    <!-- Title -->
                     <div class="col-md-3 mb-3">
 
                         <label asp-for="Profile.sOrgIntTitle2"
@@ -1311,10 +1483,13 @@
 
                         </select>
 
+                        <span asp-validation-for="Profile.sOrgIntTitle2"
+                              class="text-danger">
+                        </span>
+
                     </div>
 
 
-                    <!-- Duration -->
                     <div class="col-md-3 mb-3">
 
                         <label asp-for="Profile.sOrgIntDuration2"
@@ -1332,10 +1507,13 @@
 
                         </select>
 
+                        <span asp-validation-for="Profile.sOrgIntDuration2"
+                              class="text-danger">
+                        </span>
+
                     </div>
 
 
-                    <!-- Status -->
                     <div class="col-md-3 mb-3">
 
                         <label asp-for="Profile.sOrgIntStatus2"
@@ -1353,14 +1531,16 @@
 
                         </select>
 
+                        <span asp-validation-for="Profile.sOrgIntStatus2"
+                              class="text-danger">
+                        </span>
+
                     </div>
 
                 </div>
 
 
-                <!-- =====================================================
-                 INTERNSHIP 3
-                 ===================================================== -->
+                <!-- INTERNSHIP 3 -->
 
                 <h6 class="mt-3 mb-3">
                     Internship 3
@@ -1368,7 +1548,6 @@
 
                 <div class="row">
 
-                    <!-- Organization -->
                     <div class="col-md-3 mb-3">
 
                         <label asp-for="Profile.sOrgName3"
@@ -1378,12 +1557,16 @@
 
                         <input asp-for="Profile.sOrgName3"
                                class="form-control"
+                               maxlength="150"
                                placeholder="Organization Name" />
+
+                        <span asp-validation-for="Profile.sOrgName3"
+                              class="text-danger">
+                        </span>
 
                     </div>
 
 
-                    <!-- Title -->
                     <div class="col-md-3 mb-3">
 
                         <label asp-for="Profile.sOrgIntTitle3"
@@ -1401,10 +1584,13 @@
 
                         </select>
 
+                        <span asp-validation-for="Profile.sOrgIntTitle3"
+                              class="text-danger">
+                        </span>
+
                     </div>
 
 
-                    <!-- Duration -->
                     <div class="col-md-3 mb-3">
 
                         <label asp-for="Profile.sOrgIntDuration3"
@@ -1422,10 +1608,13 @@
 
                         </select>
 
+                        <span asp-validation-for="Profile.sOrgIntDuration3"
+                              class="text-danger">
+                        </span>
+
                     </div>
 
 
-                    <!-- Status -->
                     <div class="col-md-3 mb-3">
 
                         <label asp-for="Profile.sOrgIntStatus3"
@@ -1443,14 +1632,16 @@
 
                         </select>
 
+                        <span asp-validation-for="Profile.sOrgIntStatus3"
+                              class="text-danger">
+                        </span>
+
                     </div>
 
                 </div>
 
 
-                <!-- =====================================================
-                 INTERNSHIP 4
-                 ===================================================== -->
+                <!-- INTERNSHIP 4 -->
 
                 <h6 class="mt-3 mb-3">
                     Internship 4
@@ -1458,7 +1649,6 @@
 
                 <div class="row">
 
-                    <!-- Organization -->
                     <div class="col-md-3 mb-3">
 
                         <label asp-for="Profile.sOrgName4"
@@ -1468,12 +1658,16 @@
 
                         <input asp-for="Profile.sOrgName4"
                                class="form-control"
+                               maxlength="150"
                                placeholder="Organization Name" />
+
+                        <span asp-validation-for="Profile.sOrgName4"
+                              class="text-danger">
+                        </span>
 
                     </div>
 
 
-                    <!-- Title -->
                     <div class="col-md-3 mb-3">
 
                         <label asp-for="Profile.sOrgIntTitle4"
@@ -1491,10 +1685,13 @@
 
                         </select>
 
+                        <span asp-validation-for="Profile.sOrgIntTitle4"
+                              class="text-danger">
+                        </span>
+
                     </div>
 
 
-                    <!-- Duration -->
                     <div class="col-md-3 mb-3">
 
                         <label asp-for="Profile.sOrgIntDuration4"
@@ -1512,10 +1709,13 @@
 
                         </select>
 
+                        <span asp-validation-for="Profile.sOrgIntDuration4"
+                              class="text-danger">
+                        </span>
+
                     </div>
 
 
-                    <!-- Status -->
                     <div class="col-md-3 mb-3">
 
                         <label asp-for="Profile.sOrgIntStatus4"
@@ -1533,22 +1733,20 @@
 
                         </select>
 
+                        <span asp-validation-for="Profile.sOrgIntStatus4"
+                              class="text-danger">
+                        </span>
+
                     </div>
 
                 </div>
 
 
-                <!-- =====================================================
-                 UPDATE BUTTON
-                 ===================================================== -->
-
                 <div class="text-end mt-3">
 
                     <button type="submit"
                             class="btn btn-primary">
-
                         Update Internship Details
-
                     </button>
 
                 </div>
@@ -1563,16 +1761,22 @@
     <!-- ================================================= -->
     <!-- LANGUAGES -->
     <!-- ================================================= -->
+    <!-- ================================================= -->
+    <!-- LANGUAGES -->
+    <!-- ================================================= -->
 
     <div class="card mb-4">
 
         <div class="card-header">
-            <h5 class="mb-0">Languages Known</h5>
+            <h5 class="mb-0">
+                Languages Known
+            </h5>
         </div>
 
         <div class="card-body">
 
-            <form asp-action="UpdateLanguages"
+            <form id="languagesForm"
+                  asp-action="UpdateLanguages"
                   asp-controller="Candidate"
                   method="post">
 
@@ -1581,91 +1785,90 @@
                 <input type="hidden"
                        asp-for="Profile.CandidateID" />
 
-
-                <!-- ================================================= -->
                 <!-- LANGUAGE 1 -->
-                <!-- ================================================= -->
 
-                <div class="row">
+                <div class="row language-row">
 
                     <div class="col-md-6 mb-3">
 
-                        <label class="form-label">
+                        <label asp-for="Profile.sLanguage1"
+                               class="form-label">
                             Language 1
                         </label>
 
                         <input asp-for="Profile.sLanguage1"
-                               class="form-control"
-                               placeholder="Enter language" />
+                               class="form-control language-input"
+                               placeholder="Enter language"
+                               maxlength="50" />
+
+                        <span asp-validation-for="Profile.sLanguage1"
+                              class="text-danger">
+                        </span>
 
                     </div>
 
                     <div class="col-md-6 mb-3">
 
-                        <label class="form-label">
+                        <label asp-for="Profile.sLanguageStar1"
+                               class="form-label">
                             Rating
                         </label>
 
                         <select asp-for="Profile.sLanguageStar1"
-                                class="form-control">
+                                class="form-control language-rating">
 
                             <option value="">
                                 -- Rating --
                             </option>
 
-                            <option value="1">
-                                1 Star
-                            </option>
-
-                            <option value="2">
-                                2 Stars
-                            </option>
-
-                            <option value="3">
-                                3 Stars
-                            </option>
-
-                            <option value="4">
-                                4 Stars
-                            </option>
-
-                            <option value="5">
-                                5 Stars
-                            </option>
+                            <option value="1">1 Star</option>
+                            <option value="2">2 Stars</option>
+                            <option value="3">3 Stars</option>
+                            <option value="4">4 Stars</option>
+                            <option value="5">5 Stars</option>
 
                         </select>
+
+                        <span asp-validation-for="Profile.sLanguageStar1"
+                              class="text-danger">
+                        </span>
 
                     </div>
 
                 </div>
 
 
-                <!-- ================================================= -->
                 <!-- LANGUAGE 2 -->
-                <!-- ================================================= -->
 
-                <div class="row">
+                <div class="row language-row">
 
                     <div class="col-md-6 mb-3">
 
-                        <label class="form-label">
+                        <label asp-for="Profile.sLanguage2"
+                               class="form-label">
                             Language 2
                         </label>
 
                         <input asp-for="Profile.sLanguage2"
-                               class="form-control"
-                               placeholder="Enter language" />
+                               class="form-control language-input"
+                               placeholder="Enter language"
+                               maxlength="50" />
+
+                        <span asp-validation-for="Profile.sLanguage2"
+                              class="text-danger">
+                        </span>
 
                     </div>
 
                     <div class="col-md-6 mb-3">
 
-                        <label class="form-label">
+                        <label asp-for="Profile.sLanguageStar2"
+                               class="form-label">
                             Rating
                         </label>
 
                         <select asp-for="Profile.sLanguageStar2"
-                                class="form-control">
+                                class="form-control language-rating">
 
                             <option value="">
                                 -- Rating --
@@ -1679,37 +1882,46 @@
 
                         </select>
 
+                        <span asp-validation-for="Profile.sLanguageStar2"
+                              class="text-danger">
+                        </span>
+
                     </div>
 
                 </div>
 
 
-                <!-- ================================================= -->
                 <!-- LANGUAGE 3 -->
-                <!-- ================================================= -->
 
-                <div class="row">
+                <div class="row language-row">
 
                     <div class="col-md-6 mb-3">
 
-                        <label class="form-label">
+                        <label asp-for="Profile.sLanguage3"
+                               class="form-label">
                             Language 3
                         </label>
 
                         <input asp-for="Profile.sLanguage3"
-                               class="form-control"
-                               placeholder="Enter language" />
+                               class="form-control language-input"
+                               placeholder="Enter language"
+                               maxlength="50" />
+
+                        <span asp-validation-for="Profile.sLanguage3"
+                              class="text-danger">
+                        </span>
 
                     </div>
 
                     <div class="col-md-6 mb-3">
 
-                        <label class="form-label">
+                        <label asp-for="Profile.sLanguageStar3"
+                               class="form-label">
                             Rating
                         </label>
 
                         <select asp-for="Profile.sLanguageStar3"
-                                class="form-control">
+                                class="form-control language-rating">
 
                             <option value="">
                                 -- Rating --
@@ -1723,37 +1935,46 @@
 
                         </select>
 
+                        <span asp-validation-for="Profile.sLanguageStar3"
+                              class="text-danger">
+                        </span>
+
                     </div>
 
                 </div>
 
 
-                <!-- ================================================= -->
                 <!-- LANGUAGE 4 -->
-                <!-- ================================================= -->
 
-                <div class="row">
+                <div class="row language-row">
 
                     <div class="col-md-6 mb-3">
 
-                        <label class="form-label">
+                        <label asp-for="Profile.sLanguage4"
+                               class="form-label">
                             Language 4
                         </label>
 
                         <input asp-for="Profile.sLanguage4"
-                               class="form-control"
-                               placeholder="Enter language" />
+                               class="form-control language-input"
+                               placeholder="Enter language"
+                               maxlength="50" />
+
+                        <span asp-validation-for="Profile.sLanguage4"
+                              class="text-danger">
+                        </span>
 
                     </div>
 
                     <div class="col-md-6 mb-3">
 
-                        <label class="form-label">
+                        <label asp-for="Profile.sLanguageStar4"
+                               class="form-label">
                             Rating
                         </label>
 
                         <select asp-for="Profile.sLanguageStar4"
-                                class="form-control">
+                                class="form-control language-rating">
 
                             <option value="">
                                 -- Rating --
@@ -1767,37 +1988,46 @@
 
                         </select>
 
+                        <span asp-validation-for="Profile.sLanguageStar4"
+                              class="text-danger">
+                        </span>
+
                     </div>
 
                 </div>
 
 
-                <!-- ================================================= -->
                 <!-- LANGUAGE 5 -->
-                <!-- ================================================= -->
 
-                <div class="row">
+                <div class="row language-row">
 
                     <div class="col-md-6 mb-3">
 
-                        <label class="form-label">
+                        <label asp-for="Profile.sLanguage5"
+                               class="form-label">
                             Language 5
                         </label>
 
                         <input asp-for="Profile.sLanguage5"
-                               class="form-control"
-                               placeholder="Enter language" />
+                               class="form-control language-input"
+                               placeholder="Enter language"
+                               maxlength="50" />
+
+                        <span asp-validation-for="Profile.sLanguage5"
+                              class="text-danger">
+                        </span>
 
                     </div>
 
                     <div class="col-md-6 mb-3">
 
-                        <label class="form-label">
+                        <label asp-for="Profile.sLanguageStar5"
+                               class="form-label">
                             Rating
                         </label>
 
                         <select asp-for="Profile.sLanguageStar5"
-                                class="form-control">
+                                class="form-control language-rating">
 
                             <option value="">
                                 -- Rating --
@@ -1811,37 +2041,46 @@
 
                         </select>
 
+                        <span asp-validation-for="Profile.sLanguageStar5"
+                              class="text-danger">
+                        </span>
+
                     </div>
 
                 </div>
 
 
-                <!-- ================================================= -->
                 <!-- LANGUAGE 6 -->
-                <!-- ================================================= -->
 
-                <div class="row">
+                <div class="row language-row">
 
                     <div class="col-md-6 mb-3">
 
-                        <label class="form-label">
+                        <label asp-for="Profile.sLanguage6"
+                               class="form-label">
                             Language 6
                         </label>
 
                         <input asp-for="Profile.sLanguage6"
-                               class="form-control"
-                               placeholder="Enter language" />
+                               class="form-control language-input"
+                               placeholder="Enter language"
+                               maxlength="50" />
+
+                        <span asp-validation-for="Profile.sLanguage6"
+                              class="text-danger">
+                        </span>
 
                     </div>
 
                     <div class="col-md-6 mb-3">
 
-                        <label class="form-label">
+                        <label asp-for="Profile.sLanguageStar6"
+                               class="form-label">
                             Rating
                         </label>
 
                         <select asp-for="Profile.sLanguageStar6"
-                                class="form-control">
+                                class="form-control language-rating">
 
                             <option value="">
                                 -- Rating --
@@ -1855,37 +2094,46 @@
 
                         </select>
 
+                        <span asp-validation-for="Profile.sLanguageStar6"
+                              class="text-danger">
+                        </span>
+
                     </div>
 
                 </div>
 
 
-                <!-- ================================================= -->
                 <!-- LANGUAGE 7 -->
-                <!-- ================================================= -->
 
-                <div class="row">
+                <div class="row language-row">
 
                     <div class="col-md-6 mb-3">
 
-                        <label class="form-label">
+                        <label asp-for="Profile.sLanguage7"
+                               class="form-label">
                             Language 7
                         </label>
 
                         <input asp-for="Profile.sLanguage7"
-                               class="form-control"
-                               placeholder="Enter language" />
+                               class="form-control language-input"
+                               placeholder="Enter language"
+                               maxlength="50" />
+
+                        <span asp-validation-for="Profile.sLanguage7"
+                              class="text-danger">
+                        </span>
 
                     </div>
 
                     <div class="col-md-6 mb-3">
 
-                        <label class="form-label">
+                        <label asp-for="Profile.sLanguageStar7"
+                               class="form-label">
                             Rating
                         </label>
 
                         <select asp-for="Profile.sLanguageStar7"
-                                class="form-control">
+                                class="form-control language-rating">
 
                             <option value="">
                                 -- Rating --
@@ -1899,37 +2147,46 @@
 
                         </select>
 
+                        <span asp-validation-for="Profile.sLanguageStar7"
+                              class="text-danger">
+                        </span>
+
                     </div>
 
                 </div>
 
 
-                <!-- ================================================= -->
                 <!-- LANGUAGE 8 -->
-                <!-- ================================================= -->
 
-                <div class="row">
+                <div class="row language-row">
 
                     <div class="col-md-6 mb-3">
 
-                        <label class="form-label">
+                        <label asp-for="Profile.sLanguage8"
+                               class="form-label">
                             Language 8
                         </label>
 
                         <input asp-for="Profile.sLanguage8"
-                               class="form-control"
-                               placeholder="Enter language" />
+                               class="form-control language-input"
+                               placeholder="Enter language"
+                               maxlength="50" />
+
+                        <span asp-validation-for="Profile.sLanguage8"
+                              class="text-danger">
+                        </span>
 
                     </div>
 
                     <div class="col-md-6 mb-3">
 
-                        <label class="form-label">
+                        <label asp-for="Profile.sLanguageStar8"
+                               class="form-label">
                             Rating
                         </label>
 
                         <select asp-for="Profile.sLanguageStar8"
-                                class="form-control">
+                                class="form-control language-rating">
 
                             <option value="">
                                 -- Rating --
@@ -1943,22 +2200,29 @@
 
                         </select>
 
+                        <span asp-validation-for="Profile.sLanguageStar8"
+                              class="text-danger">
+                        </span>
+
                     </div>
 
                 </div>
 
 
-                <!-- ================================================= -->
-                <!-- UPDATE BUTTON -->
-                <!-- ================================================= -->
+                <div id="languageValidation"
+                     class="text-danger mb-3"
+                     style="display:none;">
+
+                    Please enter at least one language and select its rating.
+
+                </div>
+
 
                 <div class="text-end">
 
                     <button type="submit"
                             class="btn btn-primary">
-
                         Update Languages
-
                     </button>
 
                 </div>
@@ -1977,12 +2241,15 @@
     <div class="card mb-4">
 
         <div class="card-header">
-            <h5 class="mb-0">References</h5>
+            <h5 class="mb-0">
+                References
+            </h5>
         </div>
 
         <div class="card-body">
 
-            <form asp-action="UpdateReferences"
+            <form id="referencesForm"
+                  asp-action="UpdateReferences"
                   asp-controller="Candidate"
                   method="post">
 
@@ -1993,22 +2260,36 @@
 
                 <div class="row">
 
+                    <!-- REFERENCE 1 -->
+
                     <div class="col-md-6">
 
                         <h6>Reference 1</h6>
 
                         <div class="mb-3">
 
-                            <label>Name</label>
+                            <label asp-for="Profile.sRefName1"
+                                   class="form-label">
+                                Name
+                            </label>
 
                             <input asp-for="Profile.sRefName1"
-                                   class="form-control" />
+                                   class="form-control"
+                                   maxlength="100" />
+
+                            <span asp-validation-for="Profile.sRefName1"
+                                  class="text-danger">
+                            </span>
 
                         </div>
 
+
                         <div class="mb-3">
 
-                            <label>Relationship</label>
+                            <label asp-for="Profile.sRefRelationName1"
+                                   class="form-label">
+                                Relationship
+                            </label>
 
                             <select asp-for="Profile.sRefRelationName1"
                                     class="form-control"
@@ -2020,28 +2301,56 @@
 
                             </select>
 
+                            <span asp-validation-for="Profile.sRefRelationName1"
+                                  class="text-danger">
+                            </span>
+
                         </div>
+
 
                         <div class="mb-3">
 
-                            <label>Location</label>
+                            <label asp-for="Profile.sLocation1"
+                                   class="form-label">
+                                Location
+                            </label>
 
                             <input asp-for="Profile.sLocation1"
-                                   class="form-control" />
+                                   class="form-control"
+                                   maxlength="150" />
+
+                            <span asp-validation-for="Profile.sLocation1"
+                                  class="text-danger">
+                            </span>
 
                         </div>
 
+
                         <div class="mb-3">
 
-                            <label>Mobile</label>
+                            <label asp-for="Profile.sMobile1"
+                                   class="form-label">
+                                Mobile
+                            </label>
 
                             <input asp-for="Profile.sMobile1"
-                                   class="form-control" />
+                                   class="form-control reference-mobile"
+                                   maxlength="10"
+                                   minlength="10"
+                                   pattern="[6-9][0-9]{9}"
+                                   inputmode="numeric"
+                                   placeholder="10 digit mobile number" />
+
+                            <span asp-validation-for="Profile.sMobile1"
+                                  class="text-danger">
+                            </span>
 
                         </div>
 
                     </div>
 
+
+                    <!-- REFERENCE 2 -->
 
                     <div class="col-md-6">
 
@@ -2049,16 +2358,28 @@
 
                         <div class="mb-3">
 
-                            <label>Name</label>
+                            <label asp-for="Profile.sRefName2"
+                                   class="form-label">
+                                Name
+                            </label>
 
                             <input asp-for="Profile.sRefName2"
-                                   class="form-control" />
+                                   class="form-control"
+                                   maxlength="100" />
+
+                            <span asp-validation-for="Profile.sRefName2"
+                                  class="text-danger">
+                            </span>
 
                         </div>
 
+
                         <div class="mb-3">
 
-                            <label>Relationship</label>
+                            <label asp-for="Profile.sRefRelationName2"
+                                   class="form-label">
+                                Relationship
+                            </label>
 
                             <select asp-for="Profile.sRefRelationName2"
                                     class="form-control"
@@ -2070,23 +2391,49 @@
 
                             </select>
 
+                            <span asp-validation-for="Profile.sRefRelationName2"
+                                  class="text-danger">
+                            </span>
+
                         </div>
+
 
                         <div class="mb-3">
 
-                            <label>Location</label>
+                            <label asp-for="Profile.sLocation2"
+                                   class="form-label">
+                                Location
+                            </label>
 
                             <input asp-for="Profile.sLocation2"
-                                   class="form-control" />
+                                   class="form-control"
+                                   maxlength="150" />
+
+                            <span asp-validation-for="Profile.sLocation2"
+                                  class="text-danger">
+                            </span>
 
                         </div>
 
+
                         <div class="mb-3">
 
-                            <label>Mobile</label>
+                            <label asp-for="Profile.sMobile2"
+                                   class="form-label">
+                                Mobile
+                            </label>
 
                             <input asp-for="Profile.sMobile2"
-                                   class="form-control" />
+                                   class="form-control reference-mobile"
+                                   maxlength="10"
+                                   minlength="10"
+                                   pattern="[6-9][0-9]{9}"
+                                   inputmode="numeric"
+                                   placeholder="10 digit mobile number" />
+
+                            <span asp-validation-for="Profile.sMobile2"
+                                  class="text-danger">
+                            </span>
 
                         </div>
 
@@ -2099,9 +2446,7 @@
 
                     <button type="submit"
                             class="btn btn-primary">
-
                         Update References
-
                     </button>
 
                 </div>
@@ -2140,31 +2485,45 @@
 
                     <div class="col-md-4 mb-3">
 
-                        <label>Achievement / Certificate 1</label>
+                        <label asp-for="Profile.Achievements_Certification1"
+                               class="form-label">
+                            Achievement / Certificate 1
+                        </label>
 
                         <textarea asp-for="Profile.Achievements_Certification1"
                                   class="form-control"
-                                  rows="3"></textarea>
+                                  rows="3"
+                                  maxlength="500"></textarea>
 
                     </div>
 
+
                     <div class="col-md-4 mb-3">
 
-                        <label>Achievement / Certificate 2</label>
+                        <label asp-for="Profile.Achievements_Certification2"
+                               class="form-label">
+                            Achievement / Certificate 2
+                        </label>
 
                         <textarea asp-for="Profile.Achievements_Certification2"
                                   class="form-control"
-                                  rows="3"></textarea>
+                                  rows="3"
+                                  maxlength="500"></textarea>
 
                     </div>
 
+
                     <div class="col-md-4 mb-3">
 
-                        <label>Achievement / Certificate 3</label>
+                        <label asp-for="Profile.Achievements_Certification3"
+                               class="form-label">
+                            Achievement / Certificate 3
+                        </label>
 
                         <textarea asp-for="Profile.Achievements_Certification3"
                                   class="form-control"
-                                  rows="3"></textarea>
+                                  rows="3"
+                                  maxlength="500"></textarea>
 
                     </div>
 
@@ -2175,9 +2534,7 @@
 
                     <button type="submit"
                             class="btn btn-primary">
-
                         Update Achievements
-
                     </button>
 
                 </div>
@@ -2196,12 +2553,15 @@
     <div class="card mb-4">
 
         <div class="card-header">
-            <h5 class="mb-0">Social Links</h5>
+            <h5 class="mb-0">
+                Social Links
+            </h5>
         </div>
 
         <div class="card-body">
 
-            <form asp-action="UpdateSocialLinks"
+            <form id="socialForm"
+                  asp-action="UpdateSocialLinks"
                   asp-controller="Candidate"
                   method="post">
 
@@ -2214,21 +2574,40 @@
 
                     <div class="col-md-6 mb-3">
 
-                        <label>GitHub</label>
+                        <label asp-for="Profile.GitHub"
+                               class="form-label">
+                            GitHub
+                        </label>
 
                         <input asp-for="Profile.GitHub"
+                               type="url"
                                class="form-control"
-                               placeholder="GitHub URL" />
+                               maxlength="300"
+                               placeholder="https://github.com/username" />
+
+                        <span asp-validation-for="Profile.GitHub"
+                              class="text-danger">
+                        </span>
 
                     </div>
 
+
                     <div class="col-md-6 mb-3">
 
-                        <label>LinkedIn</label>
+                        <label asp-for="Profile.Linkedin"
+                               class="form-label">
+                            LinkedIn
+                        </label>
 
                         <input asp-for="Profile.Linkedin"
+                               type="url"
                                class="form-control"
-                               placeholder="LinkedIn URL" />
+                               maxlength="300"
+                               placeholder="https://www.linkedin.com/in/username" />
+
+                        <span asp-validation-for="Profile.Linkedin"
+                              class="text-danger">
+                        </span>
 
                     </div>
 
@@ -2239,9 +2618,7 @@
 
                     <button type="submit"
                             class="btn btn-primary">
-
                         Update Links
-
                     </button>
 
                 </div>
@@ -2254,18 +2631,21 @@
 
 
     <!-- ================================================= -->
-    <!-- OBJECTIVE -->
+    <!-- CAREER OBJECTIVE -->
     <!-- ================================================= -->
 
     <div class="card mb-4">
 
         <div class="card-header">
-            <h5 class="mb-0">Career Objective</h5>
+            <h5 class="mb-0">
+                Career Objective
+            </h5>
         </div>
 
         <div class="card-body">
 
-            <form asp-action="UpdateSocialLinks"
+            <form id="objectiveForm"
+                  asp-action="UpdateObjective"
                   asp-controller="Candidate"
                   method="post">
 
@@ -2274,31 +2654,40 @@
                 <input type="hidden"
                        asp-for="Profile.CandidateID" />
 
-                <div class="row">
+                <div class="mb-3">
 
-                    <div class="col-md-6 mb-3">
-                        <label>GitHub</label>
+                    <label asp-for="Profile.Objective"
+                           class="form-label">
+                        Career Objective
+                        <span class="text-danger">*</span>
+                    </label>
 
-                        <input asp-for="Profile.GitHub"
-                               class="form-control"
-                               placeholder="GitHub URL" />
-                    </div>
+                    <textarea asp-for="Profile.Objective"
+                              class="form-control"
+                              rows="5"
+                              maxlength="1000"
+                              minlength="20"
+                              placeholder="Enter your career objective"
+                              required></textarea>
 
-                    <div class="col-md-6 mb-3">
-                        <label>LinkedIn</label>
+                    <span asp-validation-for="Profile.Objective"
+                          class="text-danger">
+                    </span>
 
-                        <input asp-for="Profile.Linkedin"
-                               class="form-control"
-                               placeholder="LinkedIn URL" />
-                    </div>
+                    <small class="text-muted">
+                        Minimum 20 characters, maximum 1000 characters.
+                    </small>
 
                 </div>
 
+
                 <div class="text-end">
+
                     <button type="submit"
                             class="btn btn-primary">
-                        Update Links
+                        Update Career Objective
                     </button>
+
                 </div>
 
             </form>
@@ -2311,13 +2700,6 @@
     <!-- ================================================= -->
     <!-- SKILLS -->
     <!-- ================================================= -->
-    <!-- ========================================================= -->
-    <!-- SKILLS -->
-    <!-- ========================================================= -->
-    @* =========================================================
-   SKILLS SECTION
-   ========================================================= *@
-
     @{
         var selectedMedicalSkills = new HashSet<string>(
         (Model.Profile?.sMedicalSkillIDs ?? "")
@@ -2361,31 +2743,26 @@
                 <input type="hidden"
                        asp-for="Profile.CandidateID" />
 
-                <section class="skills-section" id="skills">
-
-                    <!-- ================================================= -->
-                    <!-- TITLE -->
-                    <!-- ================================================= -->
+                <section class="skills-section">
 
                     <div class="skills-title">
 
                         <label>
-                            Select Skill Type (Any 1)
-                            <span class="required">*</span>
+                            Select Skill Type
+                            <span class="text-danger">*</span>
                         </label>
 
                         <small class="text-muted d-block mt-1">
-                            Select one or more skills from any category.
+                            Select at least one skill from any category.
                         </small>
 
                     </div>
 
 
-                    <!-- ================================================= -->
-                    <!-- MEDICAL SKILLS -->
-                    <!-- ================================================= -->
+                    <!-- MEDICAL -->
 
-                    <details class="skill-accordion" open>
+                    <details class="skill-accordion"
+                             open>
 
                         <summary class="skill-header">
 
@@ -2412,142 +2789,38 @@
                         <div class="skill-body"
                              id="medicalSkills">
 
+                            @foreach (var skill in new[]
+                                                        {
+                                                        "3D Slicer",
+                                                        "B.Pharm",
+                                                        "Auditory",
+                                                        "Clinical Research",
+                                                        "Anatomy",
+                                                        "Biochemistry",
+                                                        "Pharmacology",
+                                                        "Medical Coding"
+                                                        })
+                            {
+                                <label class="skill-item d-block mb-2">
 
-                            <!-- 3D Slicer -->
+                                    <input type="checkbox"
+                                           class="medical-skill"
+                                           value="@skill"
+                                           @(selectedMedicalSkills.Contains(skill) ? "checked" : "") />
 
-                            <label class="skill-item">
+                                    <span>
+                                        @skill
+                                    </span>
 
-                                <input type="checkbox"
-                                       class="medical-skill"
-                                       value="3D Slicer"
-                                       @(selectedMedicalSkills.Contains("3D Slicer") ? "checked" : "") />
-
-                                <span>
-                                    3D Slicer
-                                </span>
-
-                            </label>
-
-
-                            <!-- B.Pharm -->
-
-                            <label class="skill-item">
-
-                                <input type="checkbox"
-                                       class="medical-skill"
-                                       value="B.Pharm"
-                                       @(selectedMedicalSkills.Contains("B.Pharm") ? "checked" : "") />
-
-                                <span>
-                                    B.Pharm
-                                </span>
-
-                            </label>
-
-
-                            <!-- Auditory -->
-
-                            <label class="skill-item">
-
-                                <input type="checkbox"
-                                       class="medical-skill"
-                                       value="Auditory"
-                                       @(selectedMedicalSkills.Contains("Auditory") ? "checked" : "") />
-
-                                <span>
-                                    Auditory
-                                </span>
-
-                            </label>
-
-
-                            <!-- Clinical Research -->
-
-                            <label class="skill-item">
-
-                                <input type="checkbox"
-                                       class="medical-skill"
-                                       value="Clinical Research"
-                                       @(selectedMedicalSkills.Contains("Clinical Research") ? "checked" : "") />
-
-                                <span>
-                                    Clinical Research
-                                </span>
-
-                            </label>
-
-
-                            <!-- Anatomy -->
-
-                            <label class="skill-item">
-
-                                <input type="checkbox"
-                                       class="medical-skill"
-                                       value="Anatomy"
-                                       @(selectedMedicalSkills.Contains("Anatomy") ? "checked" : "") />
-
-                                <span>
-                                    Anatomy
-                                </span>
-
-                            </label>
-
-
-                            <!-- Biochemistry -->
-
-                            <label class="skill-item">
-
-                                <input type="checkbox"
-                                       class="medical-skill"
-                                       value="Biochemistry"
-                                       @(selectedMedicalSkills.Contains("Biochemistry") ? "checked" : "") />
-
-                                <span>
-                                    Biochemistry
-                                </span>
-
-                            </label>
-
-
-                            <!-- Pharmacology -->
-
-                            <label class="skill-item">
-
-                                <input type="checkbox"
-                                       class="medical-skill"
-                                       value="Pharmacology"
-                                       @(selectedMedicalSkills.Contains("Pharmacology") ? "checked" : "") />
-
-                                <span>
-                                    Pharmacology
-                                </span>
-
-                            </label>
-
-
-                            <!-- Medical Coding -->
-
-                            <label class="skill-item">
-
-                                <input type="checkbox"
-                                       class="medical-skill"
-                                       value="Medical Coding"
-                                       @(selectedMedicalSkills.Contains("Medical Coding") ? "checked" : "") />
-
-                                <span>
-                                    Medical Coding
-                                </span>
-
-                            </label>
+                                </label>
+                            }
 
                         </div>
 
                     </details>
 
 
-                    <!-- ================================================= -->
-                    <!-- TECHNICAL SKILLS -->
-                    <!-- ================================================= -->
+                    <!-- TECHNICAL -->
 
                     <details class="skill-accordion">
 
@@ -2576,206 +2849,42 @@
                         <div class="skill-body"
                              id="technicalSkills">
 
-
-                            <!-- HTML -->
-
-                            <label class="skill-item">
-
-                                <input type="checkbox"
-                                       class="technical-skill"
-                                       value="HTML"
-                                       @(selectedTechnicalSkills.Contains("HTML") ? "checked" : "") />
-
-                                <span>
-                                    HTML
-                                </span>
-
-                            </label>
-
-
-                            <!-- CSS -->
-
-                            <label class="skill-item">
-
-                                <input type="checkbox"
-                                       class="technical-skill"
-                                       value="CSS"
-                                       @(selectedTechnicalSkills.Contains("CSS") ? "checked" : "") />
-
-                                <span>
-                                    CSS
-                                </span>
-
-                            </label>
-
-
-                            <!-- JavaScript -->
-
-                            <label class="skill-item">
-
-                                <input type="checkbox"
-                                       class="technical-skill"
-                                       value="JavaScript"
-                                       @(selectedTechnicalSkills.Contains("JavaScript") ? "checked" : "") />
-
-                                <span>
-                                    JavaScript
-                                </span>
-
-                            </label>
-
-
-                            <!-- React -->
-
-                            <label class="skill-item">
-
-                                <input type="checkbox"
-                                       class="technical-skill"
-                                       value="React.js"
-                                       @(selectedTechnicalSkills.Contains("React.js") ? "checked" : "") />
-
-                                <span>
-                                    React.js
-                                </span>
-
-                            </label>
-
-
-                            <!-- Angular -->
-
-                            <label class="skill-item">
-
-                                <input type="checkbox"
-                                       class="technical-skill"
-                                       value="Angular"
-                                       @(selectedTechnicalSkills.Contains("Angular") ? "checked" : "") />
-
-                                <span>
-                                    Angular
-                                </span>
-
-                            </label>
-
-
-                            <!-- ASP.NET -->
-
-                            <label class="skill-item">
-
-                                <input type="checkbox"
-                                       class="technical-skill"
-                                       value="ASP.NET"
-                                       @(selectedTechnicalSkills.Contains("ASP.NET") ? "checked" : "") />
-
-                                <span>
-                                    ASP.NET
-                                </span>
-
-                            </label>
-
-
-                            <!-- C# -->
-
-                            <label class="skill-item">
-
-                                <input type="checkbox"
-                                       class="technical-skill"
-                                       value="C#"
-                                       @(selectedTechnicalSkills.Contains("C#") ? "checked" : "") />
-
-                                <span>
-                                    C#
-                                </span>
-
-                            </label>
-
-
-                            <!-- Java -->
-
-                            <label class="skill-item">
-
-                                <input type="checkbox"
-                                       class="technical-skill"
-                                       value="Java"
-                                       @(selectedTechnicalSkills.Contains("Java") ? "checked" : "") />
-
-                                <span>
-                                    Java
-                                </span>
-
-                            </label>
-
-
-                            <!-- Python -->
-
-                            <label class="skill-item">
-
-                                <input type="checkbox"
-                                       class="technical-skill"
-                                       value="Python"
-                                       @(selectedTechnicalSkills.Contains("Python") ? "checked" : "") />
-
-                                <span>
-                                    Python
-                                </span>
-
-                            </label>
-
-
-                            <!-- SQL -->
-
-                            <label class="skill-item">
-
-                                <input type="checkbox"
-                                       class="technical-skill"
-                                       value="SQL"
-                                       @(selectedTechnicalSkills.Contains("SQL") ? "checked" : "") />
-
-                                <span>
-                                    SQL
-                                </span>
-
-                            </label>
-
-
-                            <!-- Git -->
-
-                            <label class="skill-item">
-
-                                <input type="checkbox"
-                                       class="technical-skill"
-                                       value="Git"
-                                       @(selectedTechnicalSkills.Contains("Git") ? "checked" : "") />
-
-                                <span>
-                                    Git
-                                </span>
-
-                            </label>
-
-
-                            <!-- Bootstrap -->
-
-                            <label class="skill-item">
-
-                                <input type="checkbox"
-                                       class="technical-skill"
-                                       value="Bootstrap"
-                                       @(selectedTechnicalSkills.Contains("Bootstrap") ? "checked" : "") />
-
-                                <span>
-                                    Bootstrap
-                                </span>
-
-                            </label>
+                            @foreach (var skill in new[]
+                                                        {
+                                                        "HTML",
+                                                        "CSS",
+                                                        "JavaScript",
+                                                        "React.js",
+                                                        "Angular",
+                                                        "ASP.NET",
+                                                        "C#",
+                                                        "Java",
+                                                        "Python",
+                                                        "SQL",
+                                                        "Git",
+                                                        "Bootstrap"
+                                                        })
+                            {
+                                <label class="skill-item d-block mb-2">
+
+                                    <input type="checkbox"
+                                           class="technical-skill"
+                                           value="@skill"
+                                           @(selectedTechnicalSkills.Contains(skill) ? "checked" : "") />
+
+                                    <span>
+                                        @skill
+                                    </span>
+
+                                </label>
+                            }
 
                         </div>
 
                     </details>
 
 
-                    <!-- ================================================= -->
-                    <!-- NON TECHNICAL SKILLS -->
-                    <!-- ================================================= -->
+                    <!-- NON TECHNICAL -->
 
                     <details class="skill-accordion">
 
@@ -2804,142 +2913,38 @@
                         <div class="skill-body"
                              id="nonTechnicalSkills">
 
+                            @foreach (var skill in new[]
+                                                        {
+                                                        "Communication",
+                                                        "Teamwork",
+                                                        "Leadership",
+                                                        "Problem Solving",
+                                                        "Time Management",
+                                                        "Presentation",
+                                                        "Adaptability",
+                                                        "Creativity"
+                                                        })
+                            {
+                                <label class="skill-item d-block mb-2">
 
-                            <!-- Communication -->
+                                    <input type="checkbox"
+                                           class="nontechnical-skill"
+                                           value="@skill"
+                                           @(selectedNonTechnicalSkills.Contains(skill) ? "checked" : "") />
 
-                            <label class="skill-item">
+                                    <span>
+                                        @skill
+                                    </span>
 
-                                <input type="checkbox"
-                                       class="nontechnical-skill"
-                                       value="Communication"
-                                       @(selectedNonTechnicalSkills.Contains("Communication") ? "checked" : "") />
-
-                                <span>
-                                    Communication
-                                </span>
-
-                            </label>
-
-
-                            <!-- Teamwork -->
-
-                            <label class="skill-item">
-
-                                <input type="checkbox"
-                                       class="nontechnical-skill"
-                                       value="Teamwork"
-                                       @(selectedNonTechnicalSkills.Contains("Teamwork") ? "checked" : "") />
-
-                                <span>
-                                    Teamwork
-                                </span>
-
-                            </label>
-
-
-                            <!-- Leadership -->
-
-                            <label class="skill-item">
-
-                                <input type="checkbox"
-                                       class="nontechnical-skill"
-                                       value="Leadership"
-                                       @(selectedNonTechnicalSkills.Contains("Leadership") ? "checked" : "") />
-
-                                <span>
-                                    Leadership
-                                </span>
-
-                            </label>
-
-
-                            <!-- Problem Solving -->
-
-                            <label class="skill-item">
-
-                                <input type="checkbox"
-                                       class="nontechnical-skill"
-                                       value="Problem Solving"
-                                       @(selectedNonTechnicalSkills.Contains("Problem Solving") ? "checked" : "") />
-
-                                <span>
-                                    Problem Solving
-                                </span>
-
-                            </label>
-
-
-                            <!-- Time Management -->
-
-                            <label class="skill-item">
-
-                                <input type="checkbox"
-                                       class="nontechnical-skill"
-                                       value="Time Management"
-                                       @(selectedNonTechnicalSkills.Contains("Time Management") ? "checked" : "") />
-
-                                <span>
-                                    Time Management
-                                </span>
-
-                            </label>
-
-
-                            <!-- Presentation -->
-
-                            <label class="skill-item">
-
-                                <input type="checkbox"
-                                       class="nontechnical-skill"
-                                       value="Presentation"
-                                       @(selectedNonTechnicalSkills.Contains("Presentation") ? "checked" : "") />
-
-                                <span>
-                                    Presentation
-                                </span>
-
-                            </label>
-
-
-                            <!-- Adaptability -->
-
-                            <label class="skill-item">
-
-                                <input type="checkbox"
-                                       class="nontechnical-skill"
-                                       value="Adaptability"
-                                       @(selectedNonTechnicalSkills.Contains("Adaptability") ? "checked" : "") />
-
-                                <span>
-                                    Adaptability
-                                </span>
-
-                            </label>
-
-
-                            <!-- Creativity -->
-
-                            <label class="skill-item">
-
-                                <input type="checkbox"
-                                       class="nontechnical-skill"
-                                       value="Creativity"
-                                       @(selectedNonTechnicalSkills.Contains("Creativity") ? "checked" : "") />
-
-                                <span>
-                                    Creativity
-                                </span>
-
-                            </label>
+                                </label>
+                            }
 
                         </div>
 
                     </details>
 
 
-                    <!-- ================================================= -->
-                    <!-- HIDDEN DATABASE FIELDS -->
-                    <!-- ================================================= -->
+                    <!-- HIDDEN FIELDS -->
 
                     <input type="hidden"
                            asp-for="Profile.sMedicalSkillIDs"
@@ -2954,10 +2959,6 @@
                            id="sNonTechnicalSkillIDs" />
 
 
-                    <!-- ================================================= -->
-                    <!-- VALIDATION MESSAGE -->
-                    <!-- ================================================= -->
-
                     <div id="skillValidationMessage"
                          class="text-danger mt-3"
                          style="display:none;">
@@ -2966,10 +2967,6 @@
 
                     </div>
 
-
-                    <!-- ================================================= -->
-                    <!-- UPDATE BUTTON -->
-                    <!-- ================================================= -->
 
                     <div class="text-end mt-4">
 
@@ -2985,7 +2982,6 @@
                                   class="spinner-border spinner-border-sm ms-2"
                                   style="display:none;"
                                   role="status">
-
                             </span>
 
                         </button>
@@ -3004,63 +3000,32 @@
 
 
 @section Scripts {
-    <script>
 
-        $('#addressForm').on('submit', function () {
+    <partial name="_ValidationScriptsPartial" />
 
-            $('#StateID').prop('disabled', false);
-
-            $('#CityID').prop('disabled', false);
-
-        });
-
-    </script>
     <script>
 
         $(document).ready(function () {
 
-            var selectedCountryID = '@Model.Profile.CountryID';
-            var selectedStateID = '@Model.Profile.StateID';
-            var selectedCityID = '@Model.Profile.CityID';
+            /* =====================================================
+               ADDRESS
+               ===================================================== */
 
+            var selectedCountryID =
+                '@(Model.Profile?.CountryID ?? "")';
 
-            // ============================================
-            // IMPORTANT:
-            // Disabled select values are not submitted.
-            // Enable them before Address form submit.
-            // ============================================
+            var selectedStateID =
+                '@(Model.Profile?.StateID ?? "")';
 
-            $('form[action*="UpdateAddress"]').submit(function () {
+            var selectedCityID =
+                '@(Model.Profile?.CityID ?? "")';
 
-                $('#StateID').prop('disabled', false);
-                $('#CityID').prop('disabled', false);
-
-            });
-
-
-            $('#addressForm').on('submit', function () {
-
-                console.log("CountryID:", $('#CountryID').val());
-                console.log("StateID:", $('#StateID').val());
-                console.log("CityID:", $('#CityID').val());
-                console.log("Pincode:", $('#Profile_Pincode').val());
-
-                // Disabled controls are NOT submitted.
-                $('#StateID').prop('disabled', false);
-
-                $('#CityID').prop('disabled', false);
-
-            });
-            // ============================================
-            // LOAD COUNTRIES
-            // ============================================
 
             function loadCountries() {
 
                 $.ajax({
 
                     url: '/Location/GetCountries',
-
                     type: 'GET',
 
                     success: function (data) {
@@ -3071,16 +3036,13 @@
                             '<option value="">-- Select Country --</option>'
                         );
 
-
                         $.each(data, function (index, item) {
 
                             $('#CountryID').append(
 
                                 $('<option>', {
-
                                     value: item.id,
                                     text: item.name
-
                                 }).attr(
                                     'data-code',
                                     item.iso2
@@ -3115,129 +3077,93 @@
             }
 
 
-            // ============================================
-            // COUNTRY CHANGE
-            // ============================================
-
             $('#CountryID').change(function () {
 
-                var countryID = $(this).val();
+                var countryID =
+                    $(this).val();
 
                 var countryCode =
                     $('#CountryID option:selected')
                         .attr('data-code');
 
 
-                $('#StateID').empty();
+                $('#StateID')
+                    .empty()
+                    .append(
+                        '<option value="">-- Select State --</option>'
+                    );
 
-                $('#StateID').append(
-                    '<option value="">-- Select State --</option>'
-                );
+                $('#CityID')
+                    .empty()
+                    .append(
+                        '<option value="">-- Select City --</option>'
+                    );
 
-
-                $('#CityID').empty();
-
-                $('#CityID').append(
-                    '<option value="">-- Select City --</option>'
-                );
-
-                $('#CityID').prop('disabled', true);
+                $('#CityID')
+                    .prop('disabled', true);
 
 
                 if (!countryID || !countryCode) {
 
-                    $('#StateID').prop('disabled', true);
+                    $('#StateID')
+                        .prop('disabled', true);
 
                     return;
-
                 }
 
 
-                $('#StateID').prop('disabled', false);
+                $('#StateID')
+                    .prop('disabled', false);
 
 
                 $.ajax({
 
                     url: '/Location/GetStates',
-
                     type: 'GET',
 
                     data: {
-
                         countryCode: countryCode
-
                     },
 
                     success: function (data) {
 
-                        $('#StateID').empty();
-
-                        $('#StateID').append(
-                            '<option value="">-- Select State --</option>'
-                        );
-
-                                $.each(data, function (index, item) {
-
-            var stateCode = item.stateCode;
-
-            if (!stateCode && item.id) {
-
-                var parts = item.id.split(':');
-
-                stateCode =
-                    parts.length > 1
-                        ? parts[1]
-                        : item.id;
-            }
-
-            $('#StateID').append(
-
-                $('<option>', {
-
-                    value: item.id,
-                    text: item.name
-
-                }).attr(
-                    'data-code',
-                    stateCode
-                )
-
-            );
-
-        });
-
-                        // $.each(data, function (index, item) {
-
-                        //     var stateCode = item.stateCode;
-
-                        //     if (!stateCode && item.id) {
-
-                        //         var parts =
-                        //             item.id.split(':');
-
-                        //         stateCode =
-                        //             parts.length > 1
-                        //                 ? parts[1]
-                        //                 : item.id;
-
-                        //     }
+                        $('#StateID')
+                            .empty()
+                            .append(
+                                '<option value="">-- Select State --</option>'
+                            );
 
 
-                        //     $('#StateID').append(
+                        $.each(data, function (index, item) {
 
-                        //         $('<option>', {
+                            var stateCode =
+                                item.stateCode;
 
-                        //             value: item.id,
-                        //             text: item.name
+                            if (!stateCode && item.id) {
 
-                        //         }).attr(
-                        //             'data-code',
-                        //             stateCode
-                        //         )
+                                var parts =
+                                    item.id.split(':');
 
-                        //     );
+                                stateCode =
+                                    parts.length > 1
+                                        ? parts[1]
+                                        : item.id;
+                            }
 
-                        // });
+
+                            $('#StateID').append(
+
+                                $('<option>', {
+                                    value: item.id,
+                                    text: item.name
+                                }).attr(
+                                    'data-code',
+                                    stateCode
+                                )
+
+                            );
+
+                        });
 
 
                         if (selectedStateID !== '') {
@@ -3266,13 +3192,10 @@
             });
 
 
-            // ============================================
-            // STATE CHANGE
-            // ============================================
-
             $('#StateID').change(function () {
 
-                var stateID = $(this).val();
+                var stateID =
+                    $(this).val();
 
                 var stateCode =
                     $('#StateID option:selected')
@@ -3283,37 +3206,31 @@
                         .attr('data-code');
 
 
-                $('#CityID').empty();
-
-                $('#CityID').append(
-                    '<option value="">-- Select City --</option>'
-                );
+                $('#CityID')
+                    .empty()
+                    .append(
+                        '<option value="">-- Select City --</option>'
+                    );
 
 
                 if (!stateID ||
                     !stateCode ||
                     !countryCode) {
 
-                    $('#CityID').prop(
-                        'disabled',
-                        true
-                    );
+                    $('#CityID')
+                        .prop('disabled', true);
 
                     return;
-
                 }
 
 
-                $('#CityID').prop(
-                    'disabled',
-                    false
-                );
+                $('#CityID')
+                    .prop('disabled', false);
 
 
                 $.ajax({
 
                     url: '/Location/GetCities',
-
                     type: 'GET',
 
                     data: {
@@ -3325,11 +3242,11 @@
 
                     success: function (data) {
 
-                        $('#CityID').empty();
-
-                        $('#CityID').append(
-                            '<option value="">-- Select City --</option>'
-                        );
+                        $('#CityID')
+                            .empty()
+                            .append(
+                                '<option value="">-- Select City --</option>'
+                            );
 
 
                         $.each(data, function (index, item) {
@@ -3337,10 +3254,8 @@
                             $('#CityID').append(
 
                                 $('<option>', {
-
                                     value: item.id,
                                     text: item.name
-
                                 })
 
                             );
@@ -3348,7 +3263,7 @@
                         });
 
 
-                        if (selectedCityID) {
+                        if (selectedCityID !== '') {
 
                             $('#CityID')
                                 .val(selectedCityID);
@@ -3373,284 +3288,590 @@
             });
 
 
-            // ============================================
-            // INITIAL LOAD
-            // ============================================
+            $('#addressForm').on('submit', function (e) {
 
-            loadCountries();
+                /*
+                 * Disabled select controls are not posted.
+                 * Enable them before validation/submission.
+                 */
 
-        });
-        //         $(document).ready(function () {
+                $('#StateID')
+                    .prop('disabled', false);
 
-
-        // });
-    </script>
-
-    <script>
-
-        /* =========================================================
-           UPDATE SKILL COUNT + HIDDEN FIELD
-           ========================================================= */
-
-        function updateSkillCount(type) {
-
-            let selector = "";
-            let countElement = "";
-            let hiddenField = "";
-
-            if (type === "medical") {
-
-                selector = ".medical-skill:checked";
-                countElement = "medicalCount";
-                hiddenField = "sMedicalSkillIDs";
-
-            }
-            else if (type === "technical") {
-
-                selector = ".technical-skill:checked";
-                countElement = "technicalCount";
-                hiddenField = "sTechnicalSkillIDs";
-
-            }
-            else if (type === "nonTechnical") {
-
-                selector = ".nontechnical-skill:checked";
-                countElement = "nonTechnicalCount";
-                hiddenField = "sNonTechnicalSkillIDs";
-
-            }
+                $('#CityID')
+                    .prop('disabled', false);
 
 
-            const selected =
-                document.querySelectorAll(selector);
+                if (!this.checkValidity()) {
 
+                    e.preventDefault();
 
-            /* UPDATE COUNT */
+                    this.reportValidity();
 
-            document.getElementById(countElement).innerText =
-                selected.length + " selected";
-
-
-            /* UPDATE HIDDEN FIELD */
-
-            const values = [];
-
-
-            selected.forEach(function(checkbox) {
-
-                values.push(checkbox.value);
+                    return false;
+                }
 
             });
 
 
-            document.getElementById(hiddenField).value =
-                values.join(",");
-
-        }
+            loadCountries();
 
 
-        /* =========================================================
-           UPDATE ALL SKILLS
-           ========================================================= */
+            /* =====================================================
+               PINCODE
+               ===================================================== */
 
-        function updateAllSkillCounts() {
+            $('#Pincode').on('input', function () {
 
-            updateSkillCount("medical");
+                this.value =
+                    this.value
+                        .replace(/\D/g, '')
+                        .substring(0, 6);
 
-            updateSkillCount("technical");
-
-            updateSkillCount("nonTechnical");
-
-        }
-
-
-        /* =========================================================
-           CHECKBOX CHANGE
-           ========================================================= */
-
-        document.addEventListener("change", function(event) {
-
-            if (event.target.classList.contains("medical-skill")) {
-
-                updateSkillCount("medical");
-
-            }
+            });
 
 
-            if (event.target.classList.contains("technical-skill")) {
+            /* =====================================================
+               REFERENCE MOBILE
+               ===================================================== */
 
-                updateSkillCount("technical");
+            $('.reference-mobile').on('input', function () {
 
-            }
+                this.value =
+                    this.value
+                        .replace(/\D/g, '')
+                        .substring(0, 10);
 
-
-            if (event.target.classList.contains("nontechnical-skill")) {
-
-                updateSkillCount("nonTechnical");
-
-            }
-
-        });
+            });
 
 
-        /* =========================================================
-           SKILLS FORM SUBMIT
-           ========================================================= */
+            /* =====================================================
+               EDUCATION YEAR
+               ===================================================== */
 
-        document.addEventListener("DOMContentLoaded", function() {
+            $('.education-year').on('input', function () {
 
-            updateAllSkillCounts();
+                this.value =
+                    this.value
+                        .replace(/\D/g, '')
+                        .substring(0, 4);
 
-
-            const skillsForm =
-                document.getElementById("skillsForm");
-
-
-            if (!skillsForm) {
-                return;
-            }
+            });
 
 
-            skillsForm.addEventListener("submit", function(event) {
+            /* =====================================================
+               DOCUMENT VALIDATION
+               ===================================================== */
 
-                /* Make sure hidden fields contain latest values */
+            function validateFile(
+                inputId,
+                errorId,
+                allowedExtensions) {
 
-                updateAllSkillCounts();
+                const input =
+                    document.getElementById(inputId);
 
+                const error =
+                    document.getElementById(errorId);
 
-                const medical =
-                    document.querySelectorAll(
-                        ".medical-skill:checked"
-                    ).length;
+                if (!input || !error) {
+                    return true;
+                }
 
+                error.innerText = '';
 
-                const technical =
-                    document.querySelectorAll(
-                        ".technical-skill:checked"
-                    ).length;
+                if (!input.files ||
+                    input.files.length === 0) {
 
+                    return true;
+                }
 
-                const nonTechnical =
-                    document.querySelectorAll(
-                        ".nontechnical-skill:checked"
-                    ).length;
+                const file =
+                    input.files[0];
 
+                const maxSize =
+                    5 * 1024 * 1024;
 
-                const total =
-                    medical +
-                    technical +
-                    nonTechnical;
-
-
-                /* =================================================
-                   VALIDATION
-                   ================================================= */
-
-                if (total === 0) {
-
-                    event.preventDefault();
-
-
-                    document.getElementById(
-                        "skillValidationMessage"
-                    ).style.display = "block";
+                const extension =
+                    '.' +
+                    file.name
+                        .split('.')
+                        .pop()
+                        .toLowerCase();
 
 
-                    document.getElementById(
-                        "skillValidationMessage"
-                    ).scrollIntoView({
-                        behavior: "smooth",
-                        block: "center"
-                    });
+                if (!allowedExtensions
+                    .includes(extension)) {
 
+                    error.innerText =
+                        'Invalid file type.';
+
+                    input.value = '';
 
                     return false;
                 }
 
 
-                /* Hide validation */
+                if (file.size > maxSize) {
 
-                document.getElementById(
-                    "skillValidationMessage"
-                ).style.display = "none";
+                    error.innerText =
+                        'File size must not exceed 5 MB.';
 
+                    input.value = '';
 
-                /* =================================================
-                   DISABLE BUTTON
-                   ================================================= */
-
-                const button =
-                    document.getElementById(
-                        "btnUpdateSkills"
-                    );
+                    return false;
+                }
 
 
-                const text =
-                    document.getElementById(
-                        "updateSkillsText"
-                    );
+                return true;
+            }
 
 
-                const loader =
-                    document.getElementById(
-                        "updateSkillsLoader"
-                    );
+            $('#ResumeFile').on('change', function () {
 
-
-                button.disabled = true;
-
-
-                text.innerText =
-                    "Updating...";
-
-
-                loader.style.display =
-                    "inline-block";
+                validateFile(
+                    'ResumeFile',
+                    'resumeError',
+                    ['.pdf', '.doc', '.docx']
+                );
 
             });
 
-        });
+
+            $('#PhotoFile').on('change', function () {
+
+                validateFile(
+                    'PhotoFile',
+                    'photoError',
+                    ['.jpg', '.jpeg', '.png']
+                );
+
+            });
 
 
-        /* =========================================================
-           ACCORDION ARROW
-           ========================================================= */
+            $('#SignatureFile').on('change', function () {
 
-        document.querySelectorAll(
-            ".skill-accordion"
-        ).forEach(function(accordion) {
+                validateFile(
+                    'SignatureFile',
+                    'signatureError',
+                    ['.jpg', '.jpeg', '.png']
+                );
 
-            accordion.addEventListener(
-                "toggle",
-                function() {
-
-                    const arrow =
-                        accordion.querySelector(
-                            ".accordion-arrow"
-                        );
+            });
 
 
-                    if (!arrow) {
-                        return;
+            $('#documentsForm').on('submit', function (e) {
+
+                const resumeValid =
+                    validateFile(
+                        'ResumeFile',
+                        'resumeError',
+                        ['.pdf', '.doc', '.docx']
+                    );
+
+                const photoValid =
+                    validateFile(
+                        'PhotoFile',
+                        'photoError',
+                        ['.jpg', '.jpeg', '.png']
+                    );
+
+                const signatureValid =
+                    validateFile(
+                        'SignatureFile',
+                        'signatureError',
+                        ['.jpg', '.jpeg', '.png']
+                    );
+
+
+                if (!resumeValid ||
+                    !photoValid ||
+                    !signatureValid) {
+
+                    e.preventDefault();
+
+                    return false;
+                }
+
+            });
+
+
+            /* =====================================================
+               LANGUAGES
+               ===================================================== */
+
+            $('#languagesForm').on('submit', function (e) {
+
+                let valid = true;
+                let hasLanguage = false;
+
+
+                $('.language-row').each(function () {
+
+                    const language =
+                        $(this)
+                            .find('.language-input')
+                            .val()
+                            .trim();
+
+                    const rating =
+                        $(this)
+                            .find('.language-rating')
+                            .val();
+
+
+                    if (language !== '') {
+
+                        hasLanguage = true;
+
+                        if (rating === '') {
+
+                            valid = false;
+
+                        }
+
+                    }
+
+                    if (rating !== '' &&
+                        language === '') {
+
+                        valid = false;
+
+                    }
+
+                });
+
+
+                if (!hasLanguage || !valid) {
+
+                    e.preventDefault();
+
+                    $('#languageValidation')
+                        .show();
+
+                    $('#languageValidation')
+                        .get(0)
+                        .scrollIntoView({
+                            behavior: 'smooth',
+                            block: 'center'
+                        });
+
+                    return false;
+
+                }
+
+
+                $('#languageValidation')
+                    .hide();
+
+            });
+
+
+            /* =====================================================
+               SOCIAL URL VALIDATION
+               ===================================================== */
+
+            $('#socialForm').on('submit', function (e) {
+
+                let valid = true;
+
+
+                $('#socialForm input[type="url"]')
+                    .each(function () {
+
+                        const value =
+                            $(this).val().trim();
+
+                        if (value !== '') {
+
+                            try {
+
+                                new URL(value);
+
+                            }
+                            catch {
+
+                                valid = false;
+
+                                $(this).addClass(
+                                    'is-invalid'
+                                );
+
+                            }
+
+                        }
+
+                    });
+
+
+                if (!valid) {
+
+                    e.preventDefault();
+
+                    alert(
+                        'Please enter valid social profile URLs.'
+                    );
+
+                    return false;
+
+                }
+
+            });
+
+
+            /* =====================================================
+               CAREER OBJECTIVE
+               ===================================================== */
+
+            $('#objectiveForm').on('submit', function (e) {
+
+                const objective =
+                    $('#CareerObjective')
+                        .val()
+                        .trim();
+
+
+                if (objective.length < 20) {
+
+                    e.preventDefault();
+
+                    alert(
+                        'Career Objective must contain at least 20 characters.'
+                    );
+
+                    $('#CareerObjective')
+                        .focus();
+
+                    return false;
+
+                }
+
+            });
+
+
+            /* =====================================================
+               SKILLS
+               ===================================================== */
+
+            function updateSkillCount(type) {
+
+                let selector = "";
+                let countElement = "";
+                let hiddenField = "";
+
+
+                if (type === "medical") {
+
+                    selector =
+                        ".medical-skill:checked";
+
+                    countElement =
+                        "medicalCount";
+
+                    hiddenField =
+                        "sMedicalSkillIDs";
+
+                }
+                else if (type === "technical") {
+
+                    selector =
+                        ".technical-skill:checked";
+
+                    countElement =
+                        "technicalCount";
+
+                    hiddenField =
+                        "sTechnicalSkillIDs";
+
+                }
+                else if (type === "nonTechnical") {
+
+                    selector =
+                        ".nontechnical-skill:checked";
+
+                    countElement =
+                        "nonTechnicalCount";
+
+                    hiddenField =
+                        "sNonTechnicalSkillIDs";
+                }
+
+
+                const selected =
+                    document.querySelectorAll(selector);
+
+
+                document.getElementById(
+                    countElement
+                ).innerText =
+                    selected.length + " selected";
+
+
+                const values = [];
+
+
+                selected.forEach(function (checkbox) {
+
+                    values.push(
+                        checkbox.value
+                    );
+
+                });
+
+
+                document.getElementById(
+                    hiddenField
+                ).value =
+                    values.join(",");
+
+            }
+
+
+            function updateAllSkillCounts() {
+
+                updateSkillCount("medical");
+                updateSkillCount("technical");
+                updateSkillCount("nonTechnical");
+
+            }
+
+
+            document.addEventListener(
+                "change",
+                function (event) {
+
+                    if (
+                        event.target.classList
+                            .contains("medical-skill")
+                    ) {
+
+                        updateSkillCount("medical");
+
                     }
 
 
-                    if (accordion.open) {
+                    if (
+                        event.target.classList
+                            .contains("technical-skill")
+                    ) {
 
-                        arrow.innerHTML = "▴";
+                        updateSkillCount("technical");
 
                     }
-                    else {
 
-                        arrow.innerHTML = "▾";
+
+                    if (
+                        event.target.classList
+                            .contains("nontechnical-skill")
+                    ) {
+
+                        updateSkillCount("nonTechnical");
 
                     }
 
                 }
             );
 
+
+            $('#skillsForm').on('submit', function (event) {
+
+                updateAllSkillCounts();
+
+
+                const total =
+                    $('.medical-skill:checked').length +
+                    $('.technical-skill:checked').length +
+                    $('.nontechnical-skill:checked').length;
+
+
+                if (total === 0) {
+
+                    event.preventDefault();
+
+
+                    $('#skillValidationMessage')
+                        .show();
+
+
+                    $('#skillValidationMessage')
+                        .get(0)
+                        .scrollIntoView({
+                            behavior: "smooth",
+                            block: "center"
+                        });
+
+
+                    return false;
+
+                }
+
+
+                $('#skillValidationMessage')
+                    .hide();
+
+
+                const button =
+                    $('#btnUpdateSkills');
+
+                const text =
+                    $('#updateSkillsText');
+
+                const loader =
+                    $('#updateSkillsLoader');
+
+
+                button.prop(
+                    'disabled',
+                    true
+                );
+
+                text.text(
+                    'Updating...'
+                );
+
+                loader.show();
+
+            });
+
+
+            /* =====================================================
+               ACCORDION ARROW
+               ===================================================== */
+
+            document.querySelectorAll(
+                ".skill-accordion"
+            ).forEach(function (accordion) {
+
+                accordion.addEventListener(
+                    "toggle",
+                    function () {
+
+                        const arrow =
+                            accordion.querySelector(
+                                ".accordion-arrow"
+                            );
+
+
+                        if (!arrow) {
+                            return;
+                        }
+
+
+                        arrow.innerHTML =
+                            accordion.open
+                                ? "▴"
+                                : "▾";
+
+                    }
+                );
+
+            });
+
+
+            updateAllSkillCounts();
+
         });
 
     </script>
-
 }
+

@@ -14,7 +14,6 @@ namespace ErJobPortal.Repositories
             _db = db;
         }
 
-
         // =========================================================
         // ENSURE PROFILE EXISTS
         // =========================================================
@@ -76,8 +75,7 @@ namespace ErJobPortal.Repositories
 
             using SqlCommand cmd = new SqlCommand(query, con);
 
-            cmd.Parameters.Add("@CandidateID", SqlDbType.Int)
-                .Value = candidateId;
+            cmd.Parameters.Add("@CandidateID", SqlDbType.Int).Value = candidateId;
 
             con.Open();
 
