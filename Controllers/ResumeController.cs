@@ -76,6 +76,8 @@ namespace ErJobPortal.Controllers
         }
 
 
+
+
         public IActionResult viewProfileOne(int id)
         {
             if (id <= 0)
