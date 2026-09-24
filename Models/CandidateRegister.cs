@@ -70,7 +70,7 @@ namespace ErJobPortal.Models
         // =====================================================
         // DATE OF BIRTH
         // =====================================================
-
+        [Required(ErrorMessage = "Date of Birth is required.")]
         [DataType(DataType.Date)]
         [CustomValidation(
             typeof(CandidateRegister),
@@ -106,6 +106,8 @@ namespace ErJobPortal.Models
             5 * 1024 * 1024,
             ErrorMessage = "Profile image cannot exceed 5 MB."
         )]
+
+        [Required(ErrorMessage = "Please select a profile image.")]
         public IFormFile? ProfileImageFile { get; set; }
 
 

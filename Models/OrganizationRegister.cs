@@ -8,7 +8,7 @@ namespace ErJobPortal.Models
         [StringLength(150, ErrorMessage = "Organization name cannot exceed 150 characters.")]
         public string? sOrgName { get; set; }
 
-
+        [Required(ErrorMessage = "Organization website is required.")]
         [Url(ErrorMessage = "Please enter a valid website URL.")]
         [StringLength(200, ErrorMessage = "Website URL cannot exceed 200 characters.")]
         public string? sOrgUrl { get; set; }
@@ -22,7 +22,7 @@ namespace ErJobPortal.Models
         )]
         public string? sName { get; set; }
 
-
+        [Required(ErrorMessage = "Designation is required.")]
         [StringLength(150, ErrorMessage = "Designation cannot exceed 150 characters.")]
         public string? sDesignation { get; set; }
 
