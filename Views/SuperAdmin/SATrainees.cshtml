@@ -7,8 +7,7 @@
     ViewData["UserName"] = "Super Admin";
 }
 
-
-<div class="container-fluid">   
+<div class="container-fluid">
 
 
     <!-- MASTER TABLE -->
@@ -31,10 +30,9 @@
 
             <a asp-controller="SuperAdmin"
                asp-action="Dashboard"
-               class="btn btn-secondary">
-
-                Back to Dashboard
-
+               class="master-back-btn"
+               title="Back to Dashboard">
+                <i class="fas fa-arrow-left"></i>
             </a>
         </div>
 
@@ -106,7 +104,8 @@
                                 </td>
 
                             </tr>
-                        };
+                        }
+                        ;
                     }
                     else
                     {
@@ -130,7 +129,7 @@
 
 
         <div id="candidatePageInfo"
-             class="master-page-info text-center">
+             class="master-page-info text-center d-none">
         </div>
 
     </div>
