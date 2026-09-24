@@ -1009,3 +1009,30 @@
 
     </script>
 }
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+
+        const nameFields = ["sFName", "sLName"];
+
+        nameFields.forEach(function (fieldName) {
+
+            const input = document.querySelector(
+                `[name="${fieldName}"]`
+            );
+
+            if (!input) return;
+
+            input.addEventListener("input", function () {
+
+                if (this.value.length > 0) {
+                    this.value =
+                        this.value.charAt(0).toUpperCase() +
+                        this.value.slice(1);
+                }
+
+            });
+        });
+
+    });
+</script>
