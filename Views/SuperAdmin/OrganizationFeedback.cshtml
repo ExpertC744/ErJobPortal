@@ -236,11 +236,7 @@
 
 </style>
 
-
 <div class="feedback-page">
-
- 
-
 
   <!-- CARD -->
 <div class="feedback-card">
@@ -396,22 +392,67 @@
         </div>
 
     </div>
+        <script>
+            document.querySelectorAll(".organization-feedback-toggle-form")
+                .forEach(function (form) {
 
+                    form.addEventListener("submit", function (e) {
+
+                        e.preventDefault();
+
+                        const button = form.querySelector(".status-button");
+                        const formData = new FormData(form);
+
+                        fetch(form.action, {
+                            method: "POST",
+                            body: formData
+                        })
+                        .then(response => {
+
+                            if (!response.ok) {
+                                throw new Error("Update failed");
+                            }
+
+                            if (button.classList.contains("status-enabled")) {
+
+                                button.innerText = "Disabled";
+
+                                button.classList.remove("status-enabled");
+                                button.classList.add("status-disabled");
+
+                            }
+                            else {
+
+                                button.innerText = "Enabled";
+
+                                button.classList.remove("status-disabled");
+                                button.classList.add("status-enabled");
+                            }
+                        })
+                        .catch(error => {
+
+                            console.error(error);
+                            alert("Unable to update organization feedback status.");
+
+                        });
+
+                    });
+
+                });
+        </script>
+
+</div>
 </div>
 
 <script>
 
-    const searchInput =
-        document.getElementById("searchInput");
+    const searchInput = document.getElementById("searchInput");
 
-    const entriesSelect =
-        document.getElementById("entriesSelect");
+    const entriesSelect = document.getElementById("entriesSelect");
 
-    const table =
-        document.getElementById("feedbackTable");
+    const table = document.getElementById("feedbackTable");
 
-    const rows =
-        table.querySelectorAll("tbody tr");
+    const rows = table.querySelectorAll("tbody tr");
 
 
     function filterTable() {

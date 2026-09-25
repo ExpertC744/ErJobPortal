@@ -337,6 +337,64 @@
 
     </div>
 
+    <script>
+        document.querySelectorAll(".feedback-toggle-form").forEach(function (form) {
+
+            form.addEventListener("submit", function (e) {
+
+                e.preventDefault();
+
+                const button = form.querySelector(".status-button");
+                const formData = new FormData(form);
+
+                fetch(form.action, {
+                    method: "POST",
+                    body: formData
+                })
+                .then(response => {
+
+                    if (!response.ok) {
+                        throw new Error("Update failed");
+                    }
+
+                    if (button.classList.contains("status-enabled")) {
+
+                        button.innerText = "Disabled";
+
+                        button.classList.remove("status-enabled");
+                        button.classList.add("status-disabled");
+
+                        button.setAttribute(
+                            "onclick",
+                            "return confirm('Are you sure you want to enable this feedback?');"
+                        );
+
+                    }
+                    else {
+
+                        button.innerText = "Enabled";
+
+                        button.classList.remove("status-disabled");
+                        button.classList.add("status-enabled");
+
+                        button.setAttribute(
+                            "onclick",
+                            "return confirm('Are you sure you want to disable this feedback?');"
+                        );
+                    }
+                })
+                .catch(error => {
+
+                    console.error(error);
+                    alert("Unable to update feedback status.");
+
+                });
+
+            });
+
+        });
+    </script>
+
 </div>
 
  
