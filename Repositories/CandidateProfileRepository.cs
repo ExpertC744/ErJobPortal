@@ -917,49 +917,79 @@ WHERE CandidateID = @CandidateID";
         }
 
 
+        // shrirang 24/09/26
+
+
         // =========================================================
         // UPDATE OBJECTIVE
+        // =========================================================
+
+        // =========================================================
+        // UPDATE CAREER OBJECTIVE
         // =========================================================
 
         public void UpdateObjective(
             CandidateProfileModel model)
         {
-            using SqlConnection con =
-                _db.GetConnection();
+            using SqlConnection con = _db.GetConnection();
 
             con.Open();
 
-            EnsureProfileExists(con, model.CandidateID);
+            // Make sure candidate profile exists
+            EnsureProfileExists(
+                con,
+                model.CandidateID
+            );
 
             string sql = @"
 UPDATE tblCandidateProfile
 SET
-
     Objective = @Objective,
     Resume_Profile = @Resume_Profile,
-
     ModDate = GETDATE()
-
 WHERE CandidateID = @CandidateID";
 
             using SqlCommand cmd =
                 new SqlCommand(sql, con);
 
-            cmd.Parameters.Add("@CandidateID", SqlDbType.Int)
-                .Value = model.CandidateID;
+            // =====================================================
+            // CANDIDATE ID
+            // =====================================================
+
+            cmd.Parameters.Add(
+                "@CandidateID",
+                SqlDbType.Int
+            ).Value = model.CandidateID;
+
+
+            // =====================================================
+            // CAREER OBJECTIVE
+            // =====================================================
 
             AddNullableString(
                 cmd,
                 "@Objective",
-                model.Objective,
-                400
+                string.IsNullOrWhiteSpace(model.Objective)
+                    ? null
+                    : model.Objective.Trim(),
+                1000
             );
+
+
+            // =====================================================
+            // RESUME PROFILE
+            // =====================================================
 
             AddNullableInt(
                 cmd,
                 "@Resume_Profile",
                 model.Resume_Profile
             );
+
+
+            // =====================================================
+            // EXECUTE UPDATE
+            // =====================================================
 
             cmd.ExecuteNonQuery();
         }
@@ -1408,5 +1438,6 @@ WHERE CandidateID = @CandidateID";
 
             return reader.GetValue(index)?.ToString();
         }
+
     }
 }

@@ -69,6 +69,7 @@
 
                 <a asp-controller="Organization"
                    asp-action="TraineeList"
+                   asp-route-id="@ViewBag.OrgCode"
                    class="stat-link">
                     View Details
                     <i class="fas fa-arrow-right"></i>
@@ -110,6 +111,7 @@
 
                 <a asp-controller="Organization"
                    asp-action="OrgList"
+                   asp-route-id="@ViewBag.OrgCode"
                    class="stat-link">
                     View Details
                     <i class="fas fa-arrow-right"></i>

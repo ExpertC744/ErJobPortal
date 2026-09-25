@@ -658,29 +658,76 @@ namespace ErJobPortal.Controllers
         }
 
 
+        // shrirang 24/09/26
         // =========================================================
         // UPDATE OBJECTIVE
         // =========================================================
 
+        // =========================================================
+        // UPDATE CAREER OBJECTIVE
+        // =========================================================
+
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult UpdateObjective(CandidateProfileModel model)
+        public IActionResult UpdateObjective(
+            [Bind(Prefix = "Profile")] CandidateProfileModel model)
         {
-            int? candidateId = HttpContext.Session.GetInt32("CandidateID");
+            int? candidateId =
+                HttpContext.Session.GetInt32("CandidateID");
 
-            if (candidateId == null)
+            // =====================================================
+            // CHECK LOGIN
+            // =====================================================
+
+            if (candidateId == null || candidateId <= 0)
             {
-                return RedirectToAction("CandidateLogin", "Account");
+                return RedirectToAction(
+                    "CandidateLogin",
+                    "Account");
             }
+
+            // =====================================================
+            // ALWAYS USE LOGGED-IN CANDIDATE ID
+            // Do not trust CandidateID coming from the browser.
+            // =====================================================
 
             model.CandidateID = candidateId.Value;
 
+            // =====================================================
+            // VALIDATION
+            // =====================================================
+
+            if (!string.IsNullOrWhiteSpace(model.Objective) &&
+                model.Objective.Trim().Length > 1000)
+            {
+                TempData["Error"] =
+                    "Career Objective cannot exceed 1000 characters.";
+
+                return RedirectToAction("Profile");
+            }
+
+            // =====================================================
+            // UPDATE DATABASE
+            // =====================================================
+
             _repo.UpdateObjective(model);
 
-            TempData["Success"] = "Career objective updated successfully.";
+            // =====================================================
+            // SUCCESS MESSAGE
+            // =====================================================
+
+            TempData["Success"] =
+                "Career objective updated successfully.";
+
+            // =====================================================
+            // REDIRECT TO PROFILE
+            // Profile() will call GetProfile() again and load
+            // the newly saved Objective.
+            // =====================================================
 
             return RedirectToAction("Profile");
         }
+
 
 
         // =========================================================
@@ -2042,15 +2089,234 @@ namespace ErJobPortal.Controllers
         }
 
         // =========================================================
-        // CUSTOM RESUME BUILDER
+        // MY INTERNSHIP radhika24-09
+        // =========================================================
+        [HttpGet]
+        [Route("Candidate/MyInternship/{id?}")]
+        public IActionResult MyInternship(string? id)
+        {
+            // =====================================================
+            // GET CANDIDATE ID FROM SESSION
+            // =====================================================
+
+            int? candidateId =
+                HttpContext.Session.GetInt32("CandidateID");
+
+            if (candidateId == null || candidateId <= 0)
+            {
+                return RedirectToAction(
+                    "CandidateLogin",
+                    "Account");
+            }
+
+            // =====================================================
+            // GET CANDIDATE CODE
+            // =====================================================
+
+            string? candidateCode = GetCandidateCode();
+
+            if (string.IsNullOrEmpty(candidateCode))
+            {
+                return NotFound(
+                    "Candidate code could not be generated.");
+            }
+
+            // =====================================================
+            // IF URL DOES NOT HAVE CANDIDATE CODE
+            // REDIRECT TO CODE URL
+            // =====================================================
+
+            if (string.IsNullOrEmpty(id))
+            {
+                return RedirectToAction(
+                    "MyInternship",
+                    "Candidate",
+                    new { id = candidateCode });
+            }
+
+            // =====================================================
+            // VALIDATE CANDIDATE CODE
+            // =====================================================
+
+            if (id != candidateCode)
+            {
+                return NotFound();
+            }
+
+            // =====================================================
+            // SEND CANDIDATE INFORMATION TO VIEW
+            // =====================================================
+
+            ViewBag.CandidateCode = candidateCode;
+            ViewBag.CandidateID = candidateId.Value;
+
+            ViewBag.CandidateName =
+                HttpContext.Session.GetString("CandidateName");
+
+            ViewBag.CandidateEmail =
+                HttpContext.Session.GetString("CandidateEmail");
+
+            // =====================================================
+            // OPEN MyInternship.cshtml
+            // =====================================================
+
+            return View();
+        }
+
+        // =========================================================
+        // ORGANIZATION INTERESTED
         // =========================================================
 
         [HttpGet]
-        [Route("Candidate/customResumeBuilder/{id?}")]
-        [ResponseCache(
-            NoStore = true,
-            Location = ResponseCacheLocation.None)]
-        public IActionResult CustomResumeBuilder(string? id)
+        [Route("Candidate/OrganizationInterested/{id?}")]
+        public IActionResult OrganizationInterested(string? id)
+        {
+            // =====================================================
+            // GET LOGGED-IN CANDIDATE ID
+            // =====================================================
+
+            int? candidateId =
+                HttpContext.Session.GetInt32("CandidateID");
+
+            if (candidateId == null || candidateId <= 0)
+            {
+                return RedirectToAction(
+                    "CandidateLogin",
+                    "Account");
+            }
+
+            // =====================================================
+            // GET CANDIDATE CODE
+            // =====================================================
+
+            string? candidateCode = GetCandidateCode();
+
+            if (string.IsNullOrEmpty(candidateCode))
+            {
+                return NotFound(
+                    "Candidate code could not be generated.");
+            }
+
+            // =====================================================
+            // IF URL DOES NOT HAVE CANDIDATE CODE
+            // REDIRECT TO CODE URL
+            // =====================================================
+
+            if (string.IsNullOrEmpty(id))
+            {
+                return RedirectToAction(
+                    "OrganizationInterested",
+                    "Candidate",
+                    new
+                    {
+                        id = candidateCode
+                    });
+            }
+
+            // =====================================================
+            // VALIDATE CANDIDATE CODE
+            // =====================================================
+
+            if (id != candidateCode)
+            {
+                return NotFound();
+            }
+
+            // =====================================================
+            // GET ORGANIZATION DATA
+            // =====================================================
+
+            List<OrganizationInterestedViewModel> organizations =
+                new List<OrganizationInterestedViewModel>();
+
+            string connectionString =
+                _configuration.GetConnectionString(
+                    "DefaultConnection");
+
+            using (SqlConnection con =
+                   new SqlConnection(connectionString))
+            {
+                string query = @"
+      SELECT
+          nID,
+          sOrgName,
+          sOrgUrl,
+          sName,
+          sDesignation
+      FROM tblOrgRegistration
+      ORDER BY nID DESC";
+
+                using (SqlCommand cmd =
+                       new SqlCommand(query, con))
+                {
+                    con.Open();
+
+                    using (SqlDataReader dr =
+                           cmd.ExecuteReader())
+                    {
+                        while (dr.Read())
+                        {
+                            organizations.Add(
+                                new OrganizationInterestedViewModel
+                                {
+                                    ID =
+                                        dr["nID"] != DBNull.Value
+                                        ? Convert.ToInt32(dr["nID"])
+                                        : 0,
+
+                                    OrganizationName =
+                                        dr["sOrgName"] != DBNull.Value
+                                        ? dr["sOrgName"].ToString()
+                                        : "",
+
+                                    OrganizationUrl =
+                                        dr["sOrgUrl"] != DBNull.Value
+                                        ? dr["sOrgUrl"].ToString()
+                                        : "",
+
+                                    ContactPersonName =
+                                        dr["sName"] != DBNull.Value
+                                        ? dr["sName"].ToString()
+                                        : "",
+
+                                    Designation =
+                                        dr["sDesignation"] != DBNull.Value
+                                        ? dr["sDesignation"].ToString()
+                                        : "",
+
+                                    ApplyStatus = "Interested"
+                                });
+                        }
+                    }
+                }
+            }
+
+            // =====================================================
+            // SEND DATA TO VIEW
+            // =====================================================
+
+            ViewBag.CandidateCode = candidateCode;
+            ViewBag.CandidateID = candidateId.Value;
+
+            ViewBag.CandidateName =
+                HttpContext.Session.GetString(
+                    "CandidateName");
+
+            ViewBag.CandidateEmail =
+                HttpContext.Session.GetString(
+                    "CandidateEmail");
+
+            return View(organizations);
+        }
+
+
+        // =========================================================
+        // TRAINEE SELECTION
+        // =========================================================
+
+        [HttpGet]
+        [Route("Candidate/TraineeStatus/{id?}")]
+        public IActionResult TraineeStatus(string? id)
         {
             // =====================================================
             // GET LOGGED-IN CANDIDATE
@@ -2066,13 +2332,11 @@ namespace ErJobPortal.Controllers
                     "Account");
             }
 
-
             // =====================================================
             // GET CANDIDATE CODE
             // =====================================================
 
-            string? candidateCode =
-                GetCandidateCode();
+            string? candidateCode = GetCandidateCode();
 
             if (string.IsNullOrEmpty(candidateCode))
             {
@@ -2080,145 +2344,157 @@ namespace ErJobPortal.Controllers
                     "Candidate code could not be generated.");
             }
 
-
             // =====================================================
-            // IF URL DOES NOT CONTAIN CODE
+            // IF ID IS MISSING
+            // REDIRECT TO CODE URL
             // =====================================================
 
             if (string.IsNullOrEmpty(id))
             {
                 return RedirectToAction(
-                    "CustomResumeBuilder",
+                    "TraineeStatus",
                     "Candidate",
-                    new
-                    {
-                        id = candidateCode
-                    });
+                    new { id = candidateCode });
             }
-
 
             // =====================================================
             // VALIDATE CANDIDATE CODE
             // =====================================================
 
-            if (!string.Equals(
-                    id,
-                    candidateCode,
-                    StringComparison.OrdinalIgnoreCase))
+            if (id != candidateCode)
             {
                 return NotFound();
             }
 
-
             // =====================================================
-            // GET CANDIDATE PROFILE FROM DATABASE
-            // =====================================================
-
-            CandidateProfileModel? profile =
-                _repo.GetProfile(candidateId.Value);
-
-
-            if (profile == null)
-            {
-                profile =
-                    new CandidateProfileModel
-                    {
-                        CandidateID =
-                            candidateId.Value
-                    };
-            }
-
-
-            // =====================================================
-            // CREATE RESUME VIEW MODEL
+            // LOAD TRAINEE SELECTION DATA
             // =====================================================
 
-            ResumeViewModel vm =
-                new ResumeViewModel
-                {
-                    Profile = profile,
+            List<TraineeSelectionViewModel> selectionList =
+                new List<TraineeSelectionViewModel>();
 
-                    CandidateID =
-                        candidateId.Value,
+            string connectionString =
+                _configuration.GetConnectionString(
+                    "DefaultConnection");
 
-                    CandidateName =
-                        HttpContext.Session.GetString(
-                            "CandidateName") ?? "",
+            //    using (SqlConnection con =
+            //           new SqlConnection(connectionString))
+            //    {
+            //        string query = @"
+            //    SELECT
+            //        nID,
+            //        sOrgName,
+            //        sPosition,
+            //        sFinalStatus,
+            //        RegDate
+            //    FROM tblTraineeSelection
+            //    WHERE nCandidateID = @CandidateID
+            //    ORDER BY RegDate DESC;
+            //";
 
-                    CandidateEmail =
-                        HttpContext.Session.GetString(
-                            "CandidateEmail") ?? "",
+            //        using (SqlCommand cmd =
+            //               new SqlCommand(query, con))
+            //        {
+            //            cmd.Parameters.Add(
+            //                "@CandidateID",
+            //                SqlDbType.Int).Value =
+            //                    candidateId.Value;
 
-                    CandidatePhone = "",
+            //            con.Open();
 
+            //            using (SqlDataReader dr =
+            //                   cmd.ExecuteReader())
+            //            {
+            //                while (dr.Read())
+            //                {
+            //                    selectionList.Add(
+            //                        new TraineeSelectionViewModel
+            //                        {
+            //                            ID =
+            //                                dr["nID"] != DBNull.Value
+            //                                ? Convert.ToInt32(dr["nID"])
+            //                                : 0,
 
-                    // =================================================
-                    // LOOKUP DATA
-                    // =================================================
+            //                            OrganizationName =
+            //                                dr["sOrgName"] != DBNull.Value
+            //                                ? dr["sOrgName"].ToString()
+            //                                : "",
 
-                    Relationships =
-                        _repo.GetRelationships(),
+            //                            Position =
+            //                                dr["sPosition"] != DBNull.Value
+            //                                ? dr["sPosition"].ToString()
+            //                                : "",
 
-                    Streams =
-                        _repo.GetStreams(),
+            //                            FinalStatus =
+            //                                dr["sFinalStatus"] != DBNull.Value
+            //                                ? dr["sFinalStatus"].ToString()
+            //                                : "",
 
-                    Divisions =
-                        _repo.GetDivisions(),
-
-                    InternshipFellowshipType =
-                        _repo.GetInternshipFellowshipType(),
-
-                    InternshipTitles =
-                        _repo.GetInternshipTitles(),
-
-                    InternshipDurations =
-                        _repo.GetInternshipDurations(),
-
-                    InternshipStatuses =
-                        _repo.GetInternshipStatuses()
-                };
-
-
-            // =====================================================
-            // VIEWBAG
-            // =====================================================
-
-            ViewBag.CandidateID =
-                candidateId.Value;
-
-            ViewBag.CandidateCode =
-                candidateCode;
-
-            ViewBag.CandidateName =
-                vm.CandidateName;
-
-            ViewBag.CandidateEmail =
-                vm.CandidateEmail;
-
-
-            // =====================================================
-            // NO CACHE
-            // =====================================================
-
-            Response.Headers["Cache-Control"] =
-                "no-cache, no-store, must-revalidate";
-
-            Response.Headers["Pragma"] =
-                "no-cache";
-
-            Response.Headers["Expires"] =
-                "0";
-
+            //                            RegistrationDate =
+            //                                dr["RegDate"] != DBNull.Value
+            //                                ? Convert.ToDateTime(dr["RegDate"])
+            //                                : null
+            //                        });
+            //                }
+            //            }
+            //        }
+            //    }
 
             // =====================================================
-            // RETURN VIEW
+            // VIEW BAG
             // =====================================================
 
-            return View(
-                "CustomResumeBuilder",
-                vm);
+            ViewBag.CandidateCode = candidateCode;
+            ViewBag.CandidateID = candidateId.Value;
+
+            return View(selectionList);
         }
 
+        // =========================================================
+        // CHARTS
+        // =========================================================
 
+        [HttpGet]
+        [Route("Candidate/Charts/{id?}")]
+        public IActionResult Charts(string? id)
+        {
+            int? candidateId =
+                HttpContext.Session.GetInt32("CandidateID");
+
+            if (candidateId == null || candidateId <= 0)
+            {
+                return RedirectToAction(
+                    "CandidateLogin",
+                    "Account");
+            }
+
+            string? candidateCode = GetCandidateCode();
+
+            if (string.IsNullOrEmpty(candidateCode))
+            {
+                return NotFound(
+                    "Candidate code could not be generated.");
+            }
+
+            // If candidate code is missing from URL
+            if (string.IsNullOrEmpty(id))
+            {
+                return RedirectToAction(
+                    "Charts",
+                    "Candidate",
+                    new { id = candidateCode });
+            }
+
+            // Validate candidate code
+            if (id != candidateCode)
+            {
+                return NotFound();
+            }
+
+            ViewBag.CandidateCode = candidateCode;
+            ViewBag.CandidateID = candidateId.Value;
+
+            return View();
+        }
     }
 }

@@ -343,7 +343,7 @@ namespace JobPortalTrainee.Controllers
             return View();
         }
 
-
+        [HttpGet]
         public IActionResult CreatePost()
         {
             return View();
@@ -1725,7 +1725,7 @@ string nameColumn)
 
         // Create Post
         [HttpGet]
-        [Route("Organization/CreatePost/{id}")]
+        [Route("Organization/CreatePostNew/{id}")]
         public IActionResult CreatePostNew(string id)
         {
             if (!IsValidOrganizationCode(id))
@@ -1793,16 +1793,16 @@ string nameColumn)
                 // =====================================================
 
                 cmd.Parameters.AddWithValue(
-                    "@sCountryCode",
-                    model.sCountryCode ?? (object)DBNull.Value);
+                    "@sCountryName",
+                    model.sCountryName ?? (object)DBNull.Value);
 
                 cmd.Parameters.AddWithValue(
-                    "@sStateCode",
-                    model.sStateCode ?? (object)DBNull.Value);
+                    "@sStateName",
+                    model.sStateName ?? (object)DBNull.Value);
 
                 cmd.Parameters.AddWithValue(
-                    "@nCityID",
-                    model.nCityID);
+                    "@sCityName",
+                    model.sCityName);
 
                 cmd.Parameters.AddWithValue(
                     "@sWorkingHours",
@@ -2862,7 +2862,7 @@ string nameColumn)
         }
 
         [HttpPost]
-        [Route("Organization/CreatePost/{id}")]
+        [Route("Organization/DisablePost/{id}")]
         public IActionResult DisablePost(int id)
         {
             int? orgID = HttpContext.Session.GetInt32("OrgID");
