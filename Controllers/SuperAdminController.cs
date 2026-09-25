@@ -1135,36 +1135,36 @@ namespace ErJobPortal.Controllers
                 con.Open();
 
                 string query = @"
-    WITH LatestFeedback AS
-    (
-        SELECT
-            CF.nID AS FeedbackID,
-            CF.nAdminID,
-            CF.nSABit,
-            ROW_NUMBER() OVER
-            (
-                PARTITION BY CF.nAdminID
-                ORDER BY CF.nID DESC
-            ) AS RowNum
-        FROM tblCandidateFeedback CF
-    )
-
+WITH LatestFeedback AS
+(
     SELECT
-        CR.nID,
-        CR.sFName,
-        CR.sLName,
-        LF.FeedbackID,
-        LF.nAdminID,
-        ISNULL(LF.nSABit, 0) AS nSABit
+        CF.nID AS FeedbackID,
+        CF.nAdminID,
+        CF.nSABit,
+        ROW_NUMBER() OVER
+        (
+            PARTITION BY CF.nAdminID
+            ORDER BY CF.nID DESC
+        ) AS RowNum
+    FROM tblCandidateFeedback CF
+)
 
-    FROM tblCandidateRegister CR
+SELECT
+    CR.nID,
+    CR.sFName,
+    CR.sLName,
+    LF.FeedbackID,
+    LF.nAdminID,
+    ISNULL(LF.nSABit, 0) AS nSABit
 
-    INNER JOIN LatestFeedback LF
-        ON CR.nID = LF.nAdminID
+FROM tblCandidateRegister CR
 
-    WHERE LF.RowNum = 1
+INNER JOIN LatestFeedback LF
+    ON CR.nID = LF.nAdminID
 
-    ORDER BY LF.FeedbackID DESC";
+WHERE LF.RowNum = 1
+
+ORDER BY LF.FeedbackID DESC";
 
                 using (SqlCommand cmd = new SqlCommand(query, con))
                 {
@@ -1202,22 +1202,22 @@ namespace ErJobPortal.Controllers
         [ValidateAntiForgeryToken]
         public IActionResult ToggleCandidateFeedback(int id)
         {
-            string connectionString =  _configuration.GetConnectionString("DefaultConnection");
+            string connectionString =
+                _configuration.GetConnectionString("DefaultConnection");
 
             using (SqlConnection con = new SqlConnection(connectionString))
             {
                 con.Open();
 
                 string query = @"
-            UPDATE tblCandidateFeedback
-            SET
-                nSABit = CASE
-                            WHEN ISNULL(nSABit, 0) = 1
-                                THEN 0
-                            ELSE 1
-                         END,
-                ModDate = GETDATE()
-            WHERE nAdminID = @id";
+     UPDATE tblCandidateFeedback
+     SET
+         nSABit = CASE
+                     WHEN ISNULL(nSABit, 0) = 1 THEN 0
+                     ELSE 1
+                  END,
+         ModDate = GETDATE()
+     WHERE nAdminID = @id";
 
                 using (SqlCommand cmd = new SqlCommand(query, con))
                 {
@@ -1227,13 +1227,12 @@ namespace ErJobPortal.Controllers
 
                     if (result == 0)
                     {
-                        TempData["Error"] =
-                            "Feedback record not found.";
+                        return BadRequest();
                     }
                 }
             }
 
-            return RedirectToAction("CandidateFeedback");
+            return Ok();
         }
 
 
@@ -1450,14 +1449,14 @@ ORDER BY LF.FeedbackID DESC";
                 con.Open();
 
                 string query = @"
-            UPDATE tblSAOrgFeedback
-            SET 
-                nSABit = CASE
-                            WHEN ISNULL(nSABit, 0) = 1 THEN 0
-                            ELSE 1
-                         END,
-                dModDate = GETDATE()
-            WHERE nID = @id";
+       UPDATE tblSAOrgFeedback
+       SET 
+           nSABit = CASE
+                       WHEN ISNULL(nSABit, 0) = 1 THEN 0
+                       ELSE 1
+                    END,
+           dModDate = GETDATE()
+       WHERE nID = @id";
 
                 using (SqlCommand cmd = new SqlCommand(query, con))
                 {
@@ -1465,20 +1464,16 @@ ORDER BY LF.FeedbackID DESC";
 
                     int result = cmd.ExecuteNonQuery();
 
-                    if (result > 0)
+                    if (result == 0)
                     {
-                        TempData["Success"] =
-                            "Organization feedback status updated successfully.";
-                    }
-                    else
-                    {
-                        TempData["Error"] =
-                            "Organization feedback record not found.";
+                        return BadRequest(
+                            "Organization feedback record not found."
+                        );
                     }
                 }
             }
 
-            return RedirectToAction("OrganizationFeedback");
+            return Ok();
         }
 
         [HttpGet]

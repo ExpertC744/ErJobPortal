@@ -1,0 +1,648 @@
+﻿@{
+    Layout = "~/Views/Shared/_DashboardLayout.cshtml";
+
+    ViewData["Title"] = "Charts";
+    ViewData["Panel"] = "Candidate";
+    ViewData["UserName"] = "Candidate";
+}
+
+<div class="candidate-charts-page">
+      <!-- PAGE HEADING -->
+    <div class="charts-heading">
+        <h1>Charts</h1>
+        <p>HN236383503368076</p>
+    </div>
+    <div class="charts-grid">
+
+        <!-- =====================================================
+             SUITABLE OPENINGS
+        ====================================================== -->
+        <div class="chart-card">
+
+            <div class="chart-card-top">
+
+                <div class="chart-info">
+
+                    <div class="chart-title">
+                        No. of Suitable Openings
+                    </div>
+
+                    <div class="chart-number">
+                        103
+                    </div>
+
+                    <div class="chart-subtitle">
+                        Current month
+                    </div>
+
+                </div>
+
+                <div class="chart-icon">
+                    <i class="fas fa-briefcase"></i>
+                </div>
+
+            </div>
+
+
+            <div class="chart-wrapper">
+
+                <canvas id="suitableOpeningChart"></canvas>
+
+            </div>
+
+
+            <div class="chart-footer">
+
+                <i class="fas fa-chart-line"></i>
+
+                <span>
+                    Monthly suitable-opening trend
+                </span>
+
+            </div>
+
+        </div>
+
+
+        <!-- =====================================================
+             ORGANIZATION INTERNSHIP POSTS
+        ====================================================== -->
+        <div class="chart-card">
+
+            <div class="chart-card-top">
+
+                <div class="chart-info">
+
+                    <div class="chart-title">
+                        Internship Posts from Organization
+                    </div>
+
+                    <div class="chart-number">
+                        154
+                    </div>
+
+                    <div class="chart-subtitle">
+                        Current month
+                    </div>
+
+                </div>
+
+                <div class="chart-icon">
+                    <i class="fas fa-building"></i>
+                </div>
+
+            </div>
+
+
+            <div class="chart-wrapper">
+
+                <canvas id="organizationInternshipChart"></canvas>
+
+            </div>
+
+
+            <div class="chart-footer">
+
+                <i class="fas fa-chart-line"></i>
+
+                <span>
+                    Monthly organization internship trend
+                </span>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<!-- =========================================================
+     CHART.JS
+========================================================= -->
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+
+<script>
+
+    document.addEventListener("DOMContentLoaded", function () {
+
+        const months = [
+            "Jan", "Feb", "Mar", "Apr",
+            "May", "Jun", "Jul", "Aug",
+            "Sep", "Oct", "Nov", "Dec"
+        ];
+
+
+        /* =====================================================
+           SUITABLE OPENINGS
+        ====================================================== */
+
+        const suitableCanvas =
+            document.getElementById("suitableOpeningChart");
+
+        const suitableCtx =
+            suitableCanvas.getContext("2d");
+
+
+        const suitableGradient =
+            suitableCtx.createLinearGradient(
+                0,
+                0,
+                0,
+                250
+            );
+
+        suitableGradient.addColorStop(
+            0,
+            "rgba(30, 123, 103, 0.18)"
+        );
+
+        suitableGradient.addColorStop(
+            1,
+            "rgba(30, 123, 103, 0)"
+        );
+
+
+        new Chart(suitableCtx, {
+
+            type: "line",
+
+            data: {
+
+                labels: months,
+
+                datasets: [{
+
+                    label: "Suitable Openings",
+
+                    data: [
+                        72,
+                        78,
+                        75,
+                        83,
+                        86,
+                        80,
+                        88,
+                        94,
+                        91,
+                        99,
+                        96,
+                        103
+                    ],
+
+                    borderColor: "#1e7b67",
+
+                    backgroundColor: suitableGradient,
+
+                    borderWidth: 3,
+
+                    fill: true,
+
+                    tension: 0.35,
+
+                    pointRadius: function (context) {
+
+                        return context.dataIndex === 11
+                            ? 5
+                            : 0;
+
+                    },
+
+                    pointHoverRadius: 6,
+
+                    pointBackgroundColor: "#ffffff",
+
+                    pointBorderColor: "#1e7b67",
+
+                    pointBorderWidth: 3
+
+                }]
+
+            },
+
+            options: {
+
+                responsive: true,
+
+                maintainAspectRatio: false,
+
+                plugins: {
+
+                    legend: {
+                        display: false
+                    },
+
+                    tooltip: {
+                        enabled: true
+                    }
+
+                },
+
+                scales: {
+
+                    x: {
+
+                        grid: {
+                            display: false
+                        },
+
+                        border: {
+                            display: false
+                        },
+
+                        ticks: {
+
+                            color: "#7c8ba5",
+
+                            font: {
+                                size: 11
+                            }
+                        }
+
+                    },
+
+                    y: {
+
+                        display: false,
+
+                        grid: {
+                            display: false
+                        },
+
+                        border: {
+                            display: false
+                        },
+
+                        beginAtZero: false
+
+                    }
+
+                },
+
+                interaction: {
+
+                    intersect: false,
+
+                    mode: "index"
+
+                }
+
+            }
+
+        });
+
+
+        /* =====================================================
+           ORGANIZATION INTERNSHIP POSTS
+        ====================================================== */
+
+        const organizationCanvas =
+            document.getElementById(
+                "organizationInternshipChart"
+            );
+
+        const organizationCtx =
+            organizationCanvas.getContext("2d");
+
+
+        const organizationGradient =
+            organizationCtx.createLinearGradient(
+                0,
+                0,
+                0,
+                250
+            );
+
+        organizationGradient.addColorStop(
+            0,
+            "rgba(30, 123, 103, 0.18)"
+        );
+
+        organizationGradient.addColorStop(
+            1,
+            "rgba(30, 123, 103, 0)"
+        );
+
+
+        new Chart(organizationCtx, {
+
+            type: "line",
+
+            data: {
+
+                labels: months,
+
+                datasets: [{
+
+                    label: "Organization Internship Posts",
+
+                    data: [
+                        70,
+                        76,
+                        72,
+                        82,
+                        88,
+                        84,
+                        94,
+                        100,
+                        91,
+                        103,
+                        97,
+                        108
+                    ],
+
+                    borderColor: "#1e7b67",
+
+                    backgroundColor: organizationGradient,
+
+                    borderWidth: 3,
+
+                    fill: true,
+
+                    tension: 0.35,
+
+                    pointRadius: function (context) {
+
+                        return context.dataIndex === 11
+                            ? 5
+                            : 0;
+
+                    },
+
+                    pointHoverRadius: 6,
+
+                    pointBackgroundColor: "#ffffff",
+
+                    pointBorderColor: "#1e7b67",
+
+                    pointBorderWidth: 3
+
+                }]
+
+            },
+
+            options: {
+
+                responsive: true,
+
+                maintainAspectRatio: false,
+
+                plugins: {
+
+                    legend: {
+                        display: false
+                    },
+
+                    tooltip: {
+                        enabled: true
+                    }
+
+                },
+
+                scales: {
+
+                    x: {
+
+                        grid: {
+                            display: false
+                        },
+
+                        border: {
+                            display: false
+                        },
+
+                        ticks: {
+
+                            color: "#7c8ba5",
+
+                            font: {
+                                size: 11
+                            }
+                        }
+
+                    },
+
+                    y: {
+
+                        display: false,
+
+                        grid: {
+                            display: false
+                        },
+
+                        border: {
+                            display: false
+                        },
+
+                        beginAtZero: false
+
+                    }
+
+                },
+
+                interaction: {
+
+                    intersect: false,
+
+                    mode: "index"
+
+                }
+
+            }
+
+        });
+
+    });
+
+</script>
+
+
+<style>
+
+    /* =========================================================
+       PAGE
+    ========================================================= */
+
+    .candidate-charts-page {
+        width: 100%;
+        padding: 0;
+    }
+
+
+    /* =========================================================
+       GRID
+    ========================================================= */
+
+    .charts-grid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 30px;
+    }
+
+
+    /* =========================================================
+       CARD
+    ========================================================= */
+
+    .chart-card {
+        background: #ffffff;
+        border: 1px solid #e6ebf1;
+        border-radius: 22px;
+        padding: 28px 30px 26px;
+        min-height: 370px;
+        box-shadow: 0 8px 25px rgba(15, 23, 42, 0.04);
+    }
+
+
+    /* =========================================================
+       TOP
+    ========================================================= */
+
+    .chart-card-top {
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+    }
+
+
+    .chart-title {
+        color: #64748b;
+        font-size: 15px;
+        font-weight: 500;
+        margin-bottom: 8px;
+    }
+
+
+    .chart-number {
+        color: #0f172a;
+        font-size: 38px;
+        line-height: 1;
+        font-weight: 700;
+        margin-bottom: 10px;
+    }
+
+
+    .chart-subtitle {
+        color: #8b9ab0;
+        font-size: 13px;
+    }
+
+
+    /* =========================================================
+       ICON
+    ========================================================= */
+
+    .chart-icon {
+        width: 54px;
+        height: 54px;
+
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        border-radius: 15px;
+
+        background: #e7f5f1;
+
+        color: #1e7b67;
+
+        font-size: 22px;
+    }
+
+
+    /* =========================================================
+       CHART
+    ========================================================= */
+
+    .chart-wrapper {
+        width: 100%;
+        height: 175px;
+        margin-top: 20px;
+    }
+
+
+    .chart-wrapper canvas {
+        width: 100% !important;
+        height: 100% !important;
+    }
+
+
+    /* =========================================================
+       FOOTER
+    ========================================================= */
+
+    .chart-footer {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+
+        margin-top: 12px;
+
+        color: #71819a;
+
+        font-size: 13px;
+    }
+
+
+    .chart-footer i {
+        color: #1e7b67;
+        font-size: 15px;
+    }
+
+
+    /* =========================================================
+       TABLET
+    ========================================================= */
+
+    @@media (max-width: 991px) {
+
+        .charts-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .chart-card {
+            min-height: 350px;
+        }
+
+    }
+
+
+    /* =========================================================
+       MOBILE
+    ========================================================= */
+
+    @@media (max-width: 576px) {
+
+        .chart-card {
+            padding: 22px 20px;
+            border-radius: 18px;
+        }
+
+        .chart-title {
+            font-size: 14px;
+        }
+
+        .chart-number {
+            font-size: 32px;
+        }
+
+        .chart-icon {
+            width: 48px;
+            height: 48px;
+            font-size: 19px;
+        }
+
+        .chart-wrapper {
+            height: 160px;
+        }
+
+        .chart-footer {
+            font-size: 12px;
+        }
+
+    }
+
+</style>

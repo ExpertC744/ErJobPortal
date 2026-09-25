@@ -13,31 +13,7 @@
 
 <div class="container-fluid">
 
-    <!-- PAGE HEADING -->
-    @* <div class="d-flex justify-content-between align-items-center mb-4">
-
-        <div>
-
-            <h2 class="mb-1">
-                Organization Registration List
-            </h2>
-
-            <p class="text-muted mb-0">
-                View and manage registered organizations
-            </p>
-
-        </div>
-
-
-        <a asp-controller="SuperAdmin"
-           asp-action="Dashboard"
-           class="btn btn-secondary">
-
-            Back to Dashboard
-
-        </a>
-
-    </div> *@
+  
 
 
     <!-- MASTER TABLE -->
@@ -58,13 +34,12 @@
 
             </div>
 
-            <a asp-controller="SuperAdmin"
-               asp-action="Dashboard"
-               class="btn btn-secondary">
-
-                Back to Dashboard
-
-            </a>
+                   <a asp-controller="SuperAdmin"
+   asp-action="Dashboard"
+   class="master-back-btn"
+   title="Back to Dashboard">
+    <i class="fas fa-arrow-left"></i>
+</a>
 
         </div>
 
@@ -217,7 +192,7 @@
 
 
         <div id="organizationPageInfo"
-             class="master-page-info text-center">
+             class="master-page-info text-center d-none">
         </div>
 
     </div>

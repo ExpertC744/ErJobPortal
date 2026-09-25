@@ -1,0 +1,148 @@
+﻿@{
+    Layout = "~/Views/Shared/_DashboardLayout.cshtml";
+
+    ViewData["Title"] = "Internship Post";
+    ViewData["Panel"] = "Candidate";
+    ViewData["UserName"] = "Candidate";
+}
+<style>
+    
+/* =========================================================
+       SUBMIT
+       ========================================================= */
+
+.submit-area {
+    margin-top: 24px;
+    margin-left: 0;
+    display: flex;
+    justify-content: flex-end;
+}
+
+.submit-button {
+    min-width: 125px;
+    padding: 11px 24px;
+    background: linear-gradient( 135deg, #0d9488, #0f766e );
+    color: #ffffff;
+    border: none;
+    border-radius: 9px;
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    box-shadow: 0 5px 14px rgba(13, 148, 136, 0.22);
+    transition: all 0.2s ease;
+}
+
+    .submit-button:hover {
+        background: linear-gradient( 135deg, #0f766e, #115e59 );
+        transform: translateY(-1px);
+        box-shadow: 0 7px 18px rgba(13, 148, 136, 0.28);
+    }
+
+    .submit-button:active {
+        transform: translateY(0);
+    }
+
+    </style>
+<div class="container-fluid">
+
+   
+
+
+    <!-- =====================================================
+         MASTER TABLE CARD
+    ====================================================== -->
+
+    <div class="master-table-container">
+
+        
+
+
+        <!-- =================================================
+             TABLE
+        ================================================== -->
+
+        <div class="table-responsive">
+             <!-- =====================================================
+         PAGE HEADING
+    ====================================================== -->
+
+    <div class="mb-4">
+
+        <h1 class="mb-2">
+            Internship Post
+        </h1>
+
+        <p class="mb-0 text-muted">
+            HN236383503368076
+        </p>
+
+    </div>
+            <table class="master-data-table">
+
+                <thead>
+
+                    <tr>
+
+                        <th>
+                            Sr. No
+                        </th>
+
+                        <th>
+                            Organization Name
+                        </th>
+
+                        <th>
+                            Position
+                        </th>
+
+                        <th>
+                            Location
+                        </th>
+
+                        <th>
+                            Internship / Fellowship Type
+                        </th>
+
+                        <th>
+                            Facilities
+                        </th>
+
+                        <th>
+                            Apply Status
+                        </th>
+
+                    </tr>
+
+                </thead>
+
+
+                <tbody>
+
+                    
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+
+        <!-- =================================================
+             EXTRA POST BUTTON
+        ================================================== -->
+
+        <div class="mt-4">
+
+            <button type="button"
+                    class="submit-button">
+
+                Extra Post
+
+            </button>
+
+        </div>
+
+    </div>
+
+</div>
