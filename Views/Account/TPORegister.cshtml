@@ -1,0 +1,886 @@
+﻿@model ErJobPortal.Models.TPORegistration
+
+@{
+    ViewData["Title"] = "TPO Registration";
+}
+
+<link rel="stylesheet" href="~/css/CandidateRegister.css" />
+
+<div class="candidate-register-page">
+
+    <div class="candidate-register-card">
+
+        <!-- =====================================================
+             REGISTRATION SWITCH
+        ====================================================== -->
+
+        <div class="registration-switch">
+
+            <a asp-controller="Account"
+               asp-action="CandidateRegister"
+               class="switch-btn">
+                Trainee
+            </a>
+
+            <a asp-controller="Account"
+               asp-action="OrganizationRegister"
+               class="switch-btn">
+                Organization
+            </a>
+
+            <a asp-controller="Account"
+               asp-action="TPORegister"
+               class="switch-btn active">
+                TPO
+            </a>
+
+        </div>
+
+
+        <!-- =====================================================
+             HEADER
+        ====================================================== -->
+
+        <div class="register-icon">
+            <i class="fa-solid fa-user-tie"></i>
+        </div>
+
+        <div class="register-heading">
+
+            <h2>TPO Registration</h2>
+
+            <p>
+                Register as a Training & Placement Officer
+            </p>
+
+        </div>
+
+
+        <!-- =====================================================
+             SUCCESS / ERROR MESSAGE
+        ====================================================== -->
+        @if (TempData["Success"] != null)
+        {
+            <div class="alert alert-success register-alert">
+                @TempData["Success"]
+            </div>
+        }
+
+        @if (TempData["Error"] != null)
+        {
+            <div class="alert alert-danger register-alert">
+                @TempData["Error"]
+            </div>
+        }
+
+
+        <!-- =====================================================
+             FORM
+        ====================================================== -->
+
+        <form asp-controller="Account"
+              asp-action="TPORegister"
+              method="post"
+              enctype="multipart/form-data">
+
+            @Html.AntiForgeryToken()
+
+
+            <!-- =================================================
+                 VALIDATION SUMMARY
+            ================================================== -->
+
+            <div asp-validation-summary="All"
+                 class="text-danger register-summary">
+            </div>
+
+
+            <!-- =================================================
+                 PERSONAL DETAILS
+            ================================================== -->
+
+            <div class="section-title mt-3 mb-3">
+
+                <i class="fa-solid fa-user"></i>
+
+                Personal Details
+
+            </div>
+
+
+            <!-- =================================================
+                 FULL NAME + MOBILE
+            ================================================== -->
+
+            <div class="register-form-row">
+
+                <!-- Full Name -->
+
+                <div class="register-form-group">
+
+                    <label asp-for="FullName"
+                           class="register-label">
+                        Full Name
+                    </label>
+
+                    <input asp-for="FullName"
+                           type="text"
+                           class="register-input"
+                           placeholder="Enter full name"
+                           autocomplete="name" />
+
+                    <span asp-validation-for="FullName"
+                          class="text-danger register-validation">
+                    </span>
+
+                </div>
+
+
+                <!-- Mobile -->
+
+                <div class="register-form-group">
+
+                    <label asp-for="MobileNo"
+                           class="register-label">
+                        Mobile Number
+                    </label>
+
+                    <input asp-for="MobileNo"
+                           type="tel"
+                           class="register-input"
+                           placeholder="Enter mobile number"
+                           maxlength="10"
+                           autocomplete="tel" />
+
+                    <span asp-validation-for="MobileNo"
+                          class="text-danger register-validation">
+                    </span>
+
+                </div>
+
+            </div>
+
+
+            <!-- =================================================
+                 COLLEGE EMAIL
+            ================================================== -->
+
+            <div class="register-form-row">
+
+                <div class="register-form-group">
+
+                    <label asp-for="CollegeMailID"
+                           class="register-label">
+                        College Mail ID
+                    </label>
+
+                    <input asp-for="CollegeMailID"
+                           type="email"
+                           class="register-input"
+                           placeholder="Enter official college email"
+                           autocomplete="email" />
+
+                    <span asp-validation-for="CollegeMailID"
+                          class="text-danger register-validation">
+                    </span>
+
+                </div>
+
+
+                <div class="register-form-group">
+
+                    <label asp-for="CollegeEmployeeID"
+                           class="register-label">
+                        College Employee ID
+                    </label>
+
+                    <input asp-for="CollegeEmployeeID"
+                           type="text"
+                           class="register-input"
+                           placeholder="Enter employee ID"
+                           autocomplete="off" />
+
+                    <span asp-validation-for="CollegeEmployeeID"
+                          class="text-danger register-validation">
+                    </span>
+
+                </div>
+
+            </div>
+
+
+            <!-- =================================================
+                 ORGANIZATION DETAILS
+            ================================================== -->
+
+            <div class="section-title mt-4 mb-3">
+
+                <i class="fa-solid fa-building-columns"></i>
+
+                College / Organization Details
+
+            </div>
+
+
+            <!-- =================================================
+                 COLLEGE NAME + COLLEGE CODE
+            ================================================== -->
+
+            <div class="register-form-row">
+
+                <!-- College Name -->
+
+                <div class="register-form-group">
+
+                    <label asp-for="CollegeName"
+                           class="register-label">
+                        College Name
+                    </label>
+
+                    <input asp-for="CollegeName"
+                           type="text"
+                           class="register-input"
+                           placeholder="Enter college name"
+                           autocomplete="organization" />
+
+                    <span asp-validation-for="CollegeName"
+                          class="text-danger register-validation">
+                    </span>
+
+                </div>
+
+
+                <!-- College Code -->
+
+                <div class="register-form-group">
+
+                    <label asp-for="CollegeCode"
+                           class="register-label">
+                        College Code
+                    </label>
+
+                    <input asp-for="CollegeCode"
+                           type="text"
+                           class="register-input"
+                           placeholder="Enter college code"
+                           autocomplete="off" />
+
+                    <span asp-validation-for="CollegeCode"
+                          class="text-danger register-validation">
+                    </span>
+
+                </div>
+
+            </div>
+
+
+            <!-- =================================================
+                 COLLEGE ADDRESS
+            ================================================== -->
+
+            <div class="register-form-row">
+
+                <div class="register-form-group"
+                     style="width:100%;">
+
+                    <label asp-for="CollegeAddress"
+                           class="register-label">
+                        College Address
+                    </label>
+
+                    <textarea asp-for="CollegeAddress"
+                              class="register-input"
+                              rows="3"
+                              placeholder="Enter complete college address"></textarea>
+
+                    <span asp-validation-for="CollegeAddress"
+                          class="text-danger register-validation">
+                    </span>
+
+                </div>
+
+            </div>
+
+
+            <!-- =================================================
+                 ORGANIZATION WEBSITE
+            ================================================== -->
+
+            <div class="register-form-row">
+
+                <div class="register-form-group"
+                     style="width:100%;">
+
+                    <label asp-for="OrganizationWebsiteURL"
+                           class="register-label">
+                        College / Organization Website URL
+                    </label>
+
+                    <input asp-for="OrganizationWebsiteURL"
+                           type="url"
+                           class="register-input"
+                           placeholder="https://www.examplecollege.ac.in"
+                           autocomplete="url" />
+
+                    <span asp-validation-for="OrganizationWebsiteURL"
+                          class="text-danger register-validation">
+                    </span>
+
+                </div>
+
+            </div>
+
+
+            <!-- =================================================
+                 PROFESSIONAL DETAILS
+            ================================================== -->
+
+            <div class="section-title mt-4 mb-3">
+
+                <i class="fa-solid fa-briefcase"></i>
+
+                Professional Details
+
+            </div>
+
+
+            <!-- =================================================
+                 DESIGNATION + DEPARTMENT
+            ================================================== -->
+
+            <div class="register-form-row">
+
+                <!-- Designation -->
+
+                <div class="register-form-group">
+
+                    <label asp-for="Designation"
+                           class="register-label">
+                        Designation
+                    </label>
+
+                    <input asp-for="Designation"
+                           type="text"
+                           class="register-input"
+                           placeholder="e.g. Training & Placement Officer" />
+
+                    <span asp-validation-for="Designation"
+                          class="text-danger register-validation">
+                    </span>
+
+                </div>
+
+
+                <!-- Department -->
+
+                <div class="register-form-group">
+
+                    <label asp-for="DepartmentName"
+                           class="register-label">
+                        Department Name
+                    </label>
+
+                    <input asp-for="DepartmentName"
+                           type="text"
+                           class="register-input"
+                           placeholder="e.g. Training & Placement" />
+
+                    <span asp-validation-for="DepartmentName"
+                          class="text-danger register-validation">
+                    </span>
+
+                </div>
+
+            </div>
+
+
+            <!-- =================================================
+                 VERIFICATION DOCUMENTS
+            ================================================== -->
+
+            <div class="section-title mt-4 mb-3">
+
+                <i class="fa-solid fa-file-shield"></i>
+
+                Verification Documents
+
+            </div>
+
+
+            <!-- =================================================
+                 SUPPORTING DOCUMENT 1 + 2
+            ================================================== -->
+
+            <div class="register-form-row">
+
+                <!-- Supporting Document 1 -->
+
+                <div class="register-form-group">
+
+                    <label asp-for="SupportingDocument1File"
+                           class="register-label">
+
+                        Supporting Document 1
+                        <small>
+                            (ID Card / Appointment Letter)
+                        </small>
+
+                    </label>
+
+                    <input asp-for="SupportingDocument1File"
+                           type="file"
+                           accept=".pdf,.jpg,.jpeg,.png"
+                           class="register-input register-file" />
+
+                    <span asp-validation-for="SupportingDocument1File"
+                          class="text-danger register-validation">
+                    </span>
+
+                </div>
+
+
+                <!-- Supporting Document 2 -->
+
+                <div class="register-form-group">
+
+                    <label asp-for="SupportingDocument2File"
+                           class="register-label">
+
+                        Supporting Document 2
+                        <small>
+                            (Authorization / Other Proof)
+                        </small>
+
+                    </label>
+
+                    <input asp-for="SupportingDocument2File"
+                           type="file"
+                           accept=".pdf,.jpg,.jpeg,.png"
+                           class="register-input register-file" />
+
+                    <span asp-validation-for="SupportingDocument2File"
+                          class="text-danger register-validation">
+                    </span>
+
+                </div>
+
+            </div>
+
+
+            <!-- =================================================
+                 PROFILE PHOTO
+            ================================================== -->
+
+            <div class="register-form-row">
+
+                <div class="register-form-group">
+
+                    <label asp-for="ProfilePhotoFile"
+                           class="register-label">
+                        Profile Photo
+                    </label>
+
+                    <input asp-for="ProfilePhotoFile"
+                           type="file"
+                           accept=".jpg,.jpeg,.png"
+                           class="register-input register-file" />
+
+                    <span asp-validation-for="ProfilePhotoFile"
+                          class="text-danger register-validation">
+                    </span>
+
+                </div>
+
+            </div>
+
+
+            <!-- =================================================
+                 OTP VERIFICATION
+            ================================================== -->
+
+            <div class="section-title mt-4 mb-3">
+
+                <i class="fa-solid fa-shield-halved"></i>
+
+                Email / Mobile Verification
+
+            </div>
+
+
+            <div class="otp-section">
+
+                <label class="otp-label">
+                    OTP Verification
+                </label>
+
+                <div class="otp-content">
+
+                    <!-- OTP Options -->
+
+                    <div class="otp-options">
+
+                        <label class="radio-option">
+
+                            <input type="radio"
+                                   name="OTPType"
+                                   value="Mobile"
+                                   checked />
+
+                            <span>
+                                Mobile No.
+                            </span>
+
+                        </label>
+
+
+                        <label class="radio-option">
+
+                            <input type="radio"
+                                   name="OTPType"
+                                   value="Email" />
+
+                            <span>
+                                College Email
+                            </span>
+
+                        </label>
+
+
+                        <button type="button"
+                                class="send-otp-btn"
+                                id="btnSendOTP">
+
+                            Send OTP
+
+                        </button>
+
+                    </div>
+
+
+                    <!-- OTP Input -->
+
+                    <div class="otp-input-container">
+
+                        <input asp-for="OTP"
+                               type="text"
+                               class="otp-input"
+                               placeholder="Enter OTP"
+                               maxlength="6"
+                               autocomplete="one-time-code" />
+
+                        <span asp-validation-for="OTP"
+                              class="text-danger register-validation">
+                        </span>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <!-- =================================================
+                 LOGIN DETAILS
+            ================================================== -->
+
+            <div class="section-title mt-4 mb-3">
+
+                <i class="fa-solid fa-lock"></i>
+
+                Login Details
+
+            </div>
+
+
+            <!-- =================================================
+                 PASSWORD + CONFIRM PASSWORD
+            ================================================== -->
+
+            <div class="register-form-row">
+
+                <!-- Password -->
+
+                <div class="register-form-group">
+
+                    <label asp-for="Password"
+                           class="register-label">
+                        Password
+                    </label>
+
+                    <input asp-for="Password"
+                           type="password"
+                           class="register-input"
+                           placeholder="Create password"
+                           autocomplete="new-password" />
+
+                    <span asp-validation-for="Password"
+                          class="text-danger register-validation">
+                    </span>
+
+                </div>
+
+
+                <!-- Confirm Password -->
+
+                <div class="register-form-group">
+
+                    <label asp-for="ConfirmPassword"
+                           class="register-label">
+                        Confirm Password
+                    </label>
+
+                    <input asp-for="ConfirmPassword"
+                           type="password"
+                           class="register-input"
+                           placeholder="Confirm password"
+                           autocomplete="new-password" />
+
+                    <span asp-validation-for="ConfirmPassword"
+                          class="text-danger register-validation">
+                    </span>
+
+                </div>
+
+            </div>
+
+
+            <!-- =================================================
+                 IMPORTANT NOTICE
+            ================================================== -->
+
+            <div class="alert alert-info mt-3">
+
+                <i class="fa-solid fa-circle-info me-2"></i>
+
+                Your TPO account will remain pending until it is
+                verified and approved by the Super Admin.
+
+            </div>
+
+
+            <!-- =================================================
+                 REGISTER BUTTON
+            ================================================== -->
+
+            <button type="submit"
+                    class="register-main-btn">
+
+                <i class="fa-solid fa-user-tie"></i>
+
+                Submit TPO Registration
+
+            </button>
+
+
+            <!-- =================================================
+                 LOGIN LINK
+            ================================================== -->
+
+            <div class="register-bottom-text">
+
+                Already have a TPO account?
+
+                <a asp-controller="Account"
+                   asp-action="TPOLogin">
+
+                    Sign In
+
+                </a>
+
+            </div>
+
+        </form>
+
+    </div>
+
+</div>
+
+
+@section Scripts
+{
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+
+    <script>
+
+        $(document).ready(function() {
+
+            // =====================================================
+            // BASIC INPUT SPACE HANDLING
+            // =====================================================
+
+            $('input[type="text"], input[type="email"], input[type="tel"], input[type="password"], textarea')
+                .on('keydown', function(e) {
+
+                    if (e.key === " " && this.value.length === 0) {
+                        e.preventDefault();
+                    }
+
+                })
+                .on('input', function() {
+
+                    this.value = this.value.replace(/^\s+/, '');
+
+                })
+                .on('blur', function() {
+
+                    this.value = this.value.trim();
+
+                });
+
+
+            // =====================================================
+            // MOBILE NUMBER - ONLY DIGITS
+            // =====================================================
+
+            $('#MobileNo').on('input', function() {
+
+                this.value = this.value.replace(/\D/g, '');
+
+                if (this.value.length > 10) {
+
+                    this.value =
+                        this.value.substring(0, 10);
+
+                }
+
+            });
+
+
+            // =====================================================
+            // COLLEGE CODE - TRIM
+            // =====================================================
+
+            $('#CollegeCode').on('blur', function() {
+
+                this.value = this.value.trim();
+
+            });
+
+
+            // =====================================================
+            // EMPLOYEE ID - TRIM
+            // =====================================================
+
+            $('#CollegeEmployeeID').on('blur', function() {
+
+                this.value = this.value.trim();
+
+            });
+
+
+            // =====================================================
+            // SEND OTP
+            // =====================================================
+
+            $('#btnSendOTP').click(function() {
+
+                const otpType =
+                    $('input[name="OTPType"]:checked').val();
+
+                const email =
+                    $('#CollegeMailID').val();
+
+                const mobile =
+                    $('#MobileNo').val();
+
+
+                if (otpType === "Email") {
+
+                    if (!email) {
+
+                        alert("Please enter College Mail ID.");
+
+                        $('#CollegeMailID').focus();
+
+                        return;
+
+                    }
+
+                }
+                else {
+
+                    if (!mobile) {
+
+                        alert("Please enter Mobile Number.");
+
+                        $('#MobileNo').focus();
+
+                        return;
+
+                    }
+
+                }
+
+
+                const button = $(this);
+
+                button.prop('disabled', true);
+
+                button.text('Sending...');
+
+
+                $.ajax({
+
+                    url: '@Url.Action("SendTPOOTP", "Account")',
+
+                    type: 'POST',
+
+                    data: {
+
+                        email: email,
+
+                        mobile: mobile,
+
+                        otpType: otpType
+
+                    },
+
+                    success: function(response) {
+
+                        if (response.success) {
+
+                            alert(response.message);
+
+                            button.text('OTP Sent');
+
+                        }
+                        else {
+
+                            alert(response.message);
+
+                            button.prop('disabled', false);
+
+                            button.text('Send OTP');
+
+                        }
+
+                    },
+
+                    error: function(xhr, status, error) {
+
+                        console.error(
+                            "OTP Error:",
+                            error
+                        );
+
+                        alert(
+                            "Unable to send OTP. Please try again."
+                        );
+
+                        button.prop('disabled', false);
+
+                        button.text('Send OTP');
+
+                    }
+
+                });
+
+            });
+
+
+        });
+
+    </script>
+}

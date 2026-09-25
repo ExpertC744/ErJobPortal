@@ -536,31 +536,31 @@ namespace ErJobPortal.Controllers
         // UPDATE INTERNSHIP DETAILS
         // =========================================================
 
-    //    [HttpPost]
-    //    [ValidateAntiForgeryToken]
-    //    public IActionResult UpdateInternshipPreference(
-    //[Bind(Prefix = "Profile")] CandidateProfileModel model)
-    //    {
-    //        int? candidateId =
-    //            HttpContext.Session.GetInt32("CandidateID");
+        //    [HttpPost]
+        //    [ValidateAntiForgeryToken]
+        //    public IActionResult UpdateInternshipPreference(
+        //[Bind(Prefix = "Profile")] CandidateProfileModel model)
+        //    {
+        //        int? candidateId =
+        //            HttpContext.Session.GetInt32("CandidateID");
 
-    //        if (candidateId == null)
-    //        {
-    //            return RedirectToAction(
-    //                "CandidateLogin",
-    //                "Account"
-    //            );
-    //        }
+        //        if (candidateId == null)
+        //        {
+        //            return RedirectToAction(
+        //                "CandidateLogin",
+        //                "Account"
+        //            );
+        //        }
 
-    //        model.CandidateID = candidateId.Value;
+        //        model.CandidateID = candidateId.Value;
 
-    //        _repo.UpdateInternshipPreference(model);
+        //        _repo.UpdateInternshipPreference(model);
 
-    //        TempData["Success"] =
-    //            "Internship / Fellowship Preference updated successfully.";
+        //        TempData["Success"] =
+        //            "Internship / Fellowship Preference updated successfully.";
 
-    //        return RedirectToAction("Profile");
-    //    }
+        //        return RedirectToAction("Profile");
+        //    }
 
         //[HttpPost]
         //[ValidateAntiForgeryToken]
@@ -2039,6 +2039,184 @@ namespace ErJobPortal.Controllers
                     }
                 }
             }
+        }
+
+        // =========================================================
+        // CUSTOM RESUME BUILDER
+        // =========================================================
+
+        [HttpGet]
+        [Route("Candidate/customResumeBuilder/{id?}")]
+        [ResponseCache(
+            NoStore = true,
+            Location = ResponseCacheLocation.None)]
+        public IActionResult CustomResumeBuilder(string? id)
+        {
+            // =====================================================
+            // GET LOGGED-IN CANDIDATE
+            // =====================================================
+
+            int? candidateId =
+                HttpContext.Session.GetInt32("CandidateID");
+
+            if (candidateId == null || candidateId <= 0)
+            {
+                return RedirectToAction(
+                    "CandidateLogin",
+                    "Account");
+            }
+
+
+            // =====================================================
+            // GET CANDIDATE CODE
+            // =====================================================
+
+            string? candidateCode =
+                GetCandidateCode();
+
+            if (string.IsNullOrEmpty(candidateCode))
+            {
+                return NotFound(
+                    "Candidate code could not be generated.");
+            }
+
+
+            // =====================================================
+            // IF URL DOES NOT CONTAIN CODE
+            // =====================================================
+
+            if (string.IsNullOrEmpty(id))
+            {
+                return RedirectToAction(
+                    "CustomResumeBuilder",
+                    "Candidate",
+                    new
+                    {
+                        id = candidateCode
+                    });
+            }
+
+
+            // =====================================================
+            // VALIDATE CANDIDATE CODE
+            // =====================================================
+
+            if (!string.Equals(
+                    id,
+                    candidateCode,
+                    StringComparison.OrdinalIgnoreCase))
+            {
+                return NotFound();
+            }
+
+
+            // =====================================================
+            // GET CANDIDATE PROFILE FROM DATABASE
+            // =====================================================
+
+            CandidateProfileModel? profile =
+                _repo.GetProfile(candidateId.Value);
+
+
+            if (profile == null)
+            {
+                profile =
+                    new CandidateProfileModel
+                    {
+                        CandidateID =
+                            candidateId.Value
+                    };
+            }
+
+
+            // =====================================================
+            // CREATE RESUME VIEW MODEL
+            // =====================================================
+
+            ResumeViewModel vm =
+                new ResumeViewModel
+                {
+                    Profile = profile,
+
+                    CandidateID =
+                        candidateId.Value,
+
+                    CandidateName =
+                        HttpContext.Session.GetString(
+                            "CandidateName") ?? "",
+
+                    CandidateEmail =
+                        HttpContext.Session.GetString(
+                            "CandidateEmail") ?? "",
+
+                    CandidatePhone = "",
+
+
+                    // =================================================
+                    // LOOKUP DATA
+                    // =================================================
+
+                    Relationships =
+                        _repo.GetRelationships(),
+
+                    Streams =
+                        _repo.GetStreams(),
+
+                    Divisions =
+                        _repo.GetDivisions(),
+
+                    InternshipFellowshipType =
+                        _repo.GetInternshipFellowshipType(),
+
+                    InternshipTitles =
+                        _repo.GetInternshipTitles(),
+
+                    InternshipDurations =
+                        _repo.GetInternshipDurations(),
+
+                    InternshipStatuses =
+                        _repo.GetInternshipStatuses()
+                };
+
+
+            // =====================================================
+            // VIEWBAG
+            // =====================================================
+
+            ViewBag.CandidateID =
+                candidateId.Value;
+
+            ViewBag.CandidateCode =
+                candidateCode;
+
+            ViewBag.CandidateName =
+                vm.CandidateName;
+
+            ViewBag.CandidateEmail =
+                vm.CandidateEmail;
+
+
+            // =====================================================
+            // NO CACHE
+            // =====================================================
+
+            Response.Headers["Cache-Control"] =
+                "no-cache, no-store, must-revalidate";
+
+            Response.Headers["Pragma"] =
+                "no-cache";
+
+            Response.Headers["Expires"] =
+                "0";
+
+
+            // =====================================================
+            // RETURN VIEW
+            // =====================================================
+
+            return View(
+                "CustomResumeBuilder",
+                vm);
         }
 
 
