@@ -14,6 +14,7 @@ namespace ErJobPortal.Repositories
             _db = db;
         }
 
+
         // =========================================================
         // ENSURE PROFILE EXISTS
         // =========================================================
@@ -55,7 +56,7 @@ namespace ErJobPortal.Repositories
         }
 
 
-    
+
 
         // =========================================================
         // GET PROFILE
@@ -68,14 +69,120 @@ namespace ErJobPortal.Repositories
             using SqlConnection con = _db.GetConnection();
 
             string query = @"
-        SELECT *
+        SELECT TOP (1)
+            CandidateID,
+
+            CountryID,
+            StateID,
+            CityID,
+            Pincode,
+
+            Internship_FellowshipType,
+            Preferred_Country,
+            Preferred_State,
+            Preferred_City,
+
+            SSC_YEAR,
+            SSC_DIVISION,
+            HSC_DIPLOMA_YEAR,
+            HSC_DIPLOMA_DIVISION,
+
+            Graduation_Year,
+            Graduation_Stream,
+            Graduation_Division,
+            Other_Stream,
+
+            PG_Year,
+            PG_Stream,
+            PG_Division,
+            Other_Specialization,
+
+            PhD_Year,
+            PhD_Status,
+            PhD_Topic,
+            Previous_PhD_Topic_Year,
+
+            sMedicalSkillIDs,
+            sMedicalSkillStarIDs,
+            sTechnicalSkillIDs,
+            sTechnicalSkillStarIDs,
+            sNonTechnicalSkillIDs,
+            sNonTechnicalSkillStarIDs,
+
+            sLanguage1,
+            sLanguageStar1,
+            sLanguage2,
+            sLanguageStar2,
+            sLanguage3,
+            sLanguageStar3,
+            sLanguage4,
+            sLanguageStar4,
+            sLanguage5,
+            sLanguageStar5,
+            sLanguage6,
+            sLanguageStar6,
+            sLanguage7,
+            sLanguageStar7,
+            sLanguage8,
+            sLanguageStar8,
+
+            sRefName1,
+            sRefRelationName1,
+            sLocation1,
+            sMobile1,
+
+            sRefName2,
+            sRefRelationName2,
+            sLocation2,
+            sMobile2,
+
+            GitHub,
+            Linkedin,
+
+            sOrgName1,
+            sOrgIntTitle1,
+            sOrgIntDuration1,
+            sOrgIntStatus1,
+
+            sOrgName2,
+            sOrgIntTitle2,
+            sOrgIntDuration2,
+            sOrgIntStatus2,
+
+            sOrgName3,
+            sOrgIntTitle3,
+            sOrgIntDuration3,
+            sOrgIntStatus3,
+
+            sOrgName4,
+            sOrgIntTitle4,
+            sOrgIntDuration4,
+            sOrgIntStatus4,
+
+            sResume,
+            sPhoto,
+            sSignature,
+            sDivyang,
+            sHobbies,
+
+            Objective,
+            Resume_Profile,
+
+            Achievements_Certification1,
+            Achievements_Certification2,
+            Achievements_Certification3
+
         FROM tblCandidateProfile
         WHERE CandidateID = @CandidateID
-          AND ISNULL(nBit, 1) = 1";
+          AND (nBit = 1 OR nBit IS NULL);";
 
             using SqlCommand cmd = new SqlCommand(query, con);
 
-            cmd.Parameters.Add("@CandidateID", SqlDbType.Int).Value = candidateId;
+            cmd.Parameters.Add("@CandidateID", SqlDbType.Int)
+                .Value = candidateId;
+
+            // Keep normal timeout initially.
+            cmd.CommandTimeout = 30;
 
             con.Open();
 
@@ -90,19 +197,10 @@ namespace ErJobPortal.Repositories
             {
                 CandidateID = candidateId,
 
-                // =====================================================
-                // ADDRESS
-                // =====================================================
-
                 CountryID = GetString(dr, "CountryID"),
                 StateID = GetString(dr, "StateID"),
                 CityID = GetString(dr, "CityID"),
                 Pincode = GetString(dr, "Pincode"),
-
-
-                // =====================================================
-                // INTERNSHIP / FELLOWSHIP PREFERENCE
-                // =====================================================
 
                 Internship_FellowshipType =
                     GetNullableInt(dr, "Internship_FellowshipType"),
@@ -115,11 +213,6 @@ namespace ErJobPortal.Repositories
 
                 Preferred_City =
                     GetString(dr, "Preferred_City"),
-
-
-                // =====================================================
-                // EDUCATION
-                // =====================================================
 
                 SSC_YEAR =
                     GetNullableInt(dr, "SSC_YEAR"),
@@ -169,11 +262,6 @@ namespace ErJobPortal.Repositories
                 Previous_PhD_Topic_Year =
                     GetString(dr, "Previous_PhD_Topic_Year"),
 
-
-                // =====================================================
-                // SKILLS
-                // =====================================================
-
                 sMedicalSkillIDs =
                     GetString(dr, "sMedicalSkillIDs"),
 
@@ -192,202 +280,87 @@ namespace ErJobPortal.Repositories
                 sNonTechnicalSkillStarIDs =
                     GetString(dr, "sNonTechnicalSkillStarIDs"),
 
+                sLanguage1 = GetString(dr, "sLanguage1"),
+                sLanguageStar1 = GetNullableInt(dr, "sLanguageStar1"),
 
-                // =====================================================
-                // LANGUAGES
-                // =====================================================
+                sLanguage2 = GetString(dr, "sLanguage2"),
+                sLanguageStar2 = GetNullableInt(dr, "sLanguageStar2"),
 
-                sLanguage1 =
-                    GetString(dr, "sLanguage1"),
+                sLanguage3 = GetString(dr, "sLanguage3"),
+                sLanguageStar3 = GetNullableInt(dr, "sLanguageStar3"),
 
-                sLanguageStar1 =
-                    GetNullableInt(dr, "sLanguageStar1"),
+                sLanguage4 = GetString(dr, "sLanguage4"),
+                sLanguageStar4 = GetNullableInt(dr, "sLanguageStar4"),
 
-                sLanguage2 =
-                    GetString(dr, "sLanguage2"),
+                sLanguage5 = GetString(dr, "sLanguage5"),
+                sLanguageStar5 = GetNullableInt(dr, "sLanguageStar5"),
 
-                sLanguageStar2 =
-                    GetNullableInt(dr, "sLanguageStar2"),
+                sLanguage6 = GetString(dr, "sLanguage6"),
+                sLanguageStar6 = GetNullableInt(dr, "sLanguageStar6"),
 
-                sLanguage3 =
-                    GetString(dr, "sLanguage3"),
+                sLanguage7 = GetString(dr, "sLanguage7"),
+                sLanguageStar7 = GetNullableInt(dr, "sLanguageStar7"),
 
-                sLanguageStar3 =
-                    GetNullableInt(dr, "sLanguageStar3"),
+                sLanguage8 = GetString(dr, "sLanguage8"),
+                sLanguageStar8 = GetNullableInt(dr, "sLanguageStar8"),
 
-                sLanguage4 =
-                    GetString(dr, "sLanguage4"),
-
-                sLanguageStar4 =
-                    GetNullableInt(dr, "sLanguageStar4"),
-
-                sLanguage5 =
-                    GetString(dr, "sLanguage5"),
-
-                sLanguageStar5 =
-                    GetNullableInt(dr, "sLanguageStar5"),
-
-                sLanguage6 =
-                    GetString(dr, "sLanguage6"),
-
-                sLanguageStar6 =
-                    GetNullableInt(dr, "sLanguageStar6"),
-
-                sLanguage7 =
-                    GetString(dr, "sLanguage7"),
-
-                sLanguageStar7 =
-                    GetNullableInt(dr, "sLanguageStar7"),
-
-                sLanguage8 =
-                    GetString(dr, "sLanguage8"),
-
-                sLanguageStar8 =
-                    GetNullableInt(dr, "sLanguageStar8"),
-
-
-                // =====================================================
-                // REFERENCES
-                // =====================================================
-
-                sRefName1 =
-                    GetString(dr, "sRefName1"),
-
+                sRefName1 = GetString(dr, "sRefName1"),
                 sRefRelationName1 =
                     GetNullableInt(dr, "sRefRelationName1"),
+                sLocation1 = GetString(dr, "sLocation1"),
+                sMobile1 = GetString(dr, "sMobile1"),
 
-                sLocation1 =
-                    GetString(dr, "sLocation1"),
-
-                sMobile1 =
-                    GetString(dr, "sMobile1"),
-
-                sRefName2 =
-                    GetString(dr, "sRefName2"),
-
+                sRefName2 = GetString(dr, "sRefName2"),
                 sRefRelationName2 =
                     GetNullableInt(dr, "sRefRelationName2"),
+                sLocation2 = GetString(dr, "sLocation2"),
+                sMobile2 = GetString(dr, "sMobile2"),
 
-                sLocation2 =
-                    GetString(dr, "sLocation2"),
+                GitHub = GetString(dr, "GitHub"),
+                Linkedin = GetString(dr, "Linkedin"),
 
-                sMobile2 =
-                    GetString(dr, "sMobile2"),
-
-
-                // =====================================================
-                // SOCIAL LINKS
-                // =====================================================
-
-                GitHub =
-                    GetString(dr, "GitHub"),
-
-                Linkedin =
-                    GetString(dr, "Linkedin"),
-
-
-                // =====================================================
-                // INTERNSHIP 1
-                // =====================================================
-
-                sOrgName1 =
-                    GetString(dr, "sOrgName1"),
-
+                sOrgName1 = GetString(dr, "sOrgName1"),
                 sOrgIntTitle1 =
                     GetNullableInt(dr, "sOrgIntTitle1"),
-
                 sOrgIntDuration1 =
                     GetNullableInt(dr, "sOrgIntDuration1"),
-
                 sOrgIntStatus1 =
                     GetNullableInt(dr, "sOrgIntStatus1"),
 
-
-                // =====================================================
-                // INTERNSHIP 2
-                // =====================================================
-
-                sOrgName2 =
-                    GetString(dr, "sOrgName2"),
-
+                sOrgName2 = GetString(dr, "sOrgName2"),
                 sOrgIntTitle2 =
                     GetNullableInt(dr, "sOrgIntTitle2"),
-
                 sOrgIntDuration2 =
                     GetNullableInt(dr, "sOrgIntDuration2"),
-
                 sOrgIntStatus2 =
                     GetNullableInt(dr, "sOrgIntStatus2"),
 
-
-                // =====================================================
-                // INTERNSHIP 3
-                // =====================================================
-
-                sOrgName3 =
-                    GetString(dr, "sOrgName3"),
-
+                sOrgName3 = GetString(dr, "sOrgName3"),
                 sOrgIntTitle3 =
                     GetNullableInt(dr, "sOrgIntTitle3"),
-
                 sOrgIntDuration3 =
                     GetNullableInt(dr, "sOrgIntDuration3"),
-
                 sOrgIntStatus3 =
                     GetNullableInt(dr, "sOrgIntStatus3"),
 
-
-                // =====================================================
-                // INTERNSHIP 4
-                // =====================================================
-
-                sOrgName4 =
-                    GetString(dr, "sOrgName4"),
-
+                sOrgName4 = GetString(dr, "sOrgName4"),
                 sOrgIntTitle4 =
                     GetNullableInt(dr, "sOrgIntTitle4"),
-
                 sOrgIntDuration4 =
                     GetNullableInt(dr, "sOrgIntDuration4"),
-
                 sOrgIntStatus4 =
                     GetNullableInt(dr, "sOrgIntStatus4"),
 
+                sResume = GetString(dr, "sResume"),
+                sPhoto = GetString(dr, "sPhoto"),
+                sSignature = GetString(dr, "sSignature"),
+                sDivyang = GetString(dr, "sDivyang"),
+                sHobbies = GetString(dr, "sHobbies"),
 
-                // =====================================================
-                // DOCUMENTS
-                // =====================================================
-
-                sResume =
-                    GetString(dr, "sResume"),
-
-                sPhoto =
-                    GetString(dr, "sPhoto"),
-
-                sSignature =
-                    GetString(dr, "sSignature"),
-
-                sDivyang =
-                    GetString(dr, "sDivyang"),
-
-                sHobbies =
-                    GetString(dr, "sHobbies"),
-
-
-                // =====================================================
-                // OBJECTIVE
-                // =====================================================
-
-                Objective =
-                    GetString(dr, "Objective"),
+                Objective = GetString(dr, "Objective"),
 
                 Resume_Profile =
                     GetNullableInt(dr, "Resume_Profile"),
-
-
-                // =====================================================
-                // ACHIEVEMENTS
-                // =====================================================
 
                 Achievements_Certification1 =
                     GetString(dr, "Achievements_Certification1"),
@@ -1316,7 +1289,7 @@ WHERE CandidateID = @CandidateID";
         //}
 
 
-       
+
 
         // =========================================================
         // UPDATE SOCIAL LINKS

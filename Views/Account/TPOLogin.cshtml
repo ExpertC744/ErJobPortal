@@ -1,7 +1,7 @@
-﻿@model ErJobPortal.Models.CandidateLogin
+﻿@model ErJobPortal.Models.TPOLogin
 
 @{
-    ViewData["Title"] = "Candidate Login";
+    ViewData["Title"] = "TPO Login";
     Layout = null;
 }
 
@@ -15,7 +15,7 @@
     <meta name="viewport"
           content="width=device-width, initial-scale=1.0" />
 
-    <title>Candidate Login</title>
+    <title>TPO Login</title>
 
 
     <!-- =========================================================
@@ -50,7 +50,7 @@
 
 
     <!-- =========================================================
-         CANDIDATE LOGIN CSS
+         TPO LOGIN CSS
     ========================================================== -->
 
     <link rel="stylesheet"
@@ -99,21 +99,22 @@
 
                     <div class="candidate-login-icon">
 
-                        <i class="fas fa-user"></i>
+                        <i class="fas fa-user-tie"></i>
 
                     </div>
 
 
                     <h2>
-                        Candidate Login
+                        TPO Login
                     </h2>
 
 
                     <p>
-                        Sign in to access candidate account
+                        Sign in to access TPO account
                     </p>
 
                 </div>
+
 
                 <!-- =================================================
                      ACCOUNT TYPE SWITCH
@@ -128,7 +129,7 @@
 
                     <a asp-controller="Account"
                        asp-action="CandidateLogin"
-                       class="candidate-switch-link active">
+                       class="candidate-switch-link">
 
                         <i class="fa-solid fa-user-graduate"></i>
 
@@ -157,12 +158,12 @@
 
 
                     <!-- =================================================
-                        TPO
+                         TPO
                     ================================================== -->
 
                     <a asp-controller="Account"
                        asp-action="TPOLogin"
-                       class="candidate-switch-link">
+                       class="candidate-switch-link active">
 
                         <i class="fa-solid fa-user-tie"></i>
 
@@ -176,7 +177,6 @@
                 </div>
 
 
-
                 <!-- =================================================
                      SECURITY BADGE
                 ================================================== -->
@@ -185,7 +185,7 @@
 
                     <i class="fas fa-lock"></i>
 
-                    Secure Candidate Access
+                    Secure TPO Access
 
                 </div>
 
@@ -229,8 +229,11 @@
                 ================================================== -->
 
                 <form asp-controller="Account"
-                      asp-action="CandidateLogin"
+                      asp-action="TPOLogin"
                       method="post">
+
+
+                    @Html.AntiForgeryToken()
 
 
                     <!-- =================================================
@@ -243,15 +246,15 @@
 
 
                     <!-- =================================================
-                         EMAIL
+                         COLLEGE EMAIL
                     ================================================== -->
 
                     <div class="candidate-form-group">
 
-                        <label asp-for="sEmail"
+                        <label asp-for="CollegeMailID"
                                class="candidate-form-label">
 
-                            Email Address
+                            College Mail ID
 
                         </label>
 
@@ -262,17 +265,17 @@
                             <i class="fas fa-envelope candidate-input-icon"></i>
 
 
-                            <input asp-for="sEmail"
+                            <input asp-for="CollegeMailID"
                                    class="candidate-input"
                                    type="email"
-                                   placeholder="Email address"
+                                   placeholder="College email address"
                                    autocomplete="username" />
 
 
                         </div>
 
 
-                        <span asp-validation-for="sEmail"
+                        <span asp-validation-for="CollegeMailID"
                               class="candidate-field-validation">
                         </span>
 
@@ -285,7 +288,7 @@
 
                     <div class="candidate-form-group">
 
-                        <label asp-for="sPassword"
+                        <label asp-for="Password"
                                class="candidate-form-label">
 
                             Password
@@ -299,8 +302,8 @@
                             <i class="fas fa-lock candidate-input-icon"></i>
 
 
-                            <input asp-for="sPassword"
-                                   id="candidatePassword"
+                            <input asp-for="Password"
+                                   id="tpoPassword"
                                    class="candidate-input"
                                    type="password"
                                    placeholder="Password"
@@ -311,7 +314,7 @@
 
                             <button type="button"
                                     class="candidate-password-toggle"
-                                    id="candidateTogglePassword"
+                                    id="tpoTogglePassword"
                                     aria-label="Show password">
 
                                 <i class="fas fa-eye"></i>
@@ -322,7 +325,7 @@
                         </div>
 
 
-                        <span asp-validation-for="sPassword"
+                        <span asp-validation-for="Password"
                               class="candidate-field-validation">
                         </span>
 
@@ -331,7 +334,7 @@
                     <div class="candidate-password-actions">
 
                         <a asp-controller="Account"
-                           asp-action="CandidateForgotPassword"
+                           asp-action="TPOForgotPassword"
                            class="candidate-password-link">
 
                             <i class="fas fa-circle-question"></i>
@@ -345,7 +348,7 @@
 
 
                         <a asp-controller="Account"
-                           asp-action="CandidateResetPassword"
+                           asp-action="TPORestPassword"
                            class="candidate-password-link">
 
                             <i class="fas fa-key"></i>
@@ -355,7 +358,7 @@
                         </a>
 
                     </div>
-            
+
 
 
                     <!-- =================================================
@@ -388,11 +391,11 @@
 
                         <i class="fas fa-user-check"></i>
 
-                        Don't have an Candidate account?
+                        Don't have a TPO account?
 
 
                         <a asp-controller="Account"
-                           asp-action="CandidateRegister"
+                           asp-action="TPORegister"
                            class="candidate-register-link">
 
                             Register
@@ -418,68 +421,68 @@
 
     <script>
 
-        document.addEventListener("DOMContentLoaded", function () {
+            document.addEventListener("DOMContentLoaded", function() {
 
 
-            const passwordInput =
-                document.getElementById("candidatePassword");
+                const passwordInput =
+                    document.getElementById("tpoPassword");
 
 
-            const toggleButton =
-                document.getElementById("candidateTogglePassword");
+                const toggleButton =
+                    document.getElementById("tpoTogglePassword");
 
 
-            if (!passwordInput || !toggleButton) {
-                return;
-            }
-
-
-            toggleButton.addEventListener("click", function () {
-
-
-                const icon =
-                    this.querySelector("i");
-
-
-                if (passwordInput.type === "password") {
-
-
-                    passwordInput.type = "text";
-
-
-                    icon.classList.remove("fa-eye");
-
-                    icon.classList.add("fa-eye-slash");
-
-
-                    this.setAttribute(
-                        "aria-label",
-                        "Hide password"
-                    );
-
-
+                if (!passwordInput || !toggleButton) {
+                    return;
                 }
-                else {
 
 
-                    passwordInput.type = "password";
+                toggleButton.addEventListener("click", function() {
 
 
-                    icon.classList.remove("fa-eye-slash");
+                    const icon =
+                        this.querySelector("i");
 
-                    icon.classList.add("fa-eye");
+
+                    if (passwordInput.type === "password") {
 
 
-                    this.setAttribute(
-                        "aria-label",
-                        "Show password"
-                    );
+                        passwordInput.type = "text";
 
-                }
+
+                        icon.classList.remove("fa-eye");
+
+                        icon.classList.add("fa-eye-slash");
+
+
+                        this.setAttribute(
+                            "aria-label",
+                            "Hide password"
+                        );
+
+
+                    }
+                    else {
+
+
+                        passwordInput.type = "password";
+
+
+                        icon.classList.remove("fa-eye-slash");
+
+                        icon.classList.add("fa-eye");
+
+
+                        this.setAttribute(
+                            "aria-label",
+                            "Show password"
+                        );
+
+                    }
+
+                });
 
             });
-
-        });
 
     </script>
 
