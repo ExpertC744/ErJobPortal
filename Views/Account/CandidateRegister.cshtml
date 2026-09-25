@@ -27,6 +27,11 @@
                class="switch-btn">
                 Organization
             </a>
+            <a asp-controller="Account"
+               asp-action="TPORegister"
+               class="switch-btn">
+                TPO
+            </a>
 
         </div>
 
@@ -78,15 +83,6 @@
               enctype="multipart/form-data">
 
             @Html.AntiForgeryToken()
-
-
-            <!-- =================================================
-                 VALIDATION SUMMARY
-            ================================================== -->
-
-            <div asp-validation-summary="All"
-                 class="text-danger register-summary">
-            </div>
 
 
             <!-- =================================================
@@ -362,8 +358,6 @@
 
                         </select>
 
-                        @*  <i class="fa-solid fa-building register-input-icon"></i> *@
-
                     </div>
 
                     <span asp-validation-for="sCollegeName"
@@ -393,8 +387,6 @@
                             </option>
 
                         </select>
-
-                        @* <i class="fa-solid fa-hashtag register-input-icon"></i> *@
 
                     </div>
 
@@ -434,8 +426,6 @@
 
                         </select>
 
-                        @*  <i class="fa-solid fa-building-columns register-input-icon"></i> *@
-
                     </div>
 
                     <span asp-validation-for="nDepartment"
@@ -466,8 +456,6 @@
 
                         </select>
 
-                        @*   <i class="fa-solid fa-code-branch register-input-icon"></i> *@
-
                     </div>
 
                     <span asp-validation-for="nBranch"
@@ -480,10 +468,12 @@
 
 
             <!-- =================================================
-                 PASSOUT YEAR
+                 PASSOUT YEAR + PROFILE IMAGE
             ================================================== -->
 
             <div class="register-form-row">
+
+                <!-- Passout Year -->
 
                 <div class="register-form-group">
 
@@ -520,10 +510,7 @@
                 </div>
 
 
-
-                <!-- =================================================
-                     PROFILE IMAGE
-                ================================================== -->
+                <!-- Profile Image -->
 
                 <div class="register-form-group">
 
@@ -546,14 +533,11 @@
             </div>
 
 
-
             <!-- =================================================
-                 PASSWORD + CONFIRM PASSWORD
+                 PASSWORD
             ================================================== -->
 
             <div class="register-form-row">
-
-                <!-- Password -->
 
                 <div class="register-form-group">
 
@@ -572,26 +556,6 @@
                     </span>
 
                 </div>
-
-
-                <!-- Confirm Password -->
-                @*  <div class="register-form-group">
-
-                    <label asp-for="sConfirmPassword"
-                           class="register-label">
-                        Confirm Password
-                    </label>
-
-                    <input asp-for="sConfirmPassword"
-                           type="password"
-                           class="register-input"
-                           placeholder="Confirm password" />
-
-                    <span asp-validation-for="sConfirmPassword"
-                          class="text-danger register-validation">
-                    </span>
-
-                </div> *@
 
             </div>
 
@@ -1009,3 +973,45 @@
 
     </script>
 }
+
+
+<!-- =========================================================
+     CAPITALIZE FIRST LETTER OF FIRST NAME / LAST NAME
+========================================================== -->
+
+<script>
+
+    document.addEventListener("DOMContentLoaded", function () {
+
+        const nameFields = [
+            "sFName",
+            "sLName"
+        ];
+
+        nameFields.forEach(function (fieldName) {
+
+            const input = document.querySelector(
+                `[name="${fieldName}"]`
+            );
+
+            if (!input) {
+                return;
+            }
+
+            input.addEventListener("input", function () {
+
+                if (this.value.length > 0) {
+
+                    this.value =
+                        this.value.charAt(0).toUpperCase() +
+                        this.value.slice(1);
+
+                }
+
+            });
+
+        });
+
+    });
+
+</script>

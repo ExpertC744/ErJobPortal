@@ -1361,5 +1361,430 @@ public OrganizationLogin? GetOrganizationLoginDetails(string email)
         public SALoginModel? GetSuperAdminLoginDetails(string email) { using (SqlConnection cn = _db.GetConnection()) { string query = @" SELECT sEmail, sPassword FROM tblSuperAdmin WHERE sEmail = @Email AND nBit = 1"; using (SqlCommand cmd = new SqlCommand(query, cn)) { cmd.Parameters.Add("@Email", SqlDbType.NVarChar, 200).Value = email.Trim(); cn.Open(); using (SqlDataReader reader = cmd.ExecuteReader()) { if (reader.Read()) { return new SALoginModel { sEmail = reader["sEmail"] == DBNull.Value ? "" : reader["sEmail"].ToString(), sPassword = reader["sPassword"] == DBNull.Value ? "" : reader["sPassword"].ToString() }; } } } } return null; }
         public bool ResetSuperAdminPassword(string email, string newPassword) { using (SqlConnection cn = _db.GetConnection()) { string query = @" UPDATE tblSuperAdmin SET sPassword = @NewPassword, ModDate = GETDATE() WHERE sEmail = @Email AND nBit = 1"; using (SqlCommand cmd = new SqlCommand(query, cn)) { cmd.Parameters.Add("@NewPassword", SqlDbType.NVarChar, 300).Value = newPassword; cmd.Parameters.Add("@Email", SqlDbType.NVarChar, 200).Value = email.Trim(); cn.Open(); int rowsAffected = cmd.ExecuteNonQuery(); return rowsAffected > 0; } } }
 
+
+
+        // TPO REGISTRATION//
+
+        // shrirang 23/09/26
+
+        // ==========================================================
+        // TPO REGISTRATION
+        // ==========================================================
+
+        public int RegisterTPO(TPORegistration model)
+        {
+            // ==========================================================
+            // HASH PASSWORD
+            // ==========================================================
+
+            var passwordHasher =
+                new Microsoft.AspNetCore.Identity.PasswordHasher<string>();
+
+            string passwordHash =
+                passwordHasher.HashPassword(
+                    model.CollegeMailID,
+                    model.Password
+                );
+
+
+            // ==========================================================
+            // DATABASE CONNECTION
+            // ==========================================================
+
+            using (SqlConnection cn = _db.GetConnection())
+            {
+                string query = @"
+            INSERT INTO tblTPORegistration
+            (
+                FullName,
+                CollegeMailID,
+                MobileNo,
+                PasswordHash,
+                CollegeName,
+                CollegeCode,
+                CollegeAddress,
+                OrganizationWebsiteURL,
+                Designation,
+                DepartmentName,
+                CollegeEmployeeID,
+                SupportingDocument1,
+                SupportingDocument2,
+                ProfilePhoto,
+                OTP,
+                OTPVerified,
+                Status,
+                IsApproved,
+                IsActive,
+                CreatedDate
+            )
+            VALUES
+            (
+                @FullName,
+                @CollegeMailID,
+                @MobileNo,
+                @PasswordHash,
+                @CollegeName,
+                @CollegeCode,
+                @CollegeAddress,
+                @OrganizationWebsiteURL,
+                @Designation,
+                @DepartmentName,
+                @CollegeEmployeeID,
+                @SupportingDocument1,
+                @SupportingDocument2,
+                @ProfilePhoto,
+                @OTP,
+                @OTPVerified,
+                @Status,
+                @IsApproved,
+                @IsActive,
+                GETDATE()
+            )";
+
+                using (SqlCommand cmd =
+                       new SqlCommand(query, cn))
+                {
+                    // ==================================================
+                    // BASIC DETAILS
+                    // ==================================================
+
+                    cmd.Parameters.Add(
+                        "@FullName",
+                        SqlDbType.NVarChar,
+                        150
+                    ).Value =
+                        model.FullName ?? "";
+
+                    cmd.Parameters.Add(
+                        "@CollegeMailID",
+                        SqlDbType.NVarChar,
+                        200
+                    ).Value =
+                        model.CollegeMailID ?? "";
+
+                    cmd.Parameters.Add(
+                        "@MobileNo",
+                        SqlDbType.VarChar,
+                        15
+                    ).Value =
+                        model.MobileNo ?? "";
+
+
+                    // ==================================================
+                    // PASSWORD HASH
+                    // ==================================================
+
+                    cmd.Parameters.Add(
+                        "@PasswordHash",
+                        SqlDbType.NVarChar,
+                        500
+                    ).Value =
+                        passwordHash;
+
+
+                    // ==================================================
+                    // COLLEGE DETAILS
+                    // ==================================================
+
+                    cmd.Parameters.Add(
+                        "@CollegeName",
+                        SqlDbType.NVarChar,
+                        250
+                    ).Value =
+                        model.CollegeName ?? "";
+
+                    cmd.Parameters.Add(
+                        "@CollegeCode",
+                        SqlDbType.NVarChar,
+                        100
+                    ).Value =
+                        string.IsNullOrWhiteSpace(model.CollegeCode)
+                            ? (object)DBNull.Value
+                            : model.CollegeCode;
+
+                    cmd.Parameters.Add(
+                        "@CollegeAddress",
+                        SqlDbType.NVarChar,
+                        500
+                    ).Value =
+                        model.CollegeAddress ?? "";
+
+                    cmd.Parameters.Add(
+                        "@OrganizationWebsiteURL",
+                        SqlDbType.NVarChar,
+                        500
+                    ).Value =
+                        string.IsNullOrWhiteSpace(
+                            model.OrganizationWebsiteURL)
+                            ? (object)DBNull.Value
+                            : model.OrganizationWebsiteURL;
+
+
+                    // ==================================================
+                    // EMPLOYEE DETAILS
+                    // ==================================================
+
+                    cmd.Parameters.Add(
+                        "@Designation",
+                        SqlDbType.NVarChar,
+                        150
+                    ).Value =
+                        model.Designation ?? "";
+
+                    cmd.Parameters.Add(
+                        "@DepartmentName",
+                        SqlDbType.NVarChar,
+                        150
+                    ).Value =
+                        model.DepartmentName ?? "";
+
+                    cmd.Parameters.Add(
+                        "@CollegeEmployeeID",
+                        SqlDbType.NVarChar,
+                        100
+                    ).Value =
+                        model.CollegeEmployeeID ?? "";
+
+
+                    // ==================================================
+                    // DOCUMENTS
+                    // ==================================================
+
+                    cmd.Parameters.Add(
+                        "@SupportingDocument1",
+                        SqlDbType.NVarChar,
+                        500
+                    ).Value =
+                        string.IsNullOrWhiteSpace(
+                            model.SupportingDocument1)
+                            ? (object)DBNull.Value
+                            : model.SupportingDocument1;
+
+                    cmd.Parameters.Add(
+                        "@SupportingDocument2",
+                        SqlDbType.NVarChar,
+                        500
+                    ).Value =
+                        string.IsNullOrWhiteSpace(
+                            model.SupportingDocument2)
+                            ? (object)DBNull.Value
+                            : model.SupportingDocument2;
+
+                    cmd.Parameters.Add(
+                        "@ProfilePhoto",
+                        SqlDbType.NVarChar,
+                        500
+                    ).Value =
+                        string.IsNullOrWhiteSpace(
+                            model.ProfilePhoto)
+                            ? (object)DBNull.Value
+                            : model.ProfilePhoto;
+
+
+                    // ==================================================
+                    // OTP
+                    // ==================================================
+
+                    cmd.Parameters.Add(
+                        "@OTP",
+                        SqlDbType.VarChar,
+                        10
+                    ).Value =
+                        string.IsNullOrWhiteSpace(model.OTP)
+                            ? (object)DBNull.Value
+                            : model.OTP;
+
+                    cmd.Parameters.Add(
+                        "@OTPVerified",
+                        SqlDbType.Bit
+                    ).Value =
+                        model.OTPVerified;
+
+
+                    // ==================================================
+                    // APPROVAL STATUS
+                    // ==================================================
+
+                    cmd.Parameters.Add(
+                        "@Status",
+                        SqlDbType.NVarChar,
+                        50
+                    ).Value =
+                        string.IsNullOrWhiteSpace(model.Status)
+                            ? "Pending"
+                            : model.Status;
+
+                    cmd.Parameters.Add(
+                        "@IsApproved",
+                        SqlDbType.Bit
+                    ).Value =
+                        model.IsApproved;
+
+                    cmd.Parameters.Add(
+                        "@IsActive",
+                        SqlDbType.Bit
+                    ).Value =
+                        model.IsActive;
+
+
+                    // ==================================================
+                    // EXECUTE
+                    // ==================================================
+
+                    cn.Open();
+
+                    return cmd.ExecuteNonQuery();
+                }
+            }
+        }
+
+
+
+        // =========================================================
+        // TPO LOGIN
+        // =========================================================
+
+        public TPOLoginResult LoginTPO(string collegeMailID)
+        {
+            using (SqlConnection cn = _db.GetConnection())
+            {
+                string query = @"
+            SELECT
+                TPOID,
+                FullName,
+                CollegeMailID,
+                MobileNo,
+                PasswordHash,
+                CollegeName,
+                CollegeCode,
+                Designation,
+                DepartmentName,
+                OTPVerified,
+                Status,
+                IsApproved,
+                IsActive
+            FROM tblTPORegistration
+            WHERE CollegeMailID = @CollegeMailID";
+
+                using (SqlCommand cmd = new SqlCommand(query, cn))
+                {
+                    cmd.Parameters.Add("@CollegeMailID", SqlDbType.NVarChar, 200)
+                                  .Value = collegeMailID.Trim();
+
+                    cn.Open();
+
+                    using (SqlDataReader reader = cmd.ExecuteReader())
+                    {
+                        if (reader.Read())
+                        {
+                            return new TPOLoginResult
+                            {
+                                TPOID = Convert.ToInt32(reader["TPOID"]),
+
+                                FullName = reader["FullName"].ToString(),
+
+                                CollegeMailID =
+                                    reader["CollegeMailID"].ToString(),
+
+                                MobileNo =
+                                    reader["MobileNo"].ToString(),
+
+                                PasswordHash =
+                                    reader["PasswordHash"].ToString(),
+
+                                CollegeName =
+                                    reader["CollegeName"].ToString(),
+
+                                CollegeCode =
+                                    reader["CollegeCode"] == DBNull.Value
+                                        ? null
+                                        : reader["CollegeCode"].ToString(),
+
+                                Designation =
+                                    reader["Designation"].ToString(),
+
+                                DepartmentName =
+                                    reader["DepartmentName"].ToString(),
+
+                                OTPVerified =
+                                    Convert.ToBoolean(reader["OTPVerified"]),
+
+                                Status =
+                                    reader["Status"].ToString(),
+
+                                IsApproved =
+                                    Convert.ToBoolean(reader["IsApproved"]),
+
+                                IsActive =
+                                    Convert.ToBoolean(reader["IsActive"])
+                            };
+                        }
+                    }
+                }
+            }
+
+            return null;
+        }
+
+
+        public bool TPOEmailExists(string collegeMailID)
+        {
+            using (SqlConnection cn = _db.GetConnection())
+            {
+                string query = @"
+            SELECT COUNT(1)
+            FROM tblTPORegistration
+            WHERE CollegeMailID = @CollegeMailID";
+
+                using (SqlCommand cmd = new SqlCommand(query, cn))
+                {
+                    cmd.Parameters.Add("@CollegeMailID", SqlDbType.NVarChar, 200)
+                        .Value = collegeMailID.Trim();
+
+                    cn.Open();
+
+                    int count = Convert.ToInt32(cmd.ExecuteScalar());
+
+                    return count > 0;
+                }
+            }
+        }
+
+        // RESET PASSWORD TPO
+        public bool ResetTPOPassword(
+    string collegeMailID,
+    string newPassword)
+        {
+            using (SqlConnection cn = _db.GetConnection())
+            {
+                string query = @"
+            UPDATE tblTPORegistration
+            SET
+                PasswordHash = @Password,
+                UpdatedDate = GETDATE()
+            WHERE CollegeMailID = @CollegeMailID";
+
+                using (SqlCommand cmd = new SqlCommand(query, cn))
+                {
+                    cmd.Parameters.Add(
+                        "@Password",
+                        SqlDbType.NVarChar,
+                        500
+                    ).Value = newPassword;
+
+                    cmd.Parameters.Add(
+                        "@CollegeMailID",
+                        SqlDbType.NVarChar,
+                        200
+                    ).Value = collegeMailID.Trim();
+
+                    cn.Open();
+
+                    int result = cmd.ExecuteNonQuery();
+
+                    return result > 0;
+                }
+            }
+        }
     }
 }

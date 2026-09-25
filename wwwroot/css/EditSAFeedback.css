@@ -1,679 +1,828 @@
-﻿@model ErJobPortal.Models.SAFeedbackM @ {
-    Layout = "~/Views/Shared/_DashboardLayout.cshtml";
-    ViewData ["Title"] = "Super Admin Dashboard";
-    ViewData ["Panel"] = "SuperAdmin";
-    ViewData ["UserName"] = "Super Admin";
-}
+﻿/* =========================================================
+   1TRAINEE - EDIT TRAINEE FEEDBACK
+   ========================================================= */
 
-@section Styles {
-    <link rel="stylesheet" href="~/css/EditSAFeedback.css" asp-append-version="true" />
-}
 
-@ {
-    ViewData ["Title"] = "Edit Trainee Feedback";
-}
-
-<style >
+/* =========================================================
+   PAGE CONTAINER
+   ========================================================= */
 
 .feedback-edit-container {
     width: 100%;
-    display: flex;
-    justify-content: center;
-    padding: 0;
     margin: 0;
+    padding: 0;
     box-sizing: border-box;
 }
+
+
+/* =========================================================
+   MAIN CARD
+   ========================================================= */
 
 .feedback-edit-card {
-    width: 870px;
-    max-width: 100%;
-    background: #f4faf8;
-    border: 1px solid #d7e8e3;
-    border-top: 4px solid #0f5d52;
-    border-radius: 0 0 20px 20px;
-    padding: 38px 35px 42px 35px;
+    width: 100%;
+    margin: 0;
+    padding: 0 0 30px;
+    background: transparent;
+    border: none;
+    border-radius: 0;
+    box-shadow: none;
     box-sizing: border-box;
-    box-shadow: 0 5px 18px rgba(15, 93, 82, 0.10);
 }
+
+
+/* =========================================================
+   PAGE TITLE
+   ========================================================= */
 
 .feedback-edit-title {
-    margin: 0 0 24px 0;
+    position: relative;
+    margin: 0 0 24px;
+    padding-left: 14px;
+    color: #0f172a;
     font-family: Arial, Helvetica, sans-serif;
-    font-size: 30px;
-    font-weight: 600;
-    color: #0f5d52;
+    font-size: 26px;
+    font-weight: 700;
+    line-height: 1.3;
 }
+
+
+    /* Teal line */
+
+    .feedback-edit-title::before {
+        content: "";
+        position: absolute;
+        left: 0;
+        top: 2px;
+        width: 4px;
+        height: 30px;
+        background: #0d9488;
+        border-radius: 4px;
+    }
+
+
+/* =========================================================
+   QUESTION CARD
+   ========================================================= */
 
 .feedback-question {
-    margin-bottom: 18px;
+    width: 100%;
+    margin: 0 0 15px;
+    padding: 18px 21px 22px;
+    background: #ffffff;
+    border: 1px solid #dbe4ea;
+    border-radius: 12px;
+    box-sizing: border-box;
+    box-shadow: 0 3px 10px rgba(15, 23, 42, 0.035);
 }
+
+
+/* =========================================================
+   QUESTION LABEL
+   ========================================================= */
 
 .question-label {
-    display: block;
-    margin-bottom: 10px;
-    font-family: Arial, Helvetica, sans-serif;
-    font-size: 17px;
-    font-weight: 600;
-    color: #0f5d52;
-}
-
-.question-textarea {
-    display: block;
+    position: relative;
+    display: flex;
+    align-items: center;
     width: 100%;
-    min-height: 58px;
-    padding: 7px 12px;
-    border: 1px solid #b9d6cd;
-    border-radius: 6px;
-    background: #fff;
-    color: #1f2d2b;
-    font-family: Arial, Helvetica, sans-serif;
-    font-size: 16px;
-    line-height: 1.45;
-    resize: vertical;
-    box-sizing: border-box;
-    outline: none;
-    transition: border-color 0.15s ease, box-shadow 0.15s ease;
-}
-
-    .question-textarea:focus {
-        border-color: #17a589;
-        box-shadow: 0 0 0 3px rgba(23, 165, 137, 0.15);
-    }
-
-.answer-area {
-    margin-left: 23px;
-    margin-top: 10px;
-    margin-bottom: 13px;
-}
-
-.radio-options {
-    display: flex;
-    align-items: center;
-    gap: 5px;
-    font-family: Arial, Helvetica, sans-serif;
-    font-size: 17px;
-    color: #1f2d2b;
-}
-
-    .radio-options label {
-        display: flex;
-        align-items: center;
-        gap: 5px;
-        margin-right: 4px;
-        cursor: pointer;
-    }
-
-    .radio-options input[type="radio"] {
-        width: 14px;
-        height: 14px;
-        margin: 0;
-        cursor: pointer;
-        accent-color: #0f5d52;
-    }
-
-.star-options {
-    display: flex;
-    align-items: center;
-    gap: 3px;
-}
-
-    .star-options label {
-        position: relative;
-        width: 35px;
-        height: 35px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        cursor: pointer;
-    }
-
-    .star-options input[type="radio"] {
-        position: absolute;
-        opacity: 0;
-        pointer-events: none;
-    }
-
-.star {
-    display: inline-block;
-    font-size: 30px;
-    line-height: 1;
-    color: #c7d9d4;
-    transition: all 0.15s ease;
-    cursor: pointer;
-}
-
-    .star.active {
-        color: #17a589;
-    }
-
-.star-options label:hover .star {
-    color: #17a589;
-    transform: scale(1.15);
-}
-
-.emoji-options {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-}
-
-    .emoji-options label {
-        position: relative;
-        width: 43px;
-        height: 43px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        border-radius: 50%;
-        cursor: pointer;
-        transition: all 0.2s ease;
-    }
-
-    .emoji-options input[type="radio"] {
-        position: absolute;
-        opacity: 0;
-        pointer-events: none;
-    }
-
-.emoji {
-    display: inline-block;
-    font-family: "Segoe UI Emoji", "Apple Color Emoji", "Noto Color Emoji", sans-serif;
-    font-size: 27px;
-    filter: grayscale(100%);
-    opacity: 0.55;
-    transition: all 0.2s ease;
-    cursor: pointer;
-}
-
-.emoji-options label:hover {
-    background: #e7f3ef;
-    transform: translateY(-2px);
-    box-shadow: 0 2px 7px rgba(15, 93, 82, 0.12);
-}
-
-    .emoji-options label:hover .emoji {
-        filter: grayscale(0%);
-        opacity: 1;
-        transform: scale(1.15);
-    }
-
-.emoji-options label.selected {
-    background: #e7f3ef;
-    box-shadow: 0 2px 8px rgba(15, 93, 82, 0.20);
-    transform: translateY(-2px);
-}
-
-    .emoji-options label.selected .emoji {
-        filter: grayscale(0%);
-        opacity: 1;
-        transform: scale(1.2);
-    }
-
-.description-label {
-    display: block;
-    margin-left: 0;
-    margin-top: 3px;
-    margin-bottom: 7px;
-    font-family: Arial, Helvetica, sans-serif;
-    font-size: 17px;
-    color: #0f5d52;
-    font-weight: 600;
-}
-
-.description-textarea {
-    display: block;
-    width: 100%;
-    min-height: 72px;
-    margin-left: 0;
-    padding: 8px 12px;
-    border: 1px solid #b9d6cd;
-    border-radius: 6px;
-    background: #fff;
-    color: #1f2d2b;
-    font-family: Arial, Helvetica, sans-serif;
-    font-size: 16px;
-    line-height: 1.4;
-    resize: vertical;
-    box-sizing: border-box;
-    outline: none;
-    transition: border-color 0.15s ease, box-shadow 0.15s ease;
-}
-
-    .description-textarea:focus {
-        border-color: #17a589;
-        box-shadow: 0 0 0 3px rgba(23, 165, 137, 0.15);
-    }
-
-.save-area {
-    margin-left: 23px;
-    margin-top: 20px;
-}
-
-.save-button {
-    background: #0f5d52;
-    color: #fff;
-    border: 1px solid #0f5d52;
-    border-radius: 6px;
-    padding: 7px 15px;
+    min-height: 30px;
+    margin: 0 0 10px;
+    padding: 0 0 0 42px;
+    /*
+       Keep the original text in the HTML,
+       but hide it visually.
+    */
+    color: transparent;
     font-family: Arial, Helvetica, sans-serif;
     font-size: 14px;
     font-weight: 600;
-    cursor: pointer;
-    transition: all 0.15s ease;
-}
-
-    .save-button:hover {
-        background: #0c4b42;
-        border-color: #0c4b42;
-    }
-
-.validation-message {
-    display: block;
-    margin-left: 23px;
-    margin-top: 3px;
-    color: #dc3545;
-    font-size: 12px;
-}
-
-@@media (max-width: 900px) {
-
-    .feedback-edit-card {
-        width: 100%;
-        padding: 30px 25px 35px 25px;
-    }
-
-    .feedback-edit-title {
-        font-size: 28px;
-    }
-
-    .question-textarea {
-        font-size: 15px;
-    }
-
-    .answer-area,
-    .save-area {
-        margin-left: 15px;
-    }
-
-    .star {
-        font-size: 27px;
-    }
-
-    .emoji {
-        font-size: 24px;
-    }
-}
-
-@@media (max-width: 500px) {
-
-    .feedback-edit-card {
-        padding: 25px 18px 30px 18px;
-    }
-
-    .feedback-edit-title {
-        font-size: 24px;
-    }
-
-    .question-label {
-        font-size: 16px;
-    }
-
-    .answer-area,
-    .save-area {
-        margin-left: 10px;
-    }
-
-    .star-options {
-        gap: 1px;
-    }
-
-        .star-options label {
-            width: 32px;
-        }
-
-    .star {
-        font-size: 24px;
-    }
-
-    .emoji-options {
-        gap: 7px;
-    }
-
-        .emoji-options label {
-            width: 39px;
-            height: 39px;
-        }
-
-    .emoji {
-        font-size: 21px;
-    }
-}
-
-</style >
-@*
-<style >
-
-.feedback-edit-container {
-    width: 100%;
-    display: flex;
-    justify-content: center;
-    padding: 0;
-    margin: 0;
+    line-height: 30px;
     box-sizing: border-box;
 }
 
-.feedback-edit-card {
-    width: 870px;
-    max-width: 100%;
-    background: #eef4ff;
-    border: 1px solid #d9d9d9;
-    border-radius: 0 0 20px 20px;
-    padding: 38px 35px 42px 35px;
-    box-sizing: border-box;
-    box-shadow: 0 5px 18px rgba(0, 0, 0, 0.08);
+
+    /* =========================================================
+   NUMBER BADGE
+   ========================================================= */
+
+    .question-label::before {
+        content: "";
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 30px;
+        height: 30px;
+        background: #ccfbf1;
+        border-radius: 8px;
+    }
+
+
+    /* =========================================================
+   NUMBER INSIDE BADGE
+   ========================================================= */
+
+    .question-label::after {
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 30px;
+        height: 30px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #0d9488;
+        font-family: Arial, Helvetica, sans-serif;
+        font-size: 14px;
+        font-weight: 700;
+        line-height: 1;
+    }
+
+
+/* =========================================================
+   QUESTION NUMBERS
+   ========================================================= */
+
+.feedback-question:nth-of-type(1)
+.question-label::after {
+    content: "1.";
 }
 
-.feedback-edit-title {
-    margin: 0 0 24px 0;
-    font-family: Arial, Helvetica, sans-serif;
-    font-size: 30px;
-    font-weight: 400;
-    color: #111;
+.feedback-question:nth-of-type(2)
+.question-label::after {
+    content: "2.";
 }
 
-.feedback-question {
-    margin-bottom: 18px;
+.feedback-question:nth-of-type(3)
+.question-label::after {
+    content: "3.";
 }
 
-.question-label {
-    display: block;
-    margin-bottom: 10px;
-    font-family: Arial, Helvetica, sans-serif;
-    font-size: 17px;
-    font-weight: 400;
-    color: #111;
+.feedback-question:nth-of-type(4)
+.question-label::after {
+    content: "4.";
 }
+
+.feedback-question:nth-of-type(5)
+.question-label::after {
+    content: "5.";
+}
+
+
+/* =========================================================
+   QUESTION TEXTAREA
+   ========================================================= */
 
 .question-textarea {
     display: block;
     width: 100%;
-    min-height: 58px;
-    padding: 7px 12px;
-    border: 1px solid #999;
-    border-radius: 2px;
-    background: #fff;
-    color: #111;
+    min-height: 76px;
+    margin: 0;
+    padding: 10px 13px;
+    background: #ffffff;
+    border: 1px solid #d2dde6;
+    border-radius: 8px;
+    outline: none;
+    color: #0f172a;
     font-family: Arial, Helvetica, sans-serif;
-    font-size: 16px;
-    line-height: 1.45;
+    font-size: 14px;
+    font-weight: 500;
+    line-height: 1.5;
     resize: vertical;
     box-sizing: border-box;
-    outline: none;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
 }
+
+
+    /* Question textarea focus */
 
     .question-textarea:focus {
-        border-color: #777;
-        box-shadow: none;
+        border-color: #0d9488;
+        box-shadow: 0 0 0 3px rgba(13, 148, 136, 0.08);
     }
 
+
+/* =========================================================
+   ANSWER AREA
+   ========================================================= */
+
 .answer-area {
-    margin-left: 23px;
-    margin-top: 10px;
-    margin-bottom: 13px;
+    width: 100%;
+    min-height: 52px;
+    display: flex;
+    align-items: center;
+    margin: 15px 0 0;
+    padding: 0;
+    box-sizing: border-box;
 }
+
+
+/* =========================================================
+   RADIO OPTIONS
+   TRUE / FALSE
+   YES / NO
+   ========================================================= */
 
 .radio-options {
     display: flex;
     align-items: center;
-    gap: 5px;
-    font-family: Arial, Helvetica, sans-serif;
-    font-size: 17px;
-    color: #555;
+    gap: 10px;
+    margin: 0;
+    padding: 0;
 }
 
+
+    /* =========================================================
+   RADIO OPTION BOX
+   ========================================================= */
+
     .radio-options label {
-        display: flex;
+        position: relative;
+        min-width: 100px;
+        height: 52px;
+        display: inline-flex;
         align-items: center;
-        gap: 5px;
-        margin-right: 4px;
+        margin: 0;
+        padding: 0 18px 0 45px;
+        background: #ffffff;
+        border: 1px solid #d6e0e8;
+        border-radius: 10px;
+        color: #0f172a;
+        font-family: Arial, Helvetica, sans-serif;
+        font-size: 18px;
+        font-weight: 400;
         cursor: pointer;
+        box-sizing: border-box;
+        transition: background 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
     }
 
+
+    /* =========================================================
+   RADIO INPUT
+   ========================================================= */
+
     .radio-options input[type="radio"] {
-        width: 14px;
-        height: 14px;
+        position: absolute;
+        left: 18px;
+        top: 50%;
+        width: 20px;
+        height: 20px;
         margin: 0;
+        transform: translateY(-50%);
+        appearance: none;
+        -webkit-appearance: none;
+        background: #ffffff;
+        border: 1.5px solid #9aabbc;
+        border-radius: 50%;
         cursor: pointer;
-        accent-color: #555;
+        box-sizing: border-box;
     }
+
+
+    /* Radio hover */
+
+    .radio-options label:hover {
+        border-color: #0d9488;
+        background: #f0fdfa;
+    }
+
+
+    /* =========================================================
+   RADIO SELECTED
+   ========================================================= */
+
+    .radio-options input[type="radio"]:checked {
+        border-color: #0d9488;
+    }
+
+
+        /* Inner selected circle */
+
+        .radio-options input[type="radio"]:checked::after {
+            content: "";
+            position: absolute;
+            left: 50%;
+            top: 50%;
+            width: 10px;
+            height: 10px;
+            background: #0d9488;
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+        }
+
+
+    /* Selected option */
+
+    .radio-options label:has( input[type="radio"]:checked ) {
+        border-color: #0d9488;
+        background: #f0fdfa;
+        box-shadow: 0 2px 7px rgba(13, 148, 136, 0.08);
+    }
+
+
+/* =========================================================
+   STAR OPTIONS
+   ========================================================= */
 
 .star-options {
     display: flex;
     align-items: center;
-    gap: 3px;
+    gap: 5px;
+    margin: 0;
+    padding: 0;
 }
+
+
+    /* Star label */
 
     .star-options label {
         position: relative;
-        width: 35px;
-        height: 35px;
+        width: 30px;
+        height: 34px;
         display: flex;
         align-items: center;
         justify-content: center;
+        margin: 0;
         cursor: pointer;
+        box-sizing: border-box;
     }
+
+
+    /* Hide radio */
 
     .star-options input[type="radio"] {
         position: absolute;
+        width: 1px;
+        height: 1px;
         opacity: 0;
         pointer-events: none;
     }
 
+
+/* =========================================================
+   STAR
+   ========================================================= */
+
 .star {
-    display: inline-block;
-    font-size: 30px;
-    line-height: 1;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
     color: #c7c7c7;
-    transition: all 0.15s ease;
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 28px;
+    font-weight: 400;
+    line-height: 1;
     cursor: pointer;
+    transition: color 0.15s ease, transform 0.15s ease;
 }
+
+
+    /* Selected stars */
 
     .star.active {
-        color: #ffc107;
+        color: #f59e0b;
     }
 
+
+/* Hover star */
+
 .star-options label:hover .star {
-    color: #ffc107;
-    transform: scale(1.15);
+    color: #f59e0b;
+    transform: scale(1.12);
 }
+
+
+/* =========================================================
+   EMOJI OPTIONS
+   ========================================================= */
 
 .emoji-options {
     display: flex;
     align-items: center;
-    gap: 12px;
+    gap: 10px;
+    margin: 0;
+    padding: 0;
 }
+
+
+    /* =========================================================
+   EMOJI LABEL
+   ========================================================= */
 
     .emoji-options label {
         position: relative;
-        width: 43px;
-        height: 43px;
+        width: 40px;
+        height: 40px;
         display: flex;
         align-items: center;
         justify-content: center;
+        margin: 0;
+        background: #ffffff;
+        border: 1px solid #d6e0e8;
         border-radius: 50%;
         cursor: pointer;
-        transition: all 0.2s ease;
+        box-sizing: border-box;
+        transition: background 0.2s ease, border-color 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
     }
+
+
+    /* =========================================================
+   HIDDEN EMOJI RADIO
+   ========================================================= */
 
     .emoji-options input[type="radio"] {
         position: absolute;
+        width: 1px;
+        height: 1px;
         opacity: 0;
         pointer-events: none;
     }
 
+
+/* =========================================================
+   COLORED EMOJI
+   ========================================================= */
+
 .emoji {
-    display: inline-block;
-    font-family: "Segoe UI Emoji", "Apple Color Emoji", "Noto Color Emoji", sans-serif;
-    font-size: 27px;
-    filter: grayscale(100%);
-    opacity: 0.55;
-    transition: all 0.2s ease;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    /*
+       Segoe UI Emoji gives colored emojis
+       on Windows / Chrome.
+    */
+    font-family: "Segoe UI Emoji", "Noto Color Emoji", "Apple Color Emoji", sans-serif;
+    font-size: 23px;
+    font-weight: normal;
+    line-height: 1;
+    opacity: 1;
+    filter: none;
     cursor: pointer;
+    transition: transform 0.2s ease;
 }
+
+
+/* =========================================================
+   EMOJI HOVER
+   ========================================================= */
 
 .emoji-options label:hover {
-    background: #ffffff;
+    background: #f0fdfa;
+    border-color: #0d9488;
     transform: translateY(-2px);
-    box-shadow: 0 2px 7px rgba(0, 0, 0, 0.08);
+    box-shadow: 0 3px 8px rgba(13, 148, 136, 0.14);
 }
+
 
     .emoji-options label:hover .emoji {
-        filter: grayscale(0%);
         opacity: 1;
-        transform: scale(1.15);
+        filter: none;
+        transform: scale(1.12);
     }
+
+
+/* =========================================================
+   SELECTED EMOJI
+   ========================================================= */
 
 .emoji-options label.selected {
-    background: #ffffff;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.14);
-    transform: translateY(-2px);
+    background: #ccfbf1;
+    border: 2px solid #0d9488;
+    transform: translateY(-1px);
+    box-shadow: 0 3px 8px rgba(13, 148, 136, 0.18);
 }
 
+
     .emoji-options label.selected .emoji {
-        filter: grayscale(0%);
         opacity: 1;
-        transform: scale(1.2);
+        filter: none;
+        transform: scale(1.12);
     }
+
+
+    /* =========================================================
+   SELECTED EMOJI + HOVER
+   ========================================================= */
+
+    .emoji-options label.selected:hover {
+        background: #ccfbf1;
+        border-color: #0f766e;
+        transform: translateY(-2px);
+    }
+
+
+        .emoji-options label.selected:hover .emoji {
+            transform: scale(1.18);
+        }
+
+
+/* =========================================================
+   DESCRIPTION LABEL
+   ========================================================= */
 
 .description-label {
     display: block;
-    margin-left: 23px;
-    margin-top: 3px;
-    margin-bottom: 7px;
+    margin: 15px 0 8px;
+    color: #64748b;
     font-family: Arial, Helvetica, sans-serif;
-    font-size: 17px;
-    color: #111;
+    font-size: 13px;
+    font-weight: 500;
+    line-height: 1.4;
 }
+
+
+/* =========================================================
+   DESCRIPTION TEXTAREA
+   ========================================================= */
 
 .description-textarea {
     display: block;
-    width: calc(100% - 46px);
-    min-height: 72px;
-    margin-left: 23px;
-    padding: 8px 12px;
-    border: 1px solid #999;
-    border-radius: 2px;
-    background: #fff;
-    color: #111;
-    font-family: Arial, Helvetica, sans-serif;
-    font-size: 16px;
-    line-height: 1.4;
-    resize: vertical;
-    box-sizing: border-box;
+    width: 100%;
+    min-height: 105px;
+    margin: 0;
+    padding: 10px 13px;
+    background: #ffffff;
+    border: 1px solid #d2dde6;
+    border-radius: 8px;
     outline: none;
-}
-
-    .description-textarea:focus {
-        border-color: #777;
-        box-shadow: none;
-    }
-
-.save-area {
-    margin-left: 23px;
-    margin-top: 20px;
-}
-
-.save-button {
-    background: #fff;
-    color: #111;
-    border: 1px solid #777;
-    border-radius: 3px;
-    padding: 7px 15px;
+    color: #0f172a;
     font-family: Arial, Helvetica, sans-serif;
     font-size: 14px;
-    cursor: pointer;
-    transition: all 0.15s ease;
+    font-weight: 500;
+    line-height: 1.5;
+    resize: vertical;
+    box-sizing: border-box;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
 }
 
-    .save-button:hover {
-        background: #f2f2f2;
-        border-color: #555;
+
+    .description-textarea:focus {
+        border-color: #0d9488;
+        box-shadow: 0 0 0 3px rgba(13, 148, 136, 0.08);
     }
+
+
+/* =========================================================
+   VALIDATION MESSAGE
+   ========================================================= */
 
 .validation-message {
     display: block;
-    margin-left: 23px;
-    margin-top: 3px;
+    margin: 5px 0 0;
     color: #dc3545;
+    font-family: Arial, Helvetica, sans-serif;
     font-size: 12px;
+    font-weight: 400;
+    line-height: 1.4;
 }
 
-@@media (max-width: 900px) {
 
-    .feedback-edit-card {
-        width: 100%;
-        padding: 30px 25px 35px 25px;
+/* =========================================================
+   SAVE AREA
+   ========================================================= */
+
+.save-area {
+    width: 100%;
+    display: flex;
+    justify-content: flex-end;
+    margin: 20px 0 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+
+/* =========================================================
+   SAVE BUTTON
+   ========================================================= */
+
+.save-button {
+    min-width: 104px;
+    height: 38px;
+    padding: 0 21px;
+    background: #0d9488;
+    border: none;
+    border-radius: 7px;
+    color: #ffffff;
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    box-shadow: 0 4px 10px rgba(13, 148, 136, 0.18);
+    transition: background 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease;
+}
+
+
+    .save-button:hover {
+        background: #0f766e;
+        box-shadow: 0 5px 13px rgba(13, 148, 136, 0.23);
+        transform: translateY(-1px);
     }
+
+
+    .save-button:active {
+        transform: translateY(0);
+    }
+
+
+/* =========================================================
+   TABLET
+   ========================================================= */
+
+@media (max-width: 991px) {
 
     .feedback-edit-title {
-        font-size: 28px;
+        font-size: 24px;
     }
 
-    .question-textarea {
-        font-size: 15px;
+    .feedback-question {
+        padding: 17px 18px 20px;
     }
 
-    .answer-area,
-    .description-label,
-    .save-area {
-        margin-left: 15px;
-    }
-
+    .question-textarea,
     .description-textarea {
-        width: calc(100% - 30px);
-        margin-left: 15px;
-    }
-
-    .star {
-        font-size: 27px;
-    }
-
-    .emoji {
-        font-size: 24px;
+        font-size: 14px;
     }
 }
 
-@@media (max-width: 500px) {
 
-    .feedback-edit-card {
-        padding: 25px 18px 30px 18px;
+/* =========================================================
+   MOBILE
+   ========================================================= */
+
+@media (max-width: 767px) {
+
+    .feedback-edit-container {
+        padding: 0;
     }
 
     .feedback-edit-title {
-        font-size: 24px;
+        margin-bottom: 18px;
+        padding-left: 12px;
+        font-size: 22px;
+    }
+
+        .feedback-edit-title::before {
+            width: 4px;
+            height: 26px;
+        }
+
+    .feedback-question {
+        margin-bottom: 12px;
+        padding: 16px;
+        border-radius: 11px;
     }
 
     .question-label {
-        font-size: 16px;
+        min-height: 28px;
+        margin-bottom: 10px;
+        padding-left: 38px;
+        line-height: 28px;
     }
 
-    .answer-area,
-    .description-label,
-    .save-area {
-        margin-left: 10px;
+        .question-label::before,
+        .question-label::after {
+            width: 28px;
+            height: 28px;
+        }
+
+        .question-label::after {
+            font-size: 13px;
+        }
+
+    .question-textarea {
+        min-height: 76px;
+        padding: 9px 11px;
+        font-size: 13px;
     }
 
-    .description-textarea {
-        width: calc(100% - 20px);
-        margin-left: 10px;
+    .answer-area {
+        min-height: 46px;
+        margin-top: 13px;
     }
+
+
+    /* Radio */
+
+    .radio-options {
+        gap: 8px;
+    }
+
+        .radio-options label {
+            min-width: 88px;
+            height: 46px;
+            padding: 0 15px 0 40px;
+            font-size: 15px;
+            border-radius: 9px;
+        }
+
+        .radio-options input[type="radio"] {
+            left: 14px;
+            width: 18px;
+            height: 18px;
+        }
+
+            .radio-options input[type="radio"]:checked::after {
+                width: 9px;
+                height: 9px;
+            }
+
+
+    /* Stars */
 
     .star-options {
-        gap: 1px;
+        gap: 3px;
     }
 
         .star-options label {
-            width: 32px;
+            width: 27px;
+            height: 32px;
+        }
+
+    .star {
+        font-size: 26px;
+    }
+
+
+    /* Emoji */
+
+    .emoji-options {
+        gap: 8px;
+    }
+
+        .emoji-options label {
+            width: 36px;
+            height: 36px;
+        }
+
+    .emoji {
+        font-size: 21px;
+    }
+
+
+    /* Description */
+
+    .description-label {
+        margin-top: 14px;
+        font-size: 12px;
+    }
+
+    .description-textarea {
+        min-height: 100px;
+        font-size: 13px;
+    }
+
+
+    /* Save */
+
+    .save-area {
+        margin-top: 17px;
+    }
+
+    .save-button {
+        width: 100%;
+        height: 40px;
+    }
+}
+
+
+/* =========================================================
+   SMALL MOBILE
+   ========================================================= */
+
+@media (max-width: 420px) {
+
+    .feedback-question {
+        padding: 14px;
+    }
+
+    .question-label {
+        padding-left: 36px;
+    }
+
+    .question-textarea {
+        font-size: 12.5px;
+    }
+
+    .radio-options {
+        gap: 6px;
+    }
+
+        .radio-options label {
+            min-width: 82px;
+            padding-left: 37px;
+            font-size: 14px;
+        }
+
+        .radio-options input[type="radio"] {
+            left: 13px;
+        }
+
+    .star-options {
+        gap: 2px;
+    }
+
+        .star-options label {
+            width: 25px;
         }
 
     .star {
@@ -681,534 +830,15 @@
     }
 
     .emoji-options {
-        gap: 7px;
+        gap: 6px;
     }
 
         .emoji-options label {
-            width: 39px;
-            height: 39px;
+            width: 34px;
+            height: 34px;
         }
 
     .emoji {
-        font-size: 21px;
+        font-size: 20px;
     }
-}
-
-</style > *@
-
-
-<div class="feedback-edit-container" >
-
-<div class="feedback-edit-card" >
-
-<h1 class="feedback-edit-title" >
-Edit Trainee Feedback
-</h1 >
-<!-- ONLY ONE FORM -->
-<form asp-controller="SuperAdmin"
-asp-action="EditSAFeedback"
-method="post" >
-
-@Html.AntiForgeryToken()
-<!-- IMPORTANT -->
-<input type="hidden" asp-for="nID" / >
-
-<input type="hidden" asp-for="nSAID" / >
-<!-- ================= QUESTION 1 ================= -->
-<div class="feedback-question" >
-
-<label class="question-label" >
-Question 1.
-</label >
-
-<textarea asp-for="Que1"
-class="question-textarea" > </textarea >
-
-<span asp-validation-for="Que1"
-class="validation-message" > </span >
-
-
-<div class="answer-area" >
-
-<div class="radio-options" >
-
-<label >
-
-<input type="radio"
-name="Ans1"
-value="True"
-@(Model.Ans1 == "True" ? "checked" : "") / >
-
-<span > True</span >
-
-</label >
-
-
-<label >
-
-<input type="radio"
-name="Ans1"
-value="False"
-@(Model.Ans1 == "False" ? "checked" : "") / >
-
-<span > False</span >
-
-</label >
-
-</div >
-
-</div >
-
-</div >
-<!-- ================= QUESTION 2 ================= -->
-<div class="feedback-question" >
-
-<label class="question-label" >
-Question 2.
-</label >
-
-<textarea asp-for="Que2"
-class="question-textarea" > </textarea >
-
-<span asp-validation-for="Que2"
-class="validation-message" > </span >
-
-
-<div class="answer-area" >
-
-<div class="star-options"
-id="starRating" >
-
-<label >
-
-<input type="radio"
-name="Ans2"
-value="1"
-@(Model.Ans2 == "1" ? "checked" : "") / >
-
-<span class="star" > ★</span >
-
-</label >
-
-
-<label >
-
-<input type="radio"
-name="Ans2"
-value="2"
-@(Model.Ans2 == "2" ? "checked" : "") / >
-
-<span class="star" > ★</span >
-
-</label >
-
-
-<label >
-
-<input type="radio"
-name="Ans2"
-value="3"
-@(Model.Ans2 == "3" ? "checked" : "") / >
-
-<span class="star" > ★</span >
-
-</label >
-
-
-<label >
-
-<input type="radio"
-name="Ans2"
-value="4"
-@(Model.Ans2 == "4" ? "checked" : "") / >
-
-<span class="star" > ★</span >
-
-</label >
-
-
-<label >
-
-<input type="radio"
-name="Ans2"
-value="5"
-@(Model.Ans2 == "5" ? "checked" : "") / >
-
-<span class="star" > ★</span >
-
-</label >
-
-</div >
-
-</div >
-
-</div >
-<!-- ================= QUESTION 3 ================= -->
-<div class="feedback-question" >
-
-<label class="question-label" >
-Question 3.
-</label >
-
-<textarea asp-for="Que3"
-class="question-textarea" > </textarea >
-
-<span asp-validation-for="Que3"
-class="validation-message" > </span >
-
-
-<div class="answer-area" >
-
-<div class="radio-options" >
-
-<label >
-
-<input type="radio"
-name="Ans3"
-value="Yes"
-@(Model.Ans3 == "Yes" ? "checked" : "") / >
-
-<span > Yes</span >
-
-</label >
-
-
-<label >
-
-<input type="radio"
-name="Ans3"
-value="No"
-@(Model.Ans3 == "No" ? "checked" : "") / >
-
-<span > No</span >
-
-</label >
-
-</div >
-
-</div >
-
-</div >
-<!-- ================= QUESTION 4 ================= -->
-<div class="feedback-question" >
-
-<label class="question-label" >
-Question 4.
-</label >
-
-<textarea asp-for="Que4"
-class="question-textarea" > </textarea >
-
-<span asp-validation-for="Que4"
-class="validation-message" > </span >
-
-
-<div class="answer-area" >
-
-<div class="emoji-options"
-id="emojiRating" >
-<!-- VERY BAD -->
-<label title="Very Bad" >
-
-<input type="radio"
-name="Ans4"
-value="😞"
-@(Model.Ans4 == "😞" ? "checked" : "") / >
-
-<span class="emoji" > 😞</span >
-
-</label >
-<!-- BAD -->
-<label title="Bad" >
-
-<input type="radio"
-name="Ans4"
-value="😟"
-@(Model.Ans4 == "😟" ? "checked" : "") / >
-
-<span class="emoji" > 😟</span >
-
-</label >
-<!-- NEUTRAL -->
-<label title="Neutral" >
-
-<input type="radio"
-name="Ans4"
-value="😐"
-@(Model.Ans4 == "😐" ? "checked" : "") / >
-
-<span class="emoji" > 😐</span >
-
-</label >
-<!-- GOOD -->
-<label title="Good" >
-
-<input type="radio"
-name="Ans4"
-value="🙂"
-@(Model.Ans4 == "🙂" ? "checked" : "") / >
-
-<span class="emoji" > 🙂</span >
-
-</label >
-<!-- EXCELLENT -->
-<label title="Excellent" >
-
-<input type="radio"
-name="Ans4"
-value="😍"
-@(Model.Ans4 == "😍" ? "checked" : "") / >
-
-<span class="emoji" > 😍</span >
-
-</label >
-
-
-</div >
-
-</div >
-
-</div >
-<!-- ================= QUESTION 5 ================= -->
-<div class="feedback-question" >
-
-<label class="question-label" >
-Question 5.
-</label >
-
-
-<textarea asp-for="Que5"
-class="question-textarea" > </textarea >
-
-<span asp-validation-for="Que5"
-class="validation-message" > </span >
-
-
-<label class="description-label" >
-Description
-</label >
-
-
-<textarea asp-for="Ans5"
-class="description-textarea" > </textarea >
-
-<span asp-validation-for="Ans5"
-class="validation-message" > </span >
-
-</div >
-<!-- ================= SAVE ================= -->
-<div class="save-area" >
-
-<button type="submit"
-class="save-button" >
-
-Save
-
-</button >
-
-</div >
-
-
-</form >
-
-</div >
-
-</div >
-
-
-@section Scripts {
-    <partial name="_ValidationScriptsPartial" /> <script> document.addEventListener("DOMContentLoaded", function () {
-
-
-            // =====================================================
-            // STAR RATING
-            // =====================================================
-
-            const starRating =
-                document.getElementById("starRating");
-
-
-            if (starRating) {
-
-                const starLabels =
-                    starRating.querySelectorAll("label");
-
-                const starInputs =
-                    starRating.querySelectorAll(
-                        "input[type='radio']"
-                    );
-
-
-                function updateStars(rating) {
-
-                    starLabels.forEach(function (label, index) {
-
-                        const star =
-                            label.querySelector(".star");
-
-                        if (index < rating) {
-
-                            star.classList.add("active");
-
-                        }
-                        else {
-
-                            star.classList.remove("active");
-
-                        }
-
-                    });
-
-                }
-
-
-                // Load existing value
-
-                const checkedStar =
-                    starRating.querySelector(
-                        "input[type='radio']:checked"
-                    );
-
-
-                if (checkedStar) {
-
-                    updateStars(
-                        parseInt(checkedStar.value)
-                    );
-
-                }
-
-
-                // Change rating
-
-                starInputs.forEach(function (input) {
-
-                    input.addEventListener(
-                        "change",
-                        function () {
-
-                            updateStars(
-                                parseInt(this.value)
-                            );
-
-                        }
-                    );
-
-                });
-
-
-                // Hover
-
-                starLabels.forEach(function (label, index) {
-
-                    label.addEventListener(
-                        "mouseenter",
-                        function () {
-
-                            updateStars(index + 1);
-
-                        }
-                    );
-
-
-                    label.addEventListener(
-                        "mouseleave",
-                        function () {
-
-                            const selected =
-                                starRating.querySelector(
-                                    "input[type='radio']:checked"
-                                );
-
-
-                            if (selected) {
-
-                                updateStars(
-                                    parseInt(selected.value)
-                                );
-
-                            }
-                            else {
-
-                                updateStars(0);
-
-                            }
-
-                        }
-                    );
-
-                });
-
-            }
-
-
-            // =====================================================
-            // EMOJI RATING
-            // =====================================================
-
-            const emojiRating =
-                document.getElementById("emojiRating");
-
-
-            if (emojiRating) {
-
-                const emojiLabels =
-                    emojiRating.querySelectorAll("label");
-
-                const emojiInputs =
-                    emojiRating.querySelectorAll(
-                        "input[type='radio']"
-                    );
-
-
-                function updateEmoji() {
-
-                    emojiLabels.forEach(function (label) {
-
-                        const input =
-                            label.querySelector(
-                                "input[type='radio']"
-                            );
-
-
-                        if (input.checked) {
-
-                            label.classList.add("selected");
-
-                        }
-                        else {
-
-                            label.classList.remove("selected");
-
-                        }
-
-                    });
-
-                }
-
-
-                // Load existing emoji
-
-                updateEmoji();
-
-
-                // Change emoji
-
-                emojiInputs.forEach(function (input) {
-
-                    input.addEventListener(
-                        "change",
-                        function () {
-
-                            updateEmoji();
-
-                        }
-                    );
-
-                });
-
-            }
-
-        });
-    </script>
 }
