@@ -1,0 +1,2352 @@
+﻿@model ErJobPortal.Models.ResumeViewModel
+
+@{
+	Layout = null;
+
+	ViewData["Title"] = "Horizontal Resume";
+
+	var p = Model.Profile;
+
+	var candidateName = Model.CandidateName?.Trim();
+
+	var candidateRole = GetLookupName(
+		Model.InternshipFellowshipType,
+		p.Internship_FellowshipType
+	);
+
+	// Do not show this as a resume designation.
+	if (string.Equals(
+		candidateRole,
+		"Paid by Trainee",
+		StringComparison.OrdinalIgnoreCase))
+	{
+		candidateRole = "";
+	}
+}
+
+@functions {
+
+	string GetLookupName(System.Collections.IEnumerable list, object id)
+	{
+		if (list == null || id == null || string.IsNullOrWhiteSpace(id.ToString()))
+			return "";
+
+		foreach (var item in list)
+		{
+			var idProp = item.GetType().GetProperty("ID");
+			var nameProp = item.GetType().GetProperty("Name");
+
+			if (idProp != null && nameProp != null)
+			{
+				var idValue = idProp.GetValue(item)?.ToString();
+
+				if (idValue == id.ToString())
+				{
+					return nameProp.GetValue(item)?.ToString() ?? "";
+				}
+			}
+		}
+
+		return "";
+	}
+
+	bool Has(string s)
+	{
+		return !string.IsNullOrWhiteSpace(s);
+	}
+
+	bool HasNum(int? n)
+	{
+		return n.HasValue && n.Value != 0;
+	}
+}
+
+<!DOCTYPE html>
+
+<html lang="en">
+
+<head>
+
+	<meta charset="utf-8" />
+
+	<meta name="viewport"
+		  content="width=device-width, initial-scale=1.0" />
+
+	<title>
+		@(string.IsNullOrWhiteSpace(candidateName)
+				? "Resume"
+				: candidateName + " - Resume")
+	</title>
+
+
+	<!-- FONT AWESOME -->
+
+	<link rel="stylesheet"
+		  href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+
+
+	<style>
+
+		/* =========================================================
+						   ROOT
+						========================================================= */
+
+		:root {
+			--resume-blue: #526987;
+			--resume-blue-dark: #303b4f;
+			--resume-text: #303b4f;
+			--resume-muted: #68717d;
+			--resume-light: #f6f8fb;
+			--resume-border: #dfe4ea;
+			--resume-white: #ffffff;
+		}
+
+
+		/* =========================================================
+						   GLOBAL
+						========================================================= */
+
+		* {
+			box-sizing: border-box;
+		}
+
+		html,
+		body {
+			margin: 0;
+			padding: 0;
+			background: #e9edf2;
+			font-family: "Segoe UI", Arial, sans-serif;
+			color: var(--resume-text);
+		}
+
+		body {
+			min-height: 100vh;
+		}
+
+
+		/* =========================================================
+						   TOOLBAR
+						========================================================= */
+
+		.resume-toolbar {
+			width: 297mm;
+			max-width: calc(100% - 30px);
+			margin: 18px auto 10px;
+			display: flex;
+			justify-content: flex-end;
+			gap: 8px;
+		}
+
+			.resume-toolbar button,
+			.resume-toolbar a {
+				border: 0;
+				padding: 9px 15px;
+				border-radius: 7px;
+				font-size: 12px;
+				font-weight: 600;
+				cursor: pointer;
+				text-decoration: none;
+				display: inline-flex;
+				align-items: center;
+				gap: 7px;
+				transition: .2s ease;
+			}
+
+				.resume-toolbar button:hover,
+				.resume-toolbar a:hover {
+					transform: translateY(-1px);
+				}
+
+		.btn-edit {
+			background: #ffffff;
+			color: #303b4f;
+			border: 1px solid #d7dce3 !important;
+		}
+
+		.btn-print {
+			background: #526987;
+			color: #ffffff;
+		}
+
+		.btn-download {
+			background: #303b4f;
+			color: #ffffff;
+		}
+
+
+		/* =========================================================
+						   THEME SWITCHER
+						========================================================= */
+
+		.theme-switcher {
+			width: 297mm;
+			max-width: calc(100% - 30px);
+			margin: 0 auto 14px;
+			display: flex;
+			align-items: center;
+			justify-content: flex-end;
+			gap: 9px;
+		}
+
+			.theme-switcher span {
+				font-size: 11px;
+				color: #68717d;
+				font-weight: 700;
+				margin-right: 2px;
+			}
+
+		.theme-swatch {
+			width: 22px;
+			height: 22px;
+			border-radius: 50%;
+			cursor: pointer;
+			border: 2px solid #ffffff;
+			box-shadow: 0 0 0 1px #c7cdd5;
+			transition: .2s ease;
+		}
+
+			.theme-swatch:hover {
+				transform: scale(1.08);
+			}
+
+			.theme-swatch.active {
+				box-shadow: 0 0 0 2px #303b4f;
+			}
+
+
+		/* =========================================================
+						   PAGE WRAPPER
+						========================================================= */
+
+		.resume-page-wrapper {
+			padding: 10px 0 60px;
+		}
+
+
+		/* =========================================================
+						   A4 LANDSCAPE
+						========================================================= */
+
+		.resume-sheet {
+			width: 297mm;
+			height: 210mm;
+			margin: 0 auto;
+			position: relative;
+			overflow: hidden;
+			background: #ffffff;
+			box-shadow: 0 10px 35px rgba(25, 35, 50, .18);
+			border: 1px solid #d7dce3;
+			--sidebar-bg: #526987;
+			--header-bg: #303b4f;
+			--accent: #526987;
+		}
+
+
+			/* =========================================================
+						   THEMES
+						========================================================= */
+
+			.resume-sheet[data-theme="orange"] {
+				--sidebar-bg: #526987;
+				--header-bg: #303b4f;
+				--accent: #526987;
+			}
+
+			.resume-sheet[data-theme="navy-gold"] {
+				--sidebar-bg: #3d526f;
+				--header-bg: #26354a;
+				--accent: #c69b45;
+			}
+
+			.resume-sheet[data-theme="teal-coral"] {
+				--sidebar-bg: #426d6c;
+				--header-bg: #294c4b;
+				--accent: #d36f63;
+			}
+
+			.resume-sheet[data-theme="charcoal-blue"] {
+				--sidebar-bg: #556579;
+				--header-bg: #293545;
+				--accent: #4e8bd8;
+			}
+
+			.resume-sheet[data-theme="maroon-beige"] {
+				--sidebar-bg: #71515a;
+				--header-bg: #452d34;
+				--accent: #d4a56f;
+			}
+
+			.resume-sheet[data-theme="emerald"] {
+				--sidebar-bg: #467266;
+				--header-bg: #274a42;
+				--accent: #63b59d;
+			}
+
+
+		/* =========================================================
+						   SIDEBAR
+						========================================================= */
+
+		.resume-sidebar {
+			position: absolute;
+			left: 12px;
+			top: 10px;
+			bottom: 10px;
+			width: 30%;
+			background: var(--sidebar-bg);
+			border-radius: 0 34px 34px 0;
+			color: #ffffff;
+			padding: 22px 28px 22px;
+			overflow: hidden;
+		}
+
+
+		/* =========================================================
+						   PHOTO
+						========================================================= */
+
+		.photo-wrapper {
+			height: 120px;
+			text-align: center;
+			margin-bottom: 18px;
+		}
+
+		.resume-photo {
+			width: 118px;
+			height: 118px;
+			border-radius: 50%;
+			position: relative;
+			object-fit: contain;
+			border: 4px solid #ffffff;
+			box-shadow: 0 0 0 2px rgba(255,255,255,.45), 0 8px 18px rgba(0,0,0,.20);
+		}
+
+		.resume-photo-placeholder {
+			width: 118px;
+			height: 118px;
+			border-radius: 50%;
+			margin: 0 auto;
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			background: #3d4b60;
+			border: 4px solid #ffffff;
+			color: #e6ebf1;
+			font-size: 36px;
+		}
+
+
+		/* =========================================================
+						   SIDEBAR SECTION
+						========================================================= */
+
+		.sidebar-section {
+			margin-top: 16px;
+		}
+
+		.sidebar-title {
+			font-size: 15px;
+			line-height: 1.2;
+			font-weight: 800;
+			text-transform: uppercase;
+			letter-spacing: .7px;
+			color: #ffffff;
+			margin-bottom: 7px;
+		}
+
+		.sidebar-line {
+			width: 82px;
+			height: 2px;
+			background: rgba(255,255,255,.65);
+			margin-bottom: 10px;
+		}
+
+		.sidebar-item {
+			display: flex;
+			align-items: flex-start;
+			gap: 9px;
+			font-size: 10px;
+			line-height: 1.45;
+			margin-bottom: 7px;
+			color: #f6f8fa;
+			word-break: break-word;
+		}
+
+			.sidebar-item i {
+				width: 17px;
+				flex-shrink: 0;
+				text-align: center;
+				font-size: 11px;
+				margin-top: 2px;
+				color: #ffffff;
+			}
+
+			.sidebar-item span {
+				min-width: 0;
+			}
+
+
+		/* =========================================================
+						   LANGUAGE
+						========================================================= */
+
+		.language-item {
+			position: relative;
+			padding-left: 14px;
+			font-size: 10px;
+			line-height: 1.45;
+			margin-bottom: 5px;
+			color: #f5f7f9;
+		}
+
+			.language-item::before {
+				content: "";
+				position: absolute;
+				left: 0;
+				top: 6px;
+				width: 5px;
+				height: 5px;
+				border-radius: 50%;
+				background: #ffffff;
+			}
+
+		.language-stars {
+			color: #ffffff;
+			font-size: 8px;
+			margin-left: 5px;
+			letter-spacing: 0;
+		}
+
+
+		/* =========================================================
+						   EDUCATION SIDEBAR
+						========================================================= */
+
+		.education-item {
+			margin-bottom: 9px;
+		}
+
+		.education-title {
+			font-size: 10px;
+			font-weight: 700;
+			color: grey;
+			line-height: 1.3;
+		}
+
+		.education-meta {
+			font-size: 9px;
+			color: black;
+			line-height: 1.4;
+			margin-top: 2px;
+		}
+
+
+		/* =========================================================
+						   MAIN AREA
+						========================================================= */
+
+		.resume-main {
+			position: absolute;
+			left: 30%;
+			right: 0;
+			top: 0;
+			bottom: 0;
+			padding: 22px 30px 22px 28px;
+			overflow: hidden;
+		}
+
+
+		/* =========================================================
+						   HEADER
+						========================================================= */
+
+		.resume-header {
+			height: 64px;
+			margin-left: -44px;
+			margin-right: -30px;
+			background: var(--header-bg);
+			display: flex;
+			align-items: center;
+			padding: 8px 28px 8px 54px;
+			position: relative;
+			margin-bottom: 18px;
+		}
+
+			.resume-header::before {
+				content: "";
+				position: absolute;
+				left: 0;
+				top: 0;
+				width: 8px;
+				height: 100%;
+				background: var(--accent);
+			}
+
+		.header-content {
+			min-width: 0;
+		}
+
+		.resume-name {
+			margin: 0;
+			font-size: 29px;
+			line-height: 1;
+			font-weight: 800;
+			color: #ffffff;
+			text-transform: uppercase;
+			letter-spacing: 1.1px;
+			white-space: nowrap;
+			overflow: hidden;
+			text-overflow: ellipsis;
+		}
+
+		.resume-role {
+			margin-top: 7px;
+			color: #ffffff;
+			font-size: 12px;
+			line-height: 1;
+			letter-spacing: 2.2px;
+			text-transform: uppercase;
+			opacity: .92;
+		}
+
+
+		/* =========================================================
+						   MAIN GRID
+						========================================================= */
+
+		.main-content {
+			display: grid;
+			grid-template-columns: 1fr 1fr;
+			column-gap: 28px;
+			height: calc(100% - 82px);
+		}
+
+		.main-column {
+			min-width: 0;
+			overflow: hidden;
+		}
+
+
+		/* =========================================================
+						   SECTION
+						========================================================= */
+
+		.resume-section {
+			margin-bottom: 13px;
+			break-inside: avoid;
+			page-break-inside: avoid;
+		}
+
+		.section-title {
+			font-size: 15px;
+			line-height: 1.1;
+			font-weight: 800;
+			text-transform: uppercase;
+			color:white;
+			margin: 0 0 8px;
+			letter-spacing: .3px;
+		}
+
+			.section-title::after {
+				content: "";
+				display: block;
+				width: 58px;
+				height: 2px;
+				background: var(--accent);
+				margin-top: 5px;
+			}
+
+		.section-text {
+			font-size: 9.5px;
+			line-height: 1.42;
+			color: #505862;
+			margin: 0;
+			text-align: left;
+			word-break: break-word;
+		}
+
+
+		/* =========================================================
+						   EXPERIENCE
+						========================================================= */
+
+		.experience-item {
+			margin-bottom: 10px;
+			padding-left: 10px;
+			border-left: 2px solid #e1e5ea;
+		}
+
+		.experience-title {
+			font-size: 10.5px;
+			font-weight: 800;
+			color: #374151;
+			text-transform: uppercase;
+			margin-bottom: 2px;
+			line-height: 1.3;
+		}
+
+		.experience-company {
+			font-size: 9.8px;
+			font-weight: 700;
+			color: var(--accent);
+			margin-bottom: 3px;
+			line-height: 1.3;
+		}
+
+		.experience-meta {
+			font-size: 8.7px;
+			color: #737b85;
+			line-height: 1.4;
+		}
+
+
+		/* =========================================================
+						   ACHIEVEMENTS
+						========================================================= */
+
+		.achievement {
+			font-size: 9px;
+			line-height: 1.4;
+			color: #515861;
+			padding-left: 13px;
+			position: relative;
+			margin-bottom: 5px;
+		}
+
+			.achievement::before {
+				content: "";
+				position: absolute;
+				left: 0;
+				top: 6px;
+				width: 5px;
+				height: 5px;
+				border-radius: 50%;
+				background: var(--accent);
+			}
+
+
+		/* =========================================================
+						   SKILLS
+						========================================================= */
+
+		.skill-category {
+			font-size: 9.5px;
+			font-weight: 800;
+			color: #384150;
+			margin-bottom: 4px;
+			margin-top: 4px;
+		}
+
+		.skill-item {
+			position: relative;
+			font-size: 9px;
+			color: #505862;
+			margin-bottom: 4px;
+			padding-left: 13px;
+			line-height: 1.35;
+		}
+
+			.skill-item::before {
+				content: "";
+				position: absolute;
+				left: 0;
+				top: 5px;
+				width: 5px;
+				height: 5px;
+				border-radius: 50%;
+				background: var(--accent);
+			}
+
+
+		/* =========================================================
+						   REFERENCES
+						========================================================= */
+
+		.reference-item {
+			margin-bottom: 9px;
+			padding-left: 9px;
+			border-left: 2px solid #e2e6eb;
+		}
+
+		.reference-name {
+			font-size: 9.8px;
+			font-weight: 700;
+			color: #384150;
+			line-height: 1.3;
+		}
+
+		.reference-relation {
+			font-size: 8.8px;
+			color: var(--accent);
+			font-weight: 600;
+			margin-top: 2px;
+		}
+
+		.reference-meta {
+			font-size: 8.5px;
+			color: #737b84;
+			line-height: 1.35;
+			margin-top: 1px;
+		}
+
+
+		/* =========================================================
+						   CAREER PREFERENCE
+						========================================================= */
+
+		.preference-box {
+			background: #f7f8fa;
+			border-left: 3px solid var(--accent);
+			padding: 8px 10px;
+			border-radius: 0 6px 6px 0;
+		}
+
+			.preference-box .section-text {
+				margin-bottom: 4px;
+			}
+
+				.preference-box .section-text:last-child {
+					margin-bottom: 0;
+				}
+
+
+		/* =========================================================
+						   EMPTY CONTENT
+						========================================================= */
+
+		.empty-content {
+			display: none;
+		}
+
+
+		/* =========================================================
+						   MOBILE / TABLET
+						========================================================= */
+
+		@@media (max-width: 1000px) {
+
+			body {
+				background: #ffffff;
+			}
+
+			.resume-toolbar,
+			.theme-switcher {
+				width: 100%;
+				max-width: 100%;
+				padding: 0 12px;
+				justify-content: center;
+				flex-wrap: wrap;
+			}
+
+			.resume-page-wrapper {
+				overflow-x: auto;
+				padding: 10px 0 40px;
+			}
+
+			.resume-sheet {
+				margin-left: 10px;
+				transform-origin: top left;
+				transform: scale(.72);
+				margin-bottom: -58px;
+			}
+		}
+
+
+		/* =========================================================
+						   SMALL SCREEN
+						========================================================= */
+
+		@@media (max-width: 600px) {
+
+			.resume-sheet {
+				transform: scale(.55);
+				margin-bottom: -95px;
+			}
+
+			.resume-toolbar button,
+			.resume-toolbar a {
+				font-size: 11px;
+				padding: 8px 11px;
+			}
+		}
+
+
+		/* =========================================================
+						   PRINT
+						========================================================= */
+
+		@@media print {
+
+			html,
+			body {
+				width: 297mm;
+				height: 210mm;
+				margin: 0;
+				padding: 0;
+				background: #ffffff;
+			}
+
+				body * {
+					visibility: hidden;
+				}
+
+			.resume-sheet,
+			.resume-sheet * {
+				visibility: visible;
+			}
+
+			.resume-toolbar,
+			.theme-switcher {
+				display: none !important;
+			}
+
+			.resume-page-wrapper {
+				padding: 0;
+				margin: 0;
+				background: #ffffff;
+			}
+
+			.resume-sheet {
+				width: 297mm;
+				height: 210mm;
+				margin: 0;
+				box-shadow: none;
+				border: none;
+			}
+
+			@@page {
+				size: A4 landscape;
+				margin: 0;
+			}
+		}
+
+	</style>
+
+</head>
+
+
+<body>
+
+
+	<!-- =========================================================
+		 TOOLBAR
+	========================================================= -->
+
+	<div class="resume-toolbar">
+
+		<a asp-controller="Candidate"
+		   asp-action="Profile"
+		   class="btn-edit">
+
+			<i class="fa fa-pen"></i>
+
+			Edit Profile
+
+		</a>
+
+
+		<button type="button"
+				class="btn-print"
+				onclick="window.print()">
+
+			<i class="fa fa-print"></i>
+
+			Print / Save PDF
+
+		</button>
+
+
+		<button type="button"
+				class="btn-download"
+				onclick="downloadResumePDF()">
+
+			<i class="fa fa-download"></i>
+
+			Download PDF
+
+		</button>
+
+	</div>
+
+
+	<!-- =========================================================
+		 THEME SWITCHER
+	========================================================= -->
+
+	<div class="theme-switcher">
+
+		<span>Theme</span>
+
+		<div class="theme-swatch active"
+			 data-theme="orange"
+			 style="background:#526987">
+		</div>
+
+		<div class="theme-swatch"
+			 data-theme="navy-gold"
+			 style="background:#3c526f">
+		</div>
+
+		<div class="theme-swatch"
+			 data-theme="teal-coral"
+			 style="background:#426c6c">
+		</div>
+
+		<div class="theme-swatch"
+			 data-theme="charcoal-blue"
+			 style="background:#566579">
+		</div>
+
+		<div class="theme-swatch"
+			 data-theme="maroon-beige"
+			 style="background:#71515a">
+		</div>
+
+		<div class="theme-swatch"
+			 data-theme="emerald"
+			 style="background:#467266">
+		</div>
+
+	</div>
+
+
+	<!-- =========================================================
+		 RESUME PAGE
+	========================================================= -->
+
+	<div class="resume-page-wrapper">
+
+		<div class="resume-sheet"
+			 id="resumeSheet"
+			 data-theme="orange">
+
+
+			<!-- =====================================================
+				 LEFT SIDEBAR
+			===================================================== -->
+
+			<aside class="resume-sidebar">
+
+
+				<!-- =================================================
+					 PHOTO
+				================================================= -->
+
+				<div class="photo-wrapper">
+
+					@if (Has(p.sPhoto))
+					{
+						<img src="@p.sPhoto"
+							 class="resume-photo"
+							 alt="Profile Photo" />
+					}
+					else
+					{
+						<div class="resume-photo-placeholder">
+
+							<i class="fa fa-user"></i>
+
+						</div>
+					}
+
+				</div>
+
+
+				<!-- =================================================
+					 CONTACT
+				================================================= -->
+				@if (Has(Model.CandidatePhone) ||
+									Has(Model.CandidateEmail))
+				{
+					<div class="sidebar-section">
+
+						<div class="sidebar-title">
+							Contact
+						</div>
+
+						<div class="sidebar-line"></div>
+
+
+						@if (Has(Model.CandidatePhone))
+						{
+							<div class="sidebar-item">
+
+								<i class="fa fa-phone"></i>
+
+								<span>
+									@Model.CandidatePhone
+								</span>
+
+							</div>
+						}
+
+
+						@if (Has(Model.CandidateEmail))
+						{
+							<div class="sidebar-item">
+
+								<i class="fa fa-envelope"></i>
+
+								<span>
+									@Model.CandidateEmail
+								</span>
+
+							</div>
+						}
+
+					</div>
+				}
+
+
+				<!-- =================================================
+					 ADDRESS
+				================================================= -->
+				@if (Has(p.CountryID) ||
+									Has(p.StateID) ||
+									Has(p.CityID) ||
+									Has(p.Pincode))
+				{
+					<div class="sidebar-section">
+
+						<div class="sidebar-title">
+							Location
+						</div>
+
+						<div class="sidebar-line"></div>
+
+						<div class="sidebar-item">
+
+							<i class="fa fa-location-dot"></i>
+
+							<span id="rvAddress"
+								  data-country-id="@p.CountryID"
+								  data-state-id="@p.StateID"
+								  data-city-id="@p.CityID"
+								  data-pincode="@p.Pincode">
+
+								@p.Pincode
+
+							</span>
+
+						</div>
+
+					</div>
+				}
+
+
+				<!-- =================================================
+					 PREFERRED LOCATION
+				================================================= -->
+				@if (Has(p.Preferred_City) ||
+									Has(p.Preferred_State) ||
+									Has(p.Preferred_Country))
+				{
+					<div class="sidebar-section">
+
+						<div class="sidebar-title">
+							Preferred Location
+						</div>
+
+						<div class="sidebar-line"></div>
+
+						<div class="sidebar-item">
+
+							<i class="fa fa-location-arrow"></i>
+
+							<span>
+
+								@string.Join(
+																	", ",
+																	new[]
+																	{
+							p.Preferred_City,
+							p.Preferred_State,
+							p.Preferred_Country
+							}.Where(Has)
+																	)
+
+							</span>
+
+						</div>
+
+					</div>
+				}
+
+
+				<!-- =================================================
+					 LANGUAGES
+				================================================= -->
+				@{
+					var langItems =
+					new List<(string Lang, string Star)>();
+
+					for (int i = 1; i <= 8; i++)
+					{
+						var lang =
+						typeof(ErJobPortal.Models.CandidateProfileModel)
+						.GetProperty($"sLanguage{i}")
+						?.GetValue(p)
+						?.ToString();
+
+						var star =
+						typeof(ErJobPortal.Models.CandidateProfileModel)
+						.GetProperty($"sLanguageStar{i}")
+						?.GetValue(p)
+						?.ToString();
+
+						if (Has(lang))
+						{
+							langItems.Add((lang, star));
+						}
+					}
+				}
+
+
+				@if (langItems.Any())
+				{
+					<div class="sidebar-section">
+
+						<div class="sidebar-title">
+							Languages
+						</div>
+
+						<div class="sidebar-line"></div>
+
+						@foreach (var language in langItems)
+						{
+							<div class="language-item">
+
+								@language.Lang
+
+								@if (Has(language.Star))
+								{
+									<span class="language-stars">
+										@language.Star&#9733;
+									</span>
+								}
+
+							</div>
+						}
+
+					</div>
+				}
+
+
+
+				<!-- =================================================
+					 HOBBIES
+				================================================= -->
+				@if (Has(p.sHobbies))
+				{
+					<div class="sidebar-section">
+
+						<div class="sidebar-title">
+							Interests
+						</div>
+
+						<div class="sidebar-line"></div>
+
+						<div class="sidebar-item">
+
+							<i class="fa fa-heart"></i>
+
+							<span>
+								@p.sHobbies
+							</span>
+
+						</div>
+
+					</div>
+				}
+
+
+				<!-- =================================================
+					 SOCIAL LINKS
+				================================================= -->
+				@if (Has(p.GitHub) ||
+									Has(p.Linkedin))
+				{
+					<div class="sidebar-section">
+
+						<div class="sidebar-title">
+							Links
+						</div>
+
+						<div class="sidebar-line"></div>
+
+
+						@if (Has(p.GitHub))
+						{
+							<div class="sidebar-item">
+
+								<i class="fa-brands fa-github"></i>
+
+								<span>
+									@p.GitHub
+								</span>
+
+							</div>
+						}
+
+
+						@if (Has(p.Linkedin))
+						{
+							<div class="sidebar-item">
+
+								<i class="fa-brands fa-linkedin"></i>
+
+								<span>
+									@p.Linkedin
+								</span>
+
+							</div>
+						}
+
+					</div>
+				}
+
+
+
+				<!-- =================================================
+					 CAREER PREFERENCE
+				================================================= -->
+				@if (Has(p.Preferred_Country) ||
+									Has(p.Preferred_State) ||
+									Has(p.Preferred_City) ||
+									Has(
+									GetLookupName(
+									Model.InternshipFellowshipType,
+									p.Internship_FellowshipType
+									)))
+				{
+					<section class="resume-section">
+
+						<h2 class="section-title">
+							Career Preference
+						</h2>
+
+
+						<div class="preference-box">
+
+
+							@if (Has(
+												GetLookupName(
+												Model.InternshipFellowshipType,
+												p.Internship_FellowshipType
+												)))
+							{
+								<p class="section-text">
+
+									<strong>Type:</strong>
+
+									@GetLookupName(
+																		Model.InternshipFellowshipType,
+																		p.Internship_FellowshipType
+																		)
+
+								</p>
+							}
+
+
+							@if (Has(p.Preferred_City) ||
+												Has(p.Preferred_State) ||
+												Has(p.Preferred_Country))
+							{
+								<p class="section-text">
+
+									<strong>Location:</strong>
+
+									@string.Join(
+																		", ",
+																		new[]
+																		{
+							p.Preferred_City,
+							p.Preferred_State,
+							p.Preferred_Country
+							}.Where(Has)
+																		)
+
+								</p>
+							}
+
+						</div>
+
+					</section>
+				}
+
+
+			</aside>
+
+
+			<!-- =====================================================
+				 MAIN CONTENT
+			===================================================== -->
+
+			<main class="resume-main">
+
+
+				<!-- =================================================
+					 HEADER
+				================================================= -->
+
+				<header class="resume-header">
+
+					<div class="header-content">
+
+						@if (!string.IsNullOrWhiteSpace(candidateName))
+						{
+							<h1 class="resume-name">
+								@candidateName
+							</h1>
+						}
+
+						@if (!string.IsNullOrWhiteSpace(candidateRole))
+						{
+							<div class="resume-role">
+								@candidateRole
+							</div>
+						}
+
+					</div>
+
+				</header>
+
+
+				<!-- =================================================
+					 CONTENT GRID
+				================================================= -->
+
+				<div class="main-content">
+
+
+					<!-- =================================================
+						 LEFT COLUMN
+					================================================= -->
+
+					<div class="main-column">
+
+
+						<!-- =================================================
+							 ABOUT
+						================================================= -->
+						@if (Has(p.Objective))
+						{
+							<section class="resume-section">
+
+								<h2 class="section-title">
+									About Me
+								</h2>
+
+								<p class="section-text">
+									@p.Objective
+								</p>
+
+							</section>
+						}
+
+
+						<!-- =================================================
+							 EXPERIENCE
+						================================================= -->
+						@{
+							var internships =
+							new[]
+							{
+						new
+						{
+						Name = p.sOrgName1,
+						Title = p.sOrgIntTitle1,
+						Duration = p.sOrgIntDuration1,
+						Status = p.sOrgIntStatus1
+						},
+
+						new
+						{
+						Name = p.sOrgName2,
+						Title = p.sOrgIntTitle2,
+						Duration = p.sOrgIntDuration2,
+						Status = p.sOrgIntStatus2
+						},
+
+						new
+						{
+						Name = p.sOrgName3,
+						Title = p.sOrgIntTitle3,
+						Duration = p.sOrgIntDuration3,
+						Status = p.sOrgIntStatus3
+						},
+
+						new
+						{
+						Name = p.sOrgName4,
+						Title = p.sOrgIntTitle4,
+						Duration = p.sOrgIntDuration4,
+						Status = p.sOrgIntStatus4
+						}
+
+			}
+							.Where(x => Has(x.Name))
+							.ToList();
+						}
+
+
+						@if (internships.Any())
+						{
+							<section class="resume-section">
+
+								<h2 class="section-title">
+									Experience
+								</h2>
+
+
+								@foreach (var internship in internships)
+								{
+									<div class="experience-item">
+
+
+										@if (Has(
+																		GetLookupName(
+																		Model.InternshipTitles,
+																		internship.Title
+																		)))
+										{
+											<div class="experience-title">
+
+												@GetLookupName(
+																					Model.InternshipTitles,
+																					internship.Title
+																					)
+
+											</div>
+										}
+
+
+										<div class="experience-company">
+
+											@internship.Name
+
+										</div>
+
+
+										<div class="experience-meta">
+
+											@GetLookupName(
+																				Model.InternshipDurations,
+																				internship.Duration
+																				)
+
+											@if (Has(
+																			GetLookupName(
+																			Model.InternshipStatuses,
+																			internship.Status
+																			)))
+											{
+												<span>
+													&nbsp; · &nbsp;
+
+													@GetLookupName(
+																									Model.InternshipStatuses,
+																									internship.Status
+																									)
+
+												</span>
+											}
+
+										</div>
+
+									</div>
+								}
+
+							</section>
+						}
+
+
+						<!-- =================================================
+							 ACHIEVEMENTS
+						================================================= -->
+						@{
+							var achievements =
+							new[]
+							{
+						p.Achievements_Certification1,
+						p.Achievements_Certification2,
+						p.Achievements_Certification3
+			}
+							.Where(Has)
+							.ToList();
+						}
+
+
+						@if (achievements.Any())
+						{
+							<section class="resume-section">
+
+								<h2 class="section-title">
+									Achievements
+								</h2>
+
+
+								@foreach (var achievement in achievements)
+								{
+									<div class="achievement">
+
+										@achievement
+
+									</div>
+								}
+
+							</section>
+						}
+
+
+						<!-- =================================================
+							 REFERENCES
+						================================================= -->
+						@if (Has(p.sRefName1) ||
+											Has(p.sRefName2))
+						{
+							<section class="resume-section">
+
+								<h2 class="section-title">
+									References
+								</h2>
+
+
+								@if (Has(p.sRefName1))
+								{
+									<div class="reference-item">
+
+										<div class="reference-name">
+											@p.sRefName1
+										</div>
+
+										@if (Has(
+																		GetLookupName(
+																		Model.Relationships,
+																		p.sRefRelationName1
+																		)))
+										{
+											<div class="reference-relation">
+
+												@GetLookupName(
+																					Model.Relationships,
+																					p.sRefRelationName1
+																					)
+
+											</div>
+										}
+
+
+										@if (Has(p.sLocation1))
+										{
+											<div class="reference-meta">
+												@p.sLocation1
+											</div>
+										}
+
+
+										@if (Has(p.sMobile1))
+										{
+											<div class="reference-meta">
+												Tel: @p.sMobile1
+											</div>
+										}
+
+									</div>
+								}
+
+
+								@if (Has(p.sRefName2))
+								{
+									<div class="reference-item">
+
+										<div class="reference-name">
+											@p.sRefName2
+										</div>
+
+										@if (Has(
+																		GetLookupName(
+																		Model.Relationships,
+																		p.sRefRelationName2
+																		)))
+										{
+											<div class="reference-relation">
+
+												@GetLookupName(
+																					Model.Relationships,
+																					p.sRefRelationName2
+																					)
+
+											</div>
+										}
+
+
+										@if (Has(p.sLocation2))
+										{
+											<div class="reference-meta">
+												@p.sLocation2
+											</div>
+										}
+
+
+										@if (Has(p.sMobile2))
+										{
+											<div class="reference-meta">
+												Tel: @p.sMobile2
+											</div>
+										}
+
+									</div>
+								}
+
+							</section>
+						}
+						<!-- =================================================
+							 EDUCATION
+						================================================= -->
+						@if (HasNum(p.PG_Year) ||
+											HasNum(p.Graduation_Year) ||
+											HasNum(p.HSC_DIPLOMA_YEAR) ||
+											HasNum(p.SSC_YEAR))
+						{
+							<section class="resume-section">
+
+								<h2 class="section-title">
+									Education
+								</h2>
+
+
+								@if (HasNum(p.PG_Year))
+								{
+									<div class="education-item">
+
+										<div class="education-title">
+
+											@GetLookupName(
+																				Model.Streams,
+																				p.PG_Stream
+																				)
+
+										</div>
+
+										<div class="education-meta">
+
+											Post Graduation ·
+											@p.PG_Year
+
+											@GetLookupName(
+																				Model.Divisions,
+																				p.PG_Division
+																				)
+
+										</div>
+
+									</div>
+								}
+
+
+								@if (HasNum(p.Graduation_Year))
+								{
+									<div class="education-item">
+
+										<div class="education-title">
+
+											@GetLookupName(
+																				Model.Streams,
+																				p.Graduation_Stream
+																				)
+
+										</div>
+
+										<div class="education-meta">
+
+											Graduation ·
+											@p.Graduation_Year
+
+											@GetLookupName(
+																				Model.Divisions,
+																				p.Graduation_Division
+																				)
+
+										</div>
+
+									</div>
+								}
+
+
+								@if (HasNum(p.HSC_DIPLOMA_YEAR))
+								{
+									<div class="education-item">
+
+										<div class="education-title">
+											HSC / Diploma
+										</div>
+
+										<div class="education-meta">
+
+											@p.HSC_DIPLOMA_YEAR
+
+											@GetLookupName(
+																				Model.Divisions,
+																				p.HSC_DIPLOMA_DIVISION
+																				)
+
+										</div>
+
+									</div>
+								}
+
+
+								@if (HasNum(p.SSC_YEAR))
+								{
+									<div class="education-item">
+
+										<div class="education-title">
+											SSC / 10th
+										</div>
+
+										<div class="education-meta">
+
+											@p.SSC_YEAR
+
+											@GetLookupName(
+																				Model.Divisions,
+																				p.SSC_DIVISION
+																				)
+
+										</div>
+
+									</div>
+								}
+
+							</section>
+						}
+
+
+					</div>
+
+
+					<!-- =================================================
+						 RIGHT COLUMN
+					================================================= -->
+
+					<div class="main-column">
+
+
+
+						<!-- =================================================
+							 SKILLS
+						================================================= -->
+						@{
+							var skillGroups =
+							new[]
+							{
+						("Technical", p.sTechnicalSkillIDs),
+						("Medical", p.sMedicalSkillIDs),
+						("Non-Technical", p.sNonTechnicalSkillIDs)
+			}
+							.Where(x => Has(x.Item2))
+							.ToList();
+						}
+
+
+						@if (skillGroups.Any())
+						{
+							<section class="resume-section">
+
+								<h2 class="section-title">
+									Skills
+								</h2>
+
+
+								@foreach (var skill in skillGroups)
+								{
+									<div class="skill-category">
+
+										@skill.Item1
+
+									</div>
+
+
+									@foreach (var value in
+														skill.Item2.Split(
+														new[] { ',', ';', '|' },
+														StringSplitOptions.RemoveEmptyEntries
+														))
+									{
+										<div class="skill-item">
+
+											@value.Trim()
+
+										</div>
+									}
+
+								}
+
+							</section>
+						}
+
+
+					</div>
+
+				</div>
+
+			</main>
+
+		</div>
+
+	</div>
+
+
+	<!-- =========================================================
+		 PDF LIBRARIES
+	========================================================= -->
+
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
+
+	<script>
+
+		/* =========================================================
+		   THEME SWITCHER
+		========================================================= */
+
+		document.addEventListener("DOMContentLoaded", function () {
+
+			const resumeSheet =
+				document.getElementById("resumeSheet");
+
+			const swatches =
+				document.querySelectorAll(".theme-swatch");
+
+
+			const savedTheme =
+				localStorage.getItem("resumeTheme");
+
+
+			if (savedTheme) {
+
+				resumeSheet.setAttribute(
+					"data-theme",
+					savedTheme
+				);
+
+
+				swatches.forEach(function (swatch) {
+
+					swatch.classList.remove("active");
+
+
+					if (swatch.dataset.theme === savedTheme) {
+
+						swatch.classList.add("active");
+
+					}
+
+				});
+
+			}
+
+
+			swatches.forEach(function (swatch) {
+
+				swatch.addEventListener(
+					"click",
+					function () {
+
+						const theme =
+							this.dataset.theme;
+
+
+						resumeSheet.setAttribute(
+							"data-theme",
+							theme
+						);
+
+
+						swatches.forEach(function (item) {
+
+							item.classList.remove("active");
+
+						});
+
+
+						this.classList.add("active");
+
+
+						localStorage.setItem(
+							"resumeTheme",
+							theme
+						);
+
+					}
+				);
+
+			});
+
+
+			/* =====================================================
+			   ADDRESS RESOLUTION
+			===================================================== */
+
+			const addressEl =
+				document.getElementById("rvAddress");
+
+
+			if (!addressEl) {
+				return;
+			}
+
+
+			const countryID =
+				addressEl.getAttribute(
+					"data-country-id"
+				) || "";
+
+
+			const stateID =
+				addressEl.getAttribute(
+					"data-state-id"
+				) || "";
+
+
+			const cityID =
+				addressEl.getAttribute(
+					"data-city-id"
+				) || "";
+
+
+			const pincode =
+				addressEl.getAttribute(
+					"data-pincode"
+				) || "";
+
+
+			function renderAddress(
+				cityName,
+				stateName,
+				countryName
+			) {
+
+				const parts =
+					[
+						cityName,
+						stateName,
+						countryName,
+						pincode
+					]
+					.filter(function (value) {
+
+						return value &&
+							value.trim() !== "";
+
+					});
+
+
+				addressEl.textContent =
+					parts.length
+						? parts.join(", ")
+						: "";
+
+			}
+
+
+			if (!countryID) {
+
+				if (pincode) {
+					addressEl.textContent = pincode;
+				}
+
+				return;
+			}
+
+
+			fetch("/Location/GetCountries")
+
+				.then(function (res) {
+
+					return res.json();
+
+				})
+
+				.then(function (countries) {
+
+					const country =
+						countries.find(function (c) {
+
+							return String(c.id) ===
+								String(countryID);
+
+						});
+
+
+					const countryName =
+						country
+							? country.name
+							: "";
+
+
+					const countryCode =
+						country
+							? country.iso2
+							: countryID;
+
+
+					if (!stateID) {
+
+						renderAddress(
+							"",
+							"",
+							countryName
+						);
+
+						return;
+					}
+
+
+					return fetch(
+						"/Location/GetStates?countryCode=" +
+						encodeURIComponent(countryCode)
+					)
+
+					.then(function (res) {
+
+						return res.json();
+
+					})
+
+					.then(function (states) {
+
+						const state =
+							states.find(function (s) {
+
+								return String(s.id) ===
+									String(stateID);
+
+							});
+
+
+						const stateName =
+							state
+								? state.name
+								: "";
+
+
+						const stateCode =
+							state
+								? (
+									state.stateCode ||
+									(
+										String(state.id)
+											.split(":")[1]
+									)
+								)
+								: "";
+
+
+						if (!cityID) {
+
+							renderAddress(
+								"",
+								stateName,
+								countryName
+							);
+
+							return;
+						}
+
+
+						return fetch(
+							"/Location/GetCities?countryCode=" +
+							encodeURIComponent(countryCode) +
+							"&stateCode=" +
+							encodeURIComponent(stateCode)
+						)
+
+						.then(function (res) {
+
+							return res.json();
+
+						})
+
+						.then(function (cities) {
+
+							const city =
+								cities.find(function (c) {
+
+									return String(c.id) ===
+										String(cityID);
+
+								});
+
+
+							const cityName =
+								city
+									? city.name
+									: "";
+
+
+							renderAddress(
+								cityName,
+								stateName,
+								countryName
+							);
+
+						});
+
+					});
+
+				})
+
+				.catch(function (error) {
+
+					console.log(
+						"Address resolution error:",
+						error
+					);
+
+				});
+
+		});
+
+
+		/* =========================================================
+		   DOWNLOAD PDF
+		========================================================= */
+
+		async function downloadResumePDF() {
+
+			const resumeSheet =
+				document.getElementById(
+					"resumeSheet"
+				);
+
+
+			if (!resumeSheet) {
+
+				alert("Resume not found.");
+
+				return;
+			}
+
+
+			const downloadBtn =
+				document.querySelector(
+					".btn-download"
+				);
+
+
+			const originalText =
+				downloadBtn.innerHTML;
+
+
+			try {
+
+				downloadBtn.disabled = true;
+
+
+				downloadBtn.innerHTML =
+					'<i class="fa fa-spinner fa-spin"></i> Generating...';
+
+
+				/* =================================================
+				   WAIT FOR IMAGES
+				================================================= */
+
+				const images =
+					resumeSheet.querySelectorAll("img");
+
+
+				await Promise.all(
+
+					Array.from(images)
+						.map(function (img) {
+
+							if (img.complete) {
+
+								return Promise.resolve();
+
+							}
+
+
+							return new Promise(
+								function (resolve) {
+
+									img.onload =
+										resolve;
+
+									img.onerror =
+										resolve;
+
+								}
+							);
+
+						})
+
+				);
+
+
+				/* =================================================
+				   CAPTURE RESUME
+				================================================= */
+
+				const canvas =
+					await html2canvas(
+						resumeSheet,
+						{
+							scale: 3,
+
+							useCORS: true,
+
+							allowTaint: false,
+
+							backgroundColor:
+								"#ffffff",
+
+							logging: false
+						}
+					);
+
+
+				/* =================================================
+				   CREATE PDF
+				================================================= */
+
+				const {
+					jsPDF
+				} = window.jspdf;
+
+
+				const pdf =
+					new jsPDF({
+						orientation: "landscape",
+
+						unit: "mm",
+
+						format: "a4",
+
+						compress: true
+					});
+
+
+				const pageWidth =
+					pdf.internal.pageSize.getWidth();
+
+
+				const pageHeight =
+					pdf.internal.pageSize.getHeight();
+
+
+				const imageWidth =
+					pageWidth;
+
+
+				const imageHeight =
+					canvas.height *
+					imageWidth /
+					canvas.width;
+
+
+				const image =
+					canvas.toDataURL(
+						"image/jpeg",
+						0.95
+					);
+
+
+				let y =
+					(pageHeight -
+						imageHeight) / 2;
+
+
+				if (y < 0) {
+
+					y = 0;
+
+				}
+
+
+				pdf.addImage(
+					image,
+					"JPEG",
+					0,
+					y,
+					imageWidth,
+					imageHeight,
+					undefined,
+					"FAST"
+				);
+
+
+				/* =================================================
+				   FILE NAME
+				================================================= */
+
+				let candidateName =
+		@Html.Raw(
+									System.Text.Json.JsonSerializer.Serialize(
+										candidateName ?? ""
+									)
+								);
+
+
+				candidateName =
+					candidateName
+						.trim()
+						.replace(
+							/[^a-zA-Z0-9-_ ]/g,
+							""
+						)
+						.replace(
+							/\s+/g,
+							"_"
+						);
+
+
+				if (!candidateName) {
+
+					candidateName =
+						"Resume";
+
+				}
+
+
+				pdf.save(
+					candidateName +
+					"_Horizontal_Resume.pdf"
+				);
+
+			}
+			catch (error) {
+
+				console.error(
+					"PDF generation error:",
+					error
+				);
+
+
+				alert(
+					"Unable to generate PDF. Please try again."
+				);
+
+			}
+			finally {
+
+				downloadBtn.disabled =
+					false;
+
+
+				downloadBtn.innerHTML =
+					originalText;
+
+			}
+
+		}
+
+	</script>
+
+</body>
+
+</html>

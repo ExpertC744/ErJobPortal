@@ -536,31 +536,31 @@ namespace ErJobPortal.Controllers
         // UPDATE INTERNSHIP DETAILS
         // =========================================================
 
-    //    [HttpPost]
-    //    [ValidateAntiForgeryToken]
-    //    public IActionResult UpdateInternshipPreference(
-    //[Bind(Prefix = "Profile")] CandidateProfileModel model)
-    //    {
-    //        int? candidateId =
-    //            HttpContext.Session.GetInt32("CandidateID");
+        //    [HttpPost]
+        //    [ValidateAntiForgeryToken]
+        //    public IActionResult UpdateInternshipPreference(
+        //[Bind(Prefix = "Profile")] CandidateProfileModel model)
+        //    {
+        //        int? candidateId =
+        //            HttpContext.Session.GetInt32("CandidateID");
 
-    //        if (candidateId == null)
-    //        {
-    //            return RedirectToAction(
-    //                "CandidateLogin",
-    //                "Account"
-    //            );
-    //        }
+        //        if (candidateId == null)
+        //        {
+        //            return RedirectToAction(
+        //                "CandidateLogin",
+        //                "Account"
+        //            );
+        //        }
 
-    //        model.CandidateID = candidateId.Value;
+        //        model.CandidateID = candidateId.Value;
 
-    //        _repo.UpdateInternshipPreference(model);
+        //        _repo.UpdateInternshipPreference(model);
 
-    //        TempData["Success"] =
-    //            "Internship / Fellowship Preference updated successfully.";
+        //        TempData["Success"] =
+        //            "Internship / Fellowship Preference updated successfully.";
 
-    //        return RedirectToAction("Profile");
-    //    }
+        //        return RedirectToAction("Profile");
+        //    }
 
         //[HttpPost]
         //[ValidateAntiForgeryToken]
