@@ -160,6 +160,22 @@
 
                     </a>
 
+                    <!-- =================================================
+                         TPO
+                    ================================================== -->
+
+                    <a asp-controller="Account"
+                       asp-action="TPOLogin"
+                       class="org-switch-link">
+
+                        <i class="fa-solid fa-user-tie"></i>
+
+                        <span>
+                            TPO
+                        </span>
+
+                    </a>
+
 
                 </div>
 
@@ -311,24 +327,32 @@
 
                     </div>
 
-                    <div class="text-end mb-3">
-                        <a asp-controller="Account"
-                           asp-action="OrganizationResetPassword"
-                           class="text-primary text-decoration-none fw-semibold">
-                            <i class="fas fa-key me-1"></i>
-                            Reset Password
-                        </a>
-                    </div>
+                    <div class="candidate-password-actions">
 
-                    <div class="text-end mb-3">
                         <a asp-controller="Account"
-                           asp-action="OrganizationForgotPassword"
-                           class="text-primary text-decoration-none fw-semibold">
+                           asp-action="CandidateForgotPassword"
+                           class="candidate-password-link">
 
-                            <i class="fas fa-key me-1"></i>
-                            Forgot Password?
+                            <i class="fas fa-circle-question"></i>
+
+                            <span>Forgot Password?</span>
 
                         </a>
+
+
+                        <span class="candidate-password-divider"></span>
+
+
+                        <a asp-controller="Account"
+                           asp-action="CandidateResetPassword"
+                           class="candidate-password-link">
+
+                            <i class="fas fa-key"></i>
+
+                            <span>Reset Password</span>
+
+                        </a>
+
                     </div>
 
 
