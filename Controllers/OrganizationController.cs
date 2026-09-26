@@ -1792,6 +1792,7 @@ string nameColumn)
                 // LOCATION
                 // =====================================================
 
+<<<<<<< Updated upstream
                 cmd.Parameters.AddWithValue(
                     "@sCountryName",
                     model.sCountryName ?? (object)DBNull.Value);
@@ -1803,6 +1804,26 @@ string nameColumn)
                 cmd.Parameters.AddWithValue(
                     "@sCityName",
                     model.sCityName);
+=======
+
+                cmd.Parameters.AddWithValue(
+                    "@sCountryName",
+                    string.IsNullOrWhiteSpace(model.sCountryName)
+                        ? DBNull.Value
+                        : model.sCountryName);
+
+                cmd.Parameters.AddWithValue(
+                    "@sStateName",
+                    string.IsNullOrWhiteSpace(model.sStateName)
+                        ? DBNull.Value
+                        : model.sStateName);
+
+                cmd.Parameters.AddWithValue(
+                    "@nCityName",
+                    string.IsNullOrWhiteSpace(model.nCityName)
+                        ? DBNull.Value
+                        : model.nCityName);
+>>>>>>> Stashed changes
 
                 cmd.Parameters.AddWithValue(
                     "@sWorkingHours",
@@ -2075,6 +2096,79 @@ string nameColumn)
         // =========================================================
 
         [HttpGet]
+        public async Task<IActionResult> GetStates(string countryCode)
+        {
+            try
+            {
+                if (string.IsNullOrWhiteSpace(countryCode))
+                {
+                    return BadRequest("Country code is required.");
+                }
+
+                countryCode = countryCode.Trim().ToUpperInvariant();
+
+                string url =
+                    "https://api.geocoded.me/v2/states" +
+                    "?filter[country]=" +
+                    Uri.EscapeDataString(countryCode) +
+                    "&fields=id,name,countryCode,stateCode" +
+                    "&limit=5000";
+
+                using HttpClient client = new HttpClient();
+
+                client.DefaultRequestHeaders.Accept.Clear();
+                client.DefaultRequestHeaders.Accept.Add(
+                    new System.Net.Http.Headers.MediaTypeWithQualityHeaderValue(
+                        "application/json"));
+
+                HttpResponseMessage response =
+                    await client.GetAsync(url);
+
+                string json =
+                    await response.Content.ReadAsStringAsync();
+
+                if (!response.IsSuccessStatusCode)
+                {
+                    return StatusCode(
+                        (int)response.StatusCode,
+                        json);
+                }
+
+                var result =
+                    JsonSerializer.Deserialize<StateApiResponse>(
+                        json,
+                        new JsonSerializerOptions
+                        {
+                            PropertyNameCaseInsensitive = true
+                        });
+
+                if (result?.Data == null)
+                {
+                    return Json(new List<State>());
+                }
+
+                var states = result.Data
+                    .OrderBy(x => x.Name)
+                    .Select(x => new
+                    {
+                        id = x.Id,
+                        name = x.Name,
+                        countryCode = x.CountryCode,
+                        stateCode = x.StateCode
+                    })
+                    .ToList();
+
+                return Json(states);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(
+                    500,
+                    "State API Error: " + ex.Message);
+            }
+        }
+
+        [HttpGet]
         public async Task<IActionResult> GetCountries()
         {
             try
@@ -2117,10 +2211,15 @@ string nameColumn)
                     return Json(new List<Country>());
                 }
 
-                var countries =
-                    result.Data
-                        .OrderBy(x => x.Name)
-                        .ToList();
+                var countries = result.Data
+                    .OrderBy(x => x.Name)
+                    .Select(x => new
+                    {
+                        id = x.Id,
+                        iso2 = x.Iso2,
+                        name = x.Name
+                    })
+                    .ToList();
 
                 return Json(countries);
             }
@@ -2132,104 +2231,21 @@ string nameColumn)
             }
         }
 
-
-        // =========================================================
-        // GET STATES BY COUNTRY
-        // =========================================================
-
-        [HttpGet]
-        public async Task<IActionResult> GetStates(
-            string countryCode)
-        {
-            try
-            {
-                if (string.IsNullOrWhiteSpace(countryCode))
-                {
-                    return BadRequest(
-                        "Country code is required.");
-                }
-
-                countryCode =
-                    countryCode.Trim().ToUpperInvariant();
-
-                string url =
-                    "https://api.geocoded.me/v2/states" +
-                    "?filter[country]=" +
-                    Uri.EscapeDataString(countryCode) +
-                    "&fields=id,name,countryCode,stateCode" +
-                    "&limit=5000";
-
-                using HttpClient client = new HttpClient();
-
-                client.DefaultRequestHeaders.Accept.Clear();
-
-                client.DefaultRequestHeaders.Accept.Add(
-                    new System.Net.Http.Headers.MediaTypeWithQualityHeaderValue(
-                        "application/json"));
-
-                HttpResponseMessage response =
-                    await client.GetAsync(url);
-
-                string json =
-                    await response.Content.ReadAsStringAsync();
-
-                if (!response.IsSuccessStatusCode)
-                {
-                    return StatusCode(
-                        (int)response.StatusCode,
-                        json);
-                }
-
-                var result =
-                    JsonSerializer.Deserialize<StateApiResponse>(
-                        json,
-                        new JsonSerializerOptions
-                        {
-                            PropertyNameCaseInsensitive = true
-                        });
-
-                if (result?.Data == null)
-                {
-                    return Json(new List<State>());
-                }
-
-                var states =
-                    result.Data
-                        .OrderBy(x => x.Name)
-                        .ToList();
-
-                return Json(states);
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(
-                    500,
-                    "State API Error: " + ex.Message);
-            }
-        }
-
-
-        // =========================================================
-        // GET CITIES BY COUNTRY + STATE
-        // =========================================================
-
         [HttpGet]
         public async Task<IActionResult> GetCities(
-            string countryCode,
-            string stateCode)
+    string countryCode,
+    string stateCode)
         {
             try
             {
                 if (string.IsNullOrWhiteSpace(countryCode))
                 {
-                    return BadRequest(
-                        "Country code is required.");
+                    return BadRequest("Country code is required.");
                 }
 
                 if (string.IsNullOrWhiteSpace(stateCode))
                 {
-                    return BadRequest(
-                        "State code is required.");
+                    return BadRequest("State code is required.");
                 }
 
                 countryCode =
@@ -2247,13 +2263,9 @@ string nameColumn)
                     "&fields=id,name,countryCode,stateCode" +
                     "&limit=1000";
 
-                Console.WriteLine(
-                    "CITY URL: " + url);
-
                 using HttpClient client = new HttpClient();
 
                 client.DefaultRequestHeaders.Accept.Clear();
-
                 client.DefaultRequestHeaders.Accept.Add(
                     new System.Net.Http.Headers.MediaTypeWithQualityHeaderValue(
                         "application/json"));
@@ -2263,12 +2275,6 @@ string nameColumn)
 
                 string json =
                     await response.Content.ReadAsStringAsync();
-
-                Console.WriteLine(
-                    "CITY STATUS: " + response.StatusCode);
-
-                Console.WriteLine(
-                    "CITY RESPONSE: " + json);
 
                 if (!response.IsSuccessStatusCode)
                 {
@@ -2290,10 +2296,16 @@ string nameColumn)
                     return Json(new List<City>());
                 }
 
-                var cities =
-                    result.Data
-                        .OrderBy(x => x.Name)
-                        .ToList();
+                var cities = result.Data
+                    .OrderBy(x => x.Name)
+                    .Select(x => new
+                    {
+                        id = x.Id,
+                        name = x.Name,
+                        countryCode = x.CountryCode,
+                        stateCode = x.StateCode
+                    })
+                    .ToList();
 
                 return Json(cities);
             }
@@ -2304,7 +2316,6 @@ string nameColumn)
                     "City API Error: " + ex.Message);
             }
         }
-
 
         // =========================================================
         // API RESPONSE MODELS
@@ -2557,17 +2568,24 @@ string nameColumn)
                 // LOCATION
                 // =====================================================
 
-                cmd.Parameters.AddWithValue(
-                    "@sCountryCode",
-                    model.sCountryCode ?? (object)DBNull.Value);
 
                 cmd.Parameters.AddWithValue(
-                    "@sStateCode",
-                    model.sStateCode ?? (object)DBNull.Value);
+                    "@sCountryName",
+                    string.IsNullOrWhiteSpace(model.sCountryName)
+                        ? DBNull.Value
+                        : model.sCountryName);
 
                 cmd.Parameters.AddWithValue(
-                    "@nCityID",
-                    model.nCityID);
+                    "@sStateName",
+                    string.IsNullOrWhiteSpace(model.sStateName)
+                        ? DBNull.Value
+                        : model.sStateName);
+
+                cmd.Parameters.AddWithValue(
+                    "@nCityName",
+                    string.IsNullOrWhiteSpace(model.nCityName)
+                        ? DBNull.Value
+                        : model.nCityName);
 
                 cmd.Parameters.AddWithValue(
                     "@sWorkingHours",
@@ -2778,17 +2796,25 @@ string nameColumn)
                             item.sMinimumQualificationName =
                                 dr["sMinimumQualificationName"]?.ToString() ?? "";
 
-                            item.sCountryCode =
-                                dr["sCountryCode"]?.ToString() ?? "";
+                            //item.sCountryCode =
+                            //    dr["sCountryCode"]?.ToString() ?? "";
 
-                            item.sStateCode =
-                                dr["sStateCode"]?.ToString() ?? "";
+                            //item.sStateCode =
+                            //    dr["sStateCode"]?.ToString() ?? "";
 
-                            item.nCityID =
-                                Convert.ToInt32(dr["nCityID"]);
+                            //item.nCityID =
+                            //    Convert.ToInt32(dr["nCityID"]);
                             //item.sCityName =
                             //    dr["sCityName"]?.ToString() ?? "";
 
+                            item.sCountryName =
+    dr["sCountryName"]?.ToString() ?? "";
+
+                            item.sStateName =
+                                dr["sStateName"]?.ToString() ?? "";
+
+                            item.nCityName =
+                                dr["nCityName"]?.ToString() ?? "";
                             item.sWorkingHours =
                                 dr["sWorkingHours"]?.ToString() ?? "";
 
@@ -2931,6 +2957,10 @@ string nameColumn)
         // EDIT POST - GET
         // =========================================================
 
+        // =========================================================
+        // EDIT POST - GET
+        // =========================================================
+
         [HttpGet]
         public IActionResult EditPost(int id)
         {
@@ -2950,37 +2980,37 @@ string nameColumn)
 
             using (SqlConnection con = new SqlConnection(connectionString))
             using (SqlCommand cmd = new SqlCommand(@"
-    SELECT
-        nID,
-        nOrgID,
-        nPositionID,
-        nRequiredTrainees,
-        nGenderID,
-        nMinimumQualificationID,
-        sCountryCode,
-        sStateCode,
-        nCityID,
-        sWorkingHours,
-        nInternshipTypeID,
-        sWorkingShift,
-        nInternshipFellowshipTypeID,
-        sTotalCharges,
-        sCurrency,
-        nTrainingInvolvedID,
-        nInternshipDurationID,
-        dStartDate,
-        dCompletionDate,
-        nInternshipModeID,
-        sDivyang,
-        sLanguageKnown,
-        sWorkingDays,
-        sFacilities,
-        sMedicalSkills,
-        sTechnicalSkills,
-        sNonTechnicalSkills
-    FROM tblPost
-    WHERE nID = @nID
-      AND nOrgID = @nOrgID", con))
+SELECT
+    nID,
+    nOrgID,
+    nPositionID,
+    nRequiredTrainees,
+    nGenderID,
+    nMinimumQualificationID,
+       sCountryName,
+        sStateName,
+        nCityName,
+    sWorkingHours,
+    nInternshipTypeID,
+    sWorkingShift,
+    nInternshipFellowshipTypeID,
+    sTotalCharges,
+    sCurrency,
+    nTrainingInvolvedID,
+    nInternshipDurationID,
+    dStartDate,
+    dCompletionDate,
+    nInternshipModeID,
+    sDivyang,
+    sLanguageKnown,
+    sWorkingDays,
+    sFacilities,
+    sMedicalSkills,
+    sTechnicalSkills,
+    sNonTechnicalSkills
+FROM tblPost
+WHERE nID = @nID
+  AND nOrgID = @nOrgID", con))
             {
                 cmd.Parameters.Add("@nID", SqlDbType.Int).Value = id;
                 cmd.Parameters.Add("@nOrgID", SqlDbType.Int).Value = orgID;
@@ -3012,20 +3042,20 @@ string nameColumn)
                     model.nMinimumQualificationID =
                         Convert.ToInt32(dr["nMinimumQualificationID"]);
 
-                    model.sCountryCode =
-                        dr["sCountryCode"] == DBNull.Value
-                            ? ""
-                            : dr["sCountryCode"].ToString()!;
+                    model.sCountryName =
+               dr["sCountryName"] == DBNull.Value
+                   ? ""
+                   : dr["sCountryName"].ToString()!;
 
-                    model.sStateCode =
-                        dr["sStateCode"] == DBNull.Value
+                    model.sStateName =
+                        dr["sStateName"] == DBNull.Value
                             ? ""
-                            : dr["sStateCode"].ToString()!;
+                            : dr["sStateName"].ToString()!;
 
-                    model.nCityID =
-                        dr["nCityID"] == DBNull.Value
-                            ? 0
-                            : Convert.ToInt32(dr["nCityID"]);
+                    model.nCityName =
+                        dr["nCityName"] == DBNull.Value
+                            ? ""
+                            : dr["nCityName"].ToString()!;
 
                     model.sWorkingHours =
                         dr["sWorkingHours"] == DBNull.Value
@@ -3228,16 +3258,22 @@ string nameColumn)
                     // =====================================================
 
                     cmd.Parameters.AddWithValue(
-                        "@sCountryCode",
-                        model.sCountryCode ?? (object)DBNull.Value);
+      "@sCountryName",
+      string.IsNullOrWhiteSpace(model.sCountryName)
+          ? DBNull.Value
+          : model.sCountryName);
 
                     cmd.Parameters.AddWithValue(
-                        "@sStateCode",
-                        model.sStateCode ?? (object)DBNull.Value);
+                        "@sStateName",
+                        string.IsNullOrWhiteSpace(model.sStateName)
+                            ? DBNull.Value
+                            : model.sStateName);
 
                     cmd.Parameters.AddWithValue(
-                        "@nCityID",
-                        model.nCityID);
+                        "@nCityName",
+                        string.IsNullOrWhiteSpace(model.nCityName)
+                            ? DBNull.Value
+                            : model.nCityName);
 
                     cmd.Parameters.AddWithValue(
                         "@sWorkingHours",
@@ -3407,6 +3443,41 @@ string nameColumn)
 
                 return View(model);
             }
+        }
+
+        //radhika25-09
+
+        [HttpGet]
+        public IActionResult SelectedTrainees()
+        {
+            return View();
+        }
+
+        [HttpGet]
+        public IActionResult Charts()
+        {
+            return View();
+        }
+
+        [HttpGet]
+        public IActionResult OrgPreviousPost()
+        {
+            return View();
+        }
+        [HttpGet]
+        public IActionResult Trainees()
+        {
+            return View();
+        }
+        [HttpGet]
+        public IActionResult OrgTopSearch()
+        {
+            return View();
+        }
+        [HttpGet]
+        public IActionResult AppliedTrainees()
+        {
+            return View();
         }
 
     }

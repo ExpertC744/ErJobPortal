@@ -1,0 +1,196 @@
+﻿@{
+    Layout = "~/Views/Shared/_DashboardLayout.cshtml";
+
+    ViewData["Title"] = "Selected Trainees";
+    ViewData["Panel"] = "Candidate";
+    ViewData["UserName"] = "Candidate";
+}
+
+<div class="container-fluid selected-trainees-page">
+
+    <div class="master-table-container">
+ 
+        <!-- TABLE AREA -->
+        <div class="table-responsive">
+
+            <!-- PAGE TITLE -->
+            <div class="page-header">
+
+                <h1>
+                    Selected Trainees
+                </h1>
+
+                <p>
+                    At738034692839
+                </p>
+
+            </div>
+
+
+            <!-- TABLE -->
+            <table id="selectedTraineesTable"
+                   class="master-data-table">
+
+                <thead>
+
+                    <tr>
+
+                        <th>
+                            Sr. No
+                        </th>
+
+                        <th>
+                            Post Date
+                        </th>
+
+                        <th>
+                            Position
+                        </th>
+
+                        <th>
+                            Name
+                        </th>
+
+                        <th>
+                            Email ID
+                        </th>
+
+                        <th>
+                            Skills
+                        </th>
+
+                        <th>
+                            View Resume
+                        </th>
+
+                    </tr>
+
+                </thead>
+
+
+                <tbody>
+
+                    <!-- STATIC DATA -->
+                    <tr>
+
+                        <td class="master-id">
+                            1
+                        </td>
+
+                        <td>
+                            NA
+                        </td>
+
+                        <td>
+                            NA
+                        </td>
+
+                        <td>
+                            Candidate Name
+                        </td>
+
+                        <td>
+                            candidate@example.com
+                        </td>
+
+                        <td>
+                            HTML, CSS, JavaScript
+                        </td>
+
+                        <td class="resume-column">
+
+                 
+        <a asp-controller="Resume"
+           asp-action="Resume"
+           asp-route-id="1"
+           class="resume-view-btn"
+           title="View Resume">
+            <i class="fas fa-eye"></i>
+        </a>
+     
+
+
+                        </td>
+
+                    </tr>
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+
+        <!-- PAGE INFORMATION -->
+        <div id="selectedTraineesPageInfo"
+             class="master-page-info d-none">
+        </div>
+
+    </div>
+
+</div>
+
+
+<script>
+
+    $(document).ready(function () {
+
+        $('#selectedTraineesTable').DataTable({
+
+            pageLength: 25,
+
+            lengthMenu: [
+                [10, 25, 50, 100],
+                [10, 25, 50, 100]
+            ],
+
+            searching: true,
+
+            ordering: true,
+
+            paging: true,
+
+            info: true,
+
+            autoWidth: false,
+
+            responsive: true,
+
+            columnDefs: [
+
+                {
+                    targets: 0,
+                    className: "text-center"
+                },
+
+                {
+                    targets: 6,
+                    className: "text-center",
+                    orderable: false
+                }
+
+            ],
+
+            language: {
+
+                search: "",
+
+                searchPlaceholder: "Search...",
+
+                lengthMenu: "_MENU_ entries per page",
+
+                emptyTable: "No entries found",
+
+                zeroRecords: "No matching records found",
+
+                info: "Showing _START_ to _END_ of _TOTAL_ entries",
+
+                infoEmpty: "Showing 0 to 0 of 0 entries"
+
+            }
+
+        });
+
+    });
+
+</script>

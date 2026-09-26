@@ -754,8 +754,8 @@
                             Country <span class="req">*</span>
                         </label>
 
-                        <select asp-for="sCountryCode"
-                                id="sCountryCode"
+                        <select asp-for="sCountryName"
+                                @*  id="sCountryCode" *@
                                 class="form-select"
                                 required>
 
@@ -776,8 +776,8 @@
                             State <span class="req">*</span>
                         </label>
 
-                        <select asp-for="sStateCode"
-                                id="sStateCode"
+                        <select asp-for="sStateName"
+                                @*  id="sStateCode" *@
                                 class="form-select"
                                 disabled
                                 required>
@@ -799,8 +799,8 @@
                             City <span class="req">*</span>
                         </label>
 
-                        <select asp-for="nCityID"
-                                id="nCityID"
+                        <select asp-for="nCityName"
+                                @* id="nCityID" *@
                                 class="form-select"
                                 disabled
                                 required>
@@ -2414,18 +2414,14 @@
             // =====================================================
 
             const countryDropdown =
-                document.getElementById("sCountryCode");
+                document.getElementById("sCountryName");
 
             const stateDropdown =
-                document.getElementById("sStateCode");
+                document.getElementById("sStateName");
 
             const cityDropdown =
-                document.getElementById("nCityID");
+                document.getElementById("nCityName");
 
-
-            // =====================================================
-            // CHECK DROPDOWNS
-            // =====================================================
 
             if (!countryDropdown ||
                 !stateDropdown ||
@@ -2467,16 +2463,22 @@
                             document.createElement("option");
 
                         // IMPORTANT:
-                        // Use ISO2 as value
-                        // Example: IN, US, GB
-
+                        // Value = country NAME
+                        // This is what will be submitted to C#
                         option.value =
-                            country.iso2;
+                            country.name;
 
                         option.textContent =
                             country.name;
 
+                        // IMPORTANT:
+                        // Keep country code separately
+                        // for API calls
+                        option.dataset.code =
+                            country.iso2;
+
                         countryDropdown.appendChild(option);
+
                     });
 
                 })
@@ -2499,10 +2501,32 @@
                 "change",
                 function () {
 
-                    const countryCode =
-                        this.value;
+                    const selectedCountry =
+                        this.options[this.selectedIndex];
 
-                    // Reset state
+                    // Country NAME -> database
+                    const countryName =
+                        selectedCountry.value;
+
+                    // Country CODE -> API
+                    const countryCode =
+                        selectedCountry.dataset.code;
+
+
+                    console.log(
+                        "Country Name:",
+                        countryName
+                    );
+
+                    console.log(
+                        "Country Code:",
+                        countryCode
+                    );
+
+
+                    // =================================================
+                    // RESET STATE
+                    // =================================================
 
                     stateDropdown.innerHTML =
                         '<option value="">-- Select State --</option>';
@@ -2510,15 +2534,15 @@
                     stateDropdown.disabled = true;
 
 
-                    // Reset city
+                    // =================================================
+                    // RESET CITY
+                    // =================================================
 
                     cityDropdown.innerHTML =
-                        '<option value="0">-- Select City --</option>';
+                        '<option value="">-- Select City --</option>';
 
                     cityDropdown.disabled = true;
 
-
-                    // Nothing selected
 
                     if (!countryCode) {
                         return;
@@ -2529,77 +2553,99 @@
                     // LOAD STATES
                     // =================================================
 
-                    fetch(
+                    const stateUrl =
                         '@Url.Action("GetStates", "Organization")' +
-                        '?countryCode=' +
-                        encodeURIComponent(countryCode)
-                    )
+                        '?countryName=' +
+                        encodeURIComponent(countryCode);
 
-                    .then(response => {
 
-                        if (!response.ok) {
+                    console.log(
+                        "State Request:",
+                        stateUrl
+                    );
 
-                            throw new Error(
-                                "State API failed: " +
-                                response.status
-                            );
 
-                        }
+                    fetch(stateUrl)
 
-                        return response.json();
+                        .then(response => {
 
-                    })
+                            if (!response.ok) {
 
-                    .then(states => {
+                                throw new Error(
+                                    "State API failed: " +
+                                    response.status
+                                );
+                            }
 
-                        stateDropdown.innerHTML =
-                            '<option value="">-- Select State --</option>';
+                            return response.json();
 
-                        if (!states ||
-                            states.length === 0) {
+                        })
+
+                        .then(states => {
 
                             stateDropdown.innerHTML =
-                                '<option value="">No states found</option>';
-
-                            return;
-                        }
+                                '<option value="">-- Select State --</option>';
 
 
-                        states.forEach(state => {
+                            if (!states ||
+                                states.length === 0) {
 
-                            const option =
-                                document.createElement("option");
+                                stateDropdown.innerHTML =
+                                    '<option value="">No states found</option>';
 
-                            // IMPORTANT:
-                            // State value must be StateCode
-                            // Example: MH, GJ, DL
+                                return;
+                            }
 
-                            option.value =
-                                state.stateCode;
 
-                            option.textContent =
-                                state.name;
+                            states.forEach(state => {
 
-                            stateDropdown.appendChild(
-                                option
+                                const option =
+                                    document.createElement("option");
+
+
+                                // =================================================
+                                // DATABASE VALUE
+                                // =================================================
+
+                                // Save STATE NAME
+                                option.value =
+                                    state.name;
+
+
+                                // Display STATE NAME
+                                option.textContent =
+                                    state.name;
+
+
+                                // =================================================
+                                // API VALUE
+                                // =================================================
+
+                                // Keep state code separately
+                                option.dataset.code =
+                                    state.stateCode;
+
+
+                                stateDropdown.appendChild(
+                                    option
+                                );
+
+                            });
+
+
+                            stateDropdown.disabled =
+                                false;
+
+                        })
+
+                        .catch(error => {
+
+                            console.error(
+                                "State Error:",
+                                error
                             );
 
                         });
-
-
-                        stateDropdown.disabled =
-                            false;
-
-                    })
-
-                    .catch(error => {
-
-                        console.error(
-                            "State Error:",
-                            error
-                        );
-
-                    });
 
                 }
             );
@@ -2613,17 +2659,57 @@
                 "change",
                 function () {
 
+                    // Selected country
+                    const selectedCountry =
+                        countryDropdown.options[
+                            countryDropdown.selectedIndex
+                        ];
+
+
+                    // Selected state
+                    const selectedState =
+                        stateDropdown.options[
+                            stateDropdown.selectedIndex
+                        ];
+
+
+                    // Country code for API
                     const countryCode =
-                        countryDropdown.value;
+                        selectedCountry.dataset.code;
 
+
+                    // State code for API
                     const stateCode =
-                        this.value;
+                        selectedState.dataset.code;
 
 
-                    // Reset city
+                    // State name for database
+                    const stateName =
+                        selectedState.value;
+
+
+                    console.log(
+                        "Country Code:",
+                        countryCode
+                    );
+
+                    console.log(
+                        "State Name:",
+                        stateName
+                    );
+
+                    console.log(
+                        "State Code:",
+                        stateCode
+                    );
+
+
+                    // =================================================
+                    // RESET CITY
+                    // =================================================
 
                     cityDropdown.innerHTML =
-                        '<option value="0">-- Select City --</option>';
+                        '<option value="">-- Select City --</option>';
 
                     cityDropdown.disabled = true;
 
@@ -2639,7 +2725,7 @@
                     // LOAD CITIES
                     // =================================================
 
-                    const url =
+                    const cityUrl =
                         '@Url.Action("GetCities", "Organization")' +
                         '?countryCode=' +
                         encodeURIComponent(countryCode) +
@@ -2649,88 +2735,94 @@
 
                     console.log(
                         "City Request:",
-                        url
+                        cityUrl
                     );
 
 
-                    fetch(url)
+                    fetch(cityUrl)
 
-                    .then(response => {
+                        .then(response => {
 
-                        if (!response.ok) {
+                            if (!response.ok) {
 
-                            throw new Error(
-                                "City API failed: " +
-                                response.status
-                            );
+                                throw new Error(
+                                    "City API failed: " +
+                                    response.status
+                                );
+                            }
 
-                        }
+                            return response.json();
 
-                        return response.json();
+                        })
 
-                    })
-
-                    .then(cities => {
-
-                        cityDropdown.innerHTML =
-                            '<option value="0">-- Select City --</option>';
-
-
-                        if (!cities ||
-                            cities.length === 0) {
+                        .then(cities => {
 
                             cityDropdown.innerHTML =
-                                '<option value="0">No cities found</option>';
-
-                            return;
-                        }
+                                '<option value="">-- Select City --</option>';
 
 
-                        cities.forEach(city => {
+                            if (!cities ||
+                                cities.length === 0) {
 
-                            const option =
-                                document.createElement("option");
+                                cityDropdown.innerHTML =
+                                    '<option value="">No cities found</option>';
 
-                            // City ID is sent to C#
-                            option.value =
-                                city.id;
+                                return;
+                            }
 
-                            // City name displayed to user
-                            option.textContent =
-                                city.name;
 
-                            cityDropdown.appendChild(
-                                option
+                            cities.forEach(city => {
+
+                                const option =
+                                    document.createElement("option");
+
+
+                                // =================================================
+                                // DATABASE VALUE
+                                // =================================================
+
+                                // Save CITY NAME
+                                option.value =
+                                    city.name;
+
+
+                                // Display CITY NAME
+                                option.textContent =
+                                    city.name;
+
+
+                                cityDropdown.appendChild(
+                                    option
+                                );
+
+                            });
+
+
+                            cityDropdown.disabled =
+                                false;
+
+                        })
+
+                        .catch(error => {
+
+                            console.error(
+                                "City Error:",
+                                error
                             );
 
                         });
-
-
-                        cityDropdown.disabled =
-                            false;
-
-                    })
-
-                    .catch(error => {
-
-                        console.error(
-                            "City Error:",
-                            error
-                        );
-
-                    });
 
                 }
             );
 
 
             // =====================================================
-            // IMPORTANT:
-            // ENABLE STATE/CITY BEFORE FORM SUBMIT
+            // ENABLE BEFORE FORM SUBMIT
             // =====================================================
 
             const form =
                 countryDropdown.closest("form");
+
 
             if (form) {
 
@@ -2738,11 +2830,11 @@
                     "submit",
                     function () {
 
-                        // Disabled fields are NOT submitted
-                        // by normal HTML forms.
+                        stateDropdown.disabled =
+                            false;
 
-                        stateDropdown.disabled = false;
-                        cityDropdown.disabled = false;
+                        cityDropdown.disabled =
+                            false;
 
                     }
                 );

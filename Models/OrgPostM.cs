@@ -16,9 +16,13 @@ namespace JobPortalTrainee.Models
         public int nMinimumQualificationID { get; set; }
 
         // Location
-        public string sCountryCode { get; set; } = string.Empty;
-        public string sStateCode { get; set; } = string.Empty;
-        public int nCityID { get; set; }
+        //public string sCountryCode { get; set; } = string.Empty;
+        //public string sStateCode { get; set; } = string.Empty;
+        //public int nCityID { get; set; }
+
+        public string sCountryName { get; set; } = string.Empty;
+        public string sStateName { get; set; } = string.Empty;
+        public string nCityName { get; set; } = string.Empty;
         public string sWorkingHours { get; set; } = string.Empty;
 
         // Work Terms
@@ -163,9 +167,12 @@ namespace JobPortalTrainee.Models
 
         public string sCityName { get; set; } = string.Empty;
 
-        public string sStateName { get; set; } = string.Empty;
 
-        public string sCountryName { get; set; } = string.Empty;
+        //public string sStateName { get; set; } = string.Empty;
+
+        //public string sCountryName { get; set; } = string.Empty;
+
+
 
 
 

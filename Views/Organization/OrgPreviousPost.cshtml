@@ -1,0 +1,409 @@
+﻿@{
+    Layout = "~/Views/Shared/_DashboardLayout.cshtml";
+
+    ViewData["Title"] = "Previous Post";
+    ViewData["Panel"] = "Organization";
+    ViewData["UserName"] = "Atharv Infotech";
+}
+
+<div class="container-fluid">
+
+     
+
+
+    <!-- =====================================================
+         MASTER TABLE
+    ====================================================== -->
+
+    <div class="master-table-container">
+
+       
+
+
+        <div class="table-responsive">
+               <h1>
+            Previous Post
+        </h1>
+
+        <p>
+            At738034692839
+        </p>
+            <table id="previousPostTable"
+                   class="master-data-table">
+
+                <thead>
+
+                    <tr>
+
+                        <th>Sr. No</th>
+
+                        <th>Position</th>
+
+                        <th>Action</th>
+
+                        <th>No. of Trainee</th>
+
+                        <th>Gender</th>
+
+                        <th>Minimum Qualification</th>
+
+                        <th>Location</th>
+
+                        <th>Working Hrs / Day</th>
+
+                        <th>Weekly Working Days</th>
+
+                        <th>Internship Type</th>
+
+                        <th>Internship / Fellowship Type</th>
+
+                        <th>Total Charges</th>
+
+                        <th>Training Involved</th>
+
+                        <th>Duration</th>
+
+                        <th>Facilities Available</th>
+
+                        <th>Internship Mode</th>
+
+                        <th>Divyang (Allowed)</th>
+
+                        <th>Status</th>
+
+                    </tr>
+
+                </thead>
+
+
+                <tbody>
+
+                    <!-- =================================================
+                         ROW 1
+                    ================================================== -->
+
+                    <tr>
+
+                        <td class="master-id">
+                            1
+                        </td>
+
+                        <td>
+                            .Net Trainee
+                        </td>
+
+                        <td>
+
+                            <a href="#"
+                               class="text-primary"
+                               title="View Post">
+
+                                <i class="fas fa-eye"></i>
+
+                            </a>
+
+                        </td>
+
+                        <td>
+                            4
+                        </td>
+
+                        <td>
+                            Any
+                        </td>
+
+                        <td>
+                            Graduate
+                        </td>
+
+                        <td>
+                            India<br />
+                            Maharashtra<br />
+                            Nagpur
+                        </td>
+
+                        <td>
+                            Up to 8 Hrs
+                        </td>
+
+                        <td>
+                            Monday, Tuesday, Wednesday,
+                            Thursday, Friday
+                        </td>
+
+                        <td>
+                            Full Time
+                        </td>
+
+                        <td>
+                            Any<br />
+                            (Free/Paid/Stipend/Sponsored)
+                        </td>
+
+                        <td>
+                            NA
+                        </td>
+
+                        <td>
+                            Yes
+                        </td>
+
+                        <td>
+                            NA
+                        </td>
+
+                        <td>
+
+                            <i class="fas fa-wifi"
+                               title="Facilities Available"></i>
+
+                        </td>
+
+                        <td>
+                            Hybrid
+                        </td>
+
+                        <td>
+                            No
+                        </td>
+
+                        <td>
+
+                            <span class="master-status">
+                                Disabled
+                            </span>
+
+                        </td>
+
+                    </tr>
+
+
+                    <!-- =================================================
+                         ROW 2
+                    ================================================== -->
+
+                    <tr>
+
+                        <td class="master-id">
+                            2
+                        </td>
+
+                        <td>
+                            .Net Trainee
+                        </td>
+
+                        <td>
+
+                            <a href="#"
+                               class="text-primary"
+                               title="View Post">
+
+                                <i class="fas fa-eye"></i>
+
+                            </a>
+
+                        </td>
+
+                        <td>
+                            5
+                        </td>
+
+                        <td>
+                            Any
+                        </td>
+
+                        <td>
+                            Graduate
+                        </td>
+
+                        <td>
+                            India<br />
+                            Maharashtra<br />
+                            Nagpur
+                        </td>
+
+                        <td>
+                            Up to 8 Hrs
+                        </td>
+
+                        <td>
+                            Monday, Tuesday, Wednesday,
+                            Thursday, Friday
+                        </td>
+
+                        <td>
+                            Full Time
+                        </td>
+
+                        <td>
+                            Free
+                        </td>
+
+                        <td>
+                            NA
+                        </td>
+
+                        <td>
+                            Yes
+                        </td>
+
+                        <td>
+                            NA
+                        </td>
+
+                        <td>
+                            NA
+                        </td>
+
+                        <td>
+                            Offline
+                        </td>
+
+                        <td>
+                            No
+                        </td>
+
+                        <td>
+
+                            <span class="master-status">
+                                Disabled
+                            </span>
+
+                        </td>
+
+                    </tr>
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+
+        <!-- =====================================================
+             PAGE INFO
+        ====================================================== -->
+
+        <div id="previousPostPageInfo"
+             class="master-page-info text-center d-none">
+        </div>
+
+    </div>
+
+</div>
+
+
+<!-- =========================================================
+     DATATABLE
+========================================================= -->
+
+<script>
+
+    $(document).ready(function () {
+
+        $('#previousPostTable').DataTable({
+
+            pageLength: 25,
+
+            lengthMenu: [
+                [10, 25, 50, 100],
+                [10, 25, 50, 100]
+            ],
+
+            searching: true,
+
+            ordering: true,
+
+            paging: true,
+
+            info: true,
+
+            autoWidth: false,
+
+            responsive: false,
+
+            scrollX: true,
+
+            language: {
+
+                search: "",
+
+                searchPlaceholder: "Search...",
+
+                lengthMenu: "_MENU_ entries per page",
+
+                emptyTable: "No entries found",
+
+                zeroRecords: "No matching records found",
+
+                info: "Showing _START_ to _END_ of _TOTAL_ entries",
+
+                infoEmpty: "Showing 0 to 0 of 0 entries"
+
+            },
+
+            columnDefs: [
+
+                {
+                    targets: 0,
+                    className: "text-center"
+                },
+
+                {
+                    targets: 2,
+                    className: "text-center",
+                    orderable: false
+                },
+
+                {
+                    targets: 3,
+                    className: "text-center"
+                },
+
+                {
+                    targets: 4,
+                    className: "text-center"
+                },
+
+                {
+                    targets: 11,
+                    className: "text-center"
+                },
+
+                {
+                    targets: 12,
+                    className: "text-center"
+                },
+
+                {
+                    targets: 13,
+                    className: "text-center"
+                },
+
+                {
+                    targets: 14,
+                    className: "text-center"
+                },
+
+                {
+                    targets: 15,
+                    className: "text-center"
+                },
+
+                {
+                    targets: 16,
+                    className: "text-center"
+                },
+
+                {
+                    targets: 17,
+                    className: "text-center"
+                }
+
+            ]
+
+        });
+
+    });
+
+</script>

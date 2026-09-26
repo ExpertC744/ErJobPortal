@@ -2775,6 +2775,7 @@
 							   class="profile-submenu-link">
 
 								View Profile
+<<<<<<< Updated upstream
 
 							</a>
 
@@ -2785,6 +2786,19 @@
 								Custom Resume
 							</a>
 
+=======
+
+							</a>
+
+							<a asp-controller="Candidate"
+							   asp-action="customResumeBuilder"
+							   asp-route-id="@Context.Session.GetInt32("CandidateID")"
+							   class="profile-submenu-link">
+								Custom Resume
+							</a>
+
+ 
+>>>>>>> Stashed changes
 
                             <a asp-controller="Candidate"
                                asp-action="ViewOrgProfile"
@@ -3167,7 +3181,11 @@
 							</a>
 
 							<a asp-controller="Organization"
+<<<<<<< Updated upstream
 							   asp-action="FinalSelection"
+=======
+							   asp-action="SelectedTrainees"
+>>>>>>> Stashed changes
 							   asp-route-id="@orgCode"
 							   class="profile-submenu-link">
 								Final Selection
@@ -3202,7 +3220,11 @@
 						<div class="profile-submenu" id="historySubmenu">
 
 							<a asp-controller="Organization"
+<<<<<<< Updated upstream
 							   asp-action="PreviousPost"
+=======
+							   asp-action="OrgPreviousPost"
+>>>>>>> Stashed changes
 							   asp-route-id="@orgCode"
 							   class="profile-submenu-link">
 								Previous Post
@@ -3237,7 +3259,11 @@
 						<div class="profile-submenu" id="chartsSubmenu">
 
 							<a asp-controller="Organization"
+<<<<<<< Updated upstream
 							   asp-action="PostInfo"
+=======
+							   asp-action="Charts"
+>>>>>>> Stashed changes
 							   asp-route-id="@orgCode"
 							   class="profile-submenu-link">
 								Post Info
@@ -3341,6 +3367,7 @@
 				//session
 				int? orgID = Context.Session.GetInt32("OrgID");
 			}
+<<<<<<< Updated upstream
 
 
 			<!-- ================= SUPER ADMIN ================= -->
@@ -3352,6 +3379,21 @@
 						 DASHBOARD
 					========================================================== -->
 					<a asp-controller="SuperAdmin" asp-action="Dashboard" asp-route-id="1" class="sidebar-link active">
+=======
+			@* shrirang 23/09/26 TPO *@
+			<!-- ================= TPO ================= -->
+			@if (ViewData["Panel"]?.ToString() == "TPO")
+			{
+				var tpoId = Context.Session.GetInt32("TPOID");
+
+				<div class="sidebar-section candidate-sidebar">
+
+					<!-- ================= DASHBOARD ================= -->
+
+					<a asp-controller="TPO"
+					   asp-action="Dashboard"
+					   class="sidebar-link active">
+>>>>>>> Stashed changes
 
 						<span class="menu-icon">
 							<i class="fas fa-chart-pie"></i>
@@ -3364,6 +3406,7 @@
 					</a>
 
 
+<<<<<<< Updated upstream
 					<!-- =========================================================
 						 TRAINEE
 					========================================================== -->
@@ -3433,9 +3476,59 @@
 							<span class="menu-arrow">
 								<i class="fas fa-chevron-down"></i>
 							</span>
+=======
+					<!-- ================= PROFILE ================= -->
+
+					<div class="sidebar-dropdown">
+
+						<div class="sidebar-link"
+							 onclick="toggleSidebarMenu('tpoProfileSubmenu', 'tpoProfileArrow')">
+
+							<span class="menu-icon">
+								<i class="fas fa-id-card"></i>
+							</span>
+
+							<span class="menu-text">
+								Profile
+							</span>
+
+							<span class="profile-arrow"
+								  id="tpoProfileArrow">
+
+								<i class="fas fa-chevron-right"></i>
+
+							</span>
 
 						</div>
 
+
+						<div class="profile-submenu"
+							 id="tpoProfileSubmenu">
+
+							<a asp-controller="TPO"
+							   asp-action="Profile"
+							   class="profile-submenu-link">
+
+								View Profile
+
+							</a>
+
+							<a asp-controller="TPO"
+							   asp-action="EditProfile"
+							   class="profile-submenu-link">
+
+								Edit Profile
+
+							</a>
+
+						</div>
+
+					</div>
+>>>>>>> Stashed changes
+
+						</div>
+
+<<<<<<< Updated upstream
 
 						<div id="organizationMenu"
 							 class="sidebar-submenu collapse">
@@ -3703,6 +3796,263 @@
 			<header class="dashboard-header">
 
 				<div class="header-left">
+=======
+					<!-- ================= SCHEDULER ================= -->
+
+					<a asp-controller="TPO"
+					   asp-action="Scheduler"
+					   class="sidebar-link">
+
+						<span class="menu-icon">
+							<i class="fas fa-calendar-alt"></i>
+						</span>
+
+						<span class="menu-text">
+							Scheduler
+						</span>
+
+					</a>
+
+
+					<!-- ================= TRAINEES INFO ================= -->
+
+					<a asp-controller="TPO"
+					   asp-action="TraineesInfo"
+					   class="sidebar-link">
+
+						<span class="menu-icon">
+							<i class="fas fa-users"></i>
+						</span>
+
+						<span class="menu-text">
+							Trainees Info
+						</span>
+
+					</a>
+
+
+					<!-- ================= CREATE USER ================= -->
+
+					<a asp-controller="TPO"
+					   asp-action="CreateUser"
+					   class="sidebar-link">
+
+						<span class="menu-icon">
+							<i class="fas fa-user-plus"></i>
+						</span>
+
+						<span class="menu-text">
+							Create User
+						</span>
+
+					</a>
+
+
+					<!-- ================= NOTIFICATION / EVENT ================= -->
+
+					<a asp-controller="TPO"
+					   asp-action="AddNotificationEvent"
+					   class="sidebar-link">
+
+						<span class="menu-icon">
+							<i class="fas fa-bell"></i>
+						</span>
+
+						<span class="menu-text">
+							Add Notification/Event
+						</span>
+
+					</a>
+
+
+					<!-- ================= FEEDBACK ================= -->
+
+					<a asp-controller="TPO"
+					   asp-action="Feedback"
+					   class="sidebar-link">
+
+						<span class="menu-icon">
+							<i class="fas fa-comment-dots"></i>
+						</span>
+
+						<span class="menu-text">
+							Feedback
+						</span>
+
+					</a>
+
+
+					<!-- ================= SETTINGS ================= -->
+
+					<div class="sidebar-dropdown">
+
+						<div class="sidebar-link"
+							 onclick="toggleSidebarMenu('tpoSettingsSubmenu', 'tpoSettingsArrow')">
+
+							<span class="menu-icon">
+								<i class="fas fa-cog"></i>
+							</span>
+
+							<span class="menu-text">
+								Settings
+							</span>
+
+							<span class="profile-arrow"
+								  id="tpoSettingsArrow">
+
+								<i class="fas fa-chevron-right"></i>
+
+							</span>
+
+						</div>
+
+
+						<div class="profile-submenu"
+							 id="tpoSettingsSubmenu">
+
+							<!-- RESET PASSWORD -->
+
+							<a asp-controller="Account"
+							   asp-action="TPORestPassword"
+							   class="profile-submenu-link">
+
+								<i class="fas fa-key me-2"></i>
+								Reset Password
+
+							</a>
+
+
+							<!-- FORGOT PASSWORD -->
+
+							<a asp-controller="Account"
+							   asp-action="TPOForgotPassword"
+							   class="profile-submenu-link">
+
+								<i class="fas fa-unlock-alt me-2"></i>
+								Forgot Password
+
+							</a>
+
+						</div>
+
+					</div>
+
+
+					<!-- ================= LOGOUT ================= -->
+					@*  <div class="sidebar-logout">
+
+            <a asp-controller="Account"
+               asp-action="Logout"
+               class="logout-link">
+
+                <span class="menu-icon">
+                    <i class="fas fa-right-from-bracket"></i>
+                </span>
+
+                <span class="menu-text">
+                    Logout
+                </span>
+
+            </a>
+
+        </div> *@
+
+				</div>
+			}
+
+			<!-- ================= SUPER ADMIN ================= -->
+			@if (ViewData["Panel"]?.ToString() == "SuperAdmin")
+			{
+				<div class="sidebar-section superadmin-sidebar">
+
+					<!-- =========================================================
+						 DASHBOARD
+					========================================================== -->
+					<a asp-controller="SuperAdmin" asp-action="Dashboard" asp-route-id="1" class="sidebar-link active">
+
+						<span class="menu-icon">
+							<i class="fas fa-chart-pie"></i>
+						</span>
+
+						<span class="menu-text">
+							Dashboard
+						</span>
+
+					</a>
+
+
+					<!-- =========================================================
+						 TRAINEE
+					========================================================== -->
+					<div class="sidebar-menu">
+
+						<div class="sidebar-link sidebar-dropdown"
+							 data-bs-toggle="collapse"
+							 data-bs-target="#traineeMenu"
+							 aria-expanded="false">
+
+							<span class="menu-icon">
+								<i class="fas fa-user-graduate"></i>
+							</span>
+
+							<span class="menu-text">
+								Trainee
+							</span>
+
+							<span class="menu-arrow">
+								<i class="fas fa-chevron-down"></i>
+							</span>
+
+						</div>
+
+
+						<div id="traineeMenu"
+							 class="sidebar-submenu collapse">
+
+							<a asp-controller="Trainee"
+							   asp-action="SATrainees" asp-route-id="1">
+								Trainee Registrations
+							</a>
+
+							<a asp-controller="Trainee"
+							   asp-action="Profiles" asp-route-id="1">
+								Trainee Profiles
+							</a>
+
+							<a asp-controller="Trainee"
+							   asp-action="Status" asp-route-id="1">
+								Trainee Status
+							</a>
+
+						</div>
+
+					</div>
+
+
+					<!-- =========================================================
+						 ORGANIZATION
+					========================================================== -->
+					<div class="sidebar-menu">
+
+						<div class="sidebar-link sidebar-dropdown"
+							 data-bs-toggle="collapse"
+							 data-bs-target="#organizationMenu"
+							 aria-expanded="false">
+
+							<span class="menu-icon">
+								<i class="fas fa-building"></i>
+							</span>
+
+							<span class="menu-text">
+								Organization
+							</span>
+
+							<span class="menu-arrow">
+								<i class="fas fa-chevron-down"></i>
+							</span>
+
+						</div>
+>>>>>>> Stashed changes
 
 					<button class="sidebar-toggle"
 							id="sidebarToggle"
@@ -3710,6 +4060,7 @@
 						<i class="fas fa-bars"></i>
 					</button>
 
+<<<<<<< Updated upstream
 
 					<div class="header-page-info">
 
@@ -3749,6 +4100,700 @@
 					</button>
 
 
+					<!-- User -->
+					<div class="header-user-dropdown">
+
+						<button type="button"
+								class="header-user"
+								id="userDropdownBtn">
+
+							<div class="header-avatar">
+								<i class="fas fa-user"></i>
+							</div>
+
+							<div class="header-user-info">
+
+								<strong>
+									@ViewData["UserName"]
+								</strong>
+
+								<small>
+									@ViewData["Panel"]
+								</small>
+
+							</div>
+
+							<i class="fas fa-chevron-down user-arrow"></i>
+=======
+						<div id="organizationMenu"
+							 class="sidebar-submenu collapse">
+
+							<a asp-controller="Organization"
+							   asp-action="Registration" asp-route-id="1">
+								Org Registration
+							</a>
+
+							<a asp-controller="Organization"
+							   asp-action="Profiles" asp-route-id="1">
+								Org Profiles
+							</a>
+
+							<a asp-controller="Organization"
+							   asp-action="Posts" asp-route-id="1">
+								Org Posts
+							</a>
+
+							<a asp-controller="Organization"
+							   asp-action="FinalSelectionDetails" asp-route-id="1">
+								Final Selection Details
+							</a>
+
+						</div>
+
+					</div>
+
+
+					<!-- =========================================================
+						 CHARTS
+					========================================================== -->
+					<div class="sidebar-menu">
+
+						<div class="sidebar-link sidebar-dropdown"
+							 data-bs-toggle="collapse"
+							 data-bs-target="#chartsMenu"
+							 aria-expanded="false">
+
+							<span class="menu-icon">
+								<i class="fas fa-chart-area"></i>
+							</span>
+
+							<span class="menu-text">
+								Charts
+							</span>
+
+							<span class="menu-arrow">
+								<i class="fas fa-chevron-down"></i>
+							</span>
+
+						</div>
+
+
+						<div id="chartsMenu"
+							 class="sidebar-submenu collapse">
+
+							<a asp-controller="Charts"
+							   asp-action="Index" asp-route-id="1">
+								Charts
+							</a>
+
+						</div>
+
+					</div>
+
+
+					<!-- =========================================================
+						 ADVERTISEMENT
+					========================================================== -->
+					<div class="sidebar-menu">
+
+						<div class="sidebar-link sidebar-dropdown"
+							 data-bs-toggle="collapse"
+							 data-bs-target="#advertisementMenu"
+							 aria-expanded="false">
+
+							<span class="menu-icon">
+								<i class="fas fa-bullhorn"></i>
+							</span>
+
+							<span class="menu-text">
+								Advertisement
+							</span>
+
+							<span class="menu-arrow">
+								<i class="fas fa-chevron-down"></i>
+							</span>
+
+						</div>
+>>>>>>> Stashed changes
+
+						</button>
+
+<<<<<<< Updated upstream
+
+						<!-- USER DROPDOWN -->
+
+						<div class="user-dropdown-menu"
+							 id="userDropdownMenu">
+
+							<div class="dropdown-user-header">
+
+								<div class="dropdown-avatar">
+									<i class="fas fa-user"></i>
+								</div>
+
+								<div>
+
+									<strong>
+										@ViewData["UserName"]
+									</strong>
+
+									<small>
+										@ViewData["Panel"]
+									</small>
+
+								</div>
+
+							</div>
+
+
+							<div class="dropdown-divider"></div>
+
+
+							<a href="#"
+							   class="user-dropdown-item">
+
+								<span class="dropdown-item-icon">
+									<i class="fas fa-user"></i>
+								</span>
+
+								<span>
+									My Profile
+								</span>
+
+							</a>
+
+
+							<a href="#"
+							   class="user-dropdown-item">
+
+								<span class="dropdown-item-icon">
+									<i class="fas fa-key"></i>
+								</span>
+
+								<span>
+									Reset Password
+								</span>
+=======
+						<div id="advertisementMenu"
+							 class="sidebar-submenu collapse">
+
+							<a asp-controller="Advertisement"
+							   asp-action="AddAdv" asp-route-id="1">
+								Add Adv
+							</a>
+
+							<a asp-controller="Advertisement"
+							   asp-action="Index" asp-route-id="1">
+								View All Adv
+							</a>
+
+							<a asp-controller="Advertisement"
+							   asp-action="Receipt" asp-route-id="1">
+								Receipt
+							</a>
+
+							<a asp-controller="Advertisement"
+							   asp-action="Invoice" asp-route-id="1">
+								Invoice
+							</a>
+
+							<a asp-controller="Advertisement"
+							   asp-action="BillingController" asp-route-id="1">
+								Billing Controller
+							</a>
+
+						</div>
+
+					</div>
+
+
+					<!-- =========================================================
+						 CREATE FEEDBACK
+					========================================================== -->
+					<div class="sidebar-menu">
+
+						<div class="sidebar-link sidebar-dropdown"
+							 data-bs-toggle="collapse"
+							 data-bs-target="#createFeedbackMenu"
+							 aria-expanded="false">
+
+							<span class="menu-icon">
+								<i class="fas fa-comment-medical"></i>
+							</span>
+
+							<span class="menu-text">
+								Create Feedback
+							</span>
+
+							<span class="menu-arrow">
+								<i class="fas fa-chevron-down"></i>
+							</span>
+
+						</div>
+
+
+						<div id="createFeedbackMenu"
+							 class="sidebar-submenu collapse">
+
+							<a asp-controller="SuperAdmin"
+							   asp-action="SAFeedback" asp-route-id="1">
+								Trainee
+							</a>
+
+							<a asp-controller="SuperAdmin"
+							   asp-action="SAOrgFeedback" asp-route-id="1">
+								Organization
+							</a>
+
+						</div>
+
+					</div>
+>>>>>>> Stashed changes
+
+							</a>
+
+<<<<<<< Updated upstream
+
+							<div class="dropdown-divider"></div>
+
+
+							<a asp-controller="Account"
+							   asp-action="Logout"
+							   class="user-dropdown-item logout-dropdown">
+
+								<span class="dropdown-item-icon">
+									<i class="fas fa-right-from-bracket"></i>
+								</span>
+
+								<span>
+									Logout
+								</span>
+
+							</a>
+
+						</div>
+
+					</div>
+				</div>
+
+			</header>
+
+
+			<!-- ================= CONTENT ================= -->
+
+			<main class="dashboard-content">
+
+				@RenderBody()
+
+			</main>
+
+		</div>
+
+	</div>
+
+
+	<!-- Mobile Overlay -->
+	<div class="sidebar-overlay"
+		 id="sidebarOverlay"
+		 onclick="toggleSidebar()">
+	</div>
+=======
+					<!-- =========================================================
+						 VIEW FEEDBACK
+					========================================================== -->
+					<div class="sidebar-menu">
+
+						<div class="sidebar-link sidebar-dropdown"
+							 data-bs-toggle="collapse"
+							 data-bs-target="#viewFeedbackMenu"
+							 aria-expanded="false">
+
+							<span class="menu-icon">
+								<i class="fas fa-comments"></i>
+							</span>
+
+							<span class="menu-text">
+								View Feedback
+							</span>
+
+							<span class="menu-arrow">
+								<i class="fas fa-chevron-down"></i>
+							</span>
+
+						</div>
+
+
+						<div id="viewFeedbackMenu"
+							 class="sidebar-submenu collapse">
+
+							<a asp-controller="SuperAdmin"
+							   asp-action="CandidateFeedback" asp-route-id="1">
+								Trainee
+							</a>
+
+							<a asp-controller="SuperAdmin"
+							   asp-action="OrganizationFeedback" asp-route-id="1">
+								Organization
+							</a>
+
+						</div>
+
+					</div>
+
+				</div>
+			}
+
+			<!-- ================= SIDEBAR BOTTOM ================= -->
+
+			<div class="sidebar-bottom">
+
+				<div class="sidebar-user">
+
+					<div class="sidebar-user-avatar">
+						<i class="fas fa-user"></i>
+					</div>
+
+					<div class="sidebar-user-info">
+
+						<strong>
+							@ViewData["UserName"]
+						</strong>
+>>>>>>> Stashed changes
+
+						<small>
+							@ViewData["Panel"]
+						</small>
+
+<<<<<<< Updated upstream
+
+	<script src="~/lib/jquery/dist/jquery.min.js"></script>
+
+	<script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+
+	<script src="~/js/dashboard.js"></script>
+
+	@* data-table *@
+
+	@* <script src="~/lib/jquery/dist/jquery.min.js"></script> *@
+
+	<script src="~/js/datatables.min.js"></script>
+
+	<script src="~/js/master-table.js"></script>
+
+	@* data-table End *@
+=======
+					</div>
+
+				</div>
+
+
+				<a asp-controller="Account"
+				   asp-action="Logout"
+				   class="logout-link">
+
+					<span class="menu-icon">
+						<i class="fas fa-right-from-bracket"></i>
+					</span>
+
+					<span class="menu-text">
+						Logout
+					</span>
+
+				</a>
+
+			</div>
+
+		</aside>
+>>>>>>> Stashed changes
+
+	<script>
+
+<<<<<<< Updated upstream
+
+			document.addEventListener("DOMContentLoaded", function () {
+
+				const sidebar =
+					document.getElementById("dashboardSidebar");
+
+				const main =
+					document.querySelector(".dashboard-main");
+
+				const toggle =
+					document.getElementById("sidebarToggle");
+
+				const overlay =
+					document.getElementById("sidebarOverlay");
+
+
+				// Desktop starts expanded
+				if (window.innerWidth > 991) {
+
+					main.classList.add("sidebar-expanded");
+
+				}
+
+
+				toggle.addEventListener("click", function () {
+
+					if (window.innerWidth > 991) {
+
+						sidebar.classList.toggle("sidebar-collapsed");
+
+						main.classList.toggle("sidebar-collapsed");
+						main.classList.toggle("sidebar-expanded");
+
+					}
+					else {
+
+						sidebar.classList.toggle("sidebar-collapsed");
+
+						overlay.classList.toggle("show");
+
+					}
+=======
+		<!-- ================= MAIN ================= -->
+
+		<div class="dashboard-main">
+
+
+			<!-- ================= HEADER ================= -->
+
+			<header class="dashboard-header">
+
+				<div class="header-left">
+
+					<button class="sidebar-toggle"
+							id="sidebarToggle"
+							type="button">
+						<i class="fas fa-bars"></i>
+					</button>
+
+
+					<div class="header-page-info">
+
+						<span class="header-small-text">
+							@ViewData["Panel"] Portal
+						</span>
+
+						<strong>
+							@ViewData["Title"]
+						</strong>
+
+					</div>
+
+				</div>
+
+
+				<div class="header-right">
+
+					<!-- Search -->
+					<div class="header-search">
+
+						<i class="fas fa-search"></i>
+
+						<input type="text"
+							   placeholder="Search..." />
+
+					</div>
+>>>>>>> Stashed changes
+
+				});
+
+<<<<<<< Updated upstream
+
+				// Mobile overlay
+				overlay.addEventListener("click", function () {
+
+					sidebar.classList.remove("sidebar-collapsed");
+
+					overlay.classList.remove("show");
+=======
+					<!-- Notification -->
+					<button class="header-icon-btn">
+
+						<i class="far fa-bell"></i>
+
+						<span class="notification-dot"></span>
+
+					</button>
+>>>>>>> Stashed changes
+
+				});
+
+<<<<<<< Updated upstream
+
+				// Resize handling
+				window.addEventListener("resize", function () {
+
+					if (window.innerWidth > 991) {
+
+						sidebar.classList.remove("sidebar-collapsed");
+
+						overlay.classList.remove("show");
+
+						main.classList.remove("sidebar-collapsed");
+
+						main.classList.add("sidebar-expanded");
+
+					}
+					else {
+
+						main.classList.remove("sidebar-expanded");
+
+						main.classList.remove("sidebar-collapsed");
+
+					}
+
+				});
+
+			});
+
+
+		// Active menu
+		document.addEventListener("DOMContentLoaded", function () {
+
+			const links =
+				document.querySelectorAll(".sidebar-link");
+
+			const currentPath =
+				window.location.pathname.toLowerCase();
+
+			links.forEach(function (link) {
+
+				const href =
+					link.getAttribute("href");
+
+				if (href &&
+					href !== "#" &&
+					currentPath.includes(href.toLowerCase())) {
+
+					links.forEach(x =>
+						x.classList.remove("active"));
+
+					link.classList.add("active");
+				}
+
+			});
+
+		});
+
+	</script>
+	<script>
+
+		document.addEventListener("DOMContentLoaded", function () {
+
+			const userDropdown =
+				document.querySelector(".header-user-dropdown");
+
+			const userDropdownBtn =
+				document.getElementById("userDropdownBtn");
+
+
+			if (userDropdownBtn) {
+
+				userDropdownBtn.addEventListener("click", function (event) {
+
+					event.stopPropagation();
+
+					userDropdown.classList.toggle("open");
+
+				});
+
+			}
+
+
+			document.addEventListener("click", function (event) {
+
+				if (
+					userDropdown &&
+					!userDropdown.contains(event.target)
+				) {
+
+					userDropdown.classList.remove("open");
+
+				}
+
+			});
+
+		});
+
+	</script>
+
+	<script>
+
+		function toggleSidebarMenu(submenuId, arrowId) {
+
+		const submenu =
+		document.getElementById(submenuId);
+
+		const arrow =
+		document.getElementById(arrowId);
+
+		if (!submenu || !arrow) {
+		return;
+		}
+
+		// Close all other menus
+		document.querySelectorAll(".profile-submenu").forEach(function (menu) {
+
+		if (menu.id !== submenuId) {
+		menu.classList.remove("show");
+		}
+
+		});
+
+		// Reset all other arrows
+		document.querySelectorAll(".profile-arrow").forEach(function (item) {
+
+		if (item.id !== arrowId) {
+		item.classList.remove("open");
+		}
+
+		});
+
+		// Toggle selected menu
+		submenu.classList.toggle("show");
+
+		arrow.classList.toggle("open");
+		}
+
+	</script>
+
+	<script>
+		function toggleSidebarMenu(submenuId, arrowId) {
+
+		const submenu =
+		document.getElementById(submenuId);
+
+		const arrow =
+		document.getElementById(arrowId);
+
+		if (!submenu || !arrow) {
+		return;
+		}
+
+		// Close all other menus
+		document.querySelectorAll(".profile-submenu").forEach(function (menu) {
+
+		if (menu.id !== submenuId) {
+		menu.classList.remove("show");
+		}
+
+		});
+
+		// Reset all other arrows
+		document.querySelectorAll(".profile-arrow").forEach(function (item) {
+
+		if (item.id !== arrowId) {
+		item.classList.remove("open");
+		}
+
+		});
+
+		// Toggle selected menu
+		submenu.classList.toggle("show");
+
+=======
 					<!-- User -->
 					<div class="header-user-dropdown">
 
@@ -4124,6 +5169,7 @@
 		// Toggle selected menu
 		submenu.classList.toggle("show");
 
+>>>>>>> Stashed changes
 		arrow.classList.toggle("open");
 		}
 	</script>

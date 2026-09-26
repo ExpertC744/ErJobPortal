@@ -8,7 +8,11 @@
 }
 
 
+<<<<<<< Updated upstream
  
+=======
+
+>>>>>>> Stashed changes
 
 <link rel="stylesheet"
       href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
@@ -158,6 +162,7 @@
         <h2 class="page-title">
             All Post Details
         </h2>
+<<<<<<< Updated upstream
 
         <div class="page-subtitle">
             At73803469839
@@ -171,311 +176,324 @@
             <table id="organizationJobsTable"
                    class="master-data-table">
             <thead>
+=======
+>>>>>>> Stashed changes
 
-                <tr>
-
-                    <th>Sr.<br />No</th>
-
-                    <th>Post<br />Creation<br />Date</th>
-
-                    <th>Position</th>
-
-                    <th>Action</th>
-
-                    <th>No. of<br />Required<br />Trainee</th>
-
-                    <th>Eligible<br />Trainee</th>
-
-                    <th>Gender</th>
-
-                    <th>Minimum<br />Qualification</th>
-
-                    <th>Location</th>
-
-                    <th>Working<br />Hours Per<br />Day</th>
-
-                    <th>Weekly Working<br />Days</th>
-
-                    <th>Internship<br />Type</th>
-
-                    <th>Internship / Fellowship<br />Type</th>
-
-                    <th>Training<br />Involved</th>
-
-                    <th>Internship<br />Duration</th>
-
-                    <th>Facilities<br />Available</th>
-
-                    <th>Internship<br />Mode</th>
-
-                    <th>Divyang<br />Allowed</th>
-
-                    <th>Status</th>
-
-                </tr>
-
-            </thead>
+        <div class="page-subtitle">
+            At73803469839
+        </div>
 
 
-            <tbody>
 
-                @{
-                    int srNo = 1;
-                }
+        <!-- MASTER TABLE -->
+        <div class="table-responsive">
 
-                @foreach (var item in Model)
-                {
+            <table id="organizationJobsTable"
+                   class="master-data-table">
+                <thead>
+
                     <tr>
 
-                        <!-- Sr. No -->
-                        <td>
-                            @srNo
-                        </td>
+                        <th>Sr.<br />No</th>
 
+                        <th>Post<br />Creation<br />Date</th>
 
-                        <!-- Post Creation Date -->
-                        <td>
-                            @(item.dRegisterDate.HasValue
-                                                    ? item.dRegisterDate.Value.ToString("dd-MM-yyyy")
-                                                    : "")
-                        </td>
+                        <th>Position</th>
 
+                        <th>Action</th>
 
-                        <!-- Position -->
-                        <td>
-                            @item.sPositionName
-                        </td>
+                        <th>No. of<br />Required<br />Trainee</th>
 
+                        <th>Eligible<br />Trainee</th>
 
-                     @*    <!-- Action radhika22-09--> *@
-                        <td>
+                        <th>Gender</th>
 
-                            <div class="action">
+                        <th>Minimum<br />Qualification</th>
 
-                                <a asp-action="ViewOrgPost"
-                                   asp-route-id="@item.nID"
-                                   title="View">
+                        <th>Location</th>
 
-                                    <i class="fa-solid fa-eye"></i>
+                        <th>Working<br />Hours Per<br />Day</th>
 
-                                </a>
+                        <th>Weekly Working<br />Days</th>
 
-                                <a asp-action="EditPost"
-                                   asp-route-id="@item.nID"
-                                   title="Edit">
+                        <th>Internship<br />Type</th>
 
-                                    <i class="fa-solid fa-pen-to-square"></i>
+                        <th>Internship / Fellowship<br />Type</th>
 
-                                </a>
+                        <th>Training<br />Involved</th>
 
-                            </div>
+                        <th>Internship<br />Duration</th>
 
-                        </td>
+                        <th>Facilities<br />Available</th>
 
+                        <th>Internship<br />Mode</th>
 
-                        <!-- Required Trainees -->
-                        <td>
-                            @item.nRequiredTrainees
-                        </td>
+                        <th>Divyang<br />Allowed</th>
 
-
-                        <!-- Eligible Trainee -->
-                        <td>
-
-                            <a href="#"
-                               class="trainee">
-
-                                @item.nRequiredTrainees
-
-                            </a>
-
-                        </td>
-
-
-                        <!-- Gender -->
-                        <td>
-                            @item.sGenderName
-                        </td>
-
-
-                        <!-- Minimum Qualification -->
-                        <td>
-                            @item.sMinimumQualificationName
-                        </td>
-
-
-                        <!-- Location -->
-                        <td>
-
-                            <div class="location">
-
-                                @item.sCountryCode
-                                <br />
-
-                                @item.sStateCode
-                                <br />
-
-                                @item.sCityName
-
-                            </div>
-
-                        </td>
-
-
-                        <!-- Working Hours -->
-                        <td>
-                            @item.sWorkingHours
-                        </td>
-
-
-                        <!-- Working Days -->
-                        <td>
-
-                            <div class="days">
-                                @item.sWorkingDays
-                            </div>
-
-                        </td>
-
-
-                        <!-- Internship Type -->
-                        <td>
-                            @item.sInternshipTypeName
-                        </td>
-
-
-                        <!-- Internship Fellowship Type -->
-                        <td>
-                            @item.sInternshipFellowshipTypeName
-                        </td>
-
-
-                        <!-- Training Involved -->
-                        <td>
-                            @item.sTrainingInvolvedName
-                        </td>
-
-
-                        <!-- Internship Duration -->
-                        <td>
-                            @item.sInternshipDurationName
-                        </td>
-
-
-                        <!-- Facilities -->
-                        <td>
-
-                            @if (!string.IsNullOrWhiteSpace(item.sFacilities))
-                            {
-                                <i class="fa-solid fa-wifi wifi"
-                                   title="@item.sFacilities">
-                                </i>
-                            }
-                            else
-                            {
-                                <span>-</span>
-                            }
-
-                    </td>
-
-
-                    <!-- Internship Mode -->
-                    <td>
-                        @item.sInternshipModeName
-                    </td>
-
-
-                    <!-- Divyang -->
-                    <td>
-
-                        @(string.IsNullOrWhiteSpace(item.sDivyang)
-                                                ? "No"
-                                                : item.sDivyang)
-
-                        </td>
-
-
-                        <!-- Status -->
-                        <td>
-
-                            @if (item.nBit)
-                            {
-                                <form asp-action="DisablePost"
-                                      method="post"
-                                      class="status-form">
-
-                                    <input type="hidden"
-                                           name="id"
-                                           value="@item.nID" />
-
-                                    <button type="submit"
-                                            class="status enabled">
-                                        Enabled
-                                    </button>
-
-                                </form>
-                            }
-                            else
-                            {
-                                <form asp-action="EnablePost"
-                                      method="post"
-                                      class="status-form">
-
-                                    <input type="hidden"
-                                           name="id"
-                                           value="@item.nID" />
-
-                                    <button type="submit"
-                                            class="status disabled">
-                                        Disabled
-                                    </button>
-
-                                </form>
-                            }
-
-                        </td>
+                        <th>Status</th>
 
                     </tr>
 
-                    srNo++;
-                }
+                </thead>
 
-            </tbody>
 
-        </table>
+                <tbody>
+
+                    @{
+                        int srNo = 1;
+                    }
+
+                    @foreach (var item in Model)
+                    {
+                        <tr>
+
+                            <!-- Sr. No -->
+                            <td>
+                                @srNo
+                            </td>
+
+
+                            <!-- Post Creation Date -->
+                            <td>
+                                @(item.dRegisterDate.HasValue
+                                                            ? item.dRegisterDate.Value.ToString("dd-MM-yyyy")
+                                                            : "")
+                            </td>
+
+
+                            <!-- Position -->
+                            <td>
+                                @item.sPositionName
+                            </td>
+
+
+                            @*    <!-- Action radhika22-09--> *@
+                            <td>
+
+                                <div class="action">
+
+                                    <a asp-action="ViewOrgPost"
+                                       asp-route-id="@item.nID"
+                                       title="View">
+
+                                        <i class="fa-solid fa-eye"></i>
+
+                                    </a>
+
+                                    <a asp-action="EditPost"
+                                       asp-route-id="@item.nID"
+                                       title="Edit">
+
+                                        <i class="fa-solid fa-pen-to-square"></i>
+
+                                    </a>
+
+                                </div>
+
+                            </td>
+
+
+                            <!-- Required Trainees -->
+                            <td>
+                                @item.nRequiredTrainees
+                            </td>
+
+
+                            <!-- Eligible Trainee -->
+                            <td>
+
+                                <a href="#"
+                                   class="trainee">
+
+                                    @item.nRequiredTrainees
+
+                                </a>
+
+                            </td>
+
+
+                            <!-- Gender -->
+                            <td>
+                                @item.sGenderName
+                            </td>
+
+
+                            <!-- Minimum Qualification -->
+                            <td>
+                                @item.sMinimumQualificationName
+                            </td>
+
+
+
+                            <!-- Location -->
+                            <td>
+                                <div class="location">
+
+                                    @item.sCountryName
+                                    <br />
+
+                                    @item.sStateName
+                                    <br />
+
+                                    @item.nCityName
+
+                                </div>
+                            </td>
+
+                            <!-- Working Hours -->
+                            <td>
+                                @item.sWorkingHours
+                            </td>
+
+
+                            <!-- Working Days -->
+                            <td>
+
+                                <div class="days">
+                                    @item.sWorkingDays
+                                </div>
+
+                            </td>
+
+
+                            <!-- Internship Type -->
+                            <td>
+                                @item.sInternshipTypeName
+                            </td>
+
+
+                            <!-- Internship Fellowship Type -->
+                            <td>
+                                @item.sInternshipFellowshipTypeName
+                            </td>
+
+
+                            <!-- Training Involved -->
+                            <td>
+                                @item.sTrainingInvolvedName
+                            </td>
+
+
+                            <!-- Internship Duration -->
+                            <td>
+                                @item.sInternshipDurationName
+                            </td>
+
+
+                            <!-- Facilities -->
+                            <td>
+
+                                @if (!string.IsNullOrWhiteSpace(item.sFacilities))
+                                {
+                                    <i class="fa-solid fa-wifi wifi"
+                                       title="@item.sFacilities">
+                                    </i>
+                                }
+                                else
+                                {
+                                    <span>-</span>
+                                }
+
+                        </td>
+
+
+                        <!-- Internship Mode -->
+                        <td>
+                            @item.sInternshipModeName
+                        </td>
+
+
+                        <!-- Divyang -->
+                        <td>
+
+                            @(string.IsNullOrWhiteSpace(item.sDivyang)
+                                                        ? "No"
+                                                        : item.sDivyang)
+
+                            </td>
+
+
+                            <!-- Status -->
+                            <td>
+
+                                @if (item.nBit)
+                                {
+                                    <form asp-action="DisablePost"
+                                          method="post"
+                                          class="status-form">
+
+                                        <input type="hidden"
+                                               name="id"
+                                               value="@item.nID" />
+
+                                        <button type="submit"
+                                                class="status enabled">
+                                            Enabled
+                                        </button>
+
+                                    </form>
+                                }
+                                else
+                                {
+                                    <form asp-action="EnablePost"
+                                          method="post"
+                                          class="status-form">
+
+                                        <input type="hidden"
+                                               name="id"
+                                               value="@item.nID" />
+
+                                        <button type="submit"
+                                                class="status disabled">
+                                            Disabled
+                                        </button>
+
+                                    </form>
+                                }
+
+                            </td>
+
+                        </tr>
+
+                        srNo++;
+                    }
+
+                </tbody>
+
+            </table>
+
+        </div>
 
     </div>
 
-</div>
+
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+
+    <script src="https://cdn.datatables.net/1.13.8/js/jquery.dataTables.min.js"></script>
 
 
-<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <script>
 
-<script src="https://cdn.datatables.net/1.13.8/js/jquery.dataTables.min.js"></script>
+        $(document).ready(function () {
 
+        $('#postTable').DataTable({
 
-<script>
+        pageLength: 25,
 
-    $(document).ready(function () {
+        searching: true,
 
-    $('#postTable').DataTable({
+        ordering: true,
 
-    pageLength: 25,
+        paging: true,
 
-    searching: true,
+        info: true,
 
-    ordering: true,
+        autoWidth: false,
 
-    paging: true,
+        scrollX: true
 
-    info: true,
+        });
 
-    autoWidth: false,
+        });
 
-    scrollX: true
-
-    });
-
-    });
-
-</script>
+    </script>
