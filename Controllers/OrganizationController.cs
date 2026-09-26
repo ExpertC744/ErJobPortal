@@ -980,14 +980,14 @@ IFormFile? CompanyLogo)
                             // LOCATION
                             // =====================================================
 
-                            model.sCountryCode =
-                                dr["sCountryCode"]?.ToString() ?? "";
+                            model.sCountryName =
+     dr["sCountryName"]?.ToString() ?? "";
 
-                            model.sStateCode =
-                                dr["sStateCode"]?.ToString() ?? "";
+                            model.sStateName =
+                                dr["sStateName"]?.ToString() ?? "";
 
-                            model.nCityID =
-                                Convert.ToInt32(dr["nCityID"]);
+                            model.nCityName =
+                                dr["nCityName"]?.ToString() ?? "";
 
                             // =====================================================
                             // WORKING HOURS
@@ -1792,7 +1792,7 @@ string nameColumn)
                 // LOCATION
                 // =====================================================
 
-<<<<<<< Updated upstream
+//<<<<<<< Updated upstream
                 cmd.Parameters.AddWithValue(
                     "@sCountryName",
                     model.sCountryName ?? (object)DBNull.Value);
@@ -1804,7 +1804,7 @@ string nameColumn)
                 cmd.Parameters.AddWithValue(
                     "@sCityName",
                     model.sCityName);
-=======
+//=======
 
                 cmd.Parameters.AddWithValue(
                     "@sCountryName",
@@ -1823,7 +1823,7 @@ string nameColumn)
                     string.IsNullOrWhiteSpace(model.nCityName)
                         ? DBNull.Value
                         : model.nCityName);
->>>>>>> Stashed changes
+//>>>>>>> Stashed changes
 
                 cmd.Parameters.AddWithValue(
                     "@sWorkingHours",
