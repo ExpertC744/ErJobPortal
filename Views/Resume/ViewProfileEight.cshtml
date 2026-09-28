@@ -1,0 +1,773 @@
+﻿@model ErJobPortal.Models.ResumeViewModel
+
+@{
+    Layout = null;
+    ViewData["Title"] = "Professional Resume - Three Column Modern (Template 8)";
+
+    var p = Model.Profile;
+    var candidateName = Model.CandidateName?.Trim();
+
+    var candidateRole = GetLookupName(
+        Model.InternshipFellowshipType,
+        p.Internship_FellowshipType
+    );
+
+    if (string.Equals(candidateRole, "Paid by Trainee", StringComparison.OrdinalIgnoreCase))
+    {
+        candidateRole = "";
+    }
+}
+
+@functions {
+
+    string GetLookupName(System.Collections.IEnumerable list, object id)
+    {
+        if (list == null || id == null || string.IsNullOrWhiteSpace(id.ToString()))
+            return "";
+
+        foreach (var item in list)
+        {
+            var idProp = item.GetType().GetProperty("ID");
+            var nameProp = item.GetType().GetProperty("Name");
+
+            if (idProp != null && nameProp != null)
+            {
+                var idValue = idProp.GetValue(item)?.ToString();
+
+                if (idValue == id.ToString())
+                {
+                    return nameProp.GetValue(item)?.ToString() ?? "";
+                }
+            }
+        }
+
+        return "";
+    }
+
+    bool Has(string s) => !string.IsNullOrWhiteSpace(s);
+
+    bool HasNum(int? n) => n.HasValue && n.Value != 0;
+}
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <title>
+        @(Has(candidateName)
+            ? candidateName + " - Resume"
+            : "Resume")
+    </title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Montserrat:wght@400;500;600;700;800&family=Open+Sans:wght@400;600;700&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+
+    <style>
+        /* =========================================================
+                   ROOT - KEPT EXACTLY AS YOU PROVIDED
+                ========================================================= */
+        :root {
+            --primary: #263b47;
+            --primary-light: #edf2f3;
+            --accent: #b4773c;
+            --accent-light: #f5ece3;
+            --text: #27343c;
+            --muted: #718087;
+            --border: #dce2e4;
+            --soft: #f6f7f7;
+            --white: #ffffff;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        html, body { width: 100%; min-height: 100%; }
+
+        body {
+            background: #e9edef;
+            color: var(--text);
+            font-family: "DM Sans", Arial, sans-serif;
+        }
+
+        /* =========================================================
+                   TOOLBAR - KEPT EXACTLY AS YOU PROVIDED
+                ========================================================= */
+        .resume-toolbar {
+            width: 297mm;
+            max-width: calc(100% - 30px);
+            margin: 14px auto 8px;
+            display: flex;
+            justify-content: flex-end;
+            gap: 8px;
+        }
+
+        .resume-toolbar button,
+        .resume-toolbar a {
+            border: 0;
+            min-height: 32px;
+            padding: 8px 14px;
+            border-radius: 5px;
+            font-family: "DM Sans";
+            font-size: 10px;
+            font-weight: 700;
+            text-decoration: none;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .btn-edit {
+            background: #ffffff;
+            color: var(--primary);
+            border: 1px solid var(--border) !important;
+        }
+
+        .btn-print {
+            background: var(--primary);
+            color: white;
+        }
+
+        .btn-download {
+            background: var(--accent);
+            color: white;
+        }
+
+        /* =========================================================
+                   THEME SWITCHER - KEPT EXACTLY AS YOU PROVIDED
+                ========================================================= */
+        .theme-switcher {
+            width: 297mm;
+            max-width: calc(100% - 30px);
+            margin: 0 auto 10px;
+            display: flex;
+            justify-content: flex-end;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .theme-switcher span {
+            font-size: 9px;
+            font-weight: 700;
+            color: var(--muted);
+            text-transform: uppercase;
+            letter-spacing: .6px;
+        }
+
+        .theme-swatch {
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            border: 2px solid white;
+            cursor: pointer;
+            box-shadow: 0 1px 5px rgba(0,0,0,.15);
+        }
+
+        .theme-swatch.active {
+            box-shadow: 0 0 0 2px white, 0 0 0 4px var(--swatch);
+        }
+
+        /* =========================================================
+                   RESUME SHEET & THEMES
+                ========================================================= */
+        .resume-page-wrapper {
+            display: flex; justify-content: center; padding: 5px 0 25px;
+        }
+
+        .resume-sheet {
+            width: 297mm; height: 210mm; background: #ffffff;
+            box-shadow: 0 12px 40px rgba(20,40,50,.14); overflow: hidden;
+            display: grid; grid-template-columns: 26% 46% 28%;
+            
+            /* Specific variables just for the resume content */
+            --theme-main: #00796b;
+            --theme-dark: #1a1a1a;
+            --text-dark: #333333;
+            --text-light: #777777;
+        }
+
+        .resume-sheet[data-theme="teal"] { --theme-main: #00796b; --theme-dark: #1a1a1a; }
+        .resume-sheet[data-theme="navy"] { --theme-main: #1e3a8a; --theme-dark: #0f172a; }
+        .resume-sheet[data-theme="crimson"] { --theme-main: #9f1239; --theme-dark: #27060e; }
+        .resume-sheet[data-theme="emerald"] { --theme-main: #059669; --theme-dark: #064e3b; }
+        .resume-sheet[data-theme="slate"] { --theme-main: #475569; --theme-dark: #0f172a; }
+
+        /* =========================================================
+                   LAYOUT COLUMNS
+                ========================================================= */
+        /* Dynamic Full-Height Layouts */
+        .col-left {
+            background: #ffffff;
+            padding: 15mm 10mm;
+            border-right: 1px solid var(--border);
+            display: flex; flex-direction: column; gap: 15px;
+        }
+
+        .col-mid {
+            background: #ffffff;
+            padding: 15mm 15mm;
+            display: flex; flex-direction: column;
+            justify-content: flex-start; gap: 20px;
+        }
+
+        .col-right {
+            display: flex; flex-direction: column;
+            background: var(--theme-main); color: #ffffff;
+            height: 100%;
+        }
+
+        .col-right-top {
+            padding: 15mm 12mm;
+            flex-grow: 1;
+            display: flex; flex-direction: column; gap: 15px;
+        }
+
+        .col-right-bottom {
+            background: var(--theme-dark);
+            padding: 12mm;
+            margin-top: auto; 
+            display: flex; flex-direction: column; gap: 10px;
+        }
+
+        /* =========================================================
+                   LEFT COLUMN CONTENT (PHOTO FIXED)
+                ========================================================= */
+        .photo-wrap {
+            position: relative;
+            width: 35mm; 
+            height: 35mm;
+            min-width: 35mm; 
+            min-height: 35mm;
+            margin: 0 auto 10px auto;
+            border-radius: 50%;
+            border: 3px solid var(--theme-main);
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #f1f5f9;
+        }
+        
+        .photo {
+            width: 100%; height: 100%; border-radius: 50%;
+            object-fit: cover; 
+        }
+        
+        .photo-placeholder {
+            font-size: 35px; color: #cbd5e1;
+        }
+
+        .section-header-left {
+            font-family: "Montserrat", sans-serif; font-size: 10px; font-weight: 800;
+            letter-spacing: 2px; text-transform: uppercase; margin-bottom: 5px; color: #111;
+        }
+
+        .profile-text {
+            font-size: 8.5px; line-height: 1.6; color: var(--text-light); text-align: justify;
+        }
+
+        .skill-list-left {
+            list-style: none; padding: 0; margin-top: 5px;
+        }
+        .skill-list-left li {
+            font-size: 8.5px; font-weight: 600; color: var(--text-dark); margin-bottom: 4px;
+            display: flex; justify-content: space-between; align-items: center;
+        }
+        .skill-dots { color: var(--theme-main); font-size: 10px; letter-spacing: 1px; }
+
+        /* =========================================================
+                   MIDDLE COLUMN CONTENT
+                ========================================================= */
+        .intro-small {
+            font-size: 14px; font-weight: 400; color: var(--text-dark); margin-bottom: 4px;
+        }
+        
+        .intro-large {
+            font-family: "Montserrat", sans-serif; font-size: 18px; font-weight: 700; color: #111;
+            padding-bottom: 8px; border-bottom: 3px solid var(--theme-main); margin-bottom: 10px;
+        }
+        .intro-role { font-weight: 400; color: var(--text-light); }
+
+        .section-header-mid {
+            font-family: "Montserrat", sans-serif; font-size: 10px; font-weight: 800;
+            letter-spacing: 2px; text-transform: uppercase; margin-bottom: 12px; color: #111;
+        }
+
+        .exp-item { margin-bottom: 12px; break-inside: avoid; }
+        .exp-date { font-size: 8.5px; font-weight: 600; color: var(--theme-main); margin-bottom: 2px; }
+        .exp-title { 
+            font-family: "Montserrat", sans-serif; font-size: 10px; font-weight: 700; 
+            text-transform: uppercase; letter-spacing: 1px; color: #111;
+            border-bottom: 1px solid var(--border); padding-bottom: 2px; margin-bottom: 4px; display: inline-block;
+        }
+        .exp-company { font-size: 9px; font-weight: 600; color: var(--text-dark); margin-bottom: 3px; }
+        .exp-desc { font-size: 8.5px; line-height: 1.5; color: var(--text-light); }
+
+        /* =========================================================
+                   RIGHT COLUMN CONTENT
+                ========================================================= */
+        .section-header-right {
+            font-family: "Montserrat", sans-serif; font-size: 10px; font-weight: 800;
+            letter-spacing: 2px; text-transform: uppercase; margin-bottom: 8px; color: white;
+        }
+
+        .contact-item { font-size: 8.5px; line-height: 1.6; margin-bottom: 3px; color: rgba(255,255,255,0.9); word-break: break-word; }
+        
+        .edu-item { margin-bottom: 10px; }
+        .edu-date { font-size: 8px; font-weight: 700; color: rgba(255,255,255,0.7); margin-bottom: 2px; }
+        .edu-title { 
+            font-family: "Montserrat", sans-serif; font-size: 9px; font-weight: 700; text-transform: uppercase; 
+            border-bottom: 1px solid rgba(255,255,255,0.3); padding-bottom: 2px; margin-bottom: 2px; display: inline-block;
+        }
+        .edu-sub { font-size: 8px; color: rgba(255,255,255,0.9); }
+
+        .ref-item { margin-bottom: 8px; }
+        .ref-name { font-size: 9.5px; font-weight: 700; color: white; }
+        .ref-detail { font-size: 8px; color: rgba(255,255,255,0.7); margin-top: 2px; }
+
+        /* =========================================================
+                   RESPONSIVE & PRINT
+                ========================================================= */
+        @@media (max-width: 1200px) {
+            .resume-toolbar, .theme-switcher { width: 100%; padding-left: 12px; padding-right: 12px; }
+            .resume-sheet { transform: scale(.75); transform-origin: top center; margin-bottom: -45mm; }
+        }
+
+        @@media (max-width: 768px) {
+            .resume-sheet { transform: scale(.5); margin-bottom: -100mm; }
+        }
+
+        @@media print {
+            html, body { width: 297mm; height: 210mm; background: white; }
+            .resume-toolbar, .theme-switcher { display: none !important; }
+            .resume-page-wrapper { padding: 0; }
+            .resume-sheet { width: 297mm; height: 210mm; margin: 0; box-shadow: none; transform: none; }
+            @@page { size: A4 landscape; margin: 0; }
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- =========================================================
+         TOOLBAR (PRESERVED EXACTLY)
+    ========================================================== -->
+    <div class="resume-toolbar">
+
+        <a asp-controller="Candidate"
+           asp-action="Profile"
+           class="btn-edit">
+            <i class="fa fa-pen"></i> Edit
+        </a>
+
+        <button type="button"
+                class="btn-print"
+                onclick="window.print()">
+            <i class="fa fa-print"></i> Print / PDF
+        </button>
+
+        <button type="button"
+                class="btn-download"
+                onclick="downloadResumePDF()">
+            <i class="fa fa-download"></i> Download
+        </button>
+
+    </div>
+
+    <!-- =========================================================
+         THEME SWITCHER (PRESERVED EXACTLY)
+    ========================================================== -->
+    <div class="theme-switcher">
+        <span>Theme</span>
+        <div class="theme-swatch active" data-theme="teal" style="background:#00796b;--swatch:#00796b" title="Teal"></div>
+        <div class="theme-swatch" data-theme="navy" style="background:#1e3a8a;--swatch:#1e3a8a" title="Navy"></div>
+        <div class="theme-swatch" data-theme="crimson" style="background:#9f1239;--swatch:#9f1239" title="Crimson"></div>
+        <div class="theme-swatch" data-theme="emerald" style="background:#059669;--swatch:#059669" title="Emerald"></div>
+        <div class="theme-swatch" data-theme="slate" style="background:#475569;--swatch:#475569" title="Slate"></div>
+    </div>
+
+    <!-- =========================================================
+         RESUME (TEMPLATE 8 LAYOUT)
+    ========================================================== -->
+    <div class="resume-page-wrapper">
+        <div class="resume-sheet" id="resumeSheet" data-theme="teal">
+
+            <!-- 1. LEFT COLUMN -->
+            <div class="col-left">
+                
+                <!-- Fixed Photo Wrap (Perfectly Round) -->
+                <div class="photo-wrap">
+                    @if (Has(p.sPhoto))
+                    {
+                        <img src="@p.sPhoto" class="photo" alt="Profile" />
+                    }
+                    else
+                    {
+                        <div class="photo-placeholder"><i class="fa fa-user"></i></div>
+                    }
+                </div>
+
+                @if (Has(p.Objective))
+                {
+                    <div>
+                        <div class="section-header-left">Profile</div>
+                        <div class="profile-text">@p.Objective</div>
+                    </div>
+                }
+
+                @{
+                    var skillGroups = new[]
+                    {
+                        ("Technical Skills", p.sTechnicalSkillIDs),
+                        ("Professional", p.sNonTechnicalSkillIDs),
+                        ("Medical Skills", p.sMedicalSkillIDs)
+                    }.Where(x => Has(x.Item2)).ToList();
+                }
+
+                @if (skillGroups.Any())
+                {
+                    <div style="margin-top: auto;"> 
+                        <div class="section-header-left">Pro Skills</div>
+                        @foreach (var group in skillGroups)
+                        {
+                            <ul class="skill-list-left">
+                                @foreach (var skill in group.Item2.Split(new[] { ',', ';', '|' }, StringSplitOptions.RemoveEmptyEntries))
+                                {
+                                    <li>
+                                        @skill.Trim() <span class="skill-dots">••••••</span>
+                                    </li>
+                                }
+                            </ul>
+                        }
+                    </div>
+                }
+            </div>
+
+            <!-- 2. MIDDLE COLUMN -->
+            <div class="col-mid">
+                
+                <!-- Intro Header -->
+                <div>
+                    <div class="intro-small">Hello, my name is</div>
+                    <div class="intro-large">
+                        @(Has(candidateName) ? candidateName : "Candidate Name") 
+                        @if(Has(candidateRole)) { <span class="intro-role">and I'm a @candidateRole.</span> }
+                    </div>
+                </div>
+
+                <!-- Experience -->
+                @{
+                    var internships = new[]
+                    {
+                        new { Name = p.sOrgName1, Title = p.sOrgIntTitle1, Duration = p.sOrgIntDuration1, Status = p.sOrgIntStatus1 },
+                        new { Name = p.sOrgName2, Title = p.sOrgIntTitle2, Duration = p.sOrgIntDuration2, Status = p.sOrgIntStatus2 },
+                        new { Name = p.sOrgName3, Title = p.sOrgIntTitle3, Duration = p.sOrgIntDuration3, Status = p.sOrgIntStatus3 },
+                        new { Name = p.sOrgName4, Title = p.sOrgIntTitle4, Duration = p.sOrgIntDuration4, Status = p.sOrgIntStatus4 }
+                    }.Where(x => Has(x.Name)).ToList();
+                }
+
+                @if (internships.Any())
+                {
+                    <div style="margin-top: 10px;">
+                        <div class="section-header-mid">Work Experience</div>
+                        @foreach (var exp in internships)
+                        {
+                            <div class="exp-item">
+                                <div class="exp-date">@GetLookupName(Model.InternshipDurations, exp.Duration)</div>
+                                <div class="exp-title">@(Has(GetLookupName(Model.InternshipTitles, exp.Title)) ? GetLookupName(Model.InternshipTitles, exp.Title) : "Role")</div>
+                                <div class="exp-company">@exp.Name</div>
+                                @if (Has(GetLookupName(Model.InternshipStatuses, exp.Status)))
+                                {
+                                    <div class="exp-desc">Status: @GetLookupName(Model.InternshipStatuses, exp.Status)</div>
+                                }
+                            </div>
+                        }
+                    </div>
+                }
+
+                <!-- Achievements (Placed here to balance space if experience is short) -->
+                @{
+                    var achievements = new[] { p.Achievements_Certification1, p.Achievements_Certification2, p.Achievements_Certification3 }.Where(Has).ToList();
+                }
+                @if (achievements.Any())
+                {
+                    <div style="margin-top: auto;"> 
+                        <div class="section-header-mid">Achievements</div>
+                        @foreach (var a in achievements)
+                        {
+                            <div class="exp-item" style="margin-bottom: 6px;">
+                                <div class="exp-title" style="border:none; margin-bottom: 0;">@a</div>
+                            </div>
+                        }
+                    </div>
+                }
+            </div>
+
+            <!-- 3. RIGHT COLUMN (Top and Bottom split) -->
+            <div class="col-right">
+                
+                <!-- Right Top (Theme Color) -->
+                <div class="col-right-top">
+                    
+                    <div>
+                        <div class="section-header-right">Contact Me</div>
+                        @if (Has(Model.CandidateEmail)) { <div class="contact-item">@Model.CandidateEmail</div> }
+                        @if (Has(Model.CandidatePhone)) { <div class="contact-item">@Model.CandidatePhone</div> }
+                        @if (Has(p.Pincode)) { 
+                            <div class="contact-item" id="rvAddress" data-country-id="@p.CountryID" data-state-id="@p.StateID" data-city-id="@p.CityID" data-pincode="@p.Pincode">
+                                @p.Pincode
+                            </div> 
+                        }
+                        @if (Has(p.Linkedin)) { <div class="contact-item">@p.Linkedin</div> }
+                        @if (Has(p.GitHub)) { <div class="contact-item">@p.GitHub</div> }
+                    </div>
+
+                    @if (HasNum(p.PG_Year) || HasNum(p.Graduation_Year) || HasNum(p.HSC_DIPLOMA_YEAR) || HasNum(p.SSC_YEAR))
+                    {
+                        <div style="margin-top: 15px;">
+                            <div class="section-header-right">Education</div>
+                            
+                            @if (HasNum(p.PG_Year)) {
+                                <div class="edu-item">
+                                    <div class="edu-date">@p.PG_Year</div>
+                                    <div class="edu-title">@GetLookupName(Model.Streams, p.PG_Stream)</div>
+                                    <div class="edu-sub">Division: @GetLookupName(Model.Divisions, p.PG_Division)</div>
+                                </div>
+                            }
+                            @if (HasNum(p.Graduation_Year)) {
+                                <div class="edu-item">
+                                    <div class="edu-date">@p.Graduation_Year</div>
+                                    <div class="edu-title">@GetLookupName(Model.Streams, p.Graduation_Stream)</div>
+                                    <div class="edu-sub">Division: @GetLookupName(Model.Divisions, p.Graduation_Division)</div>
+                                </div>
+                            }
+                            @if (HasNum(p.HSC_DIPLOMA_YEAR)) {
+                                <div class="edu-item">
+                                    <div class="edu-date">@p.HSC_DIPLOMA_YEAR</div>
+                                    <div class="edu-title">HSC / Diploma</div>
+                                    <div class="edu-sub">Division: @GetLookupName(Model.Divisions, p.HSC_DIPLOMA_DIVISION)</div>
+                                </div>
+                            }
+                            @if (HasNum(p.SSC_YEAR)) {
+                                <div class="edu-item">
+                                    <div class="edu-date">@p.SSC_YEAR</div>
+                                    <div class="edu-title">SSC / 10th</div>
+                                    <div class="edu-sub">Division: @GetLookupName(Model.Divisions, p.SSC_DIVISION)</div>
+                                </div>
+                            }
+                        </div>
+                    }
+
+                    @{
+                        var langItems = new List<(string Lang, string Star)>();
+                        for (int i = 1; i <= 8; i++)
+                        {
+                            var lang = typeof(ErJobPortal.Models.CandidateProfileModel).GetProperty($"sLanguage{i}")?.GetValue(p)?.ToString();
+                            var star = typeof(ErJobPortal.Models.CandidateProfileModel).GetProperty($"sLanguageStar{i}")?.GetValue(p)?.ToString();
+                            if (Has(lang)) { langItems.Add((lang, star)); }
+                        }
+                    }
+                    @if (langItems.Any())
+                    {
+                        <div style="margin-top: 15px;">
+                            <div class="section-header-right">Languages</div>
+                            @foreach (var l in langItems)
+                            {
+                                <div class="contact-item">@l.Lang @(Has(l.Star) ? $" - {l.Star}★" : "")</div>
+                            }
+                        </div>
+                    }
+                </div>
+
+                <!-- Right Bottom (Darker Theme Color) -->
+                <div class="col-right-bottom">
+                    
+                    @if (Has(p.sRefName1) || Has(p.sRefName2))
+                    {
+                        <div class="section-header-right" style="margin-bottom: 12px;">Reference</div>
+                        
+                        @if (Has(p.sRefName1)) {
+                            <div class="ref-item">
+                                <div class="ref-name">@p.sRefName1</div>
+                                <div class="ref-detail">@GetLookupName(Model.Relationships, p.sRefRelationName1)</div>
+                                @if(Has(p.sMobile1)) { <div class="ref-detail">@p.sMobile1</div> }
+                            </div>
+                        }
+                        
+                        @if (Has(p.sRefName2)) {
+                            <div class="ref-item" style="margin-top: 10px;">
+                                <div class="ref-name">@p.sRefName2</div>
+                                <div class="ref-detail">@GetLookupName(Model.Relationships, p.sRefRelationName2)</div>
+                                @if(Has(p.sMobile2)) { <div class="ref-detail">@p.sMobile2</div> }
+                            </div>
+                        }
+                    } 
+                    else if (Has(p.sHobbies)) 
+                    {
+                        <div class="section-header-right" style="margin-bottom: 12px;">Interests</div>
+                        <div class="contact-item">@p.sHobbies</div>
+                    }
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+
+    <!-- =========================================================
+         PDF & JS LOGIC (PRESERVED EXACTLY AS PROVIDED)
+    ========================================================== -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
+    <script>
+        /* =========================================================
+           THEME
+        ========================================================= */
+        document.addEventListener("DOMContentLoaded", function () {
+            const sheet = document.getElementById("resumeSheet");
+            const swatches = document.querySelectorAll(".theme-swatch");
+            const savedTheme = localStorage.getItem("resumeThemeV8") || "teal";
+
+            sheet.setAttribute("data-theme", savedTheme);
+
+            swatches.forEach(function (swatch) {
+                swatch.classList.toggle("active", swatch.dataset.theme === savedTheme);
+
+                swatch.addEventListener("click", function () {
+                    const theme = this.dataset.theme;
+                    sheet.setAttribute("data-theme", theme);
+                    
+                    swatches.forEach(function (item) {
+                        item.classList.remove("active");
+                    });
+                    this.classList.add("active");
+                    
+                    localStorage.setItem("resumeThemeV8", theme);
+                });
+            });
+
+            /* =================================================
+               ADDRESS
+            ================================================= */
+            const addressElements = document.querySelectorAll("[data-country-id]");
+            if (!addressElements.length) return;
+
+            const firstAddress = addressElements[0];
+            const countryID = firstAddress.getAttribute("data-country-id") || "";
+            const stateID = firstAddress.getAttribute("data-state-id") || "";
+            const cityID = firstAddress.getAttribute("data-city-id") || "";
+            const pincode = firstAddress.getAttribute("data-pincode") || "";
+
+            function renderAddress(cityName, stateName, countryName) {
+                const parts = [cityName, stateName, countryName, pincode].filter(value => value && value.trim());
+                const address = parts.join(", ");
+                addressElements.forEach(function (element) {
+                    element.textContent = address;
+                });
+            }
+
+            if (!countryID) {
+                renderAddress("", "", "");
+                return;
+            }
+
+            fetch("/Location/GetCountries")
+                .then(response => response.json())
+                .then(countries => {
+                    const country = countries.find(c => String(c.id) === String(countryID));
+                    const countryName = country ? country.name : "";
+                    const countryCode = country ? country.iso2 : countryID;
+
+                    if (!stateID) {
+                        renderAddress("", "", countryName);
+                        return;
+                    }
+
+                    return fetch("/Location/GetStates?countryCode=" + encodeURIComponent(countryCode))
+                        .then(response => response.json())
+                        .then(states => {
+                            const state = states.find(s => String(s.id) === String(stateID));
+                            const stateName = state ? state.name : "";
+                            const stateCode = state ? (state.stateCode || String(state.id).split(":")[1]) : "";
+
+                            if (!cityID) {
+                                renderAddress("", stateName, countryName);
+                                return;
+                            }
+
+                            return fetch("/Location/GetCities?countryCode=" + encodeURIComponent(countryCode) + "&stateCode=" + encodeURIComponent(stateCode))
+                                .then(response => response.json())
+                                .then(cities => {
+                                    const city = cities.find(c => String(c.id) === String(cityID));
+                                    const cityName = city ? city.name : "";
+                                    renderAddress(cityName, stateName, countryName);
+                                });
+                        });
+                })
+                .catch(error => console.log("Address resolution error:", error));
+        });
+
+        /* =========================================================
+           PDF DOWNLOAD
+        ========================================================= */
+        async function downloadResumePDF() {
+            const sheet = document.getElementById("resumeSheet");
+            const button = document.querySelector(".btn-download");
+            const original = button.innerHTML;
+
+            try {
+                button.disabled = true;
+                button.innerHTML = '<i class="fa fa-spinner fa-spin"></i>';
+
+                const images = sheet.querySelectorAll("img");
+                await Promise.all(
+                    Array.from(images).map(image =>
+                        image.complete ? Promise.resolve() : new Promise(resolve => {
+                            image.onload = resolve;
+                            image.onerror = resolve;
+                        })
+                    )
+                );
+
+                const rect = sheet.getBoundingClientRect();
+                const canvas = await html2canvas(sheet, {
+                    scale: 2,
+                    useCORS: true,
+                    allowTaint: false,
+                    backgroundColor: "#ffffff",
+                    logging: false,
+                    width: Math.round(rect.width),
+                    height: Math.round(rect.height)
+                });
+
+                const { jsPDF } = window.jspdf;
+                const pdf = new jsPDF({
+                    orientation: "landscape",
+                    unit: "mm",
+                    format: "a4",
+                    compress: true
+                });
+
+                const imgData = canvas.toDataURL("image/jpeg", .95);
+                pdf.addImage(imgData, "JPEG", 0, 0, 297, 210);
+                pdf.save((window.candidateName || "Resume") + ".pdf");
+            }
+            catch (error) {
+                console.error("PDF error:", error);
+                alert("Error generating PDF");
+            }
+            finally {
+                button.disabled = false;
+                button.innerHTML = original;
+            }
+        }
+
+        window.candidateName = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(candidateName ?? "Resume"));
+    </script>
+</body>
+</html>

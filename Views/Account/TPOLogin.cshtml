@@ -1,0 +1,498 @@
+﻿@model ErJobPortal.Models.TPOLogin
+
+@{
+    ViewData["Title"] = "TPO Login";
+    Layout = null;
+}
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="utf-8" />
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0" />
+
+    <title>TPO Login</title>
+
+
+    <!-- =========================================================
+         BOOTSTRAP
+    ========================================================== -->
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+          rel="stylesheet" />
+
+
+    <!-- =========================================================
+         FONT AWESOME
+    ========================================================== -->
+
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"
+          rel="stylesheet" />
+
+
+    <!-- =========================================================
+         GOOGLE FONT
+    ========================================================== -->
+
+    <link rel="preconnect"
+          href="https://fonts.googleapis.com" />
+
+    <link rel="preconnect"
+          href="https://fonts.gstatic.com"
+          crossorigin />
+
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
+          rel="stylesheet" />
+
+
+    <!-- =========================================================
+         TPO LOGIN CSS
+    ========================================================== -->
+
+    <link rel="stylesheet"
+          href="~/css/CandidateLogin.css" />
+
+</head>
+
+
+<body>
+
+    <!-- =========================================================
+         MAIN LOGIN PAGE
+    ========================================================== -->
+
+    <div class="candidate-login-page">
+
+
+        <!-- =====================================================
+             BACKGROUND DECORATION
+        ====================================================== -->
+
+        <div class="candidate-bg-circle candidate-bg-circle-one"></div>
+
+        <div class="candidate-bg-circle candidate-bg-circle-two"></div>
+
+
+        <!-- =====================================================
+             LOGIN WRAPPER
+        ====================================================== -->
+
+        <div class="candidate-login-wrapper">
+
+
+            <!-- =================================================
+                 LOGIN CARD
+            ================================================== -->
+
+            <div class="candidate-login-card">
+
+
+                <!-- =================================================
+                     BRAND
+                ================================================== -->
+
+                <div class="candidate-login-brand">
+
+                    <div class="candidate-login-icon">
+
+                        <i class="fas fa-user-tie"></i>
+
+                    </div>
+
+
+                    <h2>
+                        TPO Login
+                    </h2>
+
+
+                    <p>
+                        Sign in to access TPO account
+                    </p>
+
+                </div>
+
+
+                <!-- =================================================
+                     ACCOUNT TYPE SWITCH
+                ================================================== -->
+
+                <div class="candidate-account-switch">
+
+
+                    <!-- =================================================
+                         CANDIDATE
+                    ================================================== -->
+
+                    <a asp-controller="Account"
+                       asp-action="CandidateLogin"
+                       class="candidate-switch-link">
+
+                        <i class="fa-solid fa-user-graduate"></i>
+
+                        <span>
+                            Candidate
+                        </span>
+
+                    </a>
+
+
+                    <!-- =================================================
+                         ORGANIZATION
+                    ================================================== -->
+
+                    <a asp-controller="Account"
+                       asp-action="OrganizationLogin"
+                       class="candidate-switch-link">
+
+                        <i class="fa-solid fa-building"></i>
+
+                        <span>
+                            Organization
+                        </span>
+
+                    </a>
+
+
+                    <!-- =================================================
+                         TPO
+                    ================================================== -->
+
+                    <a asp-controller="Account"
+                       asp-action="TPOLogin"
+                       class="candidate-switch-link active">
+
+                        <i class="fa-solid fa-user-tie"></i>
+
+                        <span>
+                            TPO
+                        </span>
+
+                    </a>
+
+
+                </div>
+
+
+                <!-- =================================================
+                     SECURITY BADGE
+                ================================================== -->
+
+                <div class="candidate-security-badge">
+
+                    <i class="fas fa-lock"></i>
+
+                    Secure TPO Access
+
+                </div>
+
+
+                <!-- =================================================
+                     ERROR MESSAGE
+                ================================================== -->
+                @if (TempData["Error"] != null)
+                {
+                    <div class="candidate-login-error">
+
+                        <i class="fas fa-circle-exclamation"></i>
+
+                        <span>
+                            @TempData["Error"]
+                        </span>
+
+                    </div>
+                }
+
+
+                <!-- =================================================
+                     SUCCESS MESSAGE
+                ================================================== -->
+                @if (TempData["Success"] != null)
+                {
+                    <div class="candidate-login-success">
+
+                        <i class="fas fa-circle-check"></i>
+
+                        <span>
+                            @TempData["Success"]
+                        </span>
+
+                    </div>
+                }
+
+
+                <!-- =================================================
+                     LOGIN FORM
+                ================================================== -->
+
+                <form asp-controller="Account"
+                      asp-action="TPOLogin"
+                      method="post">
+
+
+                    @Html.AntiForgeryToken()
+
+
+                    <!-- =================================================
+                         VALIDATION SUMMARY
+                    ================================================== -->
+
+                    <div asp-validation-summary="All"
+                         class="text-danger candidate-validation-summary">
+                    </div>
+
+
+                    <!-- =================================================
+                         COLLEGE EMAIL
+                    ================================================== -->
+
+                    <div class="candidate-form-group">
+
+                        <label asp-for="CollegeMailID"
+                               class="candidate-form-label">
+
+                            College Mail ID
+
+                        </label>
+
+
+                        <div class="candidate-input-wrapper">
+
+
+                            <i class="fas fa-envelope candidate-input-icon"></i>
+
+
+                            <input asp-for="CollegeMailID"
+                                   class="candidate-input"
+                                   type="email"
+                                   placeholder="College email address"
+                                   autocomplete="username" />
+
+
+                        </div>
+
+
+                        <span asp-validation-for="CollegeMailID"
+                              class="candidate-field-validation">
+                        </span>
+
+                    </div>
+
+
+                    <!-- =================================================
+                         PASSWORD
+                    ================================================== -->
+
+                    <div class="candidate-form-group">
+
+                        <label asp-for="Password"
+                               class="candidate-form-label">
+
+                            Password
+
+                        </label>
+
+
+                        <div class="candidate-input-wrapper">
+
+
+                            <i class="fas fa-lock candidate-input-icon"></i>
+
+
+                            <input asp-for="Password"
+                                   id="tpoPassword"
+                                   class="candidate-input"
+                                   type="password"
+                                   placeholder="Password"
+                                   autocomplete="current-password" />
+
+
+                            <!-- PASSWORD TOGGLE -->
+
+                            <button type="button"
+                                    class="candidate-password-toggle"
+                                    id="tpoTogglePassword"
+                                    aria-label="Show password">
+
+                                <i class="fas fa-eye"></i>
+
+                            </button>
+
+
+                        </div>
+
+
+                        <span asp-validation-for="Password"
+                              class="candidate-field-validation">
+                        </span>
+
+                    </div>
+
+                    <div class="candidate-password-actions">
+
+                        <a asp-controller="Account"
+                           asp-action="TPOForgotPassword"
+                           class="candidate-password-link">
+
+                            <i class="fas fa-circle-question"></i>
+
+                            <span>Forgot Password?</span>
+
+                        </a>
+
+
+                        <span class="candidate-password-divider"></span>
+
+
+                        <a asp-controller="Account"
+                           asp-action="TPORestPassword"
+                           class="candidate-password-link">
+
+                            <i class="fas fa-key"></i>
+
+                            <span>Reset Password</span>
+
+                        </a>
+
+                    </div>
+
+
+
+                    <!-- =================================================
+                         LOGIN BUTTON
+                    ================================================== -->
+
+                    <button type="submit"
+                            class="candidate-login-button">
+
+                        <i class="fas fa-right-to-bracket"></i>
+
+                        <span>
+                            Login
+                        </span>
+
+                    </button>
+
+
+                </form>
+
+
+                <!-- =================================================
+                     FOOTER
+                ================================================== -->
+
+                <div class="candidate-login-footer">
+
+
+                    <div>
+
+                        <i class="fas fa-user-check"></i>
+
+                        Don't have a TPO account?
+
+
+                        <a asp-controller="Account"
+                           asp-action="TPORegister"
+                           class="candidate-register-link">
+
+                            Register
+
+                        </a>
+
+                    </div>
+
+
+                </div>
+
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- =========================================================
+         PASSWORD TOGGLE SCRIPT
+    ========================================================== -->
+
+    <script>
+
+            document.addEventListener("DOMContentLoaded", function() {
+
+
+                const passwordInput =
+                    document.getElementById("tpoPassword");
+
+
+                const toggleButton =
+                    document.getElementById("tpoTogglePassword");
+
+
+                if (!passwordInput || !toggleButton) {
+                    return;
+                }
+
+
+                toggleButton.addEventListener("click", function() {
+
+
+                    const icon =
+                        this.querySelector("i");
+
+
+                    if (passwordInput.type === "password") {
+
+
+                        passwordInput.type = "text";
+
+
+                        icon.classList.remove("fa-eye");
+
+                        icon.classList.add("fa-eye-slash");
+
+
+                        this.setAttribute(
+                            "aria-label",
+                            "Hide password"
+                        );
+
+
+                    }
+                    else {
+
+
+                        passwordInput.type = "password";
+
+
+                        icon.classList.remove("fa-eye-slash");
+
+                        icon.classList.add("fa-eye");
+
+
+                        this.setAttribute(
+                            "aria-label",
+                            "Show password"
+                        );
+
+                    }
+
+                });
+
+            });
+
+    </script>
+
+
+    <!-- =========================================================
+         VALIDATION
+    ========================================================== -->
+
+    <partial name="_ValidationScriptsPartial" />
+
+</body>
+
+</html>

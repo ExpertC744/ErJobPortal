@@ -1,0 +1,173 @@
+﻿@model List<ErJobPortal.Models.TraineeSelectionViewModel>
+
+@{
+    Layout = "~/Views/Shared/_DashboardLayout.cshtml";
+
+    ViewData["Title"] = "Trainee Selection";
+    ViewData["Panel"] = "Candidate";
+    ViewData["UserName"] = "Candidate";
+}
+
+<div class="container-fluid">
+
+   
+
+
+    <!-- =====================================================
+         MASTER TABLE CARD
+    ====================================================== -->
+
+    <div class="master-table-container">
+
+
+      
+
+
+        <!-- =================================================
+             TABLE
+        ================================================== -->
+
+        <div class="table-responsive">
+             <!-- =====================================================
+         PAGE HEADING
+    ====================================================== -->
+
+    <div class="mb-4">
+
+        <h1 class="mb-2">
+            Trainee Selection
+        </h1>
+
+        <p class="mb-0 text-muted">
+            @ViewBag.CandidateCode
+        </p>
+
+    </div>
+            <table id="candidateTable"
+                   class="master-data-table">
+
+                <thead>
+
+                    <tr>
+
+                        <th>
+                            Sr. No
+                        </th>
+
+                        <th>
+                            Organization Name
+                        </th>
+
+                        <th>
+                            Position
+                        </th>
+
+                        <th>
+                            Final Status
+                        </th>
+
+                        <th>
+                            Registration Date
+                        </th>
+
+                    </tr>
+
+                </thead>
+
+
+                <tbody>
+
+                    @if (Model != null && Model.Count > 0)
+                    {
+                        int srNo = 1;
+
+                        foreach (var item in Model)
+                        {
+                            <tr>
+
+                                <!-- SR NO -->
+
+                                <td class="master-id">
+                                    @srNo
+                                </td>
+
+
+                                <!-- ORGANIZATION -->
+
+                                <td>
+                                    @item.OrganizationName
+                                </td>
+
+
+                                <!-- POSITION -->
+
+                                <td>
+                                    @item.Position
+                                </td>
+
+
+                                <!-- FINAL STATUS -->
+
+                                <td>
+
+                                    @if (!string.IsNullOrWhiteSpace(
+                                        item.FinalStatus))
+                                    {
+                                        <span class="master-status">
+                                            @item.FinalStatus
+                                        </span>
+                                    }
+                                    else
+                                    {
+                                        <span>
+                                            -
+                                        </span>
+                                    }
+
+                                </td>
+
+
+                                <!-- REGISTRATION DATE -->
+
+                                <td>
+                                    @item.RegistrationDate?
+                                        .ToString("dd-MM-yyyy")
+                                </td>
+
+                            </tr>
+
+                            srNo++;
+                        }
+                    }
+                    else
+                    {
+                        <tr>
+
+                            <td colspan="5"
+                                class="text-center">
+
+                                No entries found
+
+                            </td>
+
+                        </tr>
+                    }
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+
+        <!-- =================================================
+             PAGE INFO
+        ================================================== -->
+
+        <div id="candidatePageInfo"
+             class="master-page-info text-center d-none">
+        </div>
+
+    </div>
+
+</div>

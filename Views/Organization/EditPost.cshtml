@@ -775,7 +775,7 @@
                 <div class="grid">
 
                     <!-- COUNTRY -->
-
+                    <!-- COUNTRY -->
                     <div class="field">
 
                         <label>
@@ -783,8 +783,8 @@
                             <span class="req">*</span>
                         </label>
 
-                        <select asp-for="sCountryCode"
-                                id="sCountryCode"
+                        <select asp-for="sCountryName"
+                                id="sCountryName"
                                 class="form-select"
                                 required>
 
@@ -798,7 +798,6 @@
 
 
                     <!-- STATE -->
-
                     <div class="field">
 
                         <label>
@@ -806,8 +805,8 @@
                             <span class="req">*</span>
                         </label>
 
-                        <select asp-for="sStateCode"
-                                id="sStateCode"
+                        <select asp-for="sStateName"
+                                id="sStateName"
                                 class="form-select"
                                 required>
 
@@ -821,7 +820,6 @@
 
 
                     <!-- CITY -->
-
                     <div class="field">
 
                         <label>
@@ -829,12 +827,12 @@
                             <span class="req">*</span>
                         </label>
 
-                        <select asp-for="nCityID"
-                                id="nCityID"
+                        <select asp-for="nCityName"
+                                id="nCityName"
                                 class="form-select"
                                 required>
 
-                            <option value="0">
+                            <option value="">
                                 -- Select City --
                             </option>
 
@@ -1810,38 +1808,64 @@
 
     <script>
 
-        document.addEventListener(
-            "DOMContentLoaded",
-            function () {
+        document.addEventListener("DOMContentLoaded", function () {
 
-                const countryDropdown =
-                    document.getElementById("sCountryCode");
+            // ============================================================
+            // DROPDOWNS
+            // ============================================================
 
-                const stateDropdown =
-                    document.getElementById("sStateCode");
+            const countryDropdown =
+                document.getElementById("sCountryName");
 
-                const cityDropdown =
-                    document.getElementById("nCityID");
+            const stateDropdown =
+                document.getElementById("sStateName");
 
-
-                const existingCountry =
-                    "@Model.sCountryCode";
-
-                const existingState =
-                    "@Model.sStateCode";
-
-                const existingCity =
-                    "@Model.nCityID";
+            const cityDropdown =
+                document.getElementById("nCityName");
 
 
-                // =====================================================
-                // LOAD COUNTRIES
-                // =====================================================
+            if (!countryDropdown ||
+                !stateDropdown ||
+                !cityDropdown) {
 
-                fetch(
-                    '@Url.Action("GetCountries", "Organization")'
-                )
+                console.error(
+                    "Country / State / City dropdown not found."
+                );
 
+                return;
+            }
+
+
+            // ============================================================
+            // EXISTING DATABASE VALUES
+            // ============================================================
+
+            const existingCountry =
+                @Html.Raw(System.Text.Json.JsonSerializer.Serialize(
+                        Model.sCountryName ?? ""
+                                ));
+
+            const existingState =
+                @Html.Raw(System.Text.Json.JsonSerializer.Serialize(
+                                                Model.sStateName ?? ""
+                                ));
+
+            const existingCity =
+                @Html.Raw(System.Text.Json.JsonSerializer.Serialize(
+                                                Model.nCityName ?? ""
+                                ));
+
+
+            console.log("Existing Country:", existingCountry);
+            console.log("Existing State:", existingState);
+            console.log("Existing City:", existingCity);
+
+
+            // ============================================================
+            // LOAD COUNTRIES
+            // ============================================================
+
+            fetch('@Url.Action("GetCountries", "Organization")')
                 .then(response => {
 
                     if (!response.ok) {
@@ -1862,41 +1886,100 @@
                     countryDropdown.innerHTML =
                         '<option value="">-- Select Country --</option>';
 
+
+                    if (!countries ||
+                        countries.length === 0) {
+
+                        return;
+                    }
+
+
                     countries.forEach(country => {
 
                         const option =
                             document.createElement("option");
 
+
+                        // =================================================
+                        // IMPORTANT
+                        // VALUE = COUNTRY NAME
+                        // This is submitted to C#
+                        // =================================================
+
                         option.value =
-                            country.iso2;
+                            country.name;
+
 
                         option.textContent =
                             country.name;
 
+
+                        // =================================================
+                        // API CODE
+                        // Used only internally for API calls
+                        // =================================================
+
+                        option.dataset.code =
+                            country.iso2;
+
+
+                        // =================================================
+                        // SELECT EXISTING COUNTRY
+                        // =================================================
+
                         if (
-                            country.iso2 ===
-                            existingCountry
+                            country.name.toLowerCase() ===
+                            existingCountry.toLowerCase()
                         ) {
 
                             option.selected = true;
 
                         }
 
-                        countryDropdown.appendChild(
-                            option
-                        );
+
+                        countryDropdown.appendChild(option);
 
                     });
 
 
-                    // Automatically load existing state
+                    // =================================================
+                    // AFTER COUNTRIES LOAD
+                    // LOAD EXISTING STATE
+                    // =================================================
 
                     if (existingCountry) {
 
-                        loadStates(
-                            existingCountry,
-                            existingState
-                        );
+                        const selectedCountry =
+                            [...countryDropdown.options].find(
+                                option =>
+                                    option.value.toLowerCase() ===
+                                    existingCountry.toLowerCase()
+                            );
+
+
+                        if (selectedCountry) {
+
+                            const countryCode =
+                                selectedCountry.dataset.code;
+
+
+                            console.log(
+                                "Existing Country Name:",
+                                selectedCountry.value
+                            );
+
+                            console.log(
+                                "Existing Country Code:",
+                                countryCode
+                            );
+
+
+                            loadStates(
+                                countryCode,
+                                existingState
+                            );
+
+                        }
 
                     }
 
@@ -1912,57 +1995,115 @@
                 });
 
 
-                // =====================================================
-                // COUNTRY CHANGE
-                // =====================================================
+            // ============================================================
+            // COUNTRY CHANGE
+            // ============================================================
 
-                countryDropdown.addEventListener(
-                    "change",
-                    function () {
+            countryDropdown.addEventListener(
+                "change",
+                function () {
 
-                        const countryCode =
-                            this.value;
-
-                        stateDropdown.innerHTML =
-                            '<option value="">-- Select State --</option>';
-
-                        cityDropdown.innerHTML =
-                            '<option value="0">-- Select City --</option>';
-
-                        stateDropdown.disabled =
-                            true;
-
-                        cityDropdown.disabled =
-                            true;
+                    const selectedOption =
+                        this.options[this.selectedIndex];
 
 
-                        if (!countryCode) {
-                            return;
-                        }
+                    // =================================================
+                    // COUNTRY NAME
+                    // Goes to database/model
+                    // =================================================
+
+                    const countryName =
+                        selectedOption.value;
 
 
-                        loadStates(
-                            countryCode,
-                            ""
-                        );
+                    // =================================================
+                    // COUNTRY CODE
+                    // Used for API only
+                    // =================================================
+
+                    const countryCode =
+                        selectedOption.dataset.code;
+
+
+                    console.log(
+                        "Country Name:",
+                        countryName
+                    );
+
+                    console.log(
+                        "Country Code:",
+                        countryCode
+                    );
+
+
+                    // =================================================
+                    // RESET STATE
+                    // =================================================
+
+                    stateDropdown.innerHTML =
+                        '<option value="">-- Select State --</option>';
+
+                    stateDropdown.disabled = true;
+
+
+                    // =================================================
+                    // RESET CITY
+                    // =================================================
+
+                    cityDropdown.innerHTML =
+                        '<option value="">-- Select City --</option>';
+
+                    cityDropdown.disabled = true;
+
+
+                    if (!countryCode) {
+
+                        return;
 
                     }
+
+
+                    // =================================================
+                    // LOAD STATES
+                    // =================================================
+
+                    loadStates(
+                        countryCode,
+                        ""
+                    );
+
+                }
+            );
+
+
+            // ============================================================
+            // LOAD STATES
+            // ============================================================
+
+            function loadStates(
+                countryCode,
+                selectedState
+            ) {
+
+                console.log(
+                    "Loading states for country code:",
+                    countryCode
                 );
 
 
-                // =====================================================
-                // LOAD STATES
-                // =====================================================
+                const stateUrl =
+                    '@Url.Action("GetStates", "Organization")' +
+                    '?countryCode=' +
+                    encodeURIComponent(countryCode);
 
-                function loadStates(
-                    countryCode,
-                    selectedState) {
 
-                    fetch(
-                        '@Url.Action("GetStates", "Organization")' +
-                        '?countryCode=' +
-                        encodeURIComponent(countryCode)
-                    )
+                console.log(
+                    "State URL:",
+                    stateUrl
+                );
+
+
+                fetch(stateUrl)
 
                     .then(response => {
 
@@ -1984,6 +2125,10 @@
                         stateDropdown.innerHTML =
                             '<option value="">-- Select State --</option>';
 
+
+                        stateDropdown.disabled = true;
+
+
                         if (
                             !states ||
                             states.length === 0
@@ -1997,25 +2142,52 @@
                         }
 
 
+                        // =================================================
+                        // ADD STATES
+                        // =================================================
+
                         states.forEach(state => {
 
                             const option =
                                 document.createElement("option");
 
+
+                            // =================================================
+                            // IMPORTANT
+                            // VALUE = STATE NAME
+                            // This will be submitted to C#
+                            // =================================================
+
                             option.value =
-                                state.stateCode;
+                                state.name;
+
 
                             option.textContent =
                                 state.name;
 
+
+                            // =================================================
+                            // STATE CODE
+                            // Used only for city API
+                            // =================================================
+
+                            option.dataset.code =
+                                state.stateCode;
+
+
+                            // =================================================
+                            // SELECT EXISTING STATE
+                            // =================================================
+
                             if (
-                                state.stateCode ===
-                                selectedState
+                                state.name.toLowerCase() ===
+                                selectedState.toLowerCase()
                             ) {
 
                                 option.selected = true;
 
                             }
+
 
                             stateDropdown.appendChild(
                                 option
@@ -2024,19 +2196,47 @@
                         });
 
 
-                        stateDropdown.disabled =
-                            false;
+                        stateDropdown.disabled = false;
 
 
-                        // Load existing city
+                        // =================================================
+                        // LOAD EXISTING CITY
+                        // =================================================
 
                         if (selectedState) {
 
-                            loadCities(
-                                countryCode,
-                                selectedState,
-                                existingCity
-                            );
+                            const selectedStateOption =
+                                [...stateDropdown.options].find(
+                                    option =>
+                                        option.value.toLowerCase() ===
+                                        selectedState.toLowerCase()
+                                );
+
+
+                            if (selectedStateOption) {
+
+                                const stateCode =
+                                    selectedStateOption.dataset.code;
+
+
+                                console.log(
+                                    "Existing State Name:",
+                                    selectedStateOption.value
+                                );
+
+                                console.log(
+                                    "Existing State Code:",
+                                    stateCode
+                                );
+
+
+                                loadCities(
+                                    countryCode,
+                                    stateCode,
+                                    existingCity
+                                );
+
+                            }
 
                         }
 
@@ -2051,68 +2251,157 @@
 
                     });
 
-                }
+            }
 
 
-                // =====================================================
-                // STATE CHANGE
-                // =====================================================
+            // ============================================================
+            // STATE CHANGE
+            // ============================================================
 
-                stateDropdown.addEventListener(
-                    "change",
-                    function () {
+            stateDropdown.addEventListener(
+                "change",
+                function () {
 
-                        const countryCode =
-                            countryDropdown.value;
-
-                        const stateCode =
-                            this.value;
-
-                        cityDropdown.innerHTML =
-                            '<option value="0">-- Select City --</option>';
-
-                        cityDropdown.disabled =
-                            true;
+                    const selectedCountry =
+                        countryDropdown.options[
+                            countryDropdown.selectedIndex
+                        ];
 
 
-                        if (
-                            !countryCode ||
-                            !stateCode
-                        ) {
-
-                            return;
-
-                        }
+                    const selectedState =
+                        stateDropdown.options[
+                            stateDropdown.selectedIndex
+                        ];
 
 
-                        loadCities(
-                            countryCode,
-                            stateCode,
-                            0
-                        );
+                    if (!selectedCountry ||
+                        !selectedState) {
+
+                        return;
 
                     }
+
+
+                    // =================================================
+                    // COUNTRY CODE
+                    // API ONLY
+                    // =================================================
+
+                    const countryCode =
+                        selectedCountry.dataset.code;
+
+
+                    // =================================================
+                    // STATE NAME
+                    // DATABASE VALUE
+                    // =================================================
+
+                    const stateName =
+                        selectedState.value;
+
+
+                    // =================================================
+                    // STATE CODE
+                    // API ONLY
+                    // =================================================
+
+                    const stateCode =
+                        selectedState.dataset.code;
+
+
+                    console.log(
+                        "Country Name:",
+                        selectedCountry.value
+                    );
+
+                    console.log(
+                        "Country Code:",
+                        countryCode
+                    );
+
+                    console.log(
+                        "State Name:",
+                        stateName
+                    );
+
+                    console.log(
+                        "State Code:",
+                        stateCode
+                    );
+
+
+                    // =================================================
+                    // RESET CITY
+                    // =================================================
+
+                    cityDropdown.innerHTML =
+                        '<option value="">-- Select City --</option>';
+
+                    cityDropdown.disabled = true;
+
+
+                    if (!countryCode ||
+                        !stateCode) {
+
+                        return;
+
+                    }
+
+
+                    // =================================================
+                    // LOAD CITIES
+                    // =================================================
+
+                    loadCities(
+                        countryCode,
+                        stateCode,
+                        ""
+                    );
+
+                }
+            );
+
+
+            // ============================================================
+            // LOAD CITIES
+            // ============================================================
+
+            function loadCities(
+                countryCode,
+                stateCode,
+                selectedCity
+            ) {
+
+                console.log(
+                    "Loading cities..."
+                );
+
+                console.log(
+                    "Country Code:",
+                    countryCode
+                );
+
+                console.log(
+                    "State Code:",
+                    stateCode
                 );
 
 
-                // =====================================================
-                // LOAD CITIES
-                // =====================================================
-
-                function loadCities(
-                    countryCode,
-                    stateCode,
-                    selectedCity) {
-
-                    const url =
-                        '@Url.Action("GetCities", "Organization")' +
-                        '?countryCode=' +
-                        encodeURIComponent(countryCode) +
-                        '&stateCode=' +
-                        encodeURIComponent(stateCode);
+                const cityUrl =
+                    '@Url.Action("GetCities", "Organization")' +
+                    '?countryCode=' +
+                    encodeURIComponent(countryCode) +
+                    '&stateCode=' +
+                    encodeURIComponent(stateCode);
 
 
-                    fetch(url)
+                console.log(
+                    "City URL:",
+                    cityUrl
+                );
+
+
+                fetch(cityUrl)
 
                     .then(response => {
 
@@ -2132,7 +2421,10 @@
                     .then(cities => {
 
                         cityDropdown.innerHTML =
-                            '<option value="0">-- Select City --</option>';
+                            '<option value="">-- Select City --</option>';
+
+
+                        cityDropdown.disabled = true;
 
 
                         if (
@@ -2141,33 +2433,50 @@
                         ) {
 
                             cityDropdown.innerHTML =
-                                '<option value="0">No cities found</option>';
+                                '<option value="">No cities found</option>';
 
                             return;
 
                         }
 
 
+                        // =================================================
+                        // ADD CITIES
+                        // =================================================
+
                         cities.forEach(city => {
 
                             const option =
                                 document.createElement("option");
 
+
+                            // =================================================
+                            // IMPORTANT
+                            // VALUE = CITY NAME
+                            // This is submitted to C#
+                            // =================================================
+
                             option.value =
-                                city.id;
+                                city.name;
+
 
                             option.textContent =
                                 city.name;
 
+
+                            // =================================================
+                            // SELECT EXISTING CITY
+                            // =================================================
+
                             if (
-                                String(city.id) ===
-                                String(selectedCity)
+                                city.name.toLowerCase() ===
+                                selectedCity.toLowerCase()
                             ) {
 
-                                option.selected =
-                                    true;
+                                option.selected = true;
 
                             }
+
 
                             cityDropdown.appendChild(
                                 option
@@ -2176,8 +2485,12 @@
                         });
 
 
-                        cityDropdown.disabled =
-                            false;
+                        cityDropdown.disabled = false;
+
+
+                        console.log(
+                            "Cities loaded successfully."
+                        );
 
                     })
 
@@ -2190,10 +2503,52 @@
 
                     });
 
-                }
+            }
+
+
+            // ============================================================
+            // ENABLE STATE & CITY BEFORE SUBMIT
+            // ============================================================
+
+            const form =
+                countryDropdown.closest("form");
+
+
+            if (form) {
+
+                form.addEventListener(
+                    "submit",
+                    function () {
+
+                        // IMPORTANT:
+                        // Disabled select elements are NOT submitted.
+
+                        stateDropdown.disabled = false;
+
+                        cityDropdown.disabled = false;
+
+
+                        console.log(
+                            "Country:",
+                            countryDropdown.value
+                        );
+
+                        console.log(
+                            "State:",
+                            stateDropdown.value
+                        );
+
+                        console.log(
+                            "City:",
+                            cityDropdown.value
+                        );
+
+                    }
+                );
 
             }
-        );
+
+        });
 
     </script>
 

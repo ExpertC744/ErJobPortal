@@ -1,0 +1,165 @@
+﻿@model List<OrganizationInterestedViewModel>
+
+@{
+    Layout = "~/Views/Shared/_DashboardLayout.cshtml";
+
+    ViewData["Title"] = "Organization Interested";
+    ViewData["Panel"] = "Candidate";
+    ViewData["UserName"] = "Candidate";
+}
+
+<div class="container-fluid">
+
+  
+
+
+    <!-- MASTER TABLE CARD -->
+    <div class="master-table-container">
+
+        
+
+
+        <!-- TABLE -->
+        <div class="table-responsive">
+              <!-- PAGE HEADING -->
+    <div class="mb-4">
+
+        <h1 class="mb-2">
+            Organization Interested
+        </h1>
+
+        <p class="mb-0 text-muted">
+            @ViewBag.CandidateCode
+        </p>
+
+    </div>
+            <table id="candidateTable"
+                   class="master-data-table">
+
+                <thead>
+
+                    <tr>
+
+                        <th>
+                            Sr. No
+                        </th>
+
+                        <th>
+                            Organization Name
+                        </th>
+
+                        <th>
+                            Organization Url
+                        </th>
+
+                        <th>
+                            Contact Person Name
+                        </th>
+
+                        <th>
+                            Designation
+                        </th>
+
+                        <th>
+                            Apply Status
+                        </th>
+
+                    </tr>
+
+                </thead>
+
+
+                <tbody>
+
+                    @if (Model != null && Model.Count > 0)
+                    {
+                        int srNo = 1;
+
+                        foreach (var item in Model)
+                        {
+                            <tr>
+
+                                <!-- SR NO -->
+                                <td class="master-id">
+                                    @srNo
+                                </td>
+
+
+                                <!-- ORGANIZATION NAME -->
+                                <td>
+                                    @item.OrganizationName
+                                </td>
+
+
+                                <!-- ORGANIZATION URL -->
+                                <td>
+
+                                    @if (!string.IsNullOrWhiteSpace(
+                                        item.OrganizationUrl))
+                                    {
+                                        <a href="@item.OrganizationUrl"
+                                           target="_blank"
+                                           class="master-link">
+
+                                            Visit
+
+                                        </a>
+                                    }
+                                    else
+                                    {
+                                        <span>-</span>
+                                    }
+
+                                </td>
+
+
+                                <!-- CONTACT PERSON -->
+                                <td>
+                                    @item.ContactPersonName
+                                </td>
+
+
+                                <!-- DESIGNATION -->
+                                <td>
+                                    @item.Designation
+                                </td>
+
+
+                                <!-- APPLY STATUS -->
+                                <td>
+
+                                    @if (!string.IsNullOrWhiteSpace(
+                                        item.ApplyStatus))
+                                    {
+                                        <span class="master-status">
+                                            @item.ApplyStatus
+                                        </span>
+                                    }
+                                    else
+                                    {
+                                        <span>-</span>
+                                    }
+
+                                </td>
+
+                            </tr>
+
+                            srNo++;
+                        }
+                    }
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+
+        <!-- PAGE INFO -->
+        <div id="candidatePageInfo"
+             class="master-page-info text-center d-none">
+        </div>
+
+    </div>
+
+</div>

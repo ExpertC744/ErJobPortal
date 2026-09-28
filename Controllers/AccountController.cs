@@ -754,5 +754,652 @@ public IActionResult OrganizationResetPassword()
 
 
 
+
+        //================================//
+        //TPORegistration//
+        //================================//
+        // shrirang 23/09/26
+        // ==========================================================
+        // TPO REGISTRATION - GET
+        // ==========================================================
+
+        [HttpGet]
+        public IActionResult TPORegister()
+        {
+            return View();
+        }
+
+
+        // ==========================================================
+        // TPO REGISTRATION - POST
+        // ==========================================================
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public IActionResult TPORegister(TPORegistration model)
+        {
+            try
+            {
+                // ==========================================================
+                // STATIC OTP
+                // ==========================================================
+
+                if (model.OTP != "123456")
+                {
+                    ModelState.AddModelError(
+                        "OTP",
+                        "Invalid OTP. Please enter 123456."
+                    );
+                }
+
+
+                // ==========================================================
+                // CHECK REQUIRED FILES
+                // ==========================================================
+
+                if (model.SupportingDocument1File == null ||
+                    model.SupportingDocument1File.Length == 0)
+                {
+                    ModelState.AddModelError(
+                        "SupportingDocument1File",
+                        "Supporting Document 1 is required."
+                    );
+                }
+
+                if (model.SupportingDocument2File == null ||
+                    model.SupportingDocument2File.Length == 0)
+                {
+                    ModelState.AddModelError(
+                        "SupportingDocument2File",
+                        "Supporting Document 2 is required."
+                    );
+                }
+
+                if (model.ProfilePhotoFile == null ||
+                    model.ProfilePhotoFile.Length == 0)
+                {
+                    ModelState.AddModelError(
+                        "ProfilePhotoFile",
+                        "Profile Photo is required."
+                    );
+                }
+
+
+                // ==========================================================
+                // NOW CHECK MODEL
+                // ==========================================================
+
+                if (!ModelState.IsValid)
+                {
+                    return View(model);
+                }
+
+
+                // ==========================================================
+                // UPLOAD FOLDER
+                // ==========================================================
+
+                string uploadFolder = Path.Combine(
+                    Directory.GetCurrentDirectory(),
+                    "wwwroot",
+                    "uploads",
+                    "tpo"
+                );
+
+                if (!Directory.Exists(uploadFolder))
+                {
+                    Directory.CreateDirectory(uploadFolder);
+                }
+
+
+                // ==========================================================
+                // DOCUMENT 1
+                // ==========================================================
+
+                string[] allowedDocumentExtensions =
+                {
+            ".pdf",
+            ".jpg",
+            ".jpeg",
+            ".png"
+        };
+
+                string extension1 =
+                    Path.GetExtension(
+                        model.SupportingDocument1File.FileName
+                    ).ToLowerInvariant();
+
+                if (!allowedDocumentExtensions.Contains(extension1))
+                {
+                    ModelState.AddModelError(
+                        "SupportingDocument1File",
+                        "Only PDF, JPG, JPEG and PNG files are allowed."
+                    );
+
+                    return View(model);
+                }
+
+                if (model.SupportingDocument1File.Length >
+                    10 * 1024 * 1024)
+                {
+                    ModelState.AddModelError(
+                        "SupportingDocument1File",
+                        "Supporting Document 1 must be less than 10 MB."
+                    );
+
+                    return View(model);
+                }
+
+                string document1Name =
+                    "TPO_DOC1_" +
+                    Guid.NewGuid().ToString("N") +
+                    extension1;
+
+                string document1Path =
+                    Path.Combine(
+                        uploadFolder,
+                        document1Name
+                    );
+
+                using (FileStream stream =
+                       new FileStream(
+                           document1Path,
+                           FileMode.Create))
+                {
+                    model.SupportingDocument1File.CopyTo(stream);
+                }
+
+                model.SupportingDocument1 = document1Name;
+
+
+                // ==========================================================
+                // DOCUMENT 2
+                // ==========================================================
+
+                string extension2 =
+                    Path.GetExtension(
+                        model.SupportingDocument2File.FileName
+                    ).ToLowerInvariant();
+
+                if (!allowedDocumentExtensions.Contains(extension2))
+                {
+                    ModelState.AddModelError(
+                        "SupportingDocument2File",
+                        "Only PDF, JPG, JPEG and PNG files are allowed."
+                    );
+
+                    return View(model);
+                }
+
+                if (model.SupportingDocument2File.Length >
+                    10 * 1024 * 1024)
+                {
+                    ModelState.AddModelError(
+                        "SupportingDocument2File",
+                        "Supporting Document 2 must be less than 10 MB."
+                    );
+
+                    return View(model);
+                }
+
+                string document2Name =
+                    "TPO_DOC2_" +
+                    Guid.NewGuid().ToString("N") +
+                    extension2;
+
+                string document2Path =
+                    Path.Combine(
+                        uploadFolder,
+                        document2Name
+                    );
+
+                using (FileStream stream =
+                       new FileStream(
+                           document2Path,
+                           FileMode.Create))
+                {
+                    model.SupportingDocument2File.CopyTo(stream);
+                }
+
+                model.SupportingDocument2 = document2Name;
+
+
+                // ==========================================================
+                // PROFILE PHOTO
+                // ==========================================================
+
+                string[] allowedImageExtensions =
+                {
+            ".jpg",
+            ".jpeg",
+            ".png"
+        };
+
+                string profileExtension =
+                    Path.GetExtension(
+                        model.ProfilePhotoFile.FileName
+                    ).ToLowerInvariant();
+
+                if (!allowedImageExtensions.Contains(profileExtension))
+                {
+                    ModelState.AddModelError(
+                        "ProfilePhotoFile",
+                        "Only JPG, JPEG and PNG profile photos are allowed."
+                    );
+
+                    return View(model);
+                }
+
+                if (model.ProfilePhotoFile.Length >
+                    5 * 1024 * 1024)
+                {
+                    ModelState.AddModelError(
+                        "ProfilePhotoFile",
+                        "Profile photo must be less than 5 MB."
+                    );
+
+                    return View(model);
+                }
+
+                string profileName =
+                    "TPO_PROFILE_" +
+                    Guid.NewGuid().ToString("N") +
+                    profileExtension;
+
+                string profilePath =
+                    Path.Combine(
+                        uploadFolder,
+                        profileName
+                    );
+
+                using (FileStream stream =
+                       new FileStream(
+                           profilePath,
+                           FileMode.Create))
+                {
+                    model.ProfilePhotoFile.CopyTo(stream);
+                }
+
+                model.ProfilePhoto = profileName;
+
+
+                // ==========================================================
+                // TPO DEFAULT STATUS
+                // ==========================================================
+
+                model.OTPVerified = true;
+
+                model.Status = "Pending";
+
+                model.IsApproved = false;
+
+                model.IsActive = false;
+
+
+                // ==========================================================
+                // REGISTER
+                // ==========================================================
+
+                int result =
+                    _accountRepository.RegisterTPO(model);
+
+
+                if (result > 0)
+                {
+                    TempData["Success"] =
+                        "TPO registration submitted successfully. " +
+                        "Your application is pending Super Admin approval.";
+
+                    return RedirectToAction("TPOLogin");
+                }
+
+
+                ModelState.AddModelError(
+                    "",
+                    "TPO registration failed. Please try again."
+                );
+
+                return View(model);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("TPO Registration Error");
+                Console.WriteLine(ex.ToString());
+
+                ModelState.AddModelError(
+                    "",
+                    "Unable to complete TPO registration. Please try again later."
+                );
+
+                return View(model);
+            }
+        }
+
+
+        // ==========================================================
+        // TPO LOGIN - GET
+        // ==========================================================
+
+        [HttpGet]
+        public IActionResult TPOLogin()
+        {
+            return View();
+        }
+
+        // =========================================================
+        // TPO LOGIN - POST
+        // =========================================================
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public IActionResult TPOLogin(TPOLogin model)
+        {
+            if (!ModelState.IsValid)
+            {
+                return View(model);
+            }
+
+            try
+            {
+                string email = model.CollegeMailID.Trim();
+
+                TPOLoginResult? tpo =
+                    _accountRepository.LoginTPO(email);
+
+                // =====================================================
+                // CHECK TPO EXISTS
+                // =====================================================
+
+                if (tpo == null)
+                {
+                    ModelState.AddModelError(
+                        "",
+                        "Invalid College Mail ID or Password."
+                    );
+
+                    return View(model);
+                }
+
+                // =====================================================
+                // CHECK PASSWORD
+                // PasswordHash column currently contains plain password
+                // =====================================================
+
+                if (tpo.PasswordHash != model.Password)
+                {
+                    ModelState.AddModelError(
+                        "",
+                        "Invalid College Mail ID or Password."
+                    );
+
+                    return View(model);
+                }
+
+                // =====================================================
+                // CHECK OTP
+                // =====================================================
+
+                if (!tpo.OTPVerified)
+                {
+                    ModelState.AddModelError(
+                        "",
+                        "Your OTP verification is not completed."
+                    );
+
+                    return View(model);
+                }
+
+                // =====================================================
+                // SET TPO SESSION
+                // =====================================================
+
+                HttpContext.Session.SetInt32(
+                    "TPOID",
+                    tpo.TPOID
+                );
+
+                HttpContext.Session.SetString(
+                    "TPOName",
+                    tpo.FullName ?? ""
+                );
+
+                HttpContext.Session.SetString(
+                    "TPOEmail",
+                    tpo.CollegeMailID ?? ""
+                );
+
+                HttpContext.Session.SetString(
+                    "TPOCollegeName",
+                    tpo.CollegeName ?? ""
+                );
+
+                HttpContext.Session.SetString(
+                    "TPORole",
+                    "TPO"
+                );
+
+                // =====================================================
+                // SUCCESSFUL LOGIN
+                // REDIRECT TO TPO DASHBOARD
+                // =====================================================
+
+                return RedirectToAction(
+                    "Dashboard",
+                    "TPO"
+                );
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("========================================");
+                Console.WriteLine("TPO Login Error");
+                Console.WriteLine(ex.ToString());
+                Console.WriteLine("========================================");
+
+                ModelState.AddModelError(
+                    "",
+                    "Unable to login. Please try again later."
+                );
+
+                return View(model);
+            }
+        }
+
+
+        // ==========================================================
+        // TPO FORGOT PASSWORD - GET
+        // ==========================================================
+
+        [HttpGet]
+        public IActionResult TPOForgotPassword()
+        {
+            return View();
+        }
+
+
+        // ==========================================================
+        // TPO FORGOT PASSWORD - POST
+        // ==========================================================
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> TPOForgotPassword(
+            TPOForgotPassword model)
+        {
+            if (!ModelState.IsValid)
+            {
+                return View(model);
+            }
+
+            try
+            {
+                string email = model.CollegeMailID.Trim();
+
+                // =====================================================
+                // GET TPO DETAILS
+                // =====================================================
+
+                TPOLoginResult? tpo =
+                    _accountRepository.LoginTPO(email);
+
+                if (tpo == null)
+                {
+                    ModelState.AddModelError(
+                        "CollegeMailID",
+                        "No TPO account was found with this college email address."
+                    );
+
+                    return View(model);
+                }
+
+                // =====================================================
+                // CHECK PASSWORD
+                // =====================================================
+
+                if (string.IsNullOrWhiteSpace(tpo.PasswordHash))
+                {
+                    ModelState.AddModelError(
+                        "",
+                        "Password information is not available for this account."
+                    );
+
+                    return View(model);
+                }
+
+                // =====================================================
+                // SEND ORIGINAL PASSWORD
+                // PasswordHash column contains normal password
+                // =====================================================
+
+                await _emailService.SendTPOLoginDetailsAsync(
+                    tpo.CollegeMailID,
+                    tpo.PasswordHash
+                );
+
+                // =====================================================
+                // SUCCESS
+                // =====================================================
+
+                TempData["Success"] =
+                    "Your login credentials have been sent to your registered college email address.";
+
+                return RedirectToAction("TPOLogin");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("========================================");
+                Console.WriteLine("TPO Forgot Password Error");
+                Console.WriteLine(ex.ToString());
+                Console.WriteLine("========================================");
+
+                ModelState.AddModelError(
+                    "",
+                    "Unable to send login credentials. Please try again later."
+                );
+
+                return View(model);
+            }
+        }
+
+        // ==========================================================
+        // TPO RESET PASSWORD - GET
+        // ==========================================================
+
+        [HttpGet]
+        public IActionResult TPORestPassword()
+        {
+            return View();
+        }
+
+        // ==========================================================
+        // TPO RESET PASSWORD - POST
+        // ==========================================================
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public IActionResult TPORestPassword(
+            TPORestPassword model)
+        {
+            if (!ModelState.IsValid)
+            {
+                return View(model);
+            }
+
+            try
+            {
+                string email =
+                    model.CollegeMailID.Trim();
+
+                // =====================================================
+                // CHECK WHETHER TPO EXISTS
+                // =====================================================
+
+                TPOLoginResult? tpo =
+                    _accountRepository.LoginTPO(email);
+
+                if (tpo == null)
+                {
+                    ModelState.AddModelError(
+                        "CollegeMailID",
+                        "No TPO account was found with this college email address."
+                    );
+
+                    return View(model);
+                }
+
+                // =====================================================
+                // UPDATE PASSWORD
+                // =====================================================
+
+                bool updated =
+                    _accountRepository.ResetTPOPassword(
+                        email,
+                        model.NewPassword
+                    );
+
+                if (!updated)
+                {
+                    ModelState.AddModelError(
+                        "",
+                        "Unable to reset password. Please try again."
+                    );
+
+                    return View(model);
+                }
+
+                // =====================================================
+                // SUCCESS
+                // =====================================================
+
+                TempData["Success"] =
+                    "Your password has been reset successfully. Please login with your new password.";
+
+                return RedirectToAction("TPOLogin");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(
+                    "========================================"
+                );
+
+                Console.WriteLine(
+                    "TPO Reset Password Error"
+                );
+
+                Console.WriteLine(
+                    ex.ToString()
+                );
+
+                Console.WriteLine(
+                    "========================================"
+                );
+
+                ModelState.AddModelError(
+                    "",
+                    "Unable to reset password. Please try again later."
+                );
+
+                return View(model);
+            }
+        }
     }
 }

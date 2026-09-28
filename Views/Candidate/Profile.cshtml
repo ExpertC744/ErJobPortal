@@ -2629,7 +2629,7 @@
 
     </div>
 
-
+    @* shrirang 24/09/26 *@
     <!-- ================================================= -->
     <!-- CAREER OBJECTIVE -->
     <!-- ================================================= -->
@@ -2644,8 +2644,7 @@
 
         <div class="card-body">
 
-            <form id="objectiveForm"
-                  asp-action="UpdateObjective"
+            <form asp-action="UpdateObjective"
                   asp-controller="Candidate"
                   method="post">
 
@@ -2657,29 +2656,27 @@
                 <div class="mb-3">
 
                     <label asp-for="Profile.Objective"
-                           class="form-label">
+                           class="form-label fw-bold">
                         Career Objective
-                        <span class="text-danger">*</span>
                     </label>
 
                     <textarea asp-for="Profile.Objective"
                               class="form-control"
-                              rows="5"
+                              rows="6"
                               maxlength="1000"
-                              minlength="20"
-                              placeholder="Enter your career objective"
-                              required></textarea>
+                              placeholder="Write your career objective..."></textarea>
+
+                    <div class="form-text">
+                        Write a brief statement describing your career goals,
+                        professional strengths, experience, and what you aim
+                        to achieve in your professional career.
+                    </div>
 
                     <span asp-validation-for="Profile.Objective"
                           class="text-danger">
                     </span>
 
-                    <small class="text-muted">
-                        Minimum 20 characters, maximum 1000 characters.
-                    </small>
-
                 </div>
-
 
                 <div class="text-end">
 
