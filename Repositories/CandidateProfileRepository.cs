@@ -1439,5 +1439,45 @@ WHERE CandidateID = @CandidateID";
             return reader.GetValue(index)?.ToString();
         }
 
+        //
+
+        // =========================================================
+        // GET CANDIDATE BASIC INFO (NAME, EMAIL, PHONE)
+        // =========================================================
+        public CandidateRegister? GetCandidateBasicInfo(int candidateId)
+        {
+            using SqlConnection con = _db.GetConnection();
+
+            // NOTE: If your master table is named 'tblCandidate' instead of 'tblCandidateRegister', change it here!
+            string query = @"
+        SELECT 
+            sFName, 
+            sLName, 
+            sEmail, 
+            sMobile 
+        FROM tblCandidateRegister 
+        WHERE nID = @CandidateID"; // Note: If your table uses CandidateID as the column name, change 'nID' to 'CandidateID'
+
+            using SqlCommand cmd = new SqlCommand(query, con);
+            cmd.Parameters.Add("@CandidateID", SqlDbType.Int).Value = candidateId;
+
+            con.Open();
+            using SqlDataReader dr = cmd.ExecuteReader();
+
+            if (dr.Read())
+            {
+                return new CandidateRegister
+                {
+                    sFName = GetString(dr, "sFName"),
+                    sLName = GetString(dr, "sLName"),
+                    sEmail = GetString(dr, "sEmail"),
+                    sMobile = GetString(dr, "sMobile")
+                };
+            }
+
+            return null;
+        }
+
+        //
     }
 }
