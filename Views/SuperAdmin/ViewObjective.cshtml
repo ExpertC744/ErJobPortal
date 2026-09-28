@@ -7,9 +7,7 @@
 }
 @{
     ViewData["Title"] = "Objectives";
-
-    var genderNames = ViewBag.GenderNames as Dictionary<int, string>
-                      ?? new Dictionary<int, string>();
+    var genderNames = ViewBag.GenderNames as Dictionary<int, string> ?? new Dictionary<int, string>();
 }
 
 <style>
@@ -238,17 +236,18 @@
     }
 </style>
 
-
 <div class="objective-container">
-
     <!-- Add Objective -->
-    <button type="button" class="btn-add-objective" onclick="window.location.href='@Url.Action("AddObjective", "SuperAdmin")'">
+  @*   <button type="button" class="btn-add-objective" onclick="window.location.href='@Url.Action("AddObjective", "SuperAdmin")'" asp-route-id="1">
         Add Objective
-    </button>
+    </button> *@
+
+        <!-- Add Objective -->
+        <a asp-controller="SuperAdmin" asp-action="AddObjective" asp-route-id="1" class="btn-add-objective mt-3 mb-5"> Add Objective</a>
 
 
     <!-- Objective Card -->
-    <div class="objective-card">
+    <div class="objective-card mt-3">
         <!-- Header -->
         <div class="objective-card-header">
             <i class="bi bi-table"></i>
@@ -274,78 +273,55 @@
                     <input type="text" id="objectiveSearch" placeholder="Search..." />
                 </div>
             </div>
-
             <!-- Table -->
             <div class="table-wrapper">
-
                 <table class="objective-table" id="objectiveTable">
-
                     <thead>
                         <tr>
-
                             <th class="col-sr">
                                 Sr.<br />
                                 No.
                             </th>
-
                             <th class="col-gender">
                                 GenderName
                             </th>
-
                             <th class="col-objective">
                                 Objective
                             </th>
-
                             <th class="col-status">
                                 Status
                             </th>
-
                             <th class="col-action">
                                 Action
                             </th>
-
                         </tr>
                     </thead>
-
-
                     <tbody>
-
                         @if (Model != null && Model.Count > 0)
                         {
                             int srNo = 1;
-
                             foreach (var item in Model)
                             {
                                 string genderName = "N/A";
-
                                 if (genderNames.ContainsKey(item.nGenderID))
                                 {
                                     genderName = genderNames[item.nGenderID];
                                 }
-
                                 <tr>
-
                                     <!-- Sr No -->
                                     <td class="col-sr">
                                         @srNo
                                     </td>
-
-
                                     <!-- Gender -->
                                     <td class="col-gender">
                                         @genderName
                                     </td>
-
-
                                     <!-- Objective -->
                                     <td class="col-objective objective-text">
                                         @item.sObjective
                                     </td>
-
-
                                     <!-- Status -->
                                     <td class="col-status">
-
                                         @if (item.nBit)
                                         {
                                             <button type="button"
@@ -362,25 +338,14 @@
                                                 Disabled
                                             </button>
                                         }
-
                                     </td>
-
-
                                     <!-- Action -->
                                     <td class="col-action">
-
-                                        <a href="@Url.Action("Edit", "SAobjective", new { id = item.nID })"
-                                           class="edit-button"
-                                           title="Edit">
-
+                                        <a href="@Url.Action("Edit", "SAobjective", new { id = item.nID })" class="edit-button" title="Edit">
                                             <i class="bi bi-pencil-square"></i>
-
                                         </a>
-
                                     </td>
-
                                 </tr>
-
                                 srNo++;
                             }
                         }
