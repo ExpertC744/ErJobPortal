@@ -311,12 +311,23 @@ namespace ErJobPortal.Controllers
                 InternshipStatuses = _repository.GetInternshipStatuses()
             };
 
-            // NOTE: CandidateName/Email/Phone are not in tblCandidateProfile at all —
-            // they must live in a separate Candidate/User account table.
-            // Leave as-is until you tell me that table/repository.
-            model.CandidateName = "Candidate";
-            model.CandidateEmail = "";
-            model.CandidatePhone = "";
+            // 1. Fetch the real Name, Email, and Phone using the repository method
+            var candidateAccount = _repository.GetCandidateBasicInfo(id);
+
+            // 2. Map the data directly to the resume template
+            if (candidateAccount != null)
+            {
+                model.CandidateName = candidateAccount.sFName + " " + candidateAccount.sLName;
+                model.CandidateEmail = candidateAccount.sEmail;
+                model.CandidatePhone = candidateAccount.sMobile;
+            }
+            else
+            {
+                // Fallback if the registration record is missing
+                model.CandidateName = "Candidate Name";
+                model.CandidateEmail = "";
+                model.CandidatePhone = "";
+            }
 
             return View("~/Views/Resume/ViewProfileSeven.cshtml", model);
         }
@@ -349,16 +360,26 @@ namespace ErJobPortal.Controllers
                 InternshipStatuses = _repository.GetInternshipStatuses()
             };
 
-            // NOTE: CandidateName/Email/Phone are not in tblCandidateProfile at all —
-            // they must live in a separate Candidate/User account table.
-            // Leave as-is until you tell me that table/repository.
-            model.CandidateName = "Candidate";
-            model.CandidateEmail = "";
-            model.CandidatePhone = "";
+            // 1. Fetch the real Name, Email, and Phone using the repository method
+            var candidateAccount = _repository.GetCandidateBasicInfo(id);
+
+            // 2. Map the data directly to the resume template
+            if (candidateAccount != null)
+            {
+                model.CandidateName = candidateAccount.sFName + " " + candidateAccount.sLName;
+                model.CandidateEmail = candidateAccount.sEmail;
+                model.CandidatePhone = candidateAccount.sMobile;
+            }
+            else
+            {
+                // Fallback if the registration record is missing
+                model.CandidateName = "Candidate Name";
+                model.CandidateEmail = "";
+                model.CandidatePhone = "";
+            }
 
             return View("~/Views/Resume/ViewProfileEight.cshtml", model);
         }
-
         public IActionResult ViewProfileNine(int id)
         {
             if (id <= 0)
@@ -366,6 +387,7 @@ namespace ErJobPortal.Controllers
                 return BadRequest("Invalid Candidate ID.");
             }
 
+            // Fetch the main profile data (experience, education, skills, etc.)
             var profile = _repository.GetProfile(id);
 
             if (profile == null)
@@ -387,12 +409,24 @@ namespace ErJobPortal.Controllers
                 InternshipStatuses = _repository.GetInternshipStatuses()
             };
 
-            // NOTE: CandidateName/Email/Phone are not in tblCandidateProfile at all —
-            // they must live in a separate Candidate/User account table.
-            // Leave as-is until you tell me that table/repository.
-            model.CandidateName = "Candidate";
-            model.CandidateEmail = "";
-            model.CandidatePhone = "";
+            // 1. Fetch the real Name, Email, and Phone using the new repository method
+            var candidateAccount = _repository.GetCandidateBasicInfo(id);
+
+            // 2. Map the data directly to the resume template
+            if (candidateAccount != null)
+            {
+                // Combine First Name and Last Name
+                model.CandidateName = candidateAccount.sFName + " " + candidateAccount.sLName;
+                model.CandidateEmail = candidateAccount.sEmail;
+                model.CandidatePhone = candidateAccount.sMobile;
+            }
+            else
+            {
+                // Fallback just in case the registration record isn't found
+                model.CandidateName = "Candidate Name";
+                model.CandidateEmail = "";
+                model.CandidatePhone = "";
+            }
 
             return View("~/Views/Resume/ViewProfileNine.cshtml", model);
         }
@@ -403,6 +437,7 @@ namespace ErJobPortal.Controllers
                 return BadRequest("Invalid Candidate ID.");
             }
 
+            // Fetch the main profile data (experience, education, skills, etc.)
             var profile = _repository.GetProfile(id);
 
             if (profile == null)
@@ -424,12 +459,23 @@ namespace ErJobPortal.Controllers
                 InternshipStatuses = _repository.GetInternshipStatuses()
             };
 
-            // NOTE: CandidateName/Email/Phone are not in tblCandidateProfile at all —
-            // they must live in a separate Candidate/User account table.
-            // Leave as-is until you tell me that table/repository.
-            model.CandidateName = "Candidate";
-            model.CandidateEmail = "";
-            model.CandidatePhone = "";
+            // 1. Fetch the real Name, Email, and Phone using the repository method
+            var candidateAccount = _repository.GetCandidateBasicInfo(id);
+
+            // 2. Map the data directly to the resume template
+            if (candidateAccount != null)
+            {
+                model.CandidateName = candidateAccount.sFName + " " + candidateAccount.sLName;
+                model.CandidateEmail = candidateAccount.sEmail;
+                model.CandidatePhone = candidateAccount.sMobile;
+            }
+            else
+            {
+                // Fallback if the registration record is missing
+                model.CandidateName = "Candidate Name";
+                model.CandidateEmail = "";
+                model.CandidatePhone = "";
+            }
 
             return View("~/Views/Resume/ViewProfileTen.cshtml", model);
         }
