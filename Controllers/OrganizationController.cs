@@ -70,9 +70,7 @@ namespace JobPortalTrainee.Controllers
 
         [HttpGet]
         [Route("Organization/Dashboard/{id?}")]
-        [ResponseCache(
-            NoStore = true,
-            Location = ResponseCacheLocation.None)]
+        [ResponseCache(NoStore = true, Location = ResponseCacheLocation.None)]
         public IActionResult Dashboard(string? id)
         {
             // =====================================================
@@ -1724,6 +1722,7 @@ string nameColumn)
         }
 
         // Create Post
+        // Create Post
         [HttpGet]
         [Route("Organization/CreatePostNew/{id}")]
         public IActionResult CreatePostNew(string id)
@@ -1741,18 +1740,24 @@ string nameColumn)
         {
             try
             {
-                string? connectionString =
-                    _configuration.GetConnectionString(
-                        "DefaultConnection"
-                    );
+                string? connectionString = _configuration.GetConnectionString("DefaultConnection");
+
+                int? OrgID = HttpContext.Session.GetInt32("OrgID");
+
+                if (OrgID == null || OrgID <= 0)
+                {
+                    TempData["Error"] = "Organization session expired. Please login again.";
+
+                    return RedirectToAction("CreatePostNew", "Organization");
+                }
+
 
                 if (string.IsNullOrWhiteSpace(connectionString))
                 {
                     return Json(new
                     {
                         success = false,
-                        message =
-                            "Database connection string not found."
+                        message = "Database connection string not found."
                     });
                 }
 
@@ -1760,13 +1765,10 @@ string nameColumn)
                     new SqlConnection(connectionString);
 
                 using SqlCommand cmd =
-                    new SqlCommand(
-                        "SP_CreateOrgPost",
-                        con
-                    );
+                    new SqlCommand("SP_CreateOrgPost", con);
 
-                cmd.CommandType =
-                    CommandType.StoredProcedure;
+                cmd.CommandType = CommandType.StoredProcedure;
+
 
                 // =====================================================
                 // ROLE DETAILS
@@ -1788,23 +1790,13 @@ string nameColumn)
                     "@nMinimumQualificationID",
                     model.nMinimumQualificationID);
 
+
                 // =====================================================
                 // LOCATION
                 // =====================================================
 
-//<<<<<<< Updated upstream
-                cmd.Parameters.AddWithValue(
-                    "@sCountryName",
-                    model.sCountryName ?? (object)DBNull.Value);
-
-                cmd.Parameters.AddWithValue(
-                    "@sStateName",
-                    model.sStateName ?? (object)DBNull.Value);
-
-                cmd.Parameters.AddWithValue(
-                    "@sCityName",
-                    model.sCityName);
-//=======
+                // COUNTRY NAME
+                // Example: India
 
                 cmd.Parameters.AddWithValue(
                     "@sCountryName",
@@ -1812,22 +1804,37 @@ string nameColumn)
                         ? DBNull.Value
                         : model.sCountryName);
 
+
+                // STATE NAME
+                // Example: Maharashtra
+
                 cmd.Parameters.AddWithValue(
                     "@sStateName",
                     string.IsNullOrWhiteSpace(model.sStateName)
                         ? DBNull.Value
                         : model.sStateName);
 
+
+                // CITY NAME
+                // Example: Pune
+
                 cmd.Parameters.AddWithValue(
                     "@nCityName",
                     string.IsNullOrWhiteSpace(model.nCityName)
                         ? DBNull.Value
                         : model.nCityName);
-//>>>>>>> Stashed changes
+
+
+                // =====================================================
+                // WORKING HOURS
+                // =====================================================
 
                 cmd.Parameters.AddWithValue(
                     "@sWorkingHours",
-                    model.sWorkingHours ?? (object)DBNull.Value);
+                    string.IsNullOrWhiteSpace(model.sWorkingHours)
+                        ? DBNull.Value
+                        : model.sWorkingHours);
+
 
                 // =====================================================
                 // WORK TERMS
@@ -1839,7 +1846,9 @@ string nameColumn)
 
                 cmd.Parameters.AddWithValue(
                     "@sWorkingShift",
-                    model.sWorkingShift ?? (object)DBNull.Value);
+                    string.IsNullOrWhiteSpace(model.sWorkingShift)
+                        ? DBNull.Value
+                        : model.sWorkingShift);
 
                 cmd.Parameters.AddWithValue(
                     "@nInternshipFellowshipTypeID",
@@ -1853,7 +1862,10 @@ string nameColumn)
 
                 cmd.Parameters.AddWithValue(
                     "@sCurrency",
-                    model.sCurrency ?? (object)DBNull.Value);
+                    string.IsNullOrWhiteSpace(model.sCurrency)
+                        ? DBNull.Value
+                        : model.sCurrency);
+
 
                 // =====================================================
                 // DURATION
@@ -1875,6 +1887,7 @@ string nameColumn)
                     "@dCompletionDate",
                     model.dCompletionDate);
 
+
                 // =====================================================
                 // MODE
                 // =====================================================
@@ -1885,11 +1898,16 @@ string nameColumn)
 
                 cmd.Parameters.AddWithValue(
                     "@sDivyang",
-                    model.sDivyang ?? (object)DBNull.Value);
+                    string.IsNullOrWhiteSpace(model.sDivyang)
+                        ? DBNull.Value
+                        : model.sDivyang);
 
                 cmd.Parameters.AddWithValue(
                     "@sLanguageKnown",
-                    model.sLanguageKnown ?? (object)DBNull.Value);
+                    string.IsNullOrWhiteSpace(model.sLanguageKnown)
+                        ? DBNull.Value
+                        : model.sLanguageKnown);
+
 
                 // =====================================================
                 // WORKING DAYS / FACILITIES
@@ -1897,17 +1915,16 @@ string nameColumn)
 
                 cmd.Parameters.AddWithValue(
                     "@sWorkingDays",
-                    string.IsNullOrWhiteSpace(
-                        model.sWorkingDays)
+                    string.IsNullOrWhiteSpace(model.sWorkingDays)
                         ? DBNull.Value
                         : model.sWorkingDays);
 
                 cmd.Parameters.AddWithValue(
                     "@sFacilities",
-                    string.IsNullOrWhiteSpace(
-                        model.sFacilities)
+                    string.IsNullOrWhiteSpace(model.sFacilities)
                         ? DBNull.Value
                         : model.sFacilities);
+
 
                 // =====================================================
                 // SKILLS
@@ -1915,34 +1932,33 @@ string nameColumn)
 
                 cmd.Parameters.AddWithValue(
                     "@sMedicalSkills",
-                    string.IsNullOrWhiteSpace(
-                        model.sMedicalSkills)
+                    string.IsNullOrWhiteSpace(model.sMedicalSkills)
                         ? DBNull.Value
                         : model.sMedicalSkills);
 
                 cmd.Parameters.AddWithValue(
                     "@sTechnicalSkills",
-                    string.IsNullOrWhiteSpace(
-                        model.sTechnicalSkills)
+                    string.IsNullOrWhiteSpace(model.sTechnicalSkills)
                         ? DBNull.Value
                         : model.sTechnicalSkills);
 
                 cmd.Parameters.AddWithValue(
                     "@sNonTechnicalSkills",
-                    string.IsNullOrWhiteSpace(
-                        model.sNonTechnicalSkills)
+                    string.IsNullOrWhiteSpace(model.sNonTechnicalSkills)
                         ? DBNull.Value
                         : model.sNonTechnicalSkills);
+
 
                 // =====================================================
                 // ORGANIZATION
                 // =====================================================
 
                 // TEMPORARY
-                // Replace this with logged-in organization ID.
+                // Change this to your logged-in organization session ID.
+
                 cmd.Parameters.AddWithValue(
-                    "@nOrgID",
-                    1);
+                    "@nOrgID", OrgID);
+
 
                 // =====================================================
                 // EXECUTE
@@ -1950,8 +1966,7 @@ string nameColumn)
 
                 con.Open();
 
-                object? result =
-                    cmd.ExecuteScalar();
+                object? result = cmd.ExecuteScalar();
 
                 int newPostID =
                     result != null &&
@@ -1959,11 +1974,11 @@ string nameColumn)
                         ? Convert.ToInt32(result)
                         : 0;
 
+
                 return Json(new
                 {
                     success = true,
-                    message =
-                        "Create Post added successfully.",
+                    message = "Create Post added successfully.",
                     nID = newPostID
                 });
             }
@@ -2320,6 +2335,64 @@ string nameColumn)
         // =========================================================
         // API RESPONSE MODELS
         // =========================================================
+
+        [HttpPost]
+        [Route("Organization/TogglePostStatus")]
+        public IActionResult TogglePostStatus(int id)
+        {
+            string? connectionString =
+                _configuration.GetConnectionString("DefaultConnection");
+
+            if (string.IsNullOrWhiteSpace(connectionString))
+            {
+                return Json(new
+                {
+                    success = false,
+                    message = "Database connection string not found."
+                });
+            }
+
+            using SqlConnection con =
+                new SqlConnection(connectionString);
+
+            string query = @"
+   UPDATE tblPost
+   SET nBit =
+       CASE
+           WHEN nBit = 1 THEN 0
+           ELSE 1
+       END,
+       dModDate = GETDATE()
+   OUTPUT INSERTED.nBit
+   WHERE nID = @nID";
+
+            using SqlCommand cmd =
+                new SqlCommand(query, con);
+
+            cmd.Parameters.AddWithValue("@nID", id);
+
+            con.Open();
+
+            object? result = cmd.ExecuteScalar();
+
+            if (result == null || result == DBNull.Value)
+            {
+                return Json(new
+                {
+                    success = false,
+                    message = "Post not found."
+                });
+            }
+
+            bool newStatus =
+                Convert.ToInt32(result) == 1;
+
+            return Json(new
+            {
+                success = true,
+                enabled = newStatus
+            });
+        }
 
         public class CountryApiResponse
         {
@@ -2957,10 +3030,6 @@ string nameColumn)
         // EDIT POST - GET
         // =========================================================
 
-        // =========================================================
-        // EDIT POST - GET
-        // =========================================================
-
         [HttpGet]
         public IActionResult EditPost(int id)
         {
@@ -3184,7 +3253,6 @@ WHERE nID = @nID
 
             return View(model);
         }
-
 
         // =========================================================
         // EDIT POST - POST

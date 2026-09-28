@@ -7,15 +7,9 @@
     ViewData["UserName"] = "Organization";
 }
 
-
-<<<<<<< Updated upstream
- 
-=======
-
->>>>>>> Stashed changes
-
+@* 
 <link rel="stylesheet"
-      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" /> *@
 
 
 <link rel="stylesheet"
@@ -162,26 +156,25 @@
         <h2 class="page-title">
             All Post Details
         </h2>
-<<<<<<< Updated upstream
 
-        <div class="page-subtitle">
+
+        @*   <div class="page-subtitle">
             At73803469839
-        </div>
+        </div> *@
 
 
 
         <!-- MASTER TABLE -->
-        <div class="table-responsive">
+        @*    <div class="table-responsive">
 
             <table id="organizationJobsTable"
                    class="master-data-table">
-            <thead>
-=======
->>>>>>> Stashed changes
+            <thead> *@
 
+        @* 
         <div class="page-subtitle">
             At73803469839
-        </div>
+        </div> *@
 
 
 
@@ -416,40 +409,14 @@
                             <!-- Status -->
                             <td>
 
-                                @if (item.nBit)
-                                {
-                                    <form asp-action="DisablePost"
-                                          method="post"
-                                          class="status-form">
+                                <button type="button"
+                                        class="status @(item.nBit ? "enabled" : "disabled")"
+                                        data-id="@item.nID"
+                                        onclick="togglePostStatus(this)">
 
-                                        <input type="hidden"
-                                               name="id"
-                                               value="@item.nID" />
+                                    @(item.nBit ? "Enabled" : "Disabled")
 
-                                        <button type="submit"
-                                                class="status enabled">
-                                            Enabled
-                                        </button>
-
-                                    </form>
-                                }
-                                else
-                                {
-                                    <form asp-action="EnablePost"
-                                          method="post"
-                                          class="status-form">
-
-                                        <input type="hidden"
-                                               name="id"
-                                               value="@item.nID" />
-
-                                        <button type="submit"
-                                                class="status disabled">
-                                            Disabled
-                                        </button>
-
-                                    </form>
-                                }
+                                </button>
 
                             </td>
 
@@ -495,5 +462,48 @@
         });
 
         });
+
+    </script>
+
+    <script>
+
+        function togglePostStatus(button) {
+
+        const postId = button.dataset.id;
+
+        button.disabled = true;
+
+        fetch('@Url.Action("TogglePostStatus", "Organization")', {
+        method: 'POST',
+        headers: {
+        'Content-Type': 'application/x-www-form-urlencoded'
+        },
+        body: 'id=' + encodeURIComponent(postId)
+        })
+        .then(response => response.json())
+        .then(result => {
+
+        if (result.success) {
+
+        if (result.enabled) {
+
+        button.textContent = "Enabled";
+
+        button.classList.remove("disabled");
+        button.classList.add("enabled");
+
+        } else {
+
+        button.textContent = "Disabled";
+
+        button.classList.remove("enabled");
+        button.classList.add("disabled");
+        }
+        }
+
+        button.disabled = false;
+        });
+
+        }
 
     </script>

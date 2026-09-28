@@ -652,8 +652,11 @@
                         <select asp-for="nPositionID"
                                 id="nPositionID"
                                 class="form-select">
-                            <option value="0">-- Select Position --</option>
+                            <option value="">-- Select Position --</option>
                         </select>
+
+                        <span asp-validation-for="nPositionID"
+                              class="text-danger"></span>
 
                     </div>
 
@@ -1416,12 +1419,6 @@
             <!-- =================================================
                  SKILLS
             ================================================== -->
-            <!-- =================================================
-                 SKILLS
-            ================================================== -->
-            <!-- =================================================
-                 SKILLS
-            ================================================== -->
 
             <section class="section" id="skills">
 
@@ -1604,7 +1601,7 @@
         Copyright © 2026 — All Rights Reserved with IIPL
     </footer>
 
-    <script>
+    @* <script>
 
         document.addEventListener("DOMContentLoaded", function () {
 
@@ -1696,7 +1693,7 @@
                     await response.json();
 
                 dropdown.innerHTML =
-                    `<option value="0">
+                    `<option value="">
                         ${defaultText}
                      </option>`;
 
@@ -1724,14 +1721,14 @@
                 );
 
                 dropdown.innerHTML =
-                    `<option value="0">
+                    `<option value="">
                         Unable to load data
                      </option>`;
 
             }
         }
 
-    </script>
+    </script> *@
 
     <script>
 
@@ -2404,445 +2401,421 @@
     </script>
 
 
-
     <script>
-
         document.addEventListener("DOMContentLoaded", function () {
 
-            // =====================================================
-            // DROPDOWNS
-            // =====================================================
+            const countryDropdown = document.getElementById("sCountryName");
+            const stateDropdown = document.getElementById("sStateName");
+            const cityDropdown = document.getElementById("nCityName");
 
-            const countryDropdown =
-                document.getElementById("sCountryName");
-
-            const stateDropdown =
-                document.getElementById("sStateName");
-
-            const cityDropdown =
-                document.getElementById("nCityName");
-
-
-            if (!countryDropdown ||
-                !stateDropdown ||
-                !cityDropdown) {
-
-                console.error(
-                    "Country / State / City dropdown not found."
-                );
-
+            if (!countryDropdown || !stateDropdown || !cityDropdown) {
+                console.error("Country / State / City dropdown not found.");
                 return;
             }
 
 
-            // =====================================================
+            // ============================================================
             // LOAD COUNTRIES
-            // =====================================================
+            // ============================================================
 
             fetch('@Url.Action("GetCountries", "Organization")')
                 .then(response => {
 
                     if (!response.ok) {
                         throw new Error(
-                            "Country API failed: " +
-                            response.status
+                            "Country API failed: " + response.status
                         );
                     }
 
                     return response.json();
                 })
-
                 .then(countries => {
 
                     countryDropdown.innerHTML =
                         '<option value="">-- Select Country --</option>';
 
+                    if (!countries || countries.length === 0) {
+
+                        countryDropdown.innerHTML =
+                            '<option value="">No countries found</option>';
+
+                        return;
+                    }
+
                     countries.forEach(country => {
 
-                        const option =
-                            document.createElement("option");
+                        const option = document.createElement("option");
 
-                        // IMPORTANT:
-                        // Value = country NAME
-                        // This is what will be submitted to C#
-                        option.value =
-                            country.name;
+                        // COUNTRY NAME WILL BE SUBMITTED
+                        option.value = country.name;
 
-                        option.textContent =
-                            country.name;
+                        // COUNTRY NAME WILL BE DISPLAYED
+                        option.textContent = country.name;
 
-                        // IMPORTANT:
-                        // Keep country code separately
-                        // for API calls
-                        option.dataset.code =
-                            country.iso2;
+                        // COUNTRY CODE ONLY FOR API
+                        option.dataset.code = country.iso2;
 
                         countryDropdown.appendChild(option);
-
                     });
 
                 })
-
                 .catch(error => {
 
-                    console.error(
-                        "Country Error:",
-                        error
-                    );
+                    console.error("Country Error:", error);
 
+                    countryDropdown.innerHTML =
+                        '<option value="">Unable to load countries</option>';
                 });
 
 
-            // =====================================================
+            // ============================================================
             // COUNTRY CHANGE
-            // =====================================================
+            // ============================================================
 
-            countryDropdown.addEventListener(
-                "change",
-                function () {
+            countryDropdown.addEventListener("change", function () {
 
-                    const selectedCountry =
-                        this.options[this.selectedIndex];
+                const selectedCountry =
+                    countryDropdown.options[
+                        countryDropdown.selectedIndex
+                    ];
 
-                    // Country NAME -> database
-                    const countryName =
-                        selectedCountry.value;
-
-                    // Country CODE -> API
-                    const countryCode =
-                        selectedCountry.dataset.code;
-
-
-                    console.log(
-                        "Country Name:",
-                        countryName
-                    );
-
-                    console.log(
-                        "Country Code:",
-                        countryCode
-                    );
-
-
-                    // =================================================
-                    // RESET STATE
-                    // =================================================
+                if (!selectedCountry || !selectedCountry.value) {
 
                     stateDropdown.innerHTML =
                         '<option value="">-- Select State --</option>';
 
-                    stateDropdown.disabled = true;
-
-
-                    // =================================================
-                    // RESET CITY
-                    // =================================================
-
                     cityDropdown.innerHTML =
                         '<option value="">-- Select City --</option>';
 
+                    stateDropdown.disabled = true;
                     cityDropdown.disabled = true;
 
-
-                    if (!countryCode) {
-                        return;
-                    }
+                    return;
+                }
 
 
-                    // =================================================
-                    // LOAD STATES
-                    // =================================================
+                // COUNTRY NAME
+                // Example: India
 
-                    const stateUrl =
-                        '@Url.Action("GetStates", "Organization")' +
-                        '?countryName=' +
-                        encodeURIComponent(countryCode);
+                const countryName =
+                    selectedCountry.value;
 
 
-                    console.log(
-                        "State Request:",
-                        stateUrl
-                    );
+                // COUNTRY CODE
+                // Example: IN
+                // Used ONLY for API
+
+                const countryCode =
+                    selectedCountry.dataset.code;
 
 
-                    fetch(stateUrl)
+                console.log("Country Name:", countryName);
+                console.log("Country Code:", countryCode);
 
-                        .then(response => {
 
-                            if (!response.ok) {
+                // ========================================================
+                // RESET STATE
+                // ========================================================
 
-                                throw new Error(
-                                    "State API failed: " +
-                                    response.status
-                                );
-                            }
+                stateDropdown.innerHTML =
+                    '<option value="">Loading states...</option>';
 
-                            return response.json();
+                stateDropdown.disabled = true;
 
-                        })
 
-                        .then(states => {
+                // ========================================================
+                // RESET CITY
+                // ========================================================
+
+                cityDropdown.innerHTML =
+                    '<option value="">-- Select City --</option>';
+
+                cityDropdown.disabled = true;
+
+
+                if (!countryCode) {
+
+                    console.error("Country code not found.");
+
+                    return;
+                }
+
+
+                // ========================================================
+                // LOAD STATES
+                // ========================================================
+                //
+                // YOUR CONTROLLER EXPECTS:
+                //
+                // GetStates(string countryCode)
+                //
+                // Therefore:
+                //
+                // GetStates?countryCode=IN
+
+                const stateUrl =
+                    '@Url.Action("GetStates", "Organization")' +
+                    '?countryCode=' +
+                    encodeURIComponent(countryCode);
+
+
+                console.log("State Request:", stateUrl);
+
+
+                fetch(stateUrl)
+                    .then(response => {
+
+                        if (!response.ok) {
+
+                            throw new Error(
+                                "State API failed: " +
+                                response.status
+                            );
+                        }
+
+                        return response.json();
+                    })
+                    .then(states => {
+
+                        stateDropdown.innerHTML =
+                            '<option value="">-- Select State --</option>';
+
+
+                        if (!states || states.length === 0) {
 
                             stateDropdown.innerHTML =
-                                '<option value="">-- Select State --</option>';
+                                '<option value="">No states found</option>';
+
+                            return;
+                        }
 
 
-                            if (!states ||
-                                states.length === 0) {
+                        states.forEach(state => {
 
-                                stateDropdown.innerHTML =
-                                    '<option value="">No states found</option>';
-
-                                return;
-                            }
+                            const option =
+                                document.createElement("option");
 
 
-                            states.forEach(state => {
+                            // STATE NAME
+                            // Example: Maharashtra
 
-                                const option =
-                                    document.createElement("option");
+                            option.value = state.name;
 
-
-                                // =================================================
-                                // DATABASE VALUE
-                                // =================================================
-
-                                // Save STATE NAME
-                                option.value =
-                                    state.name;
+                            option.textContent = state.name;
 
 
-                                // Display STATE NAME
-                                option.textContent =
-                                    state.name;
+                            // STATE CODE
+                            // Example: MH
+                            // Used ONLY for city API
+
+                            option.dataset.code =
+                                state.stateCode;
 
 
-                                // =================================================
-                                // API VALUE
-                                // =================================================
-
-                                // Keep state code separately
-                                option.dataset.code =
-                                    state.stateCode;
-
-
-                                stateDropdown.appendChild(
-                                    option
-                                );
-
-                            });
-
-
-                            stateDropdown.disabled =
-                                false;
-
-                        })
-
-                        .catch(error => {
-
-                            console.error(
-                                "State Error:",
-                                error
-                            );
-
+                            stateDropdown.appendChild(option);
                         });
 
-                }
-            );
+
+                        stateDropdown.disabled = false;
+
+                    })
+                    .catch(error => {
+
+                        console.error("State Error:", error);
+
+                        stateDropdown.innerHTML =
+                            '<option value="">Unable to load states</option>';
+
+                        stateDropdown.disabled = true;
+                    });
+
+            });
 
 
-            // =====================================================
+            // ============================================================
             // STATE CHANGE
-            // =====================================================
+            // ============================================================
 
-            stateDropdown.addEventListener(
-                "change",
-                function () {
+            stateDropdown.addEventListener("change", function () {
 
-                    // Selected country
-                    const selectedCountry =
-                        countryDropdown.options[
-                            countryDropdown.selectedIndex
-                        ];
+                const selectedCountry =
+                    countryDropdown.options[
+                        countryDropdown.selectedIndex
+                    ];
 
-
-                    // Selected state
-                    const selectedState =
-                        stateDropdown.options[
-                            stateDropdown.selectedIndex
-                        ];
+                const selectedState =
+                    stateDropdown.options[
+                        stateDropdown.selectedIndex
+                    ];
 
 
-                    // Country code for API
-                    const countryCode =
-                        selectedCountry.dataset.code;
-
-
-                    // State code for API
-                    const stateCode =
-                        selectedState.dataset.code;
-
-
-                    // State name for database
-                    const stateName =
-                        selectedState.value;
-
-
-                    console.log(
-                        "Country Code:",
-                        countryCode
-                    );
-
-                    console.log(
-                        "State Name:",
-                        stateName
-                    );
-
-                    console.log(
-                        "State Code:",
-                        stateCode
-                    );
-
-
-                    // =================================================
-                    // RESET CITY
-                    // =================================================
+                if (!selectedCountry ||
+                    !selectedCountry.value ||
+                    !selectedState ||
+                    !selectedState.value) {
 
                     cityDropdown.innerHTML =
                         '<option value="">-- Select City --</option>';
 
                     cityDropdown.disabled = true;
 
-
-                    if (!countryCode ||
-                        !stateCode) {
-
-                        return;
-                    }
+                    return;
+                }
 
 
-                    // =================================================
-                    // LOAD CITIES
-                    // =================================================
+                // COUNTRY CODE
+                // Example: IN
 
-                    const cityUrl =
-                        '@Url.Action("GetCities", "Organization")' +
-                        '?countryCode=' +
-                        encodeURIComponent(countryCode) +
-                        '&stateCode=' +
-                        encodeURIComponent(stateCode);
+                const countryCode =
+                    selectedCountry.dataset.code;
 
 
-                    console.log(
-                        "City Request:",
-                        cityUrl
+                // STATE NAME
+                // Example: Maharashtra
+                //
+                // This is what your form will submit.
+
+                const stateName =
+                    selectedState.value;
+
+
+                // STATE CODE
+                // Example: MH
+                //
+                // Used ONLY for API.
+
+                const stateCode =
+                    selectedState.dataset.code;
+
+
+                console.log("Country Code:", countryCode);
+                console.log("State Name:", stateName);
+                console.log("State Code:", stateCode);
+
+
+                // ========================================================
+                // RESET CITY
+                // ========================================================
+
+                cityDropdown.innerHTML =
+                    '<option value="">Loading cities...</option>';
+
+                cityDropdown.disabled = true;
+
+
+                if (!countryCode || !stateCode) {
+
+                    console.error(
+                        "Country code or state code missing."
                     );
 
+                    return;
+                }
 
-                    fetch(cityUrl)
 
-                        .then(response => {
+                // ========================================================
+                // LOAD CITIES
+                // ========================================================
+                //
+                // YOUR CONTROLLER EXPECTS:
+                //
+                // GetCities(string countryCode, string stateCode)
+                //
+                // Example:
+                //
+                // GetCities?countryCode=IN&stateCode=MH
 
-                            if (!response.ok) {
+                const cityUrl =
+                    '@Url.Action("GetCities", "Organization")' +
+                    '?countryCode=' +
+                    encodeURIComponent(countryCode) +
+                    '&stateCode=' +
+                    encodeURIComponent(stateCode);
 
-                                throw new Error(
-                                    "City API failed: " +
-                                    response.status
-                                );
-                            }
 
-                            return response.json();
+                console.log("City Request:", cityUrl);
 
-                        })
 
-                        .then(cities => {
+                fetch(cityUrl)
+                    .then(response => {
+
+                        if (!response.ok) {
+
+                            throw new Error(
+                                "City API failed: " +
+                                response.status
+                            );
+                        }
+
+                        return response.json();
+                    })
+                    .then(cities => {
+
+                        cityDropdown.innerHTML =
+                            '<option value="">-- Select City --</option>';
+
+
+                        if (!cities || cities.length === 0) {
 
                             cityDropdown.innerHTML =
-                                '<option value="">-- Select City --</option>';
+                                '<option value="">No cities found</option>';
+
+                            return;
+                        }
 
 
-                            if (!cities ||
-                                cities.length === 0) {
+                        cities.forEach(city => {
 
-                                cityDropdown.innerHTML =
-                                    '<option value="">No cities found</option>';
-
-                                return;
-                            }
+                            const option =
+                                document.createElement("option");
 
 
-                            cities.forEach(city => {
+                            // CITY NAME
+                            // Example: Pune
 
-                                const option =
-                                    document.createElement("option");
+                            option.value = city.name;
 
-
-                                // =================================================
-                                // DATABASE VALUE
-                                // =================================================
-
-                                // Save CITY NAME
-                                option.value =
-                                    city.name;
+                            option.textContent = city.name;
 
 
-                                // Display CITY NAME
-                                option.textContent =
-                                    city.name;
-
-
-                                cityDropdown.appendChild(
-                                    option
-                                );
-
-                            });
-
-
-                            cityDropdown.disabled =
-                                false;
-
-                        })
-
-                        .catch(error => {
-
-                            console.error(
-                                "City Error:",
-                                error
-                            );
-
+                            cityDropdown.appendChild(option);
                         });
 
-                }
-            );
+
+                        cityDropdown.disabled = false;
+
+                    })
+                    .catch(error => {
+
+                        console.error("City Error:", error);
+
+                        cityDropdown.innerHTML =
+                            '<option value="">Unable to load cities</option>';
+
+                        cityDropdown.disabled = true;
+                    });
+
+            });
 
 
-            // =====================================================
-            // ENABLE BEFORE FORM SUBMIT
-            // =====================================================
+            // ============================================================
+            // ENABLE STATE + CITY BEFORE FORM SUBMIT
+            // ============================================================
 
             const form =
                 countryDropdown.closest("form");
 
-
             if (form) {
 
-                form.addEventListener(
-                    "submit",
-                    function () {
+                form.addEventListener("submit", function () {
 
-                        stateDropdown.disabled =
-                            false;
+                    stateDropdown.disabled = false;
+                    cityDropdown.disabled = false;
 
-                        cityDropdown.disabled =
-                            false;
-
-                    }
-                );
-
+                });
             }
 
         });
-
     </script>
 
     <script>
@@ -2910,6 +2883,1661 @@
 
         });
 
+    </script>
+
+    <script>
+
+        document.addEventListener("DOMContentLoaded", function () {
+
+            const fellowshipDropdown =
+                document.getElementById("nInternshipFellowshipTypeID");
+
+            const chargesInput =
+                document.getElementById("sTotalCharges");
+
+            const currencyDropdown =
+                document.getElementById("sCurrency");
+
+
+            function toggleChargesAndCurrency() {
+
+                const selectedOption =
+                    fellowshipDropdown.options[
+                        fellowshipDropdown.selectedIndex
+                    ];
+
+                if (!selectedOption) return;
+
+
+                const selectedText =
+                    selectedOption.text.trim();
+
+
+                // FREE OR ANY
+                if (
+                    selectedText === "Free" ||
+                    selectedText === "Any (Free/Paid/Stipend/Sponsored)"
+                ) {
+
+                    // Disable charges
+                    chargesInput.disabled = true;
+                    chargesInput.value = "";
+                    chargesInput.placeholder = "Enter charges";
+
+
+                    // Disable currency
+                    currencyDropdown.disabled = true;
+                    currencyDropdown.value = "";
+
+                }
+
+                // PAID / STIPEND
+                else {
+
+                    chargesInput.disabled = false;
+                    chargesInput.placeholder = "Enter charges";
+
+                    currencyDropdown.disabled = false;
+
+                }
+
+            }
+
+
+            fellowshipDropdown.addEventListener(
+                "change",
+                toggleChargesAndCurrency
+            );
+
+
+            // Run on page load
+            toggleChargesAndCurrency();
+
+        });
+
+    </script>
+
+    <script>
+
+        document.addEventListener("DOMContentLoaded", function () {
+
+            // Position
+            loadDropdown(
+                "nPositionID",
+                "/Organization/GetPosition",
+                "-- Select Position --"
+            );
+
+            // Gender
+            loadDropdown(
+                "nGenderID",
+                "/Organization/GetGender",
+                "-- Select Gender --"
+            );
+
+            // Minimum Qualification
+            loadDropdown(
+                "nMinimumQualificationID",
+                "/Organization/GetMinimumQualification",
+                "-- Select Qualification --"
+            );
+
+            // Internship Type
+            loadDropdown(
+                "nInternshipTypeID",
+                "/Organization/GetInternshipType",
+                "-- Select Internship Type --"
+            );
+
+            // Fellowship Type
+            loadDropdown(
+                "nInternshipFellowshipTypeID",
+                "/Organization/GetInternshipFellowshipType",
+                "-- Select Fellowship Type --"
+            );
+
+            // Training Involved
+            loadDropdown(
+                "nTrainingInvolvedID",
+                "/Organization/GetTrainingInvolved",
+                "-- Select Training Involved --"
+            );
+
+            // Internship Duration
+            loadDropdown(
+                "nInternshipDurationID",
+                "/Organization/GetInternshipDuration",
+                "-- Select Duration --"
+            );
+
+            // Internship Mode
+            loadDropdown(
+                "nInternshipModeID",
+                "/Organization/GetInternshipMode",
+                "-- Select Internship Mode --"
+            );
+
+        });
+
+
+        async function loadDropdown(dropdownId, url, defaultText) {
+
+            const dropdown =
+                document.getElementById(dropdownId);
+
+            if (!dropdown) {
+                console.error(
+                    "Dropdown not found: " + dropdownId
+                );
+                return;
+            }
+
+            try {
+
+                const response =
+                    await fetch(url);
+
+                if (!response.ok) {
+
+                    throw new Error(
+                        "HTTP Error: " + response.status
+                    );
+
+                }
+
+                const data =
+                    await response.json();
+
+
+                // IMPORTANT:
+                // Empty value is required for [Required] validation
+
+                dropdown.innerHTML =
+                    `<option value="">
+                        ${defaultText}
+                     </option>`;
+
+
+                if (!Array.isArray(data)) {
+
+                    console.error(
+                        "Invalid dropdown data:",
+                        data
+                    );
+
+                    return;
+                }
+
+
+                data.forEach(function (item) {
+
+                    const option =
+                        document.createElement("option");
+
+                    option.value =
+                        item.nID;
+
+                    option.textContent =
+                        item.sName;
+
+                    dropdown.appendChild(option);
+
+                });
+
+            }
+            catch (error) {
+
+                console.error(
+                    "Error loading " + dropdownId,
+                    error
+                );
+
+                dropdown.innerHTML =
+                    `<option value="">
+                        Unable to load data
+                     </option>`;
+
+            }
+
+        }
+
+    </script>
+
+    <script>
+
+        // =========================================================
+        // MUTUALLY EXCLUSIVE SKILL CATEGORIES
+        // Technical OR Medical OR Non-Technical
+        // Only ONE category can be selected at a time.
+        // =========================================================
+
+        function applySkillCategoryState() {
+
+            const technicalChecked =
+                document.querySelectorAll(
+                    "#technicalBody input[type='checkbox']:checked"
+                ).length > 0;
+
+            const medicalChecked =
+                document.querySelectorAll(
+                    "#medicalBody input[type='checkbox']:checked"
+                ).length > 0;
+
+            const nonTechnicalChecked =
+                document.querySelectorAll(
+                    "#nonTechnicalBody input[type='checkbox']:checked"
+                ).length > 0;
+
+
+            // =====================================================
+            // IF TECHNICAL IS SELECTED
+            // Disable Medical + Non-Technical
+            // =====================================================
+
+            if (technicalChecked) {
+
+                document.querySelectorAll(
+                    "#medicalBody input[type='checkbox']"
+                ).forEach(function (checkbox) {
+
+                    checkbox.disabled = true;
+
+                });
+
+                document.querySelectorAll(
+                    "#nonTechnicalBody input[type='checkbox']"
+                ).forEach(function (checkbox) {
+
+                    checkbox.disabled = true;
+
+                });
+
+            }
+
+
+            // =====================================================
+            // IF MEDICAL IS SELECTED
+            // Disable Technical + Non-Technical
+            // =====================================================
+
+            else if (medicalChecked) {
+
+                document.querySelectorAll(
+                    "#technicalBody input[type='checkbox']"
+                ).forEach(function (checkbox) {
+
+                    checkbox.disabled = true;
+
+                });
+
+                document.querySelectorAll(
+                    "#nonTechnicalBody input[type='checkbox']"
+                ).forEach(function (checkbox) {
+
+                    checkbox.disabled = true;
+
+                });
+
+            }
+
+
+            // =====================================================
+            // IF NON-TECHNICAL IS SELECTED
+            // Disable Technical + Medical
+            // =====================================================
+
+            else if (nonTechnicalChecked) {
+
+                document.querySelectorAll(
+                    "#technicalBody input[type='checkbox']"
+                ).forEach(function (checkbox) {
+
+                    checkbox.disabled = true;
+
+                });
+
+                document.querySelectorAll(
+                    "#medicalBody input[type='checkbox']"
+                ).forEach(function (checkbox) {
+
+                    checkbox.disabled = true;
+
+                });
+
+            }
+
+
+            // =====================================================
+            // NOTHING SELECTED
+            // Enable ALL
+            // =====================================================
+
+            else {
+
+                document.querySelectorAll(
+                    "#technicalBody input[type='checkbox'], " +
+                    "#medicalBody input[type='checkbox'], " +
+                    "#nonTechnicalBody input[type='checkbox']"
+                ).forEach(function (checkbox) {
+
+                    checkbox.disabled = false;
+
+                });
+
+            }
+
+
+            // Update counts
+            if (typeof updateTechnicalCount === "function") {
+                updateTechnicalCount();
+            }
+
+            if (typeof updateMedicalCount === "function") {
+                updateMedicalCount();
+            }
+
+            if (typeof updateNonTechnicalCount === "function") {
+                updateNonTechnicalCount();
+            }
+
+        }
+
+
+        // =========================================================
+        // WHEN ANY SKILL IS SELECTED / UNSELECTED
+        // =========================================================
+
+        document.addEventListener("change", function (event) {
+
+            if (
+                event.target.matches(
+                    "#technicalBody input[type='checkbox'], " +
+                    "#medicalBody input[type='checkbox'], " +
+                    "#nonTechnicalBody input[type='checkbox']"
+                )
+            ) {
+
+                applySkillCategoryState();
+
+            }
+
+        });
+
+
+        // =========================================================
+        // CHECK STATE AFTER SKILLS ARE LOADED
+        // =========================================================
+
+        document.addEventListener("DOMContentLoaded", function () {
+
+            // Wait because skills are loaded using fetch()
+            setTimeout(function () {
+
+                applySkillCategoryState();
+
+            }, 500);
+
+        });
+
+    </script>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+
+            const form = document.getElementById("internshipPostForm");
+
+            if (!form) return;
+
+
+            // =========================================================
+            // 1. REQUIRED DROPDOWN VALIDATION
+            // =========================================================
+
+            function validateDropdown(id, message) {
+
+                const element = document.getElementById(id);
+
+                if (!element) return true;
+
+                if (!element.value || element.value === "0") {
+
+                    element.setCustomValidity(message);
+
+                    return false;
+                }
+
+                element.setCustomValidity("");
+
+                return true;
+            }
+
+
+            // =========================================================
+            // 2. REQUIRED INPUT VALIDATION
+            // =========================================================
+
+            function validateInput(id, message) {
+
+                const element = document.getElementById(id);
+
+                if (!element) return true;
+
+                if (!element.value.trim()) {
+
+                    element.setCustomValidity(message);
+
+                    return false;
+                }
+
+                element.setCustomValidity("");
+
+                return true;
+            }
+
+
+            // =========================================================
+            // 3. POSITION
+            // =========================================================
+
+            document
+                .getElementById("nPositionID")
+                ?.addEventListener("change", function () {
+
+                    validateDropdown(
+                        "nPositionID",
+                        "Please select a position."
+                    );
+
+                });
+
+
+            // =========================================================
+            // 4. REQUIRED TRAINEES
+            // =========================================================
+
+            document
+                .getElementById("nRequiredTrainees")
+                ?.addEventListener("input", function () {
+
+                    const value = parseInt(this.value);
+
+                    if (!value || value < 1) {
+
+                        this.setCustomValidity(
+                            "Please enter at least 1 required trainee."
+                        );
+
+                    }
+                    else {
+
+                        this.setCustomValidity("");
+
+                    }
+
+                });
+
+
+            // =========================================================
+            // 5. GENDER
+            // =========================================================
+
+            document
+                .getElementById("nGenderID")
+                ?.addEventListener("change", function () {
+
+                    validateDropdown(
+                        "nGenderID",
+                        "Please select gender."
+                    );
+
+                });
+
+
+            // =========================================================
+            // 6. MINIMUM QUALIFICATION
+            // =========================================================
+
+            document
+                .getElementById("nMinimumQualificationID")
+                ?.addEventListener("change", function () {
+
+                    validateDropdown(
+                        "nMinimumQualificationID",
+                        "Please select minimum qualification."
+                    );
+
+                });
+
+
+            // =========================================================
+            // 7. COUNTRY
+            // =========================================================
+
+            document
+                .getElementById("sCountryName")
+                ?.addEventListener("change", function () {
+
+                    if (!this.value) {
+
+                        this.setCustomValidity(
+                            "Please select country."
+                        );
+
+                    }
+                    else {
+
+                        this.setCustomValidity("");
+
+                    }
+
+                });
+
+
+            // =========================================================
+            // 8. STATE
+            // =========================================================
+
+            document
+                .getElementById("sStateName")
+                ?.addEventListener("change", function () {
+
+                    if (!this.value) {
+
+                        this.setCustomValidity(
+                            "Please select state."
+                        );
+
+                    }
+                    else {
+
+                        this.setCustomValidity("");
+
+                    }
+
+                });
+
+
+            // =========================================================
+            // 9. CITY
+            // =========================================================
+
+            document
+                .getElementById("nCityName")
+                ?.addEventListener("change", function () {
+
+                    if (!this.value) {
+
+                        this.setCustomValidity(
+                            "Please select city."
+                        );
+
+                    }
+                    else {
+
+                        this.setCustomValidity("");
+
+                    }
+
+                });
+
+
+            // =========================================================
+            // 10. WORKING HOURS
+            // =========================================================
+
+            document
+                .getElementById("sWorkingHours")
+                ?.addEventListener("change", function () {
+
+                    if (!this.value) {
+
+                        this.setCustomValidity(
+                            "Please select working hours."
+                        );
+
+                    }
+                    else {
+
+                        this.setCustomValidity("");
+
+                    }
+
+                });
+
+
+            // =========================================================
+            // 11. INTERNSHIP TYPE
+            // =========================================================
+
+            document
+                .getElementById("nInternshipTypeID")
+                ?.addEventListener("change", function () {
+
+                    validateDropdown(
+                        "nInternshipTypeID",
+                        "Please select internship type."
+                    );
+
+                });
+
+
+            // =========================================================
+            // 12. WORKING SHIFT
+            // =========================================================
+
+            document
+                .getElementById("sWorkingShift")
+                ?.addEventListener("change", function () {
+
+                    if (!this.value) {
+
+                        this.setCustomValidity(
+                            "Please select working shift."
+                        );
+
+                    }
+                    else {
+
+                        this.setCustomValidity("");
+
+                    }
+
+                });
+
+
+            // =========================================================
+            // 13. FELLOWSHIP TYPE
+            // =========================================================
+
+            document
+                .getElementById("nInternshipFellowshipTypeID")
+                ?.addEventListener("change", function () {
+
+                    validateDropdown(
+                        "nInternshipFellowshipTypeID",
+                        "Please select internship fellowship type."
+                    );
+
+                });
+
+
+            // =========================================================
+            // 14. TOTAL CHARGES
+            // =========================================================
+
+            document
+                .getElementById("sTotalCharges")
+                ?.addEventListener("input", function () {
+
+                    const fellowship =
+                        document.getElementById(
+                            "nInternshipFellowshipTypeID"
+                        );
+
+                    const selectedText =
+                        fellowship?.options[
+                            fellowship.selectedIndex
+                        ]?.text.trim() || "";
+
+
+                    if (
+                        selectedText === "Free" ||
+                        selectedText ===
+                        "Any (Free/Paid/Stipend/Sponsored)"
+                    ) {
+
+                        this.setCustomValidity("");
+
+                        return;
+                    }
+
+
+                    if (!this.value) {
+
+                        this.setCustomValidity(
+                            "Please enter total charges."
+                        );
+
+                    }
+                    else if (parseFloat(this.value) < 0) {
+
+                        this.setCustomValidity(
+                            "Charges cannot be negative."
+                        );
+
+                    }
+                    else {
+
+                        this.setCustomValidity("");
+
+                    }
+
+                });
+
+
+            // =========================================================
+            // 15. CURRENCY
+            // =========================================================
+
+            document
+                .getElementById("sCurrency")
+                ?.addEventListener("change", function () {
+
+                    const fellowship =
+                        document.getElementById(
+                            "nInternshipFellowshipTypeID"
+                        );
+
+                    const selectedText =
+                        fellowship?.options[
+                            fellowship.selectedIndex
+                        ]?.text.trim() || "";
+
+
+                    if (
+                        selectedText === "Free" ||
+                        selectedText ===
+                        "Any (Free/Paid/Stipend/Sponsored)"
+                    ) {
+
+                        this.setCustomValidity("");
+
+                        return;
+                    }
+
+
+                    if (!this.value) {
+
+                        this.setCustomValidity(
+                            "Please select currency."
+                        );
+
+                    }
+                    else {
+
+                        this.setCustomValidity("");
+
+                    }
+
+                });
+
+
+            // =========================================================
+            // 16. TRAINING INVOLVED
+            // =========================================================
+
+            document
+                .getElementById("nTrainingInvolvedID")
+                ?.addEventListener("change", function () {
+
+                    validateDropdown(
+                        "nTrainingInvolvedID",
+                        "Please select training involved."
+                    );
+
+                });
+
+
+            // =========================================================
+            // 17. INTERNSHIP DURATION
+            // =========================================================
+
+            document
+                .getElementById("nInternshipDurationID")
+                ?.addEventListener("change", function () {
+
+                    validateDropdown(
+                        "nInternshipDurationID",
+                        "Please select internship duration."
+                    );
+
+                });
+
+
+            // =========================================================
+            // 18. START DATE
+            // =========================================================
+
+            document
+                .getElementById("dStartDate")
+                ?.addEventListener("change", function () {
+
+                    if (!this.value) {
+
+                        this.setCustomValidity(
+                            "Please select start date."
+                        );
+
+                    }
+                    else {
+
+                        this.setCustomValidity("");
+
+                    }
+
+                    validateDates();
+
+                });
+
+
+            // =========================================================
+            // 19. COMPLETION DATE
+            // =========================================================
+
+            document
+                .getElementById("dCompletionDate")
+                ?.addEventListener("change", function () {
+
+                    if (!this.value) {
+
+                        this.setCustomValidity(
+                            "Please select completion date."
+                        );
+
+                    }
+                    else {
+
+                        this.setCustomValidity("");
+
+                    }
+
+                    validateDates();
+
+                });
+
+
+            // =========================================================
+            // 20. DATE VALIDATION
+            // =========================================================
+
+            function validateDates() {
+
+                const start =
+                    document.getElementById("dStartDate");
+
+                const completion =
+                    document.getElementById("dCompletionDate");
+
+
+                if (!start || !completion) return;
+
+
+                if (!start.value) return;
+
+
+                const today = new Date();
+
+                today.setHours(0, 0, 0, 0);
+
+
+                const startDate =
+                    new Date(start.value + "T00:00:00");
+
+
+                if (startDate < today) {
+
+                    start.setCustomValidity(
+                        "Start date cannot be earlier than today."
+                    );
+
+                }
+                else {
+
+                    start.setCustomValidity("");
+
+                }
+
+
+                if (completion.value) {
+
+                    const completionDate =
+                        new Date(
+                            completion.value + "T00:00:00"
+                        );
+
+
+                    if (completionDate <= startDate) {
+
+                        completion.setCustomValidity(
+                            "Completion date must be after start date."
+                        );
+
+                    }
+                    else {
+
+                        completion.setCustomValidity("");
+
+                    }
+
+                }
+
+            }
+
+
+            // =========================================================
+            // 21. INTERNSHIP MODE
+            // =========================================================
+
+            document
+                .getElementById("nInternshipModeID")
+                ?.addEventListener("change", function () {
+
+                    validateDropdown(
+                        "nInternshipModeID",
+                        "Please select internship mode."
+                    );
+
+                });
+
+
+            // =========================================================
+            // 22. DIVYANG
+            // =========================================================
+
+            document
+                .getElementById("sDivyang")
+                ?.addEventListener("change", function () {
+
+                    this.setCustomValidity("");
+
+                });
+
+
+            // =========================================================
+            // 23. LANGUAGE
+            // =========================================================
+
+            document
+                .getElementById("sLanguageKnown")
+                ?.addEventListener("input", function () {
+
+                    this.setCustomValidity("");
+
+                });
+
+
+            // =========================================================
+            // 24. WORKING DAYS
+            // =========================================================
+
+            function validateWorkingDays() {
+
+                const selected =
+                    document.querySelectorAll(
+                        "#daysGroup input[type='checkbox']:checked"
+                    );
+
+
+                const checkboxes =
+                    document.querySelectorAll(
+                        "#daysGroup input[type='checkbox']"
+                    );
+
+
+                checkboxes.forEach(function (checkbox) {
+
+                    checkbox.setCustomValidity("");
+
+                });
+
+
+                if (selected.length === 0 && checkboxes.length > 0) {
+
+                    checkboxes[0].setCustomValidity(
+                        "Please select at least one working day."
+                    );
+
+                    return false;
+                }
+
+                return true;
+            }
+
+
+            // =========================================================
+            // 25. FACILITIES
+            // =========================================================
+
+            function validateFacilities() {
+
+                const selected =
+                    document.querySelectorAll(
+                        "#facGroup input[type='checkbox']:checked"
+                    );
+
+
+                const checkboxes =
+                    document.querySelectorAll(
+                        "#facGroup input[type='checkbox']"
+                    );
+
+
+                checkboxes.forEach(function (checkbox) {
+
+                    checkbox.setCustomValidity("");
+
+                });
+
+
+                // Facilities are optional
+                return true;
+            }
+
+
+            // =========================================================
+            // 26. SKILLS
+            // =========================================================
+
+            function validateSkills() {
+
+                const technical =
+                    document.querySelectorAll(
+                        "#technicalBody input[type='checkbox']:checked"
+                    ).length;
+
+
+                const medical =
+                    document.querySelectorAll(
+                        "#medicalBody input[type='checkbox']:checked"
+                    ).length;
+
+
+                const nonTechnical =
+                    document.querySelectorAll(
+                        "#nonTechnicalBody input[type='checkbox']:checked"
+                    ).length;
+
+
+                const total =
+                    technical +
+                    medical +
+                    nonTechnical;
+
+
+                const allSkillCheckboxes =
+                    document.querySelectorAll(
+                        "#technicalBody input[type='checkbox'], " +
+                        "#medicalBody input[type='checkbox'], " +
+                        "#nonTechnicalBody input[type='checkbox']"
+                    );
+
+
+                allSkillCheckboxes.forEach(function (checkbox) {
+
+                    checkbox.setCustomValidity("");
+
+                });
+
+
+                if (total === 0 && allSkillCheckboxes.length > 0) {
+
+                    allSkillCheckboxes[0].setCustomValidity(
+                        "Please select at least one skill."
+                    );
+
+                    return false;
+                }
+
+
+                return true;
+            }
+
+
+            // =========================================================
+            // 27. UPDATE HIDDEN WORKING DAYS
+            // =========================================================
+
+            function updateWorkingDays() {
+
+                const values = [];
+
+                document
+                    .querySelectorAll(
+                        "#daysGroup input[type='checkbox']:checked"
+                    )
+                    .forEach(function (checkbox) {
+
+                        values.push(checkbox.value);
+
+                    });
+
+
+                const hidden =
+                    document.getElementById("sWorkingDays");
+
+
+                if (hidden) {
+
+                    hidden.value =
+                        values.join(",");
+
+                }
+
+            }
+
+
+            // =========================================================
+            // 28. UPDATE HIDDEN FACILITIES
+            // =========================================================
+
+            function updateFacilities() {
+
+                const values = [];
+
+                document
+                    .querySelectorAll(
+                        "#facGroup input[type='checkbox']:checked"
+                    )
+                    .forEach(function (checkbox) {
+
+                        values.push(checkbox.value);
+
+                    });
+
+
+                const hidden =
+                    document.getElementById("sFacilities");
+
+
+                if (hidden) {
+
+                    hidden.value =
+                        values.join(",");
+
+                }
+
+            }
+
+
+            // =========================================================
+            // 29. UPDATE HIDDEN MEDICAL SKILLS
+            // =========================================================
+
+            function updateMedicalSkills() {
+
+                const values = [];
+
+                document
+                    .querySelectorAll(
+                        "#medicalBody input[type='checkbox']:checked"
+                    )
+                    .forEach(function (checkbox) {
+
+                        values.push(checkbox.value);
+
+                    });
+
+
+                const hidden =
+                    document.getElementById("sMedicalSkills");
+
+
+                if (hidden) {
+
+                    hidden.value =
+                        values.join(",");
+
+                }
+
+            }
+
+
+            // =========================================================
+            // 30. UPDATE HIDDEN TECHNICAL SKILLS
+            // =========================================================
+
+            function updateTechnicalSkills() {
+
+                const values = [];
+
+                document
+                    .querySelectorAll(
+                        "#technicalBody input[type='checkbox']:checked"
+                    )
+                    .forEach(function (checkbox) {
+
+                        values.push(checkbox.value);
+
+                    });
+
+
+                const hidden =
+                    document.getElementById("sTechnicalSkills");
+
+
+                if (hidden) {
+
+                    hidden.value =
+                        values.join(",");
+
+                }
+
+            }
+
+
+            // =========================================================
+            // 31. UPDATE HIDDEN NON-TECHNICAL SKILLS
+            // =========================================================
+
+            function updateNonTechnicalSkills() {
+
+                const values = [];
+
+                document
+                    .querySelectorAll(
+                        "#nonTechnicalBody input[type='checkbox']:checked"
+                    )
+                    .forEach(function (checkbox) {
+
+                        values.push(checkbox.value);
+
+                    });
+
+
+                const hidden =
+                    document.getElementById("sNonTechnicalSkills");
+
+
+                if (hidden) {
+
+                    hidden.value =
+                        values.join(",");
+
+                }
+
+            }
+
+
+            // =========================================================
+            // 32. UPDATE ALL HIDDEN VALUES
+            // =========================================================
+
+            function updateAllHiddenValues() {
+
+                updateWorkingDays();
+
+                updateFacilities();
+
+                updateMedicalSkills();
+
+                updateTechnicalSkills();
+
+                updateNonTechnicalSkills();
+
+            }
+
+
+            // =========================================================
+            // 33. CHECKBOX CHANGE EVENTS
+            // =========================================================
+
+            document.addEventListener("change", function (event) {
+
+                if (
+                    event.target.matches(
+                        "#daysGroup input[type='checkbox']"
+                    )
+                ) {
+
+                    updateWorkingDays();
+
+                    validateWorkingDays();
+
+                }
+
+
+                if (
+                    event.target.matches(
+                        "#facGroup input[type='checkbox']"
+                    )
+                ) {
+
+                    updateFacilities();
+
+                    validateFacilities();
+
+                }
+
+
+                if (
+                    event.target.matches(
+                        "#medicalBody input[type='checkbox']"
+                    )
+                ) {
+
+                    updateMedicalSkills();
+
+                }
+
+
+                if (
+                    event.target.matches(
+                        "#technicalBody input[type='checkbox']"
+                    )
+                ) {
+
+                    updateTechnicalSkills();
+
+                }
+
+
+                if (
+                    event.target.matches(
+                        "#nonTechnicalBody input[type='checkbox']"
+                    )
+                ) {
+
+                    updateNonTechnicalSkills();
+
+                }
+
+            });
+
+
+            // =========================================================
+            // 34. FINAL FORM VALIDATION
+            // =========================================================
+
+            form.addEventListener("submit", function (event) {
+
+                updateAllHiddenValues();
+
+
+                // Re-run validation
+                validateDropdown(
+                    "nPositionID",
+                    "Please select a position."
+                );
+
+                validateDropdown(
+                    "nGenderID",
+                    "Please select gender."
+                );
+
+                validateDropdown(
+                    "nMinimumQualificationID",
+                    "Please select minimum qualification."
+                );
+
+                validateDropdown(
+                    "nInternshipTypeID",
+                    "Please select internship type."
+                );
+
+                validateDropdown(
+                    "nInternshipFellowshipTypeID",
+                    "Please select internship fellowship type."
+                );
+
+                validateDropdown(
+                    "nTrainingInvolvedID",
+                    "Please select training involved."
+                );
+
+                validateDropdown(
+                    "nInternshipDurationID",
+                    "Please select internship duration."
+                );
+
+                validateDropdown(
+                    "nInternshipModeID",
+                    "Please select internship mode."
+                );
+
+
+                validateInput(
+                    "sCountryName",
+                    "Please select country."
+                );
+
+                validateInput(
+                    "sStateName",
+                    "Please select state."
+                );
+
+                validateInput(
+                    "nCityName",
+                    "Please select city."
+                );
+
+
+                const trainees =
+                    document.getElementById(
+                        "nRequiredTrainees"
+                    );
+
+                if (
+                    trainees &&
+                    (
+                        !trainees.value ||
+                        parseInt(trainees.value) < 1
+                    )
+                ) {
+
+                    trainees.setCustomValidity(
+                        "Please enter at least 1 required trainee."
+                    );
+
+                }
+                else if (trainees) {
+
+                    trainees.setCustomValidity("");
+
+                }
+
+
+                const hours =
+                    document.getElementById("sWorkingHours");
+
+                if (hours) {
+
+                    hours.setCustomValidity(
+                        hours.value
+                            ? ""
+                            : "Please select working hours."
+                    );
+
+                }
+
+
+                const shift =
+                    document.getElementById("sWorkingShift");
+
+                if (shift) {
+
+                    shift.setCustomValidity(
+                        shift.value
+                            ? ""
+                            : "Please select working shift."
+                    );
+
+                }
+
+
+                validateDates();
+
+                validateWorkingDays();
+
+                validateFacilities();
+
+                validateSkills();
+
+
+                // =====================================================
+                // HTML5 VALIDATION
+                // =====================================================
+
+                if (!form.checkValidity()) {
+
+                    event.preventDefault();
+
+                    form.reportValidity();
+
+                    return false;
+                }
+
+
+                // =====================================================
+                // ENABLE DISABLED LOCATION FIELDS
+                // =====================================================
+
+                const state =
+                    document.getElementById("sStateName");
+
+                const city =
+                    document.getElementById("nCityName");
+
+
+                if (state) {
+                    state.disabled = false;
+                }
+
+                if (city) {
+                    city.disabled = false;
+                }
+
+
+                // =====================================================
+                // FINAL VALUES
+                // =====================================================
+
+                updateAllHiddenValues();
+
+            });
+
+
+            // =========================================================
+            // 35. FELLOWSHIP / CHARGES VALIDATION
+            // =========================================================
+
+            const fellowship =
+                document.getElementById(
+                    "nInternshipFellowshipTypeID"
+                );
+
+            const charges =
+                document.getElementById("sTotalCharges");
+
+            const currency =
+                document.getElementById("sCurrency");
+
+
+            function validateCharges() {
+
+                if (!fellowship) return;
+
+
+                const text =
+                    fellowship.options[
+                        fellowship.selectedIndex
+                    ]?.text.trim() || "";
+
+
+                const isFree =
+                    text === "Free" ||
+                    text ===
+                    "Any (Free/Paid/Stipend/Sponsored)";
+
+
+                if (isFree) {
+
+                    if (charges) {
+
+                        charges.disabled = true;
+                        charges.value = "";
+                        charges.setCustomValidity("");
+
+                    }
+
+                    if (currency) {
+
+                        currency.disabled = true;
+                        currency.value = "";
+                        currency.setCustomValidity("");
+
+                    }
+
+                    return;
+                }
+
+
+                if (charges) {
+
+                    charges.disabled = false;
+
+                    if (!charges.value) {
+
+                        charges.setCustomValidity(
+                            "Please enter total charges."
+                        );
+
+                    }
+                    else if (parseFloat(charges.value) < 0) {
+
+                        charges.setCustomValidity(
+                            "Charges cannot be negative."
+                        );
+
+                    }
+                    else {
+
+                        charges.setCustomValidity("");
+
+                    }
+
+                }
+
+
+                if (currency) {
+
+                    currency.disabled = false;
+
+                    if (!currency.value) {
+
+                        currency.setCustomValidity(
+                            "Please select currency."
+                        );
+
+                    }
+                    else {
+
+                        currency.setCustomValidity("");
+
+                    }
+
+                }
+
+            }
+
+
+            fellowship?.addEventListener(
+                "change",
+                validateCharges
+            );
+
+
+            charges?.addEventListener(
+                "input",
+                validateCharges
+            );
+
+
+            currency?.addEventListener(
+                "change",
+                validateCharges
+            );
+
+
+            validateCharges();
+
+
+            // =========================================================
+            // 36. INITIAL UPDATE
+            // =========================================================
+
+            updateAllHiddenValues();
+
+        });
     </script>
 
 </body>
