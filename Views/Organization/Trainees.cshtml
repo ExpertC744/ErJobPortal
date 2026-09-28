@@ -1,0 +1,265 @@
+﻿@{
+    Layout = "~/Views/Shared/_DashboardLayout.cshtml";
+
+    ViewData["Title"] = "Trainee Profiles List";
+    ViewData["Panel"] = "Organization";
+    ViewData["UserName"] = "Organization";
+}
+
+<div class="container-fluid trainee-profiles-page">
+
+    <!-- PAGE HEADER -->
+   
+
+
+    <!-- MASTER TABLE -->
+    <div class="master-table-container">
+
+        <!-- TABLE HEADER -->
+        
+
+        <!-- TABLE -->
+        <div class="table-responsive">
+             <div class="page-header mb-4">
+        <h1>Trainee Profiles List</h1>
+        <p>At738034692839</p>
+    </div>
+            <table id="traineeProfilesTable"
+                   class="master-data-table">
+
+                <thead>
+                    <tr>
+
+                        <th>
+                            Sr.<br />No
+                        </th>
+
+                        <th>
+                            Name
+                        </th>
+
+                        <th>
+                            Photo
+                        </th>
+
+                        <th>
+                            Technical Skill
+                        </th>
+
+                        <th>
+                            Non-Technical Skill
+                        </th>
+
+                        <th>
+                            Medical Skill
+                        </th>
+
+                        <th>
+                            Location
+                        </th>
+
+                    </tr>
+                </thead>
+
+
+                <tbody>
+
+                    <!-- ROW 1 -->
+                    <tr>
+
+                        <td class="master-id">
+                            1
+                        </td>
+
+                        <td>
+                            Anam Khan
+                        </td>
+
+                        <td>
+                            <img src="~/images/default-profile.png"
+                                 alt="Trainee Image"
+                                 class="trainee-profile-image" />
+                        </td>
+
+                        <td>
+                            App Development, Basic Computer Knowledge,
+                            Basic Python, Blockchain, Business Analyst,
+                            C# / .Net
+                        </td>
+
+                        <td>
+                            NA
+                        </td>
+
+                        <td>
+                            NA
+                        </td>
+
+                        <td>
+                            Guadeloupe<br />
+                            Pointe-à-Pitre<br />
+                            Saint-John<br />
+                            Perse
+                        </td>
+
+                    </tr>
+
+
+                    <!-- ROW 2 -->
+                    <tr>
+
+                        <td class="master-id">
+                            2
+                        </td>
+
+                        <td>
+                            Saumya<br />
+                            Turaskar
+                        </td>
+
+                        <td>
+                            <img src="~/images/default-profile.png"
+                                 alt="Trainee Image"
+                                 class="trainee-profile-image" />
+                        </td>
+
+                        <td>
+                            CSS, Express JS, Github, HTML, JAVA,
+                            Java Script, Programming, React JS,
+                            Software Testing, SQL
+                        </td>
+
+                        <td>
+                            NA
+                        </td>
+
+                        <td>
+                            NA
+                        </td>
+
+                        <td>
+                            India<br />
+                            Maharashtra<br />
+                            Bhandara
+                        </td>
+
+                    </tr>
+
+
+                    <!-- ROW 3 -->
+                    <tr>
+
+                        <td class="master-id">
+                            3
+                        </td>
+
+                        <td>
+                            Shilpa Singh
+                        </td>
+
+                        <td>
+                            <img src="~/images/default-profile.png"
+                                 alt="Trainee Image"
+                                 class="trainee-profile-image" />
+                        </td>
+
+                        <td>
+                            Apex, CRM
+                        </td>
+
+                        <td>
+                            NA
+                        </td>
+
+                        <td>
+                            NA
+                        </td>
+
+                        <td>
+                            India<br />
+                            Maharashtra<br />
+                            Nagpur
+                        </td>
+
+                    </tr>
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+
+        <!-- PAGE INFORMATION -->
+        <div id="traineeProfilesPageInfo"
+             class="master-page-info d-none">
+        </div>
+
+    </div>
+
+</div>
+
+
+<script>
+
+    $(document).ready(function () {
+
+        $('#traineeProfilesTable').DataTable({
+
+            pageLength: 25,
+
+            lengthMenu: [
+                [10, 25, 50, 100],
+                [10, 25, 50, 100]
+            ],
+
+            searching: true,
+
+            ordering: true,
+
+            paging: true,
+
+            info: true,
+
+            autoWidth: false,
+
+            responsive: false,
+
+            columnDefs: [
+
+                {
+                    targets: 0,
+                    className: "text-center"
+                },
+
+                {
+                    targets: 2,
+                    className: "text-center",
+                    orderable: false
+                }
+
+            ],
+
+            language: {
+
+                search: "",
+
+                searchPlaceholder: "Search...",
+
+                lengthMenu: "_MENU_ entries per page",
+
+                emptyTable: "No entries found",
+
+                zeroRecords: "No matching records found",
+
+                info: "Showing _START_ to _END_ of _TOTAL_ entries",
+
+                infoEmpty: "Showing 0 to 0 of 0 entries"
+
+            }
+
+        });
+
+    });
+
+</script>

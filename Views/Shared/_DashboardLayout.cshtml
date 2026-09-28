@@ -2785,16 +2785,10 @@
 								Custom Resume
 							</a>
 
+ 
 
                             <a asp-controller="Candidate"
-                               asp-action="ViewOrgProfile"
-                               asp-route-id="@Context.Session.GetInt32("CandidateID")"
-                               class="profile-submenu-link">
-                                Custom Resume
-                            </a>
-
-                            <a asp-controller="Candidate"
-                               asp-action="customResumeBuilder"
+                               asp-action="Profile"
                                class="profile-submenu-link">
 
                                 Edit Profile
@@ -3167,7 +3161,7 @@
 							</a>
 
 							<a asp-controller="Organization"
-							   asp-action="FinalSelection"
+							   asp-action="SelectedTrainees"
 							   asp-route-id="@orgCode"
 							   class="profile-submenu-link">
 								Final Selection
@@ -3202,7 +3196,7 @@
 						<div class="profile-submenu" id="historySubmenu">
 
 							<a asp-controller="Organization"
-							   asp-action="PreviousPost"
+							   asp-action="OrgPreviousPost"
 							   asp-route-id="@orgCode"
 							   class="profile-submenu-link">
 								Previous Post
@@ -3237,7 +3231,7 @@
 						<div class="profile-submenu" id="chartsSubmenu">
 
 							<a asp-controller="Organization"
-							   asp-action="PostInfo"
+							   asp-action="Charts"
 							   asp-route-id="@orgCode"
 							   class="profile-submenu-link">
 								Post Info
@@ -3341,7 +3335,242 @@
 				//session
 				int? orgID = Context.Session.GetInt32("OrgID");
 			}
+			@* shrirang 23/09/26 TPO *@
+			<!-- ================= TPO ================= -->
+			@if (ViewData["Panel"]?.ToString() == "TPO")
+			{
+				var tpoId = Context.Session.GetInt32("TPOID");
 
+				<div class="sidebar-section candidate-sidebar">
+
+					<!-- ================= DASHBOARD ================= -->
+
+					<a asp-controller="TPO"
+					   asp-action="Dashboard"
+					   class="sidebar-link active">
+
+						<span class="menu-icon">
+							<i class="fas fa-chart-pie"></i>
+						</span>
+
+						<span class="menu-text">
+							Dashboard
+						</span>
+
+					</a>
+
+
+					<!-- ================= PROFILE ================= -->
+
+					<div class="sidebar-dropdown">
+
+						<div class="sidebar-link"
+							 onclick="toggleSidebarMenu('tpoProfileSubmenu', 'tpoProfileArrow')">
+
+							<span class="menu-icon">
+								<i class="fas fa-id-card"></i>
+							</span>
+
+							<span class="menu-text">
+								Profile
+							</span>
+
+							<span class="profile-arrow"
+								  id="tpoProfileArrow">
+
+								<i class="fas fa-chevron-right"></i>
+
+							</span>
+
+						</div>
+
+
+						<div class="profile-submenu"
+							 id="tpoProfileSubmenu">
+
+							<a asp-controller="TPO"
+							   asp-action="Profile"
+							   class="profile-submenu-link">
+
+								View Profile
+
+							</a>
+
+							<a asp-controller="TPO"
+							   asp-action="EditProfile"
+							   class="profile-submenu-link">
+
+								Edit Profile
+
+							</a>
+
+						</div>
+
+					</div>
+
+
+					<!-- ================= SCHEDULER ================= -->
+
+					<a asp-controller="TPO"
+					   asp-action="Scheduler"
+					   class="sidebar-link">
+
+						<span class="menu-icon">
+							<i class="fas fa-calendar-alt"></i>
+						</span>
+
+						<span class="menu-text">
+							Scheduler
+						</span>
+
+					</a>
+
+
+					<!-- ================= TRAINEES INFO ================= -->
+
+					<a asp-controller="TPO"
+					   asp-action="TraineesInfo"
+					   class="sidebar-link">
+
+						<span class="menu-icon">
+							<i class="fas fa-users"></i>
+						</span>
+
+						<span class="menu-text">
+							Trainees Info
+						</span>
+
+					</a>
+
+
+					<!-- ================= CREATE USER ================= -->
+
+					<a asp-controller="TPO"
+					   asp-action="CreateUser"
+					   class="sidebar-link">
+
+						<span class="menu-icon">
+							<i class="fas fa-user-plus"></i>
+						</span>
+
+						<span class="menu-text">
+							Create User
+						</span>
+
+					</a>
+
+
+					<!-- ================= NOTIFICATION / EVENT ================= -->
+
+					<a asp-controller="TPO"
+					   asp-action="AddNotificationEvent"
+					   class="sidebar-link">
+
+						<span class="menu-icon">
+							<i class="fas fa-bell"></i>
+						</span>
+
+						<span class="menu-text">
+							Add Notification/Event
+						</span>
+
+					</a>
+
+
+					<!-- ================= FEEDBACK ================= -->
+
+					<a asp-controller="TPO"
+					   asp-action="Feedback"
+					   class="sidebar-link">
+
+						<span class="menu-icon">
+							<i class="fas fa-comment-dots"></i>
+						</span>
+
+						<span class="menu-text">
+							Feedback
+						</span>
+
+					</a>
+
+
+					<!-- ================= SETTINGS ================= -->
+
+					<div class="sidebar-dropdown">
+
+						<div class="sidebar-link"
+							 onclick="toggleSidebarMenu('tpoSettingsSubmenu', 'tpoSettingsArrow')">
+
+							<span class="menu-icon">
+								<i class="fas fa-cog"></i>
+							</span>
+
+							<span class="menu-text">
+								Settings
+							</span>
+
+							<span class="profile-arrow"
+								  id="tpoSettingsArrow">
+
+								<i class="fas fa-chevron-right"></i>
+
+							</span>
+
+						</div>
+
+
+						<div class="profile-submenu"
+							 id="tpoSettingsSubmenu">
+
+							<!-- RESET PASSWORD -->
+
+							<a asp-controller="Account"
+							   asp-action="TPORestPassword"
+							   class="profile-submenu-link">
+
+								<i class="fas fa-key me-2"></i>
+								Reset Password
+
+							</a>
+
+
+							<!-- FORGOT PASSWORD -->
+
+							<a asp-controller="Account"
+							   asp-action="TPOForgotPassword"
+							   class="profile-submenu-link">
+
+								<i class="fas fa-unlock-alt me-2"></i>
+								Forgot Password
+
+							</a>
+
+						</div>
+
+					</div>
+
+
+					<!-- ================= LOGOUT ================= -->
+					@*  <div class="sidebar-logout">
+
+            <a asp-controller="Account"
+               asp-action="Logout"
+               class="logout-link">
+
+                <span class="menu-icon">
+                    <i class="fas fa-right-from-bracket"></i>
+                </span>
+
+                <span class="menu-text">
+                    Logout
+                </span>
+
+            </a>
+
+        </div> *@
+
+				</div>
+			}
 
 			<!-- ================= SUPER ADMIN ================= -->
 			@if (ViewData["Panel"]?.ToString() == "SuperAdmin")

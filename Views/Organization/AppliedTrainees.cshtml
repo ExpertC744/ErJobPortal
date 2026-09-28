@@ -1,0 +1,226 @@
+﻿@{
+    Layout = "~/Views/Shared/_DashboardLayout.cshtml";
+
+    ViewData["Title"] = "Applied Trainees";
+    ViewData["Panel"] = "Organization";
+    ViewData["UserName"] = "Organization";
+}
+
+<div class="container-fluid applied-trainees-page">
+
+  
+
+
+    <!-- MASTER TABLE -->
+    <div class="master-table-container">
+         
+        <!-- TABLE -->
+        <div class="table-responsive">
+              <!-- PAGE HEADER -->
+    <div class="page-header mb-4">
+
+        <h1>
+            Applied Trainees
+        </h1>
+
+        <p>
+            At738034692839
+        </p>
+
+    </div>
+            <table id="appliedTraineesTable"
+                   class="master-data-table">
+
+                <thead>
+
+                    <tr>
+
+                        <th>
+                            Sr. No.
+                        </th>
+
+                        <th>
+                            Date
+                        </th>
+
+                        <th>
+                            Position
+                        </th>
+
+                        <th>
+                            View Post
+                        </th>
+
+                        <th>
+                            Applied Trainees
+                        </th>
+
+                    </tr>
+
+                </thead>
+
+
+                <tbody>
+
+                    <!-- STATIC SAMPLE DATA -->
+
+                    <tr>
+
+                        <td class="master-id">
+                            1
+                        </td>
+
+                        <td>
+                            25-09-2026
+                        </td>
+
+                        <td>
+                            .Net Trainee
+                        </td>
+
+                        <td class="text-center">
+
+                            <a href="#"
+                               class="resume-view-btn"
+                               title="View Post">
+
+                                <i class="fas fa-eye"></i>
+
+                            </a>
+
+                        </td>
+
+                        <td class="text-center">
+
+                            <a href="#"
+                               class="resume-view-btn"
+                               title="View Applied Trainees">
+
+                                <i class="fas fa-users"></i>
+
+                            </a>
+
+                        </td>
+
+                    </tr>
+
+                    <tr>
+
+                        <td class="master-id">
+                            2
+                        </td>
+
+                        <td>
+                            24-09-2026
+                        </td>
+
+                        <td>
+                            React JS Trainee
+                        </td>
+
+                        <td class="text-center">
+
+                            <a href="#"
+                               class="resume-view-btn"
+                               title="View Post">
+
+                                <i class="fas fa-eye"></i>
+
+                            </a>
+
+                        </td>
+
+                        <td class="text-center">
+
+                            <a href="#"
+                               class="resume-view-btn"
+                               title="View Applied Trainees">
+
+                                <i class="fas fa-users"></i>
+
+                            </a>
+
+                        </td>
+
+                    </tr>
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+
+        <!-- PAGE INFORMATION -->
+        <div id="appliedTraineesPageInfo"
+             class="master-page-info d-none">
+        </div>
+
+    </div>
+
+</div>
+
+
+<script>
+
+    $(document).ready(function () {
+
+        $('#appliedTraineesTable').DataTable({
+
+            pageLength: 25,
+
+            lengthMenu: [
+                [10, 25, 50, 100],
+                [10, 25, 50, 100]
+            ],
+
+            searching: true,
+
+            ordering: true,
+
+            paging: true,
+
+            info: true,
+
+            autoWidth: false,
+
+            responsive: true,
+
+            columnDefs: [
+
+                {
+                    targets: 0,
+                    className: "text-center"
+                },
+
+                {
+                    targets: [3, 4],
+                    className: "text-center",
+                    orderable: false
+                }
+
+            ],
+
+            language: {
+
+                search: "",
+
+                searchPlaceholder: "Search...",
+
+                lengthMenu: "_MENU_ entries per page",
+
+                emptyTable: "No entries found",
+
+                zeroRecords: "No matching records found",
+
+                info: "Showing _START_ to _END_ of _TOTAL_ entries",
+
+                infoEmpty: "Showing 0 to 0 of 0 entries"
+
+            }
+
+        });
+
+    });
+
+</script>

@@ -683,8 +683,6 @@ namespace ErJobPortal.Controllers
             return View(model);
         }
 
-
-
         // =========================================================
         // SA ORGANIZATION FEEDBACK - GET
         // =========================================================

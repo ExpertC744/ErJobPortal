@@ -70,9 +70,7 @@ namespace JobPortalTrainee.Controllers
 
         [HttpGet]
         [Route("Organization/Dashboard/{id?}")]
-        [ResponseCache(
-            NoStore = true,
-            Location = ResponseCacheLocation.None)]
+        [ResponseCache(NoStore = true, Location = ResponseCacheLocation.None)]
         public IActionResult Dashboard(string? id)
         {
             // =====================================================
@@ -980,14 +978,14 @@ IFormFile? CompanyLogo)
                             // LOCATION
                             // =====================================================
 
-                            model.sCountryCode =
-                                dr["sCountryCode"]?.ToString() ?? "";
+                            model.sCountryName =
+     dr["sCountryName"]?.ToString() ?? "";
 
-                            model.sStateCode =
-                                dr["sStateCode"]?.ToString() ?? "";
+                            model.sStateName =
+                                dr["sStateName"]?.ToString() ?? "";
 
-                            model.nCityID =
-                                Convert.ToInt32(dr["nCityID"]);
+                            model.nCityName =
+                                dr["nCityName"]?.ToString() ?? "";
 
                             // =====================================================
                             // WORKING HOURS
@@ -1724,6 +1722,7 @@ string nameColumn)
         }
 
         // Create Post
+        // Create Post
         [HttpGet]
         [Route("Organization/CreatePostNew/{id}")]
         public IActionResult CreatePostNew(string id)
@@ -1741,18 +1740,24 @@ string nameColumn)
         {
             try
             {
-                string? connectionString =
-                    _configuration.GetConnectionString(
-                        "DefaultConnection"
-                    );
+                string? connectionString = _configuration.GetConnectionString("DefaultConnection");
+
+                int? OrgID = HttpContext.Session.GetInt32("OrgID");
+
+                if (OrgID == null || OrgID <= 0)
+                {
+                    TempData["Error"] = "Organization session expired. Please login again.";
+
+                    return RedirectToAction("CreatePostNew", "Organization");
+                }
+
 
                 if (string.IsNullOrWhiteSpace(connectionString))
                 {
                     return Json(new
                     {
                         success = false,
-                        message =
-                            "Database connection string not found."
+                        message = "Database connection string not found."
                     });
                 }
 
@@ -1760,13 +1765,10 @@ string nameColumn)
                     new SqlConnection(connectionString);
 
                 using SqlCommand cmd =
-                    new SqlCommand(
-                        "SP_CreateOrgPost",
-                        con
-                    );
+                    new SqlCommand("SP_CreateOrgPost", con);
 
-                cmd.CommandType =
-                    CommandType.StoredProcedure;
+                cmd.CommandType = CommandType.StoredProcedure;
+
 
                 // =====================================================
                 // ROLE DETAILS
@@ -1788,25 +1790,51 @@ string nameColumn)
                     "@nMinimumQualificationID",
                     model.nMinimumQualificationID);
 
+
                 // =====================================================
                 // LOCATION
                 // =====================================================
 
+                // COUNTRY NAME
+                // Example: India
+
                 cmd.Parameters.AddWithValue(
                     "@sCountryName",
-                    model.sCountryName ?? (object)DBNull.Value);
+                    string.IsNullOrWhiteSpace(model.sCountryName)
+                        ? DBNull.Value
+                        : model.sCountryName);
+
+
+                // STATE NAME
+                // Example: Maharashtra
 
                 cmd.Parameters.AddWithValue(
                     "@sStateName",
-                    model.sStateName ?? (object)DBNull.Value);
+                    string.IsNullOrWhiteSpace(model.sStateName)
+                        ? DBNull.Value
+                        : model.sStateName);
+
+
+                // CITY NAME
+                // Example: Pune
 
                 cmd.Parameters.AddWithValue(
-                    "@sCityName",
-                    model.sCityName);
+                    "@nCityName",
+                    string.IsNullOrWhiteSpace(model.nCityName)
+                        ? DBNull.Value
+                        : model.nCityName);
+
+
+                // =====================================================
+                // WORKING HOURS
+                // =====================================================
 
                 cmd.Parameters.AddWithValue(
                     "@sWorkingHours",
-                    model.sWorkingHours ?? (object)DBNull.Value);
+                    string.IsNullOrWhiteSpace(model.sWorkingHours)
+                        ? DBNull.Value
+                        : model.sWorkingHours);
+
 
                 // =====================================================
                 // WORK TERMS
@@ -1818,7 +1846,9 @@ string nameColumn)
 
                 cmd.Parameters.AddWithValue(
                     "@sWorkingShift",
-                    model.sWorkingShift ?? (object)DBNull.Value);
+                    string.IsNullOrWhiteSpace(model.sWorkingShift)
+                        ? DBNull.Value
+                        : model.sWorkingShift);
 
                 cmd.Parameters.AddWithValue(
                     "@nInternshipFellowshipTypeID",
@@ -1832,7 +1862,10 @@ string nameColumn)
 
                 cmd.Parameters.AddWithValue(
                     "@sCurrency",
-                    model.sCurrency ?? (object)DBNull.Value);
+                    string.IsNullOrWhiteSpace(model.sCurrency)
+                        ? DBNull.Value
+                        : model.sCurrency);
+
 
                 // =====================================================
                 // DURATION
@@ -1854,6 +1887,7 @@ string nameColumn)
                     "@dCompletionDate",
                     model.dCompletionDate);
 
+
                 // =====================================================
                 // MODE
                 // =====================================================
@@ -1864,11 +1898,16 @@ string nameColumn)
 
                 cmd.Parameters.AddWithValue(
                     "@sDivyang",
-                    model.sDivyang ?? (object)DBNull.Value);
+                    string.IsNullOrWhiteSpace(model.sDivyang)
+                        ? DBNull.Value
+                        : model.sDivyang);
 
                 cmd.Parameters.AddWithValue(
                     "@sLanguageKnown",
-                    model.sLanguageKnown ?? (object)DBNull.Value);
+                    string.IsNullOrWhiteSpace(model.sLanguageKnown)
+                        ? DBNull.Value
+                        : model.sLanguageKnown);
+
 
                 // =====================================================
                 // WORKING DAYS / FACILITIES
@@ -1876,17 +1915,16 @@ string nameColumn)
 
                 cmd.Parameters.AddWithValue(
                     "@sWorkingDays",
-                    string.IsNullOrWhiteSpace(
-                        model.sWorkingDays)
+                    string.IsNullOrWhiteSpace(model.sWorkingDays)
                         ? DBNull.Value
                         : model.sWorkingDays);
 
                 cmd.Parameters.AddWithValue(
                     "@sFacilities",
-                    string.IsNullOrWhiteSpace(
-                        model.sFacilities)
+                    string.IsNullOrWhiteSpace(model.sFacilities)
                         ? DBNull.Value
                         : model.sFacilities);
+
 
                 // =====================================================
                 // SKILLS
@@ -1894,34 +1932,33 @@ string nameColumn)
 
                 cmd.Parameters.AddWithValue(
                     "@sMedicalSkills",
-                    string.IsNullOrWhiteSpace(
-                        model.sMedicalSkills)
+                    string.IsNullOrWhiteSpace(model.sMedicalSkills)
                         ? DBNull.Value
                         : model.sMedicalSkills);
 
                 cmd.Parameters.AddWithValue(
                     "@sTechnicalSkills",
-                    string.IsNullOrWhiteSpace(
-                        model.sTechnicalSkills)
+                    string.IsNullOrWhiteSpace(model.sTechnicalSkills)
                         ? DBNull.Value
                         : model.sTechnicalSkills);
 
                 cmd.Parameters.AddWithValue(
                     "@sNonTechnicalSkills",
-                    string.IsNullOrWhiteSpace(
-                        model.sNonTechnicalSkills)
+                    string.IsNullOrWhiteSpace(model.sNonTechnicalSkills)
                         ? DBNull.Value
                         : model.sNonTechnicalSkills);
+
 
                 // =====================================================
                 // ORGANIZATION
                 // =====================================================
 
                 // TEMPORARY
-                // Replace this with logged-in organization ID.
+                // Change this to your logged-in organization session ID.
+
                 cmd.Parameters.AddWithValue(
-                    "@nOrgID",
-                    1);
+                    "@nOrgID", OrgID);
+
 
                 // =====================================================
                 // EXECUTE
@@ -1929,8 +1966,7 @@ string nameColumn)
 
                 con.Open();
 
-                object? result =
-                    cmd.ExecuteScalar();
+                object? result = cmd.ExecuteScalar();
 
                 int newPostID =
                     result != null &&
@@ -1938,11 +1974,11 @@ string nameColumn)
                         ? Convert.ToInt32(result)
                         : 0;
 
+
                 return Json(new
                 {
                     success = true,
-                    message =
-                        "Create Post added successfully.",
+                    message = "Create Post added successfully.",
                     nID = newPostID
                 });
             }
@@ -2075,6 +2111,79 @@ string nameColumn)
         // =========================================================
 
         [HttpGet]
+        public async Task<IActionResult> GetStates(string countryCode)
+        {
+            try
+            {
+                if (string.IsNullOrWhiteSpace(countryCode))
+                {
+                    return BadRequest("Country code is required.");
+                }
+
+                countryCode = countryCode.Trim().ToUpperInvariant();
+
+                string url =
+                    "https://api.geocoded.me/v2/states" +
+                    "?filter[country]=" +
+                    Uri.EscapeDataString(countryCode) +
+                    "&fields=id,name,countryCode,stateCode" +
+                    "&limit=5000";
+
+                using HttpClient client = new HttpClient();
+
+                client.DefaultRequestHeaders.Accept.Clear();
+                client.DefaultRequestHeaders.Accept.Add(
+                    new System.Net.Http.Headers.MediaTypeWithQualityHeaderValue(
+                        "application/json"));
+
+                HttpResponseMessage response =
+                    await client.GetAsync(url);
+
+                string json =
+                    await response.Content.ReadAsStringAsync();
+
+                if (!response.IsSuccessStatusCode)
+                {
+                    return StatusCode(
+                        (int)response.StatusCode,
+                        json);
+                }
+
+                var result =
+                    JsonSerializer.Deserialize<StateApiResponse>(
+                        json,
+                        new JsonSerializerOptions
+                        {
+                            PropertyNameCaseInsensitive = true
+                        });
+
+                if (result?.Data == null)
+                {
+                    return Json(new List<State>());
+                }
+
+                var states = result.Data
+                    .OrderBy(x => x.Name)
+                    .Select(x => new
+                    {
+                        id = x.Id,
+                        name = x.Name,
+                        countryCode = x.CountryCode,
+                        stateCode = x.StateCode
+                    })
+                    .ToList();
+
+                return Json(states);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(
+                    500,
+                    "State API Error: " + ex.Message);
+            }
+        }
+
+        [HttpGet]
         public async Task<IActionResult> GetCountries()
         {
             try
@@ -2117,10 +2226,15 @@ string nameColumn)
                     return Json(new List<Country>());
                 }
 
-                var countries =
-                    result.Data
-                        .OrderBy(x => x.Name)
-                        .ToList();
+                var countries = result.Data
+                    .OrderBy(x => x.Name)
+                    .Select(x => new
+                    {
+                        id = x.Id,
+                        iso2 = x.Iso2,
+                        name = x.Name
+                    })
+                    .ToList();
 
                 return Json(countries);
             }
@@ -2132,104 +2246,21 @@ string nameColumn)
             }
         }
 
-
-        // =========================================================
-        // GET STATES BY COUNTRY
-        // =========================================================
-
-        [HttpGet]
-        public async Task<IActionResult> GetStates(
-            string countryCode)
-        {
-            try
-            {
-                if (string.IsNullOrWhiteSpace(countryCode))
-                {
-                    return BadRequest(
-                        "Country code is required.");
-                }
-
-                countryCode =
-                    countryCode.Trim().ToUpperInvariant();
-
-                string url =
-                    "https://api.geocoded.me/v2/states" +
-                    "?filter[country]=" +
-                    Uri.EscapeDataString(countryCode) +
-                    "&fields=id,name,countryCode,stateCode" +
-                    "&limit=5000";
-
-                using HttpClient client = new HttpClient();
-
-                client.DefaultRequestHeaders.Accept.Clear();
-
-                client.DefaultRequestHeaders.Accept.Add(
-                    new System.Net.Http.Headers.MediaTypeWithQualityHeaderValue(
-                        "application/json"));
-
-                HttpResponseMessage response =
-                    await client.GetAsync(url);
-
-                string json =
-                    await response.Content.ReadAsStringAsync();
-
-                if (!response.IsSuccessStatusCode)
-                {
-                    return StatusCode(
-                        (int)response.StatusCode,
-                        json);
-                }
-
-                var result =
-                    JsonSerializer.Deserialize<StateApiResponse>(
-                        json,
-                        new JsonSerializerOptions
-                        {
-                            PropertyNameCaseInsensitive = true
-                        });
-
-                if (result?.Data == null)
-                {
-                    return Json(new List<State>());
-                }
-
-                var states =
-                    result.Data
-                        .OrderBy(x => x.Name)
-                        .ToList();
-
-                return Json(states);
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(
-                    500,
-                    "State API Error: " + ex.Message);
-            }
-        }
-
-
-        // =========================================================
-        // GET CITIES BY COUNTRY + STATE
-        // =========================================================
-
         [HttpGet]
         public async Task<IActionResult> GetCities(
-            string countryCode,
-            string stateCode)
+    string countryCode,
+    string stateCode)
         {
             try
             {
                 if (string.IsNullOrWhiteSpace(countryCode))
                 {
-                    return BadRequest(
-                        "Country code is required.");
+                    return BadRequest("Country code is required.");
                 }
 
                 if (string.IsNullOrWhiteSpace(stateCode))
                 {
-                    return BadRequest(
-                        "State code is required.");
+                    return BadRequest("State code is required.");
                 }
 
                 countryCode =
@@ -2247,13 +2278,9 @@ string nameColumn)
                     "&fields=id,name,countryCode,stateCode" +
                     "&limit=1000";
 
-                Console.WriteLine(
-                    "CITY URL: " + url);
-
                 using HttpClient client = new HttpClient();
 
                 client.DefaultRequestHeaders.Accept.Clear();
-
                 client.DefaultRequestHeaders.Accept.Add(
                     new System.Net.Http.Headers.MediaTypeWithQualityHeaderValue(
                         "application/json"));
@@ -2263,12 +2290,6 @@ string nameColumn)
 
                 string json =
                     await response.Content.ReadAsStringAsync();
-
-                Console.WriteLine(
-                    "CITY STATUS: " + response.StatusCode);
-
-                Console.WriteLine(
-                    "CITY RESPONSE: " + json);
 
                 if (!response.IsSuccessStatusCode)
                 {
@@ -2290,10 +2311,16 @@ string nameColumn)
                     return Json(new List<City>());
                 }
 
-                var cities =
-                    result.Data
-                        .OrderBy(x => x.Name)
-                        .ToList();
+                var cities = result.Data
+                    .OrderBy(x => x.Name)
+                    .Select(x => new
+                    {
+                        id = x.Id,
+                        name = x.Name,
+                        countryCode = x.CountryCode,
+                        stateCode = x.StateCode
+                    })
+                    .ToList();
 
                 return Json(cities);
             }
@@ -2305,10 +2332,67 @@ string nameColumn)
             }
         }
 
-
         // =========================================================
         // API RESPONSE MODELS
         // =========================================================
+
+        [HttpPost]
+        [Route("Organization/TogglePostStatus")]
+        public IActionResult TogglePostStatus(int id)
+        {
+            string? connectionString =
+                _configuration.GetConnectionString("DefaultConnection");
+
+            if (string.IsNullOrWhiteSpace(connectionString))
+            {
+                return Json(new
+                {
+                    success = false,
+                    message = "Database connection string not found."
+                });
+            }
+
+            using SqlConnection con =
+                new SqlConnection(connectionString);
+
+            string query = @"
+   UPDATE tblPost
+   SET nBit =
+       CASE
+           WHEN nBit = 1 THEN 0
+           ELSE 1
+       END,
+       dModDate = GETDATE()
+   OUTPUT INSERTED.nBit
+   WHERE nID = @nID";
+
+            using SqlCommand cmd =
+                new SqlCommand(query, con);
+
+            cmd.Parameters.AddWithValue("@nID", id);
+
+            con.Open();
+
+            object? result = cmd.ExecuteScalar();
+
+            if (result == null || result == DBNull.Value)
+            {
+                return Json(new
+                {
+                    success = false,
+                    message = "Post not found."
+                });
+            }
+
+            bool newStatus =
+                Convert.ToInt32(result) == 1;
+
+            return Json(new
+            {
+                success = true,
+                enabled = newStatus
+            });
+        }
 
         public class CountryApiResponse
         {
@@ -2557,17 +2641,24 @@ string nameColumn)
                 // LOCATION
                 // =====================================================
 
-                cmd.Parameters.AddWithValue(
-                    "@sCountryCode",
-                    model.sCountryCode ?? (object)DBNull.Value);
 
                 cmd.Parameters.AddWithValue(
-                    "@sStateCode",
-                    model.sStateCode ?? (object)DBNull.Value);
+                    "@sCountryName",
+                    string.IsNullOrWhiteSpace(model.sCountryName)
+                        ? DBNull.Value
+                        : model.sCountryName);
 
                 cmd.Parameters.AddWithValue(
-                    "@nCityID",
-                    model.nCityID);
+                    "@sStateName",
+                    string.IsNullOrWhiteSpace(model.sStateName)
+                        ? DBNull.Value
+                        : model.sStateName);
+
+                cmd.Parameters.AddWithValue(
+                    "@nCityName",
+                    string.IsNullOrWhiteSpace(model.nCityName)
+                        ? DBNull.Value
+                        : model.nCityName);
 
                 cmd.Parameters.AddWithValue(
                     "@sWorkingHours",
@@ -2778,17 +2869,25 @@ string nameColumn)
                             item.sMinimumQualificationName =
                                 dr["sMinimumQualificationName"]?.ToString() ?? "";
 
-                            item.sCountryCode =
-                                dr["sCountryCode"]?.ToString() ?? "";
+                            //item.sCountryCode =
+                            //    dr["sCountryCode"]?.ToString() ?? "";
 
-                            item.sStateCode =
-                                dr["sStateCode"]?.ToString() ?? "";
+                            //item.sStateCode =
+                            //    dr["sStateCode"]?.ToString() ?? "";
 
-                            item.nCityID =
-                                Convert.ToInt32(dr["nCityID"]);
+                            //item.nCityID =
+                            //    Convert.ToInt32(dr["nCityID"]);
                             //item.sCityName =
                             //    dr["sCityName"]?.ToString() ?? "";
 
+                            item.sCountryName =
+    dr["sCountryName"]?.ToString() ?? "";
+
+                            item.sStateName =
+                                dr["sStateName"]?.ToString() ?? "";
+
+                            item.nCityName =
+                                dr["nCityName"]?.ToString() ?? "";
                             item.sWorkingHours =
                                 dr["sWorkingHours"]?.ToString() ?? "";
 
@@ -2950,37 +3049,37 @@ string nameColumn)
 
             using (SqlConnection con = new SqlConnection(connectionString))
             using (SqlCommand cmd = new SqlCommand(@"
-    SELECT
-        nID,
-        nOrgID,
-        nPositionID,
-        nRequiredTrainees,
-        nGenderID,
-        nMinimumQualificationID,
-        sCountryCode,
-        sStateCode,
-        nCityID,
-        sWorkingHours,
-        nInternshipTypeID,
-        sWorkingShift,
-        nInternshipFellowshipTypeID,
-        sTotalCharges,
-        sCurrency,
-        nTrainingInvolvedID,
-        nInternshipDurationID,
-        dStartDate,
-        dCompletionDate,
-        nInternshipModeID,
-        sDivyang,
-        sLanguageKnown,
-        sWorkingDays,
-        sFacilities,
-        sMedicalSkills,
-        sTechnicalSkills,
-        sNonTechnicalSkills
-    FROM tblPost
-    WHERE nID = @nID
-      AND nOrgID = @nOrgID", con))
+SELECT
+    nID,
+    nOrgID,
+    nPositionID,
+    nRequiredTrainees,
+    nGenderID,
+    nMinimumQualificationID,
+       sCountryName,
+        sStateName,
+        nCityName,
+    sWorkingHours,
+    nInternshipTypeID,
+    sWorkingShift,
+    nInternshipFellowshipTypeID,
+    sTotalCharges,
+    sCurrency,
+    nTrainingInvolvedID,
+    nInternshipDurationID,
+    dStartDate,
+    dCompletionDate,
+    nInternshipModeID,
+    sDivyang,
+    sLanguageKnown,
+    sWorkingDays,
+    sFacilities,
+    sMedicalSkills,
+    sTechnicalSkills,
+    sNonTechnicalSkills
+FROM tblPost
+WHERE nID = @nID
+  AND nOrgID = @nOrgID", con))
             {
                 cmd.Parameters.Add("@nID", SqlDbType.Int).Value = id;
                 cmd.Parameters.Add("@nOrgID", SqlDbType.Int).Value = orgID;
@@ -3012,20 +3111,20 @@ string nameColumn)
                     model.nMinimumQualificationID =
                         Convert.ToInt32(dr["nMinimumQualificationID"]);
 
-                    model.sCountryCode =
-                        dr["sCountryCode"] == DBNull.Value
-                            ? ""
-                            : dr["sCountryCode"].ToString()!;
+                    model.sCountryName =
+               dr["sCountryName"] == DBNull.Value
+                   ? ""
+                   : dr["sCountryName"].ToString()!;
 
-                    model.sStateCode =
-                        dr["sStateCode"] == DBNull.Value
+                    model.sStateName =
+                        dr["sStateName"] == DBNull.Value
                             ? ""
-                            : dr["sStateCode"].ToString()!;
+                            : dr["sStateName"].ToString()!;
 
-                    model.nCityID =
-                        dr["nCityID"] == DBNull.Value
-                            ? 0
-                            : Convert.ToInt32(dr["nCityID"]);
+                    model.nCityName =
+                        dr["nCityName"] == DBNull.Value
+                            ? ""
+                            : dr["nCityName"].ToString()!;
 
                     model.sWorkingHours =
                         dr["sWorkingHours"] == DBNull.Value
@@ -3155,7 +3254,6 @@ string nameColumn)
             return View(model);
         }
 
-
         // =========================================================
         // EDIT POST - POST
         // =========================================================
@@ -3228,16 +3326,22 @@ string nameColumn)
                     // =====================================================
 
                     cmd.Parameters.AddWithValue(
-                        "@sCountryCode",
-                        model.sCountryCode ?? (object)DBNull.Value);
+      "@sCountryName",
+      string.IsNullOrWhiteSpace(model.sCountryName)
+          ? DBNull.Value
+          : model.sCountryName);
 
                     cmd.Parameters.AddWithValue(
-                        "@sStateCode",
-                        model.sStateCode ?? (object)DBNull.Value);
+                        "@sStateName",
+                        string.IsNullOrWhiteSpace(model.sStateName)
+                            ? DBNull.Value
+                            : model.sStateName);
 
                     cmd.Parameters.AddWithValue(
-                        "@nCityID",
-                        model.nCityID);
+                        "@nCityName",
+                        string.IsNullOrWhiteSpace(model.nCityName)
+                            ? DBNull.Value
+                            : model.nCityName);
 
                     cmd.Parameters.AddWithValue(
                         "@sWorkingHours",
@@ -3407,6 +3511,41 @@ string nameColumn)
 
                 return View(model);
             }
+        }
+
+        //radhika25-09
+
+        [HttpGet]
+        public IActionResult SelectedTrainees()
+        {
+            return View();
+        }
+
+        [HttpGet]
+        public IActionResult Charts()
+        {
+            return View();
+        }
+
+        [HttpGet]
+        public IActionResult OrgPreviousPost()
+        {
+            return View();
+        }
+        [HttpGet]
+        public IActionResult Trainees()
+        {
+            return View();
+        }
+        [HttpGet]
+        public IActionResult OrgTopSearch()
+        {
+            return View();
+        }
+        [HttpGet]
+        public IActionResult AppliedTrainees()
+        {
+            return View();
         }
 
     }
