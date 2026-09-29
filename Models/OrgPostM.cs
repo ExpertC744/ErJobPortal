@@ -214,7 +214,7 @@ namespace JobPortalTrainee.Models
 
         //public string sCountryName { get; set; } = string.Empty;
 
-
+        public int AppliedTraineeCount { get; set; }
 
 
 
