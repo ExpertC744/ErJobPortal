@@ -1,0 +1,123 @@
+﻿@{
+    Layout = "~/Views/Shared/_DashboardLayout.cshtml";
+
+    ViewData["Title"] = "Trainee Organization Details";
+    ViewData["Panel"] = "SuperAdmin";
+    ViewData["UserName"] = "ItNetworkZ";
+}
+
+<div class="container-fluid">
+
+  
+
+
+    <!-- MASTER TABLE -->
+    <div class="master-table-container">
+ 
+
+        <div class="table-responsive">
+              <!-- PAGE HEADER -->
+    <div class="mb-4">
+
+        <h1 class="mb-2">
+            Trainee Organization Details
+        </h1>
+
+        <p class="mb-0 text-muted">
+            Candidate ID: @Context.Request.Query["candidateId"]
+        </p>
+
+    </div>
+            <table id="traineeOrganizationTable"
+                   class="master-data-table">
+
+                <thead>
+
+                    <tr>
+
+                        <th>
+                            Sr. No
+                        </th>
+
+                        <th>
+                            Organization Name
+                        </th>
+
+                        <th>
+                            Position
+                        </th>
+
+                        <th>
+                            Name
+                        </th>
+
+                        <th>
+                            Status
+                        </th>
+
+                        <th>
+                            Final Status
+                        </th>
+
+                        <th>
+                            Date
+                        </th>
+
+                    </tr>
+
+                </thead>
+
+
+                <tbody>
+
+                    <!-- STATIC DATA -->
+
+                    <tr>
+
+                        <td class="master-id">
+                            1
+                        </td>
+
+                        <td>
+                            Atharv Infotech
+                        </td>
+
+                        <td>
+                            .Net Trainee
+                        </td>
+
+                        <td>
+                            Khushi Fale
+                        </td>
+
+                        <td>
+                            <span class="master-status">
+                                Shortlisted
+                            </span>
+                        </td>
+
+                        <td>
+                            Selected
+                        </td>
+
+                        <td>
+                            25-09-2026
+                        </td>
+
+                    </tr>
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+
+        <!-- PAGE INFO -->
+        <div id="traineeOrganizationPageInfo"
+             class="master-page-info text-center d-none">
+        </div>
+
+    </div>
+
+</div>

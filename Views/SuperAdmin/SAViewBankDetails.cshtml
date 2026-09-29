@@ -1,0 +1,138 @@
+﻿@{
+    Layout = "~/Views/Shared/_DashboardLayout.cshtml";
+
+    ViewData["Title"] = "Bank Details List";
+    ViewData["Panel"] = "SuperAdmin";
+    ViewData["UserName"] = "ItNetworkZ";
+}
+
+<div class="container-fluid">
+
+    <!-- Page Header -->
+    <div class="mb-4">
+        <h1 class="mb-2">Bank Details List</h1>
+        <p class="mb-0 text-muted">ItNetworkZ</p>
+    </div>
+
+
+    <!-- Master Table -->
+    <div class="master-table-container">
+
+     @*    <div class="master-table-title">
+            <div>
+                <h2>
+                    <i class="fas fa-university me-2"></i>
+                    Bank Details
+                </h2>
+            </div>
+        </div>
+ *@
+
+        <div class="table-responsive">
+
+            <table id="bankDetailsTable"
+                   class="master-data-table">
+
+                <thead>
+                    <tr>
+                        <th>Sr. No</th>
+                        <th>Select Bank</th>
+                        <th>Bank Name</th>
+                        <th>Account No.</th>
+                        <th>Customer Name</th>
+                        <th>IFSC Code</th>
+                        <th>Account Type</th>
+                        <th>Branch</th>
+                        <th>City</th>
+                        <th>PAN No.</th>
+                        <th>GST No.</th>
+                        <th>CIN No.</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+
+                    <tr>
+
+                        <td class="master-id">
+                            1
+                        </td>
+
+                        <td>
+                            <input type="radio"
+                                   name="selectedBank"
+                                   value="1"
+                                   title="Select Bank" />
+                        </td>
+
+                        <td>
+                            HDFC1
+                        </td>
+
+                        <td>
+                            12345678901
+                        </td>
+
+                        <td>
+                            Sam1
+                        </td>
+
+                        <td>
+                            HDFC0001231
+                        </td>
+
+                        <td>
+                            Saving1
+                        </td>
+
+                        <td>
+                            Nagpur1
+                        </td>
+
+                        <td>
+                            Nagpur1
+                        </td>
+
+                        <td>
+                            HDHDHD1231
+                        </td>
+
+                        <td>
+                            12345678901
+                        </td>
+
+                        <td>
+                            12345678901
+                        </td>
+
+                        <td>
+
+                            <a asp-controller="SuperAdmin"
+                               asp-action="SAEditBankDetails"
+                               asp-route-id="1"
+                               class="resume-view-btn"
+                               title="Edit Bank Details">
+
+                                <i class="fas fa-edit"></i>
+
+                            </a>
+
+                        </td>
+
+                    </tr>
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+
+        <div id="bankDetailsPageInfo"
+             class="master-page-info text-center d-none">
+        </div>
+
+    </div>
+
+</div>

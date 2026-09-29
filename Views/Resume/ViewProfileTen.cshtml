@@ -144,7 +144,7 @@
             padding: 12mm 10mm;
             display: flex;
             flex-direction: column;
-            gap: 15px; /* Reduced gap */
+            gap: 15px;
             font-family: "Inter", sans-serif;
         }
 
@@ -155,7 +155,7 @@
             padding: 12mm 15mm;
             display: flex;
             flex-direction: column;
-            gap: 15px; /* Reduced gap */
+            gap: 15px; 
             font-family: "Inter", sans-serif;
         }
 
@@ -174,7 +174,6 @@
         }
 
         .side-section { margin-bottom: 2px; }
-        .side-section.push-bottom { margin-top: auto; }
         
         .side-title {
             font-family: "Montserrat", sans-serif; font-size: 12px; font-weight: 700;
@@ -217,7 +216,6 @@
 
         .summary-text { font-size: 10.5px; line-height: 1.6; color: var(--text-main); text-align: justify; }
 
-        /* Modified for landscape to allow grids if needed, but keeping timeline vertical */
         .timeline-container { display: flex; flex-direction: column; gap: 12px; }
         
         .timeline-item { display: flex; flex-direction: column; gap: 3px; }
@@ -334,7 +332,8 @@
                     var techSkills = Has(techSkillsStr) ? techSkillsStr.Split(new[] { ',', ';', '|' }, StringSplitOptions.RemoveEmptyEntries).ToList() : new List<string>();
                 }
 
-                @if (langItems.Any() || techSkills.Any())
+                <!-- TECHNICAL SKILLS SECTION -->
+                @if (techSkills.Any())
                 {
                     <div class="side-section">
                         <div class="side-title">Skills</div>
@@ -348,6 +347,16 @@
                                     </div>
                                 </div>
                             }
+                        </div>
+                    </div>
+                }
+
+                <!-- LANGUAGES SECTION -->
+                @if (langItems.Any())
+                {
+                    <div class="side-section">
+                        <div class="side-title">Languages</div>
+                        <div class="skill-list">
                             @foreach (var l in langItems.Take(3))
                             {
                                 <div class="skill-item">
@@ -366,7 +375,7 @@
 
                 @if (Has(p.sHobbies))
                 {
-                    <div class="side-section push-bottom">
+                    <div class="side-section">
                         <div class="side-title">Hobbies & Interests</div>
                         <div class="hobbies-text">@p.sHobbies</div>
                     </div>
@@ -598,7 +607,7 @@
                 });
 
                 const { jsPDF } = window.jspdf;
-                // CHANGED: PDF formatting uses landscape and 297x210 dimensions
+                // PDF formatting uses landscape and 297x210 dimensions
                 const pdf = new jsPDF({ orientation: "landscape", unit: "mm", format: "a4", compress: true });
                 const imgData = canvas.toDataURL("image/jpeg", .95);
                 pdf.addImage(imgData, "JPEG", 0, 0, 297, 210);
