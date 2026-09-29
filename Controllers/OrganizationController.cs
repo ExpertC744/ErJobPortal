@@ -296,6 +296,76 @@ namespace JobPortalTrainee.Controllers
                         }
                     }
                 }
+                // =====================================================
+                // GET ORGANIZATION POSTS FOR DASHBOARD
+                // =====================================================
+
+                List<OrgPostM> organizationPosts =
+                    new List<OrgPostM>();
+
+                using (SqlCommand cmd =
+                       new SqlCommand(
+                           "SP_GetOrganizationDashboardPosts",
+                           con))
+                {
+                    cmd.CommandType =
+                        CommandType.StoredProcedure;
+
+                    cmd.Parameters.AddWithValue(
+                        "@nOrgID",
+                        orgId.Value);
+
+                    using (SqlDataReader dr =
+                           cmd.ExecuteReader())
+                    {
+                        while (dr.Read())
+                        {
+                            OrgPostM post =
+                                new OrgPostM();
+
+                            post.nID =
+                                dr["nID"] != DBNull.Value
+                                ? Convert.ToInt32(dr["nID"])
+                                : 0;
+
+                            post.nOrgID =
+                                dr["nOrgID"] != DBNull.Value
+                                ? Convert.ToInt32(dr["nOrgID"])
+                                : 0;
+
+                            post.nPositionID =
+                                dr["nPositionID"] != DBNull.Value
+                                ? Convert.ToInt32(dr["nPositionID"])
+                                : 0;
+
+                            post.dRegisterDate =
+                                dr["dRegisterDate"] != DBNull.Value
+                                ? Convert.ToDateTime(
+                                    dr["dRegisterDate"])
+                                : null;
+
+                            post.nBit =
+                                dr["nBit"] != DBNull.Value &&
+                                Convert.ToBoolean(
+                                    dr["nBit"]);
+
+                            post.sPositionName =
+                                dr["sPositionName"] != DBNull.Value
+                                ? dr["sPositionName"].ToString()
+                                : string.Empty;
+
+                            post.AppliedTraineeCount =
+                                dr["AppliedTraineeCount"] != DBNull.Value
+                                ? Convert.ToInt32(
+                                    dr["AppliedTraineeCount"])
+                                : 0;
+
+                            organizationPosts.Add(post);
+                        }
+                    }
+                    ViewBag.OrganizationPosts =
+    organizationPosts;
+                }
             }
 
             // =====================================================
