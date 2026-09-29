@@ -2496,5 +2496,7 @@ namespace ErJobPortal.Controllers
 
             return View();
         }
+
+
     }
 }
