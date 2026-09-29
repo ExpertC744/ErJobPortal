@@ -68,6 +68,9 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
 
     <style>
+        /* =========================================================
+                   ROOT - KEPT EXACTLY AS YOU PROVIDED
+                ========================================================= */
         :root {
             --primary: #263b47;
             --primary-light: #edf2f3;
@@ -90,7 +93,9 @@
             font-family: "DM Sans", Arial, sans-serif;
         }
 
-        /* TOOLBAR */
+        /* =========================================================
+                   TOOLBAR - KEPT EXACTLY AS YOU PROVIDED
+                ========================================================= */
         .resume-toolbar {
             width: 297mm;
             max-width: calc(100% - 30px);
@@ -116,11 +121,25 @@
             gap: 6px;
         }
 
-        .btn-edit { background: #ffffff; color: var(--primary); border: 1px solid var(--border) !important; }
-        .btn-print { background: var(--primary); color: white; }
-        .btn-download { background: var(--accent); color: white; }
+        .btn-edit {
+            background: #ffffff;
+            color: var(--primary);
+            border: 1px solid var(--border) !important;
+        }
 
-        /* THEME SWITCHER */
+        .btn-print {
+            background: var(--primary);
+            color: white;
+        }
+
+        .btn-download {
+            background: var(--accent);
+            color: white;
+        }
+
+        /* =========================================================
+                   THEME SWITCHER - KEPT EXACTLY AS YOU PROVIDED
+                ========================================================= */
         .theme-switcher {
             width: 297mm;
             max-width: calc(100% - 30px);
@@ -152,7 +171,9 @@
             box-shadow: 0 0 0 2px white, 0 0 0 4px var(--swatch);
         }
 
-        /* RESUME SHEET & THEMES */
+        /* =========================================================
+                   RESUME SHEET & THEMES
+                ========================================================= */
         .resume-page-wrapper {
             display: flex; justify-content: center; padding: 5px 0 25px;
         }
@@ -162,6 +183,7 @@
             box-shadow: 0 12px 40px rgba(20,40,50,.14); overflow: hidden;
             display: grid; grid-template-columns: 26% 46% 28%;
             
+            /* Specific variables just for the resume content */
             --theme-main: #00796b;
             --theme-dark: #1a1a1a;
             --text-dark: #333333;
@@ -174,21 +196,22 @@
         .resume-sheet[data-theme="emerald"] { --theme-main: #059669; --theme-dark: #064e3b; }
         .resume-sheet[data-theme="slate"] { --theme-main: #475569; --theme-dark: #0f172a; }
 
-        /* INCREASED FONT SIZES & TIGHTER LAYOUT COLUMNS */
+        /* =========================================================
+                   LAYOUT COLUMNS
+                ========================================================= */
+        /* Dynamic Full-Height Layouts */
         .col-left {
             background: #ffffff;
-            padding: 12mm 10mm;
+            padding: 15mm 10mm;
             border-right: 1px solid var(--border);
-            display: flex; flex-direction: column; 
-            justify-content: flex-start; /* Ensures content strictly stacks at the top */
-            gap: 15px; /* Controls uniform spacing between photo, objective, and skills */
+            display: flex; flex-direction: column; gap: 15px;
         }
 
         .col-mid {
             background: #ffffff;
-            padding: 12mm 12mm;
+            padding: 15mm 15mm;
             display: flex; flex-direction: column;
-            justify-content: flex-start; gap: 12px;
+            justify-content: flex-start; gap: 20px;
         }
 
         .col-right {
@@ -198,26 +221,28 @@
         }
 
         .col-right-top {
-            padding: 12mm 10mm;
+            padding: 15mm 12mm;
             flex-grow: 1;
-            display: flex; flex-direction: column; gap: 12px;
+            display: flex; flex-direction: column; gap: 15px;
         }
 
         .col-right-bottom {
             background: var(--theme-dark);
-            padding: 10mm;
+            padding: 12mm;
             margin-top: auto; 
-            display: flex; flex-direction: column; gap: 8px;
+            display: flex; flex-direction: column; gap: 10px;
         }
 
-        /* LEFT COLUMN CONTENT */
+        /* =========================================================
+                   LEFT COLUMN CONTENT (PHOTO FIXED)
+                ========================================================= */
         .photo-wrap {
             position: relative;
-            width: 40mm; /* Enlarged slightly to balance new fonts */
-            height: 40mm;
-            min-width: 40mm; 
-            min-height: 40mm;
-            margin: 0 auto; /* Removed bottom margin, relies purely on flex gap */
+            width: 35mm; 
+            height: 35mm;
+            min-width: 35mm; 
+            min-height: 35mm;
+            margin: 0 auto 10px auto;
             border-radius: 50%;
             border: 3px solid var(--theme-main);
             overflow: hidden;
@@ -234,74 +259,79 @@
         
         .photo-placeholder {
             font-size: 35px; color: #cbd5e1;
-            display: flex; align-items: center; justify-content: center; width: 100%; height: 100%;
         }
 
         .section-header-left {
-            font-family: "Montserrat", sans-serif; font-size: 11.5px; font-weight: 800; /* Increased font */
-            letter-spacing: 2px; text-transform: uppercase; margin-bottom: 6px; color: #111;
+            font-family: "Montserrat", sans-serif; font-size: 10px; font-weight: 800;
+            letter-spacing: 2px; text-transform: uppercase; margin-bottom: 5px; color: #111;
         }
 
         .profile-text {
-            font-size: 10px; line-height: 1.5; color: var(--text-light); text-align: justify; /* Increased font */
+            font-size: 8.5px; line-height: 1.6; color: var(--text-light); text-align: justify;
         }
 
         .skill-list-left {
-            list-style: none; padding: 0; margin-top: 4px;
+            list-style: none; padding: 0; margin-top: 5px;
         }
         .skill-list-left li {
-            font-size: 10px; font-weight: 600; color: var(--text-dark); margin-bottom: 4px; /* Increased font */
+            font-size: 8.5px; font-weight: 600; color: var(--text-dark); margin-bottom: 4px;
             display: flex; justify-content: space-between; align-items: center;
         }
         .skill-dots { color: var(--theme-main); font-size: 10px; letter-spacing: 1px; }
 
-        /* MIDDLE COLUMN CONTENT */
+        /* =========================================================
+                   MIDDLE COLUMN CONTENT
+                ========================================================= */
         .intro-small {
-            font-size: 14px; font-weight: 400; color: var(--text-dark); margin-bottom: 2px; /* Increased font */
+            font-size: 14px; font-weight: 400; color: var(--text-dark); margin-bottom: 4px;
         }
         
         .intro-large {
-            font-family: "Montserrat", sans-serif; font-size: 24px; font-weight: 700; color: #111; /* Significantly increased Name size */
-            padding-bottom: 6px; border-bottom: 2px solid var(--theme-main); margin-bottom: 8px; line-height: 1.2;
+            font-family: "Montserrat", sans-serif; font-size: 18px; font-weight: 700; color: #111;
+            padding-bottom: 8px; border-bottom: 3px solid var(--theme-main); margin-bottom: 10px;
         }
-        .intro-role { font-weight: 500; font-size: 14px; color: var(--text-light); }
+        .intro-role { font-weight: 400; color: var(--text-light); }
 
         .section-header-mid {
-            font-family: "Montserrat", sans-serif; font-size: 11.5px; font-weight: 800; /* Increased font */
-            letter-spacing: 2px; text-transform: uppercase; margin-bottom: 10px; color: #111;
+            font-family: "Montserrat", sans-serif; font-size: 10px; font-weight: 800;
+            letter-spacing: 2px; text-transform: uppercase; margin-bottom: 12px; color: #111;
         }
 
-        .exp-item { margin-bottom: 10px; break-inside: avoid; }
-        .exp-date { font-size: 9.5px; font-weight: 700; color: var(--theme-main); margin-bottom: 2px; } /* Increased font */
+        .exp-item { margin-bottom: 12px; break-inside: avoid; }
+        .exp-date { font-size: 8.5px; font-weight: 600; color: var(--theme-main); margin-bottom: 2px; }
         .exp-title { 
-            font-family: "Montserrat", sans-serif; font-size: 11px; font-weight: 700;  /* Increased font */
+            font-family: "Montserrat", sans-serif; font-size: 10px; font-weight: 700; 
             text-transform: uppercase; letter-spacing: 1px; color: #111;
-            border-bottom: 1px solid var(--border); padding-bottom: 2px; margin-bottom: 3px; display: inline-block;
+            border-bottom: 1px solid var(--border); padding-bottom: 2px; margin-bottom: 4px; display: inline-block;
         }
-        .exp-company { font-size: 10.5px; font-weight: 600; color: var(--text-dark); margin-bottom: 2px; } /* Increased font */
-        .exp-desc { font-size: 9.5px; line-height: 1.5; color: var(--text-light); } /* Increased font */
+        .exp-company { font-size: 9px; font-weight: 600; color: var(--text-dark); margin-bottom: 3px; }
+        .exp-desc { font-size: 8.5px; line-height: 1.5; color: var(--text-light); }
 
-        /* RIGHT COLUMN CONTENT */
+        /* =========================================================
+                   RIGHT COLUMN CONTENT
+                ========================================================= */
         .section-header-right {
-            font-family: "Montserrat", sans-serif; font-size: 11.5px; font-weight: 800; /* Increased font */
+            font-family: "Montserrat", sans-serif; font-size: 10px; font-weight: 800;
             letter-spacing: 2px; text-transform: uppercase; margin-bottom: 8px; color: white;
         }
 
-        .contact-item { font-size: 9.5px; line-height: 1.5; margin-bottom: 4px; color: rgba(255,255,255,0.95); word-break: break-word; } /* Increased font */
+        .contact-item { font-size: 8.5px; line-height: 1.6; margin-bottom: 3px; color: rgba(255,255,255,0.9); word-break: break-word; }
         
-        .edu-item { margin-bottom: 8px; }
-        .edu-date { font-size: 9px; font-weight: 700; color: rgba(255,255,255,0.8); margin-bottom: 2px; } /* Increased font */
+        .edu-item { margin-bottom: 10px; }
+        .edu-date { font-size: 8px; font-weight: 700; color: rgba(255,255,255,0.7); margin-bottom: 2px; }
         .edu-title { 
-            font-family: "Montserrat", sans-serif; font-size: 10px; font-weight: 700; text-transform: uppercase;  /* Increased font */
+            font-family: "Montserrat", sans-serif; font-size: 9px; font-weight: 700; text-transform: uppercase; 
             border-bottom: 1px solid rgba(255,255,255,0.3); padding-bottom: 2px; margin-bottom: 2px; display: inline-block;
         }
-        .edu-sub { font-size: 9px; color: rgba(255,255,255,0.95); } /* Increased font */
+        .edu-sub { font-size: 8px; color: rgba(255,255,255,0.9); }
 
         .ref-item { margin-bottom: 8px; }
-        .ref-name { font-size: 10.5px; font-weight: 700; color: white; } /* Increased font */
-        .ref-detail { font-size: 9px; color: rgba(255,255,255,0.8); margin-top: 1px; } /* Increased font */
+        .ref-name { font-size: 9.5px; font-weight: 700; color: white; }
+        .ref-detail { font-size: 8px; color: rgba(255,255,255,0.7); margin-top: 2px; }
 
-        /* RESPONSIVE & PRINT */
+        /* =========================================================
+                   RESPONSIVE & PRINT
+                ========================================================= */
         @@media (max-width: 1200px) {
             .resume-toolbar, .theme-switcher { width: 100%; padding-left: 12px; padding-right: 12px; }
             .resume-sheet { transform: scale(.75); transform-origin: top center; margin-bottom: -45mm; }
@@ -323,18 +353,34 @@
 
 <body>
 
+    <!-- =========================================================
+         TOOLBAR (PRESERVED EXACTLY)
+    ========================================================== -->
     <div class="resume-toolbar">
-        <a asp-controller="Candidate" asp-action="Profile" class="btn-edit">
+
+        <a asp-controller="Candidate"
+           asp-action="Profile"
+           class="btn-edit">
             <i class="fa fa-pen"></i> Edit
         </a>
-        <button type="button" class="btn-print" onclick="window.print()">
+
+        <button type="button"
+                class="btn-print"
+                onclick="window.print()">
             <i class="fa fa-print"></i> Print / PDF
         </button>
-        <button type="button" class="btn-download" onclick="downloadResumePDF()">
+
+        <button type="button"
+                class="btn-download"
+                onclick="downloadResumePDF()">
             <i class="fa fa-download"></i> Download
         </button>
+
     </div>
 
+    <!-- =========================================================
+         THEME SWITCHER (PRESERVED EXACTLY)
+    ========================================================== -->
     <div class="theme-switcher">
         <span>Theme</span>
         <div class="theme-swatch active" data-theme="teal" style="background:#00796b;--swatch:#00796b" title="Teal"></div>
@@ -344,18 +390,20 @@
         <div class="theme-swatch" data-theme="slate" style="background:#475569;--swatch:#475569" title="Slate"></div>
     </div>
 
+    <!-- =========================================================
+         RESUME (TEMPLATE 8 LAYOUT)
+    ========================================================== -->
     <div class="resume-page-wrapper">
         <div class="resume-sheet" id="resumeSheet" data-theme="teal">
 
             <!-- 1. LEFT COLUMN -->
             <div class="col-left">
                 
-                <!-- Photo with fallback -->
+                <!-- Fixed Photo Wrap (Perfectly Round) -->
                 <div class="photo-wrap">
                     @if (Has(p.sPhoto))
                     {
-                        <img src="@p.sPhoto" class="photo" alt="Profile" onerror="this.style.display='none'; document.getElementById('fallbackIcon').style.display='flex';" />
-                        <div class="photo-placeholder" id="fallbackIcon" style="display:none;"><i class="fa fa-user"></i></div>
+                        <img src="@p.sPhoto" class="photo" alt="Profile" />
                     }
                     else
                     {
@@ -382,9 +430,7 @@
 
                 @if (skillGroups.Any())
                 {
-                    <!-- Simply rendered as a direct block without margin hacks. 
-                         The gap:15px in .col-left controls the spacing smoothly -->
-                    <div> 
+                    <div style="margin-top: auto;"> 
                         <div class="section-header-left">Pro Skills</div>
                         @foreach (var group in skillGroups)
                         {
@@ -409,7 +455,7 @@
                     <div class="intro-small">Hello, my name is</div>
                     <div class="intro-large">
                         @(Has(candidateName) ? candidateName : "Candidate Name") 
-                        @if(Has(candidateRole)) { <span class="intro-role"><br/>and I'm a @candidateRole.</span> }
+                        @if(Has(candidateRole)) { <span class="intro-role">and I'm a @candidateRole.</span> }
                     </div>
                 </div>
 
@@ -426,7 +472,7 @@
 
                 @if (internships.Any())
                 {
-                    <div>
+                    <div style="margin-top: 10px;">
                         <div class="section-header-mid">Work Experience</div>
                         @foreach (var exp in internships)
                         {
@@ -443,17 +489,17 @@
                     </div>
                 }
 
-                <!-- Achievements -->
+                <!-- Achievements (Placed here to balance space if experience is short) -->
                 @{
                     var achievements = new[] { p.Achievements_Certification1, p.Achievements_Certification2, p.Achievements_Certification3 }.Where(Has).ToList();
                 }
                 @if (achievements.Any())
                 {
-                    <div> 
+                    <div style="margin-top: auto;"> 
                         <div class="section-header-mid">Achievements</div>
                         @foreach (var a in achievements)
                         {
-                            <div class="exp-item" style="margin-bottom: 4px;">
+                            <div class="exp-item" style="margin-bottom: 6px;">
                                 <div class="exp-title" style="border:none; margin-bottom: 0;">@a</div>
                             </div>
                         }
@@ -461,9 +507,10 @@
                 }
             </div>
 
-            <!-- 3. RIGHT COLUMN -->
+            <!-- 3. RIGHT COLUMN (Top and Bottom split) -->
             <div class="col-right">
                 
+                <!-- Right Top (Theme Color) -->
                 <div class="col-right-top">
                     
                     <div>
@@ -481,7 +528,7 @@
 
                     @if (HasNum(p.PG_Year) || HasNum(p.Graduation_Year) || HasNum(p.HSC_DIPLOMA_YEAR) || HasNum(p.SSC_YEAR))
                     {
-                        <div style="margin-top: 10px;">
+                        <div style="margin-top: 15px;">
                             <div class="section-header-right">Education</div>
                             
                             @if (HasNum(p.PG_Year)) {
@@ -526,7 +573,7 @@
                     }
                     @if (langItems.Any())
                     {
-                        <div style="margin-top: 10px;">
+                        <div style="margin-top: 15px;">
                             <div class="section-header-right">Languages</div>
                             @foreach (var l in langItems)
                             {
@@ -536,10 +583,12 @@
                     }
                 </div>
 
+                <!-- Right Bottom (Darker Theme Color) -->
                 <div class="col-right-bottom">
+                    
                     @if (Has(p.sRefName1) || Has(p.sRefName2))
                     {
-                        <div class="section-header-right" style="margin-bottom: 8px;">Reference</div>
+                        <div class="section-header-right" style="margin-bottom: 12px;">Reference</div>
                         
                         @if (Has(p.sRefName1)) {
                             <div class="ref-item">
@@ -550,7 +599,7 @@
                         }
                         
                         @if (Has(p.sRefName2)) {
-                            <div class="ref-item" style="margin-top: 6px;">
+                            <div class="ref-item" style="margin-top: 10px;">
                                 <div class="ref-name">@p.sRefName2</div>
                                 <div class="ref-detail">@GetLookupName(Model.Relationships, p.sRefRelationName2)</div>
                                 @if(Has(p.sMobile2)) { <div class="ref-detail">@p.sMobile2</div> }
@@ -559,8 +608,8 @@
                     } 
                     else if (Has(p.sHobbies)) 
                     {
-                        <div class="section-header-right" style="margin-bottom: 8px;">Interests</div>
-                        <div class="contact-item" style="white-space: pre-wrap;">@p.sHobbies</div>
+                        <div class="section-header-right" style="margin-bottom: 12px;">Interests</div>
+                        <div class="contact-item">@p.sHobbies</div>
                     }
                 </div>
 
@@ -569,10 +618,16 @@
     </div>
 
 
+    <!-- =========================================================
+         PDF & JS LOGIC (PRESERVED EXACTLY AS PROVIDED)
+    ========================================================== -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 
     <script>
+        /* =========================================================
+           THEME
+        ========================================================= */
         document.addEventListener("DOMContentLoaded", function () {
             const sheet = document.getElementById("resumeSheet");
             const swatches = document.querySelectorAll(".theme-swatch");
@@ -596,6 +651,9 @@
                 });
             });
 
+            /* =================================================
+               ADDRESS
+            ================================================= */
             const addressElements = document.querySelectorAll("[data-country-id]");
             if (!addressElements.length) return;
 
@@ -654,6 +712,9 @@
                 .catch(error => console.log("Address resolution error:", error));
         });
 
+        /* =========================================================
+           PDF DOWNLOAD
+        ========================================================= */
         async function downloadResumePDF() {
             const sheet = document.getElementById("resumeSheet");
             const button = document.querySelector(".btn-download");

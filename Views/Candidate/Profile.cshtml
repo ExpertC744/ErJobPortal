@@ -1,62 +1,6 @@
 ﻿@model ErJobPortal.Models.CandidateProfileViewModel
 
 <style>
-
-
-    /* shrirang 28/09/26 */
-    /* ========================================================= */
-    /* CAREER OBJECTIVE DRAFT */
-    /* ========================================================= */
-
-    #objectiveDraftModal .modal-dialog {
-        max-width: 900px;
-    }
-
-    #objectiveDraftModal .modal-title {
-        font-weight: 600;
-    }
-
-    #objectiveDraftModal table {
-        margin-bottom: 0;
-    }
-
-    #objectiveDraftModal th {
-        font-weight: 600;
-        vertical-align: middle;
-    }
-
-    #objectiveDraftModal td {
-        vertical-align: middle;
-    }
-
-    .objective-draft-row {
-        cursor: pointer;
-        transition: background-color 0.15s ease;
-    }
-
-        .objective-draft-row:hover {
-            background-color: #f1f5f9;
-        }
-
-    .objective-draft-number {
-        width: 80px;
-        text-align: center;
-        font-weight: 600;
-    }
-
-    .objective-draft-text {
-        line-height: 1.6;
-    }
-
-    .objective-draft-row:hover .objective-draft-text {
-        color: #0d6efd;
-    }
-
-
-    /* end draft carrer objective */
-
-
-
     /* ========================================================= */
     /* SKILLS SECTION */
     /* ========================================================= */
@@ -1157,892 +1101,216 @@
     </div>
 
 
-    @* shrirang 28/09/26 *@
-   <!-- ================================================= -->
-<!-- DOCUMENTS & PERSONAL DETAILS -->
-<!-- ================================================= -->
+    <!-- ================================================= -->
+    <!-- DOCUMENTS -->
+    <!-- ================================================= -->
 
-<div class="card mb-4">
+    <div class="card mb-4">
 
-    <div class="card-header">
-        <h5 class="mb-0">
-            Documents & Personal Details
-        </h5>
-    </div>
+        <div class="card-header">
+            <h5 class="mb-0">
+                Documents & Personal Details
+            </h5>
+        </div>
 
-    <div class="card-body">
+        <div class="card-body">
 
-        <form id="documentsForm"
-              asp-controller="Candidate"
-              asp-action="UpdateDocuments"
-              method="post"
-              enctype="multipart/form-data">
+            <form id="documentsForm"
+                  asp-controller="Candidate"
+                  asp-action="UpdateDocuments"
+                  method="post"
+                  enctype="multipart/form-data">
 
                 @Html.AntiForgeryToken()
 
+                <div class="row">
 
-            <!-- ================================================= -->
-            <!-- DOCUMENT ROW -->
-            <!-- ================================================= -->
+                    <!-- Resume -->
 
-            <div class="row">
+                    <div class="col-md-4 mb-3">
 
+                        <label class="form-label fw-bold">
+                            Resume
+                        </label>
 
-                <!-- ================================================= -->
-                <!-- RESUME -->
-                <!-- ================================================= -->
+                        <input type="file"
+                               name="ResumeFile"
+                               id="ResumeFile"
+                               class="form-control"
+                               accept=".pdf,.doc,.docx" />
 
-                <div class="col-md-4 mb-4">
+                        <small class="text-muted">
+                            Allowed: PDF, DOC, DOCX. Maximum 5 MB.
+                        </small>
 
-                    <label for="ResumeFile"
-                           class="form-label fw-bold">
-
-                        Resume
-
-                    </label>
-
-                    <input type="file"
-                           name="ResumeFile"
-                           id="ResumeFile"
-                           class="form-control"
-                           accept=".pdf,.doc,.docx" />
-
-                    <small class="text-muted d-block mt-1">
-
-                        Allowed: PDF, DOC, DOCX.
-                        Maximum 5 MB.
-
-                    </small>
-
-                    <!-- Resume Error -->
-
-                    <div id="resumeError"
-                         class="text-danger mt-1">
-                    </div>
-
-
-                    <!-- Existing Resume -->
+                        <div id="resumeError"
+                             class="text-danger">
+                        </div>
 
                         @if (!string.IsNullOrEmpty(Model.Profile?.sResume))
                         {
-                            <div class="mt-3">
+                            <small class="text-success d-block mt-2">
+                                ✓ Resume already uploaded
+                            </small>
 
-                                <small class="text-success d-block">
-
-                                    <i class="fas fa-check-circle"></i>
-                                    Resume already uploaded
-
-                                </small>
-
-                                <a href="@Model.Profile.sResume"
-                                   target="_blank"
-                                   class="btn btn-sm btn-outline-primary mt-2">
-
-                                    <i class="fas fa-eye me-1"></i>
-                                    View Resume
-
-                                </a>
-
-                            </div>
+                            <a href="@Model.Profile.sResume"
+                               target="_blank"
+                               class="btn btn-sm btn-outline-primary mt-1">
+                                View Resume
+                            </a>
                         }
 
-                </div>
-
-
-
-                <!-- ================================================= -->
-                <!-- PHOTO -->
-                <!-- ================================================= -->
-
-                <div class="col-md-4 mb-4">
-
-                    <label for="PhotoFile"
-                           class="form-label fw-bold">
-
-                        Photo
-
-                    </label>
-
-                    <input type="file"
-                           name="PhotoFile"
-                           id="PhotoFile"
-                           class="form-control"
-                           accept=".jpg,.jpeg,.png" />
-
-                    <small class="text-muted d-block mt-1">
-
-                        Allowed: JPG, JPEG, PNG.
-                        Maximum 5 MB.
-
-                    </small>
-
-
-                    <!-- Photo Error -->
-
-                    <div id="photoError"
-                         class="text-danger mt-1">
                     </div>
 
 
-                    <!-- ================================================= -->
-                    <!-- NEW PHOTO PREVIEW -->
-                    <!-- ================================================= -->
+                    <!-- Photo -->
 
-                    <div id="photoPreviewContainer"
-                         class="mt-3 d-none">
+                    <div class="col-md-4 mb-3">
 
-                        <label class="form-label fw-bold mb-2">
-
-                            New Photo Preview
-
+                        <label class="form-label fw-bold">
+                            Photo
                         </label>
 
-                        <div>
+                        <input type="file"
+                               name="PhotoFile"
+                               id="PhotoFile"
+                               class="form-control"
+                               accept=".jpg,.jpeg,.png" />
 
-                            <img id="photoPreview"
-                                 src=""
-                                 alt="New Photo Preview"
-                                 style="
-                                     width:120px;
-                                     height:120px;
-                                     object-fit:cover;
-                                     border:1px solid #dee2e6;
-                                     border-radius:6px;
-                                     padding:3px;
-                                     background:#fff;
-                                 " />
+                        <small class="text-muted">
+                            Allowed: JPG, JPEG, PNG. Maximum 5 MB.
+                        </small>
 
+                        <div id="photoError"
+                             class="text-danger">
                         </div>
-
-                    </div>
-
-
-                    <!-- ================================================= -->
-                    <!-- EXISTING PHOTO -->
-                    <!-- ================================================= -->
 
                         @if (!string.IsNullOrEmpty(Model.Profile?.sPhoto))
                         {
-                            <div class="mt-3">
+                            <small class="text-success d-block mt-2">
+                                ✓ Photo already uploaded
+                            </small>
 
-                                <small class="text-success d-block">
-
-                                    <i class="fas fa-check-circle"></i>
-                                    Photo already uploaded
-
-                                </small>
-
-                                <img src="@Model.Profile.sPhoto"
-                                     alt="Existing Photo"
-                                     class="mt-2"
-                                     style="
-                                     width:120px;
-                                     height:120px;
-                                     object-fit:cover;
-                                     border:1px solid #dee2e6;
-                                     border-radius:6px;
-                                     padding:3px;
-                                     background:#fff;
-                                     " />
-
-                            </div>
+                            <img src="@Model.Profile.sPhoto"
+                                 alt="Photo"
+                                 class="mt-1"
+                                 style="width:80px;height:80px;object-fit:cover;" />
                         }
 
-                </div>
-
-
-
-                <!-- ================================================= -->
-                <!-- SIGNATURE -->
-                <!-- ================================================= -->
-
-                <div class="col-md-4 mb-4">
-
-                    <label for="SignatureFile"
-                           class="form-label fw-bold">
-
-                        Signature
-
-                    </label>
-
-                    <input type="file"
-                           name="SignatureFile"
-                           id="SignatureFile"
-                           class="form-control"
-                           accept=".jpg,.jpeg,.png" />
-
-                    <small class="text-muted d-block mt-1">
-
-                        Allowed: JPG, JPEG, PNG.
-                        Maximum 5 MB.
-
-                    </small>
-
-
-                    <!-- Signature Error -->
-
-                    <div id="signatureError"
-                         class="text-danger mt-1">
                     </div>
 
 
-                    <!-- ================================================= -->
-                    <!-- NEW SIGNATURE PREVIEW -->
-                    <!-- ================================================= -->
+                    <!-- Signature -->
 
-                    <div id="signaturePreviewContainer"
-                         class="mt-3 d-none">
+                    <div class="col-md-4 mb-3">
 
-                        <label class="form-label fw-bold mb-2">
-
-                            New Signature Preview
-
+                        <label class="form-label fw-bold">
+                            Signature
                         </label>
 
-                        <div>
+                        <input type="file"
+                               name="SignatureFile"
+                               id="SignatureFile"
+                               class="form-control"
+                               accept=".jpg,.jpeg,.png" />
 
-                            <img id="signaturePreview"
-                                 src=""
-                                 alt="New Signature Preview"
-                                 style="
-                                     width:200px;
-                                     height:80px;
-                                     object-fit:contain;
-                                     border:1px solid #dee2e6;
-                                     border-radius:6px;
-                                     padding:5px;
-                                     background:#fff;
-                                 " />
+                        <small class="text-muted">
+                            Allowed: JPG, JPEG, PNG. Maximum 5 MB.
+                        </small>
 
+                        <div id="signatureError"
+                             class="text-danger">
                         </div>
-
-                    </div>
-
-
-                    <!-- ================================================= -->
-                    <!-- EXISTING SIGNATURE -->
-                    <!-- ================================================= -->
 
                         @if (!string.IsNullOrEmpty(Model.Profile?.sSignature))
                         {
-                            <div class="mt-3">
+                            <small class="text-success d-block mt-2">
+                                ✓ Signature already uploaded
+                            </small>
 
-                                <small class="text-success d-block">
-
-                                    <i class="fas fa-check-circle"></i>
-                                    Signature already uploaded
-
-                                </small>
-
-                                <img src="@Model.Profile.sSignature"
-                                     alt="Existing Signature"
-                                     class="mt-2"
-                                     style="
-                                     width:200px;
-                                     height:80px;
-                                     object-fit:contain;
-                                     border:1px solid #dee2e6;
-                                     border-radius:6px;
-                                     padding:5px;
-                                     background:#fff;
-                                     " />
-
-                            </div>
+                            <img src="@Model.Profile.sSignature"
+                                 alt="Signature"
+                                 class="mt-1"
+                                 style="width:150px;
+                                            height:60px;
+                                            object-fit:contain;
+                                            border:1px solid #ddd;" />
                         }
 
-                </div>
-
-            </div>
+                    </div>
 
 
+                    <!-- DIVYANG -->
 
-            <!-- ================================================= -->
-            <!-- PERSONAL DETAILS -->
-            <!-- ================================================= -->
+                    <div class="col-md-6 mb-3">
 
-            <div class="row">
+                        <label asp-for="Profile.sDivyang"
+                               class="form-label">
+                            Divyang <span class="text-danger">*</span>
+                        </label>
 
+                        <select asp-for="Profile.sDivyang"
+                                class="form-select"
+                                required>
 
-                <!-- ================================================= -->
-                <!-- DIVYANG -->
-                <!-- ================================================= -->
+                            <option value="">
+                                -- Select --
+                            </option>
 
-                <div class="col-md-6 mb-3">
+                            <option value="Yes">
+                                Yes
+                            </option>
 
-                    <label asp-for="Profile.sDivyang"
-                           class="form-label fw-bold">
+                            <option value="No">
+                                No
+                            </option>
 
-                        Divyang
-                        <span class="text-danger">*</span>
+                        </select>
 
-                    </label>
+                        <span asp-validation-for="Profile.sDivyang"
+                              class="text-danger">
+                        </span>
 
-                    <select asp-for="Profile.sDivyang"
-                            class="form-select"
-                            required>
-
-                        <option value="">
-                            -- Select --
-                        </option>
-
-                        <option value="Yes">
-                            Yes
-                        </option>
-
-                        <option value="No">
-                            No
-                        </option>
-
-                    </select>
-
-                    <span asp-validation-for="Profile.sDivyang"
-                          class="text-danger">
-                    </span>
-
-                </div>
+                    </div>
 
 
+                    <!-- HOBBIES -->
 
-                <!-- ================================================= -->
-                <!-- HOBBIES -->
-                <!-- ================================================= -->
+                    <div class="col-md-6 mb-3">
 
-                <div class="col-md-6 mb-3">
+                        <label asp-for="Profile.sHobbies"
+                               class="form-label">
+                            Hobbies
+                        </label>
 
-                    <label asp-for="Profile.sHobbies"
-                           class="form-label fw-bold">
+                        <input asp-for="Profile.sHobbies"
+                               class="form-control"
+                               maxlength="300"
+                               placeholder="Enter your hobbies" />
 
-                        Hobbies
+                        <span asp-validation-for="Profile.sHobbies"
+                              class="text-danger">
+                        </span>
 
-                    </label>
-
-                    <input asp-for="Profile.sHobbies"
-                           class="form-control"
-                           maxlength="300"
-                           placeholder="Enter your hobbies" />
-
-                    <span asp-validation-for="Profile.sHobbies"
-                          class="text-danger">
-                    </span>
+                    </div>
 
                 </div>
 
-            </div>
 
+                <div class="text-end mt-3">
 
+                    <button type="submit"
+                            class="btn btn-primary">
+                        Update Personal Details
+                    </button>
 
-            <!-- ================================================= -->
-            <!-- UPDATE BUTTON -->
-            <!-- ================================================= -->
+                </div>
 
-            <div class="text-end mt-3">
+            </form>
 
-                <button type="submit"
-                        class="btn btn-primary"
-                        id="btnUpdateDocuments">
-
-                    <i class="fas fa-save me-1"></i>
-
-                    Update Personal Details
-
-                </button>
-
-            </div>
-
-        </form>
+        </div>
 
     </div>
-
-</div>
-
-                <!-- ================================================= -->
-                <!-- DOCUMENT VALIDATION & PREVIEW SCRIPT -->
-                <!-- ================================================= -->
-
-                <script>
-
-                    $(document).ready(function () {
-
-
-                        // =========================================================
-                        // CONSTANTS
-                        // =========================================================
-
-                        const MAX_FILE_SIZE =
-                            5 * 1024 * 1024;
-
-
-                        // =========================================================
-                        // RESUME VALIDATION
-                        // =========================================================
-
-                        $('#ResumeFile').on('change', function () {
-
-                            const file = this.files[0];
-
-                            $('#resumeError').text('');
-
-                            if (!file) {
-                                return;
-                            }
-
-
-                            // File size
-
-                            if (file.size > MAX_FILE_SIZE) {
-
-                                $('#resumeError').text(
-                                    'Resume size must not exceed 5 MB.'
-                                );
-
-                                this.value = '';
-
-                                return;
-                            }
-
-
-                            // Extension
-
-                            const fileName =
-                                file.name.toLowerCase();
-
-                            const allowedExtensions = [
-                                '.pdf',
-                                '.doc',
-                                '.docx'
-                            ];
-
-                            const isValid =
-                                allowedExtensions.some(
-                                    function (extension) {
-
-                                        return fileName.endsWith(extension);
-
-                                    }
-                                );
-
-
-                            if (!isValid) {
-
-                                $('#resumeError').text(
-                                    'Only PDF, DOC and DOCX files are allowed.'
-                                );
-
-                                this.value = '';
-
-                                return;
-                            }
-
-                        });
-
-
-
-                        // =========================================================
-                        // PHOTO VALIDATION + PREVIEW
-                        // =========================================================
-
-                        $('#PhotoFile').on('change', function () {
-
-                            const file = this.files[0];
-
-                            $('#photoError').text('');
-
-
-                            // No file
-
-                            if (!file) {
-
-                                $('#photoPreviewContainer')
-                                    .addClass('d-none');
-
-                                $('#photoPreview')
-                                    .attr('src', '');
-
-                                return;
-                            }
-
-
-                            // =====================================================
-                            // SIZE VALIDATION
-                            // =====================================================
-
-                            if (file.size > MAX_FILE_SIZE) {
-
-                                $('#photoError').text(
-                                    'Photo size must not exceed 5 MB.'
-                                );
-
-                                this.value = '';
-
-                                $('#photoPreviewContainer')
-                                    .addClass('d-none');
-
-                                $('#photoPreview')
-                                    .attr('src', '');
-
-                                return;
-                            }
-
-
-                            // =====================================================
-                            // TYPE VALIDATION
-                            // =====================================================
-
-                            const allowedTypes = [
-                                'image/jpeg',
-                                'image/png'
-                            ];
-
-
-                            if (!allowedTypes.includes(file.type)) {
-
-                                $('#photoError').text(
-                                    'Only JPG, JPEG and PNG files are allowed.'
-                                );
-
-                                this.value = '';
-
-                                $('#photoPreviewContainer')
-                                    .addClass('d-none');
-
-                                $('#photoPreview')
-                                    .attr('src', '');
-
-                                return;
-                            }
-
-
-                            // =====================================================
-                            // FILE READER
-                            // =====================================================
-
-                            const reader =
-                                new FileReader();
-
-
-                            reader.onload = function (event) {
-
-                                $('#photoPreview')
-                                    .attr(
-                                        'src',
-                                        event.target.result
-                                    );
-
-                                $('#photoPreviewContainer')
-                                    .removeClass('d-none');
-
-                            };
-
-
-                            reader.onerror = function () {
-
-                                $('#photoError').text(
-                                    'Unable to preview the selected photo.'
-                                );
-
-                                $('#photoPreviewContainer')
-                                    .addClass('d-none');
-
-                            };
-
-
-                            reader.readAsDataURL(file);
-
-                        });
-
-
-
-                        // =========================================================
-                        // SIGNATURE VALIDATION + PREVIEW
-                        // =========================================================
-
-                        $('#SignatureFile').on('change', function () {
-
-                            const file = this.files[0];
-
-                            $('#signatureError').text('');
-
-
-                            // No file
-
-                            if (!file) {
-
-                                $('#signaturePreviewContainer')
-                                    .addClass('d-none');
-
-                                $('#signaturePreview')
-                                    .attr('src', '');
-
-                                return;
-                            }
-
-
-                            // =====================================================
-                            // SIZE VALIDATION
-                            // =====================================================
-
-                            if (file.size > MAX_FILE_SIZE) {
-
-                                $('#signatureError').text(
-                                    'Signature size must not exceed 5 MB.'
-                                );
-
-                                this.value = '';
-
-                                $('#signaturePreviewContainer')
-                                    .addClass('d-none');
-
-                                $('#signaturePreview')
-                                    .attr('src', '');
-
-                                return;
-                            }
-
-
-                            // =====================================================
-                            // TYPE VALIDATION
-                            // =====================================================
-
-                            const allowedTypes = [
-                                'image/jpeg',
-                                'image/png'
-                            ];
-
-
-                            if (!allowedTypes.includes(file.type)) {
-
-                                $('#signatureError').text(
-                                    'Only JPG, JPEG and PNG files are allowed.'
-                                );
-
-                                this.value = '';
-
-                                $('#signaturePreviewContainer')
-                                    .addClass('d-none');
-
-                                $('#signaturePreview')
-                                    .attr('src', '');
-
-                                return;
-                            }
-
-
-                            // =====================================================
-                            // FILE READER
-                            // =====================================================
-
-                            const reader =
-                                new FileReader();
-
-
-                            reader.onload = function (event) {
-
-                                $('#signaturePreview')
-                                    .attr(
-                                        'src',
-                                        event.target.result
-                                    );
-
-                                $('#signaturePreviewContainer')
-                                    .removeClass('d-none');
-
-                            };
-
-
-                            reader.onerror = function () {
-
-                                $('#signatureError').text(
-                                    'Unable to preview the selected signature.'
-                                );
-
-                                $('#signaturePreviewContainer')
-                                    .addClass('d-none');
-
-                            };
-
-
-                            reader.readAsDataURL(file);
-
-                        });
-
-
-
-                        // =========================================================
-                        // FORM SUBMIT VALIDATION
-                        // =========================================================
-
-                        $('#documentsForm').on('submit', function (e) {
-
-                            let isValid = true;
-
-
-                            // Clear previous errors
-
-                            $('#resumeError').text('');
-                            $('#photoError').text('');
-                            $('#signatureError').text('');
-
-
-                            // =====================================================
-                            // RESUME
-                            // =====================================================
-
-                            const resumeFile =
-                                $('#ResumeFile')[0].files[0];
-
-
-                            if (resumeFile) {
-
-                                if (resumeFile.size > MAX_FILE_SIZE) {
-
-                                    $('#resumeError').text(
-                                        'Resume size must not exceed 5 MB.'
-                                    );
-
-                                    isValid = false;
-                                }
-
-
-                                const resumeName =
-                                    resumeFile.name.toLowerCase();
-
-                                const resumeExtensions = [
-                                    '.pdf',
-                                    '.doc',
-                                    '.docx'
-                                ];
-
-                                const validResume =
-                                    resumeExtensions.some(
-                                        function (extension) {
-
-                                            return resumeName.endsWith(
-                                                extension
-                                            );
-
-                                        }
-                                    );
-
-
-                                if (!validResume) {
-
-                                    $('#resumeError').text(
-                                        'Only PDF, DOC and DOCX files are allowed.'
-                                    );
-
-                                    isValid = false;
-                                }
-
-                            }
-
-
-                            // =====================================================
-                            // PHOTO
-                            // =====================================================
-
-                            const photoFile =
-                                $('#PhotoFile')[0].files[0];
-
-
-                            if (photoFile) {
-
-                                if (photoFile.size > MAX_FILE_SIZE) {
-
-                                    $('#photoError').text(
-                                        'Photo size must not exceed 5 MB.'
-                                    );
-
-                                    isValid = false;
-                                }
-
-
-                                const photoTypes = [
-                                    'image/jpeg',
-                                    'image/png'
-                                ];
-
-
-                                if (!photoTypes.includes(
-                                    photoFile.type
-                                )) {
-
-                                    $('#photoError').text(
-                                        'Only JPG, JPEG and PNG files are allowed.'
-                                    );
-
-                                    isValid = false;
-                                }
-
-                            }
-
-
-                            // =====================================================
-                            // SIGNATURE
-                            // =====================================================
-
-                            const signatureFile =
-                                $('#SignatureFile')[0].files[0];
-
-
-                            if (signatureFile) {
-
-                                if (signatureFile.size > MAX_FILE_SIZE) {
-
-                                    $('#signatureError').text(
-                                        'Signature size must not exceed 5 MB.'
-                                    );
-
-                                    isValid = false;
-                                }
-
-
-                                const signatureTypes = [
-                                    'image/jpeg',
-                                    'image/png'
-                                ];
-
-
-                                if (!signatureTypes.includes(
-                                    signatureFile.type
-                                )) {
-
-                                    $('#signatureError').text(
-                                        'Only JPG, JPEG and PNG files are allowed.'
-                                    );
-
-                                    isValid = false;
-                                }
-
-                            }
-
-
-                            // =====================================================
-                            // STOP SUBMIT
-                            // =====================================================
-
-                            if (!isValid) {
-
-                                e.preventDefault();
-
-                                return false;
-                            }
-
-
-                            // =====================================================
-                            // DISABLE BUTTON
-                            // =====================================================
-
-                            $('#btnUpdateDocuments')
-                                .prop('disabled', true)
-                                .html(
-                                    '<i class="fas fa-spinner fa-spin me-1"></i> Updating...'
-                                );
-
-                        });
-
-                    });
-
-                </script>
 
 
     <!-- ================================================= -->
@@ -3361,7 +2629,7 @@
 
     </div>
 
-    @* shrirang 28/09/26 *@
+    @* shrirang 24/09/26 *@
     <!-- ================================================= -->
     <!-- CAREER OBJECTIVE -->
     <!-- ================================================= -->
@@ -3376,8 +2644,7 @@
 
         <div class="card-body">
 
-            <form id="objectiveForm"
-                  asp-action="UpdateObjective"
+            <form asp-action="UpdateObjective"
                   asp-controller="Candidate"
                   method="post">
 
@@ -3388,33 +2655,16 @@
 
                 <div class="mb-3">
 
-                    <div class="d-flex justify-content-between align-items-center mb-2">
-
-                        <label asp-for="Profile.Objective"
-                               class="form-label fw-bold mb-0">
-                            Career Objective
-                        </label>
-
-                        <!-- DRAFT BUTTON -->
-                        <button type="button"
-                                class="btn btn-outline-primary"
-                                id="btnObjectiveDraft">
-
-                            <i class="bi bi-file-earmark-text"></i>
-                            Draft
-
-                        </button>
-
-                    </div>
-
+                    <label asp-for="Profile.Objective"
+                           class="form-label fw-bold">
+                        Career Objective
+                    </label>
 
                     <textarea asp-for="Profile.Objective"
-                              id="CareerObjective"
                               class="form-control"
                               rows="6"
                               maxlength="1000"
                               placeholder="Write your career objective..."></textarea>
-
 
                     <div class="form-text">
                         Write a brief statement describing your career goals,
@@ -3422,21 +2672,17 @@
                         to achieve in your professional career.
                     </div>
 
-
                     <span asp-validation-for="Profile.Objective"
                           class="text-danger">
                     </span>
 
                 </div>
 
-
                 <div class="text-end">
 
                     <button type="submit"
                             class="btn btn-primary">
-
                         Update Career Objective
-
                     </button>
 
                 </div>
@@ -3447,98 +2693,7 @@
 
     </div>
 
-    @* shrirang 28/09/26 *@
 
-    <!-- ========================================================= -->
-    <!-- CAREER OBJECTIVE DRAFT MODAL -->
-    <!-- ========================================================= -->
-
-    <div class="modal fade"
-         id="objectiveDraftModal"
-         tabindex="-1"
-         aria-labelledby="objectiveDraftModalLabel"
-         aria-hidden="true">
-
-        <div class="modal-dialog modal-lg modal-dialog-centered">
-
-            <div class="modal-content">
-
-                <div class="modal-header">
-
-                    <h5 class="modal-title"
-                        id="objectiveDraftModalLabel">
-                        Career Objective Drafts
-                    </h5>
-
-                    <button type="button"
-                            class="btn-close"
-                            data-bs-dismiss="modal"
-                            aria-label="Close">
-                    </button>
-
-                </div>
-
-                <div class="modal-body">
-
-                    <div id="objectiveDraftLoading"
-                         class="text-center py-3">
-                        <div class="spinner-border text-primary"
-                             role="status">
-                        </div>
-
-                        <div class="mt-2">
-                            Loading objectives...
-                        </div>
-                    </div>
-
-                    <div id="objectiveDraftMessage"
-                         class="alert alert-info d-none">
-                    </div>
-
-                    <div class="table-responsive d-none"
-                         id="objectiveDraftTableContainer">
-
-                        <table class="table table-bordered table-hover align-middle">
-
-                            <thead class="table-light">
-
-                                <tr>
-                                    <th style="width:80px;"
-                                        class="text-center">
-                                        Sr. No.
-                                    </th>
-
-                                    <th>
-                                        Career Objective
-                                    </th>
-
-                                    <th style="width:110px;"
-                                        class="text-center">
-                                        Action
-                                    </th>
-                                </tr>
-
-                            </thead>
-
-                            <tbody id="objectiveDraftTableBody">
-                            </tbody>
-
-                        </table>
-
-                    </div>
-
-                </div>
-
-            </div>
-
-        </div>
-
-    </div>
-
-
-    <!-- ================================================= -->
-    <!-- SKILLS -->
-    <!-- ================================================= -->
     <!-- ================================================= -->
     <!-- SKILLS -->
     <!-- ================================================= -->
@@ -3632,23 +2787,23 @@
                              id="medicalSkills">
 
                             @foreach (var skill in new[]
-                            {
-                            "3D Slicer",
-                            "B.Pharm",
-                            "Auditory",
-                            "Clinical Research",
-                            "Anatomy",
-                            "Biochemistry",
-                            "Pharmacology",
-                            "Medical Coding"
-                            })
+                                                        {
+                                                        "3D Slicer",
+                                                        "B.Pharm",
+                                                        "Auditory",
+                                                        "Clinical Research",
+                                                        "Anatomy",
+                                                        "Biochemistry",
+                                                        "Pharmacology",
+                                                        "Medical Coding"
+                                                        })
                             {
                                 <label class="skill-item d-block mb-2">
 
                                     <input type="checkbox"
                                            class="medical-skill"
                                            value="@skill"
-                                    @(selectedMedicalSkills.Contains(skill) ? "checked" : "") />
+                                           @(selectedMedicalSkills.Contains(skill) ? "checked" : "") />
 
                                     <span>
                                         @skill
@@ -3692,27 +2847,27 @@
                              id="technicalSkills">
 
                             @foreach (var skill in new[]
-                            {
-                            "HTML",
-                            "CSS",
-                            "JavaScript",
-                            "React.js",
-                            "Angular",
-                            "ASP.NET",
-                            "C#",
-                            "Java",
-                            "Python",
-                            "SQL",
-                            "Git",
-                            "Bootstrap"
-                            })
+                                                        {
+                                                        "HTML",
+                                                        "CSS",
+                                                        "JavaScript",
+                                                        "React.js",
+                                                        "Angular",
+                                                        "ASP.NET",
+                                                        "C#",
+                                                        "Java",
+                                                        "Python",
+                                                        "SQL",
+                                                        "Git",
+                                                        "Bootstrap"
+                                                        })
                             {
                                 <label class="skill-item d-block mb-2">
 
                                     <input type="checkbox"
                                            class="technical-skill"
                                            value="@skill"
-                                    @(selectedTechnicalSkills.Contains(skill) ? "checked" : "") />
+                                           @(selectedTechnicalSkills.Contains(skill) ? "checked" : "") />
 
                                     <span>
                                         @skill
@@ -3756,23 +2911,23 @@
                              id="nonTechnicalSkills">
 
                             @foreach (var skill in new[]
-                            {
-                            "Communication",
-                            "Teamwork",
-                            "Leadership",
-                            "Problem Solving",
-                            "Time Management",
-                            "Presentation",
-                            "Adaptability",
-                            "Creativity"
-                            })
+                                                        {
+                                                        "Communication",
+                                                        "Teamwork",
+                                                        "Leadership",
+                                                        "Problem Solving",
+                                                        "Time Management",
+                                                        "Presentation",
+                                                        "Adaptability",
+                                                        "Creativity"
+                                                        })
                             {
                                 <label class="skill-item d-block mb-2">
 
                                     <input type="checkbox"
                                            class="nontechnical-skill"
                                            value="@skill"
-                                    @(selectedNonTechnicalSkills.Contains(skill) ? "checked" : "") />
+                                           @(selectedNonTechnicalSkills.Contains(skill) ? "checked" : "") />
 
                                     <span>
                                         @skill
@@ -4569,13 +3724,13 @@
             }
 
 
-            // function updateAllSkillCounts() {
+            function updateAllSkillCounts() {
 
-            //     updateSkillCount("medical");
-            //     updateSkillCount("technical");
-            //     updateSkillCount("nonTechnical");
+                updateSkillCount("medical");
+                updateSkillCount("technical");
+                updateSkillCount("nonTechnical");
 
-            // }
+            }
 
 
             document.addEventListener(
@@ -4715,731 +3870,5 @@
         });
 
     </script>
+}
 
-    @* add this in live shrirang 28/09/26 *@
-    <script>
-
-    $(document).ready(function () {
-
-        // =========================================================
-        // UPDATE SELECTED COUNTS
-        // =========================================================
-
-        function updateSkillCounts() {
-
-            const medicalCount =
-                $('.medical-skill:checked').length;
-
-            const technicalCount =
-                $('.technical-skill:checked').length;
-
-            const nonTechnicalCount =
-                $('.nontechnical-skill:checked').length;
-
-
-            $('#medicalCount').text(
-                medicalCount + ' selected'
-            );
-
-            $('#technicalCount').text(
-                technicalCount + ' selected'
-            );
-
-            $('#nonTechnicalCount').text(
-                nonTechnicalCount + ' selected'
-            );
-        }
-
-
-        // =========================================================
-        // ENABLE / DISABLE SKILL CATEGORIES
-        // =========================================================
-
-        function updateSkillCategoryState() {
-
-            const medicalSelected =
-                $('.medical-skill:checked').length > 0;
-
-            const technicalSelected =
-                $('.technical-skill:checked').length > 0;
-
-            const nonTechnicalSelected =
-                $('.nontechnical-skill:checked').length > 0;
-
-
-            // =====================================================
-            // MEDICAL SELECTED
-            // Disable Technical + Non Technical
-            // =====================================================
-
-            if (medicalSelected) {
-
-                $('.technical-skill')
-                    .prop('disabled', true);
-
-                $('.nontechnical-skill')
-                    .prop('disabled', true);
-
-            }
-            else {
-
-                $('.technical-skill')
-                    .prop('disabled', false);
-
-                $('.nontechnical-skill')
-                    .prop('disabled', false);
-            }
-
-
-            // =====================================================
-            // TECHNICAL SELECTED
-            // Disable Medical + Non Technical
-            // =====================================================
-
-            if (technicalSelected) {
-
-                $('.medical-skill')
-                    .prop('disabled', true);
-
-                $('.nontechnical-skill')
-                    .prop('disabled', true);
-
-            }
-            else if (!medicalSelected && !nonTechnicalSelected) {
-
-                $('.medical-skill')
-                    .prop('disabled', false);
-
-                $('.nontechnical-skill')
-                    .prop('disabled', false);
-            }
-
-
-            // =====================================================
-            // NON TECHNICAL SELECTED
-            // Disable Medical + Technical
-            // =====================================================
-
-            if (nonTechnicalSelected) {
-
-                $('.medical-skill')
-                    .prop('disabled', true);
-
-                $('.technical-skill')
-                    .prop('disabled', true);
-
-            }
-            else if (!medicalSelected && !technicalSelected) {
-
-                $('.medical-skill')
-                    .prop('disabled', false);
-
-                $('.technical-skill')
-                    .prop('disabled', false);
-            }
-
-
-            // =====================================================
-            // UPDATE COUNTS
-            // =====================================================
-
-            updateSkillCounts();
-        }
-
-
-        // =========================================================
-        // UPDATE HIDDEN FIELDS
-        // =========================================================
-
-        function updateHiddenFields() {
-
-            const medicalSkills =
-                $('.medical-skill:checked')
-                    .map(function () {
-                        return $(this).val();
-                    })
-                    .get()
-                    .join(',');
-
-
-            const technicalSkills =
-                $('.technical-skill:checked')
-                    .map(function () {
-                        return $(this).val();
-                    })
-                    .get()
-                    .join(',');
-
-
-            const nonTechnicalSkills =
-                $('.nontechnical-skill:checked')
-                    .map(function () {
-                        return $(this).val();
-                    })
-                    .get()
-                    .join(',');
-
-
-            $('#sMedicalSkillIDs')
-                .val(medicalSkills);
-
-            $('#sTechnicalSkillIDs')
-                .val(technicalSkills);
-
-            $('#sNonTechnicalSkillIDs')
-                .val(nonTechnicalSkills);
-        }
-
-
-        // =========================================================
-        // SKILL CHECKBOX CHANGE
-        // =========================================================
-
-        $('.medical-skill, .technical-skill, .nontechnical-skill')
-            .on('change', function () {
-
-                updateHiddenFields();
-
-                updateSkillCategoryState();
-
-            });
-
-
-        // =========================================================
-        // FORM SUBMIT VALIDATION
-        // =========================================================
-
-        $('#skillsForm').on('submit', function (e) {
-
-            // Make sure hidden fields contain latest values
-            updateHiddenFields();
-
-
-            const medicalCount =
-                $('.medical-skill:checked').length;
-
-            const technicalCount =
-                $('.technical-skill:checked').length;
-
-            const nonTechnicalCount =
-                $('.nontechnical-skill:checked').length;
-
-
-            // =====================================================
-            // AT LEAST ONE SKILL REQUIRED
-            // =====================================================
-
-            if (
-                medicalCount === 0 &&
-                technicalCount === 0 &&
-                nonTechnicalCount === 0
-            ) {
-
-                e.preventDefault();
-
-                $('#skillValidationMessage')
-                    .text(
-                        'Please select at least one skill.'
-                    )
-                    .show();
-
-                return false;
-            }
-
-
-            // =====================================================
-            // ONLY ONE CATEGORY ALLOWED
-            // =====================================================
-
-            const selectedCategories = 0
-                + (medicalCount > 0 ? 1 : 0)
-                + (technicalCount > 0 ? 1 : 0)
-                + (nonTechnicalCount > 0 ? 1 : 0);
-
-
-            if (selectedCategories > 1) {
-
-                e.preventDefault();
-
-                $('#skillValidationMessage')
-                    .text(
-                        'You can select skills from only one skill category: Medical, Technical, or Non Technical.'
-                    )
-                    .show();
-
-                return false;
-            }
-
-
-            // =====================================================
-            // VALID
-            // =====================================================
-
-            $('#skillValidationMessage')
-                .hide();
-
-            $('#btnUpdateSkills')
-                .prop('disabled', true);
-
-            $('#updateSkillsText')
-                .text('Updating...');
-
-            $('#updateSkillsLoader')
-                .show();
-
-        });
-
-
-        // =========================================================
-        // INITIALIZE ON PAGE LOAD
-        // Important for existing saved skills
-        // =========================================================
-
-        updateHiddenFields();
-
-        updateSkillCategoryState();
-
-    });
-
-</script>
-
-   @*  shrirang 28/09/26 *@
-
-    <script>
-
-    $(document).ready(function () {
-
-        /* =====================================================
-           OPEN OBJECTIVE DRAFT
-        ===================================================== */
-
-        $('#btnObjectiveDraft').on('click', function () {
-
-            $('#objectiveDraftBody').empty();
-
-            $('#objectiveLoading').show();
-
-            $('#objectiveNoData').hide();
-
-            $('#objectiveTableContainer').hide();
-
-
-            // Open Bootstrap modal
-
-            var modal = new bootstrap.Modal(
-                document.getElementById('objectiveDraftModal')
-            );
-
-            modal.show();
-
-
-            /* =================================================
-               GET OBJECTIVES
-            ================================================= */
-
-            $.ajax({
-
-                url: '@Url.Action("GetCareerObjectives", "Candidate")',
-
-                type: 'GET',
-
-                cache: false,
-
-                success: function (response) {
-
-                    $('#objectiveLoading').hide();
-
-
-                    if (!response ||
-                        !response.success ||
-                        !response.objectives ||
-                        response.objectives.length === 0) {
-
-                        $('#objectiveNoData').show();
-
-                        return;
-                    }
-
-
-                    let html = '';
-
-                    $.each(response.objectives, function (index, item) {
-
-                        const srNo = index + 1;
-
-                        html += `
-                            <tr class="objective-draft-row"
-                                data-objective="${escapeHtml(item.sObjective)}">
-
-                                <td class="objective-draft-number">
-                                    ${srNo}
-                                </td>
-
-                                <td class="objective-draft-text">
-                                    ${escapeHtml(item.sObjective)}
-                                </td>
-
-                            </tr>
-                        `;
-
-                    });
-
-
-                    $('#objectiveDraftBody').html(html);
-
-                    $('#objectiveTableContainer').show();
-
-                },
-
-                error: function (xhr) {
-
-                    $('#objectiveLoading').hide();
-
-                    console.log(xhr.responseText);
-
-                    $('#objectiveNoData')
-                        .removeClass('alert-info')
-                        .addClass('alert-danger')
-                        .text('Unable to load career objective drafts.')
-                        .show();
-
-                }
-
-            });
-
-        });
-
-
-        /* =====================================================
-           SELECT OBJECTIVE
-        ===================================================== */
-
-        $(document).on(
-            'click',
-            '.objective-draft-row',
-            function () {
-
-                const objective =
-                    $(this).data('objective');
-
-
-                $('#CareerObjective')
-                    .val(objective)
-                    .trigger('input');
-
-
-                // Close modal
-
-                const modalElement =
-                    document.getElementById(
-                        'objectiveDraftModal'
-                    );
-
-                const modal =
-                    bootstrap.Modal.getInstance(modalElement);
-
-                if (modal) {
-                    modal.hide();
-                }
-
-
-                // Focus textarea
-
-                $('#CareerObjective').focus();
-
-            }
-        );
-
-
-        /* =====================================================
-           HTML ESCAPE
-        ===================================================== */
-
-        function escapeHtml(value) {
-
-            if (value === null ||
-                value === undefined) {
-
-                return '';
-
-            }
-
-            return $('<div>')
-                .text(value)
-                .html();
-
-        }
-
-
-        /* =====================================================
-           CAREER OBJECTIVE VALIDATION
-        ===================================================== */
-
-        $('#objectiveForm').on('submit', function (e) {
-
-            const objective =
-                $('#CareerObjective')
-                    .val()
-                    .trim();
-
-
-            if (objective.length < 20) {
-
-                e.preventDefault();
-
-                alert(
-                    'Career Objective must contain at least 20 characters.'
-                );
-
-                $('#CareerObjective').focus();
-
-                return false;
-
-            }
-
-        });
-
-    });
-
-</script>
-
-<script>
-
-    $(document).ready(function () {
-
-        // =========================================================
-        // OPEN DRAFT MODAL
-        // =========================================================
-
-        $('#btnObjectiveDraft').on('click', function () {
-
-            $('#objectiveDraftLoading').removeClass('d-none');
-
-            $('#objectiveDraftTableContainer').addClass('d-none');
-
-            $('#objectiveDraftMessage')
-                .addClass('d-none')
-                .text('');
-
-            $('#objectiveDraftTableBody').empty();
-
-            $('#objectiveDraftModal').modal('show');
-
-            $.ajax({
-
-                url: '@Url.Action("GetCareerObjectives", "Candidate")',
-
-                type: 'GET',
-
-                success: function (response) {
-
-                    $('#objectiveDraftLoading')
-                        .addClass('d-none');
-
-                    if (!response.success) {
-
-                        $('#objectiveDraftMessage')
-                            .removeClass('d-none')
-                            .removeClass('alert-info')
-                            .addClass('alert-danger')
-                            .text(
-                                response.message ||
-                                'Unable to load career objectives.'
-                            );
-
-                        return;
-                    }
-
-                    if (!response.objectives ||
-                        response.objectives.length === 0) {
-
-                        $('#objectiveDraftMessage')
-                            .removeClass('d-none')
-                            .removeClass('alert-danger')
-                            .addClass('alert-info')
-                            .text(
-                                'No career objective drafts are available.'
-                            );
-
-                        return;
-                    }
-
-                    let html = '';
-
-                    $.each(
-                        response.objectives,
-                        function (index, item) {
-
-                            html += `
-                                <tr>
-
-                                    <td class="text-center">
-                                        ${index + 1}
-                                    </td>
-
-                                    <td>
-                                        ${escapeHtml(item.sObjective)}
-                                    </td>
-
-                                    <td class="text-center">
-
-                                        <button type="button"
-                                                class="btn btn-sm btn-primary btn-copy-objective"
-                                                data-objective="${escapeAttribute(item.sObjective)}">
-
-                                            <i class="fas fa-copy me-1"></i>
-                                            Copy
-
-                                        </button>
-
-                                    </td>
-
-                                </tr>
-                            `;
-                        }
-                    );
-
-                    $('#objectiveDraftTableBody')
-                        .html(html);
-
-                    $('#objectiveDraftTableContainer')
-                        .removeClass('d-none');
-                },
-
-                error: function () {
-
-                    $('#objectiveDraftLoading')
-                        .addClass('d-none');
-
-                    $('#objectiveDraftMessage')
-                        .removeClass('d-none')
-                        .removeClass('alert-info')
-                        .addClass('alert-danger')
-                        .text(
-                            'An error occurred while loading career objectives.'
-                        );
-                }
-
-            });
-
-        });
-
-
-        // =========================================================
-        // COPY OBJECTIVE TO TEXTAREA
-        // =========================================================
-
-        $(document).on(
-            'click',
-            '.btn-copy-objective',
-            function () {
-
-                const objective =
-                    $(this).attr('data-objective') || '';
-
-                $('#CareerObjective')
-                    .val(objective)
-                    .trigger('input');
-
-                $('#objectiveDraftModal')
-                    .modal('hide');
-
-                $('#CareerObjective')
-                    .focus();
-
-                // Optional visual confirmation
-                const button = $(this);
-
-                const originalHtml = button.html();
-
-                button.html(
-                    '<i class="fas fa-check me-1"></i> Copied'
-                );
-
-                button.removeClass('btn-primary')
-                      .addClass('btn-success');
-
-                setTimeout(function () {
-
-                    button.html(originalHtml);
-
-                    button.removeClass('btn-success')
-                          .addClass('btn-primary');
-
-                }, 1200);
-
-            }
-        );
-
-
-        // =========================================================
-        // HTML ENCODE
-        // =========================================================
-
-        function escapeHtml(value) {
-
-            if (value === null ||
-                value === undefined) {
-
-                return '';
-            }
-
-            return $('<div>')
-                .text(value)
-                .html();
-        }
-
-
-        // =========================================================
-        // ATTRIBUTE ENCODE
-        // =========================================================
-
-        function escapeAttribute(value) {
-
-            if (value === null ||
-                value === undefined) {
-
-                return '';
-            }
-
-            return String(value)
-                .replace(/&/g, '&amp;')
-                .replace(/"/g, '&quot;')
-                .replace(/'/g, '&#39;')
-                .replace(/</g, '&lt;')
-                .replace(/>/g, '&gt;');
-        }
-
-
-        // =========================================================
-        // OBJECTIVE VALIDATION
-        // =========================================================
-
-        $('#objectiveForm').on('submit', function (e) {
-
-            const objective =
-                $('#CareerObjective')
-                    .val()
-                    .trim();
-
-            if (objective.length < 20) {
-
-                e.preventDefault();
-
-                alert(
-                    'Career Objective must contain at least 20 characters.'
-                );
-
-                $('#CareerObjective').focus();
-
-                return false;
-            }
-
-        });
-
-    });
-
-</script>
-
-
-        }
