@@ -2352,13 +2352,10 @@ string nameColumn)
                 });
             }
 
-            using SqlConnection con =
-                new SqlConnection(connectionString);
+            using SqlConnection con = new SqlConnection(connectionString);
 
-            string query = @"
-   UPDATE tblPost
-   SET nBit =
-       CASE
+            string query = @"UPDATE tblPost
+            SET nBit = CASE
            WHEN nBit = 1 THEN 0
            ELSE 1
        END,
@@ -3547,6 +3544,182 @@ WHERE nID = @nID
         {
             return View();
         }
+
+        //khushi -- 29-09-2026
+
+        [HttpGet] 
+        public IActionResult OrgCharts()
+        {
+            int? orgId =
+                HttpContext.Session.GetInt32("OrgID");
+
+            if (orgId == null || orgId <= 0)
+            {
+                return RedirectToAction(
+                    "OrganizationLogin",
+                    "Account");
+            }
+
+            string organizationName =
+                HttpContext.Session.GetString("OrgName")
+                ?? "";
+
+            List<OrganizationChartViewModel> areaChartData =
+                GetAreaChartData(orgId.Value);
+
+            List<OrganizationChartViewModel> barChartData =
+                GetBarChartData(orgId.Value);
+
+            ViewBag.OrganizationName =
+                organizationName;
+
+            var viewModel =
+                new OrganizationChartsViewModel
+                {
+                    AreaChartData = areaChartData,
+                    BarChartData = barChartData
+                };
+
+            return View(viewModel);
+        }
+
+        //khushi -- 29-09-2026
+        // =========================================================
+        // AREA CHART DATA
+        // =========================================================
+
+        private List<OrganizationChartViewModel>GetAreaChartData(int organizationId)
+        {
+            var areaChartDataList =
+                new List<OrganizationChartViewModel>();
+
+            string connectionString =
+                _configuration.GetConnectionString(
+                    "DefaultConnection")
+                ?? throw new InvalidOperationException(
+                    "DefaultConnection was not found.");
+
+            using (SqlConnection connection =
+                   new SqlConnection(connectionString))
+            {
+                using (SqlCommand command =
+                       new SqlCommand(
+                           "SP_BrowseOrgAreaChart",
+                           connection))
+                {
+                    command.CommandType =
+                        CommandType.StoredProcedure;
+
+                    command.Parameters.Add(
+                        "@OrganizationID",
+                        SqlDbType.Int).Value =
+                        organizationId;
+
+                    connection.Open();
+
+                    using (SqlDataReader reader =
+                           command.ExecuteReader())
+                    {
+                        while (reader.Read())
+                        {
+                            areaChartDataList.Add(
+                                new OrganizationChartViewModel
+                                {
+                                    PostYear =
+                                        reader["PostYear"] != DBNull.Value
+                                            ? Convert.ToInt32(
+                                                reader["PostYear"])
+                                            : 0,
+
+                                    PostMonth =
+                                        reader["PostMonth"] != DBNull.Value
+                                            ? Convert.ToInt32(
+                                                reader["PostMonth"])
+                                            : 0,
+
+                                    TotalEligibleTrainees =
+                                        reader["TotalEligibleTrainees"]
+                                        != DBNull.Value
+                                            ? Convert.ToInt32(
+                                                reader[
+                                                    "TotalEligibleTrainees"])
+                                            : 0
+                                });
+                        }
+                    }
+                }
+            }
+
+            return areaChartDataList;
+        }
+
+        //khushi -- 29-09-2026
+        // =========================================================
+        // SECOND CHART DATA
+        // =========================================================
+
+        private List<OrganizationChartViewModel>GetBarChartData(int organizationId)
+        {
+            var barChartDataList =
+                new List<OrganizationChartViewModel>();
+
+            string connectionString =
+                _configuration.GetConnectionString(
+                    "DefaultConnection")
+                ?? throw new InvalidOperationException(
+                    "DefaultConnection was not found.");
+
+            using (SqlConnection connection =
+                   new SqlConnection(connectionString))
+            {
+                using (SqlCommand command =
+                       new SqlCommand(
+                           "SP_BrowseOrgBarChart",
+                           connection))
+                {
+                    command.CommandType =
+                        CommandType.StoredProcedure;
+
+                    command.Parameters.Add(
+                        "@OrganizationID",
+                        SqlDbType.Int).Value =
+                        organizationId;
+
+                    connection.Open();
+
+                    using (SqlDataReader reader =
+                           command.ExecuteReader())
+                    {
+                        while (reader.Read())
+                        {
+                            barChartDataList.Add(
+                                new OrganizationChartViewModel
+                                {
+                                    RegistrationMonth =
+                                        reader["RegistrationMonth"]
+                                        != DBNull.Value
+                                            ? Convert.ToInt32(
+                                                reader[
+                                                    "RegistrationMonth"])
+                                            : 0,
+
+                                    TotalRegistrations =
+                                        reader[
+                                            "OrgNumberOfRegistrations"]
+                                        != DBNull.Value
+                                            ? Convert.ToInt32(
+                                                reader[
+                                                    "OrgNumberOfRegistrations"])
+                                            : 0
+                                });
+                        }
+                    }
+                }
+            }
+
+            return barChartDataList;
+        }
+
 
     }
 
