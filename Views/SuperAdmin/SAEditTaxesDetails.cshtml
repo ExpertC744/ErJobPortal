@@ -1,0 +1,408 @@
+﻿@{
+    Layout = "~/Views/Shared/_DashboardLayout.cshtml";
+
+    ViewData["Title"] = "Edit Taxes";
+    ViewData["Panel"] = "SuperAdmin";
+    ViewData["UserName"] = "ItNetworkZ";
+}
+
+<div class="container-fluid taxes-edit-page">
+
+    
+
+    <!-- Form Card -->
+    <div class="tax-card">
+
+        <div class="tax-card-header">
+            <div class="header-icon">
+                <i class="fas fa-percent"></i>
+            </div>
+
+            <div>
+                <h2>Edit Taxes Details</h2>
+                <p>Update tax information</p>
+            </div>
+        </div>
+
+        <form asp-controller="Billing"
+              asp-action="EditTaxesDetails"
+              method="post">
+
+            <input type="hidden" name="id" value="1" />
+
+            <div class="tax-form-grid">
+
+                <!-- Taxes 1 -->
+                <div class="form-group">
+                    <label>
+                        Taxes 1 <span>*</span>
+                    </label>
+
+                    <div class="input-wrapper">
+                        <i class="fas fa-tag"></i>
+                        <input type="text"
+                               name="Taxes1"
+                               class="form-control"
+                               placeholder="Enter Taxes 1"
+                               value="GST"
+                               required />
+                    </div>
+                </div>
+
+                <!-- Rate 1 -->
+                <div class="form-group">
+                    <label>
+                        Rate 1 <span>*</span>
+                    </label>
+
+                    <div class="input-wrapper">
+                        <i class="fas fa-percent"></i>
+                        <input type="text"
+                               name="Rate1"
+                               class="form-control"
+                               placeholder="Enter Rate 1"
+                               value="5"
+                               required />
+                    </div>
+                </div>
+
+                <!-- Taxes 2 -->
+                <div class="form-group">
+                    <label>
+                        Taxes 2 <span>*</span>
+                    </label>
+
+                    <div class="input-wrapper">
+                        <i class="fas fa-tag"></i>
+                        <input type="text"
+                               name="Taxes2"
+                               class="form-control"
+                               placeholder="Enter Taxes 2"
+                               value="CGST"
+                               required />
+                    </div>
+                </div>
+
+                <!-- Rate 2 -->
+                <div class="form-group">
+                    <label>
+                        Rate 2 <span>*</span>
+                    </label>
+
+                    <div class="input-wrapper">
+                        <i class="fas fa-percent"></i>
+                        <input type="text"
+                               name="Rate2"
+                               class="form-control"
+                               placeholder="Enter Rate 2"
+                               value="2.5"
+                               required />
+                    </div>
+                </div>
+
+                <!-- Taxes 3 -->
+                <div class="form-group">
+                    <label>Taxes 3</label>
+
+                    <div class="input-wrapper">
+                        <i class="fas fa-tag"></i>
+                        <input type="text"
+                               name="Taxes3"
+                               class="form-control"
+                               placeholder="Enter Taxes 3"
+                               value="SGST" />
+                    </div>
+                </div>
+
+                <!-- Rate 3 -->
+                <div class="form-group">
+                    <label>Rate 3</label>
+
+                    <div class="input-wrapper">
+                        <i class="fas fa-percent"></i>
+                        <input type="text"
+                               name="Rate3"
+                               class="form-control"
+                               placeholder="Enter Rate 3"
+                               value="2.5" />
+                    </div>
+                </div>
+
+                <!-- Taxes 4 -->
+                <div class="form-group">
+                    <label>Taxes 4</label>
+
+                    <div class="input-wrapper">
+                        <i class="fas fa-tag"></i>
+                        <input type="text"
+                               name="Taxes4"
+                               class="form-control"
+                               placeholder="Enter Taxes 4" />
+                    </div>
+                </div>
+
+                <!-- Rate 4 -->
+                <div class="form-group">
+                    <label>Rate 4</label>
+
+                    <div class="input-wrapper">
+                        <i class="fas fa-percent"></i>
+                        <input type="text"
+                               name="Rate4"
+                               class="form-control"
+                               placeholder="Enter Rate 4"
+                               value="0" />
+                    </div>
+                </div>
+
+                <!-- Total Tax -->
+                <div class="form-group total-tax-field">
+                    <label>Total Tax</label>
+
+                    <div class="input-wrapper">
+                        <i class="fas fa-calculator"></i>
+                        <input type="text"
+                               name="TotalTax"
+                               class="form-control"
+                               placeholder="Enter Total Tax"
+                               value="10" />
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- Footer Buttons -->
+            <div class="form-footer">
+
+                <a asp-controller="Billing"
+                   asp-action="ViewTaxesDetails"
+                   class="btn-close-form">
+                    <i class="fas fa-times"></i>
+                    Close
+                </a>
+
+                <button type="submit"
+                        class="btn-save-form">
+                    <i class="fas fa-save"></i>
+                    Save
+                </button>
+
+            </div>
+
+        </form>
+
+    </div>
+</div>
+
+<style>
+    .taxes-edit-page {
+        padding-bottom: 40px;
+    }
+
+    .page-heading {
+        margin-bottom: 25px;
+    }
+
+    .page-heading h1 {
+        margin: 0 0 6px;
+        font-size: 28px;
+        font-weight: 700;
+        color: #0f172a;
+    }
+
+    .page-heading p {
+        margin: 0;
+        color: #64748b;
+        font-size: 14px;
+    }
+
+    .tax-card {
+        max-width: 1050px;
+        margin: 0 auto;
+        background: #ffffff;
+        border: 1px solid #e2e8f0;
+        border-radius: 18px;
+        box-shadow: 0 8px 30px rgba(15, 23, 42, 0.07);
+        overflow: hidden;
+    }
+
+    .tax-card-header {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+        padding: 22px 28px;
+        background: linear-gradient(135deg, #f0fdfa, #ffffff);
+        border-bottom: 1px solid #e2e8f0;
+    }
+
+    .header-icon {
+        width: 48px;
+        height: 48px;
+        border-radius: 14px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: #ccfbf1;
+        color: #0d9488;
+        font-size: 20px;
+    }
+
+    .tax-card-header h2 {
+        margin: 0 0 4px;
+        font-size: 19px;
+        font-weight: 700;
+        color: #0f172a;
+    }
+
+    .tax-card-header p {
+        margin: 0;
+        color: #64748b;
+        font-size: 13px;
+    }
+
+    .tax-form-grid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 22px;
+        padding: 30px;
+    }
+
+    .form-group label {
+        display: block;
+        margin-bottom: 8px;
+        color: #334155;
+        font-size: 14px;
+        font-weight: 600;
+    }
+
+    .form-group label span {
+        color: #dc2626;
+    }
+
+    .input-wrapper {
+        position: relative;
+    }
+
+    .input-wrapper > i {
+        position: absolute;
+        left: 15px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: #0d9488;
+        font-size: 14px;
+        z-index: 2;
+    }
+
+    .form-control {
+        width: 100%;
+        height: 45px;
+        padding: 0 15px 0 43px;
+        border: 1px solid #cbd5e1;
+        border-radius: 10px;
+        background: #ffffff;
+        color: #0f172a;
+        font-size: 14px;
+        outline: none;
+        transition: 0.2s ease;
+        box-sizing: border-box;
+    }
+
+    .form-control:focus {
+        border-color: #0d9488;
+        box-shadow: 0 0 0 3px rgba(13, 148, 136, 0.10);
+    }
+
+    .total-tax-field {
+        grid-column: span 2;
+        max-width: calc(50% - 11px);
+    }
+
+    .form-footer {
+        display: flex;
+        justify-content: flex-end;
+        gap: 12px;
+        padding: 20px 30px;
+        border-top: 1px solid #e2e8f0;
+        background: #f8fafc;
+    }
+
+    .btn-close-form,
+    .btn-save-form {
+        min-width: 115px;
+        height: 42px;
+        padding: 0 20px;
+        border-radius: 9px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        font-size: 14px;
+        font-weight: 600;
+        text-decoration: none;
+        cursor: pointer;
+    }
+
+    .btn-close-form {
+        color: #475569;
+        background: #ffffff;
+        border: 1px solid #cbd5e1;
+    }
+
+    .btn-close-form:hover {
+        color: #334155;
+        background: #f1f5f9;
+    }
+
+    .btn-save-form {
+        color: #ffffff;
+        border: none;
+        background: linear-gradient(135deg, #0d9488, #0f766e);
+        box-shadow: 0 4px 12px rgba(13, 148, 136, 0.20);
+    }
+
+    .btn-save-form:hover {
+        background: linear-gradient(135deg, #0f766e, #115e59);
+    }
+
+    @@media (max-width: 768px) {
+
+        .tax-form-grid {
+            grid-template-columns: 1fr;
+            padding: 22px;
+        }
+
+        .total-tax-field {
+            grid-column: span 1;
+            max-width: none;
+        }
+
+        .tax-card-header {
+            padding: 18px 22px;
+        }
+
+        .form-footer {
+            padding: 18px 22px;
+        }
+    }
+
+    @@media (max-width: 480px) {
+
+        .page-heading h1 {
+            font-size: 23px;
+        }
+
+        .tax-form-grid {
+            padding: 18px;
+            gap: 18px;
+        }
+
+        .form-footer {
+            flex-direction: column-reverse;
+        }
+
+        .btn-close-form,
+        .btn-save-form {
+            width: 100%;
+        }
+    }
+</style>

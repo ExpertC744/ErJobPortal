@@ -1,0 +1,279 @@
+﻿@{
+    Layout = "~/Views/Shared/_DashboardLayout.cshtml";
+
+    ViewData["Title"] = "Payment Details";
+    ViewData["Panel"] = "SuperAdmin";
+    ViewData["UserName"] = "ItNetworkZ";
+}
+
+<div class="container-fluid">
+   <!-- Master Table -->
+    <div class="master-table-container">
+         
+        <div class="table-responsive">
+            <!-- Page Header -->
+    <div class="mb-4">
+        <h1 class="mb-2">Payment Details</h1>
+        <p class="mb-0 text-muted">ItNetworkZ</p>
+    </div>
+
+            <table id="paymentDetailsTable"
+                   class="master-data-table">
+
+                <thead>
+                    <tr>
+                        <th>Sr. No</th>
+                        <th>Client Name</th>
+                        <th>Company Name</th>
+                        <th>Email ID</th>
+                        <th>Status</th>
+                        <th>Payment Status</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+
+                    <tr>
+                        <td class="master-id">1</td>
+
+                       <td>
+    <a asp-controller="SuperAdmin"
+       asp-action="SAReceiptDetails"
+       asp-route-id="1"
+       class="text-primary text-decoration-underline">
+        Tyuqw
+    </a>
+</td>
+
+                        <td>
+                            IT-NetworkZ
+                        </td>
+
+                        <td>
+                            contact@it-networkz.com
+                        </td>
+
+                        <td>
+                            <span class="master-status">
+                                Enabled
+                            </span>
+                        </td>
+
+                        <td>
+                            <a asp-controller="SuperAdmin"
+                               asp-action="SAAddInstallment"
+                               asp-route-id="1"
+                               class="resume-view-btn"
+                               title="Payment Details">
+
+                                <i class="fas fa-rupee-sign"></i>
+
+                            </a>
+                        </td>
+                    </tr>
+
+
+                    <tr>
+                        <td class="master-id">2</td>
+
+                        <td>
+                            <a href="javascript:void(0);"
+                               class="text-primary text-decoration-underline">
+                                Dfdgxgbc
+                            </a>
+                        </td>
+
+                        <td>
+                            fgfdgfdgddg
+                        </td>
+
+                        <td>
+                            sameer.sontakke26@gmail.com
+                        </td>
+
+                        <td>
+                            <span class="master-status">
+                                Enabled
+                            </span>
+                        </td>
+
+                        <td>
+                            <a asp-controller="SuperAdminAdvertisement"
+                               asp-action="Payment"
+                               asp-route-id="2"
+                               class="resume-view-btn"
+                               title="Payment Details">
+
+                                <i class="fas fa-file-invoice"></i>
+
+                            </a>
+                        </td>
+                    </tr>
+
+
+                    <tr>
+                        <td class="master-id">3</td>
+
+                        <td>
+                            <a href="javascript:void(0);"
+                               class="text-primary text-decoration-underline">
+                                Dfdgxgbc
+                            </a>
+                        </td>
+
+                        <td>
+                            fgfdgfdgddgasg
+                        </td>
+
+                        <td>
+                            sameer.sontakke26@gmail.com
+                        </td>
+
+                        <td>
+                            <span class="master-status">
+                                Enabled
+                            </span>
+                        </td>
+
+                        <td>
+                            <a asp-controller="SuperAdminAdvertisement"
+                               asp-action="Payment"
+                               asp-route-id="3"
+                               class="resume-view-btn"
+                               title="Payment Details">
+
+                                <i class="fas fa-file-invoice"></i>
+
+                            </a>
+                        </td>
+                    </tr>
+
+
+                    <tr>
+                        <td class="master-id">4</td>
+
+                        <td>
+                            <a href="javascript:void(0);"
+                               class="text-primary text-decoration-underline">
+                                Dfdgxgbc
+                            </a>
+                        </td>
+
+                        <td>
+                            fgfdgfdgddgasg
+                        </td>
+
+                        <td>
+                            sameer.sontakke26@gmail.com
+                        </td>
+
+                        <td>
+                            <span class="master-status">
+                                Enabled
+                            </span>
+                        </td>
+
+                        <td>
+                            <a asp-controller="SuperAdminAdvertisement"
+                               asp-action="Payment"
+                               asp-route-id="4"
+                               class="resume-view-btn"
+                               title="Payment Details">
+
+                                <i class="fas fa-file-invoice"></i>
+
+                            </a>
+                        </td>
+                    </tr>
+
+
+                    <tr>
+                        <td class="master-id">5</td>
+
+                        <td>
+                            <a href="javascript:void(0);"
+                               class="text-primary text-decoration-underline">
+                                Dfdgxgbc
+                            </a>
+                        </td>
+
+                        <td>
+                            fgfdgfdgddgasg
+                        </td>
+
+                        <td>
+                            sameer.sontakke26@gmail.com
+                        </td>
+
+                        <td>
+                            <span class="master-status">
+                                Enabled
+                            </span>
+                        </td>
+
+                        <td>
+                            <a asp-controller="SuperAdminAdvertisement"
+                               asp-action="Payment"
+                               asp-route-id="5"
+                               class="resume-view-btn"
+                               title="Payment Details">
+
+                                <i class="fas fa-file-invoice"></i>
+
+                            </a>
+                        </td>
+                    </tr>
+
+
+                    <tr>
+                        <td class="master-id">6</td>
+
+                        <td>
+                            <a href="javascript:void(0);"
+                               class="text-primary text-decoration-underline">
+                                Ghrrt
+                            </a>
+                        </td>
+
+                        <td>
+                            reterter
+                        </td>
+
+                        <td>
+                            ns@gmail.com
+                        </td>
+
+                        <td>
+                            <span class="master-status master-status-danger">
+                                Disabled
+                            </span>
+                        </td>
+
+                        <td>
+                            <a asp-controller="SuperAdminAdvertisement"
+                               asp-action="Payment"
+                               asp-route-id="6"
+                               class="resume-view-btn"
+                               title="Payment Details">
+
+                                <i class="fas fa-rupee-sign"></i>
+
+                            </a>
+                        </td>
+                    </tr>
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+
+        <!-- Master Pagination / Info -->
+        <div id="paymentDetailsPageInfo"
+             class="master-page-info text-center d-none">
+        </div>
+
+    </div>
+
+</div>

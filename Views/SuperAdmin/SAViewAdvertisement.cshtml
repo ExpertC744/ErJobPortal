@@ -1,0 +1,1056 @@
+﻿@{
+    Layout = "~/Views/Shared/_DashboardLayout.cshtml";
+     Layout = null;
+    ViewData["Title"] = "Payment Receipt";
+    ViewData["Panel"] = "SuperAdmin";
+    ViewData["UserName"] = "Super Admin";
+
+}
+
+<style>
+
+    /* =========================================================
+       PAYMENT RECEIPT - 1TRAINEE
+       ========================================================= */
+
+    .payment-receipt-page {
+        width: 100%;
+        padding: 10px 0 40px;
+        color: #344054;
+    }
+
+    /* =========================================================
+       PAGE TITLE
+       ========================================================= */
+
+    .payment-receipt-heading {
+        margin-bottom: 20px;
+    }
+
+    .payment-receipt-heading h2 {
+        margin: 0;
+        color: #1f2937;
+        font-size: 26px;
+        font-weight: 700;
+    }
+
+    .payment-receipt-heading p {
+        margin: 5px 0 0;
+        color: #98a2b3;
+        font-size: 13px;
+    }
+
+    /* =========================================================
+       RECEIPT AREA
+       ========================================================= */
+
+    .receipt-area {
+        display: flex;
+        justify-content: center;
+        align-items: flex-start;
+        gap: 18px;
+    }
+
+    /* =========================================================
+       RECEIPT
+       ========================================================= */
+
+    .payment-receipt {
+        width: 720px;
+        background: #ffffff;
+        border: 1px solid #dfe5e2;
+        border-radius: 5px;
+        box-shadow: 0 8px 25px rgba(0, 0, 0, .07);
+        overflow: hidden;
+    }
+
+    /* =========================================================
+       RECEIPT TOP
+       ========================================================= */
+
+    .receipt-top {
+        padding: 20px 22px 15px;
+    }
+
+    .receipt-top-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 15px;
+    }
+
+    /* =========================================================
+       LOGO
+       ========================================================= */
+
+    .receipt-logo {
+        width: 95px;
+        height: 55px;
+        object-fit: contain;
+    }
+
+    /* =========================================================
+       RECEIPT TITLE
+       ========================================================= */
+
+    .receipt-heading {
+        flex: 1;
+        text-align: center;
+    }
+
+    .receipt-heading h1 {
+        margin: 0;
+        color: #1f2937;
+        font-size: 25px;
+        font-weight: 700;
+    }
+
+    .receipt-heading span {
+        display: block;
+        margin-top: 3px;
+        color: #1e7b67;
+        font-size: 10px;
+        font-weight: 600;
+    }
+
+    /* =========================================================
+       RECEIPT NUMBER
+       ========================================================= */
+
+    .receipt-number-box {
+        min-width: 125px;
+        text-align: right;
+    }
+
+    .receipt-number-box small {
+        display: block;
+        margin-bottom: 4px;
+        color: #98a2b3;
+        font-size: 9px;
+    }
+
+    .receipt-number-box strong {
+        color: #344054;
+        font-size: 11px;
+    }
+
+    /* =========================================================
+       DIVIDER
+       ========================================================= */
+
+    .receipt-divider {
+        height: 1px;
+        margin: 4px 0 15px;
+        background: #e8ecea;
+    }
+
+    /* =========================================================
+       BASIC RECEIPT DETAILS
+       ========================================================= */
+
+    .receipt-details {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        column-gap: 30px;
+        row-gap: 7px;
+        font-size: 10px;
+        line-height: 1.5;
+    }
+
+    .receipt-detail {
+        display: flex;
+        gap: 5px;
+    }
+
+    .receipt-detail-label {
+        color: #667085;
+        font-weight: 600;
+        white-space: nowrap;
+    }
+
+    .receipt-detail-value {
+        color: #344054;
+    }
+
+    /* =========================================================
+       SECTION
+       ========================================================= */
+
+    .receipt-section {
+        padding: 0 22px;
+        margin-top: 17px;
+    }
+
+    .receipt-section-title {
+        margin-bottom: 7px;
+        padding: 6px 9px;
+        background: #e8f5f1;
+        border: 1px solid #d5eae3;
+        color: #1e7b67;
+        font-size: 11px;
+        font-weight: 700;
+        border-radius: 4px;
+    }
+
+    /* =========================================================
+       PAYMENT TABLE
+       ========================================================= */
+
+    .receipt-payment-table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 10px;
+    }
+
+    .receipt-payment-table th,
+    .receipt-payment-table td {
+        border: 1px solid #d9dfdd;
+        padding: 6px 8px;
+    }
+
+    .receipt-payment-table th {
+        background: #f7f9f8;
+        color: #344054;
+        font-size: 10px;
+        font-weight: 700;
+    }
+
+    .receipt-payment-table th:first-child,
+    .receipt-payment-table td:first-child {
+        text-align: left;
+    }
+
+    .receipt-payment-table th:last-child,
+    .receipt-payment-table td:last-child {
+        width: 180px;
+        text-align: right;
+    }
+
+    .receipt-payment-table td {
+        color: #475467;
+    }
+
+    .receipt-payment-table .total-row td {
+        background: #e8f5f1;
+        color: #1e7b67;
+        font-weight: 700;
+    }
+
+    /* =========================================================
+       ADVERTISEMENT INFORMATION
+       ========================================================= */
+
+    .advertisement-row {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        border: 1px solid #d9dfdd;
+        border-radius: 4px;
+        overflow: hidden;
+    }
+
+    .advertisement-item {
+        padding: 8px;
+        border-right: 1px solid #d9dfdd;
+    }
+
+    .advertisement-item:last-child {
+        border-right: none;
+    }
+
+    .advertisement-label {
+        margin-bottom: 4px;
+        color: #98a2b3;
+        font-size: 8px;
+        font-weight: 600;
+        text-transform: uppercase;
+    }
+
+    .advertisement-value {
+        color: #344054;
+        font-size: 10px;
+        font-weight: 600;
+    }
+
+    /* =========================================================
+       NOTE
+       ========================================================= */
+
+    .receipt-note {
+        padding: 0 22px;
+        margin-top: 18px;
+    }
+
+    .receipt-note-title {
+        margin-bottom: 4px;
+        color: #344054;
+        font-size: 10px;
+        font-weight: 700;
+    }
+
+    .receipt-note ul {
+        margin: 0;
+        padding-left: 18px;
+        color: #667085;
+        font-size: 9px;
+        line-height: 1.6;
+    }
+
+    /* =========================================================
+       RECEIPT FOOTER
+       ========================================================= */
+
+    .receipt-footer {
+        margin-top: 18px;
+        padding: 10px 22px;
+        background: #f8faf9;
+        border-top: 1px solid #e5ebe8;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+    }
+
+    .receipt-footer-text {
+        color: #98a2b3;
+        font-size: 8px;
+    }
+
+    .receipt-footer-text strong {
+        color: #1e7b67;
+    }
+
+    .receipt-status {
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        padding: 4px 9px;
+        border-radius: 20px;
+        background: #e8f5f1;
+        color: #1e7b67;
+        font-size: 9px;
+        font-weight: 700;
+    }
+
+    .receipt-status i {
+        font-size: 7px;
+    }
+
+    /* =========================================================
+       ACTION BUTTONS
+       ========================================================= */
+
+    .receipt-actions {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        padding-top: 0;
+    }
+
+    .receipt-action-btn {
+        width: 38px;
+        height: 38px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border: 1px solid #dce4e1;
+        border-radius: 7px;
+        background: #ffffff;
+        color: #1e7b67;
+        text-decoration: none;
+        cursor: pointer;
+        font-size: 13px;
+        box-shadow: 0 2px 6px rgba(0, 0, 0, .04);
+        transition: all .2s ease;
+    }
+
+    .receipt-action-btn:hover {
+        background: #e8f5f1;
+        color: #176653;
+        border-color: #c7e2da;
+    }
+
+    .receipt-action-btn.back:hover {
+        background: #f2f4f7;
+        color: #344054;
+    }
+
+    /* =========================================================
+       RESPONSIVE
+       ========================================================= */
+
+    @@media (max-width: 900px) {
+
+        .receipt-area {
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .receipt-actions {
+            flex-direction: row;
+            order: -1;
+            width: 100%;
+            justify-content: flex-end;
+        }
+
+    }
+
+    @@media (max-width: 760px) {
+
+        .payment-receipt {
+            width: 100%;
+        }
+
+        .receipt-details {
+            grid-template-columns: 1fr;
+            row-gap: 6px;
+        }
+
+        .advertisement-row {
+            grid-template-columns: repeat(2, 1fr);
+        }
+
+        .advertisement-item:nth-child(2) {
+            border-right: none;
+        }
+
+        .advertisement-item:nth-child(1),
+        .advertisement-item:nth-child(2) {
+            border-bottom: 1px solid #d9dfdd;
+        }
+
+    }
+
+    @@media (max-width: 500px) {
+
+        .payment-receipt-page {
+            padding-top: 0;
+        }
+
+        .payment-receipt-heading h2 {
+            font-size: 21px;
+        }
+
+        .receipt-top {
+            padding: 15px;
+        }
+
+        .receipt-top-header {
+            align-items: flex-start;
+        }
+
+        .receipt-logo {
+            width: 70px;
+            height: 45px;
+        }
+
+        .receipt-heading h1 {
+            font-size: 20px;
+        }
+
+        .receipt-number-box {
+            min-width: auto;
+        }
+
+        .receipt-section,
+        .receipt-note {
+            padding-left: 15px;
+            padding-right: 15px;
+        }
+
+        .advertisement-row {
+            grid-template-columns: 1fr;
+        }
+
+        .advertisement-item {
+            border-right: none !important;
+            border-bottom: 1px solid #d9dfdd;
+        }
+
+        .advertisement-item:last-child {
+            border-bottom: none;
+        }
+
+        .receipt-payment-table th:last-child,
+        .receipt-payment-table td:last-child {
+            width: 120px;
+        }
+
+        .receipt-footer {
+            padding: 10px 15px;
+            gap: 10px;
+        }
+
+    }
+
+    /* =========================================================
+       PRINT
+       ========================================================= */
+
+    @@media print {
+
+        body {
+            background: #ffffff !important;
+        }
+
+        .payment-receipt-page {
+            padding: 0;
+        }
+
+        .payment-receipt-heading,
+        .receipt-actions {
+            display: none !important;
+        }
+
+        .receipt-area {
+            display: block;
+        }
+
+        .payment-receipt {
+            width: 100%;
+            max-width: 100%;
+            border: 1px solid #333;
+            border-radius: 0;
+            box-shadow: none;
+        }
+
+        @@page {
+            size: A4;
+            margin: 12mm;
+        }
+
+    }
+
+</style>
+
+
+<div class="container-fluid payment-receipt-page">
+
+
+   
+
+    <!-- RECEIPT + ACTIONS -->
+
+    <div class="receipt-area">
+
+
+        <!-- =====================================================
+             RECEIPT
+        ====================================================== -->
+
+        <div class="payment-receipt">
+
+
+            <!-- TOP -->
+
+            <div class="receipt-top">
+
+                <div class="receipt-top-header">
+
+
+                    <!-- LOGO -->
+
+                    <img src="~/img/core-img/Logo.png"
+                         class="receipt-logo"
+                         alt="ItNetworkZ" />
+
+
+                    <!-- TITLE -->
+
+                    <div class="receipt-heading">
+
+                        <h1>
+                            Payment Receipt
+                        </h1>
+
+                        <span>
+                            1Trainee Advertisement
+                        </span>
+
+                    </div>
+
+
+                    <!-- RECEIPT NUMBER -->
+
+                    <div class="receipt-number-box">
+
+                        <small>
+                            Receipt No.
+                        </small>
+
+                        <strong>
+                            1T26112438R
+                        </strong>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <div class="receipt-divider"></div>
+
+
+            <!-- =================================================
+                 BASIC INFORMATION
+            ================================================== -->
+
+            <div class="receipt-section"
+                 style="margin-top:0;">
+
+                <div class="receipt-details">
+
+
+                    <div class="receipt-detail">
+
+                        <span class="receipt-detail-label">
+                            Date :
+                        </span>
+
+                        <span class="receipt-detail-value">
+                            26-11-2024
+                        </span>
+
+                    </div>
+
+
+                    <div class="receipt-detail">
+
+                        <span class="receipt-detail-label">
+                            Client Name :
+                        </span>
+
+                        <span class="receipt-detail-value">
+                            Tyuqw
+                        </span>
+
+                    </div>
+
+
+                    <div class="receipt-detail">
+
+                        <span class="receipt-detail-label">
+                            Company :
+                        </span>
+
+                        <span class="receipt-detail-value">
+                            ItNetworkZ
+                        </span>
+
+                    </div>
+
+
+                    <div class="receipt-detail">
+
+                        <span class="receipt-detail-label">
+                            Payment Purpose :
+                        </span>
+
+                        <span class="receipt-detail-value">
+                            Advertisement
+                        </span>
+
+                    </div>
+
+
+                    <div class="receipt-detail">
+
+                        <span class="receipt-detail-label">
+                            Paid Amount :
+                        </span>
+
+                        <span class="receipt-detail-value">
+                            ₹ 500.00
+                        </span>
+
+                    </div>
+
+
+                    <div class="receipt-detail">
+
+                        <span class="receipt-detail-label">
+                            Payment Mode :
+                        </span>
+
+                        <span class="receipt-detail-value">
+                            By Cash
+                        </span>
+
+                    </div>
+
+
+                    <div class="receipt-detail">
+
+                        <span class="receipt-detail-label">
+                            Amount In Words :
+                        </span>
+
+                        <span class="receipt-detail-value">
+                            Five Hundred Rupees Only
+                        </span>
+
+                    </div>
+
+
+                    <div class="receipt-detail">
+
+                        <span class="receipt-detail-label">
+                            Status :
+                        </span>
+
+                        <span class="receipt-detail-value">
+                            Paid
+                        </span>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <!-- =================================================
+                 ADVERTISEMENT
+            ================================================== -->
+
+            <div class="receipt-section">
+
+                <div class="receipt-section-title">
+
+                    Advertisement Details
+
+                </div>
+
+
+                <div class="advertisement-row">
+
+
+                    <div class="advertisement-item">
+
+                        <div class="advertisement-label">
+                            Location
+                        </div>
+
+                        <div class="advertisement-value">
+                            BN-A
+                        </div>
+
+                    </div>
+
+
+                    <div class="advertisement-item">
+
+                        <div class="advertisement-label">
+                            Duration
+                        </div>
+
+                        <div class="advertisement-value">
+                            1 Month
+                        </div>
+
+                    </div>
+
+
+                    <div class="advertisement-item">
+
+                        <div class="advertisement-label">
+                            Start Date
+                        </div>
+
+                        <div class="advertisement-value">
+                            27-11-2024
+                        </div>
+
+                    </div>
+
+
+                    <div class="advertisement-item">
+
+                        <div class="advertisement-label">
+                            End Date
+                        </div>
+
+                        <div class="advertisement-value">
+                            27-12-2024
+                        </div>
+
+                    </div>
+
+
+                </div>
+
+            </div>
+
+
+            <!-- =================================================
+                 PAYMENT DETAILS
+            ================================================== -->
+
+            <div class="receipt-section">
+
+                <div class="receipt-section-title">
+
+                    Payment Details
+
+                </div>
+
+
+                <table class="receipt-payment-table">
+
+                    <thead>
+
+                        <tr>
+
+                            <th>
+                                Particulars
+                            </th>
+
+                            <th>
+                                Amount
+                            </th>
+
+                        </tr>
+
+                    </thead>
+
+
+                    <tbody>
+
+                        <tr>
+
+                            <td>
+                                Actual Amount
+                            </td>
+
+                            <td>
+                                ₹ 1,200.00
+                            </td>
+
+                        </tr>
+
+
+                        <tr>
+
+                            <td>
+                                Discount
+                            </td>
+
+                            <td>
+                                ₹ 0.00
+                            </td>
+
+                        </tr>
+
+
+                        <tr>
+
+                            <td>
+                                Taxes
+                            </td>
+
+                            <td>
+                                ₹ 70.00
+                            </td>
+
+                        </tr>
+
+
+                        <tr>
+
+                            <td>
+                                Offered Amount
+                            </td>
+
+                            <td>
+                                ₹ 1,270.00
+                            </td>
+
+                        </tr>
+
+
+                        <tr>
+
+                            <td>
+                                Paid Amount / Advance
+                            </td>
+
+                            <td>
+                                ₹ 500.00
+                            </td>
+
+                        </tr>
+
+
+                        <tr>
+
+                            <td>
+                                Balance Amount
+                            </td>
+
+                            <td>
+                                ₹ 270.00
+                            </td>
+
+                        </tr>
+
+
+                        <tr>
+
+                            <td>
+                                Next Installment Date
+                            </td>
+
+                            <td>
+                                07-12-2024
+                            </td>
+
+                        </tr>
+
+
+                        <tr class="total-row">
+
+                            <td>
+                                Total Paid
+                            </td>
+
+                            <td>
+                                ₹ 500.00
+                            </td>
+
+                        </tr>
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+
+            <!-- =================================================
+                 NOTE
+            ================================================== -->
+
+            <div class="receipt-note">
+
+                <div class="receipt-note-title">
+                    Note
+                </div>
+
+                <ul>
+
+                    <li>
+                        Amount paid is non-refundable.
+                    </li>
+
+                    <li>
+                        This is an auto-generated payment receipt.
+                    </li>
+
+                    <li>
+                        Signature is not required for this receipt.
+                    </li>
+
+                </ul>
+
+            </div>
+
+
+            <!-- =================================================
+                 FOOTER
+            ================================================== -->
+
+            <div class="receipt-footer">
+
+                <div class="receipt-footer-text">
+
+                    Powered by
+                    <strong>1Trainee</strong>
+
+                </div>
+
+
+                <div class="receipt-status">
+
+                    <i class="fas fa-check-circle"></i>
+
+                    PAYMENT RECEIVED
+
+                </div>
+
+            </div>
+
+
+        </div>
+
+
+        <!-- =====================================================
+             ACTION BUTTONS
+        ====================================================== -->
+
+        <div class="receipt-actions">
+
+
+            <!-- BACK -->
+
+            <a asp-controller="SuperAdminAdvertisement"
+               asp-action="AdvertisementList"
+               class="receipt-action-btn back"
+               title="Back">
+
+                <i class="fas fa-arrow-left"></i>
+
+            </a>
+
+
+            <!-- HOME -->
+
+            <a asp-controller="SuperAdmin"
+               asp-action="Index"
+               class="receipt-action-btn"
+               title="Home">
+
+                <i class="fas fa-home"></i>
+
+            </a>
+
+
+            <!-- PRINT -->
+
+            <button type="button"
+                    class="receipt-action-btn"
+                    onclick="window.print();"
+                    title="Print">
+
+                <i class="fas fa-print"></i>
+
+            </button>
+
+
+            <!-- DOWNLOAD -->
+
+            <button type="button"
+                    class="receipt-action-btn"
+                    onclick="downloadReceipt();"
+                    title="Download Receipt">
+
+                <i class="fas fa-download"></i>
+
+            </button>
+
+
+        </div>
+
+
+    </div>
+
+</div>
+
+
+<script>
+
+    function downloadReceipt() {
+
+        window.print();
+
+    }
+
+</script>
