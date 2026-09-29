@@ -1749,5 +1749,136 @@ ORDER BY SAF.nID DESC, OFB.nID DESC;
                 return View(contactList);
             }
         }
+
+
+        //Radhika26-09
+
+        [HttpGet]
+        public IActionResult TraineeReg()
+        {
+            return View();
+        }
+        [HttpGet]
+        public IActionResult SATraineeSelection()
+        {
+            return View();
+        }
+        [HttpGet]
+        public IActionResult SADetails()
+        {
+            return View();
+        }
+        [HttpGet]
+        public IActionResult SAOrganizationList()
+        {
+            return View();
+        }
+        [HttpGet]
+        public IActionResult SAAllOrganizationPost()
+        {
+            return View();
+        }
+        [HttpGet]
+        public IActionResult SAFinalSelection()
+        {
+            return View();
+        }
+        [HttpGet]
+        public IActionResult SACharts()
+        {
+            return View();
+        }
+        [HttpGet]
+        public IActionResult SAAddAdvertisement()
+        {
+            return View();
+        }
+        [HttpGet]
+        public IActionResult SAAdvertisementList()
+        {
+            return View();
+        }
+        [HttpGet]
+        public IActionResult SABillingDetails()
+        {
+            return View();
+        }
+        [HttpGet]
+        public IActionResult SAUpdatedImage()
+        {
+            return View();
+        }
+        [HttpGet]
+        public IActionResult SAReceiptDetails()
+        {
+            return View();
+        }
+        [HttpGet]
+        public IActionResult SAViewAdvertisement()
+        {
+            return View();
+        }
+        [HttpGet]
+        public IActionResult SAAddInstallment()
+        {
+            return View();
+        }
+        [HttpGet]
+        public IActionResult SAInvoiceDetails()
+        {
+            return View();
+        }
+        [HttpGet]
+        public IActionResult SAClientPaymentDetails()
+        {
+            return View();
+        }
+        [HttpGet]
+        public IActionResult SAViewInvoice()
+        {
+            return View();
+        }
+
+        [HttpGet]
+        public IActionResult SABillingControl()
+        {
+            return View();
+        }
+
+        [HttpGet]
+        public IActionResult SAAddBankDetails()
+        {
+            return View();
+        }
+        [HttpGet]
+        public IActionResult SAViewBankDetails()
+        {
+            return View();
+        }
+        [HttpGet]
+        public IActionResult SAEditBankDetails()
+        {
+            return View();
+        }
+        [HttpGet]
+        public IActionResult SAViewTaxesDetails()
+        {
+            return View();
+        }
+        [HttpGet]
+        public IActionResult SAViewPlan()
+        {
+            return View();
+        }
+        [HttpGet]
+        public IActionResult SAEditTaxesDetails()
+        {
+            return View();
+        }
+        [HttpGet]
+        public IActionResult SAEditPlan()
+        {
+            return View();
+        }
     }
 }

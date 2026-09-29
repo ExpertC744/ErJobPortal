@@ -1,0 +1,70 @@
+﻿@{
+    Layout = "~/Views/Shared/_DashboardLayout.cshtml";
+
+    ViewData["Title"] = "Plan Details List";
+    ViewData["Panel"] = "SuperAdmin";
+    ViewData["UserName"] = "ItNetworkZ";
+}
+
+<div class="container-fluid">
+
+    <!-- Page Header -->
+    <div class="mb-4">
+        <h1 class="mb-2">Plan Details List</h1>
+        <p class="mb-0 text-muted">ItNetworkZ</p>
+    </div>
+
+    <!-- Master Table -->
+    <div class="master-table-container">
+
+        
+
+        <div class="table-responsive">
+
+            <table id="plansTable" class="master-data-table">
+
+                <thead>
+                    <tr>
+                        <th>Sr. No</th>
+                        <th>Duration</th>
+                        <th>Rectangular Price</th>
+                        <th>Square Price</th>
+                        <th>Discount %</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+
+                    <tr>
+                        <td class="master-id">1</td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td>
+                            <a asp-controller="SuperAdmin"
+                               asp-action="SAEditPlan"
+                               asp-route-id="1"
+                               class="resume-view-btn"
+                               title="Edit Plan">
+                                <i class="fas fa-edit"></i>
+                            </a>
+                        </td>
+                    </tr>
+
+                    
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+        <div id="plansPageInfo"
+             class="master-page-info text-center d-none">
+        </div>
+
+    </div>
+
+</div>

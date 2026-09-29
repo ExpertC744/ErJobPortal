@@ -1,0 +1,856 @@
+﻿@{
+    Layout = "~/Views/Shared/_DashboardLayout.cshtml";
+
+    ViewData["Title"] = "Charts";
+    ViewData["Panel"] = "SuperAdmin";
+    ViewData["UserName"] = "Super Admin";
+}
+
+<!-- Chart.js -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+
+<style>
+
+    /* =========================================================
+       SUPER ADMIN CHART PAGE
+    ========================================================= */
+
+    .sa-chart-page {
+        width: 100%;
+        padding: 5px 0 30px;
+        color: #344054;
+    }
+
+
+    /* =========================================================
+       HEADER
+    ========================================================= */
+
+    .sa-chart-header {
+        margin-bottom: 22px;
+    }
+
+    .sa-chart-header h2 {
+        margin: 0;
+        color: #1f2937;
+        font-size: 26px;
+        font-weight: 700;
+    }
+
+    .sa-chart-header p {
+        margin: 5px 0 0;
+        color: #98a2b3;
+        font-size: 13px;
+    }
+
+
+    /* =========================================================
+       CHART GRID
+    ========================================================= */
+
+    .sa-chart-grid {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 20px;
+    }
+
+
+    /* =========================================================
+       CHART CARD
+    ========================================================= */
+
+    .sa-chart-card {
+        position: relative;
+
+        min-width: 0;
+
+        background: #ffffff;
+
+        border: 1px solid #edf0f2;
+
+        border-radius: 15px;
+
+        box-shadow: 0 5px 18px rgba(0, 0, 0, 0.035);
+
+        overflow: hidden;
+
+        transition: all .25s ease;
+    }
+
+    .sa-chart-card:hover {
+        border-color: #d4e8e2;
+
+        box-shadow: 0 12px 30px rgba(30, 123, 103, 0.08);
+    }
+
+
+    /* =========================================================
+       CHART CARD HEADER
+    ========================================================= */
+
+    .sa-chart-card-header {
+        min-height: 54px;
+
+        padding: 0 20px;
+
+        display: flex;
+
+        align-items: center;
+
+        gap: 11px;
+
+        border-bottom: 1px solid #edf0f2;
+
+        color: #1f2937;
+
+        font-size: 17px;
+
+        font-weight: 500;
+    }
+
+
+    .sa-chart-card-header i {
+        color: #1e7b67;
+
+        font-size: 16px;
+    }
+
+
+    /* =========================================================
+       CHART AREA
+    ========================================================= */
+
+    .sa-chart-content {
+        position: relative;
+
+        height: 340px;
+
+        padding: 20px 20px 15px;
+    }
+
+
+    .sa-chart-content canvas {
+        width: 100% !important;
+
+        height: 100% !important;
+    }
+
+
+    /* =========================================================
+       CHART FOOTER
+    ========================================================= */
+
+    .sa-chart-footer {
+        display: flex;
+
+        align-items: center;
+
+        gap: 8px;
+
+        padding: 0 20px 16px;
+
+        color: #64748b;
+
+        font-size: 12px;
+    }
+
+
+    .sa-chart-footer i {
+        color: #1e7b67;
+
+        font-size: 13px;
+    }
+
+
+    /* =========================================================
+       RESPONSIVE
+    ========================================================= */
+
+    @@media (max-width: 1100px) {
+
+        .sa-chart-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .sa-chart-content {
+            height: 350px;
+        }
+
+    }
+
+
+    @@media (max-width: 767px) {
+
+        .sa-chart-page {
+            padding-top: 0;
+        }
+
+        .sa-chart-header h2 {
+            font-size: 22px;
+        }
+
+        .sa-chart-header p {
+            font-size: 12px;
+        }
+
+        .sa-chart-grid {
+            gap: 15px;
+        }
+
+        .sa-chart-card-header {
+            min-height: 52px;
+
+            padding: 0 15px;
+
+            font-size: 15px;
+        }
+
+        .sa-chart-content {
+            height: 300px;
+
+            padding: 15px 10px 10px;
+        }
+
+        .sa-chart-footer {
+            padding: 0 15px 15px;
+
+            font-size: 11px;
+        }
+
+    }
+
+
+    @@media (max-width: 400px) {
+
+        .sa-chart-content {
+            height: 270px;
+        }
+
+        .sa-chart-card-header {
+            font-size: 14px;
+        }
+
+    }
+
+</style>
+
+
+<div class="container-fluid sa-chart-page">
+
+
+    <!-- =====================================================
+         PAGE HEADER
+    ====================================================== -->
+
+    <div class="sa-chart-header">
+
+        <h2>
+            Charts
+        </h2>
+
+        <p>
+            Super Admin Dashboard
+        </p>
+
+    </div>
+
+
+    <!-- =====================================================
+         CHART GRID
+    ====================================================== -->
+
+    <div class="sa-chart-grid">
+
+
+        <!-- =================================================
+             TRAINEE REGISTRATION CHART
+        ================================================== -->
+
+        <div class="sa-chart-card">
+
+            <div class="sa-chart-card-header">
+
+                <i class="fas fa-chart-line"></i>
+
+                <span>
+                    No. of Trainee registered in one year
+                </span>
+
+            </div>
+
+
+            <div class="sa-chart-content">
+
+                <canvas id="traineeRegistrationChart"></canvas>
+
+            </div>
+
+
+            <div class="sa-chart-footer">
+
+                <i class="fas fa-chart-line"></i>
+
+                <span>
+                    Monthly trainee registration trend
+                </span>
+
+            </div>
+
+        </div>
+
+
+        <!-- =================================================
+             ORGANIZATION INTERNSHIP CHART
+        ================================================== -->
+
+        <div class="sa-chart-card">
+
+            <div class="sa-chart-card-header">
+
+                <i class="fas fa-chart-bar"></i>
+
+                <span>
+                    Internship post from Organization
+                </span>
+
+            </div>
+
+
+            <div class="sa-chart-content">
+
+                <canvas id="organizationInternshipChart"></canvas>
+
+            </div>
+
+
+            <div class="sa-chart-footer">
+
+                <i class="fas fa-chart-line"></i>
+
+                <span>
+                    Monthly organization internship trend
+                </span>
+
+            </div>
+
+        </div>
+
+
+    </div>
+
+</div>
+
+
+<script>
+
+    /* =========================================================
+       COMMON FONT
+    ========================================================= */
+
+    Chart.defaults.font.family =
+        "Inter, Arial, sans-serif";
+
+    Chart.defaults.font.size = 12;
+
+    Chart.defaults.color = "#667085";
+
+
+    /* =========================================================
+       MONTHS
+    ========================================================= */
+
+    const months = [
+        "Jan'24",
+        "Feb'24",
+        "Mar'24",
+        "Apr'24",
+        "May'24",
+        "Jun'24",
+        "Jul'24",
+        "Aug'24",
+        "Sep'24",
+        "Oct'24",
+        "Nov'24",
+        "Dec'24"
+    ];
+
+
+    /* =========================================================
+       TRAINEE REGISTRATION CHART
+    ========================================================= */
+
+    const traineeCtx =
+        document
+            .getElementById(
+                "traineeRegistrationChart"
+            )
+            .getContext("2d");
+
+
+    const traineeGradient =
+        traineeCtx.createLinearGradient(
+            0,
+            0,
+            0,
+            300
+        );
+
+
+    traineeGradient.addColorStop(
+        0,
+        "rgba(30, 123, 103, 0.20)"
+    );
+
+
+    traineeGradient.addColorStop(
+        1,
+        "rgba(30, 123, 103, 0.02)"
+    );
+
+
+    new Chart(
+        traineeCtx,
+        {
+            type: "line",
+
+            data: {
+
+                labels: months,
+
+                datasets: [
+
+                    {
+                        label:
+                            "No. of Trainee registered",
+
+                        data: [
+                            390,
+                            275,
+                            145,
+                            150,
+                            465,
+                            210,
+                            115,
+                            400,
+                            245,
+                            390,
+                            100,
+                            35
+                        ],
+
+                        borderColor:
+                            "#1e7b67",
+
+                        backgroundColor:
+                            traineeGradient,
+
+                        borderWidth: 3,
+
+                        pointBackgroundColor:
+                            "#ffffff",
+
+                        pointBorderColor:
+                            "#1e7b67",
+
+                        pointBorderWidth: 3,
+
+                        pointRadius: 4,
+
+                        pointHoverRadius: 6,
+
+                        fill: true,
+
+                        tension: 0.35
+                    }
+
+                ]
+
+            },
+
+            options: {
+
+                responsive: true,
+
+                maintainAspectRatio: false,
+
+                interaction: {
+
+                    intersect: false,
+
+                    mode: "index"
+
+                },
+
+                plugins: {
+
+                    legend: {
+
+                        display: true,
+
+                        position: "top",
+
+                        align: "center",
+
+                        labels: {
+
+                            usePointStyle: true,
+
+                            pointStyle: "rect",
+
+                            boxWidth: 10,
+
+                            padding: 18,
+
+                            color: "#667085",
+
+                            font: {
+
+                                size: 12
+
+                            }
+
+                        }
+
+                    },
+
+                    tooltip: {
+
+                        backgroundColor:
+                            "#1f2937",
+
+                        titleColor:
+                            "#ffffff",
+
+                        bodyColor:
+                            "#ffffff",
+
+                        padding: 10,
+
+                        displayColors: false
+
+                    }
+
+                },
+
+                scales: {
+
+                    x: {
+
+                        grid: {
+
+                            color:
+                                "#eef1f3",
+
+                            drawBorder: false
+
+                        },
+
+                        ticks: {
+
+                            color:
+                                "#7b8494",
+
+                            font: {
+
+                                size: 11
+
+                            }
+
+                        },
+
+                        title: {
+
+                            display: true,
+
+                            text: "No. Of months",
+
+                            color:
+                                "#667085",
+
+                            font: {
+
+                                size: 12
+
+                            }
+
+                        }
+
+                    },
+
+                    y: {
+
+                        beginAtZero: true,
+
+                        max: 500,
+
+                        ticks: {
+
+                            stepSize: 100,
+
+                            color:
+                                "#7b8494",
+
+                            font: {
+
+                                size: 11
+
+                            }
+
+                        },
+
+                        grid: {
+
+                            color:
+                                "#eef1f3",
+
+                            drawBorder: false
+
+                        },
+
+                        title: {
+
+                            display: true,
+
+                            text:
+                                "No. of Trainee registered",
+
+                            color:
+                                "#667085",
+
+                            font: {
+
+                                size: 12
+
+                            }
+
+                        }
+
+                    }
+
+                }
+
+            }
+
+        }
+    );
+
+
+    /* =========================================================
+       ORGANIZATION INTERNSHIP CHART
+    ========================================================= */
+
+    const organizationCtx =
+        document
+            .getElementById(
+                "organizationInternshipChart"
+            )
+            .getContext("2d");
+
+
+    new Chart(
+        organizationCtx,
+        {
+            type: "bar",
+
+            data: {
+
+                labels: months,
+
+                datasets: [
+
+                    {
+
+                        label:
+                            "No. of post",
+
+                        data: [
+                            12,
+                            20,
+                            16,
+                            28,
+                            37,
+                            32,
+                            48,
+                            56,
+                            49,
+                            64,
+                            70,
+                            22
+                        ],
+
+                        backgroundColor:
+                            "#1e7b67",
+
+                        borderRadius: 2,
+
+                        barPercentage: 0.65,
+
+                        categoryPercentage: 0.75
+
+                    }
+
+                ]
+
+            },
+
+            options: {
+
+                responsive: true,
+
+                maintainAspectRatio: false,
+
+                plugins: {
+
+                    legend: {
+
+                        display: true,
+
+                        position: "top",
+
+                        align: "center",
+
+                        labels: {
+
+                            usePointStyle: true,
+
+                            pointStyle: "rect",
+
+                            boxWidth: 10,
+
+                            padding: 18,
+
+                            color: "#667085",
+
+                            font: {
+
+                                size: 12
+
+                            }
+
+                        }
+
+                    },
+
+                    tooltip: {
+
+                        backgroundColor:
+                            "#1f2937",
+
+                        titleColor:
+                            "#ffffff",
+
+                        bodyColor:
+                            "#ffffff",
+
+                        padding: 10,
+
+                        displayColors: false
+
+                    }
+
+                },
+
+                scales: {
+
+                    x: {
+
+                        grid: {
+
+                            color:
+                                "#eef1f3",
+
+                            drawBorder: false
+
+                        },
+
+                        ticks: {
+
+                            color:
+                                "#7b8494",
+
+                            font: {
+
+                                size: 11
+
+                            }
+
+                        },
+
+                        title: {
+
+                            display: true,
+
+                            text: "No. of months",
+
+                            color:
+                                "#667085",
+
+                            font: {
+
+                                size: 12
+
+                            }
+
+                        }
+
+                    },
+
+                    y: {
+
+                        beginAtZero: true,
+
+                        max: 80,
+
+                        ticks: {
+
+                            stepSize: 10,
+
+                            color:
+                                "#7b8494",
+
+                            font: {
+
+                                size: 11
+
+                            }
+
+                        },
+
+                        grid: {
+
+                            color:
+                                "#eef1f3",
+
+                            drawBorder: false
+
+                        },
+
+                        title: {
+
+                            display: true,
+
+                            text:
+                                "No. of post",
+
+                            color:
+                                "#667085",
+
+                            font: {
+
+                                size: 12
+
+                            }
+
+                        }
+
+                    }
+
+                }
+
+            }
+
+        }
+    );
+
+</script>
