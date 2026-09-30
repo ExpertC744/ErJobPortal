@@ -216,7 +216,11 @@ namespace JobPortalTrainee.Models
 
         public int AppliedTraineeCount { get; set; }
 
+        public bool IsApplied { get; set; }
 
+        //for matching jobs 
+        public string? OrganizationName { get; set; }
+        public string? InternshipFellowshipTypeName { get; set; }
 
 
     }

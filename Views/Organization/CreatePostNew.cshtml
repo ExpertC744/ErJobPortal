@@ -995,12 +995,7 @@
                             Total Charges
                         </label>
 
-                        <input type="number"
-                               id="sTotalCharges"
-                               name="sTotalCharges"
-                               step="0.01"
-                               min="0"
-                               placeholder="Enter charges" />
+                        <input type="number" id="sTotalCharges" name="sTotalCharges" step="0.01" min="0" value="0" placeholder="Enter charges" />
 
                     </div>
 
@@ -1582,9 +1577,7 @@
                         Save Draft
                     </button>
 
-                    <button type="submit"
-                            class="btn btn-primary"
-                            id="submitButton">
+                    <button type="submit" class="btn btn-primary" id="submitButton">
                         Submit
                     </button>
 
@@ -1594,13 +1587,82 @@
 
         </form>
 
+        <div id="successMessage" class="alert alert-success mt-3" style="display:none;"></div>
+        <div id="errorMessage" class="alert alert-danger mt-3" style="display:none;"></div>
     </div>
 
 
     <footer>
         Copyright © 2026 — All Rights Reserved with IIPL
     </footer>
+    <script>
+        $(document).ready(function () {
 
+            $("#createPostForm").submit(function (e) {
+
+                e.preventDefault();
+
+                $("#successMessage").hide().text("");
+                $("#errorMessage").hide().text("");
+
+                var form = $(this);
+                var button = $("#submitButton");
+
+                button.prop("disabled", true);
+
+                $.ajax({
+                    url: '@Url.Action("CreatePostNew", "Organization")',
+                    type: 'POST',
+                    data: form.serialize(),
+
+                    success: function (response) {
+
+                        if (response.success) {
+
+                            // Show success message
+                            $("#successMessage")
+                                .text(response.message)
+                                .fadeIn();
+
+                            // Clear all form fields
+                            form[0].reset();
+
+                            // If you have select2 dropdowns
+                            $(".select2").val(null).trigger("change");
+
+                            // Optional: hide message after 5 seconds
+                            setTimeout(function () {
+                                $("#successMessage").fadeOut();
+                            }, 5000);
+
+                        }
+                        else {
+
+                            $("#errorMessage")
+                                .text(response.message)
+                                .fadeIn();
+                        }
+                    },
+
+                    error: function (xhr) {
+
+                        $("#errorMessage")
+                            .text("An error occurred while creating the post.")
+                            .fadeIn();
+
+                        console.log(xhr.responseText);
+                    },
+
+                    complete: function () {
+
+                        button.prop("disabled", false);
+                    }
+                });
+
+            });
+
+        });
+    </script>
     @* <script>
 
         document.addEventListener("DOMContentLoaded", function () {

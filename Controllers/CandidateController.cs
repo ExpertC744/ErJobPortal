@@ -1,5 +1,6 @@
 ﻿using ErJobPortal.Models;
 using ErJobPortal.Repositories;
+using JobPortalTrainee.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Configuration;
@@ -194,14 +195,222 @@ namespace ErJobPortal.Controllers
             ViewBag.Organizations =
                 organizations;
 
+            // =========================================================
+            // MATCHING INTERNSHIP POSTS
+            // =========================================================
+
+            List<OrgPostM> internshipPosts =
+                GetMatchingJobsForCandidate(
+                    candidateId.Value);
+
+            ViewBag.InternshipPosts =
+                internshipPosts;
+
             return View();
         }
+
 
 
         // ==========================================
         // ORGANIZATION LIST
         // ==========================================
+        [HttpGet]    // =============================================================
+                     // GET MATCHING INTERNSHIP POSTS FOR CANDIDATE
+                     // =============================================================
         [HttpGet]
+        private List<OrgPostM> GetMatchingJobsForCandidate(
+        int candidateId)
+        {
+            List<OrgPostM> posts =
+                new List<OrgPostM>();
+
+            string connectionString =
+                _configuration.GetConnectionString(
+                    "DefaultConnection")!;
+
+            using (SqlConnection con =
+                   new SqlConnection(connectionString))
+            {
+                using (SqlCommand cmd =
+                       new SqlCommand(
+                           "GetMatchingJobsForCandidate",
+                           con))
+                {
+                    // =====================================================
+                    // STORED PROCEDURE
+                    // =====================================================
+
+                    cmd.CommandType =
+                        CommandType.StoredProcedure;
+
+                    // =====================================================
+                    // CANDIDATE ID
+                    // =====================================================
+
+                    cmd.Parameters.Add(
+                        "@CandidateID",
+                        SqlDbType.Int).Value =
+                        candidateId;
+
+                    con.Open();
+
+                    using (SqlDataReader dr =
+                           cmd.ExecuteReader())
+                    {
+                        while (dr.Read())
+                        {
+                            OrgPostM post =
+                                new OrgPostM();
+
+                            // =================================================
+                            // POST ID
+                            // SP: fj.nID AS PostID
+                            // =================================================
+
+                            post.nID =
+                                dr["PostID"] != DBNull.Value
+                                ? Convert.ToInt32(
+                                    dr["PostID"])
+                                : 0;
+
+
+                            // =================================================
+                            // ORGANIZATION ID
+                            // SP: fj.nOrgID AS OrgID
+                            // =================================================
+
+                            post.nOrgID =
+                                dr["OrgID"] != DBNull.Value
+                                ? Convert.ToInt32(
+                                    dr["OrgID"])
+                                : 0;
+
+                            post.sName =
+    dr["OrganizationName"] != DBNull.Value
+    ? dr["OrganizationName"].ToString()!
+    : "";
+
+
+                            // =================================================
+                            // POSITION ID
+                            // SP: fj.nPositionID AS PositionID
+                            // =================================================
+
+                            post.nPositionID =
+                                dr["PositionID"] != DBNull.Value
+                                ? Convert.ToInt32(
+                                    dr["PositionID"])
+                                : 0;
+
+
+                            // =================================================
+                            // POSITION NAME
+                            // SP: fj.PositionName
+                            // =================================================
+
+                            post.sPositionName =
+                                dr["PositionName"] != DBNull.Value
+                                ? dr["PositionName"]
+                                    .ToString()!
+                                : "";
+
+
+                            // =================================================
+                            // COUNTRY
+                            // SP: fj.sCountryName AS Country
+                            // =================================================
+
+                            post.sCountryName =
+                                dr["Country"] != DBNull.Value
+                                ? dr["Country"]
+                                    .ToString()!
+                                : "";
+
+
+                            // =================================================
+                            // STATE
+                            // SP: fj.sStateName AS State
+                            // =================================================
+
+                            post.sStateName =
+                                dr["State"] != DBNull.Value
+                                ? dr["State"]
+                                    .ToString()!
+                                : "";
+
+
+                            // =================================================
+                            // CITY
+                            // SP: fj.nCityName AS City
+                            // =================================================
+
+                            post.nCityName =
+                                dr["City"] != DBNull.Value
+                                ? dr["City"]
+                                    .ToString()!
+                                : "";
+
+
+                            // =================================================
+                            // FELLOWSHIP TYPE ID
+                            // SP: InternshipFellowshipType
+                            // =================================================
+
+                            // =============================================================
+                            // FELLOWSHIP TYPE ID
+                            // =============================================================
+
+                            post.nInternshipFellowshipTypeID =
+                                dr["InternshipFellowshipTypeID"] != DBNull.Value
+                                ? Convert.ToInt32(
+                                    dr["InternshipFellowshipTypeID"])
+                                : 0;
+
+
+                            // =============================================================
+                            // FELLOWSHIP TYPE NAME
+                            // =============================================================
+
+                            post.sInternshipFellowshipTypeName =
+     dr["InternshipFellowshipType"] != DBNull.Value
+     ? dr["InternshipFellowshipType"]
+         .ToString()!
+     : "";
+                            // =================================================
+                            // FACILITIES
+                            // SP: fj.sFacilities
+                            // =================================================
+
+                            post.sFacilities =
+                                dr["sFacilities"] != DBNull.Value
+                                ? dr["sFacilities"]
+                                    .ToString()!
+                                : "";
+
+
+                            // =================================================
+                            // APPLICATION STATUS
+                            // SP: ISNULL(jas.CApply, 0) AS CApply
+                            // =================================================
+
+                            post.IsApplied =
+                                dr["CApply"] != DBNull.Value &&
+                                Convert.ToInt32(
+                                    dr["CApply"]) == 1;
+
+
+                            // =================================================
+                            // ADD TO LIST
+                            // =================================================
+
+                            posts.Add(post);
+                        }
+                    }
+                }
+            }
+
+            return posts;
+        }
         [Route("Candidate/OrgList/{id?}")]
         public IActionResult OrgList(string? id)
         {
@@ -381,13 +590,11 @@ namespace ErJobPortal.Controllers
             return View(vm);
         }
 
-
         // =========================================================
         // LOAD ALL DROPDOWNS
         // =========================================================
 
-        private CandidateProfileViewModel LoadProfileDropdowns(
-    CandidateProfileModel profile)
+        private CandidateProfileViewModel LoadProfileDropdowns(CandidateProfileModel profile)
         {
             return new CandidateProfileViewModel
             {
@@ -472,7 +679,6 @@ namespace ErJobPortal.Controllers
 
             return RedirectToAction("Profile");
         }
-
 
         // =====================================================
         // UPDATE INTERNSHIP / FELLOWSHIP PREFERENCE
@@ -607,7 +813,6 @@ namespace ErJobPortal.Controllers
             return RedirectToAction("Profile");
         }
 
-
         // =========================================================
         // UPDATE ACHIEVEMENTS
         // =========================================================
@@ -632,7 +837,6 @@ namespace ErJobPortal.Controllers
             return RedirectToAction("Profile");
         }
 
-
         // =========================================================
         // UPDATE LINKS
         // =========================================================
@@ -656,7 +860,6 @@ namespace ErJobPortal.Controllers
 
             return RedirectToAction("Profile");
         }
-
 
         // shrirang 24/09/26
         // =========================================================
