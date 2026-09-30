@@ -15,9 +15,7 @@ namespace JobPortalTrainee.Controllers
         private readonly AccountRepository _repository;
         private readonly IWebHostEnvironment _environment;
 
-        public OrganizationController(
-    IConfiguration configuration,
-    AccountRepository repository)
+        public OrganizationController(IConfiguration configuration, AccountRepository repository)
         {
             _configuration = configuration;
             _repository = repository;
