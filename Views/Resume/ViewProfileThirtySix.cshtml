@@ -509,6 +509,7 @@
                     </div>
                 </section>
             }
+         
             @if (hasRef)
             {
                 <section class="block sec-ref">
@@ -549,35 +550,11 @@
                     </div>
                 </section>
             }
-            </div>
-            }
+       
+
             @if (hasSkills || hasLang || hasAch || hasHobby)
             {
             <div class="gcol">
-            @if (hasSkills)
-            {
-                <section class="block sec-skills">
-                    <h2 class="heading">Skills</h2>
-
-                    @foreach (var group in skillGroups)
-                    {
-                        <div class="skill-group">
-
-                            <div class="skill-group-title">@group.Item1</div>
-
-                            <ul class="skill-list">
-                                @foreach (var skill in group.Item2.Split(
-                               new[] { ',', ';', '|' },
-                               StringSplitOptions.RemoveEmptyEntries))
-                                {
-                                    <li>@skill.Trim()</li>
-                                }
-                            </ul>
-
-                        </div>
-                    }
-                </section>
-            }
             @if (hasLang)
             {
                 <section class="block sec-lang">
@@ -595,6 +572,8 @@
                     }
                 </section>
             }
+    
+            
             @if (hasAch)
             {
                 <section class="block sec-ach">
@@ -611,6 +590,7 @@
                     </ul>
                 </section>
             }
+      
             @if (hasHobby)
             {
                 <section class="block sec-hobby">
@@ -627,9 +607,16 @@
                     </div>
                 </section>
             }
-            </div>
+           
+        
+        </div>
             }
-            </div>
+    
+        </div>
+            }
+         
+            
+        </div>
             }
             </div>
 

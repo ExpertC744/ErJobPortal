@@ -78,7 +78,7 @@ body {
 /* ---------- TOOLBAR ---------- */
 
 .resume-toolbar {
-    width: 297mm;
+width: 297mm;height:210mm;
     max-width: calc(100% - 40px);
     margin: 20px auto 10px;
     display: flex;
@@ -131,7 +131,7 @@ body {
 /* ---------- THEME SWITCHER ---------- */
 
 .theme-switcher {
-    width: 297mm;
+width: 297mm;height:210mm;
     max-width: calc(100% - 40px);
     margin: 0 auto 14px;
     display: flex;
@@ -180,7 +180,7 @@ body {
 
 .resume-sheet {
     position: relative;
-    width: 297mm;
+width: 297mm;height:210mm;
     min-height: 210mm;
     margin: 0 auto;
     background: #fff;
@@ -666,7 +666,7 @@ body {
 
 @media print {
     html, body {
-        width: 297mm;
+    width: 297mm;height:210mm;
         margin: 0;
         padding: 0;
         background: #fff;
@@ -684,7 +684,7 @@ body {
     }
 
     .resume-sheet {
-        width: 297mm;
+    width: 297mm;height:210mm;
         min-height: 210mm;
         margin: 0;
         box-shadow: none;

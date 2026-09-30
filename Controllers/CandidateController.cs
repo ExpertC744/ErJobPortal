@@ -2701,13 +2701,13 @@ namespace ErJobPortal.Controllers
         }
 
 
-        // shrirang 28/09/26
+        // shrirang 29/09/26
         // =========================================================
         // GET CAREER OBJECTIVE DRAFTS
         // =========================================================
 
         [HttpGet]
-        public IActionResult GetCareerObjectives()
+        public IActionResult GetCareerObjectives(int genderID)
         {
             List<SAObjectiveM> objectives = new List<SAObjectiveM>();
 
@@ -2736,8 +2736,21 @@ namespace ErJobPortal.Controllers
                                     reader["nBit"] != DBNull.Value &&
                                     Convert.ToBoolean(reader["nBit"]);
 
-                                // Only active/enabled objectives
                                 if (!isEnabled)
+                                {
+                                    continue;
+                                }
+
+                                int objectiveGenderID =
+                                    reader["nGenderID"] != DBNull.Value
+                                    ? Convert.ToInt32(reader["nGenderID"])
+                                    : 0;
+
+                                // =========================================
+                                // FILTER BY SELECTED GENDER
+                                // =========================================
+
+                                if (objectiveGenderID != genderID)
                                 {
                                     continue;
                                 }
@@ -2748,7 +2761,7 @@ namespace ErJobPortal.Controllers
                                         Convert.ToInt32(reader["nID"]),
 
                                     nGenderID =
-                                        Convert.ToInt32(reader["nGenderID"]),
+                                        objectiveGenderID,
 
                                     sObjective =
                                         reader["sObjective"]?.ToString()
@@ -2760,8 +2773,7 @@ namespace ErJobPortal.Controllers
                                             reader["dCreatedDate"])
                                         : DateTime.MinValue,
 
-                                    nBit =
-                                        isEnabled,
+                                    nBit = isEnabled,
 
                                     nSABit =
                                         reader["nSABit"] != DBNull.Value &&
@@ -2773,19 +2785,19 @@ namespace ErJobPortal.Controllers
                     }
                 }
 
-                // Serial-wise ordering
                 objectives =
                     objectives
                         .OrderBy(x => x.nID)
                         .ToList();
 
-
                 return Json(new
                 {
                     success = true,
+
                     objectives = objectives.Select(x => new
                     {
                         x.nID,
+                        x.nGenderID,
                         x.sObjective
                     }).ToList()
                 });
@@ -2798,6 +2810,199 @@ namespace ErJobPortal.Controllers
                     message = ex.Message
                 });
             }
+        }
+
+
+        // =========================================================
+        // CUSTOM RESUME BUILDER
+        // Supports:
+        // /Candidate/customResumeBuilder/2
+        //
+        // Also supports:
+        // /Candidate/customResumeBuilder/CD080599072601
+        // =========================================================
+
+        [HttpGet]
+        [Route("Candidate/customResumeBuilder/{id?}")]
+        [ResponseCache(
+            NoStore = true,
+            Location = ResponseCacheLocation.None)]
+        public IActionResult CustomResumeBuilder(string? id)
+        {
+            // =====================================================
+            // GET LOGGED-IN CANDIDATE ID
+            // =====================================================
+
+            int? candidateId =
+                HttpContext.Session.GetInt32("CandidateID");
+
+            if (candidateId == null || candidateId <= 0)
+            {
+                return RedirectToAction(
+                    "CandidateLogin",
+                    "Account");
+            }
+
+            // =====================================================
+            // GET CANDIDATE CODE
+            // =====================================================
+
+            string? candidateCode = GetCandidateCode();
+
+            if (string.IsNullOrEmpty(candidateCode))
+            {
+                return NotFound(
+                    "Candidate code could not be generated.");
+            }
+
+            // =====================================================
+            // IF NO ID IS PASSED
+            // REDIRECT TO CANDIDATE CODE URL
+            // =====================================================
+
+            if (string.IsNullOrWhiteSpace(id))
+            {
+                return RedirectToAction(
+                    "CustomResumeBuilder",
+                    "Candidate",
+                    new
+                    {
+                        id = candidateCode
+                    });
+            }
+
+            // =====================================================
+            // VALIDATE URL
+            //
+            // The URL can contain:
+            //
+            // 1. Candidate ID
+            //    /customResumeBuilder/2
+            //
+            // 2. Candidate Code
+            //    /customResumeBuilder/CD080599072601
+            //
+            // But it MUST belong to the logged-in candidate.
+            // =====================================================
+
+            bool validCandidate = false;
+
+            // -----------------------------------------------------
+            // CASE 1: NUMERIC CANDIDATE ID
+            // -----------------------------------------------------
+
+            if (int.TryParse(id, out int urlCandidateId))
+            {
+                if (urlCandidateId == candidateId.Value)
+                {
+                    validCandidate = true;
+                }
+            }
+
+            // -----------------------------------------------------
+            // CASE 2: CANDIDATE CODE
+            // -----------------------------------------------------
+
+            if (!validCandidate &&
+                string.Equals(
+                    id,
+                    candidateCode,
+                    StringComparison.OrdinalIgnoreCase))
+            {
+                validCandidate = true;
+            }
+
+            // =====================================================
+            // WRONG CANDIDATE
+            // =====================================================
+
+            if (!validCandidate)
+            {
+                return NotFound();
+            }
+
+            // =====================================================
+            // GET PROFILE
+            // =====================================================
+
+            CandidateProfileModel? profile =
+                _repo.GetProfile(candidateId.Value);
+
+            // =====================================================
+            // IF PROFILE DOES NOT EXIST
+            // =====================================================
+
+            if (profile == null)
+            {
+                profile = new CandidateProfileModel
+                {
+                    CandidateID = candidateId.Value
+                };
+            }
+
+            // =====================================================
+            // LOAD RESUME VIEW MODEL
+            // =====================================================
+
+            ResumeViewModel vm =
+     new ResumeViewModel
+     {
+         Profile = profile,
+
+         Relationships =
+             _repo.GetRelationships(),
+
+         Streams =
+             _repo.GetStreams(),
+
+         Divisions =
+             _repo.GetDivisions(),
+
+         InternshipFellowshipType =
+             _repo.GetInternshipFellowshipType(),
+
+         InternshipTitles =
+             _repo.GetInternshipTitles(),
+
+         InternshipDurations =
+             _repo.GetInternshipDurations(),
+
+         InternshipStatuses =
+             _repo.GetInternshipStatuses()
+     };
+
+            // =====================================================
+            // VIEW BAG
+            // =====================================================
+
+            ViewBag.CandidateID =
+                candidateId.Value;
+
+            ViewBag.CandidateCode =
+                candidateCode;
+
+            ViewBag.CandidateName =
+                HttpContext.Session.GetString(
+                    "CandidateName");
+
+            ViewBag.CandidateEmail =
+                HttpContext.Session.GetString(
+                    "CandidateEmail");
+
+            // =====================================================
+            // OPEN VIEW
+            // =====================================================
+
+            return View(
+                "~/Views/Candidate/customResumeBuilder.cshtml",
+                vm);
+        }
+
+        //radhika29-09
+        [HttpGet]
+        public IActionResult InternshipPostDetails()
+        {
+            return View();
         }
     }
 }
