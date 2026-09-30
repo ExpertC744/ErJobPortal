@@ -3501,7 +3501,7 @@ WHERE nID = @nID
 
         //khushi -- 29-09-2026
 
-        [HttpGet] 
+        [HttpGet]
         public IActionResult OrgCharts()
         {
             int? orgId =
@@ -3518,11 +3518,13 @@ WHERE nID = @nID
                 HttpContext.Session.GetString("OrgName")
                 ?? "";
 
+            // Existing organization area chart
             List<OrganizationChartViewModel> areaChartData =
                 GetAreaChartData(orgId.Value);
 
+            // Candidate registration chart
             List<OrganizationChartViewModel> barChartData =
-                GetBarChartData(orgId.Value);
+                GetBarChartData();
 
             ViewBag.OrganizationName =
                 organizationName;
@@ -3542,7 +3544,7 @@ WHERE nID = @nID
         // AREA CHART DATA
         // =========================================================
 
-        private List<OrganizationChartViewModel>GetAreaChartData(int organizationId)
+        private List<OrganizationChartViewModel> GetAreaChartData(int organizationId)
         {
             var areaChartDataList =
                 new List<OrganizationChartViewModel>();
@@ -3609,17 +3611,17 @@ WHERE nID = @nID
 
         //khushi -- 29-09-2026
         // =========================================================
-        // SECOND CHART DATA
+        // CANDIDATE MONTHLY REGISTRATION CHART
+        // tblcandidateRegister
         // =========================================================
 
-        private List<OrganizationChartViewModel>GetBarChartData(int organizationId)
+        private List<OrganizationChartViewModel> GetBarChartData()
         {
-            var barChartDataList =
+            var candidateChartData =
                 new List<OrganizationChartViewModel>();
 
             string connectionString =
-                _configuration.GetConnectionString(
-                    "DefaultConnection")
+                _configuration.GetConnectionString("DefaultConnection")
                 ?? throw new InvalidOperationException(
                     "DefaultConnection was not found.");
 
@@ -3628,16 +3630,11 @@ WHERE nID = @nID
             {
                 using (SqlCommand command =
                        new SqlCommand(
-                           "SP_BrowseOrgBarChart",
+                           "SP_BrowseCandidateMonthlyRegistration",
                            connection))
                 {
                     command.CommandType =
                         CommandType.StoredProcedure;
-
-                    command.Parameters.Add(
-                        "@OrganizationID",
-                        SqlDbType.Int).Value =
-                        organizationId;
 
                     connection.Open();
 
@@ -3646,24 +3643,25 @@ WHERE nID = @nID
                     {
                         while (reader.Read())
                         {
-                            barChartDataList.Add(
+                            candidateChartData.Add(
                                 new OrganizationChartViewModel
                                 {
-                                    RegistrationMonth =
-                                        reader["RegistrationMonth"]
-                                        != DBNull.Value
+                                    RegistrationYear =
+                                        reader["RegistrationYear"] != DBNull.Value
                                             ? Convert.ToInt32(
-                                                reader[
-                                                    "RegistrationMonth"])
+                                                reader["RegistrationYear"])
+                                            : 0,
+
+                                    RegistrationMonth =
+                                        reader["RegistrationMonth"] != DBNull.Value
+                                            ? Convert.ToInt32(
+                                                reader["RegistrationMonth"])
                                             : 0,
 
                                     TotalRegistrations =
-                                        reader[
-                                            "OrgNumberOfRegistrations"]
-                                        != DBNull.Value
+                                        reader["TotalRegistrations"] != DBNull.Value
                                             ? Convert.ToInt32(
-                                                reader[
-                                                    "OrgNumberOfRegistrations"])
+                                                reader["TotalRegistrations"])
                                             : 0
                                 });
                         }
@@ -3671,7 +3669,7 @@ WHERE nID = @nID
                 }
             }
 
-            return barChartDataList;
+            return candidateChartData;
         }
 
 

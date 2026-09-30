@@ -5,9 +5,190 @@
     ViewData["Panel"] = "Organization";
     ViewData["UserName"] = "Organization";
 }
- 
-<link href="~/css/orgdashboard.css" rel="stylesheet" />
 
+<link href="~/css/orgdashboard.css" rel="stylesheet" />
+<style>
+
+    /* =====================================================
+       1TRAINEE MONTHLY ANALYTICS @* Radhika29-09 *@
+    ===================================================== */
+
+    .analytics-card {
+        background: #ffffff;
+        border: 1px solid #dfe5e8;
+        border-radius: 14px;
+        overflow: hidden;
+        height: 100%;
+        box-shadow: 0 4px 14px rgba(15, 23, 42, 0.04);
+        transition: all .25s ease;
+    }
+
+    .analytics-card:hover {
+        box-shadow: 0 8px 24px rgba(15, 23, 42, 0.08);
+    }
+
+    /* Chart Header */
+    .analytics-header {
+        min-height: 52px;
+        padding: 0 18px;
+        display: flex;
+        align-items: center;
+        gap: 11px;
+        border-bottom: 1px solid #dfe5e8;
+        background: #ffffff;
+    }
+
+    .analytics-header-icon {
+        width: 25px;
+        height: 25px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #1e7b67;
+        font-size: 17px;
+    }
+
+    .analytics-header h5 {
+        margin: 0;
+        color: #16324f;
+        font-size: 17px;
+        font-weight: 500;
+        letter-spacing: .1px;
+    }
+
+    /* Chart Body */
+    .analytics-body {
+        padding: 18px 16px 14px;
+    }
+
+    .chart-wrapper {
+        position: relative;
+        width: 100%;
+        height: 235px;
+    }
+
+        .chart-wrapper svg {
+            width: 100%;
+            height: 100%;
+            display: block;
+        }
+
+    /* Legend */
+    .chart-legend {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        gap: 8px;
+        margin-bottom: 4px;
+        color: #667085;
+        font-size: 12px;
+    }
+
+    .legend-box {
+        width: 50px;
+        height: 16px;
+        border: 2px solid #1e7b67;
+        background: rgba(30, 123, 103, .14);
+    }
+
+    .legend-box-bar {
+        width: 50px;
+        height: 16px;
+        background: #1e7b67;
+    }
+
+    /* Axis text */
+    .chart-axis-text {
+        fill: #667085;
+        font-size: 11px;
+        font-family: Arial, sans-serif;
+    }
+
+    /* Grid */
+    .chart-grid {
+        stroke: #e6eaed;
+        stroke-width: 1;
+    }
+
+    .chart-axis {
+        stroke: #cfd6da;
+        stroke-width: 1;
+    }
+
+    /* Line chart */
+    .chart-line {
+        fill: none;
+        stroke: #1e7b67;
+        stroke-width: 2.5;
+        stroke-linecap: round;
+        stroke-linejoin: round;
+    }
+
+    .chart-area {
+        fill: rgba(30, 123, 103, .14);
+    }
+
+    .chart-point {
+        fill: #ffffff;
+        stroke: #1e7b67;
+        stroke-width: 2;
+    }
+
+    /* Bar chart */
+    .chart-bar {
+        fill: #1e7b67;
+        transition: opacity .2s ease;
+    }
+
+        .chart-bar:hover {
+            opacity: .78;
+        }
+
+    /* Current value */
+    .analytics-value {
+        text-align: center;
+        margin-top: 5px;
+        color: #667085;
+        font-size: 11px;
+    }
+
+    /* Footer */
+    .analytics-footer {
+        border-top: 1px solid #edf0f2;
+        padding: 10px 16px;
+        color: #7a8494;
+        font-size: 11px;
+    }
+
+        .analytics-footer i {
+            color: #1e7b67;
+            margin-right: 5px;
+        }
+
+    @@media (max-width: 767px) {
+
+        .analytics-header {
+            min-height: 48px;
+            padding: 0 14px;
+        }
+
+            .analytics-header h5 {
+                font-size: 15px;
+            }
+
+        .analytics-body {
+            padding: 15px 10px 10px;
+        }
+
+        .chart-wrapper {
+            height: 210px;
+        }
+
+        .chart-axis-text {
+            font-size: 9px;
+        }
+    }
+</style>
 <!-- =========================================================
      DASHBOARD
 ========================================================= -->
@@ -200,141 +381,352 @@
     </div>
 
     <!-- =====================================================
-     TRAINEE CHARTS
-====================================================== -->
+         TRAINEE CHARTS @* Radhika29-09 *@
+    ===================================================== -->
+    <div class="row g-4 mb-4">
 
-<div class="row g-4 mb-4">
+        <!-- =========================================
+             NO. OF TRAINEE ELIGIBLE FOR INTERNSHIP
+        ========================================== -->
 
-    <!-- =================================================
-         CHART 1
-         ELIGIBLE TRAINEES
-    ================================================== -->
+        <div class="col-xl-6 col-lg-6 col-md-12">
 
-    <div class="col-xl-6 col-lg-6 col-md-12">
+            <div class="analytics-card">
 
-        <div class="org-chart-card">
+                <!-- Header -->
+                <div class="analytics-header">
 
-            <!-- HEADER -->
-
-            <div class="chart-card-header">
-
-                <div>
-
-                    <div class="chart-title">
-                        No. of Trainee Eligible for Internship
+                    <div class="analytics-header-icon">
+                        <i class="fas fa-chart-area"></i>
                     </div>
 
-                    <div class="chart-number">
-                        @ViewBag.InternshipEligibleCount
+                    <h5>
+                        No. of Trainee eligible for internship
+                    </h5>
+
+                </div>
+
+
+                <!-- Body -->
+                <div class="analytics-body">
+
+                    <!-- Legend -->
+                    <div class="chart-legend">
+
+                        <span class="legend-box"></span>
+
+                        <span>
+                            Total Eligible Trainees
+                        </span>
+
                     </div>
 
-                    <div class="chart-subtitle">
-                        Current eligible trainees
+
+                    <!-- SVG Chart -->
+                    <div class="chart-wrapper">
+
+                        <svg id="eligibleTraineeSvg"
+                             viewBox="0 0 760 300"
+                             preserveAspectRatio="none">
+
+                            <!-- Grid -->
+                            <line class="chart-grid"
+                                  x1="60" y1="30"
+                                  x2="735" y2="30" />
+
+                            <line class="chart-grid"
+                                  x1="60" y1="75"
+                                  x2="735" y2="75" />
+
+                            <line class="chart-grid"
+                                  x1="60" y1="120"
+                                  x2="735" y2="120" />
+
+                            <line class="chart-grid"
+                                  x1="60" y1="165"
+                                  x2="735" y2="165" />
+
+                            <line class="chart-grid"
+                                  x1="60" y1="210"
+                                  x2="735" y2="210" />
+
+                            <line class="chart-grid"
+                                  x1="60" y1="255"
+                                  x2="735" y2="255" />
+
+
+                            <!-- Axis -->
+                            <line class="chart-axis"
+                                  x1="60" y1="30"
+                                  x2="60" y2="255" />
+
+                            <line class="chart-axis"
+                                  x1="60" y1="255"
+                                  x2="735" y2="255" />
+
+
+                            <!-- Y Axis -->
+                            <text class="chart-axis-text"
+                                  x="48" y="259"
+                                  text-anchor="end">
+                                0
+                            </text>
+
+                            <text class="chart-axis-text"
+                                  x="48" y="214"
+                                  text-anchor="end">
+                                20
+                            </text>
+
+                            <text class="chart-axis-text"
+                                  x="48" y="169"
+                                  text-anchor="end">
+                                40
+                            </text>
+
+                            <text class="chart-axis-text"
+                                  x="48" y="124"
+                                  text-anchor="end">
+                                60
+                            </text>
+
+                            <text class="chart-axis-text"
+                                  x="48" y="79"
+                                  text-anchor="end">
+                                80
+                            </text>
+
+                            <text class="chart-axis-text"
+                                  x="48" y="34"
+                                  text-anchor="end">
+                                100
+                            </text>
+
+
+                            <!-- Y Axis Title -->
+                            <text class="chart-axis-text"
+                                  transform="translate(16 165) rotate(-90)"
+                                  text-anchor="middle">
+
+                                Total Eligible Trainees
+
+                            </text>
+
+
+                            <!-- Area -->
+                            <polygon id="eligibleArea"
+                                     class="chart-area"
+                                     points="" />
+
+
+                            <!-- Line -->
+                            <polyline id="eligibleLine"
+                                      class="chart-line"
+                                      points="" />
+
+
+                            <!-- Points -->
+                            <g id="eligiblePoints"></g>
+
+
+                            <!-- X Axis -->
+                            <text class="chart-axis-text"
+                                  x="397"
+                                  y="292"
+                                  text-anchor="middle">
+
+                                Month Year
+
+                            </text>
+
+                            <g id="eligibleMonths"></g>
+
+                        </svg>
+
                     </div>
 
                 </div>
 
 
-                <div class="chart-icon">
+                <!-- Footer -->
+                <div class="analytics-footer">
 
-                    <i class="fas fa-user-graduate"></i>
+                    <i class="fas fa-chart-line"></i>
 
-                </div>
-
-            </div>
-
-
-            <!-- CHART -->
-
-            <div class="chart-wrapper">
-
-                <canvas id="internshipEligibleChart"></canvas>
-
-            </div>
-
-
-            <!-- FOOTER -->
-
-            <div class="chart-footer">
-
-                <i class="fas fa-chart-line"></i>
-
-                <span>
                     Monthly eligible trainee trend
-                </span>
+
+                </div>
 
             </div>
 
         </div>
 
-    </div>
 
+        <!-- =========================================
+             TOTAL REGISTRATION PER MONTH
+        ========================================== -->
 
-    <!-- =================================================
-         CHART 2
-         TOTAL REGISTRATION PER MONTH
-    ================================================== -->
+        <div class="col-xl-6 col-lg-6 col-md-12">
 
-    <div class="col-xl-6 col-lg-6 col-md-12">
+            <div class="analytics-card">
 
-        <div class="org-chart-card">
+                <!-- Header -->
+                <div class="analytics-header">
 
-            <!-- HEADER -->
+                    <div class="analytics-header-icon">
+                        <i class="fas fa-chart-bar"></i>
+                    </div>
 
-            <div class="chart-card-header">
-
-                <div>
-
-                    <div class="chart-title">
+                    <h5>
                         Total Registration Per Month
+                    </h5>
+
+                </div>
+
+
+                <!-- Body -->
+                <div class="analytics-body">
+
+                    <!-- Legend -->
+                    <div class="chart-legend">
+
+                        <span class="legend-box-bar"></span>
+
+                        <span>
+                            Total Registrations
+                        </span>
+
                     </div>
 
-                    <div class="chart-number">
-                        @ViewBag.TraineeRegistrationCount
-                    </div>
 
-                    <div class="chart-subtitle">
-                        Total trainee registrations
+                    <!-- SVG Chart -->
+                    <div class="chart-wrapper">
+
+                        <svg id="registrationSvg"
+                             viewBox="0 0 760 300"
+                             preserveAspectRatio="none">
+
+                            <!-- Grid -->
+                            <line class="chart-grid"
+                                  x1="60" y1="30"
+                                  x2="735" y2="30" />
+
+                            <line class="chart-grid"
+                                  x1="60" y1="75"
+                                  x2="735" y2="75" />
+
+                            <line class="chart-grid"
+                                  x1="60" y1="120"
+                                  x2="735" y2="120" />
+
+                            <line class="chart-grid"
+                                  x1="60" y1="165"
+                                  x2="735" y2="165" />
+
+                            <line class="chart-grid"
+                                  x1="60" y1="210"
+                                  x2="735" y2="210" />
+
+                            <line class="chart-grid"
+                                  x1="60" y1="255"
+                                  x2="735" y2="255" />
+
+
+                            <!-- Axis -->
+                            <line class="chart-axis"
+                                  x1="60" y1="30"
+                                  x2="60" y2="255" />
+
+                            <line class="chart-axis"
+                                  x1="60" y1="255"
+                                  x2="735" y2="255" />
+
+
+                            <!-- Y Axis -->
+                            <text class="chart-axis-text"
+                                  x="48" y="259"
+                                  text-anchor="end">
+                                0
+                            </text>
+
+                            <text class="chart-axis-text"
+                                  x="48" y="214"
+                                  text-anchor="end">
+                                20
+                            </text>
+
+                            <text class="chart-axis-text"
+                                  x="48" y="169"
+                                  text-anchor="end">
+                                40
+                            </text>
+
+                            <text class="chart-axis-text"
+                                  x="48" y="124"
+                                  text-anchor="end">
+                                60
+                            </text>
+
+                            <text class="chart-axis-text"
+                                  x="48" y="79"
+                                  text-anchor="end">
+                                80
+                            </text>
+
+                            <text class="chart-axis-text"
+                                  x="48" y="34"
+                                  text-anchor="end">
+                                100
+                            </text>
+
+
+                            <!-- Y Axis Title -->
+                            <text class="chart-axis-text"
+                                  transform="translate(16 165) rotate(-90)"
+                                  text-anchor="middle">
+
+                                No. of Trainees
+
+                            </text>
+
+
+                            <!-- Bars -->
+                            <g id="registrationBars"></g>
+
+
+                            <!-- X Axis Title -->
+                            <text class="chart-axis-text"
+                                  x="397"
+                                  y="292"
+                                  text-anchor="middle">
+
+                                Month Year
+
+                            </text>
+
+                            <g id="registrationMonths"></g>
+
+                        </svg>
+
                     </div>
 
                 </div>
 
 
-                <div class="chart-icon">
+                <!-- Footer -->
+                <div class="analytics-footer">
 
-                    <i class="fas fa-building"></i>
+                    <i class="fas fa-chart-line"></i>
 
-                </div>
-
-            </div>
-
-
-            <!-- CHART -->
-
-            <div class="chart-wrapper">
-
-                <canvas id="monthlyRegistrationChart"></canvas>
-
-            </div>
-
-
-            <!-- FOOTER -->
-
-            <div class="chart-footer">
-
-                <i class="fas fa-chart-line"></i>
-
-                <span>
                     Monthly trainee registration trend
-                </span>
+
+                </div>
 
             </div>
 
         </div>
 
     </div>
-
-</div>
 
 
     <!-- =====================================================
@@ -814,9 +1206,9 @@
                                     <!-- View Post -->
                                     <td>
                                         <a href="@Url.Action(
-                                                                                                                  "PostDetails",
-                                                                                                                  "Organization",
-                                                                                                                  new { id = item.nID })"
+                                                                                                                                                             "PostDetails",
+                                                                                                                                                             "Organization",
+                                                                                                                                                             new { id = item.nID })"
                                    class="view-post-btn"
                                    title="View Post">
 
@@ -828,9 +1220,9 @@
                                     <!-- Applied Trainees -->
                                     <td>
                                         <a href="@Url.Action(
-                                                                                                          "TraineeList",
-                                                                                                          "Organization",
-                                                                                                          new { id = item.nID })"
+                                                                                                                                             "TraineeList",
+                                                                                                                                             "Organization",
+                                                                                                                                             new { id = item.nID })"
                                    class="applied-trainee-link">
 
                                             @item.AppliedTraineeCount
@@ -942,441 +1334,664 @@
 
 </div>
 
-   
 
-
-<!-- =========================================================
-     JQUERY
-========================================================= -->
-
-<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
- 
-
-        <script>
+@* //radhika29-09 *@
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
+<script>
 
     document.addEventListener("DOMContentLoaded", function () {
 
-        /* =====================================================
-           MONTHS
-        ===================================================== */
+    /* =====================================================
+    MONTHS
+    ===================================================== */
+
+    const months = [
+    "Jan 26",
+    "Feb 26",
+    "Mar 26",
+    "Apr 26",
+    "May 26",
+    "Jun 26",
+    "Jul 26",
+    "Aug 26",
+    "Sep 26",
+    "Oct 26",
+    "Nov 26",
+    "Dec 26"
+    ];
 
-        const months = [
-            "Jan",
-            "Feb",
-            "Mar",
-            "Apr",
-            "May",
-            "Jun",
-            "Jul",
-            "Aug",
-            "Sep",
-            "Oct",
-            "Nov",
-            "Dec"
-        ];
 
+    /* =====================================================
+    FIXED Y AXIS
 
-        /* =====================================================
-           MONTHLY CANDIDATE REGISTRATION DATA
-        ===================================================== */
+    IMPORTANT:
+    0 to 100 means:
+    value 6 = 6
+    value 20 = 20
+    value 50 = 50
+    value 80 = 80
+    value 100 = 100
+    ===================================================== */
 
-        const monthlyRegistrationData =
-            @Html.Raw(
-                System.Text.Json.JsonSerializer.Serialize(
-                    ViewBag.MonthlyCandidateRegistrations
-                )
-            );
+    const yAxisMax = 100;
 
 
-        /* =====================================================
-           COMMON GRADIENT
-        ===================================================== */
+    /* =====================================================
+    CHART POSITION
+    ===================================================== */
 
-        function createTealGradient(context) {
+    const chartLeft = 60;
+    const chartRight = 735;
+    const chartTop = 30;
+    const chartBottom = 255;
 
-            const chart =
-                context.chart;
+    const chartHeight =
+    chartBottom - chartTop;
 
-            const ctx =
-                chart.ctx;
+    const chartWidth =
+    chartRight - chartLeft;
 
-            const gradient =
-                ctx.createLinearGradient(
-                    0,
-                    0,
-                    0,
-                    190
-                );
+    const monthGap =
+    chartWidth / 11;
 
-            gradient.addColorStop(
-                0,
-                "rgba(30, 123, 103, 0.20)"
-            );
 
-            gradient.addColorStop(
-                1,
-                "rgba(30, 123, 103, 0.01)"
-            );
+    /* =====================================================
+    ELIGIBLE TRAINEES DATA
 
-            return gradient;
-        }
+    Replace this later with your database data.
+    ===================================================== */
 
+    const eligibleData = [
+    3,
+    5,
+    4,
+    7,
+    8,
+    6,
+    9,
+    11,
+    10,
+    13,
+    12,
+    15
+    ];
 
-        /* =====================================================
-           COMMON OPTIONS
-        ===================================================== */
 
-        const commonOptions = {
+    /* =====================================================
+    REGISTRATION DATA FROM C#
+    ===================================================== */
 
-            responsive: true,
+    const rawRegistrationData =
+    @Html.Raw(
+        System.Text.Json.JsonSerializer.Serialize(
+                ViewBag.MonthlyCandidateRegistrations
+                ?? new object[0]
+        )
+        );
 
-            maintainAspectRatio: false,
 
-            interaction: {
+    /* =====================================================
+    CREATE 12 MONTH DATA
+    ===================================================== */
 
-                intersect: false,
+    let registrationData =
+    new Array(12).fill(0);
 
-                mode: "index"
 
-            },
+    /* =====================================================
+    READ REGISTRATION DATA
+    ===================================================== */
 
-            plugins: {
+    if (Array.isArray(rawRegistrationData)) {
 
-                legend: {
+    rawRegistrationData.forEach(function (item, index) {
 
-                    display: false
+    if (index >= 12) {
+    return;
+    }
 
-                },
 
-                tooltip: {
+    /* ---------------------------------------------
+    If backend directly returns number
+    --------------------------------------------- */
 
-                    backgroundColor: "#ffffff",
+    if (typeof item === "number") {
 
-                    titleColor: "#344054",
+    registrationData[index] =
+    Number(item) || 0;
 
-                    bodyColor: "#1e7b67",
+    }
 
-                    borderColor: "#e1ebe8",
 
-                    borderWidth: 1,
+    /* ---------------------------------------------
+    If backend returns object
+    --------------------------------------------- */
 
-                    padding: 11,
+    else if (item) {
 
-                    displayColors: false,
+    registrationData[index] =
+    Number(
+    item.count ??
+    item.Count ??
+    item.total ??
+    item.Total ??
+    item.value ??
+    item.Value ??
+    0
+    ) || 0;
 
-                    titleFont: {
+    }
 
-                        size: 12,
+    });
 
-                        weight: "600"
+    }
 
-                    },
 
-                    bodyFont: {
+    console.log(
+    "Registration Data:",
+    registrationData
+    );
 
-                        size: 13,
 
-                        weight: "700"
+    /* =====================================================
+    =====================================================
+    ELIGIBLE TRAINEE LINE CHART
+    =====================================================
+    ===================================================== */
 
-                    },
+    const eligibleLine =
+    document.getElementById(
+    "eligibleLine"
+    );
 
-                    callbacks: {
 
-                        label: function (context) {
+    const eligibleArea =
+    document.getElementById(
+    "eligibleArea"
+    );
 
-                            return " " +
-                                context.parsed.y +
-                                " trainees";
 
-                        }
+    const eligiblePointGroup =
+    document.getElementById(
+    "eligiblePoints"
+    );
 
-                    }
 
-                }
+    const eligibleMonths =
+    document.getElementById(
+    "eligibleMonths"
+    );
 
-            },
 
-            scales: {
+    /* =====================================================
+    CREATE ELIGIBLE LINE POINTS
+    ===================================================== */
 
-                x: {
+    const eligiblePoints = [];
 
-                    grid: {
 
-                        display: false
+    eligibleData.forEach(function (value, index) {
 
-                    },
+    /*
+    * IMPORTANT:
+    *
+    * value / 100
+    *
+    * Therefore:
+    *
+    * 6  = 6%
+    * 20 = 20%
+    * 50 = 50%
+    * 100 = 100%
+    */
 
-                    border: {
+    const x =
+    chartLeft +
+    (index * monthGap);
 
-                        display: false
 
-                    },
+    const y =
+    chartBottom -
+    (
+    (Number(value) / yAxisMax)
+    * chartHeight
+    );
 
-                    ticks: {
 
-                        color: "#9aa9bd",
+    eligiblePoints.push(
+    `${x},${y}`
+    );
 
-                        font: {
+    });
 
-                            size: 11
 
-                        },
+    /* =====================================================
+    DRAW ELIGIBLE LINE
+    ===================================================== */
 
-                        padding: 9
+    if (eligibleLine) {
 
-                    }
+    eligibleLine.setAttribute(
+    "points",
+    eligiblePoints.join(" ")
+    );
 
-                },
+    }
 
-                y: {
 
-                    beginAtZero: true,
+    /* =====================================================
+    DRAW ELIGIBLE AREA
+    ===================================================== */
 
-                    grid: {
+    if (eligibleArea) {
 
-                        color:
-                            "rgba(30,123,103,.07)",
+    const areaPoints = [
 
-                        drawBorder: false
+    `${chartLeft},${chartBottom}`,
 
-                    },
+    ...eligiblePoints,
 
-                    border: {
+    `${chartRight},${chartBottom}`
 
-                        display: false,
+    ];
 
-                        dash: [4, 4]
 
-                    },
+    eligibleArea.setAttribute(
+    "points",
+    areaPoints.join(" ")
+    );
 
-                    ticks: {
+    }
 
-                        display: false
 
-                    }
+    /* =====================================================
+    CLEAR OLD POINTS
+    ===================================================== */
 
-                }
+    if (eligiblePointGroup) {
 
-            }
+    eligiblePointGroup.innerHTML = "";
 
-        };
+    }
 
 
-        /* =====================================================
-           CHART 1
-           ELIGIBLE TRAINEES
-        ===================================================== */
+    /* =====================================================
+    DRAW ELIGIBLE POINTS
+    ===================================================== */
 
-        const eligibleCanvas =
-            document.getElementById(
-                "internshipEligibleChart"
-            );
+    eligibleData.forEach(function (value, index) {
 
+    const x =
+    chartLeft +
+    (index * monthGap);
 
-        if (eligibleCanvas) {
 
-            /*
-             * Currently using the total eligible count
-             * as the chart value.
-             *
-             * If you later want month-wise eligible data,
-             * we can send a second 12-month array from SQL.
-             */
+    const y =
+    chartBottom -
+    (
+    (Number(value) / yAxisMax)
+    * chartHeight
+    );
 
-            const eligibleCount =
-                Number(
-                    @ViewBag.InternshipEligibleCount
-                );
 
+    const circle =
+    document.createElementNS(
+    "http://www.w3.org/2000/svg",
+    "circle"
+    );
 
-            /*
-             * Create a smooth trend representation
-             * based on the current eligible count.
-             *
-             * Replace this with monthly eligible data
-             * when your eligibility history is available.
-             */
 
-            const eligibleData = [
+    circle.setAttribute(
+    "cx",
+    x
+    );
 
-                Math.round(eligibleCount * 0.38),
 
-                Math.round(eligibleCount * 0.46),
+    circle.setAttribute(
+    "cy",
+    y
+    );
 
-                Math.round(eligibleCount * 0.42),
 
-                Math.round(eligibleCount * 0.55),
+    circle.setAttribute(
+    "r",
+    "4"
+    );
 
-                Math.round(eligibleCount * 0.61),
 
-                Math.round(eligibleCount * 0.52),
+    circle.setAttribute(
+    "class",
+    "chart-point"
+    );
 
-                Math.round(eligibleCount * 0.69),
 
-                Math.round(eligibleCount * 0.78),
+    /* Tooltip */
 
-                Math.round(eligibleCount * 0.73),
+    const title =
+    document.createElementNS(
+    "http://www.w3.org/2000/svg",
+    "title"
+    );
 
-                Math.round(eligibleCount * 0.87),
 
-                Math.round(eligibleCount * 0.82),
+    title.textContent =
+    months[index] +
+    " : " +
+    value +
+    " eligible trainee(s)";
 
-                eligibleCount
 
-            ];
+    circle.appendChild(title);
 
 
-            new Chart(
-                eligibleCanvas,
-                {
+    if (eligiblePointGroup) {
 
-                    type: "line",
+    eligiblePointGroup.appendChild(
+    circle
+    );
 
-                    data: {
+    }
 
-                        labels: months,
+    });
 
-                        datasets: [
 
-                            {
+    /* =====================================================
+    ELIGIBLE MONTH LABELS
+    ===================================================== */
 
-                                data: eligibleData,
+    if (eligibleMonths) {
 
-                                borderColor:
-                                    "#1e7b67",
+    eligibleMonths.innerHTML = "";
 
-                                backgroundColor:
-                                    function (context) {
 
-                                        return createTealGradient(
-                                            context
-                                        );
+    months.forEach(function (month, index) {
 
-                                    },
+    const text =
+    document.createElementNS(
+    "http://www.w3.org/2000/svg",
+    "text"
+    );
 
-                                fill: true,
 
-                                borderWidth: 3,
+    const x =
+    chartLeft +
+    (index * monthGap);
 
-                                tension: 0.35,
 
-                                pointRadius: function (context) {
+    text.setAttribute(
+    "x",
+    x
+    );
 
-                                    return context.dataIndex === 11
-                                        ? 5
-                                        : 0;
 
-                                },
+    text.setAttribute(
+    "y",
+    chartBottom + 20
+    );
 
-                                pointHoverRadius: 5,
 
-                                pointBackgroundColor:
-                                    "#ffffff",
+    text.setAttribute(
+    "text-anchor",
+    "middle"
+    );
 
-                                pointBorderColor:
-                                    "#1e7b67",
 
-                                pointBorderWidth: 3
+    text.setAttribute(
+    "class",
+    "chart-axis-text"
+    );
 
-                            }
 
-                        ]
+    text.textContent =
+    month;
 
-                    },
 
-                    options: commonOptions
+    eligibleMonths.appendChild(
+    text
+    );
 
-                }
-            );
+    });
 
-        }
+    }
 
 
-        /* =====================================================
-           CHART 2
-           TOTAL REGISTRATION PER MONTH
-        ===================================================== */
+    /* =====================================================
+    =====================================================
+    REGISTRATION BAR CHART
+    =====================================================
+    ===================================================== */
 
-        const registrationCanvas =
-            document.getElementById(
-                "monthlyRegistrationChart"
-            );
+    const registrationBars =
+    document.getElementById(
+    "registrationBars"
+    );
 
 
-        if (registrationCanvas) {
+    if (registrationBars) {
 
-            new Chart(
-                registrationCanvas,
-                {
+    registrationBars.innerHTML = "";
 
-                    type: "line",
+    }
 
-                    data: {
 
-                        labels: months,
+    const barWidth = 30;
 
-                        datasets: [
 
-                            {
+    registrationData.forEach(function (value, index) {
 
-                                data:
-                                    monthlyRegistrationData,
+    const numericValue =
+    Number(value) || 0;
 
-                                borderColor:
-                                    "#1e7b67",
 
-                                backgroundColor:
-                                    function (context) {
+    /* ---------------------------------------------
+    BAR X POSITION
+    --------------------------------------------- */
 
-                                        return createTealGradient(
-                                            context
-                                        );
+    const x =
+    chartLeft +
+    (index * monthGap) -
+    (barWidth / 2);
 
-                                    },
 
-                                fill: true,
+    /* ---------------------------------------------
+    BAR HEIGHT
 
-                                borderWidth: 3,
+    IMPORTANT:
 
-                                tension: 0.35,
+    6 / 100
 
-                                pointRadius: function (context) {
+    means 6% of chart height.
 
-                                    /*
-                                     * Only show the final point,
-                                     * exactly like your reference.
-                                     */
+    Therefore 6 stays visually at 6.
+    --------------------------------------------- */
 
-                                    return context.dataIndex ===
-                                        monthlyRegistrationData.length - 1
-                                        ? 5
-                                        : 0;
+    const barHeight =
+    (
+    numericValue /
+    yAxisMax
+    ) *
+    chartHeight;
 
-                                },
 
-                                pointHoverRadius: 5,
+    /* ---------------------------------------------
+    BAR Y POSITION
+    --------------------------------------------- */
 
-                                pointBackgroundColor:
-                                    "#ffffff",
+    const y =
+    chartBottom -
+    barHeight;
 
-                                pointBorderColor:
-                                    "#1e7b67",
 
-                                pointBorderWidth: 3
+    /* ---------------------------------------------
+    CREATE SVG RECT
+    --------------------------------------------- */
 
-                            }
+    const rect =
+    document.createElementNS(
+    "http://www.w3.org/2000/svg",
+    "rect"
+    );
 
-                        ]
 
-                    },
+    rect.setAttribute(
+    "x",
+    x
+    );
 
-                    options: commonOptions
 
-                }
+    rect.setAttribute(
+    "y",
+    y
+    );
 
-            );
 
-        }
+    rect.setAttribute(
+    "width",
+    barWidth
+    );
+
+
+    rect.setAttribute(
+    "height",
+    Math.max(
+    barHeight,
+    0
+    )
+    );
+
+
+    rect.setAttribute(
+    "class",
+    "chart-bar"
+    );
+
+
+    /* =================================================
+    TOOLTIP
+    ================================================= */
+
+    const title =
+    document.createElementNS(
+    "http://www.w3.org/2000/svg",
+    "title"
+    );
+
+
+    title.textContent =
+    months[index] +
+    " : " +
+    numericValue +
+    " candidate(s)";
+
+
+    rect.appendChild(
+    title
+    );
+
+
+    if (registrationBars) {
+
+    registrationBars.appendChild(
+    rect
+    );
+
+    }
+
+    });
+
+
+    /* =====================================================
+    REGISTRATION MONTH LABELS
+    ===================================================== */
+
+    const registrationMonths =
+    document.getElementById(
+    "registrationMonths"
+    );
+
+
+    if (registrationMonths) {
+
+    registrationMonths.innerHTML = "";
+
+
+    months.forEach(function (month, index) {
+
+    const text =
+    document.createElementNS(
+    "http://www.w3.org/2000/svg",
+    "text"
+    );
+
+
+    const x =
+    chartLeft +
+    (index * monthGap);
+
+
+    text.setAttribute(
+    "x",
+    x
+    );
+
+
+    text.setAttribute(
+    "y",
+    chartBottom + 20
+    );
+
+
+    text.setAttribute(
+    "text-anchor",
+    "middle"
+    );
+
+
+    text.setAttribute(
+    "class",
+    "chart-axis-text"
+    );
+
+
+    text.textContent =
+    month;
+
+
+    registrationMonths.appendChild(
+    text
+    );
+
+    });
+
+    }
+
+
+    /* =====================================================
+    CONSOLE CHECK
+    ===================================================== */
+
+    const totalRegistrations =
+    registrationData.reduce(
+    function (total, value) {
+
+    return total +
+    (Number(value) || 0);
+
+    },
+    0
+    );
+
+
+    console.log(
+    "Monthly Registration Data:",
+    registrationData
+    );
+
+
+    console.log(
+    "Total Registrations:",
+    totalRegistrations
+    );
 
     });
 
