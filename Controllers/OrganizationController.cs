@@ -20,7 +20,7 @@ namespace JobPortalTrainee.Controllers
             _configuration = configuration;
             _repository = repository;
         }
-
+               
         // =========================================================
         // GET LOGGED-IN ORGANIZATION CODE
         // =========================================================
