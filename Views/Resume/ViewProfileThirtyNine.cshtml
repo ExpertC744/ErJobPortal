@@ -3,17 +3,11 @@
 @{
     Layout = null;
 
-    ViewData["Title"] = "Dark Dashboard Cards Resume";
+    ViewData["Title"] = "Modern Split Resume (Sidebar)";
 
     var p = Model.Profile;
 
     var candidateName = Model.CandidateName?.Trim();
-
-    var displayName = Has(candidateName) ? candidateName : "Professional Candidate";
-
-    var nameParts = displayName.Split(new[] { ' ' }, 2, StringSplitOptions.RemoveEmptyEntries);
-    var firstName = nameParts.Length > 0 ? nameParts[0] : "";
-    var lastName = nameParts.Length > 1 ? nameParts[1] : "";
 
     var candidateRole = GetLookupName(
         Model.InternshipFellowshipType,
@@ -40,7 +34,7 @@
             p.Preferred_City,
             p.Preferred_State,
             p.Preferred_Country
-        }.Where(Has)
+                        }.Where(Has)
     );
 
     var internships =
@@ -50,7 +44,7 @@
             new { Name = p.sOrgName2, Title = p.sOrgIntTitle2, Duration = p.sOrgIntDuration2, Status = p.sOrgIntStatus2 },
             new { Name = p.sOrgName3, Title = p.sOrgIntTitle3, Duration = p.sOrgIntDuration3, Status = p.sOrgIntStatus3 },
             new { Name = p.sOrgName4, Title = p.sOrgIntTitle4, Duration = p.sOrgIntDuration4, Status = p.sOrgIntStatus4 }
-        }
+                        }
         .Where(x => Has(x.Name))
         .ToList();
 
@@ -60,7 +54,7 @@
             p.Achievements_Certification1,
             p.Achievements_Certification2,
             p.Achievements_Certification3
-        }
+                        }
         .Where(Has)
         .ToList();
 
@@ -70,7 +64,7 @@
             ("Technical", p.sTechnicalSkillIDs),
             ("Medical", p.sMedicalSkillIDs),
             ("Non-Technical", p.sNonTechnicalSkillIDs)
-        }
+                        }
         .Where(x => Has(x.Item2))
         .ToList();
 
@@ -95,21 +89,6 @@
             languages.Add((language, rating));
         }
     }
-
-    // section visibility flags (empty sections collapse)
-    var hasAbout = Has(p.Objective);
-    var hasExp = internships.Any();
-    var hasAch = achievements.Any();
-    var hasMission = Has(typeName) || Has(preferredLocation);
-    var hasLang = languages.Any();
-    var hasHobby = Has(p.sHobbies);
-    var hasRef = Has(p.sRefName1) || Has(p.sRefName2);
-    var hasSkills = skillGroups.Any();
-    var hasContact = Has(Model.CandidatePhone) || Has(Model.CandidateEmail) ||
-                     Has(p.Linkedin) || Has(p.GitHub) ||
-                     Has(p.CountryID) || Has(p.StateID) || Has(p.CityID) || Has(p.Pincode);
-    var hasEdu = HasNum(p.PG_Year) || HasNum(p.Graduation_Year) ||
-                 HasNum(p.HSC_DIPLOMA_YEAR) || HasNum(p.SSC_YEAR);
 }
 
 @functions {
@@ -154,17 +133,17 @@
         return value.HasValue && value.Value != 0;
     }
 
-    // 1-5 rating -> bar width percentage (defaults to 80%)
-    int RatingPercent(string rating)
+    // 1-5 rating -> filled star count (defaults to 4)
+    int StarCount(string rating)
     {
         if (int.TryParse(rating?.Trim(), out var n))
         {
             if (n < 0) n = 0;
             if (n > 5) n = 5;
-            return n * 20;
+            return n;
         }
 
-        return 80;
+        return 4;
     }
 }
 
@@ -188,7 +167,7 @@
     <script>
         (function () {
             try {
-                var t = localStorage.getItem("resumeTheme39");
+                var t = localStorage.getItem("resumeThemeSixty");
                 if (t) {
                     document.documentElement.setAttribute("data-theme", t);
                 }
@@ -198,7 +177,7 @@
 
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;700;800&display=swap" />
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Lato:wght@400;700;900&family=Montserrat:wght@400;500;700;800&display=swap" />
 
     <link rel="stylesheet"
           href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
@@ -242,18 +221,21 @@
     <div class="theme-switcher">
 
         <span>Theme</span>
-        <button type="button" class="theme-swatch active" data-theme="midnight"
-                title="Midnight" aria-label="Midnight theme" style="background:linear-gradient(135deg,#171f33 50%,#f0b429 50%)"></button>
 
-        <button type="button" class="theme-swatch" data-theme="emerald"
-                title="Emerald" aria-label="Emerald theme" style="background:linear-gradient(135deg,#0f3d33 50%,#5ed3a0 50%)"></button>
+        <button type="button" class="theme-swatch active" data-theme="teal"
+                title="Teal / Gold" aria-label="Teal theme" style="background:#0e4f4a"></button>
 
-        <button type="button" class="theme-swatch" data-theme="plum"
-                title="Plum" aria-label="Plum theme" style="background:linear-gradient(135deg,#2a1a3d 50%,#c88af0 50%)"></button>
+        <button type="button" class="theme-swatch" data-theme="navy"
+                title="Navy" aria-label="Navy theme" style="background:#1e3a56"></button>
 
-        <button type="button" class="theme-swatch" data-theme="carbon"
-                title="Carbon" aria-label="Carbon theme" style="background:linear-gradient(135deg,#1c1e22 50%,#ff6b4a 50%)"></button>
+        <button type="button" class="theme-swatch" data-theme="green"
+                title="Green" aria-label="Green theme" style="background:#1e7a4c"></button>
 
+        <button type="button" class="theme-swatch" data-theme="maroon"
+                title="Maroon" aria-label="Maroon theme" style="background:#8a2c3a"></button>
+
+        <button type="button" class="theme-swatch" data-theme="purple"
+                title="Purple" aria-label="Purple theme" style="background:#5b3fa0"></button>
     </div>
 
 
@@ -262,37 +244,42 @@
     <div class="resume-container">
 
         <div class="resume-sheet" id="resumeSheet">
-            <div class="grid2 dash">
-            <div class="gcol">
-            <div class="card profile">
-            <div class="photo-frame">
-                @if (Has(p.sPhoto))
-                {
-                    <img src="@p.sPhoto" alt="Profile Photo" class="profile-photo" />
-                }
-                else
-                {
-                    <div class="profile-placeholder">
-                        <i class="fa-solid fa-user"></i>
+
+            <!-- COLUMN 1 : SIDEBAR (PHOTO / CONTACT / SKILLS / LANGUAGES) -->
+            <aside class="col col-side">
+
+                <div class="top-photo">
+                    <div class="photo-frame">
+                        @if (Has(p.sPhoto))
+                        {
+                            <img src="@p.sPhoto" alt="Profile Photo" class="profile-photo" />
+                        }
+                        else
+                        {
+                            var initials = "";
+                            if (Has(candidateName))
+                            {
+                                var parts = candidateName.Split(' ', StringSplitOptions.RemoveEmptyEntries);
+                                initials = string.Concat(parts.Take(2).Select(w => w[0])).ToUpper();
+                            }
+                            <div class="profile-placeholder">
+                                @(Has(initials) ? initials : "?")
+                            </div>
+                        }
                     </div>
+                </div>
+
+                @{
+                    var nameText = Has(candidateName) ? candidateName : "Professional Candidate";
                 }
-            </div>
-            <div class="name-block">
-                <h1 class="profile-name">
-                    <span class="name-first">@firstName</span>
-                    @if (Has(lastName))
-                    {
-                        <span class="name-last">@lastName</span>
-                    }
-                </h1>
+                <div class="side-name">@nameText</div>
                 @if (Has(candidateRole))
                 {
-                    <div class="profile-role">@candidateRole</div>
+                    <div class="side-role">@candidateRole</div>
                 }
-            </div>
-            </div>
-            @if (hasContact)
-            {
+
+                <div class="side-rule"></div>
+
                 <section class="block sec-contact">
                     <h2 class="heading">Contact</h2>
                     <div class="contact-list">
@@ -346,83 +333,91 @@
 
                     </div>
                 </section>
-            }
-            @if (hasMission)
-            {
-                <section class="block sec-mission">
-                    <h2 class="heading">My Mission</h2>
 
-                    <div class="pref-list">
+                @if (skillGroups.Any())
+                {
+                    <section class="block sec-skills">
+                        <h2 class="heading">Skills</h2>
 
-                        @if (Has(typeName))
+                        @foreach (var group in skillGroups)
                         {
-                            <div>
-                                <small>Looking for</small>
-                                <strong>@typeName</strong>
+                            <div class="skill-group">
+
+                                <div class="skill-group-title">@group.Item1</div>
+
+                                <ul class="skill-list">
+                                    @foreach (var skill in group.Item2.Split(
+                                   new[] { ',', ';', '|' },
+                                   StringSplitOptions.RemoveEmptyEntries))
+                                    {
+                                        <li>@skill.Trim()</li>
+                                    }
+                                </ul>
+
                             </div>
                         }
+                    </section>
+                }
 
-                        @if (Has(preferredLocation))
+                @if (languages.Any())
+                {
+                    <section class="block sec-lang">
+                        <h2 class="heading">Languages</h2>
+
+                        @foreach (var language in languages)
                         {
-                            <div>
-                                <small>Preferred Location</small>
-                                <strong>@preferredLocation</strong>
+                            var n = StarCount(language.Rating);
+                            <div class="lang-row">
+                                <span class="lang-name">@language.Name</span>
+                                <span class="stars">
+                                    @for (int si = 1; si <= 5; si++)
+                                    {
+                                        <span class="star @(si <= n ? "on" : "off")">&#9733;</span>
+                                    }
+                                </span>
                             </div>
                         }
+                    </section>
+                }
 
-                    </div>
-                </section>
-            }
-            @if (hasHobby)
-            {
-                <section class="block sec-hobby">
-                    <h2 class="heading">Interests</h2>
+            </aside>
 
-                    <div class="hobby-tags">
-                        @foreach (var hobby in p.sHobbies.Split(new[] { ',', ';', '|' }, StringSplitOptions.RemoveEmptyEntries))
-                        {
-                            if (Has(hobby))
+
+            <!-- COLUMN 2 : PROFILE / EXPERIENCE / EDUCATION / REFERENCE -->
+            <main class="col col-main">
+
+                @if (Has(p.Objective))
+                {
+                    <section class="block sec-about">
+                        <h2 class="heading">Profile Summary</h2>
+                        <p class="body-text">@p.Objective</p>
+                    </section>
+                }
+
+                @if (internships.Any())
+                {
+                    <section class="block sec-exp">
+                        <h2 class="heading">Work Experience</h2>
+
+                        <div class="exp-list">
+
+                            @foreach (var internship in internships)
                             {
-                                <span class="hobby-tag">@hobby.Trim()</span>
-                            }
-                        }
-                    </div>
-                </section>
-            }
-            </div>
-            @if (hasAbout || hasExp || hasRef)
-            {
-            <div class="gcol">
-            @if (hasAbout)
-            {
-                <section class="block sec-about">
-                    <h2 class="heading">Profile</h2>
-                    <p class="body-text">@p.Objective</p>
-                </section>
-            }
-            @if (hasExp)
-            {
-                <section class="block sec-exp">
-                    <h2 class="heading">Work Experience</h2>
+                                var duration = GetLookupName(Model.InternshipDurations, internship.Duration);
+                                var title = GetLookupName(Model.InternshipTitles, internship.Title);
+                                var status = GetLookupName(Model.InternshipStatuses, internship.Status);
 
-                    <div class="exp-list">
+                                <div class="exp-item">
 
-                        @foreach (var internship in internships)
-                        {
-                            var duration = GetLookupName(Model.InternshipDurations, internship.Duration);
-                            var title = GetLookupName(Model.InternshipTitles, internship.Title);
-                            var status = GetLookupName(Model.InternshipStatuses, internship.Status);
-
-                            <div class="exp-item">
-
-                                <div class="exp-body">
+                                    <div class="exp-head">
+                                        <span class="exp-org">@internship.Name</span>
+                                        <span class="exp-date">@duration</span>
+                                    </div>
 
                                     @if (Has(title))
                                     {
                                         <div class="exp-title">@title</div>
                                     }
-
-                                    <div class="exp-org">@internship.Name</div>
 
                                     @if (Has(status))
                                     {
@@ -432,198 +427,177 @@
                                     }
 
                                 </div>
+                            }
 
-                                <div class="exp-date">@duration</div>
+                        </div>
+                    </section>
+                }
 
-                            </div>
-                        }
+                <div class="two-col">
 
-                    </div>
-                </section>
-            }
-            @if (hasRef)
-            {
-                <section class="block sec-ref">
-                    <h2 class="heading">Reference</h2>
-
-                    <div class="ref-grid">
-
-                        @if (Has(p.sRefName1))
-                        {
-                            var relation = GetLookupName(Model.Relationships, p.sRefRelationName1);
-
-                            <div class="ref-item">
-                                <div class="ref-name">@p.sRefName1</div>
-                                <div class="ref-rel">@(Has(relation) ? relation : "Ref 1")</div>
-                                <div class="ref-line">@p.sMobile1</div>
-                                @if (Has(p.sLocation1))
-                                {
-                                    <div class="ref-line">@p.sLocation1</div>
-                                }
-                            </div>
-                        }
-
-                        @if (Has(p.sRefName2))
-                        {
-                            var relation = GetLookupName(Model.Relationships, p.sRefRelationName2);
-
-                            <div class="ref-item">
-                                <div class="ref-name">@p.sRefName2</div>
-                                <div class="ref-rel">@(Has(relation) ? relation : "Ref 2")</div>
-                                <div class="ref-line">@p.sMobile2</div>
-                                @if (Has(p.sLocation2))
-                                {
-                                    <div class="ref-line">@p.sLocation2</div>
-                                }
-                            </div>
-                        }
-
-                    </div>
-                </section>
-            }
-            </div>
-            }
-            @if (hasEdu || hasSkills || hasLang || hasAch)
-            {
-            <div class="gcol">
-            @if (hasEdu)
-            {
-                <section class="block sec-edu">
-                    <h2 class="heading">Education</h2>
-
-                    <div class="edu-list">
-
-                        @if (HasNum(p.PG_Year))
-                        {
-                            var division = GetLookupName(Model.Divisions, p.PG_Division);
-
-                            <div class="edu-item">
-                                <div class="edu-year">@p.PG_Year</div>
-                                <div class="edu-body">
-                                    <div class="edu-title">@GetLookupName(Model.Streams, p.PG_Stream)</div>
-                                    <div class="edu-sub">Post Graduation</div>
-                                    @if (Has(division))
-                                    {
-                                        <div class="edu-note">@division</div>
-                                    }
-                                </div>
-                            </div>
-                        }
-
-                        @if (HasNum(p.Graduation_Year))
-                        {
-                            var division = GetLookupName(Model.Divisions, p.Graduation_Division);
-
-                            <div class="edu-item">
-                                <div class="edu-year">@p.Graduation_Year</div>
-                                <div class="edu-body">
-                                    <div class="edu-title">@GetLookupName(Model.Streams, p.Graduation_Stream)</div>
-                                    <div class="edu-sub">Graduation</div>
-                                    @if (Has(division))
-                                    {
-                                        <div class="edu-note">@division</div>
-                                    }
-                                </div>
-                            </div>
-                        }
-
-                        @if (HasNum(p.HSC_DIPLOMA_YEAR))
-                        {
-                            var division = GetLookupName(Model.Divisions, p.HSC_DIPLOMA_DIVISION);
-
-                            <div class="edu-item">
-                                <div class="edu-year">@p.HSC_DIPLOMA_YEAR</div>
-                                <div class="edu-body">
-                                    <div class="edu-title">HSC / Diploma</div>
-                                    <div class="edu-sub">Higher Secondary</div>
-                                    @if (Has(division))
-                                    {
-                                        <div class="edu-note">@division</div>
-                                    }
-                                </div>
-                            </div>
-                        }
-
-                        @if (HasNum(p.SSC_YEAR))
-                        {
-                            var division = GetLookupName(Model.Divisions, p.SSC_DIVISION);
-
-                            <div class="edu-item">
-                                <div class="edu-year">@p.SSC_YEAR</div>
-                                <div class="edu-body">
-                                    <div class="edu-title">SSC / 10th</div>
-                                    <div class="edu-sub">Secondary School</div>
-                                    @if (Has(division))
-                                    {
-                                        <div class="edu-note">@division</div>
-                                    }
-                                </div>
-                            </div>
-                        }
-
-                    </div>
-                </section>
-            }
-            @if (hasSkills)
-            {
-                <section class="block sec-skills">
-                    <h2 class="heading">Skills</h2>
-
-                    @foreach (var group in skillGroups)
+                    @if (HasNum(p.PG_Year) ||
+                    HasNum(p.Graduation_Year) ||
+                    HasNum(p.HSC_DIPLOMA_YEAR) ||
+                    HasNum(p.SSC_YEAR))
                     {
-                        <div class="skill-group">
+                        <section class="block sec-edu">
+                            <h2 class="heading">Education</h2>
 
-                            <div class="skill-group-title">@group.Item1</div>
+                            <div class="edu-list">
 
-                            <ul class="skill-list">
-                                @foreach (var skill in group.Item2.Split(
-                               new[] { ',', ';', '|' },
-                               StringSplitOptions.RemoveEmptyEntries))
+                                @if (HasNum(p.PG_Year))
                                 {
-                                    <li>@skill.Trim()</li>
+                                    var division = GetLookupName(Model.Divisions, p.PG_Division);
+
+                                    <div class="edu-item">
+                                        <div class="edu-year">@p.PG_Year</div>
+                                        <div class="edu-title">@GetLookupName(Model.Streams, p.PG_Stream)</div>
+                                        <div class="edu-sub">Post Graduation @(Has(division) ? "� " + division : "")</div>
+                                    </div>
+                                }
+
+                                @if (HasNum(p.Graduation_Year))
+                                {
+                                    var division = GetLookupName(Model.Divisions, p.Graduation_Division);
+
+                                    <div class="edu-item">
+                                        <div class="edu-year">@p.Graduation_Year</div>
+                                        <div class="edu-title">@GetLookupName(Model.Streams, p.Graduation_Stream)</div>
+                                        <div class="edu-sub">Graduation @(Has(division) ? "� " + division : "")</div>
+                                    </div>
+                                }
+
+                                @if (HasNum(p.HSC_DIPLOMA_YEAR))
+                                {
+                                    var division = GetLookupName(Model.Divisions, p.HSC_DIPLOMA_DIVISION);
+
+                                    <div class="edu-item">
+                                        <div class="edu-year">@p.HSC_DIPLOMA_YEAR</div>
+                                        <div class="edu-title">HSC / Diploma</div>
+                                        <div class="edu-sub">Higher Secondary @(Has(division) ? "� " + division : "")</div>
+                                    </div>
+                                }
+
+                                @if (HasNum(p.SSC_YEAR))
+                                {
+                                    var division = GetLookupName(Model.Divisions, p.SSC_DIVISION);
+
+                                    <div class="edu-item">
+                                        <div class="edu-year">@p.SSC_YEAR</div>
+                                        <div class="edu-title">SSC / 10th</div>
+                                        <div class="edu-sub">Secondary School @(Has(division) ? "� " + division : "")</div>
+                                    </div>
+                                }
+
+                            </div>
+                        </section>
+                    }
+
+
+                    @if (achievements.Any())
+                    {
+                        <section class="block sec-ach">
+                            <h2 class="heading">Certifications</h2>
+
+                            <ul class="achievement-list">
+                                @foreach (var achievement in achievements)
+                                {
+                                    <li>
+                                        <i class="fa-solid fa-award"></i>
+                                        <span>@achievement</span>
+                                    </li>
                                 }
                             </ul>
-
-                        </div>
+                        </section>
                     }
-                </section>
-            }
-            @if (hasLang)
-            {
-                <section class="block sec-lang">
-                    <h2 class="heading">Languages</h2>
 
-                    @foreach (var language in languages)
+
+
+
+                    @if (Has(typeName) || Has(preferredLocation) || Has(p.sHobbies))
                     {
-                        <div class="lang-row">
-                            <div class="lang-name">@language.Name</div>
+                        <section class="block sec-mission">
+                            <h2 class="heading">Mission &amp; Interests</h2>
 
-                            <div class="skill-bar">
-                                <span style="width:@(RatingPercent(language.Rating))%"></span>
+                            <div class="pref-list">
+
+                                @if (Has(typeName))
+                                {
+                                    <div>
+                                        <small>Looking for</small>
+                                        <strong>@typeName</strong>
+                                    </div>
+                                }
+
+                                @if (Has(preferredLocation))
+                                {
+                                    <div>
+                                        <small>Preferred Location</small>
+                                        <strong>@preferredLocation</strong>
+                                    </div>
+                                }
+
                             </div>
-                        </div>
-                    }
-                </section>
-            }
-            @if (hasAch)
-            {
-                <section class="block sec-ach">
-                    <h2 class="heading">Achievements &amp; Certifications</h2>
 
-                    <ul class="achievement-list">
-                        @foreach (var achievement in achievements)
-                        {
-                            <li>
-                                <i class="fa-solid fa-award"></i>
-                                <span>@achievement</span>
-                            </li>
-                        }
-                    </ul>
-                </section>
-            }
-            </div>
-            }
-            </div>
+                            @if (Has(p.sHobbies))
+                            {
+                                <div class="hobby-tags">
+                                    @foreach (var hobby in p.sHobbies.Split(new[] { ',', ';', '|' }, StringSplitOptions.RemoveEmptyEntries))
+                                    {
+                                        if (Has(hobby))
+                                        {
+                                            <span class="hobby-tag">@hobby.Trim()</span>
+                                        }
+                                    }
+                                </div>
+                            }
+                        </section>
+                    }
+
+                </div>
+
+                @if (Has(p.sRefName1) || Has(p.sRefName2))
+                {
+                    <section class="block sec-ref">
+                        <h2 class="heading">Reference</h2>
+
+                        <div class="ref-grid">
+
+                            @if (Has(p.sRefName1))
+                            {
+                                var relation = GetLookupName(Model.Relationships, p.sRefRelationName1);
+
+                                <div class="ref-item">
+                                    <div class="ref-name">@p.sRefName1</div>
+                                    <div class="ref-rel">@(Has(relation) ? relation : "Ref 1")</div>
+                                    <div class="ref-line">@p.sMobile1</div>
+                                    @if (Has(p.sLocation1))
+                                    {
+                                        <div class="ref-line">@p.sLocation1</div>
+                                    }
+                                </div>
+                            }
+
+                            @if (Has(p.sRefName2))
+                            {
+                                var relation = GetLookupName(Model.Relationships, p.sRefRelationName2);
+
+                                <div class="ref-item">
+                                    <div class="ref-name">@p.sRefName2</div>
+                                    <div class="ref-rel">@(Has(relation) ? relation : "Ref 2")</div>
+                                    <div class="ref-line">@p.sMobile2</div>
+                                    @if (Has(p.sLocation2))
+                                    {
+                                        <div class="ref-line">@p.sLocation2</div>
+                                    }
+                                </div>
+                            }
+
+                        </div>
+                    </section>
+                }
+
+            </main>
 
         </div>
 
@@ -649,12 +623,14 @@
             const root = document.documentElement;
 
             function markActive(theme) {
+
                 swatches.forEach(function (swatch) {
                     swatch.classList.toggle("active", swatch.dataset.theme === theme);
                 });
+
             }
 
-            markActive(root.getAttribute("data-theme") || "midnight");
+            markActive(root.getAttribute("data-theme") || "teal");
 
             swatches.forEach(function (swatch) {
 
@@ -666,7 +642,7 @@
                     markActive(theme);
 
                     try {
-                        localStorage.setItem("resumeTheme39", theme);
+                        localStorage.setItem("resumeThemeSixty", theme);
                     } catch (e) { }
 
                 });
@@ -785,7 +761,7 @@
 
 
         /* =====================================================
-           PDF DOWNLOAD  (fits the whole sheet on one A4 page)
+           PDF DOWNLOAD  (27.9cm x 21cm landscape, one page)
         ===================================================== */
 
         async function downloadResumePDF() {
@@ -841,7 +817,7 @@
                 const pdf = new jsPDF({
                     orientation: "landscape",
                     unit: "mm",
-                    format: "a4",
+                    format: [279, 210],
                     compress: true
                 });
 
@@ -851,7 +827,7 @@
                 let imageWidth = pageWidth;
                 let imageHeight = canvas.height * imageWidth / canvas.width;
 
-                // sheet taller than A4 -> shrink to fit the page height
+                // sheet taller than the page -> shrink to fit the page height
                 if (imageHeight > pageHeight) {
                     imageHeight = pageHeight;
                     imageWidth = canvas.width * imageHeight / canvas.height;
@@ -876,7 +852,7 @@
                     candidateName = "Resume";
                 }
 
-                pdf.save(candidateName + "_ViewProfileThirtyNine.pdf");
+                pdf.save(candidateName + "_ViewProfileSixty.pdf");
 
             }
             catch (error) {

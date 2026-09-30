@@ -417,33 +417,11 @@
                     </div>
                 </section>
             }
-            @if (hasSkills)
-            {
-                <section class="block sec-skills">
-                    <h2 class="heading">Skills</h2>
-
-                    @foreach (var group in skillGroups)
-                    {
-                        <div class="skill-group">
-
-                            <div class="skill-group-title">@group.Item1</div>
-
-                            <ul class="skill-list">
-                                @foreach (var skill in group.Item2.Split(
-                               new[] { ',', ';', '|' },
-                               StringSplitOptions.RemoveEmptyEntries))
-                                {
-                                    <li>@skill.Trim()</li>
-                                }
-                            </ul>
-
-                        </div>
-                    }
-                </section>
+        </div>
             }
-            </div>
-            }
-            </aside>
+    
+        
+        </aside>
             <main class="main">
             <header class="main-head"><div class="name-block">
                 <h1 class="profile-name">
@@ -513,7 +491,35 @@
                     </div>
                 </section>
             }
-            </div>
+
+
+                                    @if (hasSkills)
+                                    {
+                                        <section class="block sec-skills">
+                                            <h2 class="heading">Skills</h2>
+
+                                            @foreach (var group in skillGroups)
+                                            {
+                                                <div class="skill-group">
+
+                                                    <div class="skill-group-title">@group.Item1</div>
+
+                                                    <ul class="skill-list">
+                                                        @foreach (var skill in group.Item2.Split(
+                                                       new[] { ',', ';', '|' },
+                                                       StringSplitOptions.RemoveEmptyEntries))
+                                                        {
+                                                            <li>@skill.Trim()</li>
+                                                        }
+                                                    </ul>
+
+                                                </div>
+                                            }
+                                        </section>
+                                    }
+
+
+                                </div>
             }
             @if (hasAch || hasMission || hasLang || hasHobby)
             {
@@ -576,7 +582,8 @@
                         </div>
                     }
                 </section>
-            }
+            };
+
             @if (hasHobby)
             {
                 <section class="block sec-hobby">
