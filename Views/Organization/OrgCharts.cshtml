@@ -23,99 +23,712 @@
 
     var latestRegistrations = barData.Any()
         ? barData
-            .OrderByDescending(x => x.RegistrationMonth)
+            .OrderByDescending(x => x.RegistrationYear)
+            .ThenByDescending(x => x.RegistrationMonth)
             .First()
             .TotalRegistrations
         : 0;
 }
 
+<style>
+
+    /* =====================================================
+               TRAINEE MONTHLY ANALYTICS
+               ===================================================== */
+
+    .analytics-card {
+        background: #ffffff;
+        border: 1px solid #dfe5e8;
+        border-radius: 14px;
+        overflow: hidden;
+        height: 100%;
+        box-shadow: 0 4px 14px rgba(15, 23, 42, 0.04);
+        transition: all .25s ease;
+    }
+
+        .analytics-card:hover {
+            box-shadow: 0 8px 24px rgba(15, 23, 42, 0.08);
+        }
+
+
+    /* =====================================================
+               CHART HEADER
+               ===================================================== */
+
+    .analytics-header {
+        min-height: 52px;
+        padding: 0 18px;
+        display: flex;
+        align-items: center;
+        gap: 11px;
+        border-bottom: 1px solid #dfe5e8;
+        background: #ffffff;
+    }
+
+    .analytics-header-icon {
+        width: 25px;
+        height: 25px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #1e7b67;
+        font-size: 17px;
+    }
+
+    .analytics-header h5 {
+        margin: 0;
+        color: #16324f;
+        font-size: 17px;
+        font-weight: 500;
+        letter-spacing: .1px;
+    }
+
+
+    /* =====================================================
+               CHART BODY
+               ===================================================== */
+
+    .analytics-body {
+        padding: 18px 16px 14px;
+    }
+
+    .chart-wrapper {
+        position: relative;
+        width: 100%;
+        height: 235px;
+    }
+
+        .chart-wrapper svg {
+            width: 100%;
+            height: 100%;
+            display: block;
+        }
+
+
+    /* =====================================================
+               LEGEND
+               ===================================================== */
+
+    .chart-legend {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        gap: 8px;
+        margin-bottom: 4px;
+        color: #667085;
+        font-size: 12px;
+    }
+
+    .legend-box {
+        width: 50px;
+        height: 16px;
+        border: 2px solid #1e7b67;
+        background: rgba(30, 123, 103, .14);
+    }
+
+    .legend-box-bar {
+        width: 50px;
+        height: 16px;
+        background: #1e7b67;
+    }
+
+
+    /* =====================================================
+               AXIS TEXT
+               ===================================================== */
+
+    .chart-axis-text {
+        fill: #667085;
+        font-size: 11px;
+        font-family: Arial, sans-serif;
+    }
+
+
+    /* =====================================================
+               GRID
+               ===================================================== */
+
+    .chart-grid {
+        stroke: #e6eaed;
+        stroke-width: 1;
+    }
+
+    .chart-axis {
+        stroke: #cfd6da;
+        stroke-width: 1;
+    }
+
+
+    /* =====================================================
+               LINE CHART
+               ===================================================== */
+
+    .chart-line {
+        fill: none;
+        stroke: #1e7b67;
+        stroke-width: 2.5;
+        stroke-linecap: round;
+        stroke-linejoin: round;
+    }
+
+    .chart-area {
+        fill: rgba(30, 123, 103, .14);
+    }
+
+    .chart-point {
+        fill: #ffffff;
+        stroke: #1e7b67;
+        stroke-width: 2;
+    }
+
+
+    /* =====================================================
+               BAR CHART
+               ===================================================== */
+
+    .chart-bar {
+        fill: #1e7b67;
+        transition: opacity .2s ease;
+    }
+
+        .chart-bar:hover {
+            opacity: .78;
+        }
+
+
+    /* =====================================================
+               CURRENT VALUE
+               ===================================================== */
+
+    .analytics-value {
+        text-align: center;
+        margin-top: 5px;
+        color: #667085;
+        font-size: 11px;
+    }
+
+
+    /* =====================================================
+               FOOTER
+               ===================================================== */
+
+    .analytics-footer {
+        border-top: 1px solid #edf0f2;
+        padding: 10px 16px;
+        color: #7a8494;
+        font-size: 11px;
+    }
+
+        .analytics-footer i {
+            color: #1e7b67;
+            margin-right: 5px;
+        }
+
+
+    /* =====================================================
+               MOBILE
+               ===================================================== */
+
+    @@media (max-width: 767px) {
+
+        .analytics-header {
+            min-height: 48px;
+            padding: 0 14px;
+        }
+
+            .analytics-header h5 {
+                font-size: 15px;
+            }
+
+        .analytics-body {
+            padding: 15px 10px 10px;
+        }
+
+        .chart-wrapper {
+            height: 210px;
+        }
+
+        .chart-axis-text {
+            font-size: 9px;
+        }
+    }
+</style>
+
+
 <div class="candidate-charts-page">
 
+    <!-- =====================================================
+         PAGE HEADING
+         ===================================================== -->
+
     <div class="charts-heading">
+
         <h1>Charts</h1>
-        <p>@ViewContext.RouteData.Values["id"]</p>
+
+        <p>
+            @ViewContext.RouteData.Values["id"]
+        </p>
+
     </div>
 
-    <div class="charts-grid">
 
-        <div class="chart-card">
+    <!-- =====================================================
+         TRAINEE CHARTS
+         ===================================================== -->
 
-            <div class="chart-card-top">
+    <div class="row g-4 mb-4">
 
-                <div class="chart-info">
 
-                    <div class="chart-title">
-                        No. of Suitable Openings
+        <!-- =================================================
+             NO. OF TRAINEE ELIGIBLE FOR INTERNSHIP
+             ================================================= -->
+
+        <div class="col-xl-6 col-lg-6 col-md-12">
+
+            <div class="analytics-card">
+
+
+                <!-- HEADER -->
+
+                <div class="analytics-header">
+
+                    <div class="analytics-header-icon">
+
+                        <i class="fas fa-chart-area"></i>
+
                     </div>
 
-                    <div class="chart-number">
-                        @latestEligibleTrainees
+                    <h5>
+                        No. of Trainee eligible for internship
+                    </h5>
+
+                </div>
+
+
+                <!-- BODY -->
+
+                <div class="analytics-body">
+
+
+                    <!-- LEGEND -->
+
+                    <div class="chart-legend">
+
+                        <span class="legend-box"></span>
+
+                        <span>
+                            Total Eligible Trainees
+                        </span>
+
                     </div>
 
-                    <div class="chart-subtitle">
-                        Current month
+
+                    <!-- SVG -->
+
+                    <div class="chart-wrapper">
+
+                        <svg id="eligibleTraineeSvg"
+                             viewBox="0 0 760 300"
+                             preserveAspectRatio="none">
+
+
+                            <!-- =========================
+                                 GRID
+                                 ========================= -->
+
+                            <line class="chart-grid"
+                                  x1="60"
+                                  y1="30"
+                                  x2="735"
+                                  y2="30" />
+
+                            <line class="chart-grid"
+                                  x1="60"
+                                  y1="75"
+                                  x2="735"
+                                  y2="75" />
+
+                            <line class="chart-grid"
+                                  x1="60"
+                                  y1="120"
+                                  x2="735"
+                                  y2="120" />
+
+                            <line class="chart-grid"
+                                  x1="60"
+                                  y1="165"
+                                  x2="735"
+                                  y2="165" />
+
+                            <line class="chart-grid"
+                                  x1="60"
+                                  y1="210"
+                                  x2="735"
+                                  y2="210" />
+
+                            <line class="chart-grid"
+                                  x1="60"
+                                  y1="255"
+                                  x2="735"
+                                  y2="255" />
+
+
+                            <!-- =========================
+                                 AXIS
+                                 ========================= -->
+
+                            <line class="chart-axis"
+                                  x1="60"
+                                  y1="30"
+                                  x2="60"
+                                  y2="255" />
+
+                            <line class="chart-axis"
+                                  x1="60"
+                                  y1="255"
+                                  x2="735"
+                                  y2="255" />
+
+
+                            <!-- =========================
+                                 Y AXIS
+                                 ========================= -->
+
+                            <text class="chart-axis-text"
+                                  x="48"
+                                  y="259"
+                                  text-anchor="end">
+                                0
+                            </text>
+
+                            <text class="chart-axis-text"
+                                  x="48"
+                                  y="214"
+                                  text-anchor="end">
+                                20
+                            </text>
+
+                            <text class="chart-axis-text"
+                                  x="48"
+                                  y="169"
+                                  text-anchor="end">
+                                40
+                            </text>
+
+                            <text class="chart-axis-text"
+                                  x="48"
+                                  y="124"
+                                  text-anchor="end">
+                                60
+                            </text>
+
+                            <text class="chart-axis-text"
+                                  x="48"
+                                  y="79"
+                                  text-anchor="end">
+                                80
+                            </text>
+
+                            <text class="chart-axis-text"
+                                  x="48"
+                                  y="34"
+                                  text-anchor="end">
+                                100
+                            </text>
+
+
+                            <!-- =========================
+                                 Y AXIS TITLE
+                                 ========================= -->
+
+                            <text class="chart-axis-text"
+                                  transform="translate(16 165) rotate(-90)"
+                                  text-anchor="middle">
+
+                                Total Eligible Trainees
+
+                            </text>
+
+
+                            <!-- =========================
+                                 AREA
+                                 ========================= -->
+
+                            <polygon id="eligibleArea"
+                                     class="chart-area"
+                                     points="" />
+
+
+                            <!-- =========================
+                                 LINE
+                                 ========================= -->
+
+                            <polyline id="eligibleLine"
+                                      class="chart-line"
+                                      points="" />
+
+
+                            <!-- =========================
+                                 POINTS
+                                 ========================= -->
+
+                            <g id="eligiblePoints"></g>
+
+
+                            <!-- =========================
+                                 X AXIS TITLE
+                                 ========================= -->
+
+                            <text class="chart-axis-text"
+                                  x="397"
+                                  y="292"
+                                  text-anchor="middle">
+
+                                Month Year
+
+                            </text>
+
+
+                            <!-- MONTHS -->
+
+                            <g id="eligibleMonths"></g>
+
+                        </svg>
+
                     </div>
 
                 </div>
 
-                <div class="chart-icon">
-                    <i class="fas fa-briefcase"></i>
+
+                <!-- FOOTER -->
+
+                <div class="analytics-footer">
+
+                    <i class="fas fa-chart-line"></i>
+
+                    Monthly eligible trainee trend
+
                 </div>
 
-            </div>
-
-            <div class="chart-wrapper">
-                <canvas id="suitableOpeningChart"></canvas>
-            </div>
-
-            <div class="chart-footer">
-                <i class="fas fa-chart-line"></i>
-
-                <span>
-                    Monthly suitable-opening trend
-                </span>
             </div>
 
         </div>
 
 
-        <div class="chart-card">
 
-            <div class="chart-card-top">
+        <!-- =================================================
+             TOTAL REGISTRATION PER MONTH
+             ================================================= -->
 
-                <div class="chart-info">
+        <div class="col-xl-6 col-lg-6 col-md-12">
 
-                    <div class="chart-title">
-                        Internship Posts from Organization
+            <div class="analytics-card">
+
+
+                <!-- HEADER -->
+
+                <div class="analytics-header">
+
+                    <div class="analytics-header-icon">
+
+                        <i class="fas fa-chart-bar"></i>
+
                     </div>
 
-                    <div class="chart-number">
-                        @latestRegistrations
+                    <h5>
+                        Candidate Registration Per Month
+                    </h5>
+
+                </div>
+
+
+                <!-- BODY -->
+
+                <div class="analytics-body">
+
+
+                    <!-- LEGEND -->
+
+                    <div class="chart-legend">
+
+                        <span class="legend-box-bar"></span>
+
+                        <span>
+                            Total Candidate Registrations
+                        </span>
+
                     </div>
 
-                    <div class="chart-subtitle">
-                        Current month
+
+                    <!-- SVG -->
+
+                    <div class="chart-wrapper">
+
+                        <svg id="registrationSvg"
+                             viewBox="0 0 760 300"
+                             preserveAspectRatio="none">
+
+
+                            <!-- =========================
+                                 GRID
+                                 ========================= -->
+
+                            <line class="chart-grid"
+                                  x1="60"
+                                  y1="30"
+                                  x2="735"
+                                  y2="30" />
+
+                            <line class="chart-grid"
+                                  x1="60"
+                                  y1="75"
+                                  x2="735"
+                                  y2="75" />
+
+                            <line class="chart-grid"
+                                  x1="60"
+                                  y1="120"
+                                  x2="735"
+                                  y2="120" />
+
+                            <line class="chart-grid"
+                                  x1="60"
+                                  y1="165"
+                                  x2="735"
+                                  y2="165" />
+
+                            <line class="chart-grid"
+                                  x1="60"
+                                  y1="210"
+                                  x2="735"
+                                  y2="210" />
+
+                            <line class="chart-grid"
+                                  x1="60"
+                                  y1="255"
+                                  x2="735"
+                                  y2="255" />
+
+
+                            <!-- =========================
+                                 AXIS
+                                 ========================= -->
+
+                            <line class="chart-axis"
+                                  x1="60"
+                                  y1="30"
+                                  x2="60"
+                                  y2="255" />
+
+                            <line class="chart-axis"
+                                  x1="60"
+                                  y1="255"
+                                  x2="735"
+                                  y2="255" />
+
+
+                            <!-- =========================
+                                 Y AXIS
+                                 ALWAYS 0 TO 100
+                                 ========================= -->
+
+                            <text class="chart-axis-text"
+                                  x="48"
+                                  y="259"
+                                  text-anchor="end">
+                                0
+                            </text>
+
+                            <text class="chart-axis-text"
+                                  x="48"
+                                  y="214"
+                                  text-anchor="end">
+                                20
+                            </text>
+
+                            <text class="chart-axis-text"
+                                  x="48"
+                                  y="169"
+                                  text-anchor="end">
+                                40
+                            </text>
+
+                            <text class="chart-axis-text"
+                                  x="48"
+                                  y="124"
+                                  text-anchor="end">
+                                60
+                            </text>
+
+                            <text class="chart-axis-text"
+                                  x="48"
+                                  y="79"
+                                  text-anchor="end">
+                                80
+                            </text>
+
+                            <text class="chart-axis-text"
+                                  x="48"
+                                  y="34"
+                                  text-anchor="end">
+                                100
+                            </text>
+
+
+                            <!-- =========================
+                                 Y AXIS TITLE
+                                 ========================= -->
+
+                            <text class="chart-axis-text"
+                                  transform="translate(16 165) rotate(-90)"
+                                  text-anchor="middle">
+
+                                No. of Trainees
+
+                            </text>
+
+
+                            <!-- =========================
+                                 BARS
+                                 ========================= -->
+
+                            <g id="registrationBars"></g>
+
+
+                            <!-- =========================
+                                 X AXIS TITLE
+                                 ========================= -->
+
+                            <text class="chart-axis-text"
+                                  x="397"
+                                  y="292"
+                                  text-anchor="middle">
+
+                                Month Year
+
+                            </text>
+
+
+                            <!-- MONTHS -->
+
+                            <g id="registrationMonths"></g>
+
+                        </svg>
+
                     </div>
 
                 </div>
 
-                <div class="chart-icon">
-                    <i class="fas fa-building"></i>
+
+                <!-- FOOTER -->
+
+                <div class="analytics-footer">
+
+                    <i class="fas fa-chart-line"></i>
+
+                    Monthly trainee registration trend
+
                 </div>
-
-            </div>
-
-            <div class="chart-wrapper">
-                <canvas id="organizationInternshipChart"></canvas>
-            </div>
-
-            <div class="chart-footer">
-
-                <i class="fas fa-chart-line"></i>
-
-                <span>
-                    Monthly organization internship trend
-                </span>
 
             </div>
 
@@ -126,534 +739,398 @@
 </div>
 
 
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-
 <script>
 
     document.addEventListener("DOMContentLoaded", function () {
 
-    const months = [
-    "Jan", "Feb", "Mar", "Apr",
-    "May", "Jun", "Jul", "Aug",
-    "Sep", "Oct", "Nov", "Dec"
-    ];
+
+        // =====================================================
+        // CANDIDATE DATA FROM C#
+        // =====================================================
+
+        const candidateData =
+        @Html.Raw(
+                System.Text.Json.JsonSerializer.Serialize(
+                                barData.Select(x => new
+                                {
+                                            year = x.RegistrationYear,
+                                            month = x.RegistrationMonth,
+                                            count = x.TotalRegistrations
+                                })
+                )
+                );
 
 
-    // ================================================
-    // DATABASE DATA FROM MODEL
-    // ================================================
+        // =====================================================
+        // CURRENT YEAR
+        // =====================================================
 
-    const areaData = @Html.Raw(
-                                System.Text.Json.JsonSerializer.Serialize(
-                                        areaData.Select(x => new
-                                        {
-                                                year = x.PostYear,
-                                                month = x.PostMonth,
-                                                value = x.TotalEligibleTrainees
-                                        })
-                                )
+        const currentYear =
+            new Date().getFullYear();
+
+
+        // =====================================================
+        // MONTH NAMES
+        // =====================================================
+
+        const monthNames = [
+
+            "Jan",
+            "Feb",
+            "Mar",
+            "Apr",
+            "May",
+            "Jun",
+            "Jul",
+            "Aug",
+            "Sep",
+            "Oct",
+            "Nov",
+            "Dec"
+
+        ];
+
+
+        // =====================================================
+        // CREATE 12 MONTHS
+        // =====================================================
+
+        const months = [];
+
+
+        for (let i = 0; i < 12; i++) {
+
+            months.push({
+
+                year: currentYear,
+
+                month: i + 1,
+
+                label:
+                    monthNames[i] +
+                    " " +
+                    String(currentYear).slice(-2),
+
+                count: 0
+
+            });
+
+        }
+
+
+        // =====================================================
+        // PUT DATABASE DATA INTO MONTHS
+        // =====================================================
+
+        if (Array.isArray(candidateData)) {
+
+            candidateData.forEach(function (item) {
+
+
+                const found =
+                    months.find(function (x) {
+
+                        return (
+
+                            x.year === Number(item.year)
+
+                            &&
+
+                            x.month === Number(item.month)
+
                         );
 
+                    });
 
-    const barData = @Html.Raw(
-                                System.Text.Json.JsonSerializer.Serialize(
-                                        barData.Select(x => new
-                                        {
-                                                month = x.RegistrationMonth,
-                                                value = x.TotalRegistrations
-                                        })
-                                )
-                        );
 
+                if (found) {
 
-    // ================================================
-    // 12 MONTH ARRAYS
-    // ================================================
+                    found.count =
+                        Number(item.count) || 0;
 
-    const suitableOpeningValues =
-    new Array(12).fill(0);
+                }
 
-    const organizationInternshipValues =
-    new Array(12).fill(0);
+            });
 
+        }
 
-    // ================================================
-    // AREA CHART DATA
-    // ================================================
 
-    areaData.forEach(function (item) {
+        // =====================================================
+        // CHART SETTINGS
+        // =====================================================
 
-    const monthIndex =
-    Number(item.month) - 1;
+        const chartLeft = 60;
 
-    if (
-    monthIndex >= 0 &&
-    monthIndex < 12
-    ) {
+        const chartRight = 735;
 
-    suitableOpeningValues[monthIndex] =
-    Number(item.value);
+        const chartTop = 30;
 
-    }
+        const chartBottom = 255;
 
-    });
+        const chartWidth =
+            chartRight - chartLeft;
 
 
-    // ================================================
-    // BAR CHART DATA
-    // ================================================
+        const monthGap =
+            chartWidth / 11;
 
-    barData.forEach(function (item) {
 
-    const monthIndex =
-    Number(item.month) - 1;
+        // =====================================================
+        // GET MAX VALUE
+        // =====================================================
 
-    if (
-    monthIndex >= 0 &&
-    monthIndex < 12
-    ) {
+        const maxValue =
+            Math.max(
+                ...months.map(x => x.count),
+                1
+            );
 
-    organizationInternshipValues[monthIndex] =
-    Number(item.value);
 
-    }
+        // =====================================================
+        // IMPORTANT
+        // =====================================================
+        // Y AXIS IS ALWAYS 0 TO 100
+        //
+        // August = 6
+        // September = 8
+        //
+        // Therefore:
+        //
+        // 6 / 100 = 6%
+        // 8 / 100 = 8%
+        //
+        // The bars will NOT be converted to 60 or 80.
+        // =====================================================
 
-    });
+        const yAxisMax = 100;
 
 
-    // ================================================
-    // SUITABLE OPENINGS CHART
-    // ================================================
+        // =====================================================
+        // REGISTRATION BAR CHART
+        // =====================================================
 
-    const suitableCanvas =
-    document.getElementById(
-    "suitableOpeningChart"
-    );
+        const registrationBars =
+            document.getElementById(
+                "registrationBars"
+            );
 
-    const suitableCtx =
-    suitableCanvas.getContext("2d");
 
+        const barWidth = 30;
 
-    const suitableGradient =
-    suitableCtx.createLinearGradient(
-    0,
-    0,
-    0,
-    250
-    );
 
+        months.forEach(function (item, index) {
 
-    suitableGradient.addColorStop(
-    0,
-    "rgba(30, 123, 103, 0.18)"
-    );
 
+            // =================================================
+            // BAR X POSITION
+            // =================================================
 
-    suitableGradient.addColorStop(
-    1,
-    "rgba(30, 123, 103, 0)"
-    );
+            const x =
+                chartLeft +
+                (index * monthGap) -
+                (barWidth / 2);
 
 
-    new Chart(suitableCtx, {
+            // =================================================
+            // BAR HEIGHT
+            // =================================================
+            //
+            // Example:
+            //
+            // count = 6
+            //
+            // 6 / 100 * 225
+            //
+            // = 13.5 pixels
+            //
+            // count = 8
+            //
+            // 8 / 100 * 225
+            //
+            // = 18 pixels
+            //
+            // =================================================
 
-    type: "line",
+            const barHeight =
+                (item.count / yAxisMax) *
+                (chartBottom - chartTop);
 
-    data: {
 
-    labels: months,
+            // =================================================
+            // BAR Y POSITION
+            // =================================================
 
-    datasets: [{
+            const y =
+                chartBottom - barHeight;
 
-    label: "Suitable Openings",
 
-    data: suitableOpeningValues,
+            // =================================================
+            // CREATE RECTANGLE
+            // =================================================
 
-    borderColor: "#1e7b67",
+            const rect =
+                document.createElementNS(
+                    "http://www.w3.org/2000/svg",
+                    "rect"
+                );
 
-    backgroundColor: suitableGradient,
 
-    borderWidth: 3,
+            rect.setAttribute(
+                "x",
+                x
+            );
 
-    fill: true,
 
-    tension: 0.35,
+            rect.setAttribute(
+                "y",
+                y
+            );
 
-    pointRadius: function (context) {
 
-    return context.dataIndex === 11
-    ? 5
-    : 0;
+            rect.setAttribute(
+                "width",
+                barWidth
+            );
 
-    },
 
-    pointHoverRadius: 6,
+            rect.setAttribute(
+                "height",
+                Math.max(
+                    barHeight,
+                    0
+                )
+            );
 
-    pointBackgroundColor: "#ffffff",
 
-    pointBorderColor: "#1e7b67",
+            rect.setAttribute(
+                "class",
+                "chart-bar"
+            );
 
-    pointBorderWidth: 3
 
-    }]
+            // =================================================
+            // TOOLTIP
+            // =================================================
 
-    },
+            const title =
+                document.createElementNS(
+                    "http://www.w3.org/2000/svg",
+                    "title"
+                );
 
-    options: {
 
-    responsive: true,
+            title.textContent =
+                item.label +
+                " : " +
+                item.count +
+                " candidate(s)";
 
-    maintainAspectRatio: false,
 
-    plugins: {
+            rect.appendChild(title);
 
-    legend: {
-    display: false
-    },
 
-    tooltip: {
-    enabled: true
-    }
+            // =================================================
+            // ADD BAR
+            // =================================================
 
-    },
+            registrationBars.appendChild(
+                rect
+            );
 
-    scales: {
+        });
 
-    x: {
 
-    grid: {
-    display: false
-    },
+        // =====================================================
+        // REGISTRATION MONTH LABELS
+        // =====================================================
 
-    border: {
-    display: false
-    },
+        const registrationMonths =
+            document.getElementById(
+                "registrationMonths"
+            );
 
-    ticks: {
 
-    color: "#7c8ba5",
+        months.forEach(function (item, index) {
 
-    font: {
-    size: 11
-    }
 
-    }
+            const text =
+                document.createElementNS(
+                    "http://www.w3.org/2000/svg",
+                    "text"
+                );
 
-    },
 
-    y: {
+            const x =
+                chartLeft +
+                (index * monthGap);
 
-    display: false,
 
-    grid: {
-    display: false
-    },
+            text.setAttribute(
+                "x",
+                x
+            );
 
-    border: {
-    display: false
-    },
 
-    beginAtZero: false
+            text.setAttribute(
+                "y",
+                chartBottom + 20
+            );
 
-    }
 
-    },
+            text.setAttribute(
+                "text-anchor",
+                "middle"
+            );
 
-    interaction: {
 
-    intersect: false,
+            text.setAttribute(
+                "class",
+                "chart-axis-text"
+            );
 
-    mode: "index"
 
-    }
+            text.textContent =
+                item.label;
 
-    }
 
-    });
+            registrationMonths.appendChild(
+                text
+            );
 
+        });
 
-    // ================================================
-    // ORGANIZATION INTERNSHIP CHART
-    // ================================================
 
-    const organizationCanvas =
-    document.getElementById(
-    "organizationInternshipChart"
-    );
+        // =====================================================
+        // TOTAL CANDIDATE REGISTRATIONS
+        // =====================================================
 
-    const organizationCtx =
-    organizationCanvas.getContext("2d");
+        const totalCandidates =
+            months.reduce(
+                function (total, item) {
 
+                    return total + item.count;
 
-    const organizationGradient =
-    organizationCtx.createLinearGradient(
-    0,
-    0,
-    0,
-    250
-    );
+                },
+                0
+            );
 
 
-    organizationGradient.addColorStop(
-    0,
-    "rgba(30, 123, 103, 0.18)"
-    );
+        // =====================================================
+        // DEBUG
+        // =====================================================
 
+        console.log(
+            "Candidate registrations:",
+            totalCandidates
+        );
 
-    organizationGradient.addColorStop(
-    1,
-    "rgba(30, 123, 103, 0)"
-    );
 
+        console.log(
+            "Candidate monthly data:",
+            months
+        );
 
-    new Chart(organizationCtx, {
-
-    type: "line",
-
-    data: {
-
-    labels: months,
-
-    datasets: [{
-
-    label:
-    "Organization Internship Posts",
-
-    data:
-    organizationInternshipValues,
-
-    borderColor: "#1e7b67",
-
-    backgroundColor:
-    organizationGradient,
-
-    borderWidth: 3,
-
-    fill: true,
-
-    tension: 0.35,
-
-    pointRadius: function (context) {
-
-    return context.dataIndex === 11
-    ? 5
-    : 0;
-
-    },
-
-    pointHoverRadius: 6,
-
-    pointBackgroundColor: "#ffffff",
-
-    pointBorderColor: "#1e7b67",
-
-    pointBorderWidth: 3
-
-    }]
-
-    },
-
-    options: {
-
-    responsive: true,
-
-    maintainAspectRatio: false,
-
-    plugins: {
-
-    legend: {
-    display: false
-    },
-
-    tooltip: {
-    enabled: true
-    }
-
-    },
-
-    scales: {
-
-    x: {
-
-    grid: {
-    display: false
-    },
-
-    border: {
-    display: false
-    },
-
-    ticks: {
-
-    color: "#7c8ba5",
-
-    font: {
-    size: 11
-    }
-
-    }
-
-    },
-
-    y: {
-
-    display: false,
-
-    grid: {
-    display: false
-    },
-
-    border: {
-    display: false
-    },
-
-    beginAtZero: false
-
-    }
-
-    },
-
-    interaction: {
-
-    intersect: false,
-
-    mode: "index"
-
-    }
-
-    }
-
-    });
 
     });
 
 </script>
-
-
-<style>
-
-    .candidate-charts-page {
-        width: 100%;
-        padding: 0;
-    }
-
-    .charts-grid {
-        display: grid;
-        grid-template-columns: repeat(2, 1fr);
-        gap: 30px;
-    }
-
-    .chart-card {
-        background: #ffffff;
-        border: 1px solid #e6ebf1;
-        border-radius: 22px;
-        padding: 28px 30px 26px;
-        min-height: 370px;
-        box-shadow: 0 8px 25px rgba(15, 23, 42, 0.04);
-    }
-
-    .chart-card-top {
-        display: flex;
-        align-items: flex-start;
-        justify-content: space-between;
-    }
-
-    .chart-title {
-        color: #64748b;
-        font-size: 15px;
-        font-weight: 500;
-        margin-bottom: 8px;
-    }
-
-    .chart-number {
-        color: #0f172a;
-        font-size: 38px;
-        line-height: 1;
-        font-weight: 700;
-        margin-bottom: 10px;
-    }
-
-    .chart-subtitle {
-        color: #8b9ab0;
-        font-size: 13px;
-    }
-
-    .chart-icon {
-        width: 54px;
-        height: 54px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        border-radius: 15px;
-        background: #e7f5f1;
-        color: #1e7b67;
-        font-size: 22px;
-    }
-
-    .chart-wrapper {
-        width: 100%;
-        height: 175px;
-        margin-top: 20px;
-    }
-
-        .chart-wrapper canvas {
-            width: 100% !important;
-            height: 100% !important;
-        }
-
-    .chart-footer {
-        display: flex;
-        align-items: center;
-        gap: 8px;
-        margin-top: 12px;
-        color: #71819a;
-        font-size: 13px;
-    }
-
-        .chart-footer i {
-            color: #1e7b67;
-            font-size: 15px;
-        }
-
-    @@media (max-width: 991px) {
-
-        .charts-grid {
-            grid-template-columns: 1fr;
-        }
-
-        .chart-card {
-            min-height: 350px;
-        }
-    }
-
-    @@media (max-width: 576px) {
-
-        .chart-card {
-            padding: 22px 20px;
-            border-radius: 18px;
-        }
-
-        .chart-title {
-            font-size: 14px;
-        }
-
-        .chart-number {
-            font-size: 32px;
-        }
-
-        .chart-icon {
-            width: 48px;
-            height: 48px;
-            font-size: 19px;
-        }
-
-        .chart-wrapper {
-            height: 160px;
-        }
-
-        .chart-footer {
-            font-size: 12px;
-        }
-    }
-
-</style>
