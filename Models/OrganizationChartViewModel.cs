@@ -13,7 +13,7 @@
         public int TotalRegistrations { get; set; }
     }
 
-    public class OrganizationChartsViewModel
+    public class OrganizationChartsViewModel 
     {
         public List<OrganizationChartViewModel> AreaChartData { get; set; } = new List<OrganizationChartViewModel>();
 
