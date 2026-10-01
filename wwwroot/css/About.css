@@ -1,0 +1,42 @@
+﻿/* Custom Teal Theme Utilities */
+.text-teal {
+    color: #0d9488 !important;
+}
+
+.bg-teal-subtle-custom {
+    background-color: #f0fdfa !important;
+}
+
+.border-teal-subtle-custom {
+    border-color: #ccfbf1 !important;
+}
+
+.badge-teal {
+    background-color: #f0fdfa;
+    color: #0f766e;
+    border: 1px solid #99f6e4;
+}
+
+.stat-badge {
+    background-color: #0d9488;
+    color: #ffffff;
+    font-size: 0.65rem;
+    letter-spacing: 0.1em;
+}
+
+.icon-box-sm {
+    width: 40px;
+    height: 40px;
+}
+
+.card-hover {
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+    .card-hover:hover {
+        transform: translateY(-2px);
+        border-color: #0d9488 !important;
+        box-shadow: 0 .5rem 1rem rgba(0,0,0,.08) !important;
+    }
+
+

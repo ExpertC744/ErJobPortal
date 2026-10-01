@@ -1,0 +1,579 @@
+﻿ 
+/* =========================================================
+       PAGE
+       ========================================================= */
+* {
+    box-sizing: border-box;
+}
+
+body {
+    background: #f4f8f7;
+}
+
+.view-post-page {
+    width: 100%;
+    min-height: 100vh;
+    padding: 95px 30px 70px;
+    font-family: Arial, Helvetica, sans-serif;
+}
+
+
+/* =========================================================
+       MAIN CARD
+       ========================================================= */
+
+.post-card {
+    width: 100%;
+    max-width: 1100px;
+    margin: 0 auto;
+    background: #ffffff;
+    border: 1px solid #e1eaea;
+    border-radius: 20px;
+    overflow: hidden;
+    box-shadow: 0 18px 45px rgba(15, 118, 110, 0.10);
+}
+
+
+/* =========================================================
+       HEADER
+       ========================================================= */
+
+.post-header {
+    position: relative;
+    width: 100%;
+    min-height: 255px;
+    padding: 75px 32px 35px;
+    background: linear-gradient( 135deg, #287f79 0%, #0d9488 55%, #14b8a6 100% );
+    overflow: hidden;
+}
+
+
+    /* Decorative circles */
+
+    .post-header::before {
+        content: "";
+        position: absolute;
+        width: 190px;
+        height: 190px;
+        border: 1px solid rgba(255,255,255,0.16);
+        border-radius: 50%;
+        right: 30px;
+        top: -100px;
+    }
+
+    .post-header::after {
+        content: "";
+        position: absolute;
+        width: 170px;
+        height: 170px;
+        border: 1px solid rgba(255,255,255,0.14);
+        border-radius: 50%;
+        right: -45px;
+        bottom: -85px;
+    }
+
+
+/* =========================================================
+       HEADER CONTENT
+       ========================================================= */
+
+.header-content {
+    position: relative;
+    z-index: 2;
+}
+
+.header-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    padding: 7px 12px;
+    border: 1px solid rgba(255,255,255,0.55);
+    border-radius: 6px;
+    color: #ffffff;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: .3px;
+    background: rgba(255,255,255,0.08);
+}
+
+    .header-badge i {
+        font-size: 10px;
+    }
+
+.post-title {
+    margin: 14px 0 0;
+    color: #ffffff;
+    font-family: Georgia, "Times New Roman", serif;
+    font-size: 32px;
+    font-weight: 700;
+    line-height: 1.2;
+}
+
+.post-subtitle {
+    margin-top: 8px;
+    color: rgba(255,255,255,0.85);
+    font-size: 13px;
+}
+
+
+/* =========================================================
+       PROFILE IMAGE AREA
+       IMPORTANT:
+       Image is NOT positioned inside the header.
+       This prevents clipping.
+       ========================================================= */
+
+.profile-image-area {
+    height: 95px;
+    background: #ffffff;
+    position: relative;
+    padding-left: 32px;
+}
+
+.company-logo {
+    position: absolute;
+    left: 32px;
+    top: -48px;
+    width: 96px;
+    height: 96px;
+    padding: 5px;
+    background: #ffffff;
+    border: 1px solid #dce8e7;
+    border-radius: 12px;
+    box-shadow: 0 8px 22px rgba(15,118,110,0.15);
+    z-index: 10;
+}
+
+    .company-logo img {
+        width: 100%;
+        height: 100%;
+        display: block;
+        object-fit: contain;
+        border-radius: 8px;
+        background: #f8fafb;
+    }
+
+
+/* =========================================================
+       CONTENT
+       ========================================================= */
+
+.post-content {
+    padding: 0 32px 30px;
+}
+
+
+/* =========================================================
+       SECTION TITLE
+       ========================================================= */
+
+.section-title {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 16px;
+    color: #132238;
+    font-family: Georgia, "Times New Roman", serif;
+    font-size: 18px;
+    font-weight: 700;
+}
+
+.section-icon {
+    width: 34px;
+    height: 34px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #d9f8f3;
+    color: #0d9488;
+    border-radius: 8px;
+    flex-shrink: 0;
+}
+
+    .section-icon i {
+        font-size: 14px;
+    }
+
+
+/* =========================================================
+       DETAILS GRID
+       ========================================================= */
+
+.post-details {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 10px;
+}
+
+
+/* =========================================================
+       DETAIL CARD
+       ========================================================= */
+
+.detail-item {
+    position: relative;
+    min-height: 76px;
+    padding: 12px 10px 12px 48px;
+    background: #ffffff;
+    border: 1px solid #dbe5e8;
+    border-radius: 9px;
+    overflow: hidden;
+    transition: box-shadow .2s ease;
+}
+
+    .detail-item::before {
+        content: "";
+        position: absolute;
+        left: 0;
+        top: 13px;
+        bottom: 13px;
+        width: 3px;
+        background: #0d9488;
+        border-radius: 0 3px 3px 0;
+    }
+
+    .detail-item:hover {
+        box-shadow: 0 5px 16px rgba(15,118,110,0.08);
+    }
+
+
+/* =========================================================
+       ICON
+       ========================================================= */
+
+.detail-icon {
+    position: absolute;
+    left: 12px;
+    top: 16px;
+    width: 28px;
+    height: 28px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #eefbf9;
+    color: #0d9488;
+    border-radius: 8px;
+}
+
+    .detail-icon i {
+        font-size: 12px;
+    }
+
+
+/* =========================================================
+       LABEL
+       ========================================================= */
+
+.detail-label {
+    margin-bottom: 7px;
+    color: #6b7c93;
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 9px;
+    font-weight: 700;
+    line-height: 1.2;
+    text-transform: uppercase;
+    letter-spacing: .25px;
+}
+
+
+/* =========================================================
+       VALUE
+       ========================================================= */
+
+.detail-value {
+    color: #172238;
+    font-family: Georgia, "Times New Roman", serif;
+    font-size: 13px;
+    font-weight: 700;
+    line-height: 1.35;
+    word-break: break-word;
+}
+
+.skill-value {
+    font-size: 12px;
+    line-height: 1.45;
+}
+
+
+/* =========================================================
+       FOOTER
+       ========================================================= */
+
+.post-footer {
+    min-height: 50px;
+    padding: 16px 30px;
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    background: #fafcfc;
+    border-top: 1px solid #e6eeee;
+    color: #9aa7b5;
+    font-size: 10px;
+}
+
+    .post-footer strong {
+        color: #0d9488;
+        margin-left: 3px;
+    }
+
+
+/* =========================================================
+       RIGHT BUTTONS
+       ========================================================= */
+
+.right-buttons {
+    position: fixed;
+    top: 30px;
+    right: 24px;
+    display: flex;
+    gap: 9px;
+    z-index: 1000;
+}
+
+.right-button {
+    width: 42px;
+    height: 42px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #ffffff;
+    color: #0d9488;
+    border: 1px solid #e0eeee;
+    border-radius: 10px;
+    text-decoration: none;
+    box-shadow: 0 5px 16px rgba(15,118,110,0.10);
+    transition: all .2s ease;
+}
+
+    .right-button i {
+        font-size: 14px;
+    }
+
+    .right-button:hover {
+        background: #0d9488;
+        color: #ffffff;
+        transform: translateY(-2px);
+    }
+
+
+/* =========================================================
+       RIGHT ARROW
+       ========================================================= */
+
+.right-arrow {
+    position: fixed;
+    right: 0;
+    top: 50%;
+    width: 52px;
+    height: 92px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #0d9488;
+    color: #ffffff;
+    border-radius: 14px 0 0 14px;
+    font-size: 38px;
+    font-weight: 300;
+    box-shadow: -4px 6px 18px rgba(15,118,110,0.15);
+    z-index: 900;
+}
+
+
+/* =========================================================
+       COPYRIGHT
+       ========================================================= */
+
+.copyright {
+    width: 100%;
+    text-align: center;
+    margin-top: 25px;
+    color: #728095;
+    font-size: 11px;
+}
+
+    .copyright a {
+        color: #0d9488;
+        font-weight: 700;
+        text-decoration: none;
+    }
+
+
+/* =========================================================
+       RESPONSIVE - TABLET
+       ========================================================= */
+
+@media (max-width: 1200px) {
+
+    .post-details {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+
+    .right-buttons {
+        right: 15px;
+    }
+}
+
+
+/* =========================================================
+       RESPONSIVE - SMALL TABLET
+       ========================================================= */
+
+@media (max-width: 900px) {
+
+    .view-post-page {
+        padding: 25px 18px 60px;
+    }
+
+    .post-card {
+        max-width: 100%;
+    }
+
+    .post-details {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .right-buttons {
+        top: 85px;
+    }
+
+    .right-arrow {
+        display: none;
+    }
+}
+
+
+/* =========================================================
+       RESPONSIVE - MOBILE
+       ========================================================= */
+
+@media (max-width: 600px) {
+
+    .view-post-page {
+        padding: 15px 10px 50px;
+    }
+
+    .post-card {
+        border-radius: 14px;
+    }
+
+    .post-header {
+        min-height: 205px;
+        padding: 55px 20px 25px;
+    }
+
+    .post-title {
+        font-size: 25px;
+    }
+
+    .post-subtitle {
+        font-size: 12px;
+    }
+
+    .profile-image-area {
+        height: 80px;
+        padding-left: 20px;
+    }
+
+    .company-logo {
+        left: 20px;
+        top: -40px;
+        width: 80px;
+        height: 80px;
+    }
+
+    .post-content {
+        padding: 0 15px 25px;
+    }
+
+    .post-details {
+        grid-template-columns: 1fr;
+        gap: 9px;
+    }
+
+    .detail-item {
+        min-height: 72px;
+    }
+
+    .right-buttons {
+        position: static;
+        justify-content: center;
+        margin: 15px 0;
+    }
+
+    .right-button {
+        width: 40px;
+        height: 40px;
+    }
+
+    .post-footer {
+        justify-content: center;
+        text-align: center;
+    }
+}
+
+
+/* =========================================================
+       VERY SMALL MOBILE
+       ========================================================= */
+
+@media (max-width: 380px) {
+
+    .post-header {
+        min-height: 190px;
+        padding: 45px 16px 20px;
+    }
+
+    .header-badge {
+        font-size: 9px;
+    }
+
+    .post-title {
+        font-size: 22px;
+    }
+
+    .detail-item {
+        padding-left: 45px;
+    }
+
+    .detail-label {
+        font-size: 8px;
+    }
+
+    .detail-value {
+        font-size: 12px;
+    }
+}
+
+
+/* =========================================================
+       PRINT
+       ========================================================= */
+
+@media print {
+
+    body {
+        background: #ffffff !important;
+    }
+
+    .view-post-page {
+        padding: 0;
+    }
+
+    .post-card {
+        max-width: 100%;
+        box-shadow: none;
+        border: 1px solid #ddd;
+    }
+
+    .right-buttons,
+    .right-arrow,
+    .copyright {
+        display: none !important;
+    }
+
+    .detail-item:hover {
+        box-shadow: none;
+    }
+}
+
+ 

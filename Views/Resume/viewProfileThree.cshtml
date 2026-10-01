@@ -15,10 +15,71 @@
     .Where(x => !string.IsNullOrWhiteSpace(x))
     .ToList();
 
+    var p = Model.Profile;
+
+    string GetSkillNames(
+        string skillIDs,
+        System.Collections.IEnumerable skills)
+    {
+        if (string.IsNullOrWhiteSpace(skillIDs) || skills == null)
+            return "";
+
+        var selectedIds = new HashSet<string>(
+            skillIDs
+                .Split(
+                    new[] { ',' },
+                    StringSplitOptions.RemoveEmptyEntries
+                )
+                .Select(x => x.Trim()),
+            StringComparer.OrdinalIgnoreCase
+        );
+
+        var names = new List<string>();
+
+        foreach (var skill in skills)
+        {
+            if (skill == null)
+                continue;
+
+            var idProperty = skill.GetType().GetProperty("ID");
+            var nameProperty = skill.GetType().GetProperty("Name");
+
+            if (idProperty == null || nameProperty == null)
+                continue;
+
+            var id = idProperty.GetValue(skill)?.ToString()?.Trim();
+            var name = nameProperty.GetValue(skill)?.ToString()?.Trim();
+
+            if (!string.IsNullOrWhiteSpace(id) &&
+                !string.IsNullOrWhiteSpace(name) &&
+                selectedIds.Contains(id))
+            {
+                names.Add(name);
+            }
+        }
+
+        return string.Join(", ", names);
+    }
+
+    var medicalSkillNames = GetSkillNames(
+        p.sMedicalSkillIDs,
+        Model.MedicalSkills
+    );
+
+    var technicalSkillNames = GetSkillNames(
+        p.sTechnicalSkillIDs,
+        Model.TechnicalSkills
+    );
+
+    var nonTechnicalSkillNames = GetSkillNames(
+        p.sNonTechnicalSkillIDs,
+        Model.NonTechnicalSkills
+    );
+
     var hasSkills =
-        !string.IsNullOrWhiteSpace(Model.AdministrativeSkills) ||
-        !string.IsNullOrWhiteSpace(Model.MedicalSkills) ||
-        !string.IsNullOrWhiteSpace(Model.TechnicalSkills);
+        !string.IsNullOrWhiteSpace(medicalSkillNames) ||
+        !string.IsNullOrWhiteSpace(technicalSkillNames) ||
+        !string.IsNullOrWhiteSpace(nonTechnicalSkillNames);
 
     var hasEducation =
         Model.SSCYear.HasValue ||
@@ -1463,7 +1524,7 @@
 
 
                 <!-- Skills -->
-
+                <!-- Skills -->
                 @if (hasSkills)
                 {
                     <section class="section">
@@ -1484,7 +1545,7 @@
                         <div class="content-card">
 
 
-                            @if (!string.IsNullOrWhiteSpace(Model.AdministrativeSkills))
+                            @if (!string.IsNullOrWhiteSpace(nonTechnicalSkillNames))
                             {
                                 <div class="skill-row">
 
@@ -1493,14 +1554,14 @@
                                     </div>
 
                                     <div class="skill-text">
-                                        @Model.AdministrativeSkills
+                                        @nonTechnicalSkillNames
                                     </div>
 
                                 </div>
                             }
 
 
-                            @if (!string.IsNullOrWhiteSpace(Model.MedicalSkills))
+                            @if (!string.IsNullOrWhiteSpace(medicalSkillNames))
                             {
                                 <div class="skill-row">
 
@@ -1509,14 +1570,14 @@
                                     </div>
 
                                     <div class="skill-text">
-                                        @Model.MedicalSkills
+                                        @medicalSkillNames
                                     </div>
 
                                 </div>
                             }
 
 
-                            @if (!string.IsNullOrWhiteSpace(Model.TechnicalSkills))
+                            @if (!string.IsNullOrWhiteSpace(technicalSkillNames))
                             {
                                 <div class="skill-row">
 
@@ -1525,7 +1586,7 @@
                                     </div>
 
                                     <div class="skill-text">
-                                        @Model.TechnicalSkills
+                                        @technicalSkillNames
                                     </div>
 
                                 </div>
@@ -1536,7 +1597,6 @@
 
                     </section>
                 }
-
 
 
                 <!-- References -->

@@ -421,29 +421,77 @@
                    AUTH BUTTONS
                 ========================================================== */
 
-     /* =========================================================
+    /* =========================================================
    NAVBAR ACTIONS
    ========================================================= */
 
 .trainee-navbar-actions {
     display: flex;
     align-items: center;
+    justify-content: flex-end;
     gap: 10px;
+    flex-direction: row;
 }
 
+/* Common button style */
+.trainee-navbar-actions .trainee-signin,
 .trainee-navbar-actions .trainee-signup {
     display: inline-flex;
     align-items: center;
     justify-content: center;
 
     width: auto;
-    min-width: 120px;
-    height: 48px;
+    min-width: unset;
+    height: 42px;
 
-    padding: 0 26px;
+    padding: 0 17px;
 
-    border: none;
-    border-radius: var(--radius-pill);
+    border-radius: 10px;
+
+    text-decoration: none !important;
+
+    font-family: "Inter", sans-serif;
+    font-size: 14px;
+    font-weight: 600;
+
+    white-space: nowrap;
+
+    cursor: pointer;
+
+    transition:
+        background 0.2s ease,
+        color 0.2s ease,
+        border-color 0.2s ease,
+        box-shadow 0.2s ease,
+        transform 0.2s ease;
+}
+
+/* =========================================================
+   SIGN IN
+   ========================================================= */
+
+.trainee-navbar-actions .trainee-signin {
+    color: var(--brand-700) !important;
+
+    background: #ffffff;
+
+    border: 1px solid var(--brand-500);
+}
+
+.trainee-navbar-actions .trainee-signin:hover {
+    background: var(--brand-50, #f0fdfa);
+    color: var(--brand-700) !important;
+
+    transform: translateY(-1px);
+}
+
+
+/* =========================================================
+   SIGN UP
+   ========================================================= */
+
+.trainee-navbar-actions .trainee-signup {
+    color: #ffffff !important;
 
     background: linear-gradient(
         135deg,
@@ -451,23 +499,42 @@
         var(--brand-700)
     );
 
+    border: 1px solid var(--brand-500);
+
+    box-shadow: 0 5px 14px rgba(13, 148, 136, 0.22);
+}
+
+.trainee-navbar-actions .trainee-signup:hover {
     color: #ffffff !important;
 
-    text-decoration: none !important;
+    background: linear-gradient(
+        135deg,
+        var(--brand-600, #0d9488),
+        var(--brand-800, #115e59)
+    );
 
-    font-family: "Inter", sans-serif;
-    font-size: 16px;
-    font-weight: 600;
+    box-shadow: 0 7px 18px rgba(13, 148, 136, 0.30);
 
-    box-shadow: 0 8px 20px rgba(13, 148, 136, 0.35);
-
-    cursor: pointer;
-
-    transition:
-        transform 0.2s ease,
-        box-shadow 0.2s ease,
-        background 0.2s ease;
+    transform: translateY(-1px);
 }
+
+
+/* =========================================================
+   ICON SPACING
+   ========================================================= */
+
+.trainee-navbar-actions i {
+    font-size: 13px;
+}
+
+.trainee-navbar-actions .trainee-signin i {
+    margin-right: 6px;
+}
+
+.trainee-navbar-actions .trainee-signup i {
+    margin-right: 6px;
+}
+
 
 
 /* =========================================================
@@ -812,7 +879,7 @@
             .trainee-navbar-actions {
                 width: 100%;
                 margin: 12px 0 0;
-                padding: 14px 0 0;
+                padding: 14px 20px 0;
                 border-top: 1px solid #edf2f0;
                 display: flex;
                 gap: 10px;
@@ -886,6 +953,7 @@
 
             .trainee-navbar-actions {
                 gap: 8px;
+                flex-direction: row;
             }
 
 
@@ -963,6 +1031,7 @@
             .trainee-navbar-actions {
                 display: flex !important;
                 margin-left: 28px;
+                flex-direction: row;
             }
 
             .trainee-navbar .dropdown-menu {

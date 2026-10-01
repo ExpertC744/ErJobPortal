@@ -157,6 +157,7 @@ namespace ErJobPortal.Models
         public string Language6 { get; set; } = "";
 
 
+
         // =========================================================
         // SKILLS
         // =========================================================
@@ -165,9 +166,16 @@ namespace ErJobPortal.Models
 
         public string AdministrativeSkills { get; set; } = "";
 
-        public string MedicalSkills { get; set; } = "";
+        // Skill master lists
+        public List<CandidateSkillOption> MedicalSkills { get; set; }
+            = new List<CandidateSkillOption>();
 
-        public string TechnicalSkills { get; set; } = "";
+        public List<CandidateSkillOption> TechnicalSkills { get; set; }
+            = new List<CandidateSkillOption>();
+
+        public List<CandidateSkillOption> NonTechnicalSkills { get; set; }
+            = new List<CandidateSkillOption>();
+
 
 
         // =========================================================
