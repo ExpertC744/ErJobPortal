@@ -37,6 +37,42 @@
         return !string.IsNullOrWhiteSpace(s);
     }
 
+    string GetSkillNames(string skillIDs, System.Collections.IEnumerable skills)
+    {
+        if (string.IsNullOrWhiteSpace(skillIDs) || skills == null)
+            return "";
+
+        var selectedIds = new HashSet<string>(
+            skillIDs
+                .Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries)
+                .Select(x => x.Trim()),
+            StringComparer.OrdinalIgnoreCase);
+
+        var names = new List<string>();
+
+        foreach (var skill in skills)
+        {
+            if (skill == null) continue;
+
+            var idProp = skill.GetType().GetProperty("ID");
+            var nameProp = skill.GetType().GetProperty("Name");
+
+            if (idProp == null || nameProp == null) continue;
+
+            var id = idProp.GetValue(skill)?.ToString()?.Trim();
+            var name = nameProp.GetValue(skill)?.ToString()?.Trim();
+
+            if (!string.IsNullOrWhiteSpace(id) &&
+                !string.IsNullOrWhiteSpace(name) &&
+                selectedIds.Contains(id))
+            {
+                names.Add(name);
+            }
+        }
+
+        return string.Join(", ", names);
+    }
+
     bool HasNum(int? n)
     {
         return n.HasValue && n.Value != 0;
@@ -337,8 +373,8 @@
     <style>
 
         /* =========================================================
-                   THEME VARIABLES
-                   ========================================================= */
+                           THEME VARIABLES
+                           ========================================================= */
 
         :root {
             --accent: #f5a623;
@@ -347,8 +383,8 @@
 
 
         /* =========================================================
-                   PAGE
-                   ========================================================= */
+                           PAGE
+                           ========================================================= */
 
         * {
             box-sizing: border-box;
@@ -364,8 +400,8 @@
 
 
         /* =========================================================
-                   TOOLBAR
-                   ========================================================= */
+                           TOOLBAR
+                           ========================================================= */
 
         .resume-toolbar {
             max-width: 210mm;
@@ -403,8 +439,8 @@
 
 
         /* =========================================================
-                   THEME SWITCHER
-                   ========================================================= */
+                           THEME SWITCHER
+                           ========================================================= */
 
         .theme-switcher {
             max-width: 210mm;
@@ -441,8 +477,8 @@
 
 
         /* =========================================================
-                   PAGE WRAPPER
-                   ========================================================= */
+                           PAGE WRAPPER
+                           ========================================================= */
 
         .resume-page-wrapper {
             background: #e9e9e9;
@@ -451,8 +487,8 @@
 
 
         /* =========================================================
-                   A4 RESUME
-                   ========================================================= */
+                           A4 RESUME
+                           ========================================================= */
 
         .resume-sheet {
             width: 210mm;
@@ -471,8 +507,8 @@
 
 
         /* =========================================================
-                   ACCENT
-                   ========================================================= */
+                           ACCENT
+                           ========================================================= */
 
         .resume-accent {
             color: var(--accent);
@@ -480,8 +516,8 @@
 
 
         /* =========================================================
-                   LEFT SIDEBAR
-                   ========================================================= */
+                           LEFT SIDEBAR
+                           ========================================================= */
 
         .resume-sidebar {
             width: 35%;
@@ -495,8 +531,8 @@
 
 
         /* =========================================================
-                   PHOTO
-                   ========================================================= */
+                           PHOTO
+                           ========================================================= */
 
         .resume-photo-wrap {
             text-align: center;
@@ -528,8 +564,8 @@
 
 
         /* =========================================================
-                   SIDEBAR SECTION
-                   ========================================================= */
+                           SIDEBAR SECTION
+                           ========================================================= */
 
         .resume-sidebar-section {
             margin-bottom: 26px;
@@ -565,8 +601,8 @@
 
 
         /* =========================================================
-                   RIGHT CONTENT
-                   ========================================================= */
+                           RIGHT CONTENT
+                           ========================================================= */
 
         .resume-main {
             width: 65%;
@@ -578,8 +614,8 @@
 
 
         /* =========================================================
-                   NAME
-                   ========================================================= */
+                           NAME
+                           ========================================================= */
 
         .resume-name {
             font-size: 26px;
@@ -602,8 +638,8 @@
 
 
         /* =========================================================
-                   SECTION
-                   ========================================================= */
+                           SECTION
+                           ========================================================= */
 
         .resume-section {
             margin-bottom: 26px;
@@ -636,8 +672,8 @@
 
 
         /* =========================================================
-                   BODY
-                   ========================================================= */
+                           BODY
+                           ========================================================= */
 
         .resume-section-body p {
             font-size: 12.5px;
@@ -649,8 +685,8 @@
 
 
         /* =========================================================
-                   EXPERIENCE
-                   ========================================================= */
+                           EXPERIENCE
+                           ========================================================= */
 
         .resume-entry {
             margin-bottom: 16px;
@@ -680,8 +716,8 @@
 
 
         /* =========================================================
-                   SKILLS
-                   ========================================================= */
+                           SKILLS
+                           ========================================================= */
 
         .resume-skill-row {
             margin-bottom: 10px;
@@ -697,8 +733,8 @@
 
 
         /* =========================================================
-                   THEMES
-                   ========================================================= */
+                           THEMES
+                           ========================================================= */
 
         .resume-sheet[data-theme="orange"] {
             --accent: #f5a623;
@@ -732,8 +768,8 @@
 
 
         /* =========================================================
-                   MOBILE
-                   ========================================================= */
+                           MOBILE
+                           ========================================================= */
 
         @@media (max-width: 800px) {
 
@@ -759,9 +795,9 @@
             .resume-sheet {
                 transform-origin: top center;
                 /*
-                         * Keep A4 internally.
-                         * Scale it visually on small screens.
-                         */
+                                 * Keep A4 internally.
+                                 * Scale it visually on small screens.
+                                 */
                 transform: scale( min( 1, calc(100vw / 210mm) ) );
                 margin-bottom: -100px;
             }
@@ -769,8 +805,8 @@
 
 
         /* =========================================================
-                   PRINT
-                   ========================================================= */
+                           PRINT
+                           ========================================================= */
 
         @@media print {
 
@@ -1397,13 +1433,13 @@
 
                 }
 
-
+                @* // shrirang 01/10/26 *@
                 <!-- =================================================
-                     LANGUAGES
-                     ================================================= -->
+                LANGUAGES
+                ================================================= -->
                 @{
                     var langItems =
-                    new List<(string Lang, string Star)>();
+                    new List<(string Lang, string Level)>();
 
                     for (int i = 1; i <= 8; i++)
                     {
@@ -1413,53 +1449,57 @@
                         ?.GetValue(p)
                         ?.ToString();
 
-                        var star =
+                        var levelID =
                         typeof(ErJobPortal.Models.CandidateProfileModel)
                         .GetProperty($"sLanguageStar{i}")
                         ?.GetValue(p)
                         ?.ToString();
 
+                        string levelName = levelID switch
+                        {
+                            "1" => "Beginner",
+                            "2" => "Intermediate",
+                            "3" => "Advance",
+                            "4" => "Expert",
+                            _ => ""
+                        };
+
                         if (Has(lang))
                         {
-                            langItems.Add((lang, star));
+                            langItems.Add((lang, levelName));
                         }
                     }
                 }
 
-
                 @if (langItems.Any())
                 {
-
                     <div class="resume-sidebar-section">
 
                         <div class="resume-sidebar-title">
                             Languages
                         </div>
 
-
                         @foreach (var l in langItems)
                         {
-
                             <div class="resume-sidebar-item">
 
                                 <span class="muted">
                                     @l.Lang
                                 </span>
 
-                                @if (Has(l.Star))
+                                @if (Has(l.Level))
                                 {
                                     <span>
-                                        — @l.Star&#9733;
+                                        — @l.Level
                                     </span>
                                 }
 
                             </div>
-
                         }
 
                     </div>
-
                 }
+                @* end *@
 
 
                 <!-- =================================================
@@ -1711,56 +1751,57 @@
                      SKILLS
                      ================================================= -->
                 @{
-                    var skillGroups =
+                    var technicalSkillNames = GetSkillNames(
+                    p.sTechnicalSkillIDs,
+                    Model.TechnicalSkills);
+
+                    var medicalSkillNames = GetSkillNames(
+                    p.sMedicalSkillIDs,
+                    Model.MedicalSkills);
+
+                    var nonTechnicalSkillNames = GetSkillNames(
+                    p.sNonTechnicalSkillIDs,
+                    Model.NonTechnicalSkills);
+
+                    var resolvedSkillGroups =
                     new[]
                     {
-                ("Technical", p.sTechnicalSkillIDs),
-                ("Medical", p.sMedicalSkillIDs),
-                ("Non-Technical", p.sNonTechnicalSkillIDs)
+                ("Technical", technicalSkillNames),
+                ("Medical", medicalSkillNames),
+                ("Non-Technical", nonTechnicalSkillNames)
             }
                     .Where(x => Has(x.Item2))
                     .ToList();
                 }
 
-
-                @if (skillGroups.Any())
+                @if (resolvedSkillGroups.Any())
                 {
-
                     <div class="resume-section">
 
                         <div class="resume-section-title">
                             Skills
                         </div>
 
-
-                        @foreach (var g in skillGroups)
+                        @foreach (var g in resolvedSkillGroups)
                         {
-
                             <div class="resume-skill-row">
 
                                 <div class="resume-skill-label">
-
                                     <span>
                                         @g.Item1
                                     </span>
-
                                 </div>
 
-
                                 <div class="resume-section-body">
-
                                     <p>
                                         @g.Item2
                                     </p>
-
                                 </div>
 
                             </div>
-
                         }
 
                     </div>
-
                 }
 
             </div>

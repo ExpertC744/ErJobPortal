@@ -7,8 +7,9 @@ namespace ErJobPortal.Models
         public CandidateProfileModel Profile { get; set; }
             = new CandidateProfileModel();
 
-
+        // =====================================================
         // EDUCATION
+        // =====================================================
 
         public List<DropdownModel> Divisions { get; set; }
             = new List<DropdownModel>();
@@ -20,7 +21,9 @@ namespace ErJobPortal.Models
             = new List<DropdownModel>();
 
 
+        // =====================================================
         // ADDRESS
+        // =====================================================
 
         public List<DropdownModel> Countries { get; set; }
             = new List<DropdownModel>();
@@ -32,7 +35,9 @@ namespace ErJobPortal.Models
             = new List<DropdownModel>();
 
 
+        // =====================================================
         // INTERNSHIP / FELLOWSHIP
+        // =====================================================
 
         public List<DropdownModel> InternshipFellowshipType { get; set; }
             = new List<DropdownModel>();
@@ -47,9 +52,39 @@ namespace ErJobPortal.Models
             = new List<DropdownModel>();
 
 
+        // =====================================================
         // REFERENCES
+        // =====================================================
 
         public List<DropdownModel> Relationships { get; set; }
             = new List<DropdownModel>();
+
+        //shrirang 30/09/26
+        // =====================================================
+        // SKILLS
+        // =====================================================
+
+        public List<CandidateSkillOption> MedicalSkills { get; set; }
+            = new List<CandidateSkillOption>();
+
+        public List<CandidateSkillOption> TechnicalSkills { get; set; }
+            = new List<CandidateSkillOption>();
+
+        public List<CandidateSkillOption> NonTechnicalSkills { get; set; }
+            = new List<CandidateSkillOption>();
     }
+
+
+    // =========================================================
+    // SKILL OPTION
+    // =========================================================
+
+    public class CandidateSkillOption
+    {
+        public int ID { get; set; }
+
+        public string Name { get; set; } = string.Empty;
+    }
+
+    //end
 }

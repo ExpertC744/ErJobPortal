@@ -47,31 +47,110 @@
     // SKILLS
     // =========================================================
 
+    var p = Model.Profile;
+
+    string GetSkillNames(
+        string skillIDs,
+        System.Collections.IEnumerable skills)
+    {
+        if (string.IsNullOrWhiteSpace(skillIDs) || skills == null)
+            return "";
+
+        var selectedIds = new HashSet<string>(
+            skillIDs
+                .Split(
+                    new[] { ',' },
+                    StringSplitOptions.RemoveEmptyEntries
+                )
+                .Select(x => x.Trim()),
+            StringComparer.OrdinalIgnoreCase
+        );
+
+        var names = new List<string>();
+
+        foreach (var skill in skills)
+        {
+            if (skill == null)
+                continue;
+
+            var idProperty = skill.GetType().GetProperty("ID");
+            var nameProperty = skill.GetType().GetProperty("Name");
+
+            if (idProperty == null || nameProperty == null)
+                continue;
+
+            var id = idProperty
+                .GetValue(skill)?
+                .ToString()?
+                .Trim();
+
+            var name = nameProperty
+                .GetValue(skill)?
+                .ToString()?
+                .Trim();
+
+            if (!string.IsNullOrWhiteSpace(id) &&
+                !string.IsNullOrWhiteSpace(name) &&
+                selectedIds.Contains(id))
+            {
+                names.Add(name);
+            }
+        }
+
+        return string.Join(", ", names);
+    }
+
+
+    var administrativeSkillNames = GetSkillNames(
+        p.sNonTechnicalSkillIDs,
+        Model.NonTechnicalSkills
+    );
+
+    var medicalSkillNames = GetSkillNames(
+        p.sMedicalSkillIDs,
+        Model.MedicalSkills
+    );
+
+    var technicalSkillNames = GetSkillNames(
+        p.sTechnicalSkillIDs,
+        Model.TechnicalSkills
+    );
+
+
     var skills = new List<string>();
 
-    if (!string.IsNullOrWhiteSpace(Model.AdministrativeSkills))
+    if (!string.IsNullOrWhiteSpace(administrativeSkillNames))
     {
         skills.AddRange(
-            Model.AdministrativeSkills
-                .Split(',', StringSplitOptions.RemoveEmptyEntries)
+            administrativeSkillNames
+                .Split(
+                    new[] { ',' },
+                    StringSplitOptions.RemoveEmptyEntries
+                )
                 .Select(x => x.Trim())
         );
     }
 
-    if (!string.IsNullOrWhiteSpace(Model.MedicalSkills))
+    if (!string.IsNullOrWhiteSpace(medicalSkillNames))
     {
         skills.AddRange(
-            Model.MedicalSkills
-                .Split(',', StringSplitOptions.RemoveEmptyEntries)
+            medicalSkillNames
+                .Split(
+                    new[] { ',' },
+                    StringSplitOptions.RemoveEmptyEntries
+                )
                 .Select(x => x.Trim())
         );
     }
 
-    if (!string.IsNullOrWhiteSpace(Model.TechnicalSkills))
+    if (!string.IsNullOrWhiteSpace(technicalSkillNames))
     {
         skills.AddRange(
-            Model.TechnicalSkills
-                .Split(',', StringSplitOptions.RemoveEmptyEntries)
+            technicalSkillNames
+                .Split(
+                    new[] { ',' },
+                    StringSplitOptions.RemoveEmptyEntries
+                )
                 .Select(x => x.Trim())
         );
     }
