@@ -372,3 +372,4 @@ appsettings.*.json
 !appsettings.template.json
 
 
+/Controllers/CandidateController.cs
