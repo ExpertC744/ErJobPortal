@@ -1,6 +1,7 @@
 ﻿using ErJobPortal.Data;
 using ErJobPortal.Models;
 using Microsoft.Data.SqlClient;
+using Microsoft.Extensions.Configuration;
 using System.Data;
 
 namespace ErJobPortal.Repositories
@@ -1640,5 +1641,34 @@ WHERE CandidateID = @CandidateID";
             return string.Join(", ", skillNames);
         }
         //end
+
+
+        public int ApplyForPost(int orgId, int candidateId, int postId)
+        {
+            int result = 0;
+
+            using (SqlConnection con = _db.GetConnection())
+            {
+                using (SqlCommand cmd = new SqlCommand("SP_AddFinalSection", con))
+                {
+                    cmd.CommandType = CommandType.StoredProcedure;
+
+                    cmd.Parameters.Add("@OrgD", SqlDbType.Int).Value = orgId;
+                    cmd.Parameters.Add("@CandidateID", SqlDbType.Int).Value = candidateId;
+                    cmd.Parameters.Add("@Postid", SqlDbType.Int).Value = postId;
+
+                    con.Open();
+
+                    object? value = cmd.ExecuteScalar();
+
+                    if (value != null && value != DBNull.Value)
+                    {
+                        result = Convert.ToInt32(value);
+                    }
+                }
+            }
+
+            return result;
+        }
     }
 }
