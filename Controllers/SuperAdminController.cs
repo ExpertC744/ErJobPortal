@@ -37,12 +37,12 @@ namespace ErJobPortal.Controllers
                 con.Open();
 
                 string query = @"
-     SELECT
-         (SELECT COUNT(nID)
-          FROM tblCandidateRegister) AS CandidateCount,
+ SELECT
+     (SELECT COUNT(nID)
+      FROM tblCandidateRegister) AS CandidateCount,
 
-         (SELECT COUNT(nID)
-          FROM tblOrgRegistration) AS OrganizationCount;";
+     (SELECT COUNT(nID)
+      FROM tblOrgRegistration) AS OrganizationCount;";
 
                 using (SqlCommand cmd = new SqlCommand(query, con))
                 using (SqlDataReader dr = cmd.ExecuteReader())
@@ -57,6 +57,8 @@ namespace ErJobPortal.Controllers
                     }
                 }
             }
+
+
 
             List<SATraineeListM> trainees =
                 _repository.GetAllTrainees();
@@ -76,7 +78,59 @@ namespace ErJobPortal.Controllers
 
             ViewBag.SuperAdminID = id;
 
-            return View();
+
+            SAChartsViewModel saCharts = new SAChartsViewModel();
+
+            using (SqlConnection chartCon = new SqlConnection(connectionString))
+            {
+                chartCon.Open();
+
+                using (SqlCommand chartCmd =
+                       new SqlCommand("SP_GetSACharts", chartCon))
+                {
+                    chartCmd.CommandType = CommandType.StoredProcedure;
+
+                    using (SqlDataReader chartReader =
+                           chartCmd.ExecuteReader())
+                    {
+                        // =====================================================
+                        // RESULT SET 1 - CANDIDATE REGISTRATION
+                        // =====================================================
+
+                        while (chartReader.Read())
+                        {
+                            saCharts.CandidateData.Add(new SAChartData
+                            {
+                                Year = Convert.ToInt32(chartReader["Year"]),
+                                Month = Convert.ToInt32(chartReader["Month"]),
+                                TotalCount = Convert.ToInt32(chartReader["TotalCount"])
+                            });
+                        }
+
+
+                        // =====================================================
+                        // RESULT SET 2 - INTERNSHIP POSTS
+                        // =====================================================
+
+                        if (chartReader.NextResult())
+                        {
+                            while (chartReader.Read())
+                            {
+                                saCharts.InternshipPostData.Add(new SAChartData
+                                {
+                                    Year = Convert.ToInt32(chartReader["Year"]),
+                                    Month = Convert.ToInt32(chartReader["Month"]),
+                                    TotalCount = Convert.ToInt32(chartReader["TotalCount"])
+                                });
+                            }
+                        }
+                    }
+                }
+            }
+
+
+
+            return View(saCharts);
         }
 
         // ==========================================
@@ -1783,10 +1837,94 @@ ORDER BY SAF.nID DESC, OFB.nID DESC;
         {
             return View();
         }
+
+        //khushi 01-10-26
         [HttpGet]
         public IActionResult SACharts()
         {
-            return View();
+            SAChartsViewModel model = new SAChartsViewModel();
+
+            string connectionString =
+                _configuration.GetConnectionString("DefaultConnection");
+
+            using (SqlConnection con =
+                   new SqlConnection(connectionString))
+            {
+                using (SqlCommand cmd =
+                       new SqlCommand("SP_GetSACharts", con))
+                {
+                    cmd.CommandType =
+                        CommandType.StoredProcedure;
+
+                    con.Open();
+
+                    using (SqlDataReader reader =
+                           cmd.ExecuteReader())
+                    {
+                        /* =========================================
+                           1. CANDIDATE DATA
+                           tblcandidateRegister
+                        ========================================= */
+
+                        while (reader.Read())
+                        {
+                            model.CandidateData.Add(
+                                new SAChartData
+                                {
+                                    Year =
+                                        Convert.ToInt32(
+                                            reader["Year"]
+                                        ),
+
+                                    Month =
+                                        Convert.ToInt32(
+                                            reader["Month"]
+                                        ),
+
+                                    TotalCount =
+                                        Convert.ToInt32(
+                                            reader["TotalCount"]
+                                        )
+                                }
+                            );
+                        }
+
+
+                        /* =========================================
+                           2. TBLPOST DATA
+                           tblPost
+                        ========================================= */
+
+                        if (reader.NextResult())
+                        {
+                            while (reader.Read())
+                            {
+                                model.InternshipPostData.Add(
+                                    new SAChartData
+                                    {
+                                        Year =
+                                            Convert.ToInt32(
+                                                reader["Year"]
+                                            ),
+
+                                        Month =
+                                            Convert.ToInt32(
+                                                reader["Month"]
+                                            ),
+
+                                        TotalCount =
+                                            Convert.ToInt32(
+                                                reader["TotalCount"]
+                                            )
+                                    }
+                                );
+                            }
+                        }
+                    }
+                }
+            }
+
+            return View(model);
         }
         [HttpGet]
         public IActionResult SAAddAdvertisement()
