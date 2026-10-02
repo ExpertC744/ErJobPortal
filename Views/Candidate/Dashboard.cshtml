@@ -1394,8 +1394,234 @@
     </script>
 }
 
+ <script>
+
+                    /* =====================================================
+                       INTERNSHIP POST CHART - DYNAMIC
+                       Data comes from SP_GetSACharts
+                    ===================================================== */
+
+                    const internshipPostData = @Html.Raw(
+                                        System.Text.Json.JsonSerializer.Serialize(
+                                                Model?.InternshipPostData ??
+                                                new List<ErJobPortal.Models.SAChartData>()
+                                        )
+                                );
+
+
+                    const internshipPostsMonthly = new Array(12).fill(0);
+
+
+                    /* =====================================================
+                       GET LATEST YEAR DATA
+                    ===================================================== */
+
+                    if (internshipPostData.length > 0) {
+
+                        const latestYear = Math.max(
+                            ...internshipPostData.map(x => x.Year)
+                        );
+
+                        internshipPostData
+                            .filter(x => x.Year === latestYear)
+                            .forEach(x => {
+
+                                const monthIndex = x.Month - 1;
+
+                                if (monthIndex >= 0 && monthIndex < 12) {
+
+                                    internshipPostsMonthly[monthIndex] =
+                                        x.TotalCount;
+
+                                }
+                            });
+                    }
+
+
+                    /* =====================================================
+                       BAR CHART
+                    ===================================================== */
+
+                    function drawInternshipPostsChart(values) {
+
+                        const svg =
+                            document.getElementById("internshipPostsChart");
+
+                        if (!svg)
+                            return;
+
+                        const width = 700;
+                        const height = 240;
+
+                        const left = 48;
+                        const right = 12;
+                        const top = 25;
+                        const bottom = 38;
+
+                        const chartWidth =
+                            width - left - right;
+
+                        const chartHeight =
+                            height - top - bottom;
+
+
+                        /* =================================================
+                           FIXED Y AXIS: 0 TO 100
+                        ================================================= */
+
+                        const maxY = 100;
+
+
+                        const barSpace =
+                            chartWidth / 12;
+
+                        const barWidth =
+                            barSpace * 0.58;
+
+                        let html = "";
+
+
+                        /* =================================================
+                           Y AXIS + GRID
+                        ================================================= */
+
+                        for (let i = 0; i <= 4; i++) {
+
+                            const value =
+                                maxY - (i * maxY / 4);
+
+                            const y =
+                                top + (i * chartHeight / 4);
+
+                            html += `
+                                <line
+                                    x1="${left}"
+                                    y1="${y}"
+                                    x2="${width - right}"
+                                    y2="${y}"
+                                    class="chart-grid" />
+
+                                <text
+                                    x="${left - 10}"
+                                    y="${y + 4}"
+                                    text-anchor="end"
+                                    class="chart-axis-text">
+                                    ${Math.round(value)}
+                                </text>
+                            `;
+                        }
+
+
+                        /* =================================================
+                           MONTHS
+                        ================================================= */
+
+                        const months = [
+                            "Jan", "Feb", "Mar", "Apr",
+                            "May", "Jun", "Jul", "Aug",
+                            "Sep", "Oct", "Nov", "Dec"
+                        ];
+
+                        months.forEach((month, index) => {
+
+                            const centerX =
+                                left +
+                                (index * barSpace) +
+                                (barSpace / 2);
+
+                            html += `
+                                <line
+                                    x1="${centerX}"
+                                    y1="${top}"
+                                    x2="${centerX}"
+                                    y2="${height - bottom}"
+                                    class="chart-grid" />
+
+                                <text
+                                    x="${centerX}"
+                                    y="${height - 13}"
+                                    text-anchor="middle"
+                                    class="chart-axis-text">
+                                    ${month}
+                                </text>
+                            `;
+                        });
+
+
+                        /* =================================================
+                           AXIS
+                        ================================================= */
+
+                        html += `
+                            <line
+                                x1="${left}"
+                                y1="${height - bottom}"
+                                x2="${width - right}"
+                                y2="${height - bottom}"
+                                class="chart-axis" />
+
+                            <line
+                                x1="${left}"
+                                y1="${top}"
+                                x2="${left}"
+                                y2="${height - bottom}"
+                                class="chart-axis" />
+                        `;
+
+
+                        /* =================================================
+                           BARS
+                        ================================================= */
+
+                        values.forEach((value, index) => {
+
+                            const centerX =
+                                left +
+                                (index * barSpace) +
+                                (barSpace / 2);
+
+                            const barHeight =
+                                (value / maxY) * chartHeight;
+
+                            const x =
+                                centerX - (barWidth / 2);
+
+                            const y =
+                                height - bottom - barHeight;
+
+                            html += `
+                                <rect
+                                    x="${x}"
+                                    y="${y}"
+                                    width="${barWidth}"
+                                    height="${barHeight}"
+                                    rx="1"
+                                    class="chart-bar">
+
+                                    <title>
+                                        ${months[index]}: ${value} posts
+                                    </title>
+
+                                </rect>
+                            `;
+                        });
+
+
+                        svg.innerHTML = html;
+                    }
+
+
+                    /* =====================================================
+                       DRAW
+                    ===================================================== */
+
+                    drawInternshipPostsChart(
+                        internshipPostsMonthly
+                    );
+
+        </script>
 @* Radhika29-09 *@
-<script>
+@* <script>
 
     /* =====================================================
        1TRAINEE CHART CONFIGURATION
@@ -1799,5 +2025,5 @@
         internshipPostsMonthly
     );
 
-</script>
+</script> *@
 

@@ -173,7 +173,57 @@ namespace ErJobPortal.Controllers
             List<OrgPostM> traineeAppliedPosts = TraineeApplyToPostList(candidateId.Value);
             ViewBag.TraineeAppliedPosts = traineeAppliedPosts;
 
-            return View();
+            //khushi 02-10
+
+            SAChartsViewModel saCharts = new SAChartsViewModel();
+
+            using (SqlConnection chartCon = new SqlConnection(connectionString))
+            {
+                chartCon.Open();
+
+                using (SqlCommand chartCmd =
+                       new SqlCommand("SP_GetSACharts", chartCon))
+                {
+                    chartCmd.CommandType = CommandType.StoredProcedure;
+
+                    using (SqlDataReader chartReader =
+                           chartCmd.ExecuteReader())
+                    {
+                        // =====================================================
+                        // RESULT SET 1 - CANDIDATE REGISTRATION
+                        // =====================================================
+
+                        while (chartReader.Read())
+                        {
+                            saCharts.CandidateData.Add(new SAChartData
+                            {
+                                Year = Convert.ToInt32(chartReader["Year"]),
+                                Month = Convert.ToInt32(chartReader["Month"]),
+                                TotalCount = Convert.ToInt32(chartReader["TotalCount"])
+                            });
+                        }
+
+
+                        // =====================================================
+                        // RESULT SET 2 - INTERNSHIP POSTS
+                        // =====================================================
+
+                        if (chartReader.NextResult())
+                        {
+                            while (chartReader.Read())
+                            {
+                                saCharts.InternshipPostData.Add(new SAChartData
+                                {
+                                    Year = Convert.ToInt32(chartReader["Year"]),
+                                    Month = Convert.ToInt32(chartReader["Month"]),
+                                    TotalCount = Convert.ToInt32(chartReader["TotalCount"])
+                                });
+                            }
+                        }
+                    }
+                }
+            }
+            return View(saCharts);
         }
 
         // ==========================================
@@ -2584,47 +2634,47 @@ namespace ErJobPortal.Controllers
         // CHARTS
         // =========================================================
 
-        [HttpGet]
-        [Route("Candidate/Charts/{id?}")]
-        public IActionResult Charts(string? id)
-        {
-            int? candidateId = HttpContext.Session.GetInt32("CandidateID");
+        //[HttpGet]
+        //[Route("Candidate/Charts/{id?}")]
+        //public IActionResult Charts(string? id)
+        //{
+        //    int? candidateId = HttpContext.Session.GetInt32("CandidateID");
 
-            if (candidateId == null || candidateId <= 0)
-            {
-                return RedirectToAction(
-                    "CandidateLogin",
-                    "Account");
-            }
+        //    if (candidateId == null || candidateId <= 0)
+        //    {
+        //        return RedirectToAction(
+        //            "CandidateLogin",
+        //            "Account");
+        //    }
 
-            string? candidateCode = GetCandidateCode();
+        //    string? candidateCode = GetCandidateCode();
 
-            if (string.IsNullOrEmpty(candidateCode))
-            {
-                return NotFound(
-                    "Candidate code could not be generated.");
-            }
+        //    if (string.IsNullOrEmpty(candidateCode))
+        //    {
+        //        return NotFound(
+        //            "Candidate code could not be generated.");
+        //    }
 
-            // If candidate code is missing from URL
-            if (string.IsNullOrEmpty(id))
-            {
-                return RedirectToAction(
-                    "Charts",
-                    "Candidate",
-                    new { id = candidateCode });
-            }
+        //    // If candidate code is missing from URL
+        //    if (string.IsNullOrEmpty(id))
+        //    {
+        //        return RedirectToAction(
+        //            "Charts",
+        //            "Candidate",
+        //            new { id = candidateCode });
+        //    }
 
-            // Validate candidate code
-            if (id != candidateCode)
-            {
-                return NotFound();
-            }
+        //    // Validate candidate code
+        //    if (id != candidateCode)
+        //    {
+        //        return NotFound();
+        //    }
 
-            ViewBag.CandidateCode = candidateCode;
-            ViewBag.CandidateID = candidateId.Value;
+        //    ViewBag.CandidateCode = candidateCode;
+        //    ViewBag.CandidateID = candidateId.Value;
 
-            return View();
-        }
+        //    return View();
+        //}
 
 
         // shrirang 29/09/26
@@ -3269,5 +3319,91 @@ namespace ErJobPortal.Controllers
         }
 
         #endregion
+
+
+        [HttpGet]
+        [Route("Candidate/Charts/{id?}")]
+        public IActionResult Charts(string id)
+        
+        {
+            int? sessionCandidateID =
+                HttpContext.Session.GetInt32("CandidateID");
+
+            if (!sessionCandidateID.HasValue)
+            {
+                return RedirectToAction("CandidateLogin", "Account");
+            }
+
+            SAChartsViewModel model = new SAChartsViewModel();
+
+            string connectionString =
+                _configuration.GetConnectionString("DefaultConnection");
+
+            using (SqlConnection con =
+                   new SqlConnection(connectionString))
+            {
+                using (SqlCommand cmd =
+                       new SqlCommand("SP_GetSACharts", con))
+                {
+                    cmd.CommandType = CommandType.StoredProcedure;
+
+                    con.Open();
+
+                    using (SqlDataReader reader =
+                           cmd.ExecuteReader())
+                    {
+                        /* =========================================
+                           1. CANDIDATE DATA
+                        ========================================= */
+
+                        while (reader.Read())
+                        {
+                            model.CandidateData.Add(
+                                new SAChartData
+                                {
+                                    Year = Convert.ToInt32(
+                                        reader["Year"]),
+
+                                    Month = Convert.ToInt32(
+                                        reader["Month"]),
+
+                                    TotalCount = Convert.ToInt32(
+                                        reader["TotalCount"])
+                                }
+                            );
+                        }
+
+
+                        /* =========================================
+                           2. INTERNSHIP POST DATA
+                        ========================================= */
+
+                        if (reader.NextResult())
+                        {
+                            while (reader.Read())
+                            {
+                                model.InternshipPostData.Add(
+                                    new SAChartData
+                                    {
+                                        Year = Convert.ToInt32(
+                                            reader["Year"]),
+
+                                        Month = Convert.ToInt32(
+                                            reader["Month"]),
+
+                                        TotalCount = Convert.ToInt32(
+                                            reader["TotalCount"])
+                                    }
+                                );
+                            }
+                        }
+                    }
+                }
+            }
+
+            return View(model);
+        }
+
+
     }
 }
