@@ -1,7 +1,7 @@
 ﻿using ErJobPortal.Models;
 using System.ComponentModel.DataAnnotations;
 
-namespace JobPortalTrainee.Models
+namespace ErJobPortal.Models
 {
     public class OrgPostM
     {
