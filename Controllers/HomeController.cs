@@ -1,9 +1,10 @@
+using ErJobPortal.Data;
 using ErJobPortal.Models;
+using ErJobPortal.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Data.SqlClient;
+using Microsoft.Extensions.Configuration;
 using System.Diagnostics;
-using ErJobPortal.Data;
-using ErJobPortal.Services;
 
 namespace ErJobPortal.Controllers
 {
@@ -12,21 +13,99 @@ namespace ErJobPortal.Controllers
         private readonly EmailService _emailService;
         private readonly ILogger<HomeController> _logger;
         private readonly DbConnection _dbConnection;
+        private readonly IConfiguration _configuration;
 
         public HomeController(
-    ILogger<HomeController> logger,
-    DbConnection dbConnection,
-    EmailService emailService)
+            ILogger<HomeController> logger,
+            DbConnection dbConnection,
+            EmailService emailService,
+            IConfiguration configuration)
         {
             _logger = logger;
             _dbConnection = dbConnection;
             _emailService = emailService;
+            _configuration = configuration;
         }
+
 
         public IActionResult Index()
         {
-            return View();
+            List<HomeTraineeCardM> trainees = new List<HomeTraineeCardM>();
+
+            string connectionString =
+                _configuration.GetConnectionString("DefaultConnection");
+
+            using (SqlConnection cn = new SqlConnection(connectionString))
+            {
+                string query = @"
+            SELECT 
+                CR.nID AS CandidateID,
+
+                LTRIM(RTRIM(
+                    ISNULL(CR.sFName, '') + ' ' +
+                    ISNULL(CR.sLName, '')
+                )) AS TraineeName,
+
+                CP.sPhoto AS ProfileImage,
+
+                '' AS Designation,
+
+                LTRIM(RTRIM(
+                    ISNULL(CP.Preferred_City, '') +
+                    CASE 
+                        WHEN CP.Preferred_City IS NOT NULL
+                             AND CP.Preferred_City <> ''
+                             AND CP.Preferred_State IS NOT NULL
+                             AND CP.Preferred_State <> ''
+                        THEN ', '
+                        ELSE ''
+                    END +
+                    ISNULL(CP.Preferred_State, '')
+                )) AS Location
+
+            FROM tblCandidateRegister CR
+
+            INNER JOIN tblCandidateProfile CP
+                ON CP.CandidateID = CR.nID
+
+            WHERE ISNULL(CR.nBit, 1) = 1
+              AND ISNULL(CP.nBit, 1) = 1
+
+            ORDER BY CR.nID DESC";
+
+                using (SqlCommand cmd = new SqlCommand(query, cn))
+                {
+                    cn.Open();
+
+                    using (SqlDataReader dr = cmd.ExecuteReader())
+                    {
+                        while (dr.Read())
+                        {
+                            trainees.Add(new HomeTraineeCardM
+                            {
+                                CandidateID =
+                                    Convert.ToInt32(dr["CandidateID"]),
+
+                                TraineeName =
+                                    dr["TraineeName"]?.ToString(),
+
+                                ProfileImage =
+                                    dr["ProfileImage"]?.ToString(),
+
+                                Designation =
+                                    dr["Designation"]?.ToString(),
+
+                                Location =
+                                    dr["Location"]?.ToString()
+                            });
+                        }
+                    }
+                }
+            }
+
+            return View(trainees);
         }
+
 
         public IActionResult About()
         {
