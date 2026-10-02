@@ -243,9 +243,7 @@
 
 @media (max-width: 767px) {
 
-    .radio-answer {
-        gap: 10px;
-    }
+   
 
     .radio-text {
         min-width: 85px;
@@ -386,9 +384,7 @@
         margin-top: 14px;
     }
 
-    .radio-answer {
-        gap: 9px;
-    }
+   
 
     .radio-text {
         min-width: 72px;

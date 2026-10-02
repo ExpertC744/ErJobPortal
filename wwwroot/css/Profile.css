@@ -1,5 +1,4 @@
-﻿
-<style >
+﻿ 
 /* ========================================================= */
 /* CAREER OBJECTIVE DRAFT */
 /* ========================================================= */
@@ -203,13 +202,13 @@
     cursor: not-allowed;
 }
 
-@@media (max-width: 992px) {
+@media (max-width: 992px) {
     .skills-section .skill-body {
         grid-template-columns: repeat(3, minmax(0, 1fr));
     }
 }
 
-@@media (max-width: 768px) {
+@media (max-width: 768px) {
     .skills-section .skill-body {
         grid-template-columns: repeat(2, minmax(0, 1fr));
     }
@@ -224,7 +223,7 @@
     }
 }
 
-@@media (max-width: 576px) {
+@media (max-width: 576px) {
     .skills-section {
         margin-top: 20px;
     }
@@ -260,7 +259,7 @@
         }
 }
 
-@@media (max-width: 400px) {
+@media (max-width: 400px) {
     .skills-section .skill-header {
         padding: 0 12px;
     }

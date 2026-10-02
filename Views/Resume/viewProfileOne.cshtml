@@ -972,6 +972,58 @@
 
                 }
 
+                <!-- SKILLS -->
+                @{
+
+                    var skillGroups =
+                    new[]
+                    {
+                ("Technical", p.sTechnicalSkillIDs),
+                ("Medical", p.sMedicalSkillIDs),
+                ("Non-Technical", p.sNonTechnicalSkillIDs)
+            }
+                    .Where(x => Has(x.Item2))
+                    .ToList();
+
+                }
+
+
+                @if (skillGroups.Any())
+                {
+
+                    <div class="resume-sidebar-section">
+
+                        <div class="resume-sidebar-title">
+
+                            <i class="fa fa-star"></i>
+
+                            Skills
+
+                        </div>
+
+
+                        @foreach (var g in skillGroups)
+                        {
+
+                            <div class="resume-sidebar-item">
+
+                                <strong>
+                                    @g.Item1
+                                </strong>
+
+
+                                <span class="side-tag">
+                                    @g.Item2
+                                </span>
+
+                            </div>
+
+                        }
+
+                    </div>
+
+                }
+
 
                 @if (langItems.Any())
                 {
@@ -1007,32 +1059,6 @@
                             </div>
 
                         }
-
-                    </div>
-
-                }
-
-
-                <!-- HOBBIES -->
-                @if (Has(p.sHobbies))
-                {
-
-                    <div class="resume-sidebar-section">
-
-                        <div class="resume-sidebar-title">
-
-                            <i class="fa fa-heart"></i>
-
-                            Hobbies
-
-                        </div>
-
-
-                        <div class="resume-sidebar-item">
-
-                            @p.sHobbies
-
-                        </div>
 
                     </div>
 
@@ -1143,58 +1169,7 @@
                 }
 
 
-                <!-- SKILLS -->
-                @{
-
-                    var skillGroups =
-                    new[]
-                    {
-                ("Technical", p.sTechnicalSkillIDs),
-                ("Medical", p.sMedicalSkillIDs),
-                ("Non-Technical", p.sNonTechnicalSkillIDs)
-            }
-                    .Where(x => Has(x.Item2))
-                    .ToList();
-
-                }
-
-
-                @if (skillGroups.Any())
-                {
-
-                    <div class="resume-sidebar-section">
-
-                        <div class="resume-sidebar-title">
-
-                            <i class="fa fa-star"></i>
-
-                            Skills
-
-                        </div>
-
-
-                        @foreach (var g in skillGroups)
-                        {
-
-                            <div class="resume-sidebar-item">
-
-                                <strong>
-                                    @g.Item1
-                                </strong>
-
-
-                                <span class="side-tag">
-                                    @g.Item2
-                                </span>
-
-                            </div>
-
-                        }
-
-                    </div>
-
-                }
-
+         
             </div>
 
 
@@ -1665,6 +1640,34 @@
                             </div>
 
                         }
+
+
+                        <!-- HOBBIES -->
+                        @if (Has(p.sHobbies))
+                        {
+
+                            <div class="resume-sidebar-section">
+
+                                <div class="resume-sidebar-title">
+
+                                    <i class="fa fa-heart"></i>
+
+                                    Hobbies
+
+                                </div>
+
+
+                                <div class="resume-sidebar-item">
+
+                                    @p.sHobbies
+
+                                </div>
+
+                            </div>
+
+                        }
+
+
 
                     </div>
 
