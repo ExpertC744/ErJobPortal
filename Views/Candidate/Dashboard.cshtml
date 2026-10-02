@@ -592,7 +592,28 @@
         }
     }
 </style>
+@if (TempData["ApplyMessage"] != null)
+{
+    var message =
+        TempData["ApplyMessage"]?.ToString();
 
+    var messageType =
+        TempData["ApplyMessageType"]?.ToString();
+
+    <div class="alert alert-@(messageType == "success" ? "success" : "info") alert-dismissible fade show"
+         role="alert">
+
+        <i class="fas fa-check-circle me-2"></i>
+
+        @message
+
+        <button type="button"
+                class="btn-close"
+                data-bs-dismiss="alert">
+        </button>
+
+    </div>
+}
 <div class="candidate-dashboard">
 
     <!-- Welcome -->
@@ -709,7 +730,13 @@
                 </div>
 
                 <div class="stat-bottom">
-                    <span>5</span> awaiting response
+                    <a asp-controller="Candidate"
+                       asp-action="TraineeApplied"
+                       class="stat-link">
+                        View Details
+                        <i class="fas fa-arrow-right"></i>
+                    </a>
+
                 </div>
 
             </div>
@@ -1208,8 +1235,7 @@
                     </div>
 
                 </div>
-                <table id="recommendedOpportunitiesTable"
-                       class="master-data-table">
+                <table id="recommendedOpportunitiesTable" class="master-data-table">
 
                     <thead>
                         <tr>
@@ -1305,10 +1331,15 @@
                                     }
                                     else
                                     {
-                                        <a href="#"
-                                           class="master-action-btn">
-                                            Apply Now
-                                        </a>
+                                        <form asp-controller="Candidate" asp-action="ApplyToPost" method="post" style="display:inline;">
+                                            @Html.AntiForgeryToken()
+                                            <input type="hidden" name="postId" value="@post.nID" />
+                                            <input type="hidden" name="orgId" value="@post.nOrgID" />
+                                            <button type="submit" class="master-action-btn" style="border:none; cursor:pointer;">
+                                                Apply Now
+                                            </button>
+
+                                        </form>
                                     }
 
                                 </td>
@@ -1346,7 +1377,22 @@
 
 </div>
 
+@if (TempData["ApplyMessage"] != null)
+{
+    var message =
+        TempData["ApplyMessage"]?.ToString();
 
+    var messageType =
+        TempData["ApplyMessageType"]?.ToString();
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+
+            alert("@Html.Raw(message)");
+
+        });
+    </script>
+}
 
 @* Radhika29-09 *@
 <script>
