@@ -1,0 +1,407 @@
+﻿@model IEnumerable<ErJobPortal.Models.OrgPostM>
+
+@{
+    Layout = "~/Views/Shared/_DashboardLayout.cshtml";
+
+    ViewData["Title"] = "Organization Post List";
+    ViewData["Panel"] = "SuperAdmin";
+    ViewData["UserName"] = "Super Admin";
+}
+
+
+<style>
+
+    .page-title {
+        margin: 25px 18px 4px;
+        font-size: 28px;
+        font-weight: 600;
+    }
+
+    .page-subtitle {
+        margin-left: 18px;
+        color: #999;
+        margin-bottom: 22px;
+    }
+
+    .post-box {
+        margin: 0 18px;
+        border: 1px solid #ddd;
+        border-radius: 5px;
+        overflow: hidden;
+    }
+
+    .post-header {
+        padding: 9px 14px;
+        background: #f7f7f7;
+        border-bottom: 1px solid #ddd;
+    }
+
+        .post-header i {
+            margin-right: 8px;
+        }
+
+    .table-area {
+        padding: 20px 14px;
+        overflow-x: auto;
+    }
+
+    #postTable {
+        width: 100% !important;
+        table-layout: auto;
+    }
+
+        #postTable th,
+        #postTable td {
+            text-align: center;
+            vertical-align: middle;
+            font-size: 13px;
+            padding: 10px 8px;
+        }
+
+        #postTable th {
+            white-space: normal;
+            font-weight: 600;
+            line-height: 1.4;
+        }
+
+        #postTable td {
+            white-space: nowrap;
+        }
+
+    .action {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        gap: 8px;
+    }
+
+        .action a {
+            color: #1677ff;
+            text-decoration: none;
+            font-size: 15px;
+        }
+
+            .action a:hover {
+                color: #0056d6;
+            }
+
+    .location {
+        line-height: 1.5;
+        white-space: normal;
+    }
+
+    .days {
+        line-height: 1.5;
+        white-space: normal;
+    }
+
+    .trainee {
+        color: #1677ff;
+        text-decoration: none;
+    }
+
+        .trainee:hover {
+            text-decoration: underline;
+        }
+
+    .wifi {
+        font-size: 22px;
+        cursor: pointer;
+    }
+
+    .status-form {
+        margin: 0;
+        padding: 0;
+        display: inline-block;
+    }
+
+    .status {
+        color: white;
+        padding: 7px 12px;
+        border: none;
+        border-radius: 6px;
+        display: inline-block;
+        font-size: 12px;
+        cursor: pointer;
+        min-width: 75px;
+    }
+
+    .enabled {
+        background: #198754;
+    }
+
+    .disabled {
+        background: #dc3545;
+    }
+
+    .status:hover {
+        opacity: 0.9;
+    }
+
+</style>
+
+
+
+
+
+
+<div class="container-fluid">
+
+    <div class="master-table-container">
+
+        <h2 class="page-title">
+            Organization Post List
+        </h2>
+
+        <div class="table-responsive">
+
+            <table id="organizationPostTable"
+                   class="master-data-table">
+
+                <thead>
+                    <tr>
+
+                        <th>Sr.<br />No</th>
+
+                        <th>Post<br />Creation<br />Date</th>
+
+                        <th>Organization</th>
+
+                        <th>Position</th>
+
+                        <th>Required<br />Trainees</th>
+
+                        <th>Gender</th>
+
+                        <th>Minimum<br />Qualification</th>
+
+                        <th>Location</th>
+
+                        <th>Working<br />Hours</th>
+
+                        <th>Working<br />Days</th>
+
+                        <th>Internship<br />Type</th>
+
+                        <th>Internship / Fellowship<br />Type</th>
+
+                        <th>Training<br />Involved</th>
+
+                        <th>Duration</th>
+
+                        <th>Facilities</th>
+
+                        <th>Internship<br />Mode</th>
+
+                        <th>Divyang</th>
+
+                        <th>Status</th>
+
+                    </tr>
+                </thead>
+
+                <tbody>
+
+                    @{
+                        int srNo = 1;
+                    }
+
+                    @foreach (var item in Model)
+                    {
+                        <tr>
+
+                            <td>
+                                @srNo
+                            </td>
+
+                            <td>
+                                @(item.dRegisterDate.HasValue
+                                    ? item.dRegisterDate.Value.ToString("dd-MM-yyyy")
+                                    : "")
+                            </td>
+
+                            <td>
+                                @item.sOrgName
+                            </td>
+
+                            <td>
+                                @item.sPositionName
+                            </td>
+
+                            <td>
+                                @item.nRequiredTrainees
+                            </td>
+
+                            <td>
+                                @item.sGenderName
+                            </td>
+
+                            <td>
+                                @item.sMinimumQualificationName
+                            </td>
+
+                            <td>
+                                <div class="location">
+                                    @item.sCountryName
+                                    <br />
+                                    @item.sStateName
+                                    <br />
+                                    @item.nCityName
+                                </div>
+                            </td>
+
+                            <td>
+                                @item.sWorkingHours
+                            </td>
+
+                            <td>
+                                @item.sWorkingDays
+                            </td>
+
+                            <td>
+                                @item.sInternshipTypeName
+                            </td>
+
+                            <td>
+                                @item.sInternshipFellowshipTypeName
+                            </td>
+
+                            <td>
+                                @item.sTrainingInvolvedName
+                            </td>
+
+                            <td>
+                                @item.sInternshipDurationName
+                            </td>
+
+                            <td>
+                                @if (!string.IsNullOrWhiteSpace(item.sFacilities))
+                                {
+                                    <i class="fa-solid fa-wifi wifi"
+                                       title="@item.sFacilities">
+                                    </i>
+                                }
+                                else
+                                {
+                                    <span>-</span>
+                                }
+                            </td>
+
+                            <td>
+                                @item.sInternshipModeName
+                            </td>
+
+                            <td>
+                                @(string.IsNullOrWhiteSpace(item.sDivyang)
+                                    ? "No"
+                                    : item.sDivyang)
+                            </td>
+
+                            <td>
+                                <button type="button"
+                                        class="status @(item.nBit ? "enabled" : "disabled")"
+                                        data-id="@item.nID"
+                                        onclick="togglePostStatus(this)">
+
+                                    @(item.nBit ? "Enabled" : "Disabled")
+
+                                </button>
+                            </td>
+
+                        </tr>
+
+                        srNo++;
+                    }
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+    </div>
+
+</div>
+
+<script>
+
+    function togglePostStatus(button) {
+
+        const postId = button.getAttribute("data-id");
+
+        if (!postId) {
+            alert("Post ID not found.");
+            return;
+        }
+
+        button.disabled = true;
+
+        fetch('@Url.Action("TogglePostStatus", "SuperAdmin")', {
+
+            method: 'POST',
+
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded'
+            },
+
+            body: 'id=' + encodeURIComponent(postId)
+
+        })
+
+        .then(response => {
+
+            if (!response.ok) {
+                throw new Error("Server error");
+            }
+
+            return response.json();
+
+        })
+
+        .then(result => {
+
+            if (result.success) {
+
+                if (result.enabled) {
+
+                    button.textContent = "Enabled";
+
+                    button.classList.remove("disabled");
+                    button.classList.add("enabled");
+
+                }
+                else {
+
+                    button.textContent = "Disabled";
+
+                    button.classList.remove("enabled");
+                    button.classList.add("disabled");
+
+                }
+
+            }
+            else {
+
+                alert(result.message || "Unable to update post status.");
+
+            }
+
+        })
+
+        .catch(error => {
+
+            console.error(error);
+
+            alert("Something went wrong while updating post status.");
+
+        })
+
+        .finally(() => {
+
+            button.disabled = false;
+
+        });
+
+    }
+
+</script>
