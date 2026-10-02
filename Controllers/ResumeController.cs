@@ -17,6 +17,8 @@ namespace ErJobPortal.Controllers
 
 
 
+        // shrirang 30/09/26
+
         [HttpGet]
         public IActionResult Resume(int id)
         {
@@ -43,19 +45,61 @@ namespace ErJobPortal.Controllers
                 InternshipFellowshipType = _repository.GetInternshipFellowshipType(),
                 InternshipTitles = _repository.GetInternshipTitles(),
                 InternshipDurations = _repository.GetInternshipDurations(),
-                InternshipStatuses = _repository.GetInternshipStatuses()
+                InternshipStatuses = _repository.GetInternshipStatuses(),
+                MedicalSkills = _repository.GetMedicalSkills(),
+                TechnicalSkills = _repository.GetTechnicalSkills(),
+                NonTechnicalSkills = _repository.GetNonTechnicalSkills()
             };
 
             // NOTE: CandidateName/Email/Phone are not in tblCandidateProfile at all —
             // they must live in a separate Candidate/User account table.
             // Leave as-is until you tell me that table/repository.
-            model.CandidateName = "Candidate";
+            model.CandidateName = "Rahul Raut";
             model.CandidateEmail = "";
             model.CandidatePhone = "";
 
             return View("~/Views/Resume/Resume.cshtml", model);
         }
+        // end
 
+
+        //public IActionResult ViewProfileOne(int id)
+        //{
+        //    if (id <= 0)
+        //    {
+        //        return BadRequest("Invalid Candidate ID.");
+        //    }
+
+        //    var profile = _repository.GetProfile(id);
+
+        //    if (profile == null)
+        //    {
+        //        return NotFound($"Candidate profile not found for CandidateID: {id}");
+        //    }
+
+        //    var model = new ResumeViewModel
+        //    {
+        //        CandidateID = id,
+        //        Profile = profile,
+
+        //        Relationships = _repository.GetRelationships(),
+        //        Streams = _repository.GetStreams(),
+        //        Divisions = _repository.GetDivisions(),
+        //        InternshipFellowshipType = _repository.GetInternshipFellowshipType(),
+        //        InternshipTitles = _repository.GetInternshipTitles(),
+        //        InternshipDurations = _repository.GetInternshipDurations(),
+        //        InternshipStatuses = _repository.GetInternshipStatuses()
+        //    };
+
+        //    // NOTE: CandidateName/Email/Phone are not in tblCandidateProfile at all —
+        //    // they must live in a separate Candidate/User account table.
+        //    // Leave as-is until you tell me that table/repository.
+        //    model.CandidateName = "Candidate";
+        //    model.CandidateEmail = "";
+        //    model.CandidatePhone = "";
+
+        //    return View("~/Views/Resume/ViewProfileOne.cshtml", model);
+        //}
         public IActionResult ViewProfileOne(int id)
         {
             if (id <= 0)
@@ -87,13 +131,12 @@ namespace ErJobPortal.Controllers
             // NOTE: CandidateName/Email/Phone are not in tblCandidateProfile at all —
             // they must live in a separate Candidate/User account table.
             // Leave as-is until you tell me that table/repository.
-            model.CandidateName = "Candidate";
+            model.CandidateName = "Rahul Raut";
             model.CandidateEmail = "";
             model.CandidatePhone = "";
 
             return View("~/Views/Resume/ViewProfileOne.cshtml", model);
-        }
-
+        }  
         public IActionResult ViewProfileTwo(int id)
         {
             if (id <= 0)
@@ -125,13 +168,13 @@ namespace ErJobPortal.Controllers
             // NOTE: CandidateName/Email/Phone are not in tblCandidateProfile at all —
             // they must live in a separate Candidate/User account table.
             // Leave as-is until you tell me that table/repository.
-            model.CandidateName = "Candidate";
+            model.CandidateName = "Rahul Raut";
             model.CandidateEmail = "";
             model.CandidatePhone = "";
 
             return View("~/Views/Resume/ViewProfileTwo.cshtml", model);
         }
-
+         
         public IActionResult ViewProfileThree(int id)
         {
             if (id <= 0)
@@ -163,12 +206,50 @@ namespace ErJobPortal.Controllers
             // NOTE: CandidateName/Email/Phone are not in tblCandidateProfile at all —
             // they must live in a separate Candidate/User account table.
             // Leave as-is until you tell me that table/repository.
-            model.CandidateName = "Candidate";
+            model.CandidateName = "Rahul Raut";
             model.CandidateEmail = "";
             model.CandidatePhone = "";
 
             return View("~/Views/Resume/ViewProfileThree.cshtml", model);
-        }
+        }  
+
+        //public IActionResult ViewProfileThree(int id)
+        //{
+        //    if (id <= 0)
+        //    {
+        //        return BadRequest("Invalid Candidate ID.");
+        //    }
+
+        //    var profile = _repository.GetProfile(id);
+
+        //    if (profile == null)
+        //    {
+        //        return NotFound($"Candidate profile not found for CandidateID: {id}");
+        //    }
+
+        //    var model = new ResumeViewModel
+        //    {
+        //        CandidateID = id,
+        //        Profile = profile,
+
+        //        Relationships = _repository.GetRelationships(),
+        //        Streams = _repository.GetStreams(),
+        //        Divisions = _repository.GetDivisions(),
+        //        InternshipFellowshipType = _repository.GetInternshipFellowshipType(),
+        //        InternshipTitles = _repository.GetInternshipTitles(),
+        //        InternshipDurations = _repository.GetInternshipDurations(),
+        //        InternshipStatuses = _repository.GetInternshipStatuses()
+        //    };
+
+        //    // NOTE: CandidateName/Email/Phone are not in tblCandidateProfile at all —
+        //    // they must live in a separate Candidate/User account table.
+        //    // Leave as-is until you tell me that table/repository.
+        //    model.CandidateName = "Candidate";
+        //    model.CandidateEmail = "";
+        //    model.CandidatePhone = "";
+
+        //    return View("~/Views/Resume/ViewProfileThree.cshtml", model);
+        //}
 
         public IActionResult ViewProfileFour(int id)
         {

@@ -1,0 +1,3044 @@
+﻿@model ErJobPortal.Models.OrgPostM
+@{
+    Layout = "~/Views/Shared/_DashboardLayout.cshtml";
+
+    ViewData["Title"] = "Repost Post";
+    ViewData["Panel"] = "Organization";
+    ViewData["UserName"] = "Organization";
+}
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="utf-8" />
+
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Create New Post — Internship Posting</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+
+    <link href="https://fonts.googleapis.com/css2?family=Sora:wght@500;600;700&family=Inter:wght@400;500;600&display=swap"
+          rel="stylesheet">
+
+    @* Radhika30-09 *@
+    <link rel="stylesheet" href="~/css/CreatePostNew.css" asp-append-version="true" />
+
+</head>
+
+<body>
+
+    <!-- TOP BAR -->
+
+    <div class="topbar">
+
+        <div class="brand">
+
+            <div class="brand-mark">
+                IN
+            </div>
+
+            Internship Connect
+
+        </div>
+
+        <div class="org-chip">
+            Organization Internship Posting
+        </div>
+
+    </div>
+
+
+    <!-- HEADER -->
+
+    <div class="page-header">
+
+        <div class="page-header-inner">
+
+            <div class="eyebrow">
+                Repost Posting
+            </div>
+
+            <h1>
+                Repost an internship post
+            </h1>
+
+            <p>
+                Review the existing internship details and repost the position.
+            </p>
+
+        </div>
+
+    </div>
+
+
+    <!-- MAIN -->
+
+    <div class="layout">
+
+        <!-- SIDEBAR -->
+
+        <nav class="side-nav">
+
+            <a href="#role" class="active">
+                <span class="dot"></span>
+                Role Details
+            </a>
+
+            <a href="#location">
+                <span class="dot"></span>
+                Location
+            </a>
+
+            <a href="#terms">
+                <span class="dot"></span>
+                Work Terms
+            </a>
+
+            <a href="#schedule">
+                <span class="dot"></span>
+                Duration & Dates
+            </a>
+
+            <a href="#mode">
+                <span class="dot"></span>
+                Mode & Language
+            </a>
+
+            <a href="#days">
+                <span class="dot"></span>
+                Working Days
+            </a>
+
+            <a href="#facilities">
+                <span class="dot"></span>
+                Facilities
+            </a>
+
+            <a href="#skills">
+                <span class="dot"></span>
+                Skills Required
+            </a>
+
+            <div class="side-note">
+
+                Fields marked
+                <strong style="color:#D64545">*</strong>
+                are required.
+
+            </div>
+
+        </nav>
+
+
+        <!-- FORM -->
+
+        <form id="internshipPostForm"
+              asp-controller="Organization"
+              asp-action="RepostOrgPost"
+              method="post">
+
+            @Html.AntiForgeryToken()
+
+            <!-- IMPORTANT HIDDEN VALUES -->
+
+            <input type="hidden"
+                   asp-for="nID" />
+
+            <input type="hidden"
+                   asp-for="nOrgID" />
+
+
+            <div id="messageBox"></div>
+
+
+            <!-- =================================================
+                 ROLE DETAILS
+            ================================================== -->
+
+            <section class="section" id="role">
+
+                <div class="section-head">
+
+                    <div class="section-icon">
+                        ★
+                    </div>
+
+                    <div>
+
+                        <h2>
+                            Role Details
+                        </h2>
+
+                        <p class="sub">
+                            Position and candidate requirements
+                        </p>
+
+                    </div>
+
+                </div>
+
+
+                <div class="grid">
+
+                    <!-- POSITION -->
+
+                    <div class="field">
+
+                        <label>
+                            Position
+                            <span class="req">*</span>
+                        </label>
+
+                        <select asp-for="nPositionID"
+                                id="nPositionID"
+                                class="form-select"
+                                required>
+
+                            <option value="0">
+                                -- Select Position --
+                            </option>
+
+                        </select>
+
+                    </div>
+
+
+                    <!-- REQUIRED TRAINEES -->
+
+                    <div class="field">
+
+                        <label>
+                            Required Trainees
+                            <span class="req">*</span>
+                        </label>
+
+                        <input asp-for="nRequiredTrainees"
+                               type="number"
+                               id="nRequiredTrainees"
+                               min="1"
+                               placeholder="e.g. 20"
+                               required />
+
+                    </div>
+
+
+                    <!-- GENDER -->
+
+                    <div class="field">
+
+                        <label>
+                            Gender
+                            <span class="req">*</span>
+                        </label>
+
+                        <select asp-for="nGenderID"
+                                id="nGenderID"
+                                class="form-select"
+                                required>
+
+                            <option value="0">
+                                -- Select Gender --
+                            </option>
+
+                        </select>
+
+                    </div>
+
+
+                    <!-- QUALIFICATION -->
+
+                    <div class="field">
+
+                        <label>
+                            Minimum Qualification
+                            <span class="req">*</span>
+                        </label>
+
+                        <select asp-for="nMinimumQualificationID"
+                                id="nMinimumQualificationID"
+                                class="form-select"
+                                required>
+
+                            <option value="0">
+                                -- Select Qualification --
+                            </option>
+
+                        </select>
+
+                    </div>
+
+                </div>
+
+            </section>
+
+
+            <!-- =================================================
+                 LOCATION
+            ================================================== -->
+
+            <section class="section" id="location">
+
+                <div class="section-head">
+
+                    <div class="section-icon">
+                        📍
+                    </div>
+
+                    <div>
+
+                        <h2>
+                            Location
+                        </h2>
+
+                        <p class="sub">
+                            Select country, state and city
+                        </p>
+
+                    </div>
+
+                </div>
+
+
+                <div class="grid">
+
+                    <!-- COUNTRY -->
+                    <!-- COUNTRY -->
+                    <div class="field">
+
+                        <label>
+                            Country
+                            <span class="req">*</span>
+                        </label>
+
+                        <select asp-for="sCountryName"
+                                id="sCountryName"
+                                class="form-select"
+                                required>
+
+                            <option value="">
+                                -- Select Country --
+                            </option>
+
+                        </select>
+
+                    </div>
+
+
+                    <!-- STATE -->
+                    <div class="field">
+
+                        <label>
+                            State
+                            <span class="req">*</span>
+                        </label>
+
+                        <select asp-for="sStateName"
+                                id="sStateName"
+                                class="form-select"
+                                required>
+
+                            <option value="">
+                                -- Select State --
+                            </option>
+
+                        </select>
+
+                    </div>
+
+
+                    <!-- CITY -->
+                    <div class="field">
+
+                        <label>
+                            City
+                            <span class="req">*</span>
+                        </label>
+
+                        <select asp-for="nCityName"
+                                id="nCityName"
+                                class="form-select"
+                                required>
+
+                            <option value="">
+                                -- Select City --
+                            </option>
+
+                        </select>
+
+                    </div>
+
+
+                    <!-- WORKING HOURS -->
+
+                    <div class="field">
+
+                        <label>
+                            Working Hours / Day
+                            <span class="req">*</span>
+                        </label>
+
+                        <select asp-for="sWorkingHours"
+                                id="sWorkingHours"
+                                required>
+
+                            <option value="">
+                                -- Select Hours --
+                            </option>
+
+                            <option value="4">
+                                4 Hours
+                            </option>
+
+                            <option value="6">
+                                6 Hours
+                            </option>
+
+                            <option value="8">
+                                8 Hours
+                            </option>
+
+                        </select>
+
+                    </div>
+
+                </div>
+
+            </section>
+
+
+            <!-- =================================================
+                 WORK TERMS
+            ================================================== -->
+
+            <section class="section" id="terms">
+
+                <div class="section-head">
+
+                    <div class="section-icon">
+                        ☰
+                    </div>
+
+                    <div>
+
+                        <h2>
+                            Work Terms
+                        </h2>
+
+                        <p class="sub">
+                            Internship type and charges
+                        </p>
+
+                    </div>
+
+                </div>
+
+
+                <div class="grid">
+
+                    <!-- INTERNSHIP TYPE -->
+
+                    <div class="field">
+
+                        <label>
+                            Internship Type
+                            <span class="req">*</span>
+                        </label>
+
+                        <select asp-for="nInternshipTypeID"
+                                id="nInternshipTypeID"
+                                class="form-select"
+                                required>
+
+                            <option value="0">
+                                -- Select Internship Type --
+                            </option>
+
+                        </select>
+
+                    </div>
+
+
+                    <!-- SHIFT -->
+
+                    <div class="field">
+
+                        <label>
+                            Working Shift
+                            <span class="req">*</span>
+                        </label>
+
+                        <select asp-for="sWorkingShift"
+                                id="sWorkingShift"
+                                required>
+
+                            <option value="">
+                                -- Select Shift --
+                            </option>
+
+                            <option value="Day">
+                                Day
+                            </option>
+
+                            <option value="Night">
+                                Night
+                            </option>
+
+                            <option value="Flexible">
+                                Flexible
+                            </option>
+
+                        </select>
+
+                    </div>
+
+
+                    <!-- FELLOWSHIP TYPE -->
+
+                    <div class="field">
+
+                        <label>
+                            Internship Fellowship Type
+                            <span class="req">*</span>
+                        </label>
+
+                        <select asp-for="nInternshipFellowshipTypeID"
+                                id="nInternshipFellowshipTypeID"
+                                class="form-select"
+                                required>
+
+                            <option value="0">
+                                -- Select Fellowship Type --
+                            </option>
+
+                        </select>
+
+                    </div>
+
+
+                    <!-- TOTAL CHARGES -->
+
+                    <div class="field">
+
+                        <label>
+                            Total Charges
+                        </label>
+
+                        <input asp-for="sTotalCharges"
+                               type="number"
+                               id="sTotalCharges"
+                               step="0.01"
+                               min="0"
+                               placeholder="Enter charges" />
+
+                    </div>
+
+
+                    <!-- CURRENCY -->
+
+                    <div class="field">
+
+                        <label>
+                            Currency
+                        </label>
+
+                        <select asp-for="sCurrency"
+                                id="sCurrency">
+
+                            <option value="">
+                                -- Select Currency --
+                            </option>
+
+                            <option value="INR">
+                                INR
+                            </option>
+
+                            <option value="USD">
+                                USD
+                            </option>
+
+                            <option value="EUR">
+                                EUR
+                            </option>
+
+                        </select>
+
+                    </div>
+
+                </div>
+
+            </section>
+
+
+            <!-- =================================================
+                 DURATION
+            ================================================== -->
+
+            <section class="section" id="schedule">
+
+                <div class="section-head">
+
+                    <div class="section-icon">
+                        📅
+                    </div>
+
+                    <div>
+
+                        <h2>
+                            Duration & Dates
+                        </h2>
+
+                        <p class="sub">
+                            Define internship duration
+                        </p>
+
+                    </div>
+
+                </div>
+
+
+                <div class="grid">
+
+                    <!-- TRAINING INVOLVED -->
+
+                    <div class="field">
+
+                        <label>
+                            Training Involved
+                            <span class="req">*</span>
+                        </label>
+
+                        <select asp-for="nTrainingInvolvedID"
+                                id="nTrainingInvolvedID"
+                                class="form-select"
+                                required>
+
+                            <option value="0">
+                                -- Select Training Involved --
+                            </option>
+
+                        </select>
+
+                    </div>
+
+
+                    <!-- DURATION -->
+
+                    <div class="field">
+
+                        <label>
+                            Internship Duration
+                            <span class="req">*</span>
+                        </label>
+
+                        <select asp-for="nInternshipDurationID"
+                                id="nInternshipDurationID"
+                                class="form-select"
+                                required>
+
+                            <option value="0">
+                                -- Select Duration --
+                            </option>
+
+                        </select>
+
+                    </div>
+
+
+                    <!-- START DATE -->
+
+                    <div class="field">
+
+                        <label>
+                            Start Date
+                            <span class="req">*</span>
+                        </label>
+
+                        <input asp-for="dStartDate"
+                               type="date"
+                               id="dStartDate"
+                               required />
+
+                    </div>
+
+
+                    <!-- COMPLETION DATE -->
+
+                    <div class="field">
+
+                        <label>
+                            Completion Date
+                            <span class="req">*</span>
+                        </label>
+
+                        <input asp-for="dCompletionDate"
+                               type="date"
+                               id="dCompletionDate"
+                               required />
+
+                    </div>
+
+                </div>
+
+            </section>
+
+
+            <!-- =================================================
+                 MODE
+            ================================================== -->
+
+            <section class="section" id="mode">
+
+                <div class="section-head">
+
+                    <div class="section-icon">
+                        💼
+                    </div>
+
+                    <div>
+
+                        <h2>
+                            Mode & Language
+                        </h2>
+
+                        <p class="sub">
+                            Select working mode and candidate requirements
+                        </p>
+
+                    </div>
+
+                </div>
+
+
+                <div class="grid">
+
+                    <!-- MODE -->
+
+                    <div class="field">
+
+                        <label>
+                            Internship Mode
+                            <span class="req">*</span>
+                        </label>
+
+                        <select asp-for="nInternshipModeID"
+                                id="nInternshipModeID"
+                                class="form-select"
+                                required>
+
+                            <option value="0">
+                                -- Select Internship Mode --
+                            </option>
+
+                        </select>
+
+                    </div>
+
+
+                    <!-- DIVYANG -->
+
+                    <div class="field">
+
+                        <label>
+                            Divyang
+                        </label>
+
+                        <select asp-for="sDivyang"
+                                id="sDivyang">
+
+                            <option value="">
+                                -- Select --
+                            </option>
+
+                            <option value="Yes">
+                                Yes
+                            </option>
+
+                            <option value="No">
+                                No
+                            </option>
+
+                        </select>
+
+                    </div>
+
+
+                    <!-- LANGUAGE -->
+
+                    <div class="field">
+
+                        <label>
+                            Language Known
+                        </label>
+
+                        <input asp-for="sLanguageKnown"
+                               type="text"
+                               id="sLanguageKnown"
+                               placeholder="e.g. English, Hindi" />
+
+                    </div>
+
+                </div>
+
+            </section>
+
+
+            <!-- =================================================
+                 WORKING DAYS
+            ================================================== -->
+
+            <input type="hidden"
+                   asp-for="sWorkingDays"
+                   id="sWorkingDays" />
+
+
+            <section class="section" id="days">
+
+                <div class="section-head">
+
+                    <div class="section-icon">
+                        🗓
+                    </div>
+
+                    <div>
+
+                        <h2>
+                            Working Days
+                        </h2>
+
+                        <p class="sub">
+                            Select applicable working days
+                        </p>
+
+                    </div>
+
+                </div>
+
+
+                <div id="daysGroup"
+                     class="checkbox-grid">
+
+                    <label class="check-item">
+
+                        <input type="checkbox"
+                               name="WorkingDays"
+                               value="Monday">
+
+                        Monday
+
+                    </label>
+
+
+                    <label class="check-item">
+
+                        <input type="checkbox"
+                               name="WorkingDays"
+                               value="Tuesday">
+
+                        Tuesday
+
+                    </label>
+
+
+                    <label class="check-item">
+
+                        <input type="checkbox"
+                               name="WorkingDays"
+                               value="Wednesday">
+
+                        Wednesday
+
+                    </label>
+
+
+                    <label class="check-item">
+
+                        <input type="checkbox"
+                               name="WorkingDays"
+                               value="Thursday">
+
+                        Thursday
+
+                    </label>
+
+
+                    <label class="check-item">
+
+                        <input type="checkbox"
+                               name="WorkingDays"
+                               value="Friday">
+
+                        Friday
+
+                    </label>
+
+
+                    <label class="check-item">
+
+                        <input type="checkbox"
+                               name="WorkingDays"
+                               value="Saturday">
+
+                        Saturday
+
+                    </label>
+
+
+                    <label class="check-item">
+
+                        <input type="checkbox"
+                               name="WorkingDays"
+                               value="Sunday">
+
+                        Sunday
+
+                    </label>
+
+                </div>
+
+            </section>
+
+
+            <!-- =================================================
+                 FACILITIES
+            ================================================== -->
+
+            <input type="hidden"
+                   asp-for="sFacilities"
+                   id="sFacilities" />
+
+
+            <section class="section" id="facilities">
+
+                <div class="section-head">
+
+                    <div class="section-icon">
+                        ✓
+                    </div>
+
+                    <div>
+
+                        <h2>
+                            Facilities
+                        </h2>
+
+                        <p class="sub">
+                            Select facilities available to trainees
+                        </p>
+
+                    </div>
+
+                </div>
+
+
+                <div id="facGroup"
+                     class="checkbox-grid">
+
+                    <label class="check-item">
+
+                        <input type="checkbox"
+                               name="Facilities"
+                               value="Certificate">
+
+                        Certificate
+
+                    </label>
+
+
+                    <label class="check-item">
+
+                        <input type="checkbox"
+                               name="Facilities"
+                               value="Stipend">
+
+                        Stipend
+
+                    </label>
+
+
+                    <label class="check-item">
+
+                        <input type="checkbox"
+                               name="Facilities"
+                               value="Transportation">
+
+                        Transportation
+
+                    </label>
+
+
+                    <label class="check-item">
+
+                        <input type="checkbox"
+                               name="Facilities"
+                               value="Canteen">
+
+                        Canteen
+
+                    </label>
+
+
+                    <label class="check-item">
+
+                        <input type="checkbox"
+                               name="Facilities"
+                               value="Accommodation">
+
+                        Accommodation
+
+                    </label>
+
+
+                    <label class="check-item">
+
+                        <input type="checkbox"
+                               name="Facilities"
+                               value="Laptop">
+
+                        Laptop
+
+                    </label>
+
+                </div>
+
+            </section>
+
+
+            <!-- =================================================
+                 SKILLS
+            ================================================== -->
+
+            <section class="section" id="skills">
+
+                <div class="section-head">
+
+                    <div class="section-icon">
+                        ⚙
+                    </div>
+
+                    <div>
+
+                        <h2>
+                            Skills Required
+                        </h2>
+
+                        <p class="sub">
+                            Select required technical, medical and
+                            non-technical skills
+                        </p>
+
+                    </div>
+
+                </div>
+
+
+                <!-- =================================================
+                     HIDDEN SKILL VALUES
+                ================================================== -->
+
+                <input type="hidden"
+                       asp-for="sMedicalSkills"
+                       id="sMedicalSkills" />
+
+                <input type="hidden"
+                       asp-for="sTechnicalSkills"
+                       id="sTechnicalSkills" />
+
+                <input type="hidden"
+                       asp-for="sNonTechnicalSkills"
+                       id="sNonTechnicalSkills" />
+
+
+                <!-- =================================================
+                     MEDICAL SKILLS
+                ================================================== -->
+
+                <div class="skill-box">
+
+                    <div class="skill-title"
+                         onclick="toggleSkill('medicalBody')">
+
+                        <span>
+                            Medical Skills
+                        </span>
+
+                        <span class="skill-count"
+                              id="medicalCount">
+                            0 selected
+                        </span>
+
+                    </div>
+
+                    <div class="skill-body"
+                         id="medicalBody">
+
+                        <span>
+                            Loading Medical Skills...
+                        </span>
+
+                    </div>
+
+                </div>
+
+
+                <!-- =================================================
+                     TECHNICAL SKILLS
+                ================================================== -->
+
+                <div class="skill-box">
+
+                    <div class="skill-title"
+                         onclick="toggleSkill('technicalBody')">
+
+                        <span>
+                            Technical Skills
+                        </span>
+
+                        <span class="skill-count"
+                              id="technicalCount">
+                            0 selected
+                        </span>
+
+                    </div>
+
+                    <div class="skill-body"
+                         id="technicalBody">
+
+                        <span>
+                            Loading Technical Skills...
+                        </span>
+
+                    </div>
+
+                </div>
+
+
+                <!-- =================================================
+                     NON-TECHNICAL SKILLS
+                ================================================== -->
+
+                <div class="skill-box">
+
+                    <div class="skill-title"
+                         onclick="toggleSkill('nonTechnicalBody')">
+
+                        <span>
+                            Non-Technical Skills
+                        </span>
+
+                        <span class="skill-count"
+                              id="nonTechnicalCount">
+                            0 selected
+                        </span>
+
+                    </div>
+
+                    <div class="skill-body"
+                         id="nonTechnicalBody">
+
+                        <span>
+                            Loading Non-Technical Skills...
+                        </span>
+
+                    </div>
+
+                </div>
+
+            </section>
+
+
+            <!-- =================================================
+                 SUBMIT
+            ================================================== -->
+
+            <div class="submit-bar">
+
+                <p>
+                    Check all required fields before updating.
+                </p>
+
+                <div class="btn-row">
+
+                    <button type="button"
+                            class="btn btn-secondary"
+                            onclick="window.history.back();">
+
+                        Cancel
+
+                    </button>
+
+
+                    <button type="submit"
+                            class="btn btn-primary"
+                            id="submitButton">
+
+                        Repost Post
+
+                    </button>
+
+                </div>
+
+            </div>
+
+        </form>
+
+    </div>
+
+
+    <footer>
+        Copyright © 2026 — All Rights Reserved with IIPL
+    </footer>
+
+
+    <!-- =============================================================
+         DROPDOWN JAVASCRIPT
+    ============================================================= -->
+
+    <script>
+
+        document.addEventListener("DOMContentLoaded", async function () {
+
+            await loadDropdown(
+                "nPositionID",
+                "/Organization/GetPosition",
+                "-- Select Position --",
+                "@Model.nPositionID"
+            );
+
+            await loadDropdown(
+                "nGenderID",
+                "/Organization/GetGender",
+                "-- Select Gender --",
+                "@Model.nGenderID"
+            );
+
+            await loadDropdown(
+                "nMinimumQualificationID",
+                "/Organization/GetMinimumQualification",
+                "-- Select Qualification --",
+                "@Model.nMinimumQualificationID"
+            );
+
+            await loadDropdown(
+                "nInternshipTypeID",
+                "/Organization/GetInternshipType",
+                "-- Select Internship Type --",
+                "@Model.nInternshipTypeID"
+            );
+
+            await loadDropdown(
+                "nInternshipFellowshipTypeID",
+                "/Organization/GetInternshipFellowshipType",
+                "-- Select Fellowship Type --",
+                "@Model.nInternshipFellowshipTypeID"
+            );
+
+            await loadDropdown(
+                "nTrainingInvolvedID",
+                "/Organization/GetTrainingInvolved",
+                "-- Select Training Involved --",
+                "@Model.nTrainingInvolvedID"
+            );
+
+            await loadDropdown(
+                "nInternshipDurationID",
+                "/Organization/GetInternshipDuration",
+                "-- Select Duration --",
+                "@Model.nInternshipDurationID"
+            );
+
+            await loadDropdown(
+                "nInternshipModeID",
+                "/Organization/GetInternshipMode",
+                "-- Select Internship Mode --",
+                "@Model.nInternshipModeID"
+            );
+
+        });
+
+
+        async function loadDropdown(
+            dropdownId,
+            url,
+            defaultText,
+            selectedValue) {
+
+            const dropdown =
+                document.getElementById(dropdownId);
+
+            if (!dropdown) {
+                return;
+            }
+
+            try {
+
+                const response =
+                    await fetch(url);
+
+                if (!response.ok) {
+
+                    throw new Error(
+                        "HTTP Error: " + response.status
+                    );
+
+                }
+
+                const data =
+                    await response.json();
+
+                dropdown.innerHTML =
+                    `<option value="0">
+                        ${defaultText}
+                     </option>`;
+
+                data.forEach(function (item) {
+
+                    const option =
+                        document.createElement("option");
+
+                    option.value =
+                        item.nID;
+
+                    option.textContent =
+                        item.sName;
+
+                    if (
+                        String(item.nID) ===
+                        String(selectedValue)
+                    ) {
+
+                        option.selected = true;
+
+                    }
+
+                    dropdown.appendChild(option);
+
+                });
+
+            }
+            catch (error) {
+
+                console.error(
+                    "Error loading " + dropdownId,
+                    error
+                );
+
+            }
+
+        }
+
+    </script>
+
+
+    <!-- =============================================================
+         COUNTRY / STATE / CITY
+    ============================================================= -->
+
+    <script>
+
+        document.addEventListener("DOMContentLoaded", function () {
+
+            // ============================================================
+            // DROPDOWNS
+            // ============================================================
+
+            const countryDropdown =
+                document.getElementById("sCountryName");
+
+            const stateDropdown =
+                document.getElementById("sStateName");
+
+            const cityDropdown =
+                document.getElementById("nCityName");
+
+
+            if (!countryDropdown ||
+                !stateDropdown ||
+                !cityDropdown) {
+
+                console.error(
+                    "Country / State / City dropdown not found."
+                );
+
+                return;
+            }
+
+
+            // ============================================================
+            // EXISTING DATABASE VALUES
+            // ============================================================
+
+            const existingCountry =
+                @Html.Raw(System.Text.Json.JsonSerializer.Serialize(
+                                Model.sCountryName ?? ""
+                                                                                                ));
+
+            const existingState =
+                @Html.Raw(System.Text.Json.JsonSerializer.Serialize(
+                                                                                                                                                                Model.sStateName ?? ""
+                                                                                                ));
+
+            const existingCity =
+                @Html.Raw(System.Text.Json.JsonSerializer.Serialize(
+                                                                                                                                                                Model.nCityName ?? ""
+                                                                                                ));
+
+
+            console.log("Existing Country:", existingCountry);
+            console.log("Existing State:", existingState);
+            console.log("Existing City:", existingCity);
+
+
+            // ============================================================
+            // LOAD COUNTRIES
+            // ============================================================
+
+            fetch('@Url.Action("GetCountries", "Organization")')
+                .then(response => {
+
+                    if (!response.ok) {
+
+                        throw new Error(
+                            "Country API failed: " +
+                            response.status
+                        );
+
+                    }
+
+                    return response.json();
+
+                })
+
+                .then(countries => {
+
+                    countryDropdown.innerHTML =
+                        '<option value="">-- Select Country --</option>';
+
+
+                    if (!countries ||
+                        countries.length === 0) {
+
+                        return;
+                    }
+
+
+                    countries.forEach(country => {
+
+                        const option =
+                            document.createElement("option");
+
+
+                        // =================================================
+                        // IMPORTANT
+                        // VALUE = COUNTRY NAME
+                        // This is submitted to C#
+                        // =================================================
+
+                        option.value =
+                            country.name;
+
+
+                        option.textContent =
+                            country.name;
+
+
+                        // =================================================
+                        // API CODE
+                        // Used only internally for API calls
+                        // =================================================
+
+                        option.dataset.code =
+                            country.iso2;
+
+
+                        // =================================================
+                        // SELECT EXISTING COUNTRY
+                        // =================================================
+
+                        if (
+                            country.name.toLowerCase() ===
+                            existingCountry.toLowerCase()
+                        ) {
+
+                            option.selected = true;
+
+                        }
+
+
+                        countryDropdown.appendChild(option);
+
+                    });
+
+
+                    // =================================================
+                    // AFTER COUNTRIES LOAD
+                    // LOAD EXISTING STATE
+                    // =================================================
+
+                    if (existingCountry) {
+
+                        const selectedCountry =
+                            [...countryDropdown.options].find(
+                                option =>
+                                    option.value.toLowerCase() ===
+                                    existingCountry.toLowerCase()
+                            );
+
+
+                        if (selectedCountry) {
+
+                            const countryCode =
+                                selectedCountry.dataset.code;
+
+
+                            console.log(
+                                "Existing Country Name:",
+                                selectedCountry.value
+                            );
+
+                            console.log(
+                                "Existing Country Code:",
+                                countryCode
+                            );
+
+
+                            loadStates(
+                                countryCode,
+                                existingState
+                            );
+
+                        }
+
+                    }
+
+                })
+
+                .catch(error => {
+
+                    console.error(
+                        "Country Error:",
+                        error
+                    );
+
+                });
+
+
+            // ============================================================
+            // COUNTRY CHANGE
+            // ============================================================
+
+            countryDropdown.addEventListener(
+                "change",
+                function () {
+
+                    const selectedOption =
+                        this.options[this.selectedIndex];
+
+
+                    // =================================================
+                    // COUNTRY NAME
+                    // Goes to database/model
+                    // =================================================
+
+                    const countryName =
+                        selectedOption.value;
+
+
+                    // =================================================
+                    // COUNTRY CODE
+                    // Used for API only
+                    // =================================================
+
+                    const countryCode =
+                        selectedOption.dataset.code;
+
+
+                    console.log(
+                        "Country Name:",
+                        countryName
+                    );
+
+                    console.log(
+                        "Country Code:",
+                        countryCode
+                    );
+
+
+                    // =================================================
+                    // RESET STATE
+                    // =================================================
+
+                    stateDropdown.innerHTML =
+                        '<option value="">-- Select State --</option>';
+
+                    stateDropdown.disabled = true;
+
+
+                    // =================================================
+                    // RESET CITY
+                    // =================================================
+
+                    cityDropdown.innerHTML =
+                        '<option value="">-- Select City --</option>';
+
+                    cityDropdown.disabled = true;
+
+
+                    if (!countryCode) {
+
+                        return;
+
+                    }
+
+
+                    // =================================================
+                    // LOAD STATES
+                    // =================================================
+
+                    loadStates(
+                        countryCode,
+                        ""
+                    );
+
+                }
+            );
+
+
+            // ============================================================
+            // LOAD STATES
+            // ============================================================
+
+            function loadStates(
+                countryCode,
+                selectedState
+            ) {
+
+                console.log(
+                    "Loading states for country code:",
+                    countryCode
+                );
+
+
+                const stateUrl =
+                    '@Url.Action("GetStates", "Organization")' +
+                    '?countryCode=' +
+                    encodeURIComponent(countryCode);
+
+
+                console.log(
+                    "State URL:",
+                    stateUrl
+                );
+
+
+                fetch(stateUrl)
+
+                    .then(response => {
+
+                        if (!response.ok) {
+
+                            throw new Error(
+                                "State API failed: " +
+                                response.status
+                            );
+
+                        }
+
+                        return response.json();
+
+                    })
+
+                    .then(states => {
+
+                        stateDropdown.innerHTML =
+                            '<option value="">-- Select State --</option>';
+
+
+                        stateDropdown.disabled = true;
+
+
+                        if (
+                            !states ||
+                            states.length === 0
+                        ) {
+
+                            stateDropdown.innerHTML =
+                                '<option value="">No states found</option>';
+
+                            return;
+
+                        }
+
+
+                        // =================================================
+                        // ADD STATES
+                        // =================================================
+
+                        states.forEach(state => {
+
+                            const option =
+                                document.createElement("option");
+
+
+                            // =================================================
+                            // IMPORTANT
+                            // VALUE = STATE NAME
+                            // This will be submitted to C#
+                            // =================================================
+
+                            option.value =
+                                state.name;
+
+
+                            option.textContent =
+                                state.name;
+
+
+                            // =================================================
+                            // STATE CODE
+                            // Used only for city API
+                            // =================================================
+
+                            option.dataset.code =
+                                state.stateCode;
+
+
+                            // =================================================
+                            // SELECT EXISTING STATE
+                            // =================================================
+
+                            if (
+                                state.name.toLowerCase() ===
+                                selectedState.toLowerCase()
+                            ) {
+
+                                option.selected = true;
+
+                            }
+
+
+                            stateDropdown.appendChild(
+                                option
+                            );
+
+                        });
+
+
+                        stateDropdown.disabled = false;
+
+
+                        // =================================================
+                        // LOAD EXISTING CITY
+                        // =================================================
+
+                        if (selectedState) {
+
+                            const selectedStateOption =
+                                [...stateDropdown.options].find(
+                                    option =>
+                                        option.value.toLowerCase() ===
+                                        selectedState.toLowerCase()
+                                );
+
+
+                            if (selectedStateOption) {
+
+                                const stateCode =
+                                    selectedStateOption.dataset.code;
+
+
+                                console.log(
+                                    "Existing State Name:",
+                                    selectedStateOption.value
+                                );
+
+                                console.log(
+                                    "Existing State Code:",
+                                    stateCode
+                                );
+
+
+                                loadCities(
+                                    countryCode,
+                                    stateCode,
+                                    existingCity
+                                );
+
+                            }
+
+                        }
+
+                    })
+
+                    .catch(error => {
+
+                        console.error(
+                            "State Error:",
+                            error
+                        );
+
+                    });
+
+            }
+
+
+            // ============================================================
+            // STATE CHANGE
+            // ============================================================
+
+            stateDropdown.addEventListener(
+                "change",
+                function () {
+
+                    const selectedCountry =
+                        countryDropdown.options[
+                            countryDropdown.selectedIndex
+                        ];
+
+
+                    const selectedState =
+                        stateDropdown.options[
+                            stateDropdown.selectedIndex
+                        ];
+
+
+                    if (!selectedCountry ||
+                        !selectedState) {
+
+                        return;
+
+                    }
+
+
+                    // =================================================
+                    // COUNTRY CODE
+                    // API ONLY
+                    // =================================================
+
+                    const countryCode =
+                        selectedCountry.dataset.code;
+
+
+                    // =================================================
+                    // STATE NAME
+                    // DATABASE VALUE
+                    // =================================================
+
+                    const stateName =
+                        selectedState.value;
+
+
+                    // =================================================
+                    // STATE CODE
+                    // API ONLY
+                    // =================================================
+
+                    const stateCode =
+                        selectedState.dataset.code;
+
+
+                    console.log(
+                        "Country Name:",
+                        selectedCountry.value
+                    );
+
+                    console.log(
+                        "Country Code:",
+                        countryCode
+                    );
+
+                    console.log(
+                        "State Name:",
+                        stateName
+                    );
+
+                    console.log(
+                        "State Code:",
+                        stateCode
+                    );
+
+
+                    // =================================================
+                    // RESET CITY
+                    // =================================================
+
+                    cityDropdown.innerHTML =
+                        '<option value="">-- Select City --</option>';
+
+                    cityDropdown.disabled = true;
+
+
+                    if (!countryCode ||
+                        !stateCode) {
+
+                        return;
+
+                    }
+
+
+                    // =================================================
+                    // LOAD CITIES
+                    // =================================================
+
+                    loadCities(
+                        countryCode,
+                        stateCode,
+                        ""
+                    );
+
+                }
+            );
+
+
+            // ============================================================
+            // LOAD CITIES
+            // ============================================================
+
+            function loadCities(
+                countryCode,
+                stateCode,
+                selectedCity
+            ) {
+
+                console.log(
+                    "Loading cities..."
+                );
+
+                console.log(
+                    "Country Code:",
+                    countryCode
+                );
+
+                console.log(
+                    "State Code:",
+                    stateCode
+                );
+
+
+                const cityUrl =
+                    '@Url.Action("GetCities", "Organization")' +
+                    '?countryCode=' +
+                    encodeURIComponent(countryCode) +
+                    '&stateCode=' +
+                    encodeURIComponent(stateCode);
+
+
+                console.log(
+                    "City URL:",
+                    cityUrl
+                );
+
+
+                fetch(cityUrl)
+
+                    .then(response => {
+
+                        if (!response.ok) {
+
+                            throw new Error(
+                                "City API failed: " +
+                                response.status
+                            );
+
+                        }
+
+                        return response.json();
+
+                    })
+
+                    .then(cities => {
+
+                        cityDropdown.innerHTML =
+                            '<option value="">-- Select City --</option>';
+
+
+                        cityDropdown.disabled = true;
+
+
+                        if (
+                            !cities ||
+                            cities.length === 0
+                        ) {
+
+                            cityDropdown.innerHTML =
+                                '<option value="">No cities found</option>';
+
+                            return;
+
+                        }
+
+
+                        // =================================================
+                        // ADD CITIES
+                        // =================================================
+
+                        cities.forEach(city => {
+
+                            const option =
+                                document.createElement("option");
+
+
+                            // =================================================
+                            // IMPORTANT
+                            // VALUE = CITY NAME
+                            // This is submitted to C#
+                            // =================================================
+
+                            option.value =
+                                city.name;
+
+
+                            option.textContent =
+                                city.name;
+
+
+                            // =================================================
+                            // SELECT EXISTING CITY
+                            // =================================================
+
+                            if (
+                                city.name.toLowerCase() ===
+                                selectedCity.toLowerCase()
+                            ) {
+
+                                option.selected = true;
+
+                            }
+
+
+                            cityDropdown.appendChild(
+                                option
+                            );
+
+                        });
+
+
+                        cityDropdown.disabled = false;
+
+
+                        console.log(
+                            "Cities loaded successfully."
+                        );
+
+                    })
+
+                    .catch(error => {
+
+                        console.error(
+                            "City Error:",
+                            error
+                        );
+
+                    });
+
+            }
+
+
+            // ============================================================
+            // ENABLE STATE & CITY BEFORE SUBMIT
+            // ============================================================
+
+            const form =
+                countryDropdown.closest("form");
+
+
+            if (form) {
+
+                form.addEventListener(
+                    "submit",
+                    function () {
+
+                        // IMPORTANT:
+                        // Disabled select elements are NOT submitted.
+
+                        stateDropdown.disabled = false;
+
+                        cityDropdown.disabled = false;
+
+
+                        console.log(
+                            "Country:",
+                            countryDropdown.value
+                        );
+
+                        console.log(
+                            "State:",
+                            stateDropdown.value
+                        );
+
+                        console.log(
+                            "City:",
+                            cityDropdown.value
+                        );
+
+                    }
+                );
+
+            }
+
+        });
+
+    </script>
+
+
+    <!-- =============================================================
+         DATE / DURATION
+    ============================================================= -->
+
+    <script>
+
+        document.addEventListener(
+            "DOMContentLoaded",
+            function () {
+
+                const durationDropdown =
+                    document.getElementById(
+                        "nInternshipDurationID"
+                    );
+
+                const startDate =
+                    document.getElementById(
+                        "dStartDate"
+                    );
+
+                const completionDate =
+                    document.getElementById(
+                        "dCompletionDate"
+                    );
+
+
+                durationDropdown.addEventListener(
+                    "change",
+                    function () {
+
+                        calculateCompletionDate();
+
+                    }
+                );
+
+
+                startDate.addEventListener(
+                    "change",
+                    function () {
+
+                        calculateCompletionDate();
+
+                    }
+                );
+
+
+                function calculateCompletionDate() {
+
+                    const durationId =
+                        parseInt(
+                            durationDropdown.value
+                        );
+
+                    const startValue =
+                        startDate.value;
+
+
+                    if (
+                        durationId === 0 ||
+                        !startValue
+                    ) {
+
+                        return;
+
+                    }
+
+
+                    const date =
+                        new Date(
+                            startValue + "T00:00:00"
+                        );
+
+
+                    if (
+                        isNaN(date.getTime())
+                    ) {
+
+                        return;
+
+                    }
+
+
+                    switch (durationId) {
+
+                        case 1:
+
+                            date.setDate(
+                                date.getDate() + 28
+                            );
+
+                            break;
+
+                        case 2:
+
+                            date.setDate(
+                                date.getDate() + 42
+                            );
+
+                            break;
+
+                        case 3:
+
+                            date.setDate(
+                                date.getDate() + 84
+                            );
+
+                            break;
+
+                        case 4:
+
+                            date.setDate(
+                                date.getDate() + 168
+                            );
+
+                            break;
+
+                        case 5:
+
+                            date.setFullYear(
+                                date.getFullYear() + 1
+                            );
+
+                            break;
+
+                        default:
+
+                            return;
+
+                    }
+
+
+                    const year =
+                        date.getFullYear();
+
+                    const month =
+                        String(
+                            date.getMonth() + 1
+                        ).padStart(2, "0");
+
+                    const day =
+                        String(
+                            date.getDate()
+                        ).padStart(2, "0");
+
+
+                    completionDate.value =
+                        `${year}-${month}-${day}`;
+
+                }
+
+            }
+        );
+
+    </script>
+
+
+    <!-- =============================================================
+         WORKING DAYS / FACILITIES
+    ============================================================= -->
+
+    <script>
+
+        document.addEventListener(
+            "DOMContentLoaded",
+            function () {
+
+                // =====================================================
+                // EXISTING WORKING DAYS
+                // =====================================================
+
+                const existingWorkingDays =
+                    "@Model.sWorkingDays";
+
+                if (existingWorkingDays) {
+
+                    const days =
+                        existingWorkingDays
+                            .split(",")
+                            .map(x => x.trim());
+
+                    document
+                        .querySelectorAll(
+                            "#daysGroup input[type='checkbox']"
+                        )
+                        .forEach(function (checkbox) {
+
+                            if (
+                                days.includes(
+                                    checkbox.value
+                                )
+                            ) {
+
+                                checkbox.checked =
+                                    true;
+
+                            }
+
+                        });
+
+                }
+
+
+                // =====================================================
+                // EXISTING FACILITIES
+                // =====================================================
+
+                const existingFacilities =
+                    "@Model.sFacilities";
+
+                if (existingFacilities) {
+
+                    const facilities =
+                        existingFacilities
+                            .split(",")
+                            .map(x => x.trim());
+
+                    document
+                        .querySelectorAll(
+                            "#facGroup input[type='checkbox']"
+                        )
+                        .forEach(function (checkbox) {
+
+                            if (
+                                facilities.includes(
+                                    checkbox.value
+                                )
+                            ) {
+
+                                checkbox.checked =
+                                    true;
+
+                            }
+
+                        });
+
+                }
+
+            }
+        );
+
+
+        // =============================================================
+        // SKILL TOGGLE
+        // =============================================================
+
+        function toggleSkill(elementId) {
+
+            const body =
+                document.getElementById(elementId);
+
+            if (!body) {
+                return;
+            }
+
+
+            if (
+                body.style.display ===
+                "none"
+            ) {
+
+                body.style.display =
+                    "grid";
+
+            }
+            else {
+
+                body.style.display =
+                    "none";
+
+            }
+
+        }
+
+    </script>
+
+
+    <!-- =============================================================
+         SKILLS
+    ============================================================= -->
+
+    <script>
+
+        document.addEventListener(
+            "DOMContentLoaded",
+            function () {
+
+                loadTechnicalSkills();
+
+                loadMedicalSkills();
+
+                loadNonTechnicalSkills();
+
+            }
+        );
+
+
+        // =============================================================
+        // EXISTING SKILL IDS
+        // =============================================================
+
+        const existingTechnicalSkills =
+            "@Model.sTechnicalSkills";
+
+        const existingMedicalSkills =
+            "@Model.sMedicalSkills";
+
+        const existingNonTechnicalSkills =
+            "@Model.sNonTechnicalSkills";
+
+
+        // =============================================================
+        // TECHNICAL
+        // =============================================================
+
+        async function loadTechnicalSkills() {
+
+            const container =
+                document.getElementById(
+                    "technicalBody"
+                );
+
+            try {
+
+                const response =
+                    await fetch(
+                        "/Organization/GetTechnicalSkills"
+                    );
+
+                if (!response.ok) {
+
+                    throw new Error(
+                        "Technical Skills API returned HTTP " +
+                        response.status
+                    );
+
+                }
+
+                const skills =
+                    await response.json();
+
+                container.innerHTML = "";
+
+
+                if (
+                    !Array.isArray(skills) ||
+                    skills.length === 0
+                ) {
+
+                    container.innerHTML =
+                        "<span>No technical skills available.</span>";
+
+                    return;
+
+                }
+
+
+                const selectedIds =
+                    existingTechnicalSkills
+                        ? existingTechnicalSkills
+                            .split(",")
+                            .map(x => x.trim())
+                        : [];
+
+
+                skills.forEach(function (skill) {
+
+                    const label =
+                        document.createElement(
+                            "label"
+                        );
+
+                    label.className =
+                        "check-item";
+
+
+                    const checkbox =
+                        document.createElement(
+                            "input"
+                        );
+
+                    checkbox.type =
+                        "checkbox";
+
+                    checkbox.name =
+                        "TechnicalSkillIDs";
+
+                    checkbox.value =
+                        skill.nTechnicalSkillID;
+
+
+                    if (
+                        selectedIds.includes(
+                            String(
+                                skill.nTechnicalSkillID
+                            )
+                        )
+                    ) {
+
+                        checkbox.checked =
+                            true;
+
+                    }
+
+
+                    checkbox.addEventListener(
+                        "change",
+                        updateTechnicalCount
+                    );
+
+
+                    const text =
+                        document.createTextNode(
+                            skill.sTechnicalSkillName
+                        );
+
+
+                    label.appendChild(
+                        checkbox
+                    );
+
+                    label.appendChild(
+                        text
+                    );
+
+                    container.appendChild(
+                        label
+                    );
+
+                });
+
+
+                updateTechnicalCount();
+
+            }
+            catch (error) {
+
+                console.error(
+                    "Error loading technical skills:",
+                    error
+                );
+
+                container.innerHTML =
+                    "<span>Unable to load technical skills.</span>";
+
+            }
+
+        }
+
+
+        // =============================================================
+        // MEDICAL
+        // =============================================================
+
+        async function loadMedicalSkills() {
+
+            const container =
+                document.getElementById(
+                    "medicalBody"
+                );
+
+            try {
+
+                const response =
+                    await fetch(
+                        "/Organization/GetMedicalSkills"
+                    );
+
+                if (!response.ok) {
+
+                    throw new Error(
+                        "Medical Skills API returned HTTP " +
+                        response.status
+                    );
+
+                }
+
+                const skills =
+                    await response.json();
+
+                container.innerHTML = "";
+
+
+                if (
+                    !Array.isArray(skills) ||
+                    skills.length === 0
+                ) {
+
+                    container.innerHTML =
+                        "<span>No medical skills available.</span>";
+
+                    return;
+
+                }
+
+
+                const selectedIds =
+                    existingMedicalSkills
+                        ? existingMedicalSkills
+                            .split(",")
+                            .map(x => x.trim())
+                        : [];
+
+
+                skills.forEach(function (skill) {
+
+                    const label =
+                        document.createElement(
+                            "label"
+                        );
+
+                    label.className =
+                        "check-item";
+
+
+                    const checkbox =
+                        document.createElement(
+                            "input"
+                        );
+
+                    checkbox.type =
+                        "checkbox";
+
+                    checkbox.name =
+                        "MedicalSkillIDs";
+
+                    checkbox.value =
+                        skill.nMedicalSkillID;
+
+
+                    if (
+                        selectedIds.includes(
+                            String(
+                                skill.nMedicalSkillID
+                            )
+                        )
+                    ) {
+
+                        checkbox.checked =
+                            true;
+
+                    }
+
+
+                    checkbox.addEventListener(
+                        "change",
+                        updateMedicalCount
+                    );
+
+
+                    const text =
+                        document.createTextNode(
+                            skill.sMedicalSkillName
+                        );
+
+
+                    label.appendChild(
+                        checkbox
+                    );
+
+                    label.appendChild(
+                        text
+                    );
+
+                    container.appendChild(
+                        label
+                    );
+
+                });
+
+
+                updateMedicalCount();
+
+            }
+            catch (error) {
+
+                console.error(
+                    "Error loading medical skills:",
+                    error
+                );
+
+                container.innerHTML =
+                    "<span>Unable to load medical skills.</span>";
+
+            }
+
+        }
+
+
+        // =============================================================
+        // NON TECHNICAL
+        // =============================================================
+
+        async function loadNonTechnicalSkills() {
+
+            const container =
+                document.getElementById(
+                    "nonTechnicalBody"
+                );
+
+            try {
+
+                const response =
+                    await fetch(
+                        "/Organization/GetNonTechnicalSkills"
+                    );
+
+                if (!response.ok) {
+
+                    throw new Error(
+                        "Non-Technical Skills API returned HTTP " +
+                        response.status
+                    );
+
+                }
+
+                const skills =
+                    await response.json();
+
+                container.innerHTML = "";
+
+
+                if (
+                    !Array.isArray(skills) ||
+                    skills.length === 0
+                ) {
+
+                    container.innerHTML =
+                        "<span>No non-technical skills available.</span>";
+
+                    return;
+
+                }
+
+
+                const selectedIds =
+                    existingNonTechnicalSkills
+                        ? existingNonTechnicalSkills
+                            .split(",")
+                            .map(x => x.trim())
+                        : [];
+
+
+                skills.forEach(function (skill) {
+
+                    const label =
+                        document.createElement(
+                            "label"
+                        );
+
+                    label.className =
+                        "check-item";
+
+
+                    const checkbox =
+                        document.createElement(
+                            "input"
+                        );
+
+                    checkbox.type =
+                        "checkbox";
+
+                    checkbox.name =
+                        "NonTechnicalSkillIDs";
+
+                    checkbox.value =
+                        skill.nNonTechnicalSkillID;
+
+
+                    if (
+                        selectedIds.includes(
+                            String(
+                                skill.nNonTechnicalSkillID
+                            )
+                        )
+                    ) {
+
+                        checkbox.checked =
+                            true;
+
+                    }
+
+
+                    checkbox.addEventListener(
+                        "change",
+                        updateNonTechnicalCount
+                    );
+
+
+                    const text =
+                        document.createTextNode(
+                            skill.sNonTechnicalSkillName
+                        );
+
+
+                    label.appendChild(
+                        checkbox
+                    );
+
+                    label.appendChild(
+                        text
+                    );
+
+                    container.appendChild(
+                        label
+                    );
+
+                });
+
+
+                updateNonTechnicalCount();
+
+            }
+            catch (error) {
+
+                console.error(
+                    "Error loading non-technical skills:",
+                    error
+                );
+
+                container.innerHTML =
+                    "<span>Unable to load non-technical skills.</span>";
+
+            }
+
+        }
+
+
+        // =============================================================
+        // COUNTS
+        // =============================================================
+
+        function updateTechnicalCount() {
+
+            const checked =
+                document.querySelectorAll(
+                    "#technicalBody input[type='checkbox']:checked"
+                ).length;
+
+            document.getElementById(
+                "technicalCount"
+            ).textContent =
+                checked + " selected";
+
+        }
+
+
+        function updateMedicalCount() {
+
+            const checked =
+                document.querySelectorAll(
+                    "#medicalBody input[type='checkbox']:checked"
+                ).length;
+
+            document.getElementById(
+                "medicalCount"
+            ).textContent =
+                checked + " selected";
+
+        }
+
+
+        function updateNonTechnicalCount() {
+
+            const checked =
+                document.querySelectorAll(
+                    "#nonTechnicalBody input[type='checkbox']:checked"
+                ).length;
+
+            document.getElementById(
+                "nonTechnicalCount"
+            ).textContent =
+                checked + " selected";
+
+        }
+
+    </script>
+
+
+    <!-- =============================================================
+         FORM SUBMIT
+    ============================================================= -->
+
+    <script>
+
+        document
+            .getElementById("internshipPostForm")
+            .addEventListener(
+                "submit",
+                function () {
+
+                    // =================================================
+                    // WORKING DAYS
+                    // =================================================
+
+                    const workingDays = [];
+
+                    document
+                        .querySelectorAll(
+                            "#daysGroup input[type='checkbox']:checked"
+                        )
+                        .forEach(function (checkbox) {
+
+                            workingDays.push(
+                                checkbox.value
+                            );
+
+                        });
+
+
+                    document.getElementById(
+                        "sWorkingDays"
+                    ).value =
+                        workingDays.join(",");
+
+
+                    // =================================================
+                    // FACILITIES
+                    // =================================================
+
+                    const facilities = [];
+
+                    document
+                        .querySelectorAll(
+                            "#facGroup input[type='checkbox']:checked"
+                        )
+                        .forEach(function (checkbox) {
+
+                            facilities.push(
+                                checkbox.value
+                            );
+
+                        });
+
+
+                    document.getElementById(
+                        "sFacilities"
+                    ).value =
+                        facilities.join(",");
+
+
+                    // =================================================
+                    // MEDICAL SKILLS
+                    // =================================================
+
+                    const medicalSkills = [];
+
+                    document
+                        .querySelectorAll(
+                            "#medicalBody input[type='checkbox']:checked"
+                        )
+                        .forEach(function (checkbox) {
+
+                            medicalSkills.push(
+                                checkbox.value
+                            );
+
+                        });
+
+
+                    document.getElementById(
+                        "sMedicalSkills"
+                    ).value =
+                        medicalSkills.join(",");
+
+
+                    // =================================================
+                    // TECHNICAL SKILLS
+                    // =================================================
+
+                    const technicalSkills = [];
+
+                    document
+                        .querySelectorAll(
+                            "#technicalBody input[type='checkbox']:checked"
+                        )
+                        .forEach(function (checkbox) {
+
+                            technicalSkills.push(
+                                checkbox.value
+                            );
+
+                        });
+
+
+                    document.getElementById(
+                        "sTechnicalSkills"
+                    ).value =
+                        technicalSkills.join(",");
+
+
+                    // =================================================
+                    // NON TECHNICAL SKILLS
+                    // =================================================
+
+                    const nonTechnicalSkills = [];
+
+                    document
+                        .querySelectorAll(
+                            "#nonTechnicalBody input[type='checkbox']:checked"
+                        )
+                        .forEach(function (checkbox) {
+
+                            nonTechnicalSkills.push(
+                                checkbox.value
+                            );
+
+                        });
+
+
+                    document.getElementById(
+                        "sNonTechnicalSkills"
+                    ).value =
+                        nonTechnicalSkills.join(",");
+
+
+                    console.log(
+                        "Working Days:",
+                        document.getElementById(
+                            "sWorkingDays"
+                        ).value
+                    );
+
+                    console.log(
+                        "Facilities:",
+                        document.getElementById(
+                            "sFacilities"
+                        ).value
+                    );
+
+                    console.log(
+                        "Medical Skills:",
+                        document.getElementById(
+                            "sMedicalSkills"
+                        ).value
+                    );
+
+                    console.log(
+                        "Technical Skills:",
+                        document.getElementById(
+                            "sTechnicalSkills"
+                        ).value
+                    );
+
+                    console.log(
+                        "Non Technical Skills:",
+                        document.getElementById(
+                            "sNonTechnicalSkills"
+                        ).value
+                    );
+
+                }
+            );
+
+    </script>
+
+
+</body>
+
+</html>

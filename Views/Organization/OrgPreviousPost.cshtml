@@ -8,7 +8,7 @@
 
 <div class="container-fluid">
 
-     
+
 
 
     <!-- =====================================================
@@ -17,17 +17,17 @@
 
     <div class="master-table-container">
 
-       
+
 
 
         <div class="table-responsive">
-               <h1>
-            Previous Post
-        </h1>
+            <h1>
+                Previous Post
+            </h1>
 
-        <p>
-            At738034692839
-        </p>
+            <p>
+                @Model?.nID
+            </p>
             <table id="previousPostTable"
                    class="master-data-table">
 
@@ -78,200 +78,134 @@
 
                 <tbody>
 
-                    <!-- =================================================
-                         ROW 1
-                    ================================================== -->
+                    @if (Model != null)
+                    {
+                        <tr>
 
-                    <tr>
+                            <td class="master-id">
+                                1
+                            </td>
 
-                        <td class="master-id">
-                            1
-                        </td>
+                            <td>
+                                @Model.sPositionName
+                            </td>
 
-                        <td>
-                            .Net Trainee
-                        </td>
+                            <td class="master-action">
 
-                        <td>
+                                <!-- View -->
+                                <a asp-controller="Organization"
+                                   asp-action="ViewOrgPost"
+                                   asp-route-id="@Model.nID"
+                                   class="resume-view-btn"
+                                   title="View Post">
+                                    <i class="fas fa-eye"></i>
+                                </a>
 
-                            <a href="#"
-                               class="text-primary"
-                               title="View Post">
+                                <!-- Edit -->
+                                <a asp-controller="Organization"
+                                   asp-action="EditPost"
+                                   asp-route-id="@Model.nID"
+                                   class="resume-edit-btn"
+                                   title="Edit Post">
+                                    <i class="fas fa-edit"></i>
+                                </a>
 
-                                <i class="fas fa-eye"></i>
+                                <!-- Repost -->
+                                <a asp-controller="Organization"
+                                   asp-action="RepostOrgPost"
+                                   asp-route-id="@Model.nID"
+                                   class="resume-repost-btn"
+                                   title="Repost">
+                                    <i class="fas fa-redo"></i>
+                                </a>
 
-                            </a>
+                            </td>
 
-                        </td>
+                            <td>
+                                @Model.nRequiredTrainees
+                            </td>
 
-                        <td>
-                            4
-                        </td>
+                            <td>
+                                @Model.sGenderName
+                            </td>
 
-                        <td>
-                            Any
-                        </td>
+                            <td>
+                                @Model.sMinimumQualificationName
+                            </td>
 
-                        <td>
-                            Graduate
-                        </td>
+                            <td>
+                                @Model.sCountryName<br />
+                                @Model.sStateName<br />
+                                @Model.sCityName
+                            </td>
 
-                        <td>
-                            India<br />
-                            Maharashtra<br />
-                            Nagpur
-                        </td>
+                            <td>
+                                @Model.sWorkingHours
+                            </td>
 
-                        <td>
-                            Up to 8 Hrs
-                        </td>
+                            <td>
+                                @Model.sWorkingDays
+                            </td>
 
-                        <td>
-                            Monday, Tuesday, Wednesday,
-                            Thursday, Friday
-                        </td>
+                            <td>
+                                @Model.sInternshipTypeName
+                            </td>
 
-                        <td>
-                            Full Time
-                        </td>
+                            <td>
+                                @Model.sInternshipFellowshipTypeName
+                            </td>
 
-                        <td>
-                            Any<br />
-                            (Free/Paid/Stipend/Sponsored)
-                        </td>
+                            <td>
+                                @if (Model.sTotalCharges > 0)
+                                {
+                                    @Model.sCurrency @Model.sTotalCharges
+                                }
+                                else
+                                {
+                                    @:NA
+                                }
+                            </td>
 
-                        <td>
-                            NA
-                        </td>
+                            <td>
+                                @Model.sTrainingInvolvedName
+                            </td>
 
-                        <td>
-                            Yes
-                        </td>
+                            <td>
+                                @Model.sInternshipDurationName
+                            </td>
 
-                        <td>
-                            NA
-                        </td>
+                            <td>
 
-                        <td>
+                                @if (!string.IsNullOrWhiteSpace(Model.sFacilities))
+                                {
+                                    <i class="fas fa-wifi"
+                                       title="@Model.sFacilities"></i>
+                                }
+                                else
+                                {
+                                    @:NA
+                                }
 
-                            <i class="fas fa-wifi"
-                               title="Facilities Available"></i>
+                            </td>
 
-                        </td>
+                            <td>
+                                @Model.sInternshipModeName
+                            </td>
 
-                        <td>
-                            Hybrid
-                        </td>
+                            <td>
+                                @Model.sDivyang
+                            </td>
 
-                        <td>
-                            No
-                        </td>
+                            <td>
 
-                        <td>
+                                <span class="master-status">
+                                    @(Model.nBit ? "Enabled" : "Disabled")
+                                </span>
 
-                            <span class="master-status">
-                                Disabled
-                            </span>
+                            </td>
 
-                        </td>
-
-                    </tr>
-
-
-                    <!-- =================================================
-                         ROW 2
-                    ================================================== -->
-
-                    <tr>
-
-                        <td class="master-id">
-                            2
-                        </td>
-
-                        <td>
-                            .Net Trainee
-                        </td>
-
-                        <td>
-
-                            <a href="#"
-                               class="text-primary"
-                               title="View Post">
-
-                                <i class="fas fa-eye"></i>
-
-                            </a>
-
-                        </td>
-
-                        <td>
-                            5
-                        </td>
-
-                        <td>
-                            Any
-                        </td>
-
-                        <td>
-                            Graduate
-                        </td>
-
-                        <td>
-                            India<br />
-                            Maharashtra<br />
-                            Nagpur
-                        </td>
-
-                        <td>
-                            Up to 8 Hrs
-                        </td>
-
-                        <td>
-                            Monday, Tuesday, Wednesday,
-                            Thursday, Friday
-                        </td>
-
-                        <td>
-                            Full Time
-                        </td>
-
-                        <td>
-                            Free
-                        </td>
-
-                        <td>
-                            NA
-                        </td>
-
-                        <td>
-                            Yes
-                        </td>
-
-                        <td>
-                            NA
-                        </td>
-
-                        <td>
-                            NA
-                        </td>
-
-                        <td>
-                            Offline
-                        </td>
-
-                        <td>
-                            No
-                        </td>
-
-                        <td>
-
-                            <span class="master-status">
-                                Disabled
-                            </span>
-
-                        </td>
-
-                    </tr>
+                        </tr>
+                    }
 
                 </tbody>
 

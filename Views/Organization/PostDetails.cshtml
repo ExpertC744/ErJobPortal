@@ -1,4 +1,4 @@
-﻿@model IEnumerable<JobPortalTrainee.Models.OrgPostM>
+﻿@model IEnumerable<ErJobPortal.Models.OrgPostM>
 @{
     Layout = "~/Views/Shared/_DashboardLayout.cshtml";
 
@@ -146,10 +146,6 @@
 
 </style>
 <div class="post-box">
-
-
-
-
     <!-- MASTER TABLE CARD -->
     <div class="master-table-container">
 
@@ -294,13 +290,19 @@
 
                             <!-- Eligible Trainee -->
                             <td>
-
-                                <a href="#"
+                                <a asp-controller="Organization"
+                                   asp-action="EligibleTrainees"
+                                   asp-route-id="@item.nID"
+                                   asp-route-orgCode="@ViewBag.OrgCode"
                                    class="trainee">
-
-                                    @item.nRequiredTrainees
-
+                                    @item.MatchingTraineeCount
                                 </a>
+                                @* <a asp-controller="Organization"
+                                   asp-action="EligibleTrainees"
+                                   asp-route-id="@item.nID"
+                                   class="trainee">
+                                    @item.MatchingTraineeCount
+                                </a> *@
 
                             </td>
 
@@ -433,7 +435,7 @@
 
     </div>
 
-
+    </div>
     <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
 
     <script src="https://cdn.datatables.net/1.13.8/js/jquery.dataTables.min.js"></script>

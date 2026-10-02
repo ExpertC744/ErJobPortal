@@ -1,7 +1,7 @@
 ﻿using ErJobPortal.Models;
 using System.ComponentModel.DataAnnotations;
 
-namespace JobPortalTrainee.Models
+namespace ErJobPortal.Models
 {
     public class OrgPostM
     {
@@ -18,6 +18,7 @@ namespace JobPortalTrainee.Models
         [Required(ErrorMessage = "Please enter the number of required trainees.")]
         [Range(1, int.MaxValue, ErrorMessage = "Number of required trainees must be at least 1.")]
         public int nRequiredTrainees { get; set; }
+        public int MatchingTraineeCount { get; set; }
 
         [Required(ErrorMessage = "Please select gender.")]
         [Range(1, int.MaxValue, ErrorMessage = "Please select a valid gender.")]

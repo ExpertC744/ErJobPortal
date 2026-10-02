@@ -2,9 +2,7 @@
 
 @{
     Layout = null;
-
     ViewData["Title"] = "Resume";
-
     var p = Model.Profile;
 }
 
@@ -20,13 +18,8 @@
             var idProp = item.GetType().GetProperty("ID");
             var nameProp = item.GetType().GetProperty("Name");
 
-            if (idProp != null && nameProp != null)
-            {
-                var idValue = idProp.GetValue(item)?.ToString();
-
-                if (idValue == id.ToString())
-                    return nameProp.GetValue(item)?.ToString() ?? "";
-            }
+            if (idProp != null && nameProp != null && idProp.GetValue(item)?.ToString() == id.ToString())
+                return nameProp.GetValue(item)?.ToString() ?? "";
         }
 
         return "";
@@ -41,332 +34,70 @@
     {
         return n.HasValue && n.Value != 0;
     }
-}
-<script>
-        document.addEventListener("DOMContentLoaded", function () {
 
-            var addressEl = document.getElementById("rvAddress");
-            if (!addressEl) return;
+    string GetSkillNames(string skillIDs, System.Collections.IEnumerable skills)
+    {
+        if (string.IsNullOrWhiteSpace(skillIDs) || skills == null)
+            return "";
 
-            var countryID = addressEl.getAttribute("data-country-id") || "";
-            var stateID   = addressEl.getAttribute("data-state-id") || "";
-            var cityID    = addressEl.getAttribute("data-city-id") || "";
-            var pincode   = addressEl.getAttribute("data-pincode") || "";
+        var selectedIds = new HashSet<string>(
+            skillIDs.Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries).Select(x => x.Trim()),
+            StringComparer.OrdinalIgnoreCase);
 
-            function renderAddress(cityName, stateName, countryName) {
-                var parts = [cityName, stateName, countryName, pincode]
-                    .filter(function (p) { return p && p.trim() !== ""; });
+        var names = new List<string>();
 
-                addressEl.textContent = parts.length ? parts.join(", ") : "-";
-            }
+        foreach (var skill in skills)
+        {
+            if (skill == null) continue;
 
-            if (!countryID) {
-                // Nothing to resolve — leave Pincode-only display as-is
-                return;
-            }
+            var idProp = skill.GetType().GetProperty("ID");
+            var nameProp = skill.GetType().GetProperty("Name");
+            if (idProp == null || nameProp == null) continue;
 
-            fetch('/Location/GetCountries')
-                .then(function (res) { return res.json(); })
-                .then(function (countries) {
+            var id = idProp.GetValue(skill)?.ToString()?.Trim();
+            var name = nameProp.GetValue(skill)?.ToString()?.Trim();
 
-                    var country = countries.find(function (c) {
-                        return String(c.id) === String(countryID);
-                    });
-
-                    var countryName = country ? country.name : "";
-                    var countryCode = country ? country.iso2 : countryID;
-
-                    if (!stateID) {
-                        renderAddress("", "", countryName);
-                        return;
-                    }
-
-                    fetch('/Location/GetStates?countryCode=' + encodeURIComponent(countryCode))
-                        .then(function (res) { return res.json(); })
-                        .then(function (states) {
-
-                            var state = states.find(function (s) {
-                                return String(s.id) === String(stateID);
-                            });
-
-                            var stateName = state ? state.name : "";
-
-                            var stateCode = state
-                                ? (state.stateCode || (String(state.id).split(':')[1] || state.id))
-                                : "";
-
-                            if (!cityID) {
-                                renderAddress("", stateName, countryName);
-                                return;
-                            }
-
-                            fetch('/Location/GetCities?countryCode=' + encodeURIComponent(countryCode) +
-                                  '&stateCode=' + encodeURIComponent(stateCode))
-                                .then(function (res) { return res.json(); })
-                                .then(function (cities) {
-
-                                    var city = cities.find(function (c) {
-                                        return String(c.id) === String(cityID);
-                                    });
-
-                                    var cityName = city ? city.name : "";
-
-                                    renderAddress(cityName, stateName, countryName);
-                                })
-                                .catch(function () { renderAddress("", stateName, countryName); });
-                        })
-                        .catch(function () { renderAddress("", "", countryName); });
-                })
-                .catch(function (err) {
-                    console.log("Address resolution error:", err);
-                });
-        });
-
-        async function downloadResumePDF() {
-
-        const resumeSheet =
-            document.getElementById("resumeSheet");
-
-        if (!resumeSheet) {
-            alert("Resume not found.");
-            return;
+            if (!string.IsNullOrWhiteSpace(id) && !string.IsNullOrWhiteSpace(name) && selectedIds.Contains(id))
+                names.Add(name);
         }
 
-        const downloadBtn =
-            document.querySelector(".btn-download");
-
-        const originalText =
-            downloadBtn.innerHTML;
-
-        try {
-
-            /* =========================================
-               BUTTON LOADING
-               ========================================= */
-
-            downloadBtn.disabled = true;
-
-            downloadBtn.innerHTML =
-                '<i class="fa fa-spinner fa-spin"></i> Generating...';
-
-
-            /* =========================================
-               WAIT FOR IMAGES
-               ========================================= */
-
-            const images =
-                resumeSheet.querySelectorAll("img");
-
-            await Promise.all(
-                Array.from(images).map(function (img) {
-
-                    if (img.complete) {
-                        return Promise.resolve();
-                    }
-
-                    return new Promise(function (resolve) {
-
-                        img.onload = resolve;
-                        img.onerror = resolve;
-
-                    });
-
-                })
-            );
-
-
-            /* =========================================
-               CAPTURE RESUME
-               ========================================= */
-
-            const canvas =
-                await html2canvas(
-                    resumeSheet,
-                    {
-                        scale: 3,
-                        useCORS: true,
-                        allowTaint: false,
-                        backgroundColor: "#ffffff",
-                        logging: false
-                    }
-                );
-
-
-            /* =========================================
-               CREATE A4 PDF
-               ========================================= */
-
-            const {
-                jsPDF
-            } = window.jspdf;
-
-
-            const pdf =
-                new jsPDF(
-                    {
-                        orientation: "portrait",
-                        unit: "mm",
-                        format: "a4",
-                        compress: true
-                    }
-                );
-
-
-            const pageWidth =
-                pdf.internal.pageSize.getWidth();
-
-            const pageHeight =
-                pdf.internal.pageSize.getHeight();
-
-
-            /* =========================================
-               FIT IMAGE PERFECTLY TO A4
-               ========================================= */
-
-            const imageWidth =
-                pageWidth;
-
-            const imageHeight =
-                canvas.height *
-                imageWidth /
-                canvas.width;
-
-
-            const image =
-                canvas.toDataURL(
-                    "image/jpeg",
-                    0.95
-                );
-
-
-            pdf.addImage(
-                image,
-                "JPEG",
-                0,
-                0,
-                imageWidth,
-                imageHeight,
-                undefined,
-                "FAST"
-            );
-
-
-            /* =========================================
-               FILE NAME
-               ========================================= */
-
-            let candidateName =
-                "@(Model.CandidateName ?? "Candidate")";
-
-
-            candidateName =
-                candidateName
-                    .trim()
-                    .replace(
-                        /[^a-zA-Z0-9-_ ]/g,
-                        ""
-                    )
-                    .replace(
-                        /\s+/g,
-                        "_"
-                    );
-
-
-            if (!candidateName) {
-                candidateName = "Candidate";
-            }
-
-
-            const fileName =
-                candidateName +
-                "_Resume.pdf";
-
-
-            /* =========================================
-               DOWNLOAD
-               ========================================= */
-
-            pdf.save(fileName);
-
-        }
-        catch (error) {
-
-            console.error(
-                "PDF generation error:",
-                error
-            );
-
-            alert(
-                "Unable to generate PDF. Please try again."
-            );
-
-        }
-        finally {
-
-            downloadBtn.disabled = false;
-
-            downloadBtn.innerHTML =
-                originalText;
-
-        }
-
+        return string.Join(", ", names);
     }
-</script>
-
-<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+}
 
 <!DOCTYPE html>
-
 <html lang="en">
-
 <head>
-
     <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@(Model.CandidateName ?? "Candidate") - Resume</title>
 
-    <meta name="viewport"
-          content="width=device-width, initial-scale=1.0" />
-
-    <title>
-        @(Model.CandidateName ?? "Candidate") - Resume
-    </title>
-
-    <link rel="stylesheet"
-          href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
 
     <style>
 
         /* =========================================================
                    THEME VARIABLES
                    ========================================================= */
-
         :root {
             --accent: #f5a623;
             --sidebar-bg: #2b2b2b;
         }
 
-
-        /* =========================================================
-                   PAGE
-                   ========================================================= */
-
         * {
             box-sizing: border-box;
         }
 
-        html,
-        body {
+        html, body {
             margin: 0;
             padding: 0;
             background: #e9e9e9;
             font-family: "Segoe UI", Arial, sans-serif;
         }
 
-
         /* =========================================================
                    TOOLBAR
                    ========================================================= */
-
         .resume-toolbar {
             max-width: 210mm;
             margin: 20px auto 16px auto;
@@ -401,11 +132,23 @@
                 background: #0f766e;
             }
 
+        .btn-download {
+            background: #2b2b2b;
+            color: #fff;
+        }
+
+            .btn-download:hover {
+                background: #111;
+            }
+
+            .btn-download:disabled {
+                opacity: .7;
+                cursor: wait;
+            }
 
         /* =========================================================
                    THEME SWITCHER
                    ========================================================= */
-
         .theme-switcher {
             max-width: 210mm;
             margin: 0 auto 12px auto;
@@ -428,7 +171,7 @@
             cursor: pointer;
             border: 2px solid #fff;
             box-shadow: 0 0 0 1px #ccc;
-            transition: transform 0.15s ease, box-shadow 0.15s ease;
+            transition: transform .15s ease, box-shadow .15s ease;
         }
 
             .theme-swatch:hover {
@@ -439,267 +182,296 @@
                 box-shadow: 0 0 0 2px #333;
             }
 
-
         /* =========================================================
                    PAGE WRAPPER
                    ========================================================= */
-
         .resume-page-wrapper {
             background: #e9e9e9;
             padding: 24px 0 60px 0;
         }
 
-
         /* =========================================================
-                   A4 RESUME
+                   A4 RESUME  (fixed 210mm x 297mm)
+                   Each column's text scale = --fit (set by the script below).
+                   Inside the columns 1em = 10px * --fit.
                    ========================================================= */
-
         .resume-sheet {
             width: 210mm;
             height: 297mm;
             margin: 0 auto;
-            background: #fff;
-            box-shadow: 0 0 18px rgba(0, 0, 0, 0.25);
+            background: linear-gradient(to right, var(--sidebar-bg) 35%, #fff 35%);
+            box-shadow: 0 0 18px rgba(0, 0, 0, .25);
             display: flex;
             align-items: stretch;
             font-family: "Segoe UI", Arial, sans-serif;
             color: #333;
             position: relative;
-            box-sizing: border-box;
             overflow: hidden;
+            -webkit-print-color-adjust: exact;
+            print-color-adjust: exact;
         }
 
+        .resume-sidebar,
+        .resume-main {
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            min-width: 0;
+            min-height: 0;
+            overflow: hidden;
+            font-size: calc(10px * var(--fit, 1));
+        }
 
-        /* =========================================================
-                   ACCENT
-                   ========================================================= */
+            .resume-sidebar > *,
+            .resume-main > * {
+                flex-shrink: 0;
+            }
+
+            .resume-sidebar > :last-child,
+            .resume-main > :last-child {
+                margin-bottom: 0;
+            }
+
+            .resume-sidebar.is-spread,
+            .resume-main.is-spread {
+                justify-content: space-between;
+            }
+
+        .resume-sidebar {
+            width: 35%;
+            background: transparent;
+            color: #eee;
+            padding: 30px 20px 40px;
+        }
+
+        .resume-main {
+            width: 65%;
+            padding: 35px 35px 45px;
+        }
 
         .resume-accent {
             color: var(--accent);
         }
 
-
-        /* =========================================================
-                   LEFT SIDEBAR
-                   ========================================================= */
-
-        .resume-sidebar {
-            width: 35%;
-            background: var(--sidebar-bg);
-            color: #eee;
-            padding: 30px 20px;
-            box-sizing: border-box;
-            min-width: 0;
-            overflow: hidden;
-        }
-
-
         /* =========================================================
                    PHOTO
                    ========================================================= */
-
         .resume-photo-wrap {
             text-align: center;
-            margin-bottom: 25px;
+            margin-bottom: calc(2.5em + var(--extra, 0em));
+        }
+
+        .resume-photo,
+        .resume-photo-placeholder {
+            width: 5em;
+            height: 5em;
+            border-radius: 50%;
+            border: 4px solid var(--accent);
+            background: #444;
         }
 
         .resume-photo {
-            width: 120px;
-            height: 120px;
-            border-radius: 50%;
             object-fit: cover;
-            border: 4px solid var(--accent);
-            background: #444;
+            display: inline-block;
         }
 
         .resume-photo-placeholder {
-            width: 120px;
-            height: 120px;
-            border-radius: 50%;
-            border: 4px solid var(--accent);
-            background: #444;
             margin: 0 auto;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 40px;
+            font-size: 4em;
             color: #999;
         }
-
 
         /* =========================================================
                    SIDEBAR SECTION
                    ========================================================= */
-
         .resume-sidebar-section {
-            margin-bottom: 26px;
+            margin-bottom: calc(2.6em + var(--extra, 0em));
+            break-inside: avoid;
+            page-break-inside: avoid;
         }
 
         .resume-sidebar-title {
             color: var(--accent);
-            font-size: 13px;
+            font-size: 1.3em;
             font-weight: 700;
-            letter-spacing: 1px;
+            letter-spacing: .08em;
             text-transform: uppercase;
-            margin-bottom: 12px;
+            margin-bottom: .9em;
             border-bottom: 1px solid #555;
-            padding-bottom: 6px;
+            padding-bottom: .45em;
         }
 
         .resume-sidebar-item {
-            font-size: 11.5px;
+            font-size: 1.15em;
             line-height: 1.5;
-            margin-bottom: 10px;
+            margin-bottom: calc(.85em + var(--extra, 0em) * .5);
             word-break: break-word;
         }
+
+            .resume-sidebar-item:last-child {
+                margin-bottom: 0;
+            }
+
+            .resume-sidebar-item i {
+                width: 1.2em;
+                margin-right: .25em;
+                text-align: center;
+            }
 
             .resume-sidebar-item strong {
                 display: block;
                 color: #fff;
-                font-size: 12px;
+                font-size: 1.04em;
             }
 
             .resume-sidebar-item .muted {
                 color: #bbb;
             }
 
-
         /* =========================================================
-                   RIGHT CONTENT
+                   NAME / ROLE
                    ========================================================= */
-
-        .resume-main {
-            width: 65%;
-            padding: 35px;
-            box-sizing: border-box;
-            min-width: 0;
-            overflow: hidden;
-        }
-
-
-        /* =========================================================
-                   NAME
-                   ========================================================= */
-
         .resume-name {
-            font-size: 26px;
+            font-size: 2.6em;
             font-weight: 700;
             color: #2b2b2b;
             margin: 0;
             text-transform: uppercase;
-            letter-spacing: 1px;
+            letter-spacing: .04em;
             word-break: break-word;
         }
 
         .resume-role {
-            font-size: 13px;
+            font-size: 1.3em;
             color: var(--accent);
             font-weight: 600;
-            letter-spacing: 2px;
+            letter-spacing: .15em;
             text-transform: uppercase;
-            margin-bottom: 25px;
         }
 
+        .resume-head {
+            margin-bottom: calc(2.5em + var(--extra, 0em));
+        }
 
         /* =========================================================
-                   SECTION
+                   MAIN SECTIONS
                    ========================================================= */
-
         .resume-section {
-            margin-bottom: 26px;
+            margin-bottom: calc(2.6em + var(--extra, 0em));
             break-inside: avoid;
             page-break-inside: avoid;
         }
 
         .resume-section-title {
-            font-size: 15px;
+            font-size: 1.5em;
             font-weight: 700;
             color: #2b2b2b;
             text-transform: uppercase;
-            letter-spacing: 1px;
-            margin-bottom: 12px;
+            letter-spacing: .07em;
+            margin-bottom: .8em;
             position: relative;
-            padding-left: 18px;
+            padding-left: 1.2em;
         }
 
             .resume-section-title::before {
                 content: "";
                 position: absolute;
                 left: 0;
-                top: 3px;
-                width: 10px;
-                height: 10px;
+                top: .2em;
+                width: .67em;
+                height: .67em;
                 background: var(--accent);
                 border-radius: 2px;
                 transform: rotate(45deg);
             }
 
-
-        /* =========================================================
-                   BODY
-                   ========================================================= */
-
         .resume-section-body p {
-            font-size: 12.5px;
+            font-size: 1.25em;
             line-height: 1.6;
             color: #555;
-            margin: 0 0 6px 0;
+            margin: 0 0 .5em 0;
             word-break: break-word;
         }
 
+            .resume-section-body p:last-child {
+                margin-bottom: 0;
+            }
 
-        /* =========================================================
-                   EXPERIENCE
-                   ========================================================= */
-
+        /* Experience */
         .resume-entry {
-            margin-bottom: 16px;
-            padding-left: 14px;
+            margin-bottom: calc(1.6em + var(--extra, 0em));
+            padding-left: 1.4em;
             border-left: 2px solid #f0f0f0;
             break-inside: avoid;
             page-break-inside: avoid;
         }
 
+            .resume-entry:last-child {
+                margin-bottom: 0;
+            }
+
         .resume-entry-title {
-            font-size: 13px;
+            font-size: 1.3em;
             font-weight: 700;
             color: #2b2b2b;
+            word-break: break-word;
         }
 
         .resume-entry-sub {
-            font-size: 11.5px;
+            font-size: 1.15em;
             color: var(--accent);
             font-weight: 600;
-            margin-bottom: 4px;
+            margin-bottom: .35em;
+            word-break: break-word;
         }
 
         .resume-entry-meta {
-            font-size: 11px;
+            font-size: 1.1em;
             color: #888;
         }
 
-
-        /* =========================================================
-                   SKILLS
-                   ========================================================= */
-
+        /* Skills */
         .resume-skill-row {
-            margin-bottom: 10px;
+            margin-bottom: calc(1em + var(--extra, 0em) * .5);
         }
 
+            .resume-skill-row:last-child {
+                margin-bottom: 0;
+            }
+
         .resume-skill-label {
-            font-size: 12px;
+            font-size: 1.2em;
             color: #444;
-            margin-bottom: 4px;
+            margin-bottom: .35em;
             display: flex;
             justify-content: space-between;
         }
 
+        /* Hobbies */
+        .resume-hobby-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: .6em;
+            margin-top: .2em;
+        }
+
+        .resume-hobby-chip {
+            font-size: 1.1em;
+            line-height: 1.3;
+            color: #eee;
+            padding: .4em 1em;
+            border: 1px solid var(--accent);
+            border-radius: 1.2em;
+            word-break: break-word;
+            max-width: 100%;
+        }
 
         /* =========================================================
                    THEMES
                    ========================================================= */
-
         .resume-sheet[data-theme="orange"] {
             --accent: #f5a623;
             --sidebar-bg: #2b2b2b;
@@ -730,82 +502,58 @@
             --sidebar-bg: #064e3b;
         }
 
-
         /* =========================================================
-                   MOBILE
+                   MOBILE: same A4 design, scaled to fit (scale set by script)
                    ========================================================= */
-
-        @@media (max-width: 800px) {
-
-            body {
-                background: #fff;
-            }
+        @@media screen and (max-width: 800px) {
 
             .resume-toolbar {
-                padding: 0 15px;
+                max-width: none;
+                margin: 14px 0 10px 0;
+                padding: 0 12px;
+                justify-content: center;
+                flex-wrap: wrap;
+                gap: 8px;
+            }
+
+                .resume-toolbar a,
+                .resume-toolbar button {
+                    flex: 1 1 auto;
+                    text-align: center;
+                    padding: 9px 10px;
+                    font-size: 12px;
+                    white-space: nowrap;
+                }
+
+            .theme-switcher {
+                max-width: none;
+                margin: 0 0 12px 0;
+                padding: 0 12px;
                 justify-content: center;
                 flex-wrap: wrap;
             }
 
-            .theme-switcher {
-                padding: 0 15px;
-                justify-content: center;
-            }
-
             .resume-page-wrapper {
-                padding: 10px 0 30px;
+                padding: 0 0 16px 0;
+                overflow: hidden;
             }
 
             .resume-sheet {
-                transform-origin: top center;
-                /*
-                         * Keep A4 internally.
-                         * Scale it visually on small screens.
-                         */
-                transform: scale( min( 1, calc(100vw / 210mm) ) );
-                margin-bottom: -100px;
+                margin: 0;
+                transform-origin: top left;
+                box-shadow: 0 0 10px rgba(0, 0, 0, .2);
             }
         }
-
 
         /* =========================================================
                    PRINT
                    ========================================================= */
-
         @@media print {
 
-            html,
-            body {
-                width: 210mm;
-                height: 297mm;
+            html, body {
                 margin: 0;
                 padding: 0;
                 background: #fff;
-            }
-
-                body * {
-                    visibility: hidden;
-                }
-
-            .resume-sheet,
-            .resume-sheet * {
-                visibility: visible;
-            }
-
-            .resume-page-wrapper {
-                padding: 0;
-                margin: 0;
-                background: #fff;
-            }
-
-            .resume-sheet {
-                width: 210mm;
-                height: 297mm;
-                min-height: 297mm;
-                margin: 0;
-                box-shadow: none;
-                display: flex;
-                overflow: hidden;
             }
 
             .resume-toolbar,
@@ -813,11 +561,20 @@
                 display: none !important;
             }
 
-            .resume-section,
-            .resume-entry,
-            .resume-sidebar-section {
-                break-inside: avoid;
-                page-break-inside: avoid;
+            .resume-page-wrapper {
+                padding: 0;
+                margin: 0;
+                background: #fff;
+                height: auto !important;
+                overflow: visible;
+            }
+
+            .resume-sheet {
+                margin: 0 !important;
+                box-shadow: none;
+                transform: none !important;
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
             }
 
             @@page {
@@ -825,263 +582,116 @@
                 margin: 0;
             }
         }
-
-        .btn-download {
-            background: #2b2b2b;
-            color: #fff;
-        }
-
-            .btn-download:hover {
-                background: #111;
-            }
     </style>
-
 </head>
-
 
 <body>
 
     <!-- =========================================================
-         TOOLBAR
+         TOOLBAR  (print / download are bound by your external script
+         through the data-resume-action attributes)
          ========================================================= -->
-
     <div class="resume-toolbar">
 
-        <a asp-controller="Candidate"
-           asp-action="Profile"
-           class="btn-edit">
-
-            <i class="fa fa-pen"></i>
-
-            Edit Profile
-
+        <a asp-controller="Candidate" asp-action="Profile" class="btn-edit">
+            <i class="fa fa-pen"></i> Edit Profile
         </a>
 
-
-        <button type="button"
-                class="btn-print"
-                onclick="window.print()">
-
-            <i class="fa fa-print"></i>
-
-            Print / Save as PDF
-
+        <button type="button" class="btn-print" data-resume-action="print">
+            <i class="fa fa-print"></i> Print / Save as PDF
         </button>
 
-        <button type="button"
-                class="btn-download"
-                onclick="downloadResumePDF()">
-
-            <i class="fa fa-download"></i>
-            Download PDF
-
+        <button type="button" class="btn-download" data-resume-action="download">
+            <i class="fa fa-download"></i> Download PDF
         </button>
 
     </div>
-
 
     <!-- =========================================================
          THEME SWITCHER
          ========================================================= -->
-
     <div class="theme-switcher">
-
         <span>Theme</span>
-
-        <div class="theme-swatch active"
-             data-theme="orange"
-             style="background:#2b2b2b;"
-             title="Orange & Charcoal">
-        </div>
-
-        <div class="theme-swatch"
-             data-theme="navy-gold"
-             style="background:#0f2140;"
-             title="Navy & Gold">
-        </div>
-
-        <div class="theme-swatch"
-             data-theme="teal-coral"
-             style="background:#0f3d3e;"
-             title="Teal & Coral">
-        </div>
-
-        <div class="theme-swatch"
-             data-theme="charcoal-blue"
-             style="background:#1f2937;"
-             title="Charcoal & Blue">
-        </div>
-
-        <div class="theme-swatch"
-             data-theme="maroon-beige"
-             style="background:#4a1a1a;"
-             title="Maroon & Beige">
-        </div>
-
-        <div class="theme-swatch"
-             data-theme="emerald"
-             style="background:#064e3b;"
-             title="Emerald">
-        </div>
-
+        <div class="theme-swatch active" data-theme="orange" style="background:#2b2b2b;" title="Orange &amp; Charcoal"></div>
+        <div class="theme-swatch" data-theme="navy-gold" style="background:#0f2140;" title="Navy &amp; Gold"></div>
+        <div class="theme-swatch" data-theme="teal-coral" style="background:#0f3d3e;" title="Teal &amp; Coral"></div>
+        <div class="theme-swatch" data-theme="charcoal-blue" style="background:#1f2937;" title="Charcoal &amp; Blue"></div>
+        <div class="theme-swatch" data-theme="maroon-beige" style="background:#4a1a1a;" title="Maroon &amp; Beige"></div>
+        <div class="theme-swatch" data-theme="emerald" style="background:#064e3b;" title="Emerald"></div>
     </div>
-
 
     <!-- =========================================================
          RESUME PAGE
          ========================================================= -->
-
     <div class="resume-page-wrapper">
 
-        <div class="resume-sheet"
-             id="resumeSheet"
-             data-theme="orange">
+        <div class="resume-sheet" id="resumeSheet" data-theme="orange" data-candidate-name="@Model.CandidateName">
 
-
-            <!-- =================================================
-                 SIDEBAR
-                 ================================================= -->
-
-            <div class="resume-sidebar">
-
+            <!-- ================= SIDEBAR ================= -->
+            <div class="resume-sidebar" data-fit data-fit-max="1.2">
 
                 <!-- PHOTO -->
-
                 <div class="resume-photo-wrap">
-
                     @if (Has(p.sPhoto))
                     {
-                        <img src="@p.sPhoto"
-                             class="resume-photo"
-                             alt="Candidate Photo" />
+                        <img src="@p.sPhoto" class="resume-photo" alt="" data-photo />
                     }
                     else
                     {
-                        <div class="resume-photo-placeholder">
-
-                            <i class="fa fa-user"></i>
-
-                        </div>
+                        <div class="resume-photo-placeholder"><i class="fa fa-user"></i></div>
                     }
-
                 </div>
 
-
-                <!-- =================================================
-                     ADDRESS
-                     ================================================= -->
+                <!-- ADDRESS -->
                 @if (Has(p.CountryID) || Has(p.StateID) || Has(p.CityID) || Has(p.Pincode))
                 {
                     <div class="resume-sidebar-section">
-
-                        <div class="resume-sidebar-title">
-                            Address
-                        </div>
-
+                        <div class="resume-sidebar-title">Address</div>
                         <div class="resume-sidebar-item">
-
-                            <i class="fa fa-map-marker resume-accent"></i>
-
+                            <i class="fa fa-location-dot resume-accent"></i>
                             <span class="muted"
                                   id="rvAddress"
                                   data-country-id="@p.CountryID"
                                   data-state-id="@p.StateID"
                                   data-city-id="@p.CityID"
-                                  data-pincode="@p.Pincode">
-
-                                @if (Has(p.Pincode))
-                                {
-                                    @p.Pincode
-                                }
-                                else
-                                {
-                                    <text>-</text>
-                                }
-
-                            </span>
-
+                                  data-pincode="@p.Pincode">@(Has(p.Pincode) ? p.Pincode : "-")</span>
                         </div>
-
                     </div>
                 }
 
-
-                <!-- =================================================
-                     CONTACT
-                     ================================================= -->
+                <!-- CONTACT -->
                 @if (Has(Model.CandidateEmail))
                 {
-
                     <div class="resume-sidebar-section">
-
-                        <div class="resume-sidebar-title">
-                            Contact Me
-                        </div>
-
+                        <div class="resume-sidebar-title">Contact Me</div>
                         <div class="resume-sidebar-item">
-
                             <i class="fa fa-envelope resume-accent"></i>
-
-                            <span class="muted">
-                                @Model.CandidateEmail
-                            </span>
-
+                            <span class="muted">@Model.CandidateEmail</span>
                         </div>
-
                     </div>
-
                 }
 
-
-                <!-- =================================================
-                     PHONE
-                     ================================================= -->
+                <!-- PHONE -->
                 @if (Has(Model.CandidatePhone))
                 {
-
                     <div class="resume-sidebar-section">
-
-                        <div class="resume-sidebar-title">
-                            Phone
-                        </div>
-
+                        <div class="resume-sidebar-title">Phone</div>
                         <div class="resume-sidebar-item">
-
                             <i class="fa fa-phone resume-accent"></i>
-
-                            <span class="muted">
-                                @Model.CandidatePhone
-                            </span>
-
+                            <span class="muted">@Model.CandidatePhone</span>
                         </div>
-
                     </div>
-
                 }
 
+                <!-- INTERNSHIP / FELLOWSHIP PREFERENCE (hidden last-but-one if page is overfull) -->
+                @{
+                    var prefType = GetLookupName(Model.InternshipFellowshipType, p.Internship_FellowshipType);
+                }
 
-                <!-- =================================================
-                     PREFERRED LOCATION
-                     ================================================= -->
-                @if (
-                Has(p.Preferred_City) ||
-                Has(p.Preferred_State) ||
-                Has(p.Preferred_Country) ||
-                Has(GetLookupName(Model.InternshipFellowshipType, p.Internship_FellowshipType))
-                )
+                @if (Has(p.Preferred_City) || Has(p.Preferred_State) || Has(p.Preferred_Country) || Has(prefType))
                 {
-                    <div class="resume-sidebar-section">
-
-                        <div class="resume-sidebar-title">
-                            Internship / Fellowship Preference
-                        </div>
-
-                        @{
-                            var prefType = GetLookupName(
-                            Model.InternshipFellowshipType,
-                            p.Internship_FellowshipType
-                            );
-                        }
+                    <div class="resume-sidebar-section" data-drop="2">
+                        <div class="resume-sidebar-title">Internship / Fellowship Preference</div>
 
                         @if (Has(prefType))
                         {
@@ -1095,672 +705,300 @@
                         {
                             <div class="resume-sidebar-item">
                                 <i class="fa fa-location-arrow resume-accent"></i>
-                                <span class="muted">
-                                    @string.Join(
-                                             ", ",
-                                             new[] { p.Preferred_City, p.Preferred_State, p.Preferred_Country }.Where(Has)
-                                             )
-                                </span>
+                                <span class="muted">@string.Join(", ", new[] { p.Preferred_City, p.Preferred_State, p.Preferred_Country }.Where(Has))</span>
                             </div>
                         }
-
                     </div>
                 }
-                <!-- =================================================
-                     SOCIAL LINKS
-                     ================================================= -->
+
+                <!-- SOCIAL LINKS -->
                 @if (Has(p.GitHub) || Has(p.Linkedin))
                 {
-
                     <div class="resume-sidebar-section">
-
-                        <div class="resume-sidebar-title">
-                            Links
-                        </div>
-
+                        <div class="resume-sidebar-title">Links</div>
 
                         @if (Has(p.GitHub))
                         {
-
                             <div class="resume-sidebar-item">
-
-                                <i class="fa fa-github resume-accent"></i>
-
-                                <span class="muted">
-                                    @p.GitHub
-                                </span>
-
+                                <i class="fa-brands fa-github resume-accent"></i>
+                                <span class="muted">@p.GitHub</span>
                             </div>
-
                         }
-
 
                         @if (Has(p.Linkedin))
                         {
-
                             <div class="resume-sidebar-item">
-
-                                <i class="fa fa-linkedin resume-accent"></i>
-
-                                <span class="muted">
-                                    @p.Linkedin
-                                </span>
-
+                                <i class="fa-brands fa-linkedin resume-accent"></i>
+                                <span class="muted">@p.Linkedin</span>
                             </div>
-
                         }
-
                     </div>
-
                 }
 
-
-                <!-- =================================================
-                     REFERENCES
-                     ================================================= -->
+                <!-- REFERENCES -->
                 @if (Has(p.sRefName1) || Has(p.sRefName2))
                 {
-
                     <div class="resume-sidebar-section">
-
-                        <div class="resume-sidebar-title">
-                            References
-                        </div>
-
+                        <div class="resume-sidebar-title">References</div>
 
                         @if (Has(p.sRefName1))
                         {
-
                             <div class="resume-sidebar-item">
-
-                                <strong>
-                                    @p.sRefName1
-                                </strong>
-
-                                <span class="muted">
-
-                                    @GetLookupName(
-                                             Model.Relationships,
-                                             p.sRefRelationName1
-                                             )
-
-                                </span>
-
+                                <strong>@p.sRefName1</strong>
+                                <span class="muted">@GetLookupName(Model.Relationships, p.sRefRelationName1)</span>
                                 <br />
-
                                 @if (Has(p.sLocation1))
                                 {
-                                    <span class="muted">
-                                        @p.sLocation1
-                                    </span>
-
+                                    <span class="muted">@p.sLocation1</span>
                                     <br />
                                 }
-
                                 @if (Has(p.sMobile1))
                                 {
-                                    <span class="muted">
-                                        Tel: @p.sMobile1
-                                    </span>
+                                    <span class="muted">Tel: @p.sMobile1</span>
                                 }
-
                             </div>
-
                         }
-
 
                         @if (Has(p.sRefName2))
                         {
-
                             <div class="resume-sidebar-item">
-
-                                <strong>
-                                    @p.sRefName2
-                                </strong>
-
-                                <span class="muted">
-
-                                    @GetLookupName(
-                                             Model.Relationships,
-                                             p.sRefRelationName2
-                                             )
-
-                                </span>
-
+                                <strong>@p.sRefName2</strong>
+                                <span class="muted">@GetLookupName(Model.Relationships, p.sRefRelationName2)</span>
                                 <br />
-
                                 @if (Has(p.sLocation2))
                                 {
-                                    <span class="muted">
-                                        @p.sLocation2
-                                    </span>
-
+                                    <span class="muted">@p.sLocation2</span>
                                     <br />
                                 }
-
                                 @if (Has(p.sMobile2))
                                 {
-                                    <span class="muted">
-                                        Tel: @p.sMobile2
-                                    </span>
+                                    <span class="muted">Tel: @p.sMobile2</span>
                                 }
-
                             </div>
-
                         }
-
                     </div>
-
                 }
 
-
-                <!-- =================================================
-                     EDUCATION
-                     ================================================= -->
-                @if (
-                HasNum(p.Graduation_Year) ||
-                HasNum(p.PG_Year) ||
-                HasNum(p.HSC_DIPLOMA_YEAR) ||
-                HasNum(p.SSC_YEAR)
-                )
+                <!-- EDUCATION -->
+                @if (HasNum(p.Graduation_Year) || HasNum(p.PG_Year) || HasNum(p.HSC_DIPLOMA_YEAR) || HasNum(p.SSC_YEAR))
                 {
-
                     <div class="resume-sidebar-section">
-
-                        <div class="resume-sidebar-title">
-                            Education
-                        </div>
-
+                        <div class="resume-sidebar-title">Education</div>
 
                         @if (HasNum(p.PG_Year))
                         {
-
                             <div class="resume-sidebar-item">
-
-                                <strong>
-
-                                    @GetLookupName(
-                                             Model.Streams,
-                                             p.PG_Stream
-                                             )
-
-                                    — Post Graduation
-
-                                </strong>
-
-                                <span class="muted">
-
-                                    @p.PG_Year
-
-                                    &middot;
-
-                                    @GetLookupName(
-                                             Model.Divisions,
-                                             p.PG_Division
-                                             )
-
-                                </span>
-
+                                <strong>@GetLookupName(Model.Streams, p.PG_Stream) &mdash; Post Graduation</strong>
+                                <span class="muted">@p.PG_Year &middot; @GetLookupName(Model.Divisions, p.PG_Division)</span>
                             </div>
-
                         }
-
 
                         @if (HasNum(p.Graduation_Year))
                         {
-
                             <div class="resume-sidebar-item">
-
-                                <strong>
-
-                                    @GetLookupName(
-                                             Model.Streams,
-                                             p.Graduation_Stream
-                                             )
-
-                                    — Graduation
-
-                                </strong>
-
-                                <span class="muted">
-
-                                    @p.Graduation_Year
-
-                                    &middot;
-
-                                    @GetLookupName(
-                                             Model.Divisions,
-                                             p.Graduation_Division
-                                             )
-
-                                </span>
-
+                                <strong>@GetLookupName(Model.Streams, p.Graduation_Stream) &mdash; Graduation</strong>
+                                <span class="muted">@p.Graduation_Year &middot; @GetLookupName(Model.Divisions, p.Graduation_Division)</span>
                             </div>
-
                         }
-
 
                         @if (HasNum(p.HSC_DIPLOMA_YEAR))
                         {
-
                             <div class="resume-sidebar-item">
-
-                                <strong>
-                                    HSC / Diploma
-                                </strong>
-
-                                <span class="muted">
-
-                                    @p.HSC_DIPLOMA_YEAR
-
-                                    &middot;
-
-                                    @GetLookupName(
-                                             Model.Divisions,
-                                             p.HSC_DIPLOMA_DIVISION
-                                             )
-
-                                </span>
-
+                                <strong>HSC / Diploma</strong>
+                                <span class="muted">@p.HSC_DIPLOMA_YEAR &middot; @GetLookupName(Model.Divisions, p.HSC_DIPLOMA_DIVISION)</span>
                             </div>
-
                         }
-
 
                         @if (HasNum(p.SSC_YEAR))
                         {
-
                             <div class="resume-sidebar-item">
-
-                                <strong>
-                                    SSC / 10th
-                                </strong>
-
-                                <span class="muted">
-
-                                    @p.SSC_YEAR
-
-                                    &middot;
-
-                                    @GetLookupName(
-                                             Model.Divisions,
-                                             p.SSC_DIVISION
-                                             )
-
-                                </span>
-
+                                <strong>SSC / 10th</strong>
+                                <span class="muted">@p.SSC_YEAR &middot; @GetLookupName(Model.Divisions, p.SSC_DIVISION)</span>
                             </div>
-
                         }
-
                     </div>
-
                 }
 
-
-                <!-- =================================================
-                     LANGUAGES
-                     ================================================= -->
+                <!-- LANGUAGES -->
                 @{
-                    var langItems =
-                    new List<(string Lang, string Star)>();
+                    var langItems = new List<(string Lang, string Level)>();
 
                     for (int i = 1; i <= 8; i++)
                     {
-                        var lang =
-                        typeof(ErJobPortal.Models.CandidateProfileModel)
-                        .GetProperty($"sLanguage{i}")
-                        ?.GetValue(p)
-                        ?.ToString();
+                        var lang = typeof(ErJobPortal.Models.CandidateProfileModel).GetProperty($"sLanguage{i}")?.GetValue(p)?.ToString();
+                        var levelID = typeof(ErJobPortal.Models.CandidateProfileModel).GetProperty($"sLanguageStar{i}")?.GetValue(p)?.ToString();
 
-                        var star =
-                        typeof(ErJobPortal.Models.CandidateProfileModel)
-                        .GetProperty($"sLanguageStar{i}")
-                        ?.GetValue(p)
-                        ?.ToString();
+                        string levelName = levelID switch
+                        {
+                            "1" => "Beginner",
+                            "2" => "Intermediate",
+                            "3" => "Advance",
+                            "4" => "Expert",
+                            _ => ""
+                        };
 
                         if (Has(lang))
                         {
-                            langItems.Add((lang, star));
+                            langItems.Add((lang, levelName));
                         }
                     }
                 }
 
-
                 @if (langItems.Any())
                 {
-
                     <div class="resume-sidebar-section">
-
-                        <div class="resume-sidebar-title">
-                            Languages
-                        </div>
-
+                        <div class="resume-sidebar-title">Languages</div>
 
                         @foreach (var l in langItems)
                         {
-
                             <div class="resume-sidebar-item">
-
-                                <span class="muted">
-                                    @l.Lang
-                                </span>
-
-                                @if (Has(l.Star))
+                                <span class="muted">@l.Lang</span>
+                                @if (Has(l.Level))
                                 {
-                                    <span>
-                                        — @l.Star&#9733;
-                                    </span>
+                                    <span>&mdash; @l.Level</span>
                                 }
-
                             </div>
-
                         }
-
                     </div>
-
                 }
 
+                <!-- HOBBIES (one chip per hobby; hidden first if page is overfull) -->
+                @{
+                    var hobbyRaw = p.sHobbies ?? "";
+                    // split on , ; | or new line; if none of those are used, split on spaces
+                    var hobbySeparators = hobbyRaw.IndexOfAny(new[] { ',', ';', '|', '\n', '\r' }) >= 0
+                    ? new[] { ',', ';', '|', '\n', '\r' }
+                    : new[] { ' ', '\t' };
 
-                <!-- =================================================
-                     HOBBIES
-                     ================================================= -->
-                @if (Has(p.sHobbies))
+                    var hobbyList = hobbyRaw
+                    .Split(hobbySeparators, StringSplitOptions.RemoveEmptyEntries)
+                    .Select(x => x.Trim())
+                    .Where(x => x.Length > 0)
+                    .ToList();
+                }
+
+                @if (hobbyList.Any())
                 {
+                    <div class="resume-sidebar-section" data-drop="1">
+                        <div class="resume-sidebar-title">Hobbies</div>
 
-                    <div class="resume-sidebar-section">
-
-                        <div class="resume-sidebar-title">
-                            Hobbies
+                        <div class="resume-hobby-list">
+                            @foreach (var hobby in hobbyList)
+                            {
+                                <span class="resume-hobby-chip">@hobby</span>
+                            }
                         </div>
-
-                        <div class="resume-sidebar-item muted">
-
-                            @p.sHobbies
-
-                        </div>
-
                     </div>
-
                 }
 
             </div>
 
 
-            <!-- =================================================
-                 MAIN CONTENT
-                 ================================================= -->
+            <!-- ================= MAIN CONTENT ================= -->
+            <div class="resume-main" data-fit data-fit-max="1.25">
 
-            <div class="resume-main">
-
-
-                <!-- NAME -->
-
-                <h1 class="resume-name">
-
-                    @(string.IsNullOrWhiteSpace(Model.CandidateName)
-                        ? "Candidate"
-                        : Model.CandidateName)
-
-                </h1>
-
-
-                <!-- ROLE -->
-
-                <div class="resume-role">
-
-                    @GetLookupName(
-                             Model.InternshipFellowshipType,
-                             p.Internship_FellowshipType
-                             )
-
+                <!-- NAME + ROLE -->
+                <div class="resume-head">
+                    <h1 class="resume-name">@(string.IsNullOrWhiteSpace(Model.CandidateName) ? "Candidate" : Model.CandidateName)</h1>
+                    <div class="resume-role">@GetLookupName(Model.InternshipFellowshipType, p.Internship_FellowshipType)</div>
                 </div>
 
-
-                <!-- =================================================
-                     ABOUT ME
-                     ================================================= -->
+                <!-- ABOUT ME -->
                 @if (Has(p.Objective))
                 {
-
                     <div class="resume-section">
-
-                        <div class="resume-section-title">
-                            About Me
-                        </div>
-
+                        <div class="resume-section-title">About Me</div>
                         <div class="resume-section-body">
-
-                            <p>
-                                @p.Objective
-                            </p>
-
+                            <p>@p.Objective</p>
                         </div>
-
                     </div>
-
                 }
 
-
-                <!-- =================================================
-                     INTERNSHIP EXPERIENCE
-                     ================================================= -->
+                <!-- INTERNSHIP EXPERIENCE -->
                 @{
-                    var internships =
-                    new[]
+                    var internships = new[]
                     {
-                new
-                {
-                Name = p.sOrgName1,
-                Title = p.sOrgIntTitle1,
-                Duration = p.sOrgIntDuration1,
-                Status = p.sOrgIntStatus1
-                },
-
-                new
-                {
-                Name = p.sOrgName2,
-                Title = p.sOrgIntTitle2,
-                Duration = p.sOrgIntDuration2,
-                Status = p.sOrgIntStatus2
-                },
-
-                new
-                {
-                Name = p.sOrgName3,
-                Title = p.sOrgIntTitle3,
-                Duration = p.sOrgIntDuration3,
-                Status = p.sOrgIntStatus3
-                },
-
-                new
-                {
-                Name = p.sOrgName4,
-                Title = p.sOrgIntTitle4,
-                Duration = p.sOrgIntDuration4,
-                Status = p.sOrgIntStatus4
+                                new { Name = p.sOrgName1, Title = p.sOrgIntTitle1, Duration = p.sOrgIntDuration1, Status = p.sOrgIntStatus1 },
+                                new { Name = p.sOrgName2, Title = p.sOrgIntTitle2, Duration = p.sOrgIntDuration2, Status = p.sOrgIntStatus2 },
+                                new { Name = p.sOrgName3, Title = p.sOrgIntTitle3, Duration = p.sOrgIntDuration3, Status = p.sOrgIntStatus3 },
+                                new { Name = p.sOrgName4, Title = p.sOrgIntTitle4, Duration = p.sOrgIntDuration4, Status = p.sOrgIntStatus4 }
+                                }.Where(x => Has(x.Name)).ToList();
                 }
-
-            }
-                    .Where(x => Has(x.Name))
-                    .ToList();
-                }
-
 
                 @if (internships.Any())
                 {
-
                     <div class="resume-section">
-
-                        <div class="resume-section-title">
-                            Internship Experience
-                        </div>
-
+                        <div class="resume-section-title">Internship Experience</div>
 
                         @foreach (var it in internships)
                         {
+                            var status = GetLookupName(Model.InternshipStatuses, it.Status);
 
                             <div class="resume-entry">
-
-                                <div class="resume-entry-title">
-
-                                    @GetLookupName(
-                                             Model.InternshipTitles,
-                                             it.Title
-                                             )
-
-                                </div>
-
-
-                                <div class="resume-entry-sub">
-
-                                    @it.Name
-
-                                </div>
-
-
+                                <div class="resume-entry-title">@GetLookupName(Model.InternshipTitles, it.Title)</div>
+                                <div class="resume-entry-sub">@it.Name</div>
                                 <div class="resume-entry-meta">
-
-                                    @GetLookupName(
-                                             Model.InternshipDurations,
-                                             it.Duration
-                                             )
-
-
-                                    @if (
-                                   Has(
-                                   GetLookupName(
-                                   Model.InternshipStatuses,
-                                   it.Status
-                                   )
-                                   )
-                                   )
+                                    @GetLookupName(Model.InternshipDurations, it.Duration)
+                                    @if (Has(status))
                                     {
-
-                                        <span>
-
-                                            &middot;
-
-                                            @GetLookupName(
-                                                     Model.InternshipStatuses,
-                                                     it.Status
-                                                     )
-
-                                        </span>
-
+                                        <span>&middot; @status</span>
                                     }
-
                                 </div>
-
                             </div>
-
                         }
-
                     </div>
-
                 }
 
-
-                <!-- =================================================
-                     ACHIEVEMENTS
-                     ================================================= -->
+                <!-- ACHIEVEMENTS -->
                 @{
-                    var achievements =
-                    new[]
-                    {
-                p.Achievements_Certification1,
-                p.Achievements_Certification2,
-                p.Achievements_Certification3
-            }
-                    .Where(Has)
-                    .ToList();
+                    var achievements = new[] { p.Achievements_Certification1, p.Achievements_Certification2, p.Achievements_Certification3 }
+                    .Where(Has).ToList();
                 }
-
 
                 @if (achievements.Any())
                 {
-
                     <div class="resume-section">
-
-                        <div class="resume-section-title">
-
-                            Achievements & Certifications
-
-                        </div>
-
+                        <div class="resume-section-title">Achievements &amp; Certifications</div>
 
                         <div class="resume-section-body">
-
-                            @foreach (var a in achievements)
+                            @for (int ai = 0; ai < achievements.Count; ai++)
                             {
-
-                                <p>
-                                    &bull; @a
-                                </p>
-
+                                if (ai == achievements.Count - 1 && achievements.Count > 1)
+                                {
+                                    <p data-drop="3">&bull; @achievements[ai]</p>
+                                }
+                                else
+                                {
+                                    <p>&bull; @achievements[ai]</p>
+                                }
                             }
-
                         </div>
-
                     </div>
-
                 }
 
-
-                <!-- =================================================
-                     SKILLS
-                     ================================================= -->
+                <!-- SKILLS -->
                 @{
-                    var skillGroups =
-                    new[]
+                    var resolvedSkillGroups = new[]
                     {
-                ("Technical", p.sTechnicalSkillIDs),
-                ("Medical", p.sMedicalSkillIDs),
-                ("Non-Technical", p.sNonTechnicalSkillIDs)
-            }
-                    .Where(x => Has(x.Item2))
-                    .ToList();
+                                ("Technical", GetSkillNames(p.sTechnicalSkillIDs, Model.TechnicalSkills)),
+                                ("Medical", GetSkillNames(p.sMedicalSkillIDs, Model.MedicalSkills)),
+                                ("Non-Technical", GetSkillNames(p.sNonTechnicalSkillIDs, Model.NonTechnicalSkills))
+                                }.Where(x => Has(x.Item2)).ToList();
                 }
 
-
-                @if (skillGroups.Any())
+                @if (resolvedSkillGroups.Any())
                 {
-
                     <div class="resume-section">
+                        <div class="resume-section-title">Skills</div>
 
-                        <div class="resume-section-title">
-                            Skills
-                        </div>
-
-
-                        @foreach (var g in skillGroups)
+                        @foreach (var g in resolvedSkillGroups)
                         {
-
                             <div class="resume-skill-row">
-
-                                <div class="resume-skill-label">
-
-                                    <span>
-                                        @g.Item1
-                                    </span>
-
-                                </div>
-
-
-                                <div class="resume-section-body">
-
-                                    <p>
-                                        @g.Item2
-                                    </p>
-
-                                </div>
-
+                                <div class="resume-skill-label"><span>@g.Item1</span></div>
+                                <div class="resume-section-body"><p>@g.Item2</p></div>
                             </div>
-
                         }
-
                     </div>
-
                 }
 
             </div>
@@ -1771,102 +1009,272 @@
 
 
     <!-- =========================================================
-         JAVASCRIPT
+         JAVASCRIPT  (auto-fit, address, theme, photo fallback,
+         mobile scale). No print / download code in this file.
          ========================================================= -->
-
     <script>
+        (function () {
+            "use strict";
 
-        document.addEventListener(
-            "DOMContentLoaded",
-            function () {
-
-                /* ============================================
-                   THEME
-                   ============================================ */
-
-                const resumeSheet =
-                    document.getElementById("resumeSheet");
-
-                const swatches =
-                    document.querySelectorAll(".theme-swatch");
+            var MIN_FIT = 0.68;       // smallest allowed text scale
+            var DEFAULT_MAX = 1.2;    // largest allowed text scale
+            var MAX_EXTRA = 0.8;      // em, most extra spacing added between items
 
 
-                const savedTheme =
-                    localStorage.getItem("resumeTheme");
+            /* ---------- AUTO-FIT: fixed A4, no overflow, no big blank space ---------- */
 
+            function overflows(el) { return el.scrollHeight - el.clientHeight > 1; }
 
-                if (savedTheme) {
+            function setFit(el, v) { el.style.setProperty("--fit", v.toFixed(3)); }
 
-                    resumeSheet.setAttribute(
-                        "data-theme",
-                        savedTheme
-                    );
+            function setExtra(el, v) { el.style.setProperty("--extra", v.toFixed(3) + "em"); }
 
-
-                    swatches.forEach(function (swatch) {
-
-                        swatch.classList.remove("active");
-
-
-                        if (
-                            swatch.dataset.theme ===
-                            savedTheme
-                        ) {
-
-                            swatch.classList.add("active");
-
-                        }
-
-                    });
-
+            // share leftover height as small extra spacing between items
+            function tuneGaps(el) {
+                setExtra(el, MAX_EXTRA);
+                if (!overflows(el)) return;
+                var lo = 0, hi = MAX_EXTRA;
+                for (var i = 0; i < 12; i++) {
+                    var mid = (lo + hi) / 2;
+                    setExtra(el, mid);
+                    if (overflows(el)) hi = mid; else lo = mid;
                 }
+                setExtra(el, lo);
+            }
 
+            // if only a modest gap is left at the bottom, spread sections evenly
+            function spread(el) {
+                el.classList.remove("is-spread");
+                var last = el.lastElementChild;
+                if (!last) return;
+                var padB = parseFloat(getComputedStyle(el).paddingBottom) || 0;
+                var free = el.clientHeight - padB - (last.offsetTop + last.offsetHeight);
+                if (free > 2 && free < el.clientHeight * 0.12) el.classList.add("is-spread");
+            }
 
-                swatches.forEach(function (swatch) {
+            function finish(el) { tuneGaps(el); spread(el); }
 
-                    swatch.addEventListener(
-                        "click",
-                        function () {
+            function fitElement(el) {
 
-                            const theme =
-                                this.dataset.theme;
+                var max = parseFloat(el.getAttribute("data-fit-max")) || DEFAULT_MAX;
 
+                el.classList.remove("is-spread");
+                setExtra(el, 0);
 
-                            resumeSheet.setAttribute(
-                                "data-theme",
-                                theme
-                            );
-
-
-                            swatches.forEach(
-                                function (item) {
-
-                                    item.classList.remove(
-                                        "active"
-                                    );
-
-                                }
-                            );
-
-
-                            this.classList.add("active");
-
-
-                            localStorage.setItem(
-                                "resumeTheme",
-                                theme
-                            );
-
-                        }
-                    );
-
+                // un-hide anything hidden by a previous run
+                el.querySelectorAll("[data-dropped]").forEach(function (n) {
+                    n.style.display = "";
+                    n.removeAttribute("data-dropped");
                 });
 
-            }
-        );
+                var drops = Array.prototype.slice.call(el.querySelectorAll("[data-drop]"))
+                    .sort(function (a, b) {
+                        return parseInt(a.getAttribute("data-drop"), 10) - parseInt(b.getAttribute("data-drop"), 10);
+                    });
 
+                var next = 0;
+
+                while (true) {
+
+                    setFit(el, max);
+                    if (!overflows(el)) { finish(el); return; }
+
+                    setFit(el, MIN_FIT);
+                    if (!overflows(el)) {
+                        var lo = MIN_FIT, hi = max;
+                        for (var i = 0; i < 14; i++) {
+                            var mid = (lo + hi) / 2;
+                            setFit(el, mid);
+                            if (overflows(el)) hi = mid; else lo = mid;
+                        }
+                        setFit(el, lo);
+                        finish(el);
+                        return;
+                    }
+
+                    // still too much at the smallest size: hide lowest-priority item
+                    if (next >= drops.length) return;
+                    drops[next].style.display = "none";
+                    drops[next].setAttribute("data-dropped", "1");
+                    next++;
+                }
+            }
+
+            function fitAll() {
+                document.querySelectorAll("[data-fit]").forEach(fitElement);
+                scaleToScreen();
+            }
+
+            var fitTimer = null;
+            function refit() {
+                clearTimeout(fitTimer);
+                fitTimer = setTimeout(fitAll, 30);
+            }
+
+
+            /* ---------- MOBILE: scale the A4 sheet to the screen width ---------- */
+
+            function scaleToScreen() {
+
+                var sheet = document.getElementById("resumeSheet");
+                var wrap = document.querySelector(".resume-page-wrapper");
+                if (!sheet || !wrap) return;
+
+                if (window.innerWidth > 800) {
+                    sheet.style.transform = "";
+                    sheet.style.marginLeft = "";
+                    wrap.style.height = "";
+                    return;
+                }
+
+                var side = 12;
+
+                sheet.style.transform = "none";
+                sheet.style.marginLeft = "0px";
+
+                var w = sheet.offsetWidth;
+                var h = sheet.offsetHeight;
+                var scale = Math.min(1, (document.documentElement.clientWidth - side * 2) / w);
+
+                sheet.style.transformOrigin = "top left";
+                sheet.style.transform = "scale(" + scale + ")";
+                sheet.style.marginLeft = side + "px";
+                wrap.style.height = (h * scale + 16) + "px";
+            }
+
+
+            /* ---------- ADDRESS (country / state / city lookup) ---------- */
+
+            function initAddress() {
+
+                var el = document.getElementById("rvAddress");
+                if (!el) return;
+
+                var countryID = el.getAttribute("data-country-id") || "";
+                var stateID = el.getAttribute("data-state-id") || "";
+                var cityID = el.getAttribute("data-city-id") || "";
+                var pincode = el.getAttribute("data-pincode") || "";
+
+                function render(city, state, country) {
+
+                    var parts = [city, state, country, pincode].filter(function (x) {
+                        return x && x.trim() !== "";
+                    });
+
+                    // drop adjacent duplicates such as "Geta, Geta"
+                    var clean = parts.filter(function (x, i) {
+                        return i === 0 || x.trim().toLowerCase() !== parts[i - 1].trim().toLowerCase();
+                    });
+
+                    el.textContent = clean.length ? clean.join(", ") : "-";
+                    refit();
+                }
+
+                if (!countryID) return;
+
+                function json(r) { return r.json(); }
+
+                fetch("/Location/GetCountries").then(json).then(function (countries) {
+
+                    var c = countries.find(function (x) { return String(x.id) === String(countryID); });
+                    var countryName = c ? c.name : "";
+                    var countryCode = c ? c.iso2 : countryID;
+
+                    if (!stateID) { render("", "", countryName); return; }
+
+                    fetch("/Location/GetStates?countryCode=" + encodeURIComponent(countryCode)).then(json).then(function (states) {
+
+                        var s = states.find(function (x) { return String(x.id) === String(stateID); });
+                        var stateName = s ? s.name : "";
+                        var stateCode = s ? (s.stateCode || (String(s.id).split(":")[1] || s.id)) : "";
+
+                        if (!cityID) { render("", stateName, countryName); return; }
+
+                        fetch("/Location/GetCities?countryCode=" + encodeURIComponent(countryCode) +
+                              "&stateCode=" + encodeURIComponent(stateCode))
+                            .then(json)
+                            .then(function (cities) {
+                                var ct = cities.find(function (x) { return String(x.id) === String(cityID); });
+                                render(ct ? ct.name : "", stateName, countryName);
+                            })
+                            .catch(function () { render("", stateName, countryName); });
+
+                    }).catch(function () { render("", "", countryName); });
+
+                }).catch(function (err) { console.log("Address resolution error:", err); });
+            }
+
+
+            /* ---------- THEME ---------- */
+
+            function initTheme() {
+
+                var sheet = document.getElementById("resumeSheet");
+                if (!sheet) return;
+
+                var swatches = document.querySelectorAll(".theme-swatch");
+                var saved = null;
+
+                try { saved = localStorage.getItem("resumeTheme"); } catch (e) { }
+
+                if (saved) {
+                    sheet.setAttribute("data-theme", saved);
+                    swatches.forEach(function (s) {
+                        s.classList.toggle("active", s.dataset.theme === saved);
+                    });
+                }
+
+                swatches.forEach(function (swatch) {
+                    swatch.addEventListener("click", function () {
+                        var theme = this.dataset.theme;
+                        sheet.setAttribute("data-theme", theme);
+                        swatches.forEach(function (s) { s.classList.remove("active"); });
+                        this.classList.add("active");
+                        try { localStorage.setItem("resumeTheme", theme); } catch (e) { }
+                    });
+                });
+            }
+
+
+            /* ---------- PHOTO: fall back to the icon if the image is missing ---------- */
+
+            function initPhoto() {
+
+                document.querySelectorAll("img[data-photo]").forEach(function (img) {
+
+                    function swap() {
+                        var ph = document.createElement("div");
+                        ph.className = "resume-photo-placeholder";
+                        ph.innerHTML = '<i class="fa fa-user"></i>';
+                        img.replaceWith(ph);
+                        refit();
+                    }
+
+                    img.addEventListener("error", swap);
+                    if (img.complete && img.naturalWidth === 0) swap();
+                });
+            }
+
+
+            /* ---------- INIT ---------- */
+
+            document.addEventListener("DOMContentLoaded", function () {
+                initTheme();
+                initPhoto();
+                initAddress();
+                fitAll();
+
+                if (document.fonts && document.fonts.ready) {
+                    document.fonts.ready.then(refit);
+                }
+            });
+
+            window.addEventListener("load", refit);
+            window.addEventListener("resize", scaleToScreen);
+            window.addEventListener("orientationchange", scaleToScreen);
+
+        })();
     </script>
 
 </body>
-
 </html>

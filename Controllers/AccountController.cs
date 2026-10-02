@@ -371,6 +371,7 @@ namespace ErJobPortal.Controllers
                 HttpContext.Session.SetInt32("OrgID", user.nID);
                 HttpContext.Session.SetString("OrgName", user.sOrgName ?? "");
                 HttpContext.Session.SetString("OrgEmail", user.sEmail ?? "");
+                HttpContext.Session.SetString("OrgCode", user.orgCode ?? "");
                 return RedirectToAction("Dashboard", "Organization");
             }
 

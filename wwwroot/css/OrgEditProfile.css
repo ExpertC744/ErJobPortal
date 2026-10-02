@@ -1,0 +1,496 @@
+﻿
+<style >
+/* =========================================================
+       1TRAINEE - EDIT INTERNSHIP POST
+       ========================================================= */
+.internship-edit-page {
+    width: 100%;
+    padding: 25px 20px 45px;
+    box-sizing: border-box;
+}
+
+
+/* =========================================================
+       PAGE HEADER
+       ========================================================= */
+
+.internship-page-header {
+    margin-bottom: 25px;
+}
+
+    .internship-page-header h1 {
+        margin: 0;
+        color: #0f172a;
+        font-size: 28px;
+        font-weight: 700;
+        line-height: 1.3;
+    }
+
+    .internship-page-header p {
+        margin: 7px 0 0;
+        color: #64748b;
+        font-size: 14px;
+    }
+
+
+/* =========================================================
+       MESSAGE
+       ========================================================= */
+
+.success-message {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 20px;
+    padding: 13px 16px;
+    color: #166534;
+    background: #f0fdf4;
+    border: 1px solid #bbf7d0;
+    border-radius: 10px;
+    font-size: 14px;
+}
+
+    .success-message i {
+        color: #16a34a;
+    }
+
+.error-message {
+    margin-bottom: 20px;
+    padding: 14px 16px;
+    color: #991b1b;
+    background: #fef2f2;
+    border: 1px solid #fecaca;
+    border-radius: 10px;
+    font-size: 14px;
+}
+
+    .error-message strong {
+        display: block;
+        margin-bottom: 6px;
+    }
+
+
+/* =========================================================
+       MAIN FORM CARD
+       ========================================================= */
+
+.internship-form-card {
+    width: 100%;
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 16px;
+    overflow: hidden;
+    box-shadow: 0 5px 20px rgba(15, 23, 42, 0.05);
+}
+
+
+/* =========================================================
+       CARD HEADER
+       ========================================================= */
+
+.internship-form-header {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 20px 24px;
+    background: linear-gradient( 135deg, #f0fdfa, #ffffff );
+    border-bottom: 1px solid #e2e8f0;
+}
+
+.internship-form-header-icon {
+    width: 46px;
+    height: 46px;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #ccfbf1;
+    color: #0d9488;
+    border-radius: 12px;
+    font-size: 19px;
+}
+
+.internship-form-header h2 {
+    margin: 0 0 3px;
+    color: #0f172a;
+    font-size: 19px;
+    font-weight: 700;
+}
+
+.internship-form-header p {
+    margin: 0;
+    color: #64748b;
+    font-size: 13px;
+}
+
+
+/* =========================================================
+       FORM BODY
+       ========================================================= */
+
+.internship-form-body {
+    padding: 28px;
+}
+
+.internship-form-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 22px 20px;
+}
+
+
+/* =========================================================
+       FORM GROUP
+       ========================================================= */
+
+.internship-field {
+    min-width: 0;
+}
+
+    .internship-field label {
+        display: block;
+        margin-bottom: 8px;
+        color: #334155;
+        font-size: 13px;
+        font-weight: 600;
+    }
+
+.required {
+    color: #dc2626;
+    margin-left: 2px;
+}
+
+
+/* =========================================================
+       INPUT WRAPPER
+       ========================================================= */
+
+.input-wrapper {
+    position: relative;
+    width: 100%;
+}
+
+    .input-wrapper > i {
+        position: absolute;
+        top: 50%;
+        left: 15px;
+        z-index: 2;
+        transform: translateY(-50%);
+        color: #0d9488;
+        font-size: 14px;
+        pointer-events: none;
+    }
+
+
+/* =========================================================
+       INPUT
+       ========================================================= */
+
+.form-control {
+    width: 100%;
+    height: 47px;
+    padding: 0 14px 0 42px;
+    box-sizing: border-box;
+    color: #0f172a;
+    background: #ffffff;
+    border: 1px solid #cbd5e1;
+    border-radius: 9px;
+    outline: none;
+    font-size: 14px;
+    transition: border-color .2s ease, box-shadow .2s ease;
+}
+
+    .form-control:focus {
+        border-color: #0d9488;
+        box-shadow: 0 0 0 3px rgba(13, 148, 136, .10);
+    }
+
+    .form-control[readonly] {
+        background: #f8fafc;
+        color: #64748b;
+        cursor: not-allowed;
+    }
+
+
+/* =========================================================
+       TEXTAREA
+       ========================================================= */
+
+textarea.form-control {
+    height: 105px;
+    padding: 12px 14px 12px 42px;
+    resize: vertical;
+    line-height: 1.5;
+}
+
+.textarea-wrapper > i {
+    top: 18px;
+    transform: none;
+}
+
+
+/* =========================================================
+       FILE INPUT
+       ========================================================= */
+
+.file-input {
+    width: 100%;
+    height: 47px;
+    padding: 0;
+    box-sizing: border-box;
+    color: #475569;
+    background: #ffffff;
+    border: 1px solid #cbd5e1;
+    border-radius: 9px;
+    font-size: 13px;
+}
+
+    .file-input:focus {
+        outline: none;
+        border-color: #0d9488;
+        box-shadow: 0 0 0 3px rgba(13, 148, 136, .10);
+    }
+
+    .file-input::file-selector-button {
+        height: 45px;
+        padding: 0 16px;
+        margin-right: 12px;
+        color: #0f766e;
+        background: #f0fdfa;
+        border: none;
+        border-right: 1px solid #ccfbf1;
+        font-size: 13px;
+        font-weight: 600;
+        cursor: pointer;
+    }
+
+
+/* =========================================================
+       FILE NOTE
+       ========================================================= */
+
+.field-note {
+    margin-top: 6px;
+    color: #64748b;
+    font-size: 11px;
+}
+
+
+/* =========================================================
+       LOGO PREVIEW
+       ========================================================= */
+
+.logo-preview-wrapper {
+    min-height: 105px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+    padding: 12px 15px;
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 9px;
+    box-sizing: border-box;
+}
+
+.logo-preview-info {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.logo-preview-label {
+    color: #334155;
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.logo-size {
+    color: #94a3b8;
+    font-size: 11px;
+}
+
+.logo-preview {
+    width: 72px;
+    height: 72px;
+    flex-shrink: 0;
+    object-fit: contain;
+    background: #ffffff;
+    border: 1px solid #dbe3e8;
+    border-radius: 8px;
+}
+
+
+/* =========================================================
+       VALIDATION
+       ========================================================= */
+
+.validation-message {
+    display: block;
+    margin-top: 5px;
+    color: #dc2626;
+    font-size: 12px;
+}
+
+
+/* =========================================================
+       FULL WIDTH FIELDS
+       ========================================================= */
+
+.field-full {
+    grid-column: span 3;
+}
+
+
+/* =========================================================
+       FORM FOOTER
+       ========================================================= */
+
+.internship-form-footer {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 12px;
+    padding: 18px 28px;
+    background: #f8fafc;
+    border-top: 1px solid #e2e8f0;
+}
+
+
+/* =========================================================
+       SAVE BUTTON
+       ========================================================= */
+
+.save-btn {
+    min-width: 125px;
+    height: 43px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 0 22px;
+    color: #ffffff;
+    background: linear-gradient( 135deg, #0d9488, #0f766e );
+    border: none;
+    border-radius: 9px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    box-shadow: 0 4px 12px rgba(13, 148, 136, .18);
+    transition: all .2s ease;
+}
+
+    .save-btn:hover {
+        background: linear-gradient( 135deg, #0f766e, #115e59 );
+        transform: translateY(-1px);
+    }
+
+
+/* =========================================================
+       CANCEL BUTTON
+       ========================================================= */
+
+.cancel-btn {
+    min-width: 105px;
+    height: 43px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 0 20px;
+    color: #475569;
+    background: #ffffff;
+    border: 1px solid #cbd5e1;
+    border-radius: 9px;
+    font-size: 14px;
+    font-weight: 600;
+    text-decoration: none;
+    transition: all .2s ease;
+}
+
+    .cancel-btn:hover {
+        color: #334155;
+        background: #f1f5f9;
+    }
+
+
+/* =========================================================
+       TABLET
+       ========================================================= */
+
+@media (max-width: 1100px) {
+
+    .internship-form-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .field-full {
+        grid-column: span 2;
+    }
+}
+
+
+/* =========================================================
+       MOBILE
+       ========================================================= */
+
+@media (max-width: 700px) {
+
+    .internship-edit-page {
+        padding: 20px 12px 35px;
+    }
+
+    .internship-page-header h1 {
+        font-size: 24px;
+    }
+
+    .internship-form-header {
+        padding: 18px;
+    }
+
+    .internship-form-body {
+        padding: 20px;
+    }
+
+    .internship-form-grid {
+        grid-template-columns: 1fr;
+        gap: 18px;
+    }
+
+    .field-full {
+        grid-column: span 1;
+    }
+
+    
+}
+
+
+/* =========================================================
+       SMALL MOBILE
+       ========================================================= */
+
+@media (max-width: 450px) {
+
+    .internship-edit-page {
+        padding-left: 8px;
+        padding-right: 8px;
+    }
+
+    .internship-form-body {
+        padding: 16px;
+    }
+
+    .internship-form-header {
+        gap: 10px;
+    }
+
+    .internship-form-header-icon {
+        width: 42px;
+        height: 42px;
+    }
+
+    .internship-form-header h2 {
+        font-size: 17px;
+    }
+}
+ 

@@ -1,4 +1,7 @@
-﻿@{
+﻿@model ErJobPortal.Models.SAChartsViewModel
+@* Radhika30-09 *@
+<link rel="stylesheet" href="~/css/SACharts.css" asp-append-version="true" />
+@{
     Layout = "~/Views/Shared/_DashboardLayout.cshtml";
 
     ViewData["Title"] = "Charts";
@@ -9,190 +12,6 @@
 <!-- Chart.js -->
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
-
-<style>
-
- 
- /* =====================================================
-   1TRAINEE MONTHLY ANALYTICS @* Radhika29-09 *@
-===================================================== */
-
-.analytics-card {
-    background: #ffffff;
-    border: 1px solid #dfe5e8;
-    border-radius: 14px;
-    overflow: hidden;
-    height: 100%;
-    box-shadow: 0 4px 14px rgba(15, 23, 42, 0.04);
-    transition: all .25s ease;
-}
-
-.analytics-card:hover {
-    box-shadow: 0 8px 24px rgba(15, 23, 42, 0.08);
-}
-
-/* Chart Header */
-.analytics-header {
-    min-height: 52px;
-    padding: 0 18px;
-    display: flex;
-    align-items: center;
-    gap: 11px;
-    border-bottom: 1px solid #dfe5e8;
-    background: #ffffff;
-}
-
-.analytics-header-icon {
-    width: 25px;
-    height: 25px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: #1e7b67;
-    font-size: 17px;
-}
-
-.analytics-header h5 {
-    margin: 0;
-    color: #16324f;
-    font-size: 17px;
-    font-weight: 500;
-    letter-spacing: .1px;
-}
-
-/* Chart Body */
-.analytics-body {
-    padding: 18px 16px 14px;
-}
-
-.chart-wrapper {
-    position: relative;
-    width: 100%;
-    height: 235px;
-}
-
-.chart-wrapper svg {
-    width: 100%;
-    height: 100%;
-    display: block;
-}
-
-/* Legend */
-.chart-legend {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    gap: 8px;
-    margin-bottom: 4px;
-    color: #667085;
-    font-size: 12px;
-}
-
-.legend-box {
-    width: 50px;
-    height: 16px;
-    border: 2px solid #1e7b67;
-    background: rgba(30, 123, 103, .14);
-}
-
-.legend-box-bar {
-    width: 50px;
-    height: 16px;
-    background: #1e7b67;
-}
-
-/* Axis text */
-.chart-axis-text {
-    fill: #667085;
-    font-size: 11px;
-    font-family: Arial, sans-serif;
-}
-
-/* Grid */
-.chart-grid {
-    stroke: #e6eaed;
-    stroke-width: 1;
-}
-
-.chart-axis {
-    stroke: #cfd6da;
-    stroke-width: 1;
-}
-
-/* Line chart */
-.chart-line {
-    fill: none;
-    stroke: #1e7b67;
-    stroke-width: 2.5;
-    stroke-linecap: round;
-    stroke-linejoin: round;
-}
-
-.chart-area {
-    fill: rgba(30, 123, 103, .14);
-}
-
-.chart-point {
-    fill: #ffffff;
-    stroke: #1e7b67;
-    stroke-width: 2;
-}
-
-/* Bar chart */
-.chart-bar {
-    fill: #1e7b67;
-    transition: opacity .2s ease;
-}
-
-.chart-bar:hover {
-    opacity: .78;
-}
-
-/* Current value */
-.analytics-value {
-    text-align: center;
-    margin-top: 5px;
-    color: #667085;
-    font-size: 11px;
-}
-
-/* Footer */
-.analytics-footer {
-    border-top: 1px solid #edf0f2;
-    padding: 10px 16px;
-    color: #7a8494;
-    font-size: 11px;
-}
-
-.analytics-footer i {
-    color: #1e7b67;
-    margin-right: 5px;
-}
-
-@@media (max-width: 767px) {
-
-    .analytics-header {
-        min-height: 48px;
-        padding: 0 14px;
-    }
-
-    .analytics-header h5 {
-        font-size: 15px;
-    }
-
-    .analytics-body {
-        padding: 15px 10px 10px;
-    }
-
-    .chart-wrapper {
-        height: 210px;
-    }
-
-    .chart-axis-text {
-        font-size: 9px;
-    }
-}
-</style>
 
 
 <div class="container-fluid sa-chart-page">
@@ -215,380 +34,382 @@
     </div>
 
 
-  <!-- =====================================================
-     1TRAINEE - YEARLY TRAINEE ANALYTICS
-===================================================== -->
+    <!-- =====================================================
+         1TRAINEE - YEARLY TRAINEE ANALYTICS
+    ===================================================== -->
 
-<div class="row g-4 mb-4">
+    <div class="row g-4 mb-4">
 
-    <!-- =================================================
-         NO. OF TRAINEE REGISTERED IN ONE YEAR
-    ================================================== -->
+        <!-- =================================================
+             NO. OF TRAINEE REGISTERED IN ONE YEAR
+        ================================================== -->
 
-    <div class="col-xl-6 col-lg-6 col-md-12">
+        <div class="col-xl-6 col-lg-6 col-md-12">
 
-        <div class="analytics-card">
+            <div class="analytics-card">
 
-            <!-- Header -->
-            <div class="analytics-header">
+                <!-- Header -->
+                <div class="analytics-header">
 
-                <div class="analytics-header-icon">
-                    <i class="fas fa-chart-line"></i>
-                </div>
+                    <div class="analytics-header-icon">
+                        <i class="fas fa-chart-line"></i>
+                    </div>
 
-                <h5>
-                    No. of Trainee registered in one year
-                </h5>
-
-            </div>
-
-
-            <!-- Body -->
-            <div class="analytics-body">
-
-                <!-- Legend -->
-                <div class="chart-legend">
-
-                    <span class="legend-box"></span>
-
-                    <span>
-                        No. of Trainee registered
-                    </span>
+                    <h5>
+                        No. of Trainee registered in one year
+                    </h5>
 
                 </div>
 
 
-                <!-- Chart -->
-                <div class="chart-wrapper">
+                <!-- Body -->
+                <div class="analytics-body">
 
-                    <svg id="yearlyTraineeChart"
-                         viewBox="0 0 760 300"
-                         preserveAspectRatio="none">
+                    <!-- Legend -->
+                    <div class="chart-legend">
 
-                        <!-- Horizontal Grid -->
-                        <line class="chart-grid"
-                              x1="65" y1="25"
-                              x2="735" y2="25" />
+                        <span class="legend-box"></span>
 
-                        <line class="chart-grid"
-                              x1="65" y1="70"
-                              x2="735" y2="70" />
-
-                        <line class="chart-grid"
-                              x1="65" y1="115"
-                              x2="735" y2="115" />
-
-                        <line class="chart-grid"
-                              x1="65" y1="160"
-                              x2="735" y2="160" />
-
-                        <line class="chart-grid"
-                              x1="65" y1="205"
-                              x2="735" y2="205" />
-
-                        <line class="chart-grid"
-                              x1="65" y1="250"
-                              x2="735" y2="250" />
-
-
-                        <!-- Vertical Grid -->
-                        <g id="yearlyVerticalGrid"></g>
-
-
-                        <!-- Axis -->
-                        <line class="chart-axis"
-                              x1="65"
-                              y1="25"
-                              x2="65"
-                              y2="250" />
-
-                        <line class="chart-axis"
-                              x1="65"
-                              y1="250"
-                              x2="735"
-                              y2="250" />
-
-
-                        <!-- Y Axis Values -->
-                        <text class="chart-axis-text"
-                              x="53"
-                              y="254"
-                              text-anchor="end">
-                            0
-                        </text>
-
-                        <text class="chart-axis-text"
-                              x="53"
-                              y="209"
-                              text-anchor="end">
-                            100
-                        </text>
-
-                        <text class="chart-axis-text"
-                              x="53"
-                              y="164"
-                              text-anchor="end">
-                            200
-                        </text>
-
-                        <text class="chart-axis-text"
-                              x="53"
-                              y="119"
-                              text-anchor="end">
-                            300
-                        </text>
-
-                        <text class="chart-axis-text"
-                              x="53"
-                              y="74"
-                              text-anchor="end">
-                            400
-                        </text>
-
-                        <text class="chart-axis-text"
-                              x="53"
-                              y="29"
-                              text-anchor="end">
-                            500
-                        </text>
-
-
-                        <!-- Y Axis Title -->
-                        <text class="chart-axis-text"
-                              transform="translate(17 140) rotate(-90)"
-                              text-anchor="middle">
-
+                        <span>
                             No. of Trainee registered
+                        </span>
 
-                        </text>
-
-
-                        <!-- Area -->
-                        <polygon id="yearlyTraineeArea"
-                                 class="chart-area"
-                                 points="">
-                        </polygon>
+                    </div>
 
 
-                        <!-- Line -->
-                        <polyline id="yearlyTraineeLine"
-                                  class="chart-line"
-                                  points="">
-                        </polyline>
+                    <!-- Chart -->
+                    <div class="chart-wrapper">
+
+                        <svg id="yearlyTraineeChart"
+                             viewBox="0 0 760 300"
+                             preserveAspectRatio="none">
+
+                            <!-- Horizontal Grid -->
+                            <line class="chart-grid"
+                                  x1="65" y1="25"
+                                  x2="735" y2="25" />
+
+                            <line class="chart-grid"
+                                  x1="65" y1="70"
+                                  x2="735" y2="70" />
+
+                            <line class="chart-grid"
+                                  x1="65" y1="115"
+                                  x2="735" y2="115" />
+
+                            <line class="chart-grid"
+                                  x1="65" y1="160"
+                                  x2="735" y2="160" />
+
+                            <line class="chart-grid"
+                                  x1="65" y1="205"
+                                  x2="735" y2="205" />
+
+                            <line class="chart-grid"
+                                  x1="65" y1="250"
+                                  x2="735" y2="250" />
 
 
-                        <!-- Points -->
-                        <g id="yearlyTraineePoints"></g>
+                            <!-- Vertical Grid -->
+                            <g id="yearlyVerticalGrid"></g>
 
 
-                        <!-- X Axis -->
-                        <g id="yearlyTraineeMonths"></g>
+                            <!-- Axis -->
+                            <line class="chart-axis"
+                                  x1="65"
+                                  y1="25"
+                                  x2="65"
+                                  y2="250" />
+
+                            <line class="chart-axis"
+                                  x1="65"
+                                  y1="250"
+                                  x2="735"
+                                  y2="250" />
 
 
-                        <!-- X Axis Title -->
-                        <text class="chart-axis-text"
-                              x="400"
-                              y="295"
-                              text-anchor="middle">
+                            <!-- Y Axis Values -->
+                            <text class="chart-axis-text"
+                                  x="53"
+                                  y="254"
+                                  text-anchor="end">
+                                0
+                            </text>
 
-                            No. Of months
+                            <text class="chart-axis-text"
+                                  x="53"
+                                  y="209"
+                                  text-anchor="end">
+                                100
+                            </text>
 
-                        </text>
+                            <text class="chart-axis-text"
+                                  x="53"
+                                  y="164"
+                                  text-anchor="end">
+                                200
+                            </text>
 
-                    </svg>
+                            <text class="chart-axis-text"
+                                  x="53"
+                                  y="119"
+                                  text-anchor="end">
+                                300
+                            </text>
+
+                            <text class="chart-axis-text"
+                                  x="53"
+                                  y="74"
+                                  text-anchor="end">
+                                400
+                            </text>
+
+                            <text class="chart-axis-text"
+                                  x="53"
+                                  y="29"
+                                  text-anchor="end">
+                                500
+                            </text>
+
+
+                            <!-- Y Axis Title -->
+                            <text class="chart-axis-text"
+                                  transform="translate(17 140) rotate(-90)"
+                                  text-anchor="middle">
+
+                                No. of Trainee registered
+
+                            </text>
+
+
+                            <!-- Area -->
+                            <polygon id="yearlyTraineeArea"
+                                     class="chart-area"
+                                     points="">
+                            </polygon>
+
+
+                            <!-- Line -->
+                            <polyline id="yearlyTraineeLine"
+                                      class="chart-line"
+                                      points="">
+                            </polyline>
+
+
+                            <!-- Points -->
+                            <g id="yearlyTraineePoints"></g>
+
+
+                            <!-- X Axis -->
+                            <g id="yearlyTraineeMonths"></g>
+
+
+                            <!-- X Axis Title -->
+                            <text class="chart-axis-text"
+                                  x="400"
+                                  y="295"
+                                  text-anchor="middle">
+
+                                No. Of months
+
+                            </text>
+
+                        </svg>
+
+                    </div>
 
                 </div>
 
-            </div>
 
+                <!-- Footer -->
+                <div class="analytics-footer">
 
-            <!-- Footer -->
-            <div class="analytics-footer">
+                    <i class="fas fa-chart-line"></i>
 
-                <i class="fas fa-chart-line"></i>
+                    Monthly trainee registration trend
 
-                Monthly trainee registration trend
+                </div>
 
             </div>
 
         </div>
 
-    </div>
 
+        <!-- =================================================
+             INTERNSHIP POST FROM ORGANIZATION
+        ================================================== -->
 
-    <!-- =================================================
-         INTERNSHIP POST FROM ORGANIZATION
-    ================================================== -->
+        <div class="col-xl-6 col-lg-6 col-md-12">
 
-    <div class="col-xl-6 col-lg-6 col-md-12">
+            <div class="analytics-card">
 
-        <div class="analytics-card">
+                <!-- Header -->
+                <div class="analytics-header">
 
-            <!-- Header -->
-            <div class="analytics-header">
+                    <div class="analytics-header-icon">
+                        <i class="fas fa-chart-bar"></i>
+                    </div>
 
-                <div class="analytics-header-icon">
-                    <i class="fas fa-chart-bar"></i>
-                </div>
-
-                <h5>
-                    Internship post from Organization
-                </h5>
-
-            </div>
-
-
-            <!-- Body -->
-            <div class="analytics-body">
-
-                <!-- Legend -->
-                <div class="chart-legend">
-
-                    <span class="legend-box-bar"></span>
-
-                    <span>
-                        No. of post
-                    </span>
+                    <h5>
+                        Internship post from Organization
+                    </h5>
 
                 </div>
 
 
-                <!-- Chart -->
-                <div class="chart-wrapper">
+                <!-- Body -->
+                <div class="analytics-body">
 
-                    <svg id="organizationPostChart"
-                         viewBox="0 0 760 300"
-                         preserveAspectRatio="none">
+                    <!-- Legend -->
+                    <div class="chart-legend">
 
-                        <!-- Horizontal Grid -->
-                        <line class="chart-grid"
-                              x1="65" y1="25"
-                              x2="735" y2="25" />
+                        <span class="legend-box-bar"></span>
 
-                        <line class="chart-grid"
-                              x1="65" y1="70"
-                              x2="735" y2="70" />
-
-                        <line class="chart-grid"
-                              x1="65" y1="115"
-                              x2="735" y2="115" />
-
-                        <line class="chart-grid"
-                              x1="65" y1="160"
-                              x2="735" y2="160" />
-
-                        <line class="chart-grid"
-                              x1="65" y1="205"
-                              x2="735" y2="205" />
-
-                        <line class="chart-grid"
-                              x1="65" y1="250"
-                              x2="735" y2="250" />
-
-
-                        <!-- Vertical Grid -->
-                        <g id="organizationVerticalGrid"></g>
-
-
-                        <!-- Axis -->
-                        <line class="chart-axis"
-                              x1="65"
-                              y1="25"
-                              x2="65"
-                              y2="250" />
-
-                        <line class="chart-axis"
-                              x1="65"
-                              y1="250"
-                              x2="735"
-                              y2="250" />
-
-
-                        <!-- Y Axis Values -->
-                        <text class="chart-axis-text"
-                              x="53"
-                              y="254"
-                              text-anchor="end">
-                            0
-                        </text>
-
-                        <text class="chart-axis-text"
-                              x="53"
-                              y="209"
-                              text-anchor="end">
-                            14
-                        </text>
-
-                        <text class="chart-axis-text"
-                              x="53"
-                              y="164"
-                              text-anchor="end">
-                            28
-                        </text>
-
-                        <text class="chart-axis-text"
-                              x="53"
-                              y="119"
-                              text-anchor="end">
-                            42
-                        </text>
-
-                        <text class="chart-axis-text"
-                              x="53"
-                              y="74"
-                              text-anchor="end">
-                            56
-                        </text>
-
-                        <text class="chart-axis-text"
-                              x="53"
-                              y="29"
-                              text-anchor="end">
-                            70
-                        </text>
-
-
-                        <!-- Y Axis Title -->
-                        <text class="chart-axis-text"
-                              transform="translate(17 140) rotate(-90)"
-                              text-anchor="middle">
-
+                        <span>
                             No. of post
+                        </span>
 
-                        </text>
-
-
-                        <!-- Bars -->
-                        <g id="organizationPostBars"></g>
+                    </div>
 
 
-                        <!-- X Axis -->
-                        <g id="organizationPostMonths"></g>
+                    <!-- Chart -->
+                    <div class="chart-wrapper">
+
+                        <svg id="organizationPostChart"
+                             viewBox="0 0 760 300"
+                             preserveAspectRatio="none">
+
+                            <!-- Horizontal Grid -->
+                            <line class="chart-grid"
+                                  x1="65" y1="25"
+                                  x2="735" y2="25" />
+
+                            <line class="chart-grid"
+                                  x1="65" y1="70"
+                                  x2="735" y2="70" />
+
+                            <line class="chart-grid"
+                                  x1="65" y1="115"
+                                  x2="735" y2="115" />
+
+                            <line class="chart-grid"
+                                  x1="65" y1="160"
+                                  x2="735" y2="160" />
+
+                            <line class="chart-grid"
+                                  x1="65" y1="205"
+                                  x2="735" y2="205" />
+
+                            <line class="chart-grid"
+                                  x1="65" y1="250"
+                                  x2="735" y2="250" />
 
 
-                        <!-- X Axis Title -->
-                        <text class="chart-axis-text"
-                              x="400"
-                              y="295"
-                              text-anchor="middle">
+                            <!-- Vertical Grid -->
+                            <g id="organizationVerticalGrid"></g>
 
-                            No. of months
 
-                        </text>
+                            <!-- Axis -->
+                            <line class="chart-axis"
+                                  x1="65"
+                                  y1="25"
+                                  x2="65"
+                                  y2="250" />
 
-                    </svg>
+                            <line class="chart-axis"
+                                  x1="65"
+                                  y1="250"
+                                  x2="735"
+                                  y2="250" />
+
+
+                            <!-- Y Axis Values -->
+                            <text class="chart-axis-text"
+                                  x="53"
+                                  y="254"
+                                  text-anchor="end">
+
+                            </text>
+
+                            <text class="chart-axis-text"
+                                  x="53"
+                                  y="209"
+                                  text-anchor="end">
+
+                            </text>
+
+                            <text class="chart-axis-text"
+                                  x="53"
+                                  y="164"
+                                  text-anchor="end">
+
+                            </text>
+
+                            <text class="chart-axis-text"
+                                  x="53"
+                                  y="119"
+                                  text-anchor="end">
+
+                            </text>
+
+                            <text class="chart-axis-text"
+                                  x="53"
+                                  y="74"
+                                  text-anchor="end">
+
+                            </text>
+
+                            <text class="chart-axis-text"
+                                  x="53"
+                                  y="29"
+                                  text-anchor="end">
+
+                            </text>
+
+
+                            <!-- Y Axis Title -->
+                            <text class="chart-axis-text"
+                                  transform="translate(17 140) rotate(-90)"
+                                  text-anchor="middle">
+
+                                No. of post
+
+                            </text>
+
+
+                            <!-- Bars -->
+                            <g id="organizationPostBars"></g>
+
+
+                            <!-- X Axis -->
+                            <g id="organizationPostMonths"></g>
+
+
+                            <!-- X Axis Title -->
+                            <text class="chart-axis-text"
+                                  x="400"
+                                  y="295"
+                                  text-anchor="middle">
+
+                                No. of months
+
+                            </text>
+
+                        </svg>
+
+                    </div>
 
                 </div>
 
-            </div>
 
+                <!-- Footer -->
+                <div class="analytics-footer">
 
-            <!-- Footer -->
-            <div class="analytics-footer">
+                    <i class="fas fa-chart-bar"></i>
 
-                <i class="fas fa-chart-bar"></i>
+                    Monthly internship post trend
 
-                Monthly internship post trend
+                </div>
 
             </div>
 
@@ -598,515 +419,1086 @@
 
 </div>
 
-</div>
+<script>
 
- 
+    document.addEventListener("DOMContentLoaded", function () {
 
-  <script>
+        /* =====================================================
+           DATA FROM C#
+        ===================================================== */
 
-document.addEventListener("DOMContentLoaded", function () {
+        const candidateData = @Html.Raw(
+                        System.Text.Json.JsonSerializer.Serialize(
+                                Model?.CandidateData ??
+                                new List<ErJobPortal.Models.SAChartData>()
+                        )
+                );
 
-    /* =====================================================
-       MONTHS
-    ===================================================== */
-
-    const months = [
-        "Jan'24",
-        "Feb'24",
-        "Mar'24",
-        "Apr'24",
-        "May'24",
-        "June'24",
-        "July'24",
-        "Aug'24",
-        "Sept'24",
-        "Oct'24",
-        "Nov'24",
-        "Dec'24"
-    ];
-
-
-    /* =====================================================
-       TRAINEE REGISTERED DATA
-       
-       Replace with your actual monthly values.
-    ===================================================== */
-
-    const traineeRegisteredData = [
-        390,
-        275,
-        145,
-        150,
-        460,
-        220,
-        120,
-        400,
-        250,
-        390,
-        100,
-        40
-    ];
-
-
-    /* =====================================================
-       ORGANIZATION INTERNSHIP POST DATA
-       
-       Replace with your actual monthly values.
-    ===================================================== */
-
-    const organizationPostData = [
-        20,
-        2,
-        2,
-        62,
-        52,
-        2,
-        15,
-        14,
-        70,
-        1,
-        1,
-        0
-    ];
-
-
-    /* =====================================================
-       CHART AREA
-    ===================================================== */
-
-    const left = 65;
-    const right = 735;
-
-    const top = 25;
-    const bottom = 250;
-
-    const width = right - left;
-    const height = bottom - top;
-
-    const gap = width / 11;
-
-
-    /* =====================================================
-       LEFT CHART
-       TRAINEE REGISTERED
-    ===================================================== */
-
-    const traineeMax = 500;
-
-    const traineePoints = [];
-
-
-    traineeRegisteredData.forEach(function (value, index) {
-
-        const x =
-            left + (index * gap);
-
-        const y =
-            bottom -
-            ((value / traineeMax) * height);
-
-        traineePoints.push(
-            `${x},${y}`
-        );
-
-    });
-
-
-    /* =====================================================
-       AREA
-    ===================================================== */
-
-    const traineeArea =
-        document.getElementById(
-            "yearlyTraineeArea"
-        );
-
-
-    if (traineeArea) {
-
-        traineeArea.setAttribute(
-            "points",
-
-            `${left},${bottom} ` +
-            traineePoints.join(" ") +
-            ` ${right},${bottom}`
-        );
-
-    }
-
-
-    /* =====================================================
-       LINE
-    ===================================================== */
-
-    const traineeLine =
-        document.getElementById(
-            "yearlyTraineeLine"
-        );
-
-
-    if (traineeLine) {
-
-        traineeLine.setAttribute(
-            "points",
-            traineePoints.join(" ")
-        );
-
-    }
-
-
-    /* =====================================================
-       POINTS
-    ===================================================== */
-
-    const traineePointGroup =
-        document.getElementById(
-            "yearlyTraineePoints"
-        );
-
-
-    traineeRegisteredData.forEach(
-        function (value, index) {
-
-            const x =
-                left + (index * gap);
-
-            const y =
-                bottom -
-                ((value / traineeMax) * height);
-
-
-            const circle =
-                document.createElementNS(
-                    "http://www.w3.org/2000/svg",
-                    "circle"
+        const internshipPostData = @Html.Raw(
+                        System.Text.Json.JsonSerializer.Serialize(
+                                Model?.InternshipPostData ??
+                                new List<ErJobPortal.Models.SAChartData>()
+                        )
                 );
 
 
-            circle.setAttribute(
-                "cx",
-                x
-            );
+        /* =====================================================
+           CURRENT YEAR : JANUARY TO DECEMBER
+        ===================================================== */
 
-            circle.setAttribute(
-                "cy",
-                y
-            );
+        const currentYear = new Date().getFullYear();
 
-            circle.setAttribute(
-                "r",
-                "4"
-            );
+        const yearShort =
+            String(currentYear).slice(-2);
 
-            circle.setAttribute(
-                "class",
-                "chart-point"
-            );
+        const months = [
+            { year: currentYear, month: 1,  label: "Jan'" + yearShort },
+            { year: currentYear, month: 2,  label: "Feb'" + yearShort },
+            { year: currentYear, month: 3,  label: "Mar'" + yearShort },
+            { year: currentYear, month: 4,  label: "Apr'" + yearShort },
+            { year: currentYear, month: 5,  label: "May'" + yearShort },
+            { year: currentYear, month: 6,  label: "Jun'" + yearShort },
+            { year: currentYear, month: 7,  label: "Jul'" + yearShort },
+            { year: currentYear, month: 8,  label: "Aug'" + yearShort },
+            { year: currentYear, month: 9,  label: "Sep'" + yearShort },
+            { year: currentYear, month: 10, label: "Oct'" + yearShort },
+            { year: currentYear, month: 11, label: "Nov'" + yearShort },
+            { year: currentYear, month: 12, label: "Dec'" + yearShort }
+        ];
 
 
-            traineePointGroup.appendChild(
-                circle
+        /* =====================================================
+           GET MONTHLY VALUE
+        ===================================================== */
+
+        function getMonthlyValue(data, year, month) {
+
+            const item = data.find(function (x) {
+
+                return Number(x.Year) === Number(year) &&
+                       Number(x.Month) === Number(month);
+
+            });
+
+            return item
+                ? Number(item.TotalCount)
+                : 0;
+        }
+
+
+        /* =====================================================
+           MONTHLY DATA
+        ===================================================== */
+
+        const traineeRegisteredData =
+            months.map(function (item) {
+
+                return getMonthlyValue(
+                    candidateData,
+                    item.year,
+                    item.month
+                );
+
+            });
+
+
+        const organizationPostData =
+            months.map(function (item) {
+
+                return getMonthlyValue(
+                    internshipPostData,
+                    item.year,
+                    item.month
+                );
+
+            });
+
+
+        const monthLabels =
+            months.map(function (item) {
+
+                return item.label;
+
+            });
+
+
+        /* =====================================================
+           CHART AREA
+        ===================================================== */
+
+        const left = 65;
+        const right = 735;
+        const top = 25;
+        const bottom = 250;
+
+        const width = right - left;
+        const height = bottom - top;
+
+        const gap = width / 11;
+
+
+        /* =====================================================
+           Y AXIS LIMITS
+        ===================================================== */
+
+        const traineeMax = 500;
+        const postMax = 100;
+
+
+        /* =====================================================
+           CUSTOM TOOLTIP
+        ===================================================== */
+
+        let tooltip =
+            document.getElementById("saChartTooltip");
+
+
+        if (!tooltip) {
+
+            tooltip =
+                document.createElement("div");
+
+            tooltip.id =
+                "saChartTooltip";
+
+            tooltip.className =
+                "chart-tooltip";
+
+            document.body.appendChild(
+                tooltip
             );
+        }
+
+
+        function showTooltip(
+            event,
+            month,
+            count,
+            type
+        ) {
+
+            if (type === "trainee") {
+
+                tooltip.innerHTML =
+                    "<strong>" +
+                    month +
+                    "</strong>" +
+                    "<span>No. of Trainee Registered: " +
+                    count +
+                    "</span>";
+
+            }
+            else {
+
+                tooltip.innerHTML =
+                    "<strong>" +
+                    month +
+                    "</strong>" +
+                    "<span>No. of Post: " +
+                    count +
+                    "</span>";
+
+            }
+
+
+            tooltip.style.display =
+                "block";
+
+
+            let x =
+                event.clientX + 12;
+
+            let y =
+                event.clientY + 12;
+
+
+            /* Prevent tooltip going outside screen */
+
+            const tooltipWidth =
+                tooltip.offsetWidth;
+
+            const tooltipHeight =
+                tooltip.offsetHeight;
+
+
+            if (
+                x + tooltipWidth >
+                window.innerWidth
+            ) {
+
+                x =
+                    event.clientX -
+                    tooltipWidth -
+                    12;
+
+            }
+
+
+            if (
+                y + tooltipHeight >
+                window.innerHeight
+            ) {
+
+                y =
+                    event.clientY -
+                    tooltipHeight -
+                    12;
+
+            }
+
+
+            tooltip.style.left =
+                x + "px";
+
+            tooltip.style.top =
+                y + "px";
+        }
+
+
+        function hideTooltip() {
+
+            tooltip.style.display =
+                "none";
 
         }
-    );
 
 
-    /* =====================================================
-       LEFT MONTH LABELS
-    ===================================================== */
+        /* =====================================================
+           LEFT CHART
+           CANDIDATE REGISTRATION
+        ===================================================== */
 
-    const traineeMonths =
-        document.getElementById(
-            "yearlyTraineeMonths"
-        );
-
-
-    months.forEach(function (month, index) {
-
-        const x =
-            left + (index * gap);
-
-
-        const text =
-            document.createElementNS(
-                "http://www.w3.org/2000/svg",
-                "text"
+        const yearlyChart =
+            document.getElementById(
+                "yearlyTraineeChart"
             );
 
 
-        text.setAttribute(
-            "x",
-            x
-        );
+        if (yearlyChart) {
 
-        text.setAttribute(
-            "y",
-            bottom + 20
-        );
+            /* =============================================
+               REMOVE OLD DYNAMIC Y LABELS
+            ============================================= */
 
-        text.setAttribute(
-            "text-anchor",
-            "middle"
-        );
+            yearlyChart
+                .querySelectorAll(
+                    ".dynamic-y-label"
+                )
+                .forEach(function (element) {
 
-        text.setAttribute(
-            "class",
-            "chart-axis-text"
-        );
+                    element.remove();
+
+                });
 
 
-        text.textContent = month;
+            /* =============================================
+               CREATE Y AXIS 0 - 500
+            ============================================= */
+
+            const steps = 5;
 
 
-        traineeMonths.appendChild(
-            text
-        );
+            for (
+                let i = 0;
+                i <= steps;
+                i++
+            ) {
 
-    });
-
-
-    /* =====================================================
-       LEFT VERTICAL GRID
-    ===================================================== */
-
-    const traineeGrid =
-        document.getElementById(
-            "yearlyVerticalGrid"
-        );
+                const value =
+                    (traineeMax / steps) * i;
 
 
-    months.forEach(function (_, index) {
-
-        const x =
-            left + (index * gap);
-
-
-        const line =
-            document.createElementNS(
-                "http://www.w3.org/2000/svg",
-                "line"
-            );
+                const y =
+                    bottom -
+                    (
+                        (value / traineeMax) *
+                        height
+                    );
 
 
-        line.setAttribute(
-            "x1",
-            x
-        );
-
-        line.setAttribute(
-            "y1",
-            top
-        );
-
-        line.setAttribute(
-            "x2",
-            x
-        );
-
-        line.setAttribute(
-            "y2",
-            bottom
-        );
-
-        line.setAttribute(
-            "class",
-            "chart-grid"
-        );
+                const text =
+                    document.createElementNS(
+                        "http://www.w3.org/2000/svg",
+                        "text"
+                    );
 
 
-        traineeGrid.appendChild(
-            line
-        );
-
-    });
-
-
-    /* =====================================================
-       RIGHT CHART
-       ORGANIZATION POSTS
-    ===================================================== */
-
-    const postMax = 70;
-
-    const postBars =
-        document.getElementById(
-            "organizationPostBars"
-        );
-
-
-    const barWidth = 32;
-
-
-    organizationPostData.forEach(
-        function (value, index) {
-
-            const x =
-                left +
-                (index * gap) -
-                (barWidth / 2);
-
-
-            const barHeight =
-                (value / postMax) *
-                height;
-
-
-            const y =
-                bottom - barHeight;
-
-
-            const rect =
-                document.createElementNS(
-                    "http://www.w3.org/2000/svg",
-                    "rect"
+                text.setAttribute(
+                    "x",
+                    "53"
                 );
 
 
-            rect.setAttribute(
-                "x",
-                x
+                text.setAttribute(
+                    "y",
+                    y + 4
+                );
+
+
+                text.setAttribute(
+                    "text-anchor",
+                    "end"
+                );
+
+
+                text.setAttribute(
+                    "class",
+                    "chart-axis-text dynamic-y-label"
+                );
+
+
+                text.textContent =
+                    value;
+
+
+                yearlyChart.appendChild(
+                    text
+                );
+
+            }
+        }
+
+
+        /* =====================================================
+           TRAINEE POINTS
+        ===================================================== */
+
+        const traineePoints = [];
+
+
+        traineeRegisteredData.forEach(
+            function (value, index) {
+
+                const x =
+                    left +
+                    (index * gap);
+
+
+                const y =
+                    bottom -
+                    (
+                        (value / traineeMax) *
+                        height
+                    );
+
+
+                traineePoints.push(
+                    `${x},${y}`
+                );
+
+            }
+        );
+
+
+        /* =====================================================
+           TRAINEE AREA
+        ===================================================== */
+
+        const traineeArea =
+            document.getElementById(
+                "yearlyTraineeArea"
             );
 
-            rect.setAttribute(
-                "y",
-                y
-            );
 
-            rect.setAttribute(
-                "width",
-                barWidth
-            );
+        if (traineeArea) {
 
-            rect.setAttribute(
-                "height",
-                barHeight
-            );
+            traineeArea.setAttribute(
+                "points",
 
-            rect.setAttribute(
-                "class",
-                "chart-bar"
-            );
-
-
-            postBars.appendChild(
-                rect
+                `${left},${bottom} ` +
+                traineePoints.join(" ") +
+                ` ${right},${bottom}`
             );
 
         }
-    );
 
 
-    /* =====================================================
-       RIGHT MONTH LABELS
-    ===================================================== */
+        /* =====================================================
+           TRAINEE LINE
+        ===================================================== */
 
-    const postMonths =
-        document.getElementById(
-            "organizationPostMonths"
-        );
-
-
-    months.forEach(function (month, index) {
-
-        const x =
-            left + (index * gap);
-
-
-        const text =
-            document.createElementNS(
-                "http://www.w3.org/2000/svg",
-                "text"
+        const traineeLine =
+            document.getElementById(
+                "yearlyTraineeLine"
             );
 
 
-        text.setAttribute(
-            "x",
-            x
-        );
+        if (traineeLine) {
 
-        text.setAttribute(
-            "y",
-            bottom + 20
-        );
+            traineeLine.setAttribute(
+                "points",
+                traineePoints.join(" ")
+            );
 
-        text.setAttribute(
-            "text-anchor",
-            "middle"
-        );
-
-        text.setAttribute(
-            "class",
-            "chart-axis-text"
-        );
+        }
 
 
-        text.textContent = month;
+        /* =====================================================
+           TRAINEE POINTS + TOOLTIP
+        ===================================================== */
 
-
-        postMonths.appendChild(
-            text
-        );
-
-    });
-
-
-    /* =====================================================
-       RIGHT VERTICAL GRID
-    ===================================================== */
-
-    const postGrid =
-        document.getElementById(
-            "organizationVerticalGrid"
-        );
-
-
-    months.forEach(function (_, index) {
-
-        const x =
-            left + (index * gap);
-
-
-        const line =
-            document.createElementNS(
-                "http://www.w3.org/2000/svg",
-                "line"
+        const traineePointGroup =
+            document.getElementById(
+                "yearlyTraineePoints"
             );
 
 
-        line.setAttribute(
-            "x1",
-            x
+        if (traineePointGroup) {
+
+            traineePointGroup.innerHTML = "";
+
+
+            traineeRegisteredData.forEach(
+                function (value, index) {
+
+                    const x =
+                        left +
+                        (index * gap);
+
+
+                    const y =
+                        bottom -
+                        (
+                            (value / traineeMax) *
+                            height
+                        );
+
+
+                    const circle =
+                        document.createElementNS(
+                            "http://www.w3.org/2000/svg",
+                            "circle"
+                        );
+
+
+                    circle.setAttribute(
+                        "cx",
+                        x
+                    );
+
+
+                    circle.setAttribute(
+                        "cy",
+                        y
+                    );
+
+
+                    circle.setAttribute(
+                        "r",
+                        "5"
+                    );
+
+
+                    circle.setAttribute(
+                        "class",
+                        "chart-point"
+                    );
+
+
+                    /* =====================================
+                       REMOVE DEFAULT TITLE
+                    ===================================== */
+
+                    circle.removeAttribute(
+                        "title"
+                    );
+
+
+                    /* =====================================
+                       MOUSE ENTER
+                    ===================================== */
+
+                    circle.addEventListener(
+                        "mouseenter",
+                        function (event) {
+
+                            showTooltip(
+                                event,
+                                monthLabels[index],
+                                value,
+                                "trainee"
+                            );
+
+                        }
+                    );
+
+
+                    /* =====================================
+                       MOUSE MOVE
+                    ===================================== */
+
+                    circle.addEventListener(
+                        "mousemove",
+                        function (event) {
+
+                            showTooltip(
+                                event,
+                                monthLabels[index],
+                                value,
+                                "trainee"
+                            );
+
+                        }
+                    );
+
+
+                    /* =====================================
+                       MOUSE LEAVE
+                    ===================================== */
+
+                    circle.addEventListener(
+                        "mouseleave",
+                        function () {
+
+                            hideTooltip();
+
+                        }
+                    );
+
+
+                    traineePointGroup.appendChild(
+                        circle
+                    );
+
+                }
+            );
+
+        }
+
+
+        /* =====================================================
+           TRAINEE MONTH LABELS
+        ===================================================== */
+
+        const traineeMonths =
+            document.getElementById(
+                "yearlyTraineeMonths"
+            );
+
+
+        if (traineeMonths) {
+
+            traineeMonths.innerHTML = "";
+
+
+            monthLabels.forEach(
+                function (month, index) {
+
+                    const x =
+                        left +
+                        (index * gap);
+
+
+                    const text =
+                        document.createElementNS(
+                            "http://www.w3.org/2000/svg",
+                            "text"
+                        );
+
+
+                    text.setAttribute(
+                        "x",
+                        x
+                    );
+
+
+                    text.setAttribute(
+                        "y",
+                        bottom + 20
+                    );
+
+
+                    text.setAttribute(
+                        "text-anchor",
+                        "middle"
+                    );
+
+
+                    text.setAttribute(
+                        "class",
+                        "chart-axis-text"
+                    );
+
+
+                    text.textContent =
+                        month;
+
+
+                    traineeMonths.appendChild(
+                        text
+                    );
+
+                }
+            );
+
+        }
+
+
+        /* =====================================================
+           TRAINEE VERTICAL GRID
+        ===================================================== */
+
+        const traineeGrid =
+            document.getElementById(
+                "yearlyVerticalGrid"
+            );
+
+
+        if (traineeGrid) {
+
+            traineeGrid.innerHTML = "";
+
+
+            months.forEach(
+                function (_, index) {
+
+                    const x =
+                        left +
+                        (index * gap);
+
+
+                    const line =
+                        document.createElementNS(
+                            "http://www.w3.org/2000/svg",
+                            "line"
+                        );
+
+
+                    line.setAttribute(
+                        "x1",
+                        x
+                    );
+
+
+                    line.setAttribute(
+                        "y1",
+                        top
+                    );
+
+
+                    line.setAttribute(
+                        "x2",
+                        x
+                    );
+
+
+                    line.setAttribute(
+                        "y2",
+                        bottom
+                    );
+
+
+                    line.setAttribute(
+                        "class",
+                        "chart-grid"
+                    );
+
+
+                    traineeGrid.appendChild(
+                        line
+                    );
+
+                }
+            );
+
+        }
+
+
+        /* =====================================================
+           RIGHT CHART
+           tblPost
+        ===================================================== */
+
+        const organizationChart =
+            document.getElementById(
+                "organizationPostChart"
+            );
+
+
+        if (organizationChart) {
+
+            organizationChart
+                .querySelectorAll(
+                    ".dynamic-post-y-label"
+                )
+                .forEach(function (element) {
+
+                    element.remove();
+
+                });
+
+
+            /* =============================================
+               Y AXIS 0 - 100
+            ============================================= */
+
+            const postSteps = 5;
+
+
+            for (
+                let i = 0;
+                i <= postSteps;
+                i++
+            ) {
+
+                const value =
+                    (postMax / postSteps) * i;
+
+
+                const y =
+                    bottom -
+                    (
+                        (value / postMax) *
+                        height
+                    );
+
+
+                const text =
+                    document.createElementNS(
+                        "http://www.w3.org/2000/svg",
+                        "text"
+                    );
+
+
+                text.setAttribute(
+                    "x",
+                    "53"
+                );
+
+
+                text.setAttribute(
+                    "y",
+                    y + 4
+                );
+
+
+                text.setAttribute(
+                    "text-anchor",
+                    "end"
+                );
+
+
+                text.setAttribute(
+                    "class",
+                    "chart-axis-text dynamic-post-y-label"
+                );
+
+
+                text.textContent =
+                    value;
+
+
+                organizationChart.appendChild(
+                    text
+                );
+
+            }
+
+        }
+
+
+        /* =====================================================
+           TBLPOST BARS
+        ===================================================== */
+
+        const postBars =
+            document.getElementById(
+                "organizationPostBars"
+            );
+
+
+        const barWidth = 32;
+
+
+        if (postBars) {
+
+            postBars.innerHTML = "";
+
+
+            organizationPostData.forEach(
+                function (value, index) {
+
+                    const x =
+                        left +
+                        (index * gap) -
+                        (barWidth / 2);
+
+
+                    const barHeight =
+                        (
+                            value / postMax
+                        ) *
+                        height;
+
+
+                    const y =
+                        bottom -
+                        barHeight;
+
+
+                    const rect =
+                        document.createElementNS(
+                            "http://www.w3.org/2000/svg",
+                            "rect"
+                        );
+
+
+                    rect.setAttribute(
+                        "x",
+                        x
+                    );
+
+
+                    rect.setAttribute(
+                        "y",
+                        y
+                    );
+
+
+                    rect.setAttribute(
+                        "width",
+                        barWidth
+                    );
+
+
+                    rect.setAttribute(
+                        "height",
+                        barHeight
+                    );
+
+
+                    rect.setAttribute(
+                        "class",
+                        "chart-bar"
+                    );
+
+
+                    /* =====================================
+                       REMOVE DEFAULT TITLE
+                    ===================================== */
+
+                    rect.removeAttribute(
+                        "title"
+                    );
+
+
+                    /* =====================================
+                       BAR HOVER
+                    ===================================== */
+
+                    rect.addEventListener(
+                        "mouseenter",
+                        function (event) {
+
+                            showTooltip(
+                                event,
+                                monthLabels[index],
+                                value,
+                                "post"
+                            );
+
+                        }
+                    );
+
+
+                    rect.addEventListener(
+                        "mousemove",
+                        function (event) {
+
+                            showTooltip(
+                                event,
+                                monthLabels[index],
+                                value,
+                                "post"
+                            );
+
+                        }
+                    );
+
+
+                    rect.addEventListener(
+                        "mouseleave",
+                        function () {
+
+                            hideTooltip();
+
+                        }
+                    );
+
+
+                    postBars.appendChild(
+                        rect
+                    );
+
+                }
+            );
+
+        }
+
+
+        /* =====================================================
+           POST MONTH LABELS
+        ===================================================== */
+
+        const postMonths =
+            document.getElementById(
+                "organizationPostMonths"
+            );
+
+
+        if (postMonths) {
+
+            postMonths.innerHTML = "";
+
+
+            monthLabels.forEach(
+                function (month, index) {
+
+                    const x =
+                        left +
+                        (index * gap);
+
+
+                    const text =
+                        document.createElementNS(
+                            "http://www.w3.org/2000/svg",
+                            "text"
+                        );
+
+
+                    text.setAttribute(
+                        "x",
+                        x
+                    );
+
+
+                    text.setAttribute(
+                        "y",
+                        bottom + 20
+                    );
+
+
+                    text.setAttribute(
+                        "text-anchor",
+                        "middle"
+                    );
+
+
+                    text.setAttribute(
+                        "class",
+                        "chart-axis-text"
+                    );
+
+
+                    text.textContent =
+                        month;
+
+
+                    postMonths.appendChild(
+                        text
+                    );
+
+                }
+            );
+
+        }
+
+
+        /* =====================================================
+           POST VERTICAL GRID
+        ===================================================== */
+
+        const postGrid =
+            document.getElementById(
+                "organizationVerticalGrid"
+            );
+
+
+        if (postGrid) {
+
+            postGrid.innerHTML = "";
+
+
+            months.forEach(
+                function (_, index) {
+
+                    const x =
+                        left +
+                        (index * gap);
+
+
+                    const line =
+                        document.createElementNS(
+                            "http://www.w3.org/2000/svg",
+                            "line"
+                        );
+
+
+                    line.setAttribute(
+                        "x1",
+                        x
+                    );
+
+
+                    line.setAttribute(
+                        "y1",
+                        top
+                    );
+
+
+                    line.setAttribute(
+                        "x2",
+                        x
+                    );
+
+
+                    line.setAttribute(
+                        "y2",
+                        bottom
+                    );
+
+
+                    line.setAttribute(
+                        "class",
+                        "chart-grid"
+                    );
+
+
+                    postGrid.appendChild(
+                        line
+                    );
+
+                }
+            );
+
+        }
+
+
+        /* =====================================================
+           DEBUG
+        ===================================================== */
+
+        console.log(
+            "Candidate Data:",
+            candidateData
         );
 
-        line.setAttribute(
-            "y1",
-            top
+        console.log(
+            "tblPost Data:",
+            internshipPostData
         );
 
-        line.setAttribute(
-            "x2",
-            x
+        console.log(
+            "Candidate Monthly:",
+            traineeRegisteredData
         );
 
-        line.setAttribute(
-            "y2",
-            bottom
-        );
-
-        line.setAttribute(
-            "class",
-            "chart-grid"
-        );
-
-
-        postGrid.appendChild(
-            line
+        console.log(
+            "tblPost Monthly:",
+            organizationPostData
         );
 
     });
-
-});
 
 </script>
- 
+

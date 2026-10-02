@@ -1,4 +1,7 @@
 ﻿@model IEnumerable<ErJobPortal.Models.SACandidateFeedbackM>
+
+    @* Radhika30-09 *@
+<link rel="stylesheet" href="~/css/SACandidateFeedback.css" asp-append-version="true" />
 @{
     Layout = "~/Views/Shared/_DashboardLayout.cshtml";
 
@@ -9,144 +12,9 @@
     ViewData["UserName"] = "Super Admin";
 }
 
-<style>
-
-    .feedback-page {
-        width: 100%;
-        padding: 15px;
-        box-sizing: border-box;
-    }
-
-    .feedback-title-row {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        margin-bottom: 25px;
-    }
-
-    .feedback-title {
-        margin: 0;
-        font-size: 30px;
-        font-weight: 600;
-        color: #142238;
-    }
-
-    .feedback-subtitle {
-        margin-top: 8px;
-        font-size: 16px;
-        color: #888;
-    }
-
-    .back-button {
-        width: 42px;
-        height: 42px;
-        border-radius: 8px;
-        background: #1e7b67;
-        color: #ffffff;
-        display: inline-flex;
-        justify-content: center;
-        align-items: center;
-        text-decoration: none;
-        font-size: 16px;
-        transition: 0.2s ease;
-    }
-
-    .back-button:hover {
-        background: #155d4e;
-        color: #ffffff;
-        text-decoration: none;
-    }
-
-    .status-button {
-        border: none;
-        color: #ffffff;
-        padding: 6px 12px;
-        border-radius: 6px;
-        font-size: 12px;
-        cursor: pointer;
-        min-width: 75px;
-    }
-
-    .status-enabled {
-        background: #198754;
-    }
-
-    .status-disabled {
-        background: #dc3545;
-    }
-
-    .status-button:hover {
-        opacity: 0.9;
-    }
-
-    @@media (max-width: 768px) {
-
-        .feedback-page {
-            padding: 10px;
-        }
-
-      
-
-        .feedback-title {
-            font-size: 24px;
-        }
-
-        .feedback-subtitle {
-            font-size: 14px;
-        }
-
-        .back-button {
-            width: 40px;
-            height: 40px;
-        }
-
-    }
-    .feedback-title-row {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 25px;
-    width: 100%;
-}
-
-.feedback-title {
-    margin: 0;
-    font-size: 30px;
-    font-weight: 600;
-    color: #142238;
-}
-
-.feedback-subtitle {
-    margin-top: 8px;
-    font-size: 16px;
-    color: #888;
-}
-
-.back-button {
-    width: 42px;
-    height: 42px;
-    border-radius: 8px;
-    background: #1e7b67;
-    color: #ffffff;
-    display: inline-flex;
-    justify-content: center;
-    align-items: center;
-    text-decoration: none;
-    font-size: 16px;
-    flex-shrink: 0;
-}
-
-.back-button:hover {
-    background: #155d4e;
-    color: #ffffff;
-    text-decoration: none;
-}
 
 
-
-</style>
-
-<div class="feedback-page">
+<div class="feedback-page container-fluid trainee-selection-page">
 
     <!-- TITLE -->
 
@@ -259,7 +127,13 @@
 
                                     @if (item.nSABit == 1)
                                     {
-                                        <button type="submit"bclass="status-button status-enabled"bonclick="return confirm('Are you sure you want to disable this feedback?');">
+                                        <button style="background: #198754;border: none;
+    color: #ffffff;
+    padding: 6px 12px;
+    border-radius: 6px;
+    font-size: 12px;
+    cursor: pointer;
+    min-width: 75px;" type="submit"bclass="status-button status-enabled"bonclick="return confirm('Are you sure you want to disable this feedback?');">
                                             Enabled
                                         </button>
                                     }
