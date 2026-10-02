@@ -180,7 +180,7 @@ a {
 .cover-content {
     position: absolute;
     left: 30px;
-    bottom: 24px;
+    bottom: 25px;
     max-width: 650px;
     color: var(--white);
 }
@@ -507,7 +507,7 @@ a {
                    TABLET
                 ========================================================= */
 
-@@media (max-width: 800px) {
+@media (max-width: 800px) {
 
     .profile-actions {
         top: 15px;
@@ -554,7 +554,7 @@ a {
                    MOBILE
                 ========================================================= */
 
-@@media (max-width: 600px) {
+@media (max-width: 600px) {
 
     .profile-actions {
         position: absolute;
@@ -668,7 +668,7 @@ a {
                    SMALL MOBILE
                 ========================================================= */
 
-@@media (max-width: 390px) {
+@media (max-width: 390px) {
 
     .profile-actions {
         right: 9px;
@@ -758,7 +758,7 @@ a {
                    PRINT
                 ========================================================= */
 
-@@media print {
+@media print {
 
     body {
         background: #ffffff;

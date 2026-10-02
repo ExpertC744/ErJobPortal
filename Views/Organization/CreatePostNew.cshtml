@@ -23,477 +23,8 @@
     <link href="https://fonts.googleapis.com/css2?family=Sora:wght@500;600;700&family=Inter:wght@400;500;600&display=swap"
           rel="stylesheet">
 
-    <style>
-
-        :root {
-            --navy: #152A4A;
-            --navy-deep: #0E1E38;
-            --teal: #0E8C82;
-            --teal-light: #E4F5F3;
-            --amber: #D98A2B;
-            --bg: #F5F7FA;
-            --card: #FFFFFF;
-            --line: #E3E8EF;
-            --text: #1F2937;
-            --muted: #6B7686;
-            --danger: #D64545;
-            --radius: 12px;
-            --shadow: 0 8px 24px -12px rgba(21,42,74,.18);
-        }
-
-        * {
-            box-sizing: border-box;
-        }
-
-        html {
-            scroll-behavior: smooth;
-        }
-
-        body {
-            margin: 0;
-            background: var(--bg);
-            color: var(--text);
-            font-family: 'Inter', sans-serif;
-        }
-
-        h1,
-        h2,
-        h3,
-        .brand {
-            font-family: 'Sora', sans-serif;
-        }
-
-        .topbar {
-            background: var(--navy-deep);
-            color: white;
-            padding: 16px 32px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-        }
-
-        .brand {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            font-weight: 700;
-            font-size: 17px;
-        }
-
-        .brand-mark {
-            width: 34px;
-            height: 34px;
-            border-radius: 9px;
-            background: linear-gradient(135deg, var(--teal), #0BB8AB);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 13px;
-            font-weight: 700;
-            color: #04211E;
-        }
-
-        .org-chip {
-            font-size: 12px;
-            color: #C7D0E0;
-            background: rgba(255,255,255,.06);
-            border: 1px solid rgba(255,255,255,.12);
-            padding: 7px 13px;
-            border-radius: 50px;
-        }
-
-        .page-header {
-            background: linear-gradient(180deg, var(--navy) 0%, var(--navy-deep) 100%);
-            color: white;
-            padding: 40px 32px 65px;
-        }
-
-        .page-header-inner {
-            max-width: 1180px;
-            margin: auto;
-        }
-
-        .eyebrow {
-            text-transform: uppercase;
-            font-size: 11px;
-            letter-spacing: 1.5px;
-            color: #8FE0D6;
-            font-weight: 600;
-            margin-bottom: 10px;
-        }
-
-        .page-header h1 {
-            margin: 0 0 8px;
-            font-size: 30px;
-        }
-
-        .page-header p {
-            margin: 0;
-            max-width: 620px;
-            color: #B9C4D6;
-            font-size: 14px;
-            line-height: 1.6;
-        }
-
-        .layout {
-            max-width: 1180px;
-            margin: -40px auto 60px;
-            padding: 0 32px;
-            display: grid;
-            grid-template-columns: 245px 1fr;
-            gap: 28px;
-            align-items: start;
-        }
-
-        .side-nav {
-            position: sticky;
-            top: 20px;
-            background: white;
-            border: 1px solid var(--line);
-            border-radius: var(--radius);
-            padding: 10px;
-            box-shadow: var(--shadow);
-        }
-
-            .side-nav a {
-                display: flex;
-                align-items: center;
-                gap: 10px;
-                text-decoration: none;
-                color: var(--muted);
-                font-size: 13px;
-                font-weight: 500;
-                padding: 11px 12px;
-                border-radius: 8px;
-            }
-
-                .side-nav a:hover,
-                .side-nav a.active {
-                    background: var(--teal-light);
-                    color: var(--teal);
-                }
-
-        .dot {
-            width: 7px;
-            height: 7px;
-            border-radius: 50%;
-            background: var(--line);
-        }
-
-        .side-nav a.active .dot {
-            background: var(--teal);
-        }
-
-        .side-note {
-            margin-top: 14px;
-            padding: 14px;
-            background: #FBF6EC;
-            border: 1px solid #F0E1BE;
-            border-radius: 10px;
-            color: #8A6416;
-            font-size: 12px;
-            line-height: 1.5;
-        }
-
-        form {
-            display: flex;
-            flex-direction: column;
-            gap: 22px;
-        }
-
-        .section {
-            background: white;
-            border: 1px solid var(--line);
-            border-radius: var(--radius);
-            box-shadow: var(--shadow);
-            padding: 26px 28px;
-            scroll-margin-top: 20px;
-        }
-
-        .section-head {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            margin-bottom: 20px;
-        }
-
-        .section-icon {
-            width: 35px;
-            height: 35px;
-            border-radius: 9px;
-            background: var(--teal-light);
-            color: var(--teal);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: 700;
-        }
-
-        .section-head h2 {
-            margin: 0;
-            font-size: 16px;
-            color: var(--navy);
-        }
-
-        .sub {
-            margin: 3px 0 0;
-            font-size: 12px;
-            color: var(--muted);
-        }
-
-        .grid {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 18px;
-        }
-
-        .field label {
-            display: block;
-            font-size: 13px;
-            font-weight: 600;
-            margin-bottom: 7px;
-        }
-
-        .req {
-            color: var(--danger);
-        }
-
-        .field select,
-        .field input {
-            width: 100%;
-            padding: 10px 12px;
-            font-size: 13px;
-            font-family: 'Inter', sans-serif;
-            color: var(--text);
-            background: white;
-            border: 1.5px solid var(--line);
-            border-radius: 8px;
-            outline: none;
-        }
-
-            .field select:focus,
-            .field input:focus {
-                border-color: var(--teal);
-                box-shadow: 0 0 0 3px rgba(14,140,130,.13);
-            }
-
-            .field select:disabled {
-                background: #F2F4F7;
-                cursor: not-allowed;
-            }
-
-        .hint {
-            display: block;
-            margin-top: 5px;
-            font-size: 11px;
-            color: var(--muted);
-        }
-
-        .checkbox-grid {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 10px;
-        }
-
-        .check-item {
-            display: flex;
-            align-items: center;
-            gap: 9px;
-            border: 1px solid var(--line);
-            border-radius: 8px;
-            padding: 10px;
-            font-size: 12.5px;
-            cursor: pointer;
-            background: white;
-        }
-
-            .check-item:hover {
-                border-color: var(--teal);
-                background: var(--teal-light);
-            }
-
-            .check-item input {
-                width: 16px;
-                height: 16px;
-                accent-color: var(--teal);
-            }
-
-        .skill-box {
-            border: 1px solid var(--line);
-            border-radius: 10px;
-            overflow: hidden;
-            margin-bottom: 12px;
-        }
-
-        .skill-title {
-            padding: 13px 16px;
-            background: #FAFBFC;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            cursor: pointer;
-            font-size: 13px;
-            font-weight: 600;
-            color: var(--navy);
-        }
-
-        .skill-count {
-            font-size: 11px;
-            color: var(--teal);
-            background: var(--teal-light);
-            padding: 3px 8px;
-            border-radius: 20px;
-        }
-
-        .skill-body {
-            padding: 15px;
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 10px;
-            border-top: 1px solid var(--line);
-        }
-
-        .submit-bar {
-            position: sticky;
-            bottom: 0;
-            z-index: 20;
-            background: white;
-            border: 1px solid var(--line);
-            border-radius: 12px;
-            box-shadow: var(--shadow);
-            padding: 18px 24px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            gap: 15px;
-        }
-
-            .submit-bar p {
-                margin: 0;
-                font-size: 12px;
-                color: var(--muted);
-            }
-
-        .btn-row {
-            display: flex;
-            gap: 10px;
-        }
-
-        .btn {
-            border: 0;
-            border-radius: 9px;
-            padding: 12px 22px;
-            font-size: 13px;
-            font-weight: 600;
-            cursor: pointer;
-        }
-
-        .btn-primary {
-            background: var(--teal);
-            color: white;
-        }
-
-            .btn-primary:hover {
-                background: #0B786F;
-            }
-
-        .btn-secondary {
-            background: white;
-            border: 1px solid var(--line);
-            color: var(--navy);
-        }
-
-        footer {
-            text-align: center;
-            padding: 25px;
-            color: var(--muted);
-            font-size: 12px;
-        }
-
-        #messageBox {
-            display: none;
-            padding: 13px 16px;
-            border-radius: 8px;
-            margin-bottom: 10px;
-            font-size: 13px;
-            font-weight: 500;
-        }
-
-            #messageBox.success {
-                display: block;
-                background: #E7F7F3;
-                border: 1px solid #B8E8DF;
-                color: #08766D;
-            }
-
-            #messageBox.error {
-                display: block;
-                background: #FDECEC;
-                border: 1px solid #F4C3C3;
-                color: #B42318;
-            }
-
-        @@media(max-width:900px) {
-
-            .layout {
-                grid-template-columns: 1fr;
-            }
-
-            .side-nav {
-                position: static;
-            }
-
-            .grid,
-            .checkbox-grid,
-            .skill-body {
-                grid-template-columns: repeat(2, 1fr);
-            }
-        }
-
-        @@media(max-width:600px) {
-
-            .topbar {
-                padding: 14px 18px;
-            }
-
-            .org-chip {
-                display: none;
-            }
-
-            .page-header {
-                padding: 30px 18px 55px;
-            }
-
-            .layout {
-                padding: 0 14px;
-            }
-
-            .section {
-                padding: 20px 18px;
-            }
-
-            .grid,
-            .checkbox-grid,
-            .skill-body {
-                grid-template-columns: 1fr;
-            }
-
-            .submit-bar {
-                position: static;
-                flex-direction: column;
-                align-items: stretch;
-            }
-
-            .btn-row {
-                width: 100%;
-            }
-
-            .btn {
-                flex: 1;
-            }
-        }
-
-    </style>
+   @* Radhika30-09 *@
+<link rel="stylesheet" href="~/css/CreatePostNew.css" asp-append-version="true" />
 
 </head>
 
@@ -995,12 +526,7 @@
                             Total Charges
                         </label>
 
-                        <input type="number"
-                               id="sTotalCharges"
-                               name="sTotalCharges"
-                               step="0.01"
-                               min="0"
-                               placeholder="Enter charges" />
+                        <input type="number" id="sTotalCharges" name="sTotalCharges" step="0.01" min="0" value="0" placeholder="Enter charges" />
 
                     </div>
 
@@ -1582,9 +1108,7 @@
                         Save Draft
                     </button>
 
-                    <button type="submit"
-                            class="btn btn-primary"
-                            id="submitButton">
+                    <button type="submit" class="btn btn-primary" id="submitButton">
                         Submit
                     </button>
 
@@ -1594,13 +1118,82 @@
 
         </form>
 
+        <div id="successMessage" class="alert alert-success mt-3" style="display:none;"></div>
+        <div id="errorMessage" class="alert alert-danger mt-3" style="display:none;"></div>
     </div>
 
 
     <footer>
         Copyright © 2026 — All Rights Reserved with IIPL
     </footer>
+    <script>
+        $(document).ready(function () {
 
+            $("#createPostForm").submit(function (e) {
+
+                e.preventDefault();
+
+                $("#successMessage").hide().text("");
+                $("#errorMessage").hide().text("");
+
+                var form = $(this);
+                var button = $("#submitButton");
+
+                button.prop("disabled", true);
+
+                $.ajax({
+                    url: '@Url.Action("CreatePostNew", "Organization")',
+                    type: 'POST',
+                    data: form.serialize(),
+
+                    success: function (response) {
+
+                        if (response.success) {
+
+                            // Show success message
+                            $("#successMessage")
+                                .text(response.message)
+                                .fadeIn();
+
+                            // Clear all form fields
+                            form[0].reset();
+
+                            // If you have select2 dropdowns
+                            $(".select2").val(null).trigger("change");
+
+                            // Optional: hide message after 5 seconds
+                            setTimeout(function () {
+                                $("#successMessage").fadeOut();
+                            }, 5000);
+
+                        }
+                        else {
+
+                            $("#errorMessage")
+                                .text(response.message)
+                                .fadeIn();
+                        }
+                    },
+
+                    error: function (xhr) {
+
+                        $("#errorMessage")
+                            .text("An error occurred while creating the post.")
+                            .fadeIn();
+
+                        console.log(xhr.responseText);
+                    },
+
+                    complete: function () {
+
+                        button.prop("disabled", false);
+                    }
+                });
+
+            });
+
+        });
+    </script>
     @* <script>
 
         document.addEventListener("DOMContentLoaded", function () {
@@ -4539,6 +4132,74 @@
 
         });
     </script>
+    <script>
+        // Radhika30-09
+    // =========================================================
+    // SKILLS ACCORDION - only one category open at a time
+    // =========================================================
+
+    const SKILL_BODIES = ["medicalBody", "technicalBody", "nonTechnicalBody"];
+
+    let skillUserToggled = false;
+
+    function getSkillBox(bodyId) {
+        const body = document.getElementById(bodyId);
+        return body ? body.closest(".skill-box") : null;
+    }
+
+    function isSkillOpen(bodyId) {
+        const box = getSkillBox(bodyId);
+        return box ? !box.classList.contains("collapsed") : false;
+    }
+
+    function openSkill(bodyId) {
+        SKILL_BODIES.forEach(function (id) {
+            const box = getSkillBox(id);
+            if (box) {
+                box.classList.toggle("collapsed", id !== bodyId);
+            }
+        });
+    }
+
+    // Called by onclick="toggleSkill('medicalBody')" in your HTML
+    function toggleSkill(bodyId) {
+
+        skillUserToggled = true;
+
+        if (isSkillOpen(bodyId)) {
+            const box = getSkillBox(bodyId);
+            if (box) box.classList.add("collapsed");   // click again to close
+        }
+        else {
+            openSkill(bodyId);                          // opens this, closes others
+        }
+    }
+
+
+    // Starting state
+  // Starting state: all three categories closed
+document.addEventListener("DOMContentLoaded", function () {
+
+    SKILL_BODIES.forEach(function (id) {
+        const box = getSkillBox(id);
+        if (box) box.classList.add("collapsed");
+    });
+
+});
+
+
+    // If validation fails on a checkbox inside a closed box, open that box
+    document.addEventListener("invalid", function (event) {
+
+        const body = event.target.closest(".skill-body");
+
+        if (body) {
+            openSkill(body.id);
+        }
+
+    }, true);
+
+</script>
 
 </body>
 

@@ -1,0 +1,703 @@
+﻿/* ============================================================
+   VIEW PROFILE TWENTY-THREE
+   WARM CREATIVE RESUME | SQUARE PHOTO + WAVES | A4 LANDSCAPE
+   ============================================================ */
+
+
+/* ---------- THEMES (default = gold) ---------- */
+
+:root {
+    --accent: #f0b73c;
+    --accent-soft: #f7d98c;
+    --track: #e9e3d6;
+    --paper: #f9f7f3;
+    --ink: #5a4d45;
+    --ink-soft: #85786f;
+    --page-bg: #e8e4df;
+}
+
+    :root[data-theme="terracotta"] {
+        --accent: #d9825b;
+        --accent-soft: #edb99f;
+        --track: #eadcd3;
+    }
+
+    :root[data-theme="rose"] {
+        --accent: #d98a9b;
+        --accent-soft: #edbcc6;
+        --track: #ecdadd;
+    }
+
+    :root[data-theme="sage"] {
+        --accent: #8fae8b;
+        --accent-soft: #bfd2bc;
+        --track: #dde5da;
+    }
+
+    :root[data-theme="ocean"] {
+        --accent: #6fa3c7;
+        --accent-soft: #a9c9de;
+        --track: #d8e3ec;
+    }
+
+    :root[data-theme="plum"] {
+        --accent: #a583a8;
+        --accent-soft: #cbb4cd;
+        --track: #e3d9e4;
+    }
+
+    :root[data-theme="slate"] {
+        --accent: #7d8a97;
+        --accent-soft: #b3bcc5;
+        --track: #dcdfe3;
+    }
+
+
+/* ---------- GLOBAL ---------- */
+
+* {
+    box-sizing: border-box;
+}
+
+html, body {
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    background: var(--page-bg);
+    color: var(--ink);
+    font-family: "DM Sans", "Segoe UI", Arial, sans-serif;
+    min-height: 100vh;
+}
+.hobby-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1.5mm;
+    margin-top: 4mm;
+}
+
+.hobby-tag {
+    padding: .9mm 3mm;
+    border: 1px solid var(--ink);
+    border-radius: 3mm;
+    color: var(--ink);
+    font-size: 9px;
+    font-weight: 500;
+    line-height: 1.35;
+}
+
+/* ---------- TOOLBAR ---------- */
+
+.resume-toolbar {
+width: 297mm;height:210mm;
+    max-width: calc(100% - 40px);
+    margin: 20px auto 10px;
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    gap: 8px;
+}
+
+.toolbar-btn {
+    border: 0;
+    border-radius: 7px;
+    padding: 9px 15px;
+    font-family: inherit;
+    font-size: 11px;
+    font-weight: 600;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    cursor: pointer;
+    transition: transform .2s ease;
+}
+
+    .toolbar-btn:hover {
+        transform: translateY(-2px);
+    }
+
+.toolbar-edit {
+    background: #fff;
+    color: var(--ink);
+    border: 1px solid #d6cfc8;
+}
+
+.toolbar-print {
+    background: var(--ink);
+    color: #fff;
+}
+
+.toolbar-download {
+    background: var(--accent);
+    color: #fff;
+}
+
+.toolbar-btn:disabled {
+    opacity: .6;
+    cursor: not-allowed;
+}
+
+
+/* ---------- THEME SWITCHER ---------- */
+
+.theme-switcher {
+width: 297mm;height:210mm;
+    max-width: calc(100% - 40px);
+    margin: 0 auto 14px;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 9px;
+}
+
+    .theme-switcher > span {
+        font-size: 11px;
+        font-weight: 600;
+        color: #7a6f68;
+        margin-right: 2px;
+    }
+
+.theme-swatch {
+    width: 22px;
+    height: 22px;
+    padding: 0;
+    border-radius: 50%;
+    cursor: pointer;
+    border: 2px solid #fff;
+    box-shadow: 0 0 0 1px #c9c1b9;
+    transition: transform .2s ease;
+}
+
+    .theme-swatch:hover {
+        transform: scale(1.12);
+    }
+
+    .theme-swatch:focus-visible {
+        outline: 2px solid var(--ink);
+        outline-offset: 2px;
+    }
+
+    .theme-swatch.active {
+        box-shadow: 0 0 0 2px var(--ink);
+    }
+
+
+/* ---------- SHEET ---------- */
+
+.resume-container {
+    padding: 5px 0 50px;
+}
+
+.resume-sheet {
+    position: relative;
+width: 297mm;height:210mm;
+    min-height: 210mm;
+    margin: 0 auto;
+    background: var(--paper);
+    display: grid;
+    grid-template-columns: 32% 68%;
+    overflow: hidden;
+    box-shadow: 0 20px 55px rgba(60, 45, 35, .16);
+}
+
+
+/* ---------- DECORATIVE WAVES ---------- */
+
+.deco {
+    position: absolute;
+    pointer-events: none;
+    z-index: 0;
+}
+
+.deco-top {
+    top: 0;
+    left: 0;
+    width: 95mm;
+    height: 48mm;
+}
+
+    .deco-top path {
+        fill: none;
+        stroke: var(--accent);
+        stroke-width: .35;
+        vector-effect: non-scaling-stroke;
+        stroke-width: 1px;
+        opacity: .75;
+    }
+
+.deco-bottom {
+    right: 0;
+    bottom: 0;
+    width: 62mm;
+    height: 46mm;
+}
+
+    .deco-bottom .wave-back {
+        fill: var(--accent-soft);
+    }
+
+    .deco-bottom .wave-front {
+        fill: var(--accent);
+    }
+
+
+/* ============================================================
+   LEFT COLUMN  -  PHOTO / NAME / ROLE / ABOUT
+   ============================================================ */
+
+.left-column {
+    position: relative;
+    z-index: 1;
+    padding: 13mm 5mm 12mm 12mm;
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+}
+
+.photo-frame {
+    width: 100%;
+    aspect-ratio: 1 / 1;
+    max-height: 68mm;
+    border: 1.2mm solid var(--ink);
+    background: var(--track);
+    overflow: hidden;
+    flex-shrink: 0;
+}
+
+.profile-photo,
+.profile-placeholder {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+
+.profile-placeholder {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 60px;
+    color: #fff;
+    background: var(--accent);
+}
+
+.profile-name {
+    margin: 6mm 0 0;
+    font-size: 40px;
+    font-weight: 700;
+    line-height: 1.05;
+    text-transform: uppercase;
+    color: var(--ink);
+    word-break: break-word;
+}
+
+.profile-role {
+    margin-top: 3mm;
+    font-size: 15px;
+    font-weight: 500;
+    line-height: 1.25;
+    text-transform: uppercase;
+    color: var(--ink);
+}
+
+.body-text {
+    margin: 4mm 0 0;
+    font-size: 10.5px;
+    line-height: 1.7;
+    color: var(--ink);
+}
+
+.profile-quote {
+    margin: 4mm 0 0;
+    padding-left: 3mm;
+    border-left: .7mm solid var(--accent);
+    font-size: 9px;
+    font-style: italic;
+    line-height: 1.6;
+    color: var(--ink-soft);
+}
+
+
+/* ============================================================
+   RIGHT COLUMN  -  EXPERIENCE / EDUCATION / CONTACT ...
+   ============================================================ */
+
+.right-column {
+    position: relative;
+    z-index: 1;
+    padding: 13mm 14mm 12mm 6mm;
+    display: flex;
+    flex-direction: column;
+    gap: 6mm;
+    min-width: 0;
+}
+
+.section-heading {
+    margin: 0 0 2.8mm;
+    font-size: 15px;
+    font-weight: 600;
+    line-height: 1.25;
+    text-transform: uppercase;
+    color: var(--ink);
+}
+
+.rule {
+    width: 100%;
+    height: 0;
+    margin: 0;
+    border: 0;
+    border-top: 1px solid var(--ink);
+    opacity: .85;
+}
+
+
+/* ---------- EXPERIENCE (2-col grid) ---------- */
+
+.exp-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    column-gap: 9mm;
+    row-gap: 6mm;
+}
+
+.exp-item {
+    min-width: 0;
+}
+
+.exp-title {
+    font-size: 11.5px;
+    font-weight: 600;
+    line-height: 1.35;
+}
+
+.exp-org {
+    font-size: 11.5px;
+    font-weight: 600;
+    line-height: 1.35;
+    word-break: break-word;
+}
+
+.exp-text {
+    margin-top: 1.2mm;
+    font-size: 10px;
+    line-height: 1.55;
+    color: var(--ink);
+}
+
+.exp-status {
+    margin-top: .8mm;
+    font-size: 9.5px;
+    line-height: 1.5;
+    color: var(--ink-soft);
+}
+
+    .exp-status i {
+        color: var(--accent);
+        margin-right: 4px;
+    }
+
+
+/* ---------- LOWER 2-COLUMN AREA ---------- */
+
+.lower-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    column-gap: 9mm;
+    align-items: start;
+}
+
+.lower-col {
+    display: flex;
+    flex-direction: column;
+    gap: 5mm;
+    min-width: 0;
+}
+
+
+/* education */
+
+.edu-list {
+    display: flex;
+    flex-direction: column;
+    gap: 3mm;
+}
+
+.edu-title {
+    font-size: 11px;
+    font-weight: 600;
+    line-height: 1.3;
+}
+
+.edu-year {
+    font-size: 11px;
+    font-weight: 600;
+    line-height: 1.3;
+}
+
+.edu-sub {
+    font-size: 10px;
+    line-height: 1.4;
+    color: var(--ink);
+}
+
+.edu-note {
+    font-size: 9px;
+    line-height: 1.4;
+    color: var(--ink-soft);
+}
+
+
+/* achievements */
+
+.achievement-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 1.8mm;
+}
+
+    .achievement-list li {
+        display: flex;
+        gap: 7px;
+        font-size: 10px;
+        line-height: 1.5;
+    }
+
+    .achievement-list i {
+        color: var(--accent);
+        margin-top: 2px;
+        font-size: 10px;
+    }
+
+
+/* mission */
+
+.pref-list {
+    display: flex;
+    flex-direction: column;
+    gap: 2.4mm;
+}
+
+    .pref-list small {
+        display: block;
+        font-size: 7.5px;
+        letter-spacing: 1.2px;
+        text-transform: uppercase;
+        color: var(--ink-soft);
+        margin-bottom: .6mm;
+    }
+
+    .pref-list strong {
+        display: block;
+        font-size: 10px;
+        font-weight: 500;
+        line-height: 1.4;
+    }
+
+
+/* contact */
+
+.contact-list {
+    display: flex;
+    flex-direction: column;
+    gap: 1.8mm;
+}
+
+.contact-row {
+    display: flex;
+    align-items: flex-start;
+    gap: 2.6mm;
+}
+
+    .contact-row i {
+        width: 3.4mm;
+        margin-top: 1.2mm;
+        text-align: center;
+        font-size: 8.5px;
+        color: var(--accent);
+        flex-shrink: 0;
+    }
+
+    .contact-row span {
+        font-size: 10.5px;
+        line-height: 1.5;
+        word-break: break-word;
+        min-width: 0;
+    }
+
+
+/* skills */
+
+.skill-group {
+    margin-bottom: 2.4mm;
+}
+
+.skill-group-title {
+    font-size: 8px;
+    letter-spacing: 1.2px;
+    text-transform: uppercase;
+    color: var(--ink-soft);
+    margin-bottom: 1mm;
+}
+
+.skill-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 1mm;
+}
+
+    .skill-list li {
+        position: relative;
+        padding-left: 4.2mm;
+        font-size: 10.5px;
+        line-height: 1.45;
+    }
+
+        .skill-list li::before {
+            content: "";
+            position: absolute;
+            left: .6mm;
+            top: .62em;
+            width: 1.3mm;
+            height: 1.3mm;
+            border-radius: 50%;
+            background: var(--ink);
+        }
+
+
+/* languages */
+
+.lang-row {
+    margin-bottom: 2.2mm;
+}
+
+.lang-name {
+    font-size: 10px;
+    margin-bottom: .8mm;
+}
+
+.skill-bar {
+    height: 1.6mm;
+    border-radius: 1mm;
+    background: var(--track);
+    overflow: hidden;
+}
+
+    .skill-bar span {
+        display: block;
+        height: 100%;
+        border-radius: 1mm;
+        background: var(--accent);
+    }
+
+
+/* ---------- REFERENCES ---------- */
+
+.block-bottom {
+    margin-top: auto;
+    padding-top: 4mm;
+    border-top: 1px solid var(--ink);
+    margin-right: 40mm; /* keeps text clear of the bottom-right wave */
+}
+
+.ref-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    column-gap: 9mm;
+}
+
+.ref-item {
+    min-width: 0;
+}
+
+.ref-name {
+    font-size: 11px;
+    font-weight: 600;
+    line-height: 1.3;
+}
+
+.ref-rel {
+    font-size: 10px;
+    line-height: 1.4;
+    margin-bottom: .8mm;
+}
+
+.ref-line {
+    font-size: 9.5px;
+    line-height: 1.45;
+    color: var(--ink-soft);
+    word-break: break-word;
+}
+
+
+/* ---------- RESPONSIVE (sheet stays A4, scrolls sideways) ---------- */
+
+@media (max-width: 1000px) {
+    .resume-toolbar,
+    .theme-switcher {
+        width: 100%;
+        max-width: calc(100% - 20px);
+        justify-content: center;
+        flex-wrap: wrap;
+    }
+
+    .resume-container {
+        overflow-x: auto;
+        padding: 10px 0 40px;
+    }
+
+    .resume-sheet {
+        margin-left: 10px;
+        margin-right: 10px;
+    }
+}
+
+@media (max-width: 600px) {
+    .toolbar-btn {
+        padding: 8px 10px;
+        font-size: 10px;
+    }
+}
+
+
+/* ---------- PRINT ---------- */
+
+@media print {
+    html, body {
+    width: 297mm;height:210mm;
+        margin: 0;
+        padding: 0;
+        background: #fff;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+    }
+
+    .resume-toolbar,
+    .theme-switcher {
+        display: none !important;
+    }
+
+    .resume-container {
+        padding: 0;
+        margin: 0;
+    }
+
+    .resume-sheet {
+    width: 297mm;height:210mm;
+        min-height: 210mm;
+        margin: 0;
+        box-shadow: none;
+    }
+
+    @page {
+        size: A4 landscape;
+        margin: 0;
+    }
+}

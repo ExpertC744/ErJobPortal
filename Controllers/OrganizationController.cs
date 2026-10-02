@@ -296,6 +296,76 @@ namespace JobPortalTrainee.Controllers
                         }
                     }
                 }
+                // =====================================================
+                // GET ORGANIZATION POSTS FOR DASHBOARD
+                // =====================================================
+
+                List<OrgPostM> organizationPosts =
+                    new List<OrgPostM>();
+
+                using (SqlCommand cmd =
+                       new SqlCommand(
+                           "SP_GetOrganizationDashboardPosts",
+                           con))
+                {
+                    cmd.CommandType =
+                        CommandType.StoredProcedure;
+
+                    cmd.Parameters.AddWithValue(
+                        "@nOrgID",
+                        orgId.Value);
+
+                    using (SqlDataReader dr =
+                           cmd.ExecuteReader())
+                    {
+                        while (dr.Read())
+                        {
+                            OrgPostM post =
+                                new OrgPostM();
+
+                            post.nID =
+                                dr["nID"] != DBNull.Value
+                                ? Convert.ToInt32(dr["nID"])
+                                : 0;
+
+                            post.nOrgID =
+                                dr["nOrgID"] != DBNull.Value
+                                ? Convert.ToInt32(dr["nOrgID"])
+                                : 0;
+
+                            post.nPositionID =
+                                dr["nPositionID"] != DBNull.Value
+                                ? Convert.ToInt32(dr["nPositionID"])
+                                : 0;
+
+                            post.dRegisterDate =
+                                dr["dRegisterDate"] != DBNull.Value
+                                ? Convert.ToDateTime(
+                                    dr["dRegisterDate"])
+                                : null;
+
+                            post.nBit =
+                                dr["nBit"] != DBNull.Value &&
+                                Convert.ToBoolean(
+                                    dr["nBit"]);
+
+                            post.sPositionName =
+                                dr["sPositionName"] != DBNull.Value
+                                ? dr["sPositionName"].ToString()
+                                : string.Empty;
+
+                            post.AppliedTraineeCount =
+                                dr["AppliedTraineeCount"] != DBNull.Value
+                                ? Convert.ToInt32(
+                                    dr["AppliedTraineeCount"])
+                                : 0;
+
+                            organizationPosts.Add(post);
+                        }
+                    }
+                    ViewBag.OrganizationPosts =
+    organizationPosts;
+                }
             }
 
             // =====================================================
@@ -1404,8 +1474,7 @@ string nameColumn)
 
             CandidateFeedbackViewModel feedback = null;
 
-            string connectionString =
-                _configuration.GetConnectionString("DefaultConnection");
+            string connectionString = _configuration.GetConnectionString("DefaultConnection");
 
             using (SqlConnection con =
                    new SqlConnection(connectionString))
@@ -1741,16 +1810,13 @@ string nameColumn)
             try
             {
                 string? connectionString = _configuration.GetConnectionString("DefaultConnection");
-
                 int? OrgID = HttpContext.Session.GetInt32("OrgID");
 
                 if (OrgID == null || OrgID <= 0)
                 {
                     TempData["Error"] = "Organization session expired. Please login again.";
-
                     return RedirectToAction("CreatePostNew", "Organization");
                 }
-
 
                 if (string.IsNullOrWhiteSpace(connectionString))
                 {
@@ -1760,36 +1826,18 @@ string nameColumn)
                         message = "Database connection string not found."
                     });
                 }
-
-                using SqlConnection con =
-                    new SqlConnection(connectionString);
-
-                using SqlCommand cmd =
-                    new SqlCommand("SP_CreateOrgPost", con);
-
+                using SqlConnection con = new SqlConnection(connectionString);
+                using SqlCommand cmd = new SqlCommand("SP_CreateOrgPost", con);
                 cmd.CommandType = CommandType.StoredProcedure;
-
 
                 // =====================================================
                 // ROLE DETAILS
                 // =====================================================
 
-                cmd.Parameters.AddWithValue(
-                    "@nPositionID",
-                    model.nPositionID);
-
-                cmd.Parameters.AddWithValue(
-                    "@nRequiredTrainees",
-                    model.nRequiredTrainees);
-
-                cmd.Parameters.AddWithValue(
-                    "@nGenderID",
-                    model.nGenderID);
-
-                cmd.Parameters.AddWithValue(
-                    "@nMinimumQualificationID",
-                    model.nMinimumQualificationID);
-
+                cmd.Parameters.AddWithValue("@nPositionID", model.nPositionID);
+                cmd.Parameters.AddWithValue("@nRequiredTrainees", model.nRequiredTrainees);
+                cmd.Parameters.AddWithValue("@nGenderID", model.nGenderID);
+                cmd.Parameters.AddWithValue("@nMinimumQualificationID", model.nMinimumQualificationID);
 
                 // =====================================================
                 // LOCATION
@@ -1798,19 +1846,14 @@ string nameColumn)
                 // COUNTRY NAME
                 // Example: India
 
-                cmd.Parameters.AddWithValue(
-                    "@sCountryName",
-                    string.IsNullOrWhiteSpace(model.sCountryName)
-                        ? DBNull.Value
-                        : model.sCountryName);
+                cmd.Parameters.AddWithValue("@sCountryName", string.IsNullOrWhiteSpace(model.sCountryName)
+                        ? DBNull.Value : model.sCountryName);
 
 
                 // STATE NAME
                 // Example: Maharashtra
 
-                cmd.Parameters.AddWithValue(
-                    "@sStateName",
-                    string.IsNullOrWhiteSpace(model.sStateName)
+                cmd.Parameters.AddWithValue("@sStateName", string.IsNullOrWhiteSpace(model.sStateName)
                         ? DBNull.Value
                         : model.sStateName);
 
@@ -1854,17 +1897,20 @@ string nameColumn)
                     "@nInternshipFellowshipTypeID",
                     model.nInternshipFellowshipTypeID);
 
-                cmd.Parameters.AddWithValue(
-                    "@sTotalCharges",
-                    model.sTotalCharges.HasValue
-                        ? model.sTotalCharges.Value
-                        : DBNull.Value);
+                //cmd.Parameters.AddWithValue(
+                //    "@sTotalCharges",
+                //    model.sTotalCharges.HasValue
+                //        ? model.sTotalCharges.Value
+                //        : DBNull.Value);
+
+                cmd.Parameters.AddWithValue("@sTotalCharges", model.sTotalCharges.HasValue
+        ? model.sTotalCharges.Value : 0);
 
                 cmd.Parameters.AddWithValue(
-                    "@sCurrency",
-                    string.IsNullOrWhiteSpace(model.sCurrency)
-                        ? DBNull.Value
-                        : model.sCurrency);
+         "@sCurrency",
+         string.IsNullOrWhiteSpace(model.sCurrency)
+             ? "NA"
+             : model.sCurrency.Trim());
 
 
                 // =====================================================
@@ -1975,12 +2021,13 @@ string nameColumn)
                         : 0;
 
 
-                return Json(new
-                {
-                    success = true,
-                    message = "Create Post added successfully.",
-                    nID = newPostID
-                });
+                //return Json(new
+                //{
+                //    success = true,
+                //    message = "Create Post added successfully.",
+                //    nID = newPostID
+                //});
+                return RedirectToAction("ViewOrgPost", "Organization", new { id = newPostID });
             }
             catch (Exception ex)
             {
@@ -2247,9 +2294,7 @@ string nameColumn)
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetCities(
-    string countryCode,
-    string stateCode)
+        public async Task<IActionResult> GetCities(string countryCode, string stateCode)
         {
             try
             {
@@ -2340,8 +2385,7 @@ string nameColumn)
         [Route("Organization/TogglePostStatus")]
         public IActionResult TogglePostStatus(int id)
         {
-            string? connectionString =
-                _configuration.GetConnectionString("DefaultConnection");
+            string? connectionString = _configuration.GetConnectionString("DefaultConnection");
 
             if (string.IsNullOrWhiteSpace(connectionString))
             {
@@ -2352,13 +2396,10 @@ string nameColumn)
                 });
             }
 
-            using SqlConnection con =
-                new SqlConnection(connectionString);
+            using SqlConnection con = new SqlConnection(connectionString);
 
-            string query = @"
-   UPDATE tblPost
-   SET nBit =
-       CASE
+            string query = @"UPDATE tblPost
+            SET nBit = CASE
            WHEN nBit = 1 THEN 0
            ELSE 1
        END,
@@ -2384,8 +2425,7 @@ string nameColumn)
                 });
             }
 
-            bool newStatus =
-                Convert.ToInt32(result) == 1;
+            bool newStatus = Convert.ToInt32(result) == 1;
 
             return Json(new
             {
@@ -2396,22 +2436,19 @@ string nameColumn)
 
         public class CountryApiResponse
         {
-            public List<Country> Data { get; set; }
-                = new List<Country>();
+            public List<Country> Data { get; set; } = new List<Country>();
         }
 
 
         public class StateApiResponse
         {
-            public List<State> Data { get; set; }
-                = new List<State>();
+            public List<State> Data { get; set; } = new List<State>();
         }
 
 
         public class CityApiResponse
         {
-            public List<City> Data { get; set; }
-                = new List<City>();
+            public List<City> Data { get; set; } = new List<City>();
         }
 
 
@@ -2582,8 +2619,6 @@ string nameColumn)
 
             return Json(list);
         }
-
-
 
         [HttpPost]
         public IActionResult AddPost(OrgPostM model)
@@ -2822,135 +2857,52 @@ string nameColumn)
             {
                 return RedirectToAction("OrganizationLogin", "Account");
             }
-
             int orgID = sessionOrgID.Value;
-
-
             List<OrgPostM> posts = new List<OrgPostM>();
-
-            using (SqlConnection con = new SqlConnection(
-                _configuration.GetConnectionString("DefaultConnection")))
+            using (SqlConnection con = new SqlConnection(_configuration.GetConnectionString("DefaultConnection")))
             {
-                using (SqlCommand cmd = new SqlCommand(
-                    "SP_GetOrganizationPostList", con))
+                using (SqlCommand cmd = new SqlCommand("SP_GetOrgPostsWithMatchingTraineeCount", con))
                 {
                     cmd.CommandType = CommandType.StoredProcedure;
-
                     cmd.Parameters.AddWithValue("@nOrgID", orgID);
-
                     con.Open();
-
                     using (SqlDataReader dr = cmd.ExecuteReader())
                     {
                         while (dr.Read())
                         {
                             OrgPostM item = new OrgPostM();
-
                             item.nID = Convert.ToInt32(dr["nID"]);
-
-                            //item.sName =
-                            //    dr["sName"]?.ToString() ?? "";
-
-                            item.nPositionID =
-     Convert.ToInt32(dr["nPositionID"]);
-                            item.sPositionName =
-                                dr["sPositionName"]?.ToString() ?? "";
-
-                            item.nRequiredTrainees =
-                                Convert.ToInt32(dr["nRequiredTrainees"]);
-
-                            item.nGenderID =
-                                Convert.ToInt32(dr["nGenderID"]);
-                            item.sGenderName =
-                                dr["sGenderName"]?.ToString() ?? "";
-
-                            item.nMinimumQualificationID =
-                                Convert.ToInt32(dr["nMinimumQualificationID"]);
-                            item.sMinimumQualificationName =
-                                dr["sMinimumQualificationName"]?.ToString() ?? "";
-
-                            //item.sCountryCode =
-                            //    dr["sCountryCode"]?.ToString() ?? "";
-
-                            //item.sStateCode =
-                            //    dr["sStateCode"]?.ToString() ?? "";
-
-                            //item.nCityID =
-                            //    Convert.ToInt32(dr["nCityID"]);
-                            //item.sCityName =
-                            //    dr["sCityName"]?.ToString() ?? "";
-
-                            item.sCountryName =
-    dr["sCountryName"]?.ToString() ?? "";
-
-                            item.sStateName =
-                                dr["sStateName"]?.ToString() ?? "";
-
-                            item.nCityName =
-                                dr["nCityName"]?.ToString() ?? "";
-                            item.sWorkingHours =
-                                dr["sWorkingHours"]?.ToString() ?? "";
-
-                            item.nInternshipTypeID =
-                                Convert.ToInt32(dr["nInternshipTypeID"]);
-                            item.sInternshipTypeName =
-                                dr["sInternshipTypeName"]?.ToString() ?? "";
-
-                            item.sWorkingShift =
-                                dr["sWorkingShift"]?.ToString() ?? "";
-
-                            item.nInternshipFellowshipTypeID =
-                                Convert.ToInt32(dr["nInternshipFellowshipTypeID"]);
-                            item.sInternshipFellowshipTypeName =
-                                dr["sInternshipFellowshipTypeName"]?.ToString() ?? "";
-
-                            item.nTrainingInvolvedID =
-                                Convert.ToInt32(dr["nTrainingInvolvedID"]);
-                            item.sTrainingInvolvedName =
-                                dr["sTrainingInvolvedName"]?.ToString() ?? "";
-
-                            item.nInternshipDurationID =
-                                Convert.ToInt32(dr["nInternshipDurationID"]);
-                            item.sInternshipDurationName =
-                                dr["sInternshipDurationName"]?.ToString() ?? "";
-
-                            item.nInternshipModeID =
-                                Convert.ToInt32(dr["nInternshipModeID"]);
-                            item.sInternshipModeName =
-                                dr["sInternshipModeName"]?.ToString() ?? "";
-
-                            item.sDivyang =
-                                dr["sDivyang"]?.ToString() ?? "";
-
-                            item.sWorkingDays =
-                                dr["sWorkingDays"]?.ToString() ?? "";
-
-                            item.sFacilities =
-                                dr["sFacilities"]?.ToString() ?? "";
-
-                            item.dRegisterDate =
-                                dr["dRegisterDate"] == DBNull.Value
-                                ? null
-                                : Convert.ToDateTime(
-                                    dr["dRegisterDate"]);
-
-                            item.dModDate =
-                                dr["dModDate"] == DBNull.Value
-                                ? null
-                                : Convert.ToDateTime(
-                                    dr["dModDate"]);
-
-                            item.nBit =
-                                dr["nBit"] != DBNull.Value &&
-                                Convert.ToBoolean(dr["nBit"]);
-
-                            item.nSABit =
-                                dr["nSABit"] != DBNull.Value &&
-                                Convert.ToBoolean(dr["nSABit"]);
-
-                            item.nOrgID =
-                                Convert.ToInt32(dr["nOrgID"]);
-
+                            item.nPositionID = Convert.ToInt32(dr["nPositionID"]);
+                            item.sPositionName = dr["sPositionName"]?.ToString() ?? "";
+                            item.nRequiredTrainees = Convert.ToInt32(dr["nRequiredTrainees"]);
+                            item.MatchingTraineeCount = Convert.ToInt32(dr["MatchingTraineeCount"]);
+                            item.nGenderID = Convert.ToInt32(dr["nGenderID"]);
+                            item.sGenderName = dr["sGenderName"]?.ToString() ?? "";
+                            item.nMinimumQualificationID = Convert.ToInt32(dr["nMinimumQualificationID"]);
+                            item.sMinimumQualificationName = dr["sMinimumQualificationName"]?.ToString() ?? "";
+                            item.sCountryName = dr["sCountryName"]?.ToString() ?? "";
+                            item.sStateName = dr["sStateName"]?.ToString() ?? "";
+                            item.nCityName = dr["nCityName"]?.ToString() ?? "";
+                            item.sWorkingHours = dr["sWorkingHours"]?.ToString() ?? "";
+                            item.nInternshipTypeID = Convert.ToInt32(dr["nInternshipTypeID"]);
+                            item.sInternshipTypeName = dr["sInternshipTypeName"]?.ToString() ?? "";
+                            item.sWorkingShift = dr["sWorkingShift"]?.ToString() ?? "";
+                            item.nInternshipFellowshipTypeID = Convert.ToInt32(dr["nInternshipFellowshipTypeID"]);
+                            item.sInternshipFellowshipTypeName = dr["sInternshipFellowshipTypeName"]?.ToString() ?? "";
+                            item.nTrainingInvolvedID = Convert.ToInt32(dr["nTrainingInvolvedID"]);
+                            item.sTrainingInvolvedName = dr["sTrainingInvolvedName"]?.ToString() ?? "";
+                            item.nInternshipDurationID = Convert.ToInt32(dr["nInternshipDurationID"]);
+                            item.sInternshipDurationName = dr["sInternshipDurationName"]?.ToString() ?? "";
+                            item.nInternshipModeID = Convert.ToInt32(dr["nInternshipModeID"]);
+                            item.sInternshipModeName = dr["sInternshipModeName"]?.ToString() ?? "";
+                            item.sDivyang = dr["sDivyang"]?.ToString() ?? "";
+                            item.sWorkingDays = dr["sWorkingDays"]?.ToString() ?? "";
+                            item.sFacilities = dr["sFacilities"]?.ToString() ?? "";
+                            item.dRegisterDate = dr["dRegisterDate"] == DBNull.Value ? null : Convert.ToDateTime(dr["dRegisterDate"]);
+                            item.dModDate = dr["dModDate"] == DBNull.Value ? null : Convert.ToDateTime(dr["dModDate"]);
+                            item.nBit = dr["nBit"] != DBNull.Value && Convert.ToBoolean(dr["nBit"]);
+                            item.nSABit = dr["nSABit"] != DBNull.Value && Convert.ToBoolean(dr["nSABit"]);
+                            item.nOrgID = Convert.ToInt32(dr["nOrgID"]);
                             posts.Add(item);
                         }
                     }
@@ -3548,6 +3500,329 @@ WHERE nID = @nID
             return View();
         }
 
-    }
+        //khushi -- 29-09-2026
 
+        [HttpGet]
+        public IActionResult OrgCharts()
+        {
+            int? orgId =
+                HttpContext.Session.GetInt32("OrgID");
+
+            if (orgId == null || orgId <= 0)
+            {
+                return RedirectToAction(
+                    "OrganizationLogin",
+                    "Account");
+            }
+
+            string organizationName =
+                HttpContext.Session.GetString("OrgName")
+                ?? "";
+
+            // Existing organization area chart
+            List<OrganizationChartViewModel> areaChartData =
+                GetAreaChartData(orgId.Value);
+
+            // Candidate registration chart
+            List<OrganizationChartViewModel> barChartData =
+                GetBarChartData();
+
+            ViewBag.OrganizationName =
+                organizationName;
+
+            var viewModel =
+                new OrganizationChartsViewModel
+                {
+                    AreaChartData = areaChartData,
+                    BarChartData = barChartData
+                };
+
+            return View(viewModel);
+        }
+
+        //khushi -- 29-09-2026
+        // =========================================================
+        // AREA CHART DATA
+        // =========================================================
+
+        private List<OrganizationChartViewModel> GetAreaChartData(int organizationId)
+        {
+            var areaChartDataList =
+                new List<OrganizationChartViewModel>();
+
+            string connectionString =
+                _configuration.GetConnectionString(
+                    "DefaultConnection")
+                ?? throw new InvalidOperationException(
+                    "DefaultConnection was not found.");
+
+            using (SqlConnection connection =
+                   new SqlConnection(connectionString))
+            {
+                using (SqlCommand command =
+                       new SqlCommand(
+                           "SP_BrowseOrgAreaChart",
+                           connection))
+                {
+                    command.CommandType =
+                        CommandType.StoredProcedure;
+
+                    command.Parameters.Add(
+                        "@OrganizationID",
+                        SqlDbType.Int).Value =
+                        organizationId;
+
+                    connection.Open();
+
+                    using (SqlDataReader reader =
+                           command.ExecuteReader())
+                    {
+                        while (reader.Read())
+                        {
+                            areaChartDataList.Add(
+                                new OrganizationChartViewModel
+                                {
+                                    PostYear = reader["PostYear"] != DBNull.Value
+                                            ? Convert.ToInt32(
+                                                reader["PostYear"])
+                                            : 0,
+
+                                    PostMonth =
+                                        reader["PostMonth"] != DBNull.Value
+                                            ? Convert.ToInt32(
+                                                reader["PostMonth"])
+                                            : 0,
+
+                                    TotalEligibleTrainees =
+                                        reader["TotalEligibleTrainees"]
+                                        != DBNull.Value
+                                            ? Convert.ToInt32(
+                                                reader[
+                                                    "TotalEligibleTrainees"])
+                                            : 0
+                                });
+                        }
+                    }
+                }
+            }
+
+            return areaChartDataList;
+        }
+
+        //khushi -- 29-09-2026
+        // =========================================================
+        // CANDIDATE MONTHLY REGISTRATION CHART
+        // tblcandidateRegister
+        // =========================================================
+
+        private List<OrganizationChartViewModel> GetBarChartData()
+        {
+            var candidateChartData =
+                new List<OrganizationChartViewModel>();
+
+            string connectionString =
+                _configuration.GetConnectionString("DefaultConnection")
+                ?? throw new InvalidOperationException(
+                    "DefaultConnection was not found.");
+
+            using (SqlConnection connection =
+                   new SqlConnection(connectionString))
+            {
+                using (SqlCommand command =
+                       new SqlCommand(
+                           "SP_BrowseCandidateMonthlyRegistration",
+                           connection))
+                {
+                    command.CommandType =
+                        CommandType.StoredProcedure;
+
+                    connection.Open();
+
+                    using (SqlDataReader reader =
+                           command.ExecuteReader())
+                    {
+                        while (reader.Read())
+                        {
+                            candidateChartData.Add(
+                                new OrganizationChartViewModel
+                                {
+                                    RegistrationYear =
+                                        reader["RegistrationYear"] != DBNull.Value
+                                            ? Convert.ToInt32(
+                                                reader["RegistrationYear"])
+                                            : 0,
+
+                                    RegistrationMonth =
+                                        reader["RegistrationMonth"] != DBNull.Value
+                                            ? Convert.ToInt32(
+                                                reader["RegistrationMonth"])
+                                            : 0,
+
+                                    TotalRegistrations =
+                                        reader["TotalRegistrations"] != DBNull.Value
+                                            ? Convert.ToInt32(
+                                                reader["TotalRegistrations"])
+                                            : 0
+                                });
+                        }
+                    }
+                }
+            }
+
+            return candidateChartData;
+        }
+
+
+        [HttpGet]
+        [Route("Organization/EligibleTrainees/{id}")]
+        public IActionResult EligibleTrainees(int id, string orgCode)
+        {
+            int? sessionOrgID = HttpContext.Session.GetInt32("OrgID");
+
+            if (sessionOrgID == null)
+            {
+                return RedirectToAction("OrganizationLogin", "Account");
+            }
+
+            int orgID = sessionOrgID.Value;
+
+            List<EligibleTraineeM> trainees = new List<EligibleTraineeM>();
+
+            using (SqlConnection con = new SqlConnection(
+                _configuration.GetConnectionString("DefaultConnection")))
+            {
+                using (SqlCommand cmd = new SqlCommand(
+                    "SP_GetCandidatesByPost", con))
+                {
+                    cmd.CommandType = CommandType.StoredProcedure;
+
+                    cmd.Parameters.Add("@nID", SqlDbType.Int).Value = id;
+                    cmd.Parameters.Add("@OrganizationID", SqlDbType.Int).Value = orgID;
+
+                    con.Open();
+
+                    using (SqlDataReader dr = cmd.ExecuteReader())
+                    {
+                        while (dr.Read())
+                        {
+                            EligibleTraineeM item = new EligibleTraineeM();
+
+                            item.CandidateID =
+                                Convert.ToInt32(dr["CandidateID"]);
+
+                            item.Name =
+                                dr["Name"] == DBNull.Value
+                                    ? ""
+                                    : dr["Name"].ToString();
+
+                            item.EmailID =
+                                dr["EmailID"] == DBNull.Value
+                                    ? ""
+                                    : dr["EmailID"].ToString();
+
+                            item.Gender =
+                                dr["Gender"] == DBNull.Value
+                                    ? null
+                                    : Convert.ToInt32(dr["Gender"]);
+
+                            item.DateOfBirth =
+                                dr["DateOfBirth"] == DBNull.Value
+                                    ? null
+                                    : Convert.ToDateTime(dr["DateOfBirth"]);
+
+                            item.PostID =
+                                Convert.ToInt32(dr["PostID"]);
+
+                            item.GenderRequired =
+                                dr["GenderRequired"] == DBNull.Value
+                                    ? null
+                                    : Convert.ToInt32(dr["GenderRequired"]);
+
+                            item.InternshipType =
+                                dr["InternshipType"] == DBNull.Value
+                                    ? null
+                                    : Convert.ToInt32(dr["InternshipType"]);
+
+                            item.MinQualification =
+                                dr["MinQualification"] == DBNull.Value
+                                    ? null
+                                    : Convert.ToInt32(dr["MinQualification"]);
+
+                            item.MaxQualification =
+                                dr["MaxQualification"] == DBNull.Value
+                                    ? null
+                                    : Convert.ToInt32(dr["MaxQualification"]);
+
+                            item.MedicalSkill =
+                                dr["MedicalSkill"] == DBNull.Value
+                                    ? ""
+                                    : dr["MedicalSkill"].ToString();
+
+                            item.TechnicalSkill =
+                                dr["TechnicalSkill"] == DBNull.Value
+                                    ? ""
+                                    : dr["TechnicalSkill"].ToString();
+
+                            item.NonTechnicalSkill =
+                                dr["NonTechnicalSkill"] == DBNull.Value
+                                    ? ""
+                                    : dr["NonTechnicalSkill"].ToString();
+
+                            item.MedicalSkillNames =
+                                dr["MedicalSkillNames"] == DBNull.Value
+                                    ? ""
+                                    : dr["MedicalSkillNames"].ToString();
+
+                            item.TechnicalSkillNames =
+                                dr["TechnicalSkillNames"] == DBNull.Value
+                                    ? ""
+                                    : dr["TechnicalSkillNames"].ToString();
+
+                            item.NonTechnicalSkillNames =
+                                dr["NonTechnicalSkillNames"] == DBNull.Value
+                                    ? ""
+                                    : dr["NonTechnicalSkillNames"].ToString();
+
+                            item.MatchedSkillType =
+                                dr["MatchedSkillType"] == DBNull.Value
+                                    ? ""
+                                    : dr["MatchedSkillType"].ToString();
+
+                            item.CApply =
+                                dr["CApply"] == DBNull.Value
+                                    ? null
+                                    : Convert.ToInt32(dr["CApply"]);
+
+                            item.Status =
+                                dr["Status"] == DBNull.Value
+                                    ? ""
+                                    : dr["Status"].ToString();
+
+                            item.FinalStatus =
+                                dr["FinalStatus"] == DBNull.Value
+                                    ? ""
+                                    : dr["FinalStatus"].ToString();
+
+                            item.Comment =
+                                dr["Comment"] == DBNull.Value
+                                    ? ""
+                                    : dr["Comment"].ToString();
+
+                            trainees.Add(item);
+                        }
+                    }
+                }
+            }
+
+            // IMPORTANT:
+            // id = PostID
+            // orgCode = Organization Code
+
+            ViewBag.PostID = id;
+            ViewBag.OrgCode = orgCode;
+
+            return View(trainees);
+        }
+
+    }
 }

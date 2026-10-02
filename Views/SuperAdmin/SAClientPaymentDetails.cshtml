@@ -1,0 +1,150 @@
+﻿@{
+    Layout = "~/Views/Shared/_DashboardLayout.cshtml";
+
+    ViewData["Title"] = "Payment Details";
+    ViewData["Panel"] = "SuperAdmin";
+    ViewData["UserName"] = "ItNetworkZ";
+}
+
+<div class="container-fluid payment-details-page">
+
+  
+
+    <!-- Advertisement Payment -->
+    <div class="master-table-container">
+
+        
+
+        <div class="table-responsive">
+              <!-- Page Header -->
+    <div class="mb-4">
+        <h1 class="mb-2">Invoice Details</h1>
+        <p class="mb-0 text-muted">ItNetworkZ</p>
+    </div>
+            <table id="paymentDetailsTable"
+                   class="master-data-table">
+
+                <thead>
+                    <tr>
+                        <th>Sr. No</th>
+                        <th>Receipt No</th>
+                        <th>Client ID</th>
+                        <th>Client Name</th>
+                        <th>Company Name</th>
+                        <th>Paid Amount</th>
+                        <th>Total Amount</th>
+                        <th>Balance Amount</th>
+                        <th>Installment Date</th>
+                        <th>Status</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+
+                    <tr>
+                        <td class="master-id">
+                            1
+                        </td>
+
+                        <td>
+                            <strong>T1T2611243R</strong>
+                        </td>
+
+                        <td>
+                            1
+                        </td>
+
+                        <td>
+                            Xyz
+                        </td>
+
+                        <td>
+                            ABC
+                        </td>
+
+                        <td>
+                            <strong>₹500.00</strong>
+                        </td>
+
+                        <td>
+                            <strong>₹1,270.00</strong>
+                        </td>
+
+                        <td>
+                            <strong>₹270.00</strong>
+                        </td>
+
+                        <td>
+                            26-11-2024
+                        </td>
+
+                        <td>
+                            <span class="master-status">
+                                Paid
+                            </span>
+                        </td>
+
+                        <td>
+                            <a asp-controller="SuperAdmin"
+                               asp-action="SAClientPaymentDetails"
+                               asp-route-id="1"
+                               class="resume-view-btn"
+                               title="View Payment Details">
+                                <i class="fas fa-eye"></i>
+                            </a>
+                        </td>
+                    </tr>
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+    </div>
+
+</div>
+
+<style>
+
+    /* =========================================
+       Payment Details
+       ========================================= */
+
+    .payment-details-page {
+        padding-bottom: 30px;
+    }
+
+    /* =========================================
+       Payment Amounts
+       ========================================= */
+
+    #paymentDetailsTable td strong {
+        color: #0f766e;
+        font-weight: 700;
+    }
+
+    /* Receipt Number */
+    #paymentDetailsTable td:nth-child(2) strong {
+        color: #0f172a;
+    }
+
+    /* =========================================
+       Responsive
+       ========================================= */
+
+    @@media (max-width: 768px) {
+
+        .payment-details-page {
+            padding-left: 10px;
+            padding-right: 10px;
+        }
+
+        .master-table-title h2 {
+            font-size: 17px;
+        }
+
+    }
+
+</style>

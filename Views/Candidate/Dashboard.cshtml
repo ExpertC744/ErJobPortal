@@ -412,117 +412,208 @@
             color: #fff;
         }
 
+    /* =====================================================
+       1TRAINEE MONTHLY ANALYTICS @* Radhika29-09 *@
+    ===================================================== */
 
-    /* Monthly Analytics */
     .analytics-card {
-        background: #fff;
-        border-radius: 18px;
-        border: 1px solid #edf0f4;
-        padding: 23px;
-        box-shadow: 0 5px 18px rgba(31,45,61,.04);
+        background: #ffffff;
+        border: 1px solid #dfe5e8;
+        border-radius: 14px;
+        overflow: hidden;
         height: 100%;
+        box-shadow: 0 4px 14px rgba(15, 23, 42, 0.04);
+        transition: all .25s ease;
     }
 
-    .analytics-top {
+    .analytics-card:hover {
+        box-shadow: 0 8px 24px rgba(15, 23, 42, 0.08);
+    }
+
+    /* Chart Header */
+    .analytics-header {
+        min-height: 52px;
+        padding: 0 18px;
         display: flex;
-        justify-content: space-between;
-        align-items: flex-start;
-        gap: 15px;
+        align-items: center;
+        gap: 11px;
+        border-bottom: 1px solid #dfe5e8;
+        background: #ffffff;
     }
 
-    .analytics-label {
-        color: #7a8494;
-        font-size: 13px;
-        font-weight: 600;
-        margin-bottom: 7px;
-    }
-
-    .analytics-number {
-        color: #1d2939;
-        font-size: 30px;
-        font-weight: 750;
-        line-height: 1;
-    }
-
-    .analytics-period {
-        color: #98a2b3;
-        font-size: 11px;
-        margin-top: 7px;
-    }
-
-    .analytics-icon {
-        width: 43px;
-        height: 43px;
-        border-radius: 12px;
+    .analytics-header-icon {
+        width: 25px;
+        height: 25px;
         display: flex;
         align-items: center;
         justify-content: center;
-        font-size: 17px;
-        background: #e7f6f1;
         color: #1e7b67;
-        flex-shrink: 0;
+        font-size: 17px;
     }
 
-    .analytics-chart {
-        margin-top: 18px;
-        height: 105px;
+    .analytics-header h5 {
+        margin: 0;
+        color: #16324f;
+        font-size: 17px;
+        font-weight: 500;
+        letter-spacing: .1px;
+    }
+
+    /* Chart Body */
+    .analytics-body {
+        padding: 18px 16px 14px;
+    }
+
+    .chart-wrapper {
+        position: relative;
         width: 100%;
+        height: 235px;
     }
 
-    .analytics-chart svg {
-        width: 100%;
-        height: 100%;
-        display: block;
-        overflow: visible;
+        .chart-wrapper svg {
+            width: 100%;
+            height: 100%;
+            display: block;
+        }
+
+    /* Legend */
+    .chart-legend {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        gap: 8px;
+        margin-bottom: 4px;
+        color: #667085;
+        font-size: 12px;
     }
 
-    .analytics-months {
-        display: grid;
-        grid-template-columns: repeat(12, 1fr);
-        gap: 2px;
-        margin-top: 7px;
-        color: #98a2b3;
-        font-size: 9px;
+    .legend-box {
+        width: 50px;
+        height: 16px;
+        border: 2px solid #1e7b67;
+        background: rgba(30, 123, 103, .14);
+    }
+
+    .legend-box-bar {
+        width: 50px;
+        height: 16px;
+        background: #1e7b67;
+    }
+
+    /* Axis text */
+    .chart-axis-text {
+        fill: #667085;
+        font-size: 11px;
+        font-family: Arial, sans-serif;
+    }
+
+    /* Grid */
+    .chart-grid {
+        stroke: #e6eaed;
+        stroke-width: 1;
+    }
+
+    .chart-axis {
+        stroke: #cfd6da;
+        stroke-width: 1;
+    }
+
+    /* Line chart */
+    .chart-line {
+        fill: none;
+        stroke: #1e7b67;
+        stroke-width: 2.5;
+        stroke-linecap: round;
+        stroke-linejoin: round;
+    }
+
+    .chart-area {
+        fill: rgba(30, 123, 103, .14);
+    }
+
+    .chart-point {
+        fill: #ffffff;
+        stroke: #1e7b67;
+        stroke-width: 2;
+    }
+
+    /* Bar chart */
+    .chart-bar {
+        fill: #1e7b67;
+        transition: opacity .2s ease;
+    }
+
+        .chart-bar:hover {
+            opacity: .78;
+        }
+
+    /* Current value */
+    .analytics-value {
         text-align: center;
+        margin-top: 5px;
+        color: #667085;
+        font-size: 11px;
     }
 
+    /* Footer */
     .analytics-footer {
-        margin-top: 10px;
+        border-top: 1px solid #edf0f2;
+        padding: 10px 16px;
         color: #7a8494;
         font-size: 11px;
     }
 
-    .analytics-footer i {
-        color: #1e7b67;
-        margin-right: 4px;
-    }
-
-    @@media (max-width: 767px) {
-        .analytics-months {
-            font-size: 8px;
-        }
-    }
-
-    /* Responsive */
-    @@media (max-width: 767px) {
-        .welcome-banner {
-            padding: 25px 20px;
+        .analytics-footer i {
+            color: #1e7b67;
+            margin-right: 5px;
         }
 
-            .welcome-banner h2 {
-                font-size: 23px;
+    @@media (max-width: 767px) {
+
+        .analytics-header {
+            min-height: 48px;
+            padding: 0 14px;
+        }
+
+            .analytics-header h5 {
+                font-size: 15px;
             }
 
-        .profile-btn {
-            margin-top: 18px;
+        .analytics-body {
+            padding: 15px 10px 10px;
         }
 
-        .dashboard-section {
-            padding: 18px;
+        .chart-wrapper {
+            height: 210px;
+        }
+
+        .chart-axis-text {
+            font-size: 9px;
         }
     }
 </style>
+@if (TempData["ApplyMessage"] != null)
+{
+    var message =
+        TempData["ApplyMessage"]?.ToString();
 
+    var messageType =
+        TempData["ApplyMessageType"]?.ToString();
+
+    <div class="alert alert-@(messageType == "success" ? "success" : "info") alert-dismissible fade show"
+         role="alert">
+
+        <i class="fas fa-check-circle me-2"></i>
+
+        @message
+
+        <button type="button"
+                class="btn-close"
+                data-bs-dismiss="alert">
+        </button>
+
+    </div>
+}
 <div class="candidate-dashboard">
 
     <!-- Welcome -->
@@ -639,7 +730,13 @@
                 </div>
 
                 <div class="stat-bottom">
-                    <span>5</span> awaiting response
+                    <a asp-controller="Candidate"
+                       asp-action="TraineeApplied"
+                       class="stat-link">
+                        View Details
+                        <i class="fas fa-arrow-right"></i>
+                    </a>
+
                 </div>
 
             </div>
@@ -650,46 +747,46 @@
 
 
 
-    <!-- Monthly Analytics -->
+    <!-- =====================================================
+         MONTHLY ANALYTICS @* Radhika29-09 *@
+    ===================================================== -->
+
     <div class="row">
 
         <!-- Suitable Openings -->
         <div class="col-lg-6 mb-4">
+
             <div class="analytics-card">
 
-                <div class="analytics-top">
-                    <div>
-                        <div class="analytics-label">
-                            No. of Suitable Openings
-                        </div>
+                <!-- Header -->
+                <div class="analytics-header">
 
-                        <div class="analytics-number" id="suitableOpeningsTotal">
-                            0
-                        </div>
-
-                        <div class="analytics-period">
-                            Current month
-                        </div>
+                    <div class="analytics-header-icon">
+                        <i class="fas fa-chart-line"></i>
                     </div>
 
-                    <div class="analytics-icon">
-                        <i class="fas fa-briefcase"></i>
+                    <h5>No. of suitable openings</h5>
+
+                </div>
+
+                <!-- Chart -->
+                <div class="analytics-body">
+
+                    <div class="chart-legend">
+                        <span class="legend-box"></span>
+                        <span>No. of openings</span>
                     </div>
-                </div>
 
-                <div class="analytics-chart">
-                    <svg id="suitableOpeningsChart"
-                         viewBox="0 0 600 105"
-                         preserveAspectRatio="none"
-                         aria-label="Suitable openings monthly chart">
-                    </svg>
-                </div>
+                    <div class="chart-wrapper">
 
-                <div class="analytics-months">
-                    <span>Jan</span><span>Feb</span><span>Mar</span>
-                    <span>Apr</span><span>May</span><span>Jun</span>
-                    <span>Jul</span><span>Aug</span><span>Sep</span>
-                    <span>Oct</span><span>Nov</span><span>Dec</span>
+                        <svg id="suitableOpeningsChart"
+                             viewBox="0 0 700 240"
+                             preserveAspectRatio="none"
+                             aria-label="Suitable openings monthly chart">
+                        </svg>
+
+                    </div>
+
                 </div>
 
                 <div class="analytics-footer">
@@ -698,406 +795,183 @@
                 </div>
 
             </div>
+
         </div>
 
 
         <!-- Internship Posts -->
         <div class="col-lg-6 mb-4">
+
             <div class="analytics-card">
 
-                <div class="analytics-top">
-                    <div>
-                        <div class="analytics-label">
-                            Internship Posts from Organization
-                        </div>
+                <!-- Header -->
+                <div class="analytics-header">
 
-                        <div class="analytics-number" id="internshipPostsTotal">
-                            0
-                        </div>
-
-                        <div class="analytics-period">
-                            Current month
-                        </div>
+                    <div class="analytics-header-icon">
+                        <i class="fas fa-chart-bar"></i>
                     </div>
 
-                    <div class="analytics-icon">
-                        <i class="fas fa-building"></i>
+                    <h5>Internship post from organization</h5>
+
+                </div>
+
+                <!-- Chart -->
+                <div class="analytics-body">
+
+                    <div class="chart-legend">
+                        <span class="legend-box-bar"></span>
+                        <span>No. of posts</span>
                     </div>
-                </div>
 
-                <div class="analytics-chart">
-                    <svg id="internshipPostsChart"
-                         viewBox="0 0 600 105"
-                         preserveAspectRatio="none"
-                         aria-label="Internship posts monthly chart">
-                    </svg>
-                </div>
+                    <div class="chart-wrapper">
 
-                <div class="analytics-months">
-                    <span>Jan</span><span>Feb</span><span>Mar</span>
-                    <span>Apr</span><span>May</span><span>Jun</span>
-                    <span>Jul</span><span>Aug</span><span>Sep</span>
-                    <span>Oct</span><span>Nov</span><span>Dec</span>
+                        <svg id="internshipPostsChart"
+                             viewBox="0 0 700 240"
+                             preserveAspectRatio="none"
+                             aria-label="Internship posts monthly chart">
+                        </svg>
+
+                    </div>
+
                 </div>
 
                 <div class="analytics-footer">
-                    <i class="fas fa-chart-line"></i>
+                    <i class="fas fa-building"></i>
                     Monthly organization internship trend
                 </div>
 
             </div>
-        </div>
-
-    </div>
-
-
-    <!-- Middle Section -->
-    <div class="row">
-
-        <!-- Profile Progress -->
-        <div class="col-lg-5 mb-4">
-
-            <div class="dashboard-section">
-
-                <div class="section-header">
-                    <h5>Profile Completion</h5>
-                    <span class="view-all">72%</span>
-                </div>
-
-                <div class="progress-wrapper">
-
-                    <div class="progress-info">
-                        <strong>Complete your profile</strong>
-                        <span>72%</span>
-                    </div>
-
-                    <div class="custom-progress">
-                        <div class="custom-progress-bar"></div>
-                    </div>
-
-                </div>
-
-                <p style="font-size:13px;color:#7a8494;">
-                    A complete profile helps organizations understand your
-                    skills and increases your chances of getting shortlisted.
-                </p>
-
-                <a href="#" class="profile-btn mt-2">
-                    <i class="fas fa-user"></i>
-                    Update Profile
-                </a>
-
-            </div>
-
-        </div>
-
-
-        <!-- Quick Actions -->
-        <div class="col-lg-7 mb-4">
-
-            <div class="dashboard-section">
-
-                <div class="section-header">
-                    <h5>Quick Actions</h5>
-                </div>
-
-                <div class="row">
-
-                    <div class="col-md-6">
-
-                        <a href="#" class="quick-action">
-
-                            <div class="quick-action-icon">
-                                <i class="fas fa-search"></i>
-                            </div>
-
-                            <div class="quick-action-text">
-                                <strong>Find Opportunities</strong>
-                                <small>Explore available openings</small>
-                            </div>
-
-                        </a>
-
-                    </div>
-
-
-                    <div class="col-md-6">
-
-                        <a href="#" class="quick-action">
-
-                            <div class="quick-action-icon">
-                                <i class="fas fa-file-alt"></i>
-                            </div>
-
-                            <div class="quick-action-text">
-                                <strong>My Applications</strong>
-                                <small>Track your applications</small>
-                            </div>
-
-                        </a>
-
-                    </div>
-
-
-                    <div class="col-md-6">
-
-                        <a href="#" class="quick-action">
-
-                            <div class="quick-action-icon">
-                                <i class="fas fa-user-edit"></i>
-                            </div>
-
-                            <div class="quick-action-text">
-                                <strong>Edit Profile</strong>
-                                <small>Update your information</small>
-                            </div>
-
-                        </a>
-
-                    </div>
-
-
-                    <div class="col-md-6">
-
-                        <a href="#" class="quick-action">
-
-                            <div class="quick-action-icon">
-                                <i class="fas fa-bookmark"></i>
-                            </div>
-
-                            <div class="quick-action-text">
-                                <strong>Saved Opportunities</strong>
-                                <small>View saved openings</small>
-                            </div>
-
-                        </a>
-
-                    </div>
-
-                </div>
-
-            </div>
 
         </div>
 
     </div>
 
 
-    <!-- Bottom Section -->
-    <div class="row">
 
-        <!-- Applications -->
-        <div class="col-lg-7 mb-4">
 
-            <div class="dashboard-section">
+</div>
 
-                <div class="section-header">
+         @* radhika30-09 *@
+<!-- Middle Section -->
+<div class="row d-none">
 
-                    <h5>Recent Applications</h5>
+    <!-- Profile Progress -->
+    <div class="col-lg-5 mb-4">
 
-                    <a href="#" class="view-all">
-                        View All
-                    </a>
+        <div class="dashboard-section">
 
+            <div class="section-header">
+                <h5>Profile Completion</h5>
+                <span class="view-all">72%</span>
+            </div>
+
+            <div class="progress-wrapper">
+
+                <div class="progress-info">
+                    <strong>Complete your profile</strong>
+                    <span>72%</span>
                 </div>
 
-
-                <div class="application-item">
-
-                    <div class="company-avatar">
-                        T
-                    </div>
-
-                    <div class="application-info">
-                        <strong>Frontend Developer</strong>
-                        <small>Tech Solutions • Applied 2 days ago</small>
-                    </div>
-
-                    <span class="status status-success">
-                        Shortlisted
-                    </span>
-
-                </div>
-
-
-                <div class="application-item">
-
-                    <div class="company-avatar">
-                        D
-                    </div>
-
-                    <div class="application-info">
-                        <strong>React Developer</strong>
-                        <small>Digital Works • Applied 4 days ago</small>
-                    </div>
-
-                    <span class="status status-warning">
-                        Pending
-                    </span>
-
-                </div>
-
-
-                <div class="application-item">
-
-                    <div class="company-avatar">
-                        I
-                    </div>
-
-                    <div class="application-info">
-                        <strong>UI Developer</strong>
-                        <small>Innovate Pvt Ltd • Applied 1 week ago</small>
-                    </div>
-
-                    <span class="status status-info">
-                        Under Review
-                    </span>
-
-                </div>
-
-
-                <div class="application-item">
-
-                    <div class="company-avatar">
-                        S
-                    </div>
-
-                    <div class="application-info">
-                        <strong>Web Designer</strong>
-                        <small>Smart Technologies • Applied 1 week ago</small>
-                    </div>
-
-                    <span class="status status-success">
-                        Selected
-                    </span>
-
+                <div class="custom-progress">
+                    <div class="custom-progress-bar"></div>
                 </div>
 
             </div>
 
+            <p style="font-size:13px;color:#7a8494;">
+                A complete profile helps organizations understand your
+                skills and increases your chances of getting shortlisted.
+            </p>
+
+            <a href="#" class="profile-btn mt-2">
+                <i class="fas fa-user"></i>
+                Update Profile
+            </a>
+
         </div>
 
+    </div>
 
-        <!-- Recommended Jobs -->
-        <div class="col-lg-5 mb-4">
 
-            <div class="dashboard-section">
+    <!-- Quick Actions -->
+    <div class="col-lg-7 mb-4">
 
-                <div class="section-header">
+        <div class="dashboard-section">
 
-                    <h5>Recommended Opportunities</h5>
+            <div class="section-header">
+                <h5>Quick Actions</h5>
+            </div>
 
-                    <a href="#" class="view-all">
-                        Explore
+            <div class="row">
+
+                <div class="col-md-6">
+
+                    <a href="#" class="quick-action">
+
+                        <div class="quick-action-icon">
+                            <i class="fas fa-search"></i>
+                        </div>
+
+                        <div class="quick-action-text">
+                            <strong>Find Opportunities</strong>
+                            <small>Explore available openings</small>
+                        </div>
+
                     </a>
 
                 </div>
 
 
-                <div class="job-card">
+                <div class="col-md-6">
 
-                    <div class="job-top">
+                    <a href="#" class="quick-action">
 
-                        <div>
-                            <h6>React Developer</h6>
-                            <p>Tech Solutions</p>
+                        <div class="quick-action-icon">
+                            <i class="fas fa-file-alt"></i>
                         </div>
 
-                        <div class="job-icon">
-                            <i class="fab fa-react"></i>
+                        <div class="quick-action-text">
+                            <strong>My Applications</strong>
+                            <small>Track your applications</small>
                         </div>
 
-                    </div>
-
-                    <div class="job-meta">
-
-                        <span>
-                            <i class="fas fa-map-marker-alt"></i>
-                            Remote
-                        </span>
-
-                        <span>
-                            <i class="fas fa-briefcase"></i>
-                            Full Time
-                        </span>
-
-                        <a href="#" class="apply-btn">
-                            Apply
-                        </a>
-
-                    </div>
+                    </a>
 
                 </div>
 
 
-                <div class="job-card">
+                <div class="col-md-6">
 
-                    <div class="job-top">
+                    <a href="#" class="quick-action">
 
-                        <div>
-                            <h6>Frontend Developer</h6>
-                            <p>Digital Works</p>
+                        <div class="quick-action-icon">
+                            <i class="fas fa-user-edit"></i>
                         </div>
 
-                        <div class="job-icon">
-                            <i class="fas fa-code"></i>
+                        <div class="quick-action-text">
+                            <strong>Edit Profile</strong>
+                            <small>Update your information</small>
                         </div>
 
-                    </div>
-
-                    <div class="job-meta">
-
-                        <span>
-                            <i class="fas fa-map-marker-alt"></i>
-                            Nagpur
-                        </span>
-
-                        <span>
-                            <i class="fas fa-briefcase"></i>
-                            Full Time
-                        </span>
-
-                        <a href="#" class="apply-btn">
-                            Apply
-                        </a>
-
-                    </div>
+                    </a>
 
                 </div>
 
 
-                <div class="job-card mb-0">
+                <div class="col-md-6">
 
-                    <div class="job-top">
+                    <a href="#" class="quick-action">
 
-                        <div>
-                            <h6>UI/UX Designer</h6>
-                            <p>Creative Studio</p>
+                        <div class="quick-action-icon">
+                            <i class="fas fa-bookmark"></i>
                         </div>
 
-                        <div class="job-icon">
-                            <i class="fas fa-palette"></i>
+                        <div class="quick-action-text">
+                            <strong>Saved Opportunities</strong>
+                            <small>View saved openings</small>
                         </div>
 
-                    </div>
-
-                    <div class="job-meta">
-
-                        <span>
-                            <i class="fas fa-map-marker-alt"></i>
-                            Hybrid
-                        </span>
-
-                        <span>
-                            <i class="fas fa-briefcase"></i>
-                            Full Time
-                        </span>
-
-                        <a href="#" class="apply-btn">
-                            Apply
-                        </a>
-
-                    </div>
+                    </a>
 
                 </div>
 
@@ -1109,104 +983,795 @@
 
 </div>
 
+
+<!-- Bottom Section radhika30-09-->
+<div class="row d-none">
+
+    <!-- Applications -->
+    <div class="col-lg-7 mb-4">
+
+        <div class="dashboard-section">
+
+            <div class="section-header">
+
+                <h5>Recent Applications</h5>
+
+                <a href="#" class="view-all">
+                    View All
+                </a>
+
+            </div>
+
+
+            <div class="application-item">
+
+                <div class="company-avatar">
+                    T
+                </div>
+
+                <div class="application-info">
+                    <strong>Frontend Developer</strong>
+                    <small>Tech Solutions • Applied 2 days ago</small>
+                </div>
+
+                <span class="status status-success">
+                    Shortlisted
+                </span>
+
+            </div>
+
+
+            <div class="application-item">
+
+                <div class="company-avatar">
+                    D
+                </div>
+
+                <div class="application-info">
+                    <strong>React Developer</strong>
+                    <small>Digital Works • Applied 4 days ago</small>
+                </div>
+
+                <span class="status status-warning">
+                    Pending
+                </span>
+
+            </div>
+
+
+            <div class="application-item">
+
+                <div class="company-avatar">
+                    I
+                </div>
+
+                <div class="application-info">
+                    <strong>UI Developer</strong>
+                    <small>Innovate Pvt Ltd • Applied 1 week ago</small>
+                </div>
+
+                <span class="status status-info">
+                    Under Review
+                </span>
+
+            </div>
+
+
+            <div class="application-item">
+
+                <div class="company-avatar">
+                    S
+                </div>
+
+                <div class="application-info">
+                    <strong>Web Designer</strong>
+                    <small>Smart Technologies • Applied 1 week ago</small>
+                </div>
+
+                <span class="status status-success">
+                    Selected
+                </span>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- Recommended Jobs -->
+    <div class="col-lg-5 mb-4">
+
+        <div class="dashboard-section">
+
+            <div class="section-header">
+
+                <h5>Recommended Opportunities</h5>
+
+                <a href="#" class="view-all">
+                    Explore
+                </a>
+
+            </div>
+
+
+            <div class="job-card">
+
+                <div class="job-top">
+
+                    <div>
+                        <h6>React Developer</h6>
+                        <p>Tech Solutions</p>
+                    </div>
+
+                    <div class="job-icon">
+                        <i class="fab fa-react"></i>
+                    </div>
+
+                </div>
+
+                <div class="job-meta">
+
+                    <span>
+                        <i class="fas fa-map-marker-alt"></i>
+                        Remote
+                    </span>
+
+                    <span>
+                        <i class="fas fa-briefcase"></i>
+                        Full Time
+                    </span>
+
+                    <a href="#" class="apply-btn">
+                        Apply
+                    </a>
+
+                </div>
+
+            </div>
+
+
+            <div class="job-card">
+
+                <div class="job-top">
+
+                    <div>
+                        <h6>Frontend Developer</h6>
+                        <p>Digital Works</p>
+                    </div>
+
+                    <div class="job-icon">
+                        <i class="fas fa-code"></i>
+                    </div>
+
+                </div>
+
+                <div class="job-meta">
+
+                    <span>
+                        <i class="fas fa-map-marker-alt"></i>
+                        Nagpur
+                    </span>
+
+                    <span>
+                        <i class="fas fa-briefcase"></i>
+                        Full Time
+                    </span>
+
+                    <a href="#" class="apply-btn">
+                        Apply
+                    </a>
+                    z
+                </div>
+
+            </div>
+
+
+            <div class="job-card mb-0">
+
+                <div class="job-top">
+
+                    <div>
+                        <h6>UI/UX Designer</h6>
+                        <p>Creative Studio</p>
+                    </div>
+
+                    <div class="job-icon">
+                        <i class="fas fa-palette"></i>
+                    </div>
+
+                </div>
+
+                <div class="job-meta">
+
+                    <span>
+                        <i class="fas fa-map-marker-alt"></i>
+                        Hybrid
+                    </span>
+
+                    <span>
+                        <i class="fas fa-briefcase"></i>
+                        Full Time
+                    </span>
+
+                    <a href="#" class="apply-btn">
+                        Apply
+                    </a>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+<!-- =====================================================
+     RECOMMENDED OPPORTUNITIES radhika29-09
+===================================================== -->
+
+<div class="row">
+
+    <div class="col-12 mb-4">
+
+        <div class="master-table-container">
+
+
+
+            <!-- Master Table -->
+            <div class="table-responsive">
+                <!-- Master Table Header -->
+                <div class="master-table-title">
+
+                    <div>
+                        <h2>
+                            <i class="fas fa-briefcase me-2"></i>
+                            Internship Post
+                        </h2>
+
+
+                    </div>
+
+                </div>
+                <table id="recommendedOpportunitiesTable" class="master-data-table">
+
+                    <thead>
+                        <tr>
+
+                            <th>Sr. No</th>
+
+                            <th>
+                                Organization Name
+                            </th>
+
+                            <th>
+                                Position
+                            </th>
+
+                            <th>
+                                Location
+                            </th>
+
+                            <th>
+                                Internship / Fellowship Type
+                            </th>
+
+                            <th>
+                                Facilities
+                            </th>
+
+                            <th>
+                                Apply Status
+                            </th>
+
+                        </tr>
+                    </thead>
+
+                    <tbody>
+
+                        @{
+                            var internshipPosts =
+                            ViewBag.InternshipPosts as List<JobPortalTrainee.Models.OrgPostM>
+                            ?? new List<JobPortalTrainee.Models.OrgPostM>();
+
+                            int srNo = 1;
+                        }
+
+                        @foreach (var post in internshipPosts)
+                        {
+                            <tr>
+
+                                <!-- Sr No -->
+                                <td class="master-id">
+                                    @srNo
+                                </td>
+
+                                <!-- Organization -->
+                                <td>
+                                    <a href="#"
+                                       class="text-primary fw-semibold text-decoration-underline">
+                                        @post.sName
+                                    </a>
+                                </td>
+
+                                <!-- Position -->
+                                <td>
+                                    @post.sPositionName
+                                </td>
+
+                                <!-- Location -->
+                                <td>
+                                    @post.sCountryName<br />
+                                    @post.sStateName<br />
+                                    @post.nCityName
+                                </td>
+
+                                <!-- Internship / Fellowship Type -->
+                                <td>
+                                    @post.sInternshipFellowshipTypeName
+                                </td>
+
+                                <!-- Facilities -->
+                                <td>
+                                    <div class="master-icon">
+                                        <i class="fas fa-building"></i>
+                                    </div>
+                                </td>
+
+                                <!-- Apply Status -->
+                                <td>
+
+                                    @if (post.IsApplied)
+                                    {
+                                        <span class="master-action-btn">
+                                            Applied
+                                        </span>
+                                    }
+                                    else
+                                    {
+                                        <form asp-controller="Candidate" asp-action="ApplyToPost" method="post" style="display:inline;">
+                                            @Html.AntiForgeryToken()
+                                            <input type="hidden" name="postId" value="@post.nID" />
+                                            <input type="hidden" name="orgId" value="@post.nOrgID" />
+                                            <button type="submit" class="master-action-btn" style="border:none; cursor:pointer;">
+                                                Apply Now
+                                            </button>
+
+                                        </form>
+                                    }
+
+                                </td>
+
+                            </tr>
+
+                            srNo++;
+                        }
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+            <!-- Master Table Page Information -->
+            <div class="master-page-info d-none">
+                Showing 1 to 1 of 1 entries
+            </div>
+
+            <!-- Extra Post -->
+            <div class="mt-3">
+
+                <a href="#"
+                   class="btn btn-success px-4 py-2">
+                    <i class="fas fa-plus me-2"></i>
+                    Extra Post
+                </a>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+@if (TempData["ApplyMessage"] != null)
+{
+    var message =
+        TempData["ApplyMessage"]?.ToString();
+
+    var messageType =
+        TempData["ApplyMessageType"]?.ToString();
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+
+            alert("@Html.Raw(message)");
+
+        });
+    </script>
+}
+
+@* Radhika29-09 *@
 <script>
 
     /* =====================================================
-       MONTHLY ANALYTICS SPARKLINES
+       1TRAINEE CHART CONFIGURATION
     ===================================================== */
 
-    function drawMonthlySparkline(svgId, values, totalId) {
+    const chartMonths = [
+        "Jan", "Feb", "Mar", "Apr",
+        "May", "Jun", "Jul", "Aug",
+        "Sep", "Oct", "Nov", "Dec"
+    ];
+
+
+    /* =====================================================
+       LINE / AREA CHART
+    ===================================================== */
+
+    function drawLineChart(svgId, values) {
 
         const svg = document.getElementById(svgId);
-        const total = document.getElementById(totalId);
 
-        if (!svg || !values || !values.length) return;
+        if (!svg || !values || !values.length)
+            return;
 
-        const width = 600;
-        const height = 105;
-        const padding = 8;
+        const width = 700;
+        const height = 240;
 
-        const max = Math.max(...values, 1);
-        const min = Math.min(...values, 0);
+        const left = 48;
+        const right = 12;
+        const top = 25;
+        const bottom = 38;
 
-        const range = Math.max(max - min, 1);
+        const chartWidth = width - left - right;
+        const chartHeight = height - top - bottom;
+
+        const maxValue = Math.max(...values, 1);
+
+        const yStep = maxValue <= 10
+            ? 2
+            : Math.ceil(maxValue / 4);
+
+        const maxY = Math.max(
+            yStep * 4,
+            Math.ceil(maxValue / yStep) * yStep
+        );
+
+        let html = "";
+
+
+        /* =================================================
+           HORIZONTAL GRID + Y AXIS
+        ================================================= */
+
+        for (let i = 0; i <= 4; i++) {
+
+            const value = maxY - (i * maxY / 4);
+
+            const y =
+                top + (i * chartHeight / 4);
+
+            html += `
+                <line
+                    x1="${left}"
+                    y1="${y}"
+                    x2="${width - right}"
+                    y2="${y}"
+                    class="chart-grid" />
+
+                <text
+                    x="${left - 10}"
+                    y="${y + 4}"
+                    text-anchor="end"
+                    class="chart-axis-text">
+                    ${Math.round(value)}
+                </text>
+            `;
+        }
+
+
+        /* =================================================
+           VERTICAL GRID
+        ================================================= */
+
+        chartMonths.forEach((month, index) => {
+
+            const x =
+                left +
+                (index * chartWidth / 11);
+
+            html += `
+                <line
+                    x1="${x}"
+                    y1="${top}"
+                    x2="${x}"
+                    y2="${height - bottom}"
+                    class="chart-grid" />
+            `;
+
+            html += `
+                <text
+                    x="${x}"
+                    y="${height - 13}"
+                    text-anchor="middle"
+                    class="chart-axis-text">
+                    ${month}
+                </text>
+            `;
+        });
+
+
+        /* =================================================
+           AXIS
+        ================================================= */
+
+        html += `
+            <line
+                x1="${left}"
+                y1="${height - bottom}"
+                x2="${width - right}"
+                y2="${height - bottom}"
+                class="chart-axis" />
+
+            <line
+                x1="${left}"
+                y1="${top}"
+                x2="${left}"
+                y2="${height - bottom}"
+                class="chart-axis" />
+        `;
+
+
+        /* =================================================
+           POINTS
+        ================================================= */
 
         const points = values.map((value, index) => {
 
-            const x = padding +
-                (index * (width - padding * 2)) /
-                (values.length - 1);
+            const x =
+                left +
+                (index * chartWidth / 11);
 
-            const y = height - padding -
-                ((value - min) / range) *
-                (height - padding * 2);
+            const y =
+                top +
+                chartHeight -
+                ((value / maxY) * chartHeight);
 
-            return `${x},${y}`;
+            return {
+                x: x,
+                y: y,
+                value: value
+            };
+        });
 
-        }).join(' ');
+
+        const pointString = points
+            .map(p => `${p.x},${p.y}`)
+            .join(" ");
+
+
+        /* =================================================
+           AREA
+        ================================================= */
 
         const areaPoints =
-            `${padding},${height - padding}
-             ${points}
-             ${width - padding},${height - padding}`;
+            `${left},${height - bottom} ` +
+            pointString +
+            ` ${width - right},${height - bottom}`;
 
-        const last =
-            points.split(' ').pop().split(',');
 
-        svg.innerHTML = `
-
-            <defs>
-                <linearGradient id="${svgId}Fill"
-                                x1="0"
-                                y1="0"
-                                x2="0"
-                                y2="1">
-
-                    <stop offset="0%"
-                          stop-color="#1e7b67"
-                          stop-opacity=".18" />
-
-                    <stop offset="100%"
-                          stop-color="#1e7b67"
-                          stop-opacity="0" />
-
-                </linearGradient>
-            </defs>
-
-            <line x1="8"
-                  y1="97"
-                  x2="592"
-                  y2="97"
-                  stroke="#edf0f4"
-                  stroke-width="1" />
-
-            <polygon points="${areaPoints}"
-                     fill="url(#${svgId}Fill)" />
-
-            <polyline points="${points}"
-                      fill="none"
-                      stroke="#1e7b67"
-                      stroke-width="3"
-                      stroke-linecap="round"
-                      stroke-linejoin="round" />
-
-            <circle cx="${last[0]}"
-                    cy="${last[1]}"
-                    r="4"
-                    fill="#fff"
-                    stroke="#1e7b67"
-                    stroke-width="3" />
+        html += `
+            <polygon
+                points="${areaPoints}"
+                class="chart-area" />
         `;
 
-        // Show TOTAL posts
-        total.textContent =
-            values.reduce((sum, value) => sum + value, 0);
+
+        /* =================================================
+           LINE
+        ================================================= */
+
+        html += `
+            <polyline
+                points="${pointString}"
+                class="chart-line" />
+        `;
+
+
+        /* =================================================
+           POINTS
+        ================================================= */
+
+        points.forEach(point => {
+
+            html += `
+                <circle
+                    cx="${point.x}"
+                    cy="${point.y}"
+                    r="3.5"
+                    class="chart-point">
+                </circle>
+            `;
+
+        });
+
+
+        svg.innerHTML = html;
     }
 
 
-    // =====================================================
-    // SUITABLE OPENINGS
-    // =====================================================
+    /* =====================================================
+       BAR CHART
+    ===================================================== */
+
+    function drawBarChart(svgId, values) {
+
+        const svg = document.getElementById(svgId);
+
+        if (!svg || !values || !values.length)
+            return;
+
+        const width = 700;
+        const height = 240;
+
+        const left = 48;
+        const right = 12;
+        const top = 25;
+        const bottom = 38;
+
+        const chartWidth = width - left - right;
+        const chartHeight = height - top - bottom;
+
+        const maxValue = Math.max(...values, 1);
+
+        const maxY =
+            Math.ceil(maxValue / 10) * 10 ||
+            10;
+
+        const barSpace =
+            chartWidth / values.length;
+
+        const barWidth =
+            barSpace * 0.58;
+
+        let html = "";
+
+
+        /* =================================================
+           Y AXIS + GRID
+        ================================================= */
+
+        for (let i = 0; i <= 4; i++) {
+
+            const value =
+                maxY - (i * maxY / 4);
+
+            const y =
+                top + (i * chartHeight / 4);
+
+            html += `
+                <line
+                    x1="${left}"
+                    y1="${y}"
+                    x2="${width - right}"
+                    y2="${y}"
+                    class="chart-grid" />
+
+                <text
+                    x="${left - 10}"
+                    y="${y + 4}"
+                    text-anchor="end"
+                    class="chart-axis-text">
+                    ${Math.round(value)}
+                </text>
+            `;
+        }
+
+
+        /* =================================================
+           VERTICAL GRID + MONTHS
+        ================================================= */
+
+        chartMonths.forEach((month, index) => {
+
+            const centerX =
+                left +
+                (index * barSpace) +
+                (barSpace / 2);
+
+            html += `
+                <line
+                    x1="${centerX}"
+                    y1="${top}"
+                    x2="${centerX}"
+                    y2="${height - bottom}"
+                    class="chart-grid" />
+
+                <text
+                    x="${centerX}"
+                    y="${height - 13}"
+                    text-anchor="middle"
+                    class="chart-axis-text">
+                    ${month}
+                </text>
+            `;
+        });
+
+
+        /* =================================================
+           AXIS
+        ================================================= */
+
+        html += `
+            <line
+                x1="${left}"
+                y1="${height - bottom}"
+                x2="${width - right}"
+                y2="${height - bottom}"
+                class="chart-axis" />
+
+            <line
+                x1="${left}"
+                y1="${top}"
+                x2="${left}"
+                y2="${height - bottom}"
+                class="chart-axis" />
+        `;
+
+
+        /* =================================================
+           BARS
+        ================================================= */
+
+        values.forEach((value, index) => {
+
+            const centerX =
+                left +
+                (index * barSpace) +
+                (barSpace / 2);
+
+            const barHeight =
+                (value / maxY) * chartHeight;
+
+            const x =
+                centerX -
+                (barWidth / 2);
+
+            const y =
+                height -
+                bottom -
+                barHeight;
+
+
+            html += `
+                <rect
+                    x="${x}"
+                    y="${y}"
+                    width="${barWidth}"
+                    height="${barHeight}"
+                    rx="1"
+                    class="chart-bar">
+
+                    <title>
+                        ${chartMonths[index]}: ${value} posts
+                    </title>
+
+                </rect>
+            `;
+        });
+
+
+        svg.innerHTML = html;
+    }
+
+
+    /* =====================================================
+       DATA
+    ===================================================== */
 
     const suitableOpeningsMonthly = [
         3, 5, 4, 7, 8, 6,
@@ -1214,41 +1779,25 @@
     ];
 
 
-    // =====================================================
-    // INTERNSHIP POSTS FROM ORGANIZATIONS
-    // STATIC DATA
-    // =====================================================
-
     const internshipPostsMonthly = [
-        4,   // January
-        7,   // February
-        5,   // March
-        9,   // April
-        12,  // May
-        10,  // June
-        15,  // July
-        18,  // August
-        14,  // September
-        20,  // October
-        17,  // November
-        23   // December
+        4, 7, 5, 9, 12, 10,
+        15, 18, 14, 20, 17, 23
     ];
 
 
-    // =====================================================
-    // DRAW CHARTS
-    // =====================================================
+    /* =====================================================
+       DRAW
+    ===================================================== */
 
-    drawMonthlySparkline(
-        'suitableOpeningsChart',
-        suitableOpeningsMonthly,
-        'suitableOpeningsTotal'
+    drawLineChart(
+        "suitableOpeningsChart",
+        suitableOpeningsMonthly
     );
 
-    drawMonthlySparkline(
-        'internshipPostsChart',
-        internshipPostsMonthly,
-        'internshipPostsTotal'
+    drawBarChart(
+        "internshipPostsChart",
+        internshipPostsMonthly
     );
 
 </script>
+

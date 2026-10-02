@@ -2,7 +2,7 @@
 
 @{
     Layout = null;
-    ViewData["Title"] = "Professional Resume - Canva Style Landscape (Template 9)";
+    ViewData["Title"] = "Professional Resume - Modern Horizontal (Template 10)";
 
     var p = Model.Profile;
     var candidateName = Model.CandidateName?.Trim();
@@ -56,14 +56,10 @@
 
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <!-- Standard font for toolbar + Modern fonts for Canva layout -->
-    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Inter:wght@400;500;600&family=Poppins:wght@400;600;700;800&display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Montserrat:wght@400;500;600;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
 
     <style>
-        /* =========================================================
-                   ROOT - KEPT EXACTLY AS YOUR STANDARD
-                ========================================================= */
         :root {
             --primary: #263b47;
             --primary-light: #edf2f3;
@@ -76,9 +72,16 @@
             --white: #ffffff;
         }
 
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        
-        html, body { width: 100%; min-height: 100%; }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html, body {
+            width: 100%;
+            min-height: 100%;
+        }
 
         body {
             background: #e9edef;
@@ -86,241 +89,398 @@
             color: var(--text);
         }
 
-        /* =========================================================
-                   TOOLBAR - KEPT EXACTLY AS YOUR STANDARD
-                ========================================================= */
-        .resume-toolbar {
-            width: 297mm; max-width: calc(100% - 30px); margin: 14px auto 8px;
-            display: flex; justify-content: flex-end; gap: 8px;
+        .btn-edit {
+            background: #ffffff;
+            color: var(--primary);
+            border: 1px solid var(--border) !important;
         }
 
-        .resume-toolbar button, .resume-toolbar a {
-            border: 0; min-height: 32px; padding: 8px 14px; border-radius: 5px;
-            font-family: "DM Sans", sans-serif; font-size: 10px; font-weight: 700;
-            text-decoration: none; cursor: pointer; display: inline-flex; align-items: center; gap: 6px;
+        .btn-print {
+            background: var(--primary);
+            color: white;
         }
 
-        .btn-edit { background: #ffffff; color: var(--primary); border: 1px solid var(--border) !important; }
-        .btn-print { background: var(--primary); color: white; }
-        .btn-download { background: var(--accent); color: white; }
+        .btn-download {
+            background: var(--accent);
+            color: white;
+        }
 
-        /* =========================================================
-                   THEME SWITCHER - KEPT EXACTLY AS YOUR STANDARD
-                ========================================================= */
         .theme-switcher {
-            width: 297mm; max-width: calc(100% - 30px); margin: 0 auto 10px;
-            display: flex; justify-content: flex-end; align-items: center; gap: 8px;
+            width: 297mm;
+            max-width: calc(100% - 30px);
+            margin: 0 auto 10px;
+            display: flex;
+            justify-content: flex-end;
+            align-items: center;
+            gap: 8px;
         }
 
-        .theme-switcher span {
-            font-size: 9px; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: .6px;
-        }
+            .theme-switcher span {
+                font-size: 9px;
+                font-weight: 700;
+                color: var(--muted);
+                text-transform: uppercase;
+                letter-spacing: .6px;
+            }
 
         .theme-swatch {
-            width: 18px; height: 18px; border-radius: 50%; border: 2px solid white; cursor: pointer; box-shadow: 0 1px 5px rgba(0,0,0,.15);
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            border: 2px solid white;
+            cursor: pointer;
+            box-shadow: 0 1px 5px rgba(0,0,0,.15);
         }
-        .theme-swatch.active { box-shadow: 0 0 0 2px white, 0 0 0 4px var(--swatch); }
 
-        /* =========================================================
-                   RESUME SHEET & THEME MAPPING
-                ========================================================= */
+            .theme-swatch.active {
+                box-shadow: 0 0 0 2px white, 0 0 0 4px var(--swatch);
+            }
+
         .resume-page-wrapper {
-            display: flex; justify-content: center; padding: 5px 0 25px;
-        }
-
-        .resume-sheet {
-            width: 297mm; height: 210mm; background: #ffffff;
-            box-shadow: 0 15px 35px rgba(0,0,0,.1); overflow: hidden;
             display: flex;
-            
-            /* Default to Navy Theme */
-            --bg-side: #263b47;
-            --text-side: #ffffff;
-            --text-side-muted: #9ba6ad;
-            --accent-resume: #b4773c;
-            --bg-main: #ffffff;
-            --text-main: #334155;
-            --head-main: #263b47;
+            justify-content: center;
+            padding: 5px 0 25px;
         }
 
-        /* Mapping your 5 standard colors to the Canva layout variables */
-        .resume-sheet[data-theme="navy"] { --bg-side: #263b47; --text-side: #ffffff; --text-side-muted: #9ba6ad; --accent-resume: #b4773c; --head-main: #263b47; }
-        .resume-sheet[data-theme="teal"] { --bg-side: #245f61; --text-side: #ffffff; --text-side-muted: #a6c0c1; --accent-resume: #a87842; --head-main: #245f61; }
-        .resume-sheet[data-theme="olive"] { --bg-side: #4f5d45; --text-side: #ffffff; --text-side-muted: #b9c1b4; --accent-resume: #a4783e; --head-main: #4f5d45; }
-        .resume-sheet[data-theme="blue"] { --bg-side: #315875; --text-side: #ffffff; --text-side-muted: #b1c3d1; --accent-resume: #b4773c; --head-main: #315875; }
-        .resume-sheet[data-theme="brown"] { --bg-side: #654d3b; --text-side: #ffffff; --text-side-muted: #c7bbb1; --accent-resume: #9d7040; --head-main: #654d3b; }
+        /* RESUME SHEET - Horizontal (Landscape) */
+        .resume-sheet {
+            width: 297mm;
+            height: 210mm; /* A4 Landscape */
+            background: #ffffff;
+            box-shadow: 0 15px 35px rgba(0,0,0,.1);
+            display: flex;
+            --bg-side: #d9e2e8;
+            --head-main: #263b47;
+            --text-side: #3a4a5a;
+            --text-main: #475569;
+            --dot-active: #263b47;
+            --dot-inactive: #ffffff;
+        }
 
+            .resume-sheet[data-theme="navy"] {
+                --head-main: #263b47;
+                --bg-side: #e2e8f0;
+                --dot-active: #263b47;
+            }
 
-        /* =========================================================
-                   CANVA LAYOUT: 35 / 65 SPLIT
-                ========================================================= */
+            .resume-sheet[data-theme="teal"] {
+                --head-main: #245f61;
+                --bg-side: #e0ecec;
+                --dot-active: #245f61;
+            }
+
+            .resume-sheet[data-theme="olive"] {
+                --head-main: #4f5d45;
+                --bg-side: #e8ede3;
+                --dot-active: #4f5d45;
+            }
+
+            .resume-sheet[data-theme="blue"] {
+                --head-main: #315875;
+                --bg-side: #e3ebf0;
+                --dot-active: #315875;
+            }
+
+            .resume-sheet[data-theme="brown"] {
+                --head-main: #654d3b;
+                --bg-side: #ede7e2;
+                --dot-active: #654d3b;
+            }
+
+        /* Adjusted Column Widths and reduced vertical paddings/gaps for shorter height */
         .col-left {
-            width: 35%;
+            width: 32%;
             background: var(--bg-side);
             color: var(--text-side);
-            padding: 16mm;
+            padding: 12mm 10mm;
             display: flex;
             flex-direction: column;
-            gap: 20px;
-        }
-
-        .col-right {
-            width: 65%;
-            background: var(--bg-main);
-            color: var(--text-main);
-            padding: 16mm 18mm;
-            display: flex;
-            flex-direction: column;
-            gap: 18px;
+            gap: 15px;
             font-family: "Inter", sans-serif;
         }
 
-        /* =========================================================
-                   LEFT COLUMN (SIDEBAR)
-                ========================================================= */
+        .col-right {
+            width: 68%;
+            background: #ffffff;
+            color: var(--text-main);
+            padding: 12mm 15mm;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            font-family: "Inter", sans-serif;
+        }
+
         .photo-container {
-            width: 48mm; height: 48mm; margin: 0 auto 5px auto;
-            border-radius: 50%; border: 3px solid var(--accent-resume);
-            padding: 4px; background: transparent;
-        }
-        .photo { width: 100%; height: 100%; border-radius: 50%; object-fit: cover; }
-        .photo-placeholder { 
-            width: 100%; height: 100%; border-radius: 50%; background: rgba(255,255,255,0.1); 
-            display: flex; align-items: center; justify-content: center; font-size: 40px; color: var(--accent-resume); 
+            width: 45mm;
+            height: 45mm;
+            margin: 0 auto 5px auto;
+            border-radius: 50%;
+            overflow: hidden;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            background: #e2e8f0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
         }
 
-        .side-section { margin-bottom: 12px; font-family: "Inter", sans-serif; }
-        
+        .photo {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .photo-placeholder {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 45px;
+            color: var(--head-main);
+            background: rgba(0,0,0,0.05);
+        }
+
+        .side-section {
+            margin-bottom: 2px;
+        }
+
         .side-title {
-            font-family: "Poppins", sans-serif; font-size: 13px; font-weight: 700;
-            text-transform: uppercase; letter-spacing: 2px; color: var(--accent-resume);
-            margin-bottom: 12px; display: flex; align-items: center; gap: 8px;
+            font-family: "Montserrat", sans-serif;
+            font-size: 12px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            color: var(--head-main);
+            margin-bottom: 10px;
+            border-bottom: 1px solid rgba(0,0,0,0.1);
+            padding-bottom: 4px;
         }
-        .side-title::after {
-            content: ""; flex: 1; height: 1px; background: var(--accent-resume); opacity: 0.3;
+
+        .contact-list {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
         }
 
-        .contact-list { display: flex; flex-direction: column; gap: 10px; }
-        .contact-item { display: flex; align-items: center; gap: 10px; font-size: 10.5px; font-weight: 500; word-break: break-word; }
-        .contact-item i { width: 16px; height: 16px; display: flex; align-items: center; justify-content: center; background: var(--accent-resume); color: var(--bg-side); border-radius: 50%; font-size: 8px; }
+        .contact-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+            font-size: 10px;
+            font-weight: 500;
+            line-height: 1.3;
+            word-break: break-word;
+            color: var(--text-side);
+        }
 
-        .edu-item { margin-bottom: 12px; }
-        .edu-year { font-family: "Poppins", sans-serif; font-size: 10px; font-weight: 700; color: var(--accent-resume); margin-bottom: 2px; }
-        .edu-degree { font-size: 11px; font-weight: 600; color: var(--text-side); margin-bottom: 2px; }
-        .edu-school { font-size: 9.5px; color: var(--text-side-muted); }
+            .contact-item i {
+                font-size: 11px;
+                margin-top: 1px;
+                color: var(--head-main);
+                width: 12px;
+                text-align: center;
+            }
 
-        .lang-list { display: flex; flex-direction: column; gap: 8px; }
-        .lang-item { display: flex; justify-content: space-between; align-items: center; font-size: 10.5px; font-weight: 500; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 4px; }
-        .lang-star { color: var(--accent-resume); font-size: 10px; }
+        .skill-list {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
 
-        /* =========================================================
-                   RIGHT COLUMN (MAIN)
-                ========================================================= */
+        .skill-item {
+            font-size: 10px;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .dots-container {
+            display: flex;
+            gap: 4px;
+        }
+
+        .dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: var(--dot-inactive);
+        }
+
+            .dot.filled {
+                background: var(--dot-active);
+            }
+
+        .hobbies-text {
+            font-size: 10px;
+            line-height: 1.5;
+            color: var(--text-side);
+        }
+
         .header-block {
-            margin-bottom: 5px;
+            margin-bottom: 2px;
         }
+
         .name {
-            font-family: "Poppins", sans-serif; font-size: 42px; font-weight: 800;
-            color: var(--head-main); line-height: 1.1; letter-spacing: -1px; text-transform: uppercase;
+            font-family: "Montserrat", sans-serif;
+            font-size: 34px;
+            font-weight: 800;
+            color: var(--head-main);
+            line-height: 1.1;
+            letter-spacing: 2px;
+            text-transform: uppercase;
         }
+
         .role {
-            font-family: "Poppins", sans-serif; font-size: 14px; font-weight: 600;
-            color: var(--accent-resume); text-transform: uppercase; letter-spacing: 3px; margin-top: 4px;
+            font-family: "Montserrat", sans-serif;
+            font-size: 11px;
+            font-weight: 600;
+            color: var(--head-main);
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            margin-top: 6px;
+            line-height: 1.4;
+            word-wrap: break-word;
+        }
+
+        .header-divider {
+            width: 100%;
+            height: 2px;
+            background: #e2e8f0;
+            margin-top: 15px;
+        }
+
+        .main-section {
+            margin-top: 2px;
+        }
+
+            .main-section.push-bottom {
+                margin-top: auto;
+            }
+
+        .main-title {
+            font-family: "Montserrat", sans-serif;
+            font-size: 14px;
+            font-weight: 700;
+            color: var(--head-main);
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-bottom: 10px;
         }
 
         .summary-text {
-            font-size: 11px; line-height: 1.7; color: var(--text-main); text-align: justify;
-            border-left: 3px solid var(--accent-resume); padding-left: 12px; margin-top: 15px;
+            font-size: 10.5px;
+            line-height: 1.6;
+            color: var(--text-main);
+            text-align: justify;
         }
 
-        .main-section { margin-top: 10px; }
-        .main-title {
-            font-family: "Poppins", sans-serif; font-size: 16px; font-weight: 700;
-            color: var(--head-main); text-transform: uppercase; letter-spacing: 1px;
-            margin-bottom: 15px; display: flex; align-items: center; gap: 10px;
-        }
-        .main-title::after {
-            content: ""; flex: 1; height: 2px; background: #e2e8f0;
+        .timeline-container {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
         }
 
-        /* Experience Timeline */
-        .exp-container { display: flex; flex-direction: column; gap: 15px; }
-        .exp-item { display: grid; grid-template-columns: 25% 75%; gap: 15px; }
-        .exp-date { font-family: "Poppins", sans-serif; font-size: 10px; font-weight: 700; color: var(--accent-resume); text-align: right; margin-top: 2px; }
-        
-        .exp-details { position: relative; padding-left: 15px; border-left: 2px solid #e2e8f0; }
-        .exp-details::before {
-            content: ""; position: absolute; left: -5px; top: 3px; width: 8px; height: 8px;
-            background: var(--bg-main); border: 2px solid var(--accent-resume); border-radius: 50%;
-        }
-        
-        .exp-role { font-family: "Poppins", sans-serif; font-size: 12px; font-weight: 700; color: var(--head-main); margin-bottom: 2px; }
-        .exp-company { font-size: 11px; font-weight: 600; color: var(--text-main); margin-bottom: 4px; }
-        .exp-status { font-size: 10px; font-style: italic; color: #64748b; }
-
-        /* Skills (Canva Pill Tags) */
-        .skill-grid { display: flex; flex-direction: column; gap: 12px; }
-        .skill-category-title { font-family: "Poppins", sans-serif; font-size: 11px; font-weight: 600; color: var(--head-main); margin-bottom: 6px; }
-        .skill-tags { display: flex; flex-wrap: wrap; gap: 6px; }
-        .skill-tag {
-            background: #f1f5f9; color: var(--head-main); padding: 5px 12px;
-            border-radius: 20px; font-size: 10px; font-weight: 600; border: 1px solid #e2e8f0;
+        .timeline-item {
+            display: flex;
+            flex-direction: column;
+            gap: 3px;
         }
 
-        /* Achievements */
-        .achieve-list { list-style: none; padding: 0; display: flex; flex-direction: column; gap: 8px; }
-        .achieve-item { font-size: 10.5px; line-height: 1.5; color: var(--text-main); display: flex; gap: 8px; }
-        .achieve-item i { color: var(--accent-resume); font-size: 12px; margin-top: 2px; }
+        .tl-header {
+            font-size: 11.5px;
+            color: var(--head-main);
+            line-height: 1.4;
+        }
 
-        /* References / Interests Grid */
-        .bottom-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-top: auto; padding-top: 10px; }
-        .ref-box { background: #f8fafc; padding: 10px 12px; border-radius: 6px; border-left: 3px solid var(--accent-resume); }
-        .ref-name { font-family: "Poppins", sans-serif; font-size: 11px; font-weight: 700; color: var(--head-main); }
-        .ref-rel { font-size: 9px; color: #64748b; margin: 2px 0; }
-        .ref-phone { font-size: 9.5px; font-weight: 500; color: var(--text-main); }
+        .tl-title {
+            font-weight: 700;
+        }
 
-        /* =========================================================
-                   RESPONSIVE & PRINT
-                ========================================================= */
+        .tl-company {
+            font-weight: 500;
+            color: var(--text-main);
+            border-left: 1px solid #cbd5e1;
+            margin-left: 6px;
+            padding-left: 6px;
+        }
+
+        .tl-date {
+            font-size: 9.5px;
+            color: #64748b;
+            font-weight: 500;
+            margin-bottom: 2px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .tl-desc {
+            font-size: 10.5px;
+            line-height: 1.5;
+            padding-left: 14px;
+            margin: 0;
+            color: var(--text-main);
+        }
+
+            .tl-desc li {
+                margin-bottom: 2px;
+            }
+
+        /* Media Queries for Print and Screen */
         @@media (max-width: 1200px) {
-            .resume-toolbar, .theme-switcher { width: 100%; padding: 0 15px; }
-            .resume-sheet { transform: scale(0.75); transform-origin: top center; margin-bottom: -45mm; }
+            .theme-switcher {
+                width: 100%;
+                padding: 0 15px;
+            }
+
+            .resume-sheet {
+                transform: scale(0.85);
+                transform-origin: top center;
+                margin-bottom: -30mm;
+            }
         }
 
-        @@media (max-width: 768px) {
-            .resume-sheet { transform: scale(0.5); margin-bottom: -100mm; }
+        @@media (max-width: 992px) {
+            .resume-sheet {
+                transform: scale(0.65);
+                margin-bottom: -70mm;
+            }
         }
 
         @@media print {
-            html, body { width: 297mm; height: 210mm; background: white; }
-            .resume-toolbar, .theme-switcher { display: none !important; }
-            .resume-page-wrapper { padding: 0; }
-            .resume-sheet { width: 297mm; height: 210mm; margin: 0; box-shadow: none; transform: none; }
-            @@page { size: A4 landscape; margin: 0; }
+            html, body {
+                width: 297mm;
+                height: 210mm;
+                background: white;
+            }
+
+            .theme-switcher {
+                display: none !important;
+            }
+
+            .resume-page-wrapper {
+                padding: 0;
+            }
+
+            .resume-sheet {
+                width: 297mm;
+                height: 210mm;
+                margin: 0;
+                box-shadow: none;
+                transform: none;
+            }
+
+            @@page {
+                size: A4 landscape;
+                margin: 0;
+            }
         }
     </style>
 </head>
 
 <body>
-
-    <!-- =========================================================
-         TOOLBAR (YOUR EXACT STANDARD)
-    ========================================================== -->
-    <div class="resume-toolbar">
-        <a asp-controller="Candidate" asp-action="Profile" class="btn-edit">
-            <i class="fa fa-pen"></i> Edit
-        </a>
-        <button type="button" class="btn-print" onclick="window.print()">
-            <i class="fa fa-print"></i> Print / PDF
-        </button>
-        <button type="button" class="btn-download" onclick="downloadResumePDF()">
-            <i class="fa fa-download"></i> Download
-        </button>
-    </div>
-
-    <!-- =========================================================
-         THEME SWITCHER (YOUR EXACT STANDARD)
-    ========================================================== -->
+    <!-- THEME SWITCHER -->
     <div class="theme-switcher">
         <span>Theme</span>
         <div class="theme-swatch active" data-theme="navy" style="background:#263b47;--swatch:#263b47" title="Navy"></div>
@@ -330,19 +490,18 @@
         <div class="theme-swatch" data-theme="brown" style="background:#654d3b;--swatch:#654d3b" title="Brown"></div>
     </div>
 
-    <!-- =========================================================
-         RESUME (CANVA LAYOUT)
-    ========================================================== -->
+    <!-- RESUME SHEET -->
     <div class="resume-page-wrapper">
         <div class="resume-sheet" id="resumeSheet" data-theme="navy">
 
-            <!-- 1. LEFT COLUMN (SIDEBAR) -->
+            <!-- 1. LEFT COLUMN -->
             <div class="col-left">
-                
+
                 <div class="photo-container">
                     @if (Has(p.sPhoto))
                     {
-                        <img src="@p.sPhoto" class="photo" alt="Profile" />
+                        <img src="@p.sPhoto" class="photo" alt="" onerror="this.style.display='none'; document.getElementById('fallbackIcon').style.display='flex';" />
+                        <div class="photo-placeholder" id="fallbackIcon" style="display:none;"><i class="fa fa-user"></i></div>
                     }
                     else
                     {
@@ -351,232 +510,253 @@
                 </div>
 
                 <div class="side-section">
-                    <div class="side-title">Contact</div>
                     <div class="contact-list">
-                        @if (Has(Model.CandidatePhone)) { 
-                            <div class="contact-item"><i class="fa fa-phone"></i> @Model.CandidatePhone</div> 
-                        }
-                        @if (Has(Model.CandidateEmail)) { 
-                            <div class="contact-item"><i class="fa fa-envelope"></i> @Model.CandidateEmail</div> 
-                        }
-                        @if (Has(p.Pincode)) { 
+                        @if (Has(p.Pincode))
+                        {
                             <div class="contact-item">
-                                <i class="fa fa-map-marker-alt"></i> 
+                                <i class="fa fa-map-marker-alt"></i>
                                 <span id="rvAddressLeft" data-country-id="@p.CountryID" data-state-id="@p.StateID" data-city-id="@p.CityID" data-pincode="@p.Pincode">@p.Pincode</span>
-                            </div> 
+                            </div>
                         }
-                        @if (Has(p.Linkedin)) { 
-                            <div class="contact-item"><i class="fa-brands fa-linkedin-in"></i> @p.Linkedin</div> 
+                        @if (Has(Model.CandidatePhone))
+                        {
+                            <div class="contact-item"><i class="fa fa-phone"></i> @Model.CandidatePhone</div>
                         }
-                        @if (Has(p.GitHub)) { 
-                            <div class="contact-item"><i class="fa-brands fa-github"></i> @p.GitHub</div> 
+                        @if (Has(Model.CandidateEmail))
+                        {
+                            <div class="contact-item"><i class="fa fa-envelope"></i> @Model.CandidateEmail</div>
+                        }
+                        @if (Has(p.Linkedin))
+                        {
+                            <div class="contact-item"><i class="fa-brands fa-linkedin"></i> @p.Linkedin</div>
+                        }
+                        @if (Has(p.GitHub))
+                        {
+                            <div class="contact-item"><i class="fa-brands fa-github"></i> @p.GitHub</div>
                         }
                     </div>
                 </div>
 
-                @if (HasNum(p.PG_Year) || HasNum(p.Graduation_Year) || HasNum(p.HSC_DIPLOMA_YEAR) || HasNum(p.SSC_YEAR))
-                {
-                    <div class="side-section">
-                        <div class="side-title">Education</div>
-                        
-                        @if (HasNum(p.PG_Year)) {
-                            <div class="edu-item">
-                                <div class="edu-year">@p.PG_Year</div>
-                                <div class="edu-degree">@GetLookupName(Model.Streams, p.PG_Stream)</div>
-                                <div class="edu-school">Post Graduation • @GetLookupName(Model.Divisions, p.PG_Division)</div>
-                            </div>
-                        }
-                        @if (HasNum(p.Graduation_Year)) {
-                            <div class="edu-item">
-                                <div class="edu-year">@p.Graduation_Year</div>
-                                <div class="edu-degree">@GetLookupName(Model.Streams, p.Graduation_Stream)</div>
-                                <div class="edu-school">Graduation • @GetLookupName(Model.Divisions, p.Graduation_Division)</div>
-                            </div>
-                        }
-                        @if (HasNum(p.HSC_DIPLOMA_YEAR)) {
-                            <div class="edu-item">
-                                <div class="edu-year">@p.HSC_DIPLOMA_YEAR</div>
-                                <div class="edu-degree">HSC / Diploma</div>
-                                <div class="edu-school">Division: @GetLookupName(Model.Divisions, p.HSC_DIPLOMA_DIVISION)</div>
-                            </div>
-                        }
-                        @if (HasNum(p.SSC_YEAR)) {
-                            <div class="edu-item">
-                                <div class="edu-year">@p.SSC_YEAR</div>
-                                <div class="edu-degree">SSC / 10th</div>
-                                <div class="edu-school">Division: @GetLookupName(Model.Divisions, p.SSC_DIVISION)</div>
-                            </div>
-                        }
-                    </div>
-                }
-
                 @{
-                    var langItems = new List<(string Lang, string Star)>();
+                    var langItems = new List<(string Lang, int Rating)>();
                     for (int i = 1; i <= 8; i++)
                     {
                         var lang = typeof(ErJobPortal.Models.CandidateProfileModel).GetProperty($"sLanguage{i}")?.GetValue(p)?.ToString();
-                        var star = typeof(ErJobPortal.Models.CandidateProfileModel).GetProperty($"sLanguageStar{i}")?.GetValue(p)?.ToString();
-                        if (Has(lang)) { langItems.Add((lang, star)); }
+                        var starVal = typeof(ErJobPortal.Models.CandidateProfileModel).GetProperty($"sLanguageStar{i}")?.GetValue(p);
+
+                        if (Has(lang))
+                        {
+                            int rating = 3;
+                            if (starVal != null && int.TryParse(starVal.ToString(), out int parsed)) rating = parsed;
+                            langItems.Add((lang, rating));
+                        }
                     }
+
+                    var techSkillsStr = p.sTechnicalSkillIDs;
+                    var techSkills = Has(techSkillsStr) ? techSkillsStr.Split(new[] { ',', ';', '|' }, StringSplitOptions.RemoveEmptyEntries).ToList() : new List<string>();
                 }
-                
-                @if (langItems.Any())
+
+                <!-- TECHNICAL SKILLS SECTION -->
+                @if (techSkills.Any())
                 {
-                    <div class="side-section" style="margin-top: auto;">
-                        <div class="side-title">Languages</div>
-                        <div class="lang-list">
-                            @foreach (var l in langItems)
+                    <div class="side-section">
+                        <div class="side-title">Skills</div>
+                        <div class="skill-list">
+                            @foreach (var ts in techSkills.Take(5))
                             {
-                                <div class="lang-item">
-                                    <span>@l.Lang</span>
-                                    @if (Has(l.Star)) { <span class="lang-star">@l.Star ★</span> }
+                                <div class="skill-item">
+                                    <span>@ts.Trim()</span>
+                                    <div class="dots-container">
+                                        <span class="dot filled"></span><span class="dot filled"></span><span class="dot filled"></span><span class="dot filled"></span><span class="dot"></span>
+                                    </div>
                                 </div>
                             }
                         </div>
                     </div>
                 }
+
+                <!-- LANGUAGES SECTION -->
+                @if (langItems.Any())
+                {
+                    <div class="side-section">
+                        <div class="side-title">Languages</div>
+                        <div class="skill-list">
+                            @foreach (var l in langItems.Take(3))
+                            {
+                                <div class="skill-item">
+                                    <span>@l.Lang</span>
+                                    <div class="dots-container">
+                                        @for (int d = 1; d <= 5; d++)
+                                        {
+                                            <span class="dot @(d <= l.Rating ? "filled" : "")"></span>
+                                        }
+                                    </div>
+                                </div>
+                            }
+                        </div>
+                    </div>
+                }
+
+                @if (Has(p.sHobbies))
+                {
+                    <div class="side-section">
+                        <div class="side-title">Hobbies & Interests</div>
+                        <div class="hobbies-text">@p.sHobbies</div>
+                    </div>
+                }
             </div>
 
-            <!-- 2. RIGHT COLUMN (MAIN CONTENT) -->
+            <!-- 2. RIGHT COLUMN -->
             <div class="col-right">
-                
+
                 <div class="header-block">
-                    <h1 class="name">@(Has(candidateName) ? candidateName : "Candidate Name")</h1>
-                    @if (Has(candidateRole)) { <div class="role">@candidateRole</div> }
-                    @if (Has(p.Objective)) { <div class="summary-text">@p.Objective</div> }
+                    <h1 class="name">@(Has(candidateName) ? candidateName : "")</h1>
+                    @if (Has(candidateRole))
+                    {
+                        <div class="role">@candidateRole</div>
+                    }
+                    <div class="header-divider"></div>
                 </div>
 
+                @if (Has(p.Objective))
+                {
+                    <div class="main-section">
+                        <div class="main-title">Profile</div>
+                        <div class="summary-text">@p.Objective</div>
+                    </div>
+                }
+
+                <!-- EDUCATION -->
+                @if (HasNum(p.PG_Year) || HasNum(p.Graduation_Year) || HasNum(p.HSC_DIPLOMA_YEAR))
+                {
+                    <div class="main-section">
+                        <div class="main-title">Education</div>
+                        <div class="timeline-container">
+                            @if (HasNum(p.PG_Year))
+                            {
+                                <div class="timeline-item">
+                                    <div class="tl-header">
+                                        <span class="tl-title">@GetLookupName(Model.Streams, p.PG_Stream)</span>
+                                        <span class="tl-company">Post Graduation</span>
+                                    </div>
+                                    <div class="tl-date">Graduated @p.PG_Year</div>
+                                    <ul class="tl-desc">
+                                        @if (Has(GetLookupName(Model.Divisions, p.PG_Division)))
+                                        {
+                                            <li>Division: @GetLookupName(Model.Divisions, p.PG_Division)</li>
+                                        }
+                                        @if (Has(p.Other_Specialization))
+                                        {
+                                            <li>Specialization: @p.Other_Specialization</li>
+                                        }
+                                    </ul>
+                                </div>
+                            }
+                            @if (HasNum(p.Graduation_Year))
+                            {
+                                <div class="timeline-item">
+                                    <div class="tl-header">
+                                        <span class="tl-title">@GetLookupName(Model.Streams, p.Graduation_Stream)</span>
+                                        <span class="tl-company">Graduation</span>
+                                    </div>
+                                    <div class="tl-date">Graduated @p.Graduation_Year</div>
+                                    <ul class="tl-desc">
+                                        @if (Has(GetLookupName(Model.Divisions, p.Graduation_Division)))
+                                        {
+                                            <li>Division: @GetLookupName(Model.Divisions, p.Graduation_Division)</li>
+                                        }
+                                    </ul>
+                                </div>
+                            }
+                            @if (HasNum(p.HSC_DIPLOMA_YEAR))
+                            {
+                                <div class="timeline-item">
+                                    <div class="tl-header">
+                                        <span class="tl-title">HSC / Diploma</span>
+                                    </div>
+                                    <div class="tl-date">Graduated @p.HSC_DIPLOMA_YEAR</div>
+                                </div>
+                            }
+                        </div>
+                    </div>
+                }
+
+                <!-- EXPERIENCE -->
                 @{
                     var internships = new[]
                     {
-                        new { Name = p.sOrgName1, Title = p.sOrgIntTitle1, Duration = p.sOrgIntDuration1, Status = p.sOrgIntStatus1 },
-                        new { Name = p.sOrgName2, Title = p.sOrgIntTitle2, Duration = p.sOrgIntDuration2, Status = p.sOrgIntStatus2 },
-                        new { Name = p.sOrgName3, Title = p.sOrgIntTitle3, Duration = p.sOrgIntDuration3, Status = p.sOrgIntStatus3 },
-                        new { Name = p.sOrgName4, Title = p.sOrgIntTitle4, Duration = p.sOrgIntDuration4, Status = p.sOrgIntStatus4 }
-                    }.Where(x => Has(x.Name)).ToList();
+                new { Name = p.sOrgName1, Title = p.sOrgIntTitle1, Duration = p.sOrgIntDuration1, Status = p.sOrgIntStatus1 },
+                new { Name = p.sOrgName2, Title = p.sOrgIntTitle2, Duration = p.sOrgIntDuration2, Status = p.sOrgIntStatus2 },
+                new { Name = p.sOrgName3, Title = p.sOrgIntTitle3, Duration = p.sOrgIntDuration3, Status = p.sOrgIntStatus3 },
+                new { Name = p.sOrgName4, Title = p.sOrgIntTitle4, Duration = p.sOrgIntDuration4, Status = p.sOrgIntStatus4 }
+                }.Where(x => Has(x.Name)).ToList();
                 }
 
                 @if (internships.Any())
                 {
                     <div class="main-section">
                         <div class="main-title">Experience</div>
-                        <div class="exp-container">
+                        <div class="timeline-container">
                             @foreach (var exp in internships)
                             {
-                                <div class="exp-item">
-                                    <div class="exp-date">@GetLookupName(Model.InternshipDurations, exp.Duration)</div>
-                                    <div class="exp-details">
-                                        <div class="exp-role">@(Has(GetLookupName(Model.InternshipTitles, exp.Title)) ? GetLookupName(Model.InternshipTitles, exp.Title) : "Role")</div>
-                                        <div class="exp-company">@exp.Name</div>
-                                        @if (Has(GetLookupName(Model.InternshipStatuses, exp.Status)))
+                                <div class="timeline-item">
+                                    <div class="tl-header">
+                                        @if (Has(GetLookupName(Model.InternshipTitles, exp.Title)))
                                         {
-                                            <div class="exp-status">Status: @GetLookupName(Model.InternshipStatuses, exp.Status)</div>
+                                            <span class="tl-title">@GetLookupName(Model.InternshipTitles, exp.Title)</span>
+                                            <span class="tl-company">@exp.Name</span>
+                                        }
+                                        else
+                                        {
+                                            <span class="tl-title">@exp.Name</span>
                                         }
                                     </div>
+
+                                    @if (Has(GetLookupName(Model.InternshipDurations, exp.Duration)))
+                                    {
+                                        <div class="tl-date">Duration: @GetLookupName(Model.InternshipDurations, exp.Duration)</div>
+                                    }
+
+                                    @if (Has(GetLookupName(Model.InternshipStatuses, exp.Status)))
+                                    {
+                                        <ul class="tl-desc">
+                                            <li>Current Status: @GetLookupName(Model.InternshipStatuses, exp.Status)</li>
+                                        </ul>
+                                    }
                                 </div>
                             }
                         </div>
                     </div>
                 }
 
-                @{
-                    var skillGroups = new[]
-                    {
-                        ("Technical", p.sTechnicalSkillIDs),
-                        ("Professional", p.sNonTechnicalSkillIDs),
-                        ("Medical", p.sMedicalSkillIDs)
-                    }.Where(x => Has(x.Item2)).ToList();
-                }
-
-                @if (skillGroups.Any())
-                {
-                    <div class="main-section">
-                        <div class="main-title">Skills & Expertise</div>
-                        <div class="skill-grid">
-                            @foreach (var group in skillGroups)
-                            {
-                                <div>
-                                    <div class="skill-category-title">@group.Item1</div>
-                                    <div class="skill-tags">
-                                        @foreach (var skill in group.Item2.Split(new[] { ',', ';', '|' }, StringSplitOptions.RemoveEmptyEntries))
-                                        {
-                                            <span class="skill-tag">@skill.Trim()</span>
-                                        }
-                                    </div>
-                                </div>
-                            }
-                        </div>
-                    </div>
-                }
-
+                <!-- ACHIEVEMENTS -->
                 @{
                     var achievements = new[] { p.Achievements_Certification1, p.Achievements_Certification2, p.Achievements_Certification3 }.Where(Has).ToList();
                 }
 
                 @if (achievements.Any())
                 {
-                    <div class="main-section">
+                    <div class="main-section push-bottom">
                         <div class="main-title">Achievements</div>
-                        <ul class="achieve-list">
+                        <ul class="tl-desc" style="list-style-type: square;">
                             @foreach (var a in achievements)
                             {
-                                <li class="achieve-item"><i class="fa fa-check-circle"></i> @a</li>
+                                <li>@a</li>
                             }
                         </ul>
                     </div>
                 }
 
-                <div class="bottom-grid">
-                    @if (Has(p.sRefName1) || Has(p.sRefName2))
-                    {
-                        <div>
-                            <div class="main-title" style="font-size: 13px; margin-bottom: 8px;">References</div>
-                            @if (Has(p.sRefName1))
-                            {
-                                <div class="ref-box" style="margin-bottom: 8px;">
-                                    <div class="ref-name">@p.sRefName1</div>
-                                    <div class="ref-rel">@(Has(GetLookupName(Model.Relationships, p.sRefRelationName1)) ? GetLookupName(Model.Relationships, p.sRefRelationName1) : "Reference")</div>
-                                    @if(Has(p.sMobile1)) { <div class="ref-phone"><i class="fa fa-phone" style="color:var(--accent-resume); font-size: 9px;"></i> @p.sMobile1</div> }
-                                </div>
-                            }
-                            @if (Has(p.sRefName2))
-                            {
-                                <div class="ref-box">
-                                    <div class="ref-name">@p.sRefName2</div>
-                                    <div class="ref-rel">@(Has(GetLookupName(Model.Relationships, p.sRefRelationName2)) ? GetLookupName(Model.Relationships, p.sRefRelationName2) : "Reference")</div>
-                                    @if(Has(p.sMobile2)) { <div class="ref-phone"><i class="fa fa-phone" style="color:var(--accent-resume); font-size: 9px;"></i> @p.sMobile2</div> }
-                                </div>
-                            }
-                        </div>
-                    }
-
-                    @if (Has(p.sHobbies))
-                    {
-                        <div>
-                            <div class="main-title" style="font-size: 13px; margin-bottom: 8px;">Interests</div>
-                            <div class="ref-box" style="border-left-color: var(--head-main); color: var(--text-main); font-size: 10.5px; line-height: 1.5;">
-                                @p.sHobbies
-                            </div>
-                        </div>
-                    }
-                </div>
-
             </div>
         </div>
     </div>
 
-
-    <!-- =========================================================
-         PDF & JS LOGIC
-    ========================================================== -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-
+    <!-- SCRIPTS -->
     <script>
         document.addEventListener("DOMContentLoaded", function () {
             const sheet = document.getElementById("resumeSheet");
             const swatches = document.querySelectorAll(".theme-swatch");
-            const savedTheme = localStorage.getItem("resumeThemeV9_Canva") || "navy";
+            const savedTheme = localStorage.getItem("resumeThemeV10_Landscape") || "navy";
 
             sheet.setAttribute("data-theme", savedTheme);
 
@@ -586,11 +766,11 @@
                 swatch.addEventListener("click", function () {
                     const theme = this.dataset.theme;
                     sheet.setAttribute("data-theme", theme);
-                    
+
                     swatches.forEach(function (item) { item.classList.remove("active"); });
                     this.classList.add("active");
-                    
-                    localStorage.setItem("resumeThemeV9_Canva", theme);
+
+                    localStorage.setItem("resumeThemeV10_Landscape", theme);
                 });
             });
 
@@ -642,49 +822,20 @@
                 .catch(error => console.log("Address resolution error:", error));
         });
 
-        /* PDF LOGIC (Landscape) */
-        async function downloadResumePDF() {
-            const sheet = document.getElementById("resumeSheet");
-            const button = document.querySelector(".btn-download");
-            const original = button.innerHTML;
 
-            try {
-                button.disabled = true;
-                button.innerHTML = '<i class="fa fa-spinner fa-spin"></i>';
-
-                const images = sheet.querySelectorAll("img");
-                await Promise.all(
-                    Array.from(images).map(image =>
-                        image.complete ? Promise.resolve() : new Promise(resolve => {
-                            image.onload = resolve;
-                            image.onerror = resolve;
-                        })
-                    )
-                );
-
-                const rect = sheet.getBoundingClientRect();
-                const canvas = await html2canvas(sheet, {
-                    scale: 2, useCORS: true, allowTaint: false, backgroundColor: "#ffffff",
-                    logging: false, width: Math.round(rect.width), height: Math.round(rect.height)
-                });
-
-                const { jsPDF } = window.jspdf;
-                const pdf = new jsPDF({ orientation: "landscape", unit: "mm", format: "a4", compress: true });
-                const imgData = canvas.toDataURL("image/jpeg", .95);
-                pdf.addImage(imgData, "JPEG", 0, 0, 297, 210);
-                pdf.save((window.candidateName || "Resume") + ".pdf");
-            }
-            catch (error) {
-                console.error("PDF error:", error);
-                alert("Error generating PDF");
-            }
-            finally {
-                button.disabled = false;
-                button.innerHTML = original;
-            }
-        }
 
         window.candidateName = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(candidateName ?? "Resume"));
     </script>
+    <script>
+        window.resumeFileName =
+        @Html.Raw(
+                     System.Text.Json.JsonSerializer.Serialize(
+                         candidateName ?? "Resume"
+                     )
+                 );
+    </script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="~/js/resume-download.js"></script>
 </body>
 </html>

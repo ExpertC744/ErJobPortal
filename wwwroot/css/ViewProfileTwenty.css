@@ -1,0 +1,620 @@
+﻿/* ============================================================
+   VIEW PROFILE TWENTY
+   2-COLUMN RESUME | SIDEBAR + MAIN | A4 LANDSCAPE (auto height)
+   WITH COLOR THEMES
+   ============================================================ */
+
+
+/* ============================================================
+   THEME VARIABLES
+   Default = Rose. Other themes override via <html data-theme="...">
+   ============================================================ */
+
+:root {
+    --side-bg: #eeeae7; /* sidebar background            */
+    --side-ink: #1c1a1b; /* sidebar text / icon outline   */
+    --side-soft: #4a4546; /* sidebar small labels          */
+    --head-bg: #eeeae7; /* main section heading bar      */
+    --accent: #b8909a; /* bars, icons, heading edge     */
+    --track: #ddd5d3; /* empty part of language bars   */
+    --band: #d9cfcd; /* footer band                   */
+    --line: #b9b3b1; /* sidebar divider lines         */
+    --chip: #ffffff; /* skill chip background         */
+
+    --ink: #1c1a1b;
+    --ink-soft: #4a4546;
+    --page-bg: #e9e6e4;
+}
+
+    :root[data-theme="sage"] {
+        --side-bg: #e8eee7;
+        --head-bg: #e8eee7;
+        --accent: #8aa58a;
+        --track: #d3ddd1;
+        --band: #c9d6c7;
+        --line: #b3c0b1;
+    }
+
+    :root[data-theme="ocean"] {
+        --side-bg: #e5edf2;
+        --head-bg: #e5edf2;
+        --accent: #7a9db8;
+        --track: #d0dce5;
+        --band: #c5d5e0;
+        --line: #aebfcc;
+    }
+
+    :root[data-theme="slate"] {
+        --side-bg: #eaebed;
+        --head-bg: #eaebed;
+        --accent: #66727f;
+        --track: #d3d6da;
+        --band: #cdd0d5;
+        --line: #b8bcc2;
+    }
+
+    :root[data-theme="plum"] {
+        --side-bg: #efe8ee;
+        --head-bg: #efe8ee;
+        --accent: #9a7396;
+        --track: #dccfdb;
+        --band: #d9cbd6;
+        --line: #c3b2c0;
+    }
+
+    :root[data-theme="gold"] {
+        --side-bg: #f1ece2;
+        --head-bg: #f1ece2;
+        --accent: #c2a26a;
+        --track: #e3dac6;
+        --band: #ddd2bb;
+        --line: #cfc4aa;
+    }
+
+    :root[data-theme="midnight"] {
+        --side-bg: #2f3b4c;
+        --side-ink: #ffffff;
+        --side-soft: #c5cfdc;
+        --head-bg: #e6eaf0;
+        --accent: #7fa7d6;
+        --track: #4a586b;
+        --band: #1f2733;
+        --line: rgba(255, 255, 255, .28);
+        --chip: #3f4d61;
+    }
+
+
+/* ============================================================
+   GLOBAL
+   ============================================================ */
+
+* {
+    box-sizing: border-box;
+}
+
+html, body {
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    background: var(--page-bg);
+    color: var(--ink);
+    font-family: "Lexend", "Segoe UI", Arial, sans-serif;
+    min-height: 100vh;
+}
+
+.hobby-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1.4mm;
+    margin-top: 4mm;
+}
+
+.hobby-tag {
+    padding: 1mm 3mm;
+    background: var(--track);
+    border-left: .8mm solid var(--accent);
+    color: var(--ink);
+    font-size: 8.5px;
+    font-weight: 500;
+    line-height: 1.35;
+}
+/* ---------- TOOLBAR ---------- */
+
+.resume-toolbar {
+width: 297mm;height:210mm;
+    max-width: calc(100% - 40px);
+    margin: 20px auto 10px;
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    gap: 8px;
+}
+
+.toolbar-btn {
+    border: 0;
+    border-radius: 7px;
+    padding: 9px 15px;
+    font-family: inherit;
+    font-size: 11px;
+    font-weight: 600;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    cursor: pointer;
+    transition: transform .2s ease;
+}
+
+    .toolbar-btn:hover {
+        transform: translateY(-2px);
+    }
+
+.toolbar-edit {
+    background: #fff;
+    color: var(--ink);
+    border: 1px solid #d5cfcd;
+}
+
+.toolbar-print {
+    background: var(--ink);
+    color: #fff;
+}
+
+.toolbar-download {
+    background: var(--accent);
+    color: #fff;
+}
+
+.toolbar-btn:disabled {
+    opacity: .6;
+    cursor: not-allowed;
+}
+
+
+/* ---------- THEME SWITCHER ---------- */
+
+.theme-switcher {
+width: 297mm;height:210mm;
+    max-width: calc(100% - 40px);
+    margin: 0 auto 14px;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 9px;
+}
+
+    .theme-switcher > span {
+        font-size: 11px;
+        font-weight: 600;
+        color: #6d6567;
+        margin-right: 2px;
+    }
+
+.theme-swatch {
+    width: 22px;
+    height: 22px;
+    padding: 0;
+    border-radius: 50%;
+    cursor: pointer;
+    border: 2px solid #fff;
+    box-shadow: 0 0 0 1px #c9c2c0;
+    transition: transform .2s ease;
+}
+
+    .theme-swatch:hover {
+        transform: scale(1.12);
+    }
+
+    .theme-swatch:focus-visible {
+        outline: 2px solid var(--ink);
+        outline-offset: 2px;
+    }
+
+    .theme-swatch.active {
+        box-shadow: 0 0 0 2px var(--ink);
+    }
+
+
+/* ---------- SHEET ---------- */
+
+.resume-container {
+    padding: 5px 0 50px;
+}
+
+.resume-sheet {
+    position: relative;
+width: 297mm;height:210mm;
+    min-height: 210mm; /* grows if content is longer */
+    margin: 0 auto;
+    background: #fff;
+    display: grid;
+    grid-template-columns: 29% 71%;
+    box-shadow: 0 20px 55px rgba(60, 40, 45, .16);
+}
+
+    .resume-sheet::after { /* footer band */
+        content: "";
+        position: absolute;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        height: 5mm;
+        background: var(--band);
+    }
+
+
+/* ============================================================
+   LEFT SIDEBAR  (blocks are spaced evenly - no dead space)
+   ============================================================ */
+
+.left-column {
+    background: var(--side-bg);
+    color: var(--side-ink);
+    padding: 9mm 6mm 9mm;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    gap: 4mm;
+    min-width: 0;
+}
+
+.side-block {
+    width: 100%;
+}
+
+.side-head {
+    text-align: center;
+}
+
+.photo-frame {
+    width: 40mm;
+    height: 40mm;
+    margin: 0 auto;
+    border-radius: 50%;
+    overflow: hidden;
+    background: var(--track);
+}
+
+.profile-photo,
+.profile-placeholder {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+
+.profile-placeholder {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #fff;
+    font-size: 54px;
+    background: var(--accent);
+}
+
+.profile-name {
+    margin: 5mm 0 0;
+    font-family: "Cormorant Garamond", Georgia, "Times New Roman", serif;
+    font-weight: 500;
+    font-size: 27px;
+    line-height: 1.05;
+    letter-spacing: -.5px;
+    word-break: break-word;
+}
+
+.profile-role {
+    margin-top: 1.5mm;
+    font-size: 10px;
+    letter-spacing: 1.6px;
+    text-transform: uppercase;
+}
+
+.left-divider {
+    height: 1px;
+    background: var(--line);
+    margin: 4mm 0 3mm;
+}
+
+.profile-quote {
+    margin: 0;
+    font-size: 8.5px;
+    line-height: 1.65;
+    font-style: italic;
+    text-align: center;
+}
+
+
+/* ---------- CONTACT ---------- */
+
+.contact-list {
+    display: flex;
+    flex-direction: column;
+    gap: 2.6mm;
+}
+
+.contact-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.contact-icon {
+    width: 24px;
+    height: 24px;
+    flex-shrink: 0;
+    border: 1.5px solid var(--side-ink);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 9px;
+}
+
+.contact-row span {
+    font-size: 8.5px;
+    line-height: 1.35;
+    letter-spacing: .3px;
+    word-break: break-word;
+    min-width: 0;
+}
+
+
+/* ---------- SIDEBAR HEADINGS / SKILLS / LANGUAGES ---------- */
+
+.side-heading {
+    font-size: 10.5px;
+    font-weight: 500;
+    letter-spacing: 1.2px;
+    text-transform: uppercase;
+    padding-bottom: 1.5mm;
+    margin-bottom: 2.5mm;
+    border-bottom: 1px solid var(--line);
+}
+
+.lang-row {
+    margin-bottom: 2mm;
+}
+
+.lang-name {
+    font-size: 9px;
+    letter-spacing: .3px;
+    margin-bottom: .8mm;
+}
+
+.skill-bar {
+    height: 2.6mm;
+    background: var(--track);
+}
+
+    .skill-bar span {
+        display: block;
+        height: 100%;
+        background: var(--accent);
+    }
+
+.skill-group {
+    margin-bottom: 2.4mm;
+}
+
+.skill-group-title {
+    font-size: 8px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: var(--side-soft);
+    margin-bottom: 1mm;
+}
+
+.skill-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 3px;
+}
+
+.skill-tag {
+    padding: 3px 6px;
+    background: var(--chip);
+    color: var(--side-ink);
+    font-size: 7.5px;
+    line-height: 1.2;
+    letter-spacing: .3px;
+}
+
+:root:not([data-theme="midnight"]) .skill-tag {
+    color: var(--ink);
+}
+
+
+/* ============================================================
+   MAIN COLUMN
+   ============================================================ */
+
+.main-column {
+    padding: 9mm 9mm 9mm 8mm;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    gap: 4mm;
+    min-width: 0;
+}
+
+.section-heading {
+    background: var(--head-bg);
+    border-left: 3px solid var(--accent);
+    color: var(--ink);
+    padding: 1.6mm 3mm;
+    margin: 0 0 2.6mm;
+    font-size: 12px;
+    font-weight: 500;
+    letter-spacing: 1.2px;
+    text-transform: uppercase;
+}
+
+.body-text {
+    margin: 0;
+    padding: 0 1mm;
+    font-size: 9px;
+    line-height: 1.65;
+    letter-spacing: .3px;
+}
+
+.pref-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 4mm;
+    padding: 0 1mm;
+}
+
+    .pref-grid small {
+        display: block;
+        font-size: 7px;
+        letter-spacing: 1.2px;
+        text-transform: uppercase;
+        color: var(--ink-soft);
+        margin-bottom: 1mm;
+    }
+
+    .pref-grid strong {
+        display: block;
+        font-size: 9.5px;
+        font-weight: 500;
+        line-height: 1.4;
+    }
+
+.entry-list {
+    display: flex;
+    flex-direction: column;
+    gap: 2.6mm;
+    padding: 0 1mm;
+}
+
+.entry {
+    display: grid;
+    grid-template-columns: 24mm 1fr;
+    column-gap: 3mm;
+    align-items: start;
+}
+
+.entry-date {
+    font-size: 9.5px;
+    letter-spacing: .3px;
+    line-height: 1.35;
+}
+
+.entry-title {
+    font-size: 9.5px;
+    font-weight: 600;
+    letter-spacing: .4px;
+    line-height: 1.35;
+}
+
+.entry-sub {
+    font-size: 8.5px;
+    letter-spacing: .5px;
+    text-transform: uppercase;
+    line-height: 1.35;
+}
+
+.entry-note {
+    grid-column: 2;
+    margin-top: .8mm;
+    font-size: 8.5px;
+    letter-spacing: .3px;
+    line-height: 1.45;
+    color: var(--ink-soft);
+}
+
+    .entry-note i {
+        color: var(--accent);
+        margin-right: 4px;
+    }
+
+.achievement-list {
+    list-style: none;
+    margin: 0;
+    padding: 0 1mm;
+    display: flex;
+    flex-direction: column;
+    gap: 1.6mm;
+}
+
+    .achievement-list li {
+        display: flex;
+        gap: 7px;
+        font-size: 9px;
+        line-height: 1.45;
+        letter-spacing: .3px;
+    }
+
+    .achievement-list i {
+        color: var(--accent);
+        margin-top: 2px;
+        font-size: 9px;
+    }
+
+
+/* ---------- RESPONSIVE (sheet stays A4, scrolls sideways) ---------- */
+
+@media (max-width: 1000px) {
+    .resume-toolbar,
+    .theme-switcher {
+        width: 100%;
+        max-width: calc(100% - 20px);
+        justify-content: center;
+        flex-wrap: wrap;
+    }
+
+    .resume-container {
+        overflow-x: auto;
+        padding: 10px 0 40px;
+    }
+
+    .resume-sheet {
+        margin-left: 10px;
+        margin-right: 10px;
+    }
+}
+
+@media (max-width: 600px) {
+    .toolbar-btn {
+        padding: 8px 10px;
+        font-size: 10px;
+    }
+}
+
+
+/* ---------- PRINT ---------- */
+
+@media print {
+    html, body {
+    width: 297mm;height:210mm;
+        margin: 0;
+        padding: 0;
+        background: #fff;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+    }
+
+    .resume-toolbar,
+    .theme-switcher {
+        display: none !important;
+    }
+
+    .resume-container {
+        padding: 0;
+        margin: 0;
+    }
+
+    .resume-sheet {
+    width: 297mm;height:210mm;
+        min-height: 210mm;
+        margin: 0;
+        box-shadow: none;
+    }
+
+    @page {
+        size: A4 landscape;
+        margin: 0;
+    }
+}

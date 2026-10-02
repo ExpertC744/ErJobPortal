@@ -1,0 +1,127 @@
+﻿@{
+    Layout = "~/Views/Shared/_DashboardLayout.cshtml";
+
+    ViewData["Title"] = "Trainee Selection";
+    ViewData["Panel"] = "SuperAdmin";
+    ViewData["UserName"] = "ItNetworkZ";
+}
+
+<div class="container-fluid trainee-selection-page">
+
+   
+
+
+    <!-- MASTER TABLE -->
+    <div class="master-table-container">
+
+     
+
+
+        <!-- TABLE -->
+        <div class="table-responsive">
+             <!-- PAGE HEADER -->
+    <div class="mb-4">
+        <h1 class="mb-2">Trainee Selection</h1>
+
+        <p class="mb-0 text-muted">
+            ItNetworkZ
+        </p>
+    </div>
+            <table id="traineeSelectionTable"
+                   class="master-data-table">
+
+                <thead>
+
+                    <tr>
+
+                        <th>
+                            Sr. No
+                        </th>
+
+                        <th>
+                            Trainee Name
+                        </th>
+
+                        <th>
+                            Total Organizations
+                        </th>
+
+                        <th>
+                            Shortlisted
+                        </th>
+
+                        <th>
+                            Rejected
+                        </th>
+
+                        <th>
+                            Hold
+                        </th>
+
+                        <th>
+                            Selected
+                        </th>
+
+                    </tr>
+
+                </thead>
+
+
+                <tbody>
+
+                    <!-- STATIC RECORD -->
+
+                    <tr>
+
+                        <td class="master-id">
+                            1
+                        </td>
+
+                        <td>
+                            Khushi Fale
+                        </td>
+
+                       <td>
+    <a asp-controller="SuperAdmin"
+       asp-action="SADetails"
+       asp-route-candidateId="KF652930263933201"
+       class="text-primary text-decoration-none fw-semibold">
+        1
+    </a>
+</td>
+
+                        <td>
+                            <span class="master-status">
+                                1
+                            </span>
+                        </td>
+
+                        <td>
+                            0
+                        </td>
+
+                        <td>
+                            0
+                        </td>
+
+                        <td>
+                            1
+                        </td>
+
+                    </tr>
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+
+        <!-- PAGE INFO -->
+        <div id="traineeSelectionPageInfo"
+             class="master-page-info text-center d-none">
+        </div>
+
+    </div>
+
+</div>
