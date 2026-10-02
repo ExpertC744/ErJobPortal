@@ -1,5 +1,8 @@
 ﻿@* Radhika30-09 *@
-<link rel="stylesheet" href="~/css/Charts.css" asp-append-version="true" />
+
+<link rel="stylesheet"
+      href="~/css/Charts.css"
+      asp-append-version="true" />
 
 @{
     Layout = "~/Views/Shared/_DashboardLayout.cshtml";
@@ -9,110 +12,171 @@
     ViewData["UserName"] = "Candidate";
 }
 
-
-
 <div class="candidate-charts-page">
-      <!-- PAGE HEADING -->
+
+    <!-- =====================================================
+         PAGE HEADING
+    ====================================================== -->
+
     <div class="charts-heading">
+
         <h1>Charts</h1>
-        <p>HN236383503368076</p>
+
+        <p>
+            @ViewBag.CandidateCode
+        </p>
+
     </div>
+
+
     <div class="charts-grid">
 
-      <!-- =====================================================
-     MONTHLY ANALYTICS @* Radhika29-09 *@
-===================================================== -->
+        <!-- =====================================================
+             MONTHLY ANALYTICS
+        ====================================================== -->
 
-<div class="row">
+        <div class="row">
 
-    <!-- Suitable Openings -->
-    <div class="col-lg-6 mb-4">
 
-        <div class="analytics-card">
+            <!-- =================================================
+                 SUITABLE OPENINGS
+            ================================================== -->
 
-            <!-- Header -->
-            <div class="analytics-header">
+            <div class="col-lg-6 mb-4">
 
-                <div class="analytics-header-icon">
-                    <i class="fas fa-chart-line"></i>
+                <div class="analytics-card">
+
+                    <!-- Header -->
+
+                    <div class="analytics-header">
+
+                        <div class="analytics-header-icon">
+
+                            <i class="fas fa-chart-line"></i>
+
+                        </div>
+
+                        <h5>
+                            No. of suitable openings
+                        </h5>
+
+                    </div>
+
+
+                    <!-- Chart -->
+
+                    <div class="analytics-body">
+
+                        <div class="chart-legend">
+
+                            <span class="legend-box"></span>
+
+                            <span>
+                                No. of openings
+                            </span>
+
+                        </div>
+
+
+                        <div class="chart-wrapper">
+
+                            <svg id="suitableOpeningsChart"
+                                 viewBox="0 0 700 240"
+                                 preserveAspectRatio="none"
+                                 aria-label="Suitable openings monthly chart">
+                            </svg>
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- Footer -->
+
+                    <div class="analytics-footer">
+
+                        <i class="fas fa-chart-line"></i>
+
+                        Monthly suitable-opening trend
+
+                        @ViewBag.ChartYear
+
+                    </div>
+
                 </div>
-
-                <h5>No. of suitable openings</h5>
 
             </div>
 
-            <!-- Chart -->
-            <div class="analytics-body">
 
-                <div class="chart-legend">
-                    <span class="legend-box"></span>
-                    <span>No. of openings</span>
+            <!-- =================================================
+                 INTERNSHIP POSTS
+            ================================================== -->
+
+            <div class="col-lg-6 mb-4">
+
+                <div class="analytics-card">
+
+                    <!-- Header -->
+
+                    <div class="analytics-header">
+
+                        <div class="analytics-header-icon">
+
+                            <i class="fas fa-chart-bar"></i>
+
+                        </div>
+
+                        <h5>
+                            Internship post from organization
+                        </h5>
+
+                    </div>
+
+
+                    <!-- Chart -->
+
+                    <div class="analytics-body">
+
+                        <div class="chart-legend">
+
+                            <span class="legend-box-bar"></span>
+
+                            <span>
+                                No. of posts
+                            </span>
+
+                        </div>
+
+
+                        <div class="chart-wrapper">
+
+                            <svg id="internshipPostsChart"
+                                 viewBox="0 0 700 240"
+                                 preserveAspectRatio="none"
+                                 aria-label="Internship posts monthly chart">
+                            </svg>
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- Footer -->
+
+                    <div class="analytics-footer">
+
+                        <i class="fas fa-building"></i>
+
+                        Monthly organization internship trend
+
+                    </div>
+
                 </div>
 
-                <div class="chart-wrapper">
-
-                    <svg id="suitableOpeningsChart"
-                         viewBox="0 0 700 240"
-                         preserveAspectRatio="none"
-                         aria-label="Suitable openings monthly chart">
-                    </svg>
-
-                </div>
-
-            </div>
-
-            <div class="analytics-footer">
-                <i class="fas fa-chart-line"></i>
-                Monthly suitable-opening trend
             </div>
 
         </div>
 
-    </div>
-
-
-    <!-- Internship Posts -->
-    <div class="col-lg-6 mb-4">
-
-        <div class="analytics-card">
-
-            <!-- Header -->
-            <div class="analytics-header">
-
-                <div class="analytics-header-icon">
-                    <i class="fas fa-chart-bar"></i>
-                </div>
-
-                <h5>Internship post from organization</h5>
-
-            </div>
-
-            <!-- Chart -->
-            <div class="analytics-body">
-
-                <div class="chart-legend">
-                    <span class="legend-box-bar"></span>
-                    <span>No. of posts</span>
-                </div>
-
-                <div class="chart-wrapper">
-
-                    <svg id="internshipPostsChart"
-                         viewBox="0 0 700 240"
-                         preserveAspectRatio="none"
-                         aria-label="Internship posts monthly chart">
-                    </svg>
-
-                </div>
-
-            </div>
-
-            <div class="analytics-footer">
-                <i class="fas fa-building"></i>
-                Monthly organization internship trend
-            </div>
-
-        </div>
 
     </div>
 
@@ -120,54 +184,95 @@
 
 
 <!-- =========================================================
-     CHART.JS @* Radhika29-09 *@
+     CHART JAVASCRIPT
 ========================================================= -->
- 
+
 <script>
 
     /* =====================================================
-       1TRAINEE CHART CONFIGURATION 
+       1. MONTH NAMES
     ===================================================== */
 
     const chartMonths = [
-        "Jan", "Feb", "Mar", "Apr",
-        "May", "Jun", "Jul", "Aug",
-        "Sep", "Oct", "Nov", "Dec"
+        "Jan",
+        "Feb",
+        "Mar",
+        "Apr",
+        "May",
+        "Jun",
+        "Jul",
+        "Aug",
+        "Sep",
+        "Oct",
+        "Nov",
+        "Dec"
     ];
 
 
     /* =====================================================
-       LINE / AREA CHART
+       2. LINE / AREA CHART
     ===================================================== */
 
     function drawLineChart(svgId, values) {
 
         const svg = document.getElementById(svgId);
 
-        if (!svg || !values || !values.length)
+        if (!svg) {
+            console.error("SVG not found:", svgId);
             return;
+        }
+
+        if (!values || values.length !== 12) {
+
+            console.error(
+                "Invalid line chart data:",
+                values
+            );
+
+            return;
+        }
+
 
         const width = 700;
+
         const height = 240;
 
         const left = 48;
+
         const right = 12;
+
         const top = 25;
+
         const bottom = 38;
 
-        const chartWidth = width - left - right;
-        const chartHeight = height - top - bottom;
 
-        const maxValue = Math.max(...values, 1);
+        const chartWidth =
+            width - left - right;
 
-        const yStep = maxValue <= 10
-            ? 2
-            : Math.ceil(maxValue / 4);
+        const chartHeight =
+            height - top - bottom;
 
-        const maxY = Math.max(
-            yStep * 4,
-            Math.ceil(maxValue / yStep) * yStep
-        );
+
+        /* =================================================
+           MAX VALUE
+        ================================================= */
+
+        const maxValue =
+            Math.max(...values, 1);
+
+
+        const yStep =
+            maxValue <= 10
+                ? 2
+                : Math.ceil(maxValue / 4);
+
+
+        const maxY =
+            Math.max(
+                yStep * 4,
+                Math.ceil(maxValue / yStep) * yStep
+            );
+
 
         let html = "";
 
@@ -178,10 +283,15 @@
 
         for (let i = 0; i <= 4; i++) {
 
-            const value = maxY - (i * maxY / 4);
+            const value =
+                maxY -
+                (i * maxY / 4);
+
 
             const y =
-                top + (i * chartHeight / 4);
+                top +
+                (i * chartHeight / 4);
+
 
             html += `
                 <line
@@ -189,7 +299,8 @@
                     y1="${y}"
                     x2="${width - right}"
                     y2="${y}"
-                    class="chart-grid" />
+                    class="chart-grid">
+                </line>
 
                 <text
                     x="${left - 10}"
@@ -203,7 +314,7 @@
 
 
         /* =================================================
-           VERTICAL GRID
+           VERTICAL GRID + MONTHS
         ================================================= */
 
         chartMonths.forEach((month, index) => {
@@ -212,14 +323,17 @@
                 left +
                 (index * chartWidth / 11);
 
+
             html += `
                 <line
                     x1="${x}"
                     y1="${top}"
                     x2="${x}"
                     y2="${height - bottom}"
-                    class="chart-grid" />
+                    class="chart-grid">
+                </line>
             `;
+
 
             html += `
                 <text
@@ -230,6 +344,7 @@
                     ${month}
                 </text>
             `;
+
         });
 
 
@@ -243,43 +358,50 @@
                 y1="${height - bottom}"
                 x2="${width - right}"
                 y2="${height - bottom}"
-                class="chart-axis" />
+                class="chart-axis">
+            </line>
 
             <line
                 x1="${left}"
                 y1="${top}"
                 x2="${left}"
                 y2="${height - bottom}"
-                class="chart-axis" />
+                class="chart-axis">
+            </line>
         `;
 
 
         /* =================================================
-           POINTS
+           CALCULATE POINTS
         ================================================= */
 
-        const points = values.map((value, index) => {
+        const points =
+            values.map((value, index) => {
 
-            const x =
-                left +
-                (index * chartWidth / 11);
-
-            const y =
-                top +
-                chartHeight -
-                ((value / maxY) * chartHeight);
-
-            return {
-                x: x,
-                y: y,
-                value: value
-            };
-        });
+                const x =
+                    left +
+                    (index * chartWidth / 11);
 
 
-        const pointString = points
-            .map(p => `${p.x},${p.y}`)
-            .join(" ");
+                const y =
+                    top +
+                    chartHeight -
+                    ((value / maxY) * chartHeight);
+
+
+                return {
+                    x: x,
+                    y: y,
+                    value: value
+                };
+
+            });
+
+
+        const pointString =
+            points
+                .map(p => `${p.x},${p.y}`)
+                .join(" ");
 
 
         /* =================================================
@@ -295,7 +417,8 @@
         html += `
             <polygon
                 points="${areaPoints}"
-                class="chart-area" />
+                class="chart-area">
+            </polygon>
         `;
 
 
@@ -306,7 +429,8 @@
         html += `
             <polyline
                 points="${pointString}"
-                class="chart-line" />
+                class="chart-line">
+            </polyline>
         `;
 
 
@@ -322,49 +446,93 @@
                     cy="${point.y}"
                     r="3.5"
                     class="chart-point">
+
+                    <title>
+                        ${point.value} openings
+                    </title>
+
                 </circle>
             `;
 
         });
 
 
+        /* =================================================
+           PUT HTML INTO SVG
+        ================================================= */
+
         svg.innerHTML = html;
+
     }
 
 
     /* =====================================================
-       BAR CHART
+       3. BAR CHART
     ===================================================== */
 
     function drawBarChart(svgId, values) {
 
-        const svg = document.getElementById(svgId);
+        const svg =
+            document.getElementById(svgId);
 
-        if (!svg || !values || !values.length)
+
+        if (!svg) {
+
+            console.error(
+                "SVG not found:",
+                svgId
+            );
+
             return;
+        }
+
+
+        if (!values || values.length !== 12) {
+
+            console.error(
+                "Invalid bar chart data:",
+                values
+            );
+
+            return;
+        }
+
 
         const width = 700;
+
         const height = 240;
 
         const left = 48;
+
         const right = 12;
+
         const top = 25;
+
         const bottom = 38;
 
-        const chartWidth = width - left - right;
-        const chartHeight = height - top - bottom;
 
-        const maxValue = Math.max(...values, 1);
+        const chartWidth =
+            width - left - right;
+
+        const chartHeight =
+            height - top - bottom;
+
+
+        const maxValue =
+            Math.max(...values, 1);
+
 
         const maxY =
-            Math.ceil(maxValue / 10) * 10 ||
-            10;
+            Math.ceil(maxValue / 10) * 10 || 10;
+
 
         const barSpace =
             chartWidth / values.length;
 
+
         const barWidth =
             barSpace * 0.58;
+
 
         let html = "";
 
@@ -376,10 +544,14 @@
         for (let i = 0; i <= 4; i++) {
 
             const value =
-                maxY - (i * maxY / 4);
+                maxY -
+                (i * maxY / 4);
+
 
             const y =
-                top + (i * chartHeight / 4);
+                top +
+                (i * chartHeight / 4);
+
 
             html += `
                 <line
@@ -387,7 +559,8 @@
                     y1="${y}"
                     x2="${width - right}"
                     y2="${y}"
-                    class="chart-grid" />
+                    class="chart-grid">
+                </line>
 
                 <text
                     x="${left - 10}"
@@ -411,13 +584,15 @@
                 (index * barSpace) +
                 (barSpace / 2);
 
+
             html += `
                 <line
                     x1="${centerX}"
                     y1="${top}"
                     x2="${centerX}"
                     y2="${height - bottom}"
-                    class="chart-grid" />
+                    class="chart-grid">
+                </line>
 
                 <text
                     x="${centerX}"
@@ -427,6 +602,7 @@
                     ${month}
                 </text>
             `;
+
         });
 
 
@@ -440,14 +616,16 @@
                 y1="${height - bottom}"
                 x2="${width - right}"
                 y2="${height - bottom}"
-                class="chart-axis" />
+                class="chart-axis">
+            </line>
 
             <line
                 x1="${left}"
                 y1="${top}"
                 x2="${left}"
                 y2="${height - bottom}"
-                class="chart-axis" />
+                class="chart-axis">
+            </line>
         `;
 
 
@@ -462,12 +640,16 @@
                 (index * barSpace) +
                 (barSpace / 2);
 
+
             const barHeight =
-                (value / maxY) * chartHeight;
+                (value / maxY) *
+                chartHeight;
+
 
             const x =
                 centerX -
                 (barWidth / 2);
+
 
             const y =
                 height -
@@ -485,36 +667,64 @@
                     class="chart-bar">
 
                     <title>
-                        ${chartMonths[index]}: ${value} posts
+                        ${chartMonths[index]}:
+                        ${value} posts
                     </title>
 
                 </rect>
             `;
+
         });
 
 
+        /* =================================================
+           PUT HTML INTO SVG
+        ================================================= */
+
         svg.innerHTML = html;
+
     }
 
 
     /* =====================================================
-       DATA
+       4. SUITABLE OPENINGS DATA
+
+       DATA COMES FROM CANDIDATE CONTROLLER
     ===================================================== */
 
-    const suitableOpeningsMonthly = [
-        3, 5, 4, 7, 8, 6,
-        9, 11, 10, 13, 12, 15
-    ];
+    const suitableOpeningsMonthly =
+        @Html.Raw(
+            System.Text.Json.JsonSerializer.Serialize(
+                    ViewBag.SuitableOpeningsMonthly
+                            ?? new int[12]
+            )
+                );
 
+
+    /* =====================================================
+       5. INTERNSHIP POSTS DATA
+
+       KEEPING YOUR CURRENT DATA FOR NOW
+    ===================================================== */
 
     const internshipPostsMonthly = [
-        4, 7, 5, 9, 12, 10,
-        15, 18, 14, 20, 17, 23
+        4,
+        7,
+        5,
+        9,
+        12,
+        10,
+        15,
+        18,
+        14,
+        20,
+        17,
+        23
     ];
 
 
     /* =====================================================
-       DRAW
+       6. DRAW BOTH CHARTS
     ===================================================== */
 
     drawLineChart(
@@ -522,10 +732,10 @@
         suitableOpeningsMonthly
     );
 
+
     drawBarChart(
         "internshipPostsChart",
         internshipPostsMonthly
     );
 
 </script>
-

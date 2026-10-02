@@ -155,6 +155,328 @@ namespace ErJobPortal.Controllers
             return View(organization);
         }
 
+
+
+        [HttpGet]
+        [Route("SuperAdmin/SAOrgPostList/{id:int}")]
+        public IActionResult SAOrgPostList()
+        {
+            List<OrgPostM> posts = new List<OrgPostM>();
+
+            string query = @"
+        SELECT
+            P.nID,
+
+            P.nPositionID,
+            POS.sName AS sPositionName,
+
+            P.nRequiredTrainees,
+
+            P.nGenderID,
+            G.sName AS sGenderName,
+
+            P.nMinimumQualificationID,
+            Q.sName AS sMinimumQualificationName,
+
+            P.sCountryName,
+            P.sStateName,
+            P.nCityName,
+
+            P.sWorkingHours,
+
+            P.nInternshipTypeID,
+            IT.sName AS sInternshipTypeName,
+
+            P.sWorkingShift,
+
+            P.nInternshipFellowshipTypeID,
+            IFT.sName AS sInternshipFellowshipTypeName,
+
+            P.sTotalCharges,
+            P.sCurrency,
+
+            P.nTrainingInvolvedID,
+            TI.sName AS sTrainingInvolvedName,
+
+            P.nInternshipDurationID,
+            D.sName AS sInternshipDurationName,
+
+            P.dStartDate,
+            P.dCompletionDate,
+
+            P.nInternshipModeID,
+            IM.sName AS sInternshipModeName,
+
+            P.sDivyang,
+            P.sLanguageKnown,
+
+            P.sWorkingDays,
+            P.sFacilities,
+
+            P.sTechnicalSkills,
+            P.sMedicalSkills,
+            P.sNonTechnicalSkills,
+
+            P.dRegisterDate,
+            P.dModDate,
+
+            P.nBit,
+            P.nSABit,
+            P.nOrgID
+
+        FROM tblPost P
+
+        LEFT JOIN tblPositions POS
+            ON P.nPositionID = POS.nID
+
+        LEFT JOIN tblGender G
+            ON P.nGenderID = G.nID
+
+        LEFT JOIN tblMinimumQualification Q
+            ON P.nMinimumQualificationID = Q.nID
+
+        LEFT JOIN tblInternshipType IT
+            ON P.nInternshipTypeID = IT.nID
+
+        LEFT JOIN tblInternshipFellowshipType IFT
+            ON P.nInternshipFellowshipTypeID = IFT.nID
+
+        LEFT JOIN tblTrainingInvolved TI
+            ON P.nTrainingInvolvedID = TI.nID
+
+        LEFT JOIN tblInternshipDuration D
+            ON P.nInternshipDurationID = D.nID
+
+        LEFT JOIN tblInternshipMode IM
+            ON P.nInternshipModeID = IM.nID
+
+        ORDER BY P.nID DESC;
+    ";
+
+            using (SqlConnection con = new SqlConnection(
+                _configuration.GetConnectionString("DefaultConnection")))
+            {
+                using (SqlCommand cmd = new SqlCommand(query, con))
+                {
+                    con.Open();
+
+                    using (SqlDataReader dr = cmd.ExecuteReader())
+                    {
+                        while (dr.Read())
+                        {
+                            OrgPostM item = new OrgPostM();
+
+                            item.nID = dr["nID"] != DBNull.Value
+                                ? Convert.ToInt32(dr["nID"])
+                                : 0;
+
+                            item.nPositionID = dr["nPositionID"] != DBNull.Value
+                                ? Convert.ToInt32(dr["nPositionID"])
+                                : 0;
+
+                            item.sPositionName =
+                                dr["sPositionName"]?.ToString() ?? "";
+
+                            item.nRequiredTrainees =
+                                dr["nRequiredTrainees"] != DBNull.Value
+                                ? Convert.ToInt32(dr["nRequiredTrainees"])
+                                : 0;
+
+                            item.nGenderID =
+                                dr["nGenderID"] != DBNull.Value
+                                ? Convert.ToInt32(dr["nGenderID"])
+                                : 0;
+
+                            item.sGenderName =
+                                dr["sGenderName"]?.ToString() ?? "";
+
+                            item.nMinimumQualificationID =
+                                dr["nMinimumQualificationID"] != DBNull.Value
+                                ? Convert.ToInt32(dr["nMinimumQualificationID"])
+                                : 0;
+
+                            item.sMinimumQualificationName =
+                                dr["sMinimumQualificationName"]?.ToString() ?? "";
+
+                            item.sCountryName =
+                                dr["sCountryName"]?.ToString() ?? "";
+
+                            item.sStateName =
+                                dr["sStateName"]?.ToString() ?? "";
+
+                            item.nCityName =
+                                dr["nCityName"]?.ToString() ?? "";
+
+                            item.sWorkingHours =
+                                dr["sWorkingHours"]?.ToString() ?? "";
+
+                            item.nInternshipTypeID =
+                                dr["nInternshipTypeID"] != DBNull.Value
+                                ? Convert.ToInt32(dr["nInternshipTypeID"])
+                                : 0;
+
+                            item.sInternshipTypeName =
+                                dr["sInternshipTypeName"]?.ToString() ?? "";
+
+                            item.sWorkingShift =
+                                dr["sWorkingShift"]?.ToString() ?? "";
+
+                            item.nInternshipFellowshipTypeID =
+                                dr["nInternshipFellowshipTypeID"] != DBNull.Value
+                                ? Convert.ToInt32(dr["nInternshipFellowshipTypeID"])
+                                : 0;
+
+                            item.sInternshipFellowshipTypeName =
+                                dr["sInternshipFellowshipTypeName"]?.ToString() ?? "";
+
+                            item.sTotalCharges =
+                                dr["sTotalCharges"] != DBNull.Value
+                                ? Convert.ToDecimal(dr["sTotalCharges"])
+                                : null;
+
+                            item.sCurrency =
+                                dr["sCurrency"]?.ToString() ?? "";
+
+                            item.nTrainingInvolvedID =
+                                dr["nTrainingInvolvedID"] != DBNull.Value
+                                ? Convert.ToInt32(dr["nTrainingInvolvedID"])
+                                : 0;
+
+                            item.sTrainingInvolvedName =
+                                dr["sTrainingInvolvedName"]?.ToString() ?? "";
+
+                            item.nInternshipDurationID =
+                                dr["nInternshipDurationID"] != DBNull.Value
+                                ? Convert.ToInt32(dr["nInternshipDurationID"])
+                                : 0;
+
+                            item.sInternshipDurationName =
+                                dr["sInternshipDurationName"]?.ToString() ?? "";
+
+                            item.dStartDate =
+                                dr["dStartDate"] != DBNull.Value
+                                ? Convert.ToDateTime(dr["dStartDate"])
+                                : DateTime.MinValue;
+
+                            item.dCompletionDate =
+                                dr["dCompletionDate"] != DBNull.Value
+                                ? Convert.ToDateTime(dr["dCompletionDate"])
+                                : DateTime.MinValue;
+
+                            item.nInternshipModeID =
+                                dr["nInternshipModeID"] != DBNull.Value
+                                ? Convert.ToInt32(dr["nInternshipModeID"])
+                                : 0;
+
+                            item.sInternshipModeName =
+                                dr["sInternshipModeName"]?.ToString() ?? "";
+
+                            item.sDivyang =
+                                dr["sDivyang"]?.ToString() ?? "";
+
+                            item.sLanguageKnown =
+                                dr["sLanguageKnown"]?.ToString() ?? "";
+
+                            item.sWorkingDays =
+                                dr["sWorkingDays"]?.ToString() ?? "";
+
+                            item.sFacilities =
+                                dr["sFacilities"]?.ToString() ?? "";
+
+                            item.sTechnicalSkills =
+                                dr["sTechnicalSkills"]?.ToString() ?? "";
+
+                            item.sMedicalSkills =
+                                dr["sMedicalSkills"]?.ToString() ?? "";
+
+                            item.sNonTechnicalSkills =
+                                dr["sNonTechnicalSkills"]?.ToString() ?? "";
+
+                            item.dRegisterDate =
+                                dr["dRegisterDate"] != DBNull.Value
+                                ? Convert.ToDateTime(dr["dRegisterDate"])
+                                : null;
+
+                            item.dModDate =
+                                dr["dModDate"] != DBNull.Value
+                                ? Convert.ToDateTime(dr["dModDate"])
+                                : null;
+
+                            item.nBit =
+                                dr["nBit"] != DBNull.Value &&
+                                Convert.ToBoolean(dr["nBit"]);
+
+                            item.nSABit =
+                                dr["nSABit"] != DBNull.Value &&
+                                Convert.ToBoolean(dr["nSABit"]);
+
+                            item.nOrgID =
+                                dr["nOrgID"] != DBNull.Value
+                                ? Convert.ToInt32(dr["nOrgID"])
+                                : 0;
+
+                            posts.Add(item);
+                        }
+                    }
+                }
+            }
+
+            return View(posts);
+        }
+
+
+
+
+        [HttpPost]
+        public IActionResult ToggleOrganizationStatus(int id, bool status)
+        {
+            try
+            {
+                using (SqlConnection con = new SqlConnection(
+                    _configuration.GetConnectionString("DefaultConnection")))
+                {
+                    string query = @"
+                UPDATE tblOrgProfile
+                SET nBit = @nBit
+                WHERE nID = @nID
+            ";
+
+                    using (SqlCommand cmd = new SqlCommand(query, con))
+                    {
+                        cmd.Parameters.Add("@nBit", SqlDbType.Bit).Value = status;
+                        cmd.Parameters.Add("@nID", SqlDbType.Int).Value = id;
+
+                        con.Open();
+
+                        int rowsAffected = cmd.ExecuteNonQuery();
+
+                        if (rowsAffected == 0)
+                        {
+                            return Json(new
+                            {
+                                success = false,
+                                message = "Organization profile not found."
+                            });
+                        }
+                    }
+                }
+
+                return Json(new
+                {
+                    success = true,
+                    status = status
+                });
+            }
+            catch (Exception ex)
+            {
+                return Json(new
+                {
+                    success = false,
+                    message = ex.Message
+                });
+            }
+        }
+
         [HttpGet]
         [Route("SuperAdmin/AddObjective/{id:int}")]
         public IActionResult AddObjective()

@@ -1,4 +1,6 @@
-﻿@{
+﻿@model List<ErJobPortal.Models.HomeTraineeCardM>
+
+@{
 	ViewData["Title"] = "Home";
 	ViewData["BodyClass"] = "home-page";
 }
@@ -506,7 +508,9 @@
 	</div><!--- END CONTAINER -->
 </section>
 <!-- END VIDEO -->
-<!-- START TEAM -->
+
+
+@* <!-- START TEAM -->
 <section class="team_area section-padding">
 	<div class="container">
 		<div class="section-title text-center">
@@ -597,7 +601,225 @@
 		</div><!--- END ROW -->
 	</div><!--- END CONTAINER -->
 </section>
+<!-- END TEAM --> *@
+<!-- START TEAM -->
+<!-- =========================================================
+     START TRAINEE SECTION
+========================================================= -->
+
+<section class="team_area">
+
+    <div class="container">
+
+        <!-- SECTION TITLE -->
+        <div class="section-title text-center">
+
+            <span class="team-subtitle">
+                OUR TRAINEES
+            </span>
+
+            <h2>
+                Meet Our Trainees
+            </h2>
+
+            <p>
+                Meet our talented trainees who are developing their skills,
+                gaining experience and building their careers.
+            </p>
+
+        </div>
+
+
+        <!-- =================================================
+             SLIDER
+        ================================================== -->
+
+        <div class="trainee-slider-wrapper">
+
+            <div class="trainee-slider-track">
+
+                @if (Model != null && Model.Any())
+                {
+
+                    <!-- =====================================
+                         FIRST SET OF CARDS
+                    ====================================== -->
+
+                    foreach (var trainee in Model)
+                    {
+
+                        <div class="trainee-slide">
+
+                            <div class="our-team">
+
+                                <!-- IMAGE -->
+                                <div class="team-content">
+
+                                    <a href="javascript:void(0);">
+
+                                        @if (!string.IsNullOrWhiteSpace(trainee.ProfileImage))
+                                        {
+                                            <img src="~/uploads/candidates/@trainee.ProfileImage"
+                                                 alt="@trainee.TraineeName"
+                                                 class="trainee-profile-image" />
+                                        }
+                                        else
+                                        {
+                                            <img src="~/assets/img/team/default-profile.png"
+                                                 alt="Profile"
+                                                 class="trainee-profile-image" />
+                                        }
+
+                                    </a>
+
+                                </div>
+
+
+                                <!-- NAME + DESIGNATION -->
+                                <div class="team-prof">
+
+                                    <h3>
+                                        @trainee.TraineeName
+                                    </h3>
+
+                                    <span>
+                                        @(string.IsNullOrWhiteSpace(trainee.Designation)
+                                            ? "Trainee"
+                                            : trainee.Designation)
+                                    </span>
+
+                                </div>
+
+
+                                <!-- LOCATION -->
+                                <div class="sth_det2">
+
+                                    <span class="ti-location-pin"></span>
+
+                                    <u>
+                                        @(string.IsNullOrWhiteSpace(trainee.Location)
+                                            ? "Location not available"
+                                            : trainee.Location)
+                                    </u>
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                    }
+
+
+                    <!-- =====================================
+                         SECOND SET
+                         Required for infinite animation
+                    ====================================== -->
+
+                    foreach (var trainee in Model)
+                    {
+
+                        <div class="trainee-slide">
+
+                            <div class="our-team">
+
+                                <!-- IMAGE -->
+                                <div class="team-content">
+
+                                    <a href="javascript:void(0);">
+
+                                        @if (!string.IsNullOrWhiteSpace(trainee.ProfileImage))
+                                        {
+                                            <img src="~/uploads/candidates/@trainee.ProfileImage"
+                                                 alt="@trainee.TraineeName"
+                                                 class="trainee-profile-image" />
+                                        }
+                                        else
+                                        {
+                                            <img src="~/assets/img/team/default-profile.png"
+                                                 alt="Profile"
+                                                 class="trainee-profile-image" />
+                                        }
+
+                                    </a>
+
+                                </div>
+
+
+                                <!-- NAME + DESIGNATION -->
+                                <div class="team-prof">
+
+                                    <h3>
+                                        @trainee.TraineeName
+                                    </h3>
+
+                                    <span>
+                                        @(string.IsNullOrWhiteSpace(trainee.Designation)
+                                            ? "Trainee"
+                                            : trainee.Designation)
+                                    </span>
+
+                                </div>
+
+
+                                <!-- LOCATION -->
+                                <div class="sth_det2">
+
+                                    <span class="ti-location-pin"></span>
+
+                                    <u>
+                                        @(string.IsNullOrWhiteSpace(trainee.Location)
+                                            ? "Location not available"
+                                            : trainee.Location)
+                                    </u>
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                    }
+
+                }
+                else
+                {
+
+                    <!-- NO DATA -->
+
+                    <div class="no-trainee">
+
+                        <div class="no-trainee-icon">
+                            <i class="ti-user"></i>
+                        </div>
+
+                        <h4>
+                            No Trainees Available
+                        </h4>
+
+                        <p>
+                            Trainee profiles will appear here once available.
+                        </p>
+
+                    </div>
+
+                }
+
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
+
+<!-- =========================================================
+     END TRAINEE SECTION
+========================================================= -->
 <!-- END TEAM -->
+
+
+
 <!-- START PROMO -->
 <section class="ab_area section-padding">
 	<div class="container">

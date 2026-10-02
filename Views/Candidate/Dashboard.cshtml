@@ -1273,8 +1273,8 @@
 
                         @{
                             var internshipPosts =
-                            ViewBag.InternshipPosts as List<JobPortalTrainee.Models.OrgPostM>
-                            ?? new List<JobPortalTrainee.Models.OrgPostM>();
+                            ViewBag.InternshipPosts as List<ErJobPortal.Models.OrgPostM>
+                            ?? new List<ErJobPortal.Models.OrgPostM>();
 
                             int srNo = 1;
                         }
@@ -1379,17 +1379,11 @@
 
 @if (TempData["ApplyMessage"] != null)
 {
-    var message =
-        TempData["ApplyMessage"]?.ToString();
-
-    var messageType =
-        TempData["ApplyMessageType"]?.ToString();
-
+    var message = TempData["ApplyMessage"]?.ToString();
+    var messageType = TempData["ApplyMessageType"]?.ToString();
     <script>
         document.addEventListener("DOMContentLoaded", function () {
-
             alert("@Html.Raw(message)");
-
         });
     </script>
 }

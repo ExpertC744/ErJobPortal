@@ -77,7 +77,7 @@ body.site-modern {
         position: relative;
     }
 
-        body.site-modern .section-title::before {
+/*        body.site-modern .section-title::before {
             content: "";
             display: inline-block;
             width: 46px;
@@ -86,7 +86,7 @@ body.site-modern {
             background: linear-gradient(90deg, var(--brand-500), var(--brand-700));
             margin-bottom: 16px;
         }
-
+*/
         body.site-modern .section-title.text-center::before {
             margin-left: auto;
             margin-right: auto;
@@ -3300,3 +3300,496 @@ body.site-modern {
     z-index: 2;
 }
 
+
+
+
+------------------Sanidhya--------------------
+/* =========================================================
+   TRAINEE SECTION
+========================================================= */
+.team_area {
+    position: relative;
+    padding: 90px 0;
+    background: #f8fafc;
+    overflow: hidden;
+}
+
+
+/* =========================================================
+   SECTION TITLE
+========================================================= */
+
+.team_area .section-title {
+    margin-bottom: 50px;
+}
+
+
+/* Small heading */
+
+.team-subtitle {
+    display: inline-block;
+    margin-bottom: 10px;
+    color: #1e7b67;
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+}
+
+
+/* Main heading */
+
+.team_area .section-title h2 {
+    margin: 0 0 15px;
+    color: #172033;
+    font-size: 40px;
+    font-weight: 800;
+    line-height: 1.2;
+}
+
+
+/* Description */
+
+.team_area .section-title p {
+    max-width: 700px;
+    margin: 0 auto;
+    color: #64748b;
+    font-size: 16px;
+    line-height: 1.7;
+}
+
+
+/* =========================================================
+   SLIDER WRAPPER
+========================================================= */
+
+.trainee-slider-wrapper {
+    width: 100%;
+    position: relative;
+    overflow: hidden;
+    padding: 15px 0 30px;
+}
+
+
+    /* =========================================================
+   LEFT FADE
+========================================================= */
+
+    .trainee-slider-wrapper::before {
+        content: "";
+        position: absolute;
+        left: 0;
+        top: 0;
+        bottom: 0;
+        width: 100px;
+        z-index: 5;
+        pointer-events: none;
+        background: linear-gradient( to right, #f8fafc, rgba(248, 250, 252, 0) );
+    }
+
+
+    /* =========================================================
+   RIGHT FADE
+========================================================= */
+
+    .trainee-slider-wrapper::after {
+        content: "";
+        position: absolute;
+        right: 0;
+        top: 0;
+        bottom: 0;
+        width: 100px;
+        z-index: 5;
+        pointer-events: none;
+        background: linear-gradient( to left, #f8fafc, rgba(248, 250, 252, 0) );
+    }
+
+
+/* =========================================================
+   SLIDER TRACK
+========================================================= */
+
+.trainee-slider-track {
+    display: flex;
+    align-items: stretch;
+    gap: 28px;
+    width: max-content;
+    will-change: transform;
+    animation: traineeRightToLeft 35s linear infinite;
+}
+
+
+/* =========================================================
+   PAUSE SLIDER ON HOVER
+========================================================= */
+
+.trainee-slider-wrapper:hover .trainee-slider-track {
+    animation-play-state: paused;
+}
+
+
+/* =========================================================
+   INDIVIDUAL SLIDE
+========================================================= */
+
+.trainee-slide {
+    width: 270px;
+    min-width: 270px;
+    max-width: 270px;
+    flex: 0 0 270px;
+}
+
+
+/* =========================================================
+   TRAINEE CARD
+========================================================= */
+
+.our-team {
+    position: relative;
+    width: 100%;
+    background: #ffffff;
+    border-radius: 18px;
+    overflow: hidden;
+    border: 1px solid rgba(30, 123, 103, 0.08);
+    box-shadow: 0 8px 25px rgba(15, 23, 42, 0.07);
+    transition: transform 0.35s ease, box-shadow 0.35s ease;
+}
+
+
+    /* Card hover */
+
+    .our-team:hover {
+        transform: translateY(-10px);
+        box-shadow: 0 20px 45px rgba(15, 23, 42, 0.14);
+    }
+
+
+    /* =========================================================
+   IMAGE CONTAINER
+========================================================= */
+
+    .our-team .team-content {
+        position: relative;
+        width: 100%;
+        height: 280px;
+        overflow: hidden;
+        background: #eaf4f1;
+    }
+
+
+/* =========================================================
+   IMAGE
+========================================================= */
+
+.trainee-profile-image {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center;
+    transition: transform 0.6s ease;
+}
+
+
+/* Image zoom */
+
+.our-team:hover .trainee-profile-image {
+    transform: scale(1.08);
+}
+
+
+/* =========================================================
+   IMAGE BOTTOM OVERLAY
+========================================================= */
+
+.our-team .team-content::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    height: 80px;
+    background: linear-gradient( to top, rgba(0, 0, 0, 0.25), transparent );
+    pointer-events: none;
+}
+
+
+/* =========================================================
+   NAME + DESIGNATION
+========================================================= */
+
+.our-team .team-prof {
+    padding: 20px 18px 8px;
+    text-align: center;
+}
+
+
+    /* Name */
+
+    .our-team .team-prof h3 {
+        margin: 0 0 8px;
+        color: #172033;
+        font-size: 19px;
+        font-weight: 700;
+        line-height: 1.3;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+
+    /* Designation */
+
+    .our-team .team-prof span {
+        display: block;
+        min-height: 20px;
+        color: #1e7b67;
+        font-size: 13px;
+        font-weight: 600;
+        line-height: 1.4;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+
+/* =========================================================
+   LOCATION
+========================================================= */
+
+.our-team .sth_det2 {
+    padding: 8px 18px 20px;
+    color: #64748b;
+    font-size: 13px;
+    line-height: 1.4;
+    text-align: center;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+
+    /* Location icon */
+
+    .our-team .sth_det2 .ti-location-pin {
+        display: inline-block;
+        margin-right: 5px;
+        color: #1e7b67;
+        font-size: 15px;
+        vertical-align: middle;
+    }
+
+
+    /* Remove underline from location */
+
+    .our-team .sth_det2 u {
+        text-decoration: none;
+    }
+
+
+/* =========================================================
+   INFINITE RIGHT → LEFT ANIMATION
+========================================================= */
+
+@keyframes traineeRightToLeft {
+
+    0% {
+        transform: translateX(0);
+    }
+
+    100% {
+        transform: translateX(-50%);
+    }
+}
+
+
+/* =========================================================
+   NO TRAINEE
+========================================================= */
+
+.no-trainee {
+    width: 100%;
+    min-width: 100vw;
+    padding: 60px 20px;
+    text-align: center;
+    color: #64748b;
+}
+
+
+/* No trainee icon */
+
+.no-trainee-icon {
+    width: 65px;
+    height: 65px;
+    margin: 0 auto 15px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    background: #eaf4f1;
+    color: #1e7b67;
+    font-size: 28px;
+}
+
+
+.no-trainee h4 {
+    margin-bottom: 8px;
+    color: #172033;
+    font-size: 20px;
+    font-weight: 700;
+}
+
+
+.no-trainee p {
+    margin: 0;
+    color: #64748b;
+    font-size: 14px;
+}
+
+
+/* =========================================================
+   RESPONSIVE - LARGE DESKTOP
+========================================================= */
+
+@media (min-width: 1400px) {
+
+    .trainee-slide {
+        width: 290px;
+        min-width: 290px;
+        max-width: 290px;
+        flex-basis: 290px;
+    }
+}
+
+
+/* =========================================================
+   RESPONSIVE - DESKTOP
+========================================================= */
+
+@media (max-width: 1199px) {
+
+    .team_area {
+        padding: 80px 0;
+    }
+
+    .trainee-slide {
+        width: 260px;
+        min-width: 260px;
+        max-width: 260px;
+        flex-basis: 260px;
+    }
+
+    .our-team .team-content {
+        height: 270px;
+    }
+}
+
+
+/* =========================================================
+   RESPONSIVE - TABLET
+========================================================= */
+
+@media (max-width: 991px) {
+
+    .team_area {
+        padding: 70px 0;
+    }
+
+        .team_area .section-title h2 {
+            font-size: 34px;
+        }
+
+    .trainee-slide {
+        width: 250px;
+        min-width: 250px;
+        max-width: 250px;
+        flex-basis: 250px;
+    }
+
+    .our-team .team-content {
+        height: 260px;
+    }
+}
+
+
+/* =========================================================
+   RESPONSIVE - MOBILE
+========================================================= */
+
+@media (max-width: 767px) {
+
+    .team_area {
+        padding: 60px 0;
+    }
+
+        .team_area .section-title {
+            margin-bottom: 35px;
+        }
+
+            .team_area .section-title h2 {
+                font-size: 30px;
+            }
+
+            .team_area .section-title p {
+                padding: 0 15px;
+                font-size: 14px;
+            }
+
+    .trainee-slide {
+        width: 240px;
+        min-width: 240px;
+        max-width: 240px;
+        flex-basis: 240px;
+    }
+
+    .our-team .team-content {
+        height: 250px;
+    }
+
+    .trainee-slider-track {
+        gap: 20px;
+    }
+}
+
+
+/* =========================================================
+   RESPONSIVE - SMALL MOBILE
+========================================================= */
+
+@media (max-width: 480px) {
+
+    .team_area {
+        padding: 50px 0;
+    }
+
+        .team_area .section-title h2 {
+            font-size: 27px;
+        }
+
+        .team_area .section-title p {
+            font-size: 13px;
+        }
+
+    .trainee-slide {
+        width: 220px;
+        min-width: 220px;
+        max-width: 220px;
+        flex-basis: 220px;
+    }
+
+    .our-team .team-content {
+        height: 230px;
+    }
+
+    .our-team .team-prof h3 {
+        font-size: 17px;
+    }
+
+    .our-team .team-prof span {
+        font-size: 12px;
+    }
+
+    .our-team .sth_det2 {
+        font-size: 12px;
+    }
+}
