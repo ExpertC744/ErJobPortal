@@ -188,6 +188,9 @@ namespace JobPortalTrainee.Models
         public int nOrgID { get; set; }
 
 
+        public string sOrgName { get; set; } = string.Empty;
+        public string sOrgCode { get; set; } = string.Empty;
+
         // =========================================================
         // DISPLAY MASTER DATA
         // =========================================================
