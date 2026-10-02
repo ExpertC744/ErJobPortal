@@ -1445,34 +1445,38 @@ WHERE CandidateID = @CandidateID";
         // =========================================================
         // GET CANDIDATE BASIC INFO (NAME, EMAIL, PHONE)
         // =========================================================
-        public CandidateRegister? GetCandidateBasicInfo(int candidateId)
+        // shrirang 02/10/26
+        public CandidateBasicInfoModel? GetCandidateBasicInfo(int candidateId)
         {
             using SqlConnection con = _db.GetConnection();
 
-            // NOTE: If your master table is named 'tblCandidate' instead of 'tblCandidateRegister', change it here!
-            string query = @"
-        SELECT 
-            sFName, 
-            sLName, 
-            sEmail, 
-            sMobile 
-        FROM tblCandidateRegister 
-        WHERE nID = @CandidateID"; // Note: If your table uses CandidateID as the column name, change 'nID' to 'CandidateID'
+            const string sql = @"
+SELECT
+    nID,
+    sFName,
+    sLName,
+    sEmail,
+    sMobile
+FROM tblCandidateRegister
+WHERE nID = @CandidateID";
 
-            using SqlCommand cmd = new SqlCommand(query, con);
-            cmd.Parameters.Add("@CandidateID", SqlDbType.Int).Value = candidateId;
+            using SqlCommand cmd = new SqlCommand(sql, con);
+
+            cmd.Parameters.AddWithValue("@CandidateID", candidateId);
 
             con.Open();
-            using SqlDataReader dr = cmd.ExecuteReader();
 
-            if (dr.Read())
+            using SqlDataReader reader = cmd.ExecuteReader();
+
+            if (reader.Read())
             {
-                return new CandidateRegister
+                return new CandidateBasicInfoModel
                 {
-                    sFName = GetString(dr, "sFName"),
-                    sLName = GetString(dr, "sLName"),
-                    sEmail = GetString(dr, "sEmail"),
-                    sMobile = GetString(dr, "sMobile")
+                    CandidateID = Convert.ToInt32(reader["nID"]),
+                    sFName = reader["sFName"]?.ToString() ?? "",
+                    sLName = reader["sLName"]?.ToString() ?? "",
+                    sEmail = reader["sEmail"]?.ToString() ?? "",
+                    sMobile = reader["sMobile"]?.ToString() ?? ""
                 };
             }
 

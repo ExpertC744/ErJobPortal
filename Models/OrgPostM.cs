@@ -1,7 +1,7 @@
 ﻿using ErJobPortal.Models;
 using System.ComponentModel.DataAnnotations;
 
-namespace JobPortalTrainee.Models
+namespace ErJobPortal.Models
 {
     public class OrgPostM
     {
@@ -72,7 +72,7 @@ namespace JobPortalTrainee.Models
         [Range(1, int.MaxValue, ErrorMessage = "Please select a valid internship duration.")]
         public int nInternshipDurationID { get; set; }
 
-        public DateTime dStartDate { get; set; }
+        public DateTime? dStartDate { get; set; }
         public DateTime dCompletionDate { get; set; }
 
         // Mode
@@ -225,6 +225,9 @@ namespace JobPortalTrainee.Models
         //for matching jobs 
         public string? OrganizationName { get; set; }
         public string? InternshipFellowshipTypeName { get; set; }
+
+
+
 
 
     }
