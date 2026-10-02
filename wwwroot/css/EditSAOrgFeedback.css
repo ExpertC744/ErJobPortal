@@ -1,131 +1,121 @@
 ﻿/* =========================================================
-   1TRAINEE - EDIT ORGANIZATION FEEDBACK
-   DESIGN ONLY
+   EDIT ORGANIZATION FEEDBACK
    ========================================================= */
 
-.feedback-edit-card {
+.feedback-page {
     width: 100%;
-    margin: 0;
-    padding: 0 0 30px;
-    background: transparent;
-    border: none;
-    box-shadow: none;
+    padding: 34px 34px 60px 34px;
     box-sizing: border-box;
 }
 
 
 /* =========================================================
-   PAGE TITLE
+   PAGE HEADER
    ========================================================= */
 
-.feedback-title {
-    position: relative;
-    margin: 0 0 24px;
-    padding-left: 14px;
-    color: #0f172a;
-    font-family: Arial, Helvetica, sans-serif;
-    font-size: 26px;
-    font-weight: 700;
-    line-height: 1.25;
+.feedback-page-header {
+    margin-bottom: 28px;
+    padding-left: 17px;
+    border-left: 5px solid #0d9488;
 }
 
-    .feedback-title::before {
-        content: "";
-        position: absolute;
-        left: 0;
-        top: 2px;
-        width: 4px;
-        height: 28px;
-        background: #0d9488;
-        border-radius: 4px;
+
+.feedback-page-title {
+    margin: 0;
+    color: #0f172a;
+    font-size: 32px;
+    line-height: 1.25;
+    font-weight: 700;
+    letter-spacing: -0.4px;
+}
+
+
+.feedback-page-subtitle {
+    margin: 7px 0 0 0;
+    color: #64748b;
+    font-size: 14px;
+    line-height: 1.5;
+}
+
+
+/* =========================================================
+   FORM
+   ========================================================= */
+
+.feedback-form {
+    width: 100%;
+}
+
+
+/* =========================================================
+   QUESTION CARD
+   ========================================================= */
+
+.question-card {
+    width: 100%;
+    box-sizing: border-box;
+    background: #ffffff;
+    border: 1px solid #dbe4eb;
+    border-radius: 16px;
+    padding: 24px 26px 28px 26px;
+    margin-bottom: 18px;
+    box-shadow: 0 3px 12px rgba(15, 23, 42, 0.035);
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+
+    .question-card:hover {
+        border-color: #cbd8e2;
+        box-shadow: 0 5px 18px rgba(15, 23, 42, 0.055);
     }
 
 
 /* =========================================================
-   QUESTION LABEL
+   QUESTION HEADER
    ========================================================= */
 
-.question-label {
-    position: relative;
+.question-header {
+    display: flex;
+    align-items: flex-start;
+    gap: 15px;
+}
+
+
+/* =========================================================
+   NUMBER
+   ========================================================= */
+
+.question-number {
+    flex: 0 0 auto;
+    width: 31px;
+    height: 31px;
     display: flex;
     align-items: center;
-    width: 100%;
-    min-height: 30px;
-    margin: 10px 0 10px;
-    padding: 0 0 0 42px;
-    color: #0f172a;
-    font-family: Arial, Helvetica, sans-serif;
+    justify-content: center;
+    border-radius: 9px;
+    background: #ccfbf1;
+    color: #0d9488;
     font-size: 14px;
-    font-weight: 600;
-    line-height: 30px;
-    box-sizing: border-box;
+    font-weight: 700;
 }
-
-
-    /* =========================================================
-   QUESTION NUMBER BADGE
-   ========================================================= */
-
-    .question-label::before {
-        content: "";
-        position: absolute;
-        left: 0;
-        top: 0;
-        width: 30px;
-        height: 30px;
-        background: #ccfbf1;
-        border-radius: 8px;
-    }
-
-
-    /* =========================================================
-   NUMBER INSIDE BADGE
-   ========================================================= */
-
-    .question-label::after {
-        position: absolute;
-        left: 0;
-        top: 0;
-        width: 30px;
-        height: 30px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        color: #0d9488;
-        font-family: Arial, Helvetica, sans-serif;
-        font-size: 14px;
-        font-weight: 700;
-        line-height: 1;
-    }
 
 
 /* =========================================================
-   QUESTION NUMBERS
+   QUESTION CONTENT
    ========================================================= */
 
-.question-section:nth-of-type(1)
-.question-label::after {
-    content: "1.";
+.question-content {
+    flex: 1;
+    min-width: 0;
 }
 
-.question-section:nth-of-type(2)
-.question-label::after {
-    content: "2.";
-}
 
-.question-section:nth-of-type(3)
-.question-label::after {
-    content: "3.";
-}
-
-.question-section:nth-of-type(4)
-.question-label::after {
-    content: "4.";
-}
-
-.question-section:nth-of-type(5)
-.question-label::after {
-    content: "5.";
+.question-label {
+    display: block;
+    margin-bottom: 9px;
+    color: #64748b;
+    font-size: 14px;
+    font-weight: 500;
 }
 
 
@@ -133,30 +123,35 @@
    QUESTION TEXTAREA
    ========================================================= */
 
-.question-textarea {
+.question-input {
     width: 100%;
-    min-height: 76px;
-    display: block;
-    margin: 0;
-    padding: 11px 13px;
-    background: #ffffff;
-    border: 1px solid #d2dde6;
-    border-radius: 8px;
-    outline: none;
-    color: #0f172a;
-    font-family: Arial, Helvetica, sans-serif;
-    font-size: 14px;
-    font-weight: 500;
-    line-height: 1.5;
-    resize: vertical;
+    min-height: 72px;
     box-sizing: border-box;
-    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    resize: vertical;
+    padding: 12px 14px;
+    border: 1px solid #d7e1e9;
+    border-radius: 10px;
+    outline: none;
+    background: #fbfcfd;
+    color: #0f172a;
+    font-family: inherit;
+    font-size: 16px;
+    font-weight: 600;
+    line-height: 1.55;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
 }
 
 
-    .question-textarea:focus {
-        border-color: #0d9488;
-        box-shadow: 0 0 0 3px rgba(13, 148, 136, 0.08);
+    .question-input::placeholder {
+        color: #9aa8b8;
+        font-weight: 400;
+    }
+
+
+    .question-input:focus {
+        background: #ffffff;
+        border-color: #14b8a6;
+        box-shadow: 0 0 0 3px rgba(20, 184, 166, 0.10);
     }
 
 
@@ -164,90 +159,103 @@
    ANSWER AREA
    ========================================================= */
 
-.answer-area {
-    min-height: 52px;
-    display: flex;
-    align-items: center;
-    margin: 15px 0 0;
-    padding: 0;
+.answer-block {
+    margin-left: 46px;
+    margin-top: 20px;
+}
+
+
+.answer-title {
+    margin-bottom: 12px;
+    color: #64748b;
+    font-size: 14px;
+    font-weight: 500;
 }
 
 
 /* =========================================================
-   TRUE / FALSE / YES / NO
+   TRUE / FALSE + YES / NO
    ========================================================= */
 
-.radio-option {
+.choice-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+
+.choice-card {
     position: relative;
-    min-width: 99px;
-    height: 52px;
-    display: inline-flex;
+    min-width: 122px;
+    height: 56px;
+    padding: 0 20px;
+    display: flex;
     align-items: center;
-    margin: 0 8px 0 0;
-    padding: 0 18px 0 45px;
-    background: #ffffff;
-    border: 1px solid #d6e0e8;
-    border-radius: 10px;
-    color: #0f172a;
-    font-family: Arial, Helvetica, sans-serif;
-    font-size: 18px;
-    font-weight: 400;
-    cursor: pointer;
+    gap: 10px;
     box-sizing: border-box;
+    border: 1px solid #d7e1e9;
+    border-radius: 11px;
+    background: #ffffff;
+    cursor: pointer;
+    transition: border-color 0.2s ease, background 0.2s ease, box-shadow 0.2s ease;
+}
+
+
+    .choice-card:hover {
+        border-color: #14b8a6;
+        background: #f8fffd;
+    }
+
+
+    .choice-card input {
+        position: absolute;
+        opacity: 0;
+        pointer-events: none;
+    }
+
+
+.choice-circle {
+    width: 24px;
+    height: 24px;
+    flex: 0 0 24px;
+    box-sizing: border-box;
+    border: 1.5px solid #aebdca;
+    border-radius: 50%;
+    position: relative;
     transition: border-color 0.2s ease, background 0.2s ease;
 }
 
 
-    /* =========================================================
-   RADIO INPUT
-   ========================================================= */
+.choice-card input:checked + .choice-circle {
+    border-color: #14a89b;
+    background: #ffffff;
+}
 
-    .radio-option input {
+
+    .choice-card input:checked + .choice-circle::after {
+        content: "";
         position: absolute;
-        left: 18px;
+        width: 12px;
+        height: 12px;
         top: 50%;
-        width: 20px;
-        height: 20px;
-        margin: 0;
-        transform: translateY(-50%);
-        appearance: none;
-        -webkit-appearance: none;
-        background: #ffffff;
-        border: 1.5px solid #9aabbc;
+        left: 50%;
+        transform: translate(-50%, -50%);
         border-radius: 50%;
-        box-sizing: border-box;
-        cursor: pointer;
+        background: #14a89b;
     }
 
 
-        /* Selected radio */
-
-        .radio-option input:checked {
-            border-color: #0d9488;
-        }
-
-
-            /* Inner circle */
-
-            .radio-option input:checked::after {
-                content: "";
-                position: absolute;
-                left: 50%;
-                top: 50%;
-                width: 10px;
-                height: 10px;
-                background: #0d9488;
-                border-radius: 50%;
-                transform: translate(-50%, -50%);
-            }
+.choice-card:has(input:checked) {
+    border-color: #c6e9e4;
+    background: #f8fffd;
+}
 
 
-    /* Selected button */
-
-    .radio-option:has(input:checked) {
-        border-color: #0d9488;
-        background: #f0fdfa;
-    }
+.choice-text {
+    color: #0f172a;
+    font-size: 17px;
+    font-weight: 500;
+}
 
 
 /* =========================================================
@@ -257,41 +265,40 @@
 .star-rating {
     display: flex;
     align-items: center;
-    gap: 7px;
-    margin: 0;
+    gap: 5px;
 }
 
 
-/* Individual star */
-
 .star {
-    width: 25px;
-    height: 30px;
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    color: #c7c7c7;
-    font-family: Arial, Helvetica, sans-serif;
-    font-size: 28px;
-    font-weight: 400;
+    width: 34px;
+    height: 34px;
+    color: #cbd5df;
+    font-size: 31px;
     line-height: 1;
     cursor: pointer;
+    user-select: none;
     transition: color 0.15s ease, transform 0.15s ease;
 }
 
 
-    /* Active star */
-
-    .star.active {
-        color: #f59e0b;
-    }
-
-
-    /* Hover */
-
     .star:hover {
         transform: scale(1.08);
     }
+
+
+    .star.active {
+        color: #0d9488;
+    }
+
+
+.rating-help {
+    margin-top: 8px;
+    color: #94a3b8;
+    font-size: 12px;
+}
 
 
 /* =========================================================
@@ -301,110 +308,67 @@
 .emoji-rating {
     display: flex;
     align-items: center;
-    gap: 10px;
+    gap: 12px;
 }
 
 
-/* =========================================================
-   COLORED EMOJI
-   ========================================================= */
-
 .emoji {
-    width: 38px;
-    height: 38px;
+    width: 46px;
+    height: 46px;
     display: flex;
     align-items: center;
     justify-content: center;
-    background: #ffffff;
-    border: 1px solid #d6e0e8;
-    border-radius: 50%;
-    /* Important for Windows Chrome */
-    font-family: "Segoe UI Emoji", "Noto Color Emoji", sans-serif;
-    font-size: 23px;
-    font-weight: normal;
-    /* Do NOT use opacity/filter on emoji */
-    opacity: 1;
-    filter: none;
+    border: 1px solid transparent;
+    border-radius: 10px;
+    font-size: 29px;
     cursor: pointer;
-    box-sizing: border-box;
-    transition: background 0.2s ease, border-color 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
+    transition: transform 0.2s ease, border-color 0.2s ease, background 0.2s ease;
 }
 
-
-    /* =========================================================
-   HOVER
-   ========================================================= */
 
     .emoji:hover {
-        background: #f0fdfa;
-        border-color: #0d9488;
-        transform: scale(1.12);
-        box-shadow: 0 3px 8px rgba(13, 148, 136, 0.15);
+        transform: translateY(-2px);
     }
 
-
-    /* =========================================================
-   SELECTED
-   ========================================================= */
 
     .emoji.active {
-        opacity: 1;
-        filter: none;
-        background: #ccfbf1;
-        border: 2px solid #0d9488;
-        transform: scale(1.08);
-        box-shadow: 0 3px 8px rgba(13, 148, 136, 0.18);
+        border-color: #bfe9e3;
+        background: #f0fdfa;
+        transform: translateY(-2px);
     }
-
-
-        /* =========================================================
-   SELECTED + HOVER
-   ========================================================= */
-
-        .emoji.active:hover {
-            background: #ccfbf1;
-            border-color: #0f766e;
-            transform: scale(1.14);
-        }
 
 
 /* =========================================================
-   MOBILE
+   DESCRIPTION
    ========================================================= */
 
-@media (max-width: 767px) {
-
-    .emoji {
-        width: 35px;
-        height: 35px;
-        font-size: 21px;
-    }
-
-    .emoji-rating {
-        gap: 8px;
-    }
-}
-
-/* =========================================================
-   DESCRIPTION LABEL
-   ========================================================= */
-
-.description-label {
-    margin: 15px 0 8px;
-    color: #64748b;
-    font-family: Arial, Helvetica, sans-serif;
-    font-size: 13px;
-    font-weight: 500;
-    line-height: 1.4;
+.description-input {
+    width: 100%;
+    min-height: 120px;
+    box-sizing: border-box;
+    resize: vertical;
+    padding: 13px 15px;
+    border: 1px solid #d7e1e9;
+    border-radius: 10px;
+    outline: none;
+    background: #fbfcfd;
+    color: #0f172a;
+    font-family: inherit;
+    font-size: 15px;
+    line-height: 1.6;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
 }
 
 
-    /* =========================================================
-   DESCRIPTION TEXTAREA
-   ========================================================= */
+    .description-input::placeholder {
+        color: #9aa8b8;
+    }
 
-    .description-label + .question-textarea {
-        min-height: 100px;
+
+    .description-input:focus {
+        background: #ffffff;
+        border-color: #14b8a6;
+        box-shadow: 0 0 0 3px rgba(20, 184, 166, 0.10);
     }
 
 
@@ -413,209 +377,211 @@
    ========================================================= */
 
 .save-area {
-    width: 100%;
     display: flex;
     justify-content: flex-end;
-    margin: 20px 0 0;
-    padding: 0;
+    align-items: center;
+    padding-top: 8px;
 }
 
-
-/* =========================================================
-   SAVE BUTTON
-   ========================================================= */
 
 .save-button {
-    min-width: 104px;
-    height: 37px;
-    padding: 0 20px;
+    min-width: 155px;
+    height: 46px;
+    padding: 0 22px;
     border: none;
-    border-radius: 7px;
+    border-radius: 9px;
     background: #0d9488;
     color: #ffffff;
-    font-family: Arial, Helvetica, sans-serif;
-    font-size: 13px;
+    font-family: inherit;
+    font-size: 15px;
     font-weight: 600;
     cursor: pointer;
-    box-shadow: 0 4px 10px rgba(13, 148, 136, 0.18);
-    transition: background 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    box-shadow: 0 5px 12px rgba(13, 148, 136, 0.16);
+    transition: background 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
 }
+
 
     .save-button:hover {
         background: #0f766e;
-        box-shadow: 0 5px 13px rgba(13, 148, 136, 0.22);
+        transform: translateY(-1px);
+        box-shadow: 0 7px 16px rgba(13, 148, 136, 0.20);
     }
+
 
     .save-button:active {
-        transform: translateY(1px);
+        transform: translateY(0);
     }
 
 
-/* =========================================================
-   TABLET
-   ========================================================= */
-
-@media (max-width: 991px) {
-
-    .feedback-title {
-        font-size: 24px;
-    }
-
-    .question-section {
-        padding: 17px 18px 20px;
-    }
+.save-icon {
+    font-size: 16px;
+    line-height: 1;
 }
 
 
 /* =========================================================
-   MOBILE
+   RESPONSIVE
    ========================================================= */
 
-@media (max-width: 767px) {
+@media (max-width: 992px) {
 
-    .feedback-edit-card {
-        padding-bottom: 25px;
+    .feedback-page {
+        padding: 28px 24px 50px 24px;
     }
 
-    .feedback-title {
-        margin-bottom: 18px;
-        padding-left: 12px;
-        font-size: 22px;
+    .feedback-page-title {
+        font-size: 29px;
     }
 
-        .feedback-title::before {
-            height: 25px;
-        }
+    .question-card {
+        padding: 22px;
+    }
+}
 
-    .question-section {
-        margin-bottom: 12px;
-        padding: 16px;
-        border-radius: 11px;
+
+@media (max-width: 768px) {
+
+    .feedback-page {
+        padding: 24px 16px 45px 16px;
     }
 
-    .question-label {
-        margin-bottom: 10px;
-        padding-left: 32px;
-        font-size: 13px;
+
+    .feedback-page-header {
+        padding-left: 13px;
+        margin-bottom: 22px;
     }
 
-        .question-label::before,
-        .question-label::after {
-            width: 23px;
-            height: 23px;
-        }
 
-        .question-label::after {
-            font-size: 12px;
-        }
-
-    .question-textarea {
-        min-height: 75px;
-        padding: 9px 11px;
-        font-size: 13px;
-    }
-
-    .answer-area {
-        min-height: 46px;
-        margin-top: 14px;
-    }
-
-    .radio-option {
-        min-width: 85px;
-        height: 46px;
-        padding: 0 15px 0 39px;
-        font-size: 15px;
-        border-radius: 9px;
-    }
-
-        .radio-option input {
-            left: 14px;
-            width: 18px;
-            height: 18px;
-        }
-
-            .radio-option input:checked::after {
-                width: 9px;
-                height: 9px;
-            }
-
-    .star-rating {
-        gap: 5px;
-    }
-
-    .star {
-        width: 23px;
+    .feedback-page-title {
         font-size: 26px;
     }
 
-    .emoji-rating {
-        gap: 8px;
+
+    .feedback-page-subtitle {
+        font-size: 13px;
     }
 
-    .emoji {
-        width: 32px;
-        height: 32px;
-        font-size: 18px;
+
+    .question-card {
+        padding: 20px 18px 22px 18px;
+        border-radius: 13px;
     }
 
-    .description-label {
-        margin-top: 14px;
-        font-size: 12px;
+
+    .question-header {
+        gap: 11px;
     }
 
-        .description-label + .question-textarea {
-            min-height: 100px;
-        }
+
+    .question-number {
+        width: 29px;
+        height: 29px;
+        font-size: 13px;
+    }
+
+
+    .question-input {
+        font-size: 15px;
+    }
+
+
+    .answer-block {
+        margin-left: 40px;
+        margin-top: 18px;
+    }
+
+
+    .choice-card {
+        min-width: 115px;
+        height: 52px;
+    }
+
 
     .save-area {
-        margin-top: 17px;
+        justify-content: center;
     }
 
-    .save-button {
-        width: 100%;
-        height: 40px;
-    }
+
+    
 }
 
 
-/* =========================================================
-   SMALL MOBILE
-   ========================================================= */
+@media (max-width: 480px) {
 
-@media (max-width: 420px) {
-
-    .question-section {
-        padding: 14px;
+    .feedback-page {
+        padding: 20px 12px 40px 12px;
     }
 
-    .question-label {
-        padding-left: 31px;
+
+    .feedback-page-title {
+        font-size: 23px;
     }
 
-    .question-textarea {
-        font-size: 12.5px;
+
+    .question-card {
+        padding: 17px 14px 20px 14px;
     }
 
-    .radio-option {
-        min-width: 80px;
-        height: 44px;
-        padding-left: 37px;
-        font-size: 14px;
+
+    .question-header {
+        align-items: flex-start;
     }
 
-        .radio-option input {
-            left: 13px;
-        }
+
+    .question-number {
+        width: 27px;
+        height: 27px;
+        border-radius: 8px;
+    }
+
+
+    .answer-block {
+        margin-left: 0;
+        margin-top: 17px;
+    }
+
+
+    .choice-row {
+        gap: 8px;
+    }
+
+
+    .choice-card {
+        flex: 1;
+        min-width: 105px;
+        padding: 0 13px;
+    }
+
+
+    .choice-text {
+        font-size: 15px;
+    }
+
 
     .star-rating {
-        gap: 3px;
+        gap: 2px;
     }
+
 
     .star {
-        font-size: 25px;
+        width: 31px;
+        height: 31px;
+        font-size: 28px;
     }
 
+
     .emoji-rating {
-        gap: 6px;
+        gap: 5px;
+    }
+
+
+    .emoji {
+        width: 40px;
+        height: 40px;
+        font-size: 25px;
     }
 }

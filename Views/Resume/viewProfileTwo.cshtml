@@ -3,192 +3,49 @@
 @{
     Layout = null;
 
-    // =========================================================
-    // ADDRESS
-    // =========================================================
-
-    var addressParts = new List<string>();
-
-    if (!string.IsNullOrWhiteSpace(Model.City))
-        addressParts.Add(Model.City);
-
-    if (!string.IsNullOrWhiteSpace(Model.State))
-        addressParts.Add(Model.State);
-
-    if (!string.IsNullOrWhiteSpace(Model.Country))
-        addressParts.Add(Model.Country);
-
-    if (!string.IsNullOrWhiteSpace(Model.Pincode))
-        addressParts.Add(Model.Pincode);
-
-    var address = !string.IsNullOrWhiteSpace(Model.Address)
-        ? Model.Address
-        : string.Join(", ", addressParts);
-
-
-    // =========================================================
-    // LANGUAGES
-    // =========================================================
-
-    var languages = new[]
-    {
-        Model.Language1,
-        Model.Language2,
-        Model.Language3,
-        Model.Language4,
-        Model.Language5,
-        Model.Language6
-    }
-    .Where(x => !string.IsNullOrWhiteSpace(x))
-    .ToList();
-
-
-    // =========================================================
-    // SKILLS
-    // =========================================================
+    ViewData["Title"] = "Resume";
 
     var p = Model.Profile;
 
-    string GetSkillNames(
-        string skillIDs,
-        System.Collections.IEnumerable skills)
+    var candidateName = string.IsNullOrWhiteSpace(Model.CandidateName)
+        ? "Candidate"
+        : Model.CandidateName;
+}
+
+@functions {
+
+    string GetLookupName(System.Collections.IEnumerable list, object id)
     {
-        if (string.IsNullOrWhiteSpace(skillIDs) || skills == null)
+        if (list == null || id == null || string.IsNullOrWhiteSpace(id.ToString()))
             return "";
 
-        var selectedIds = new HashSet<string>(
-            skillIDs
-                .Split(
-                    new[] { ',' },
-                    StringSplitOptions.RemoveEmptyEntries
-                )
-                .Select(x => x.Trim()),
-            StringComparer.OrdinalIgnoreCase
-        );
-
-        var names = new List<string>();
-
-        foreach (var skill in skills)
+        foreach (var item in list)
         {
-            if (skill == null)
-                continue;
+            var idProp = item.GetType().GetProperty("ID");
+            var nameProp = item.GetType().GetProperty("Name");
 
-            var idProperty = skill.GetType().GetProperty("ID");
-            var nameProperty = skill.GetType().GetProperty("Name");
-
-            if (idProperty == null || nameProperty == null)
-                continue;
-
-            var id = idProperty
-                .GetValue(skill)?
-                .ToString()?
-                .Trim();
-
-            var name = nameProperty
-                .GetValue(skill)?
-                .ToString()?
-                .Trim();
-
-            if (!string.IsNullOrWhiteSpace(id) &&
-                !string.IsNullOrWhiteSpace(name) &&
-                selectedIds.Contains(id))
+            if (idProp != null && nameProp != null)
             {
-                names.Add(name);
+                var idValue = idProp.GetValue(item)?.ToString();
+
+                if (idValue == id.ToString())
+                    return nameProp.GetValue(item)?.ToString() ?? "";
             }
         }
 
-        return string.Join(", ", names);
+        return "";
     }
 
-
-    var administrativeSkillNames = GetSkillNames(
-        p.sNonTechnicalSkillIDs,
-        Model.NonTechnicalSkills
-    );
-
-    var medicalSkillNames = GetSkillNames(
-        p.sMedicalSkillIDs,
-        Model.MedicalSkills
-    );
-
-    var technicalSkillNames = GetSkillNames(
-        p.sTechnicalSkillIDs,
-        Model.TechnicalSkills
-    );
-
-
-    var skills = new List<string>();
-
-    if (!string.IsNullOrWhiteSpace(administrativeSkillNames))
+    bool Has(string s)
     {
-        skills.AddRange(
-            administrativeSkillNames
-                .Split(
-                    new[] { ',' },
-                    StringSplitOptions.RemoveEmptyEntries
-                )
-                .Select(x => x.Trim())
-        );
+        return !string.IsNullOrWhiteSpace(s);
     }
 
-    if (!string.IsNullOrWhiteSpace(medicalSkillNames))
+    bool HasNum(int? n)
     {
-        skills.AddRange(
-            medicalSkillNames
-                .Split(
-                    new[] { ',' },
-                    StringSplitOptions.RemoveEmptyEntries
-                )
-                .Select(x => x.Trim())
-        );
+        return n.HasValue && n.Value != 0;
     }
-
-    if (!string.IsNullOrWhiteSpace(technicalSkillNames))
-    {
-        skills.AddRange(
-            technicalSkillNames
-                .Split(
-                    new[] { ',' },
-                    StringSplitOptions.RemoveEmptyEntries
-                )
-                .Select(x => x.Trim())
-        );
-    }
-
-
-    // =========================================================
-    // REFERENCES
-    // =========================================================
-
-    var references = new[]
-    {
-        Model.Reference1,
-        Model.Reference2
-    }
-    .Where(x => !string.IsNullOrWhiteSpace(x))
-    .ToList();
-
-
-    // =========================================================
-    // GRADUATION STREAM
-    // =========================================================
-
-    var graduationStream =
-        !string.IsNullOrWhiteSpace(Model.GraduationStream)
-            ? Model.GraduationStream
-            : Model.OtherGraduationStream;
-
-
-    // =========================================================
-    // PG STREAM
-    // =========================================================
-
-    var pgStream =
-        !string.IsNullOrWhiteSpace(Model.PGStream)
-            ? Model.PGStream
-            : Model.OtherPGSpecialization;
 }
-
 
 <!DOCTYPE html>
 
@@ -201,10 +58,12 @@
     <meta name="viewport"
           content="width=device-width, initial-scale=1.0" />
 
-    <title>
-        Resume - @Model.CandidateName
-    </title>
+    <title>@candidateName - Resume</title>
 
+
+    <!-- =========================================================
+         FONTS
+         ========================================================= -->
 
     <link rel="preconnect"
           href="https://fonts.googleapis.com" />
@@ -213,15 +72,54 @@
           href="https://fonts.gstatic.com"
           crossorigin />
 
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Playfair+Display:wght@600;700&display=swap"
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@500;600;700;800&display=swap"
           rel="stylesheet" />
+
+
+    <!-- =========================================================
+         FONT AWESOME
+         ========================================================= -->
+
+    <link rel="stylesheet"
+          href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+
+
+    <script>
+
+        window.resumeFileName =
+            @Html.Raw(
+                     System.Text.Json.JsonSerializer.Serialize(
+                         candidateName
+                     )
+                 );
+
+    </script>
 
 
     <style>
 
         /* =========================================================
-           GLOBAL
-        ========================================================= */
+                   ROOT
+                   ========================================================= */
+
+        :root {
+            --primary: #163f3b;
+            --accent: #0f766e;
+            --accent-soft: #e8f4f1;
+            --ink: #111817;
+            --text: #343d3b;
+            --muted: #697572;
+            --line: #dce3e0;
+            --soft-line: #edf1ef;
+            --paper: #ffffff;
+            --outside: #e8ecea;
+            --black: #111817;
+        }
+
+
+        /* =========================================================
+                   GLOBAL
+                   ========================================================= */
 
         * {
             box-sizing: border-box;
@@ -231,856 +129,791 @@
         body {
             margin: 0;
             padding: 0;
-            font-family: "Inter", sans-serif;
-            background: #edf4f3;
-            color: #172a2a;
+            background: var(--outside);
+            font-family: "DM Sans", Arial, sans-serif;
+            color: var(--text);
         }
 
         body {
-            padding: 25px;
+            min-height: 100vh;
         }
 
 
         /* =========================================================
-           RESUME WRAPPER
-        ========================================================= */
+                   THEME SWITCHER
+                   ========================================================= */
 
-        .resume-wrapper {
-            width: 100%;
+        .theme-switcher {
+            width: 297mm;
+            max-width: calc(100% - 30px);
+            margin: 22px auto 14px;
             display: flex;
-            justify-content: center;
-        }
-
-
-        /* =========================================================
-           A4 LANDSCAPE RESUME
-        ========================================================= */
-
-        .resume {
-            width: 29.7cm;
-            height: 21cm;
-            min-height: 21cm;
-            max-height: 21cm;
-
-            background: #ffffff;
-
-            display: grid;
-
-            grid-template-columns: 7cm minmax(0, 1fr);
-
-            overflow: hidden;
-
-            box-shadow:
-                0 20px 55px rgba(15, 118, 110, 0.16);
-
-            border-radius: 4px;
-        }
-
-
-        /* =========================================================
-           LEFT SIDEBAR
-        ========================================================= */
-
-        .sidebar {
-            width: 7cm;
-            height: 21cm;
-
-            background:
-                linear-gradient(
-                    160deg,
-                    #115e59 0%,
-                    #0f766e 55%,
-                    #0d9488 100%
-                );
-
-            color: #ffffff;
-
-            padding: 25px 20px;
-
-            position: relative;
-
-            overflow: hidden;
-        }
-
-
-        .sidebar::before {
-            content: "";
-
-            position: absolute;
-
-            width: 210px;
-            height: 210px;
-
-            border: 1px solid rgba(255,255,255,.08);
-
-            border-radius: 50%;
-
-            top: -120px;
-            left: -100px;
-        }
-
-
-        .sidebar::after {
-            content: "";
-
-            position: absolute;
-
-            width: 260px;
-            height: 260px;
-
-            border: 1px solid rgba(255,255,255,.07);
-
-            border-radius: 50%;
-
-            bottom: -160px;
-            right: -150px;
-        }
-
-
-        /* =========================================================
-           PROFILE
-        ========================================================= */
-
-        .profile {
-            position: relative;
-            z-index: 2;
-
-            text-align: center;
-        }
-
-
-        .profile-image {
-            width: 90px;
-            height: 90px;
-
-            border-radius: 50%;
-
-            background: #ffffff;
-
-            margin: 0 auto 10px;
-
-            border: 4px solid rgba(255,255,255,.22);
-
-            display: flex;
-
             align-items: center;
-            justify-content: center;
-
-            overflow: hidden;
-
-            box-shadow:
-                0 8px 20px rgba(0,0,0,.18);
+            justify-content: flex-end;
+            gap: 9px;
         }
 
-
-        .profile-image img {
-            width: 100%;
-            height: 100%;
-
-            object-fit: cover;
-        }
-
-
-        .profile-letter {
-            font-size: 32px;
-            font-weight: 800;
-
-            color: #0f766e;
-        }
-
-
-        .profile-name {
-            font-family: "Playfair Display", serif;
-
-            font-size: 21px;
-
-            line-height: 1.2;
-
-            margin: 0;
-
-            word-break: break-word;
-        }
-
-
-        .profile-title {
-            margin-top: 5px;
-
-            color: #99f6e4;
-
-            font-size: 8px;
-
+        .theme-switcher-label {
+            font-size: 11px;
             font-weight: 700;
-
-            letter-spacing: 1.3px;
-
-            text-transform: uppercase;
+            color: #68736f;
+            margin-right: 3px;
         }
+
+        .theme-swatch {
+            width: 26px;
+            height: 26px;
+            border-radius: 50%;
+            cursor: pointer;
+            border: 2px solid #fff;
+            box-shadow: 0 0 0 1px #cdd5d1;
+            transition: .18s ease;
+        }
+
+            .theme-swatch:hover {
+                transform: translateY(-2px);
+            }
+
+            .theme-swatch.active {
+                box-shadow: 0 0 0 2px var(--ink), 0 3px 8px rgba(0,0,0,.12);
+            }
 
 
         /* =========================================================
-           SIDEBAR SECTION
-        ========================================================= */
+                   PAGE
+                   ========================================================= */
 
-        .sidebar-section {
-            margin-top: 20px;
-
-            position: relative;
-
-            z-index: 2;
-        }
-
-
-        .sidebar-heading {
-            display: flex;
-
-            align-items: center;
-
-            gap: 7px;
-
-            color: #99f6e4;
-
-            font-size: 8px;
-
-            font-weight: 800;
-
-            letter-spacing: 1.2px;
-
-            text-transform: uppercase;
-
-            margin-bottom: 9px;
-        }
-
-
-        .sidebar-heading::after {
-            content: "";
-
-            flex: 1;
-
-            height: 1px;
-
-            background: rgba(255,255,255,.22);
-        }
-
-
-        /* =========================================================
-           CONTACT
-        ========================================================= */
-
-        .contact-item {
-            display: flex;
-
-            align-items: flex-start;
-
-            gap: 8px;
-
-            margin-bottom: 9px;
-
-            font-size: 8px;
-
-            line-height: 1.45;
-
-            color: #ecfdfb;
-
-            word-break: break-word;
-        }
-
-
-        .contact-icon {
-            width: 20px;
-            height: 20px;
-
-            min-width: 20px;
-
-            border-radius: 5px;
-
-            background: rgba(255,255,255,.12);
-
-            display: flex;
-
-            align-items: center;
-            justify-content: center;
-
-            font-size: 9px;
-
-            font-weight: 700;
-        }
-
-
-        /* =========================================================
-           PERSONAL DETAILS
-        ========================================================= */
-
-        .personal-item {
-            display: flex;
-
-            justify-content: space-between;
-
-            align-items: center;
-
-            gap: 8px;
-
-            padding: 7px 0;
-
-            border-bottom:
-                1px solid rgba(255,255,255,.12);
-
-            font-size: 8px;
-        }
-
-
-        .personal-label {
-            color: #99f6e4;
-
-            font-weight: 600;
-        }
-
-
-        .personal-value {
-            color: #ffffff;
-
-            font-weight: 700;
-
-            text-align: right;
-
-            word-break: break-word;
-        }
-
-
-        /* =========================================================
-           SIGNATURE
-        ========================================================= */
-
-        .signature-section {
-            margin-top: 22px;
-
-            text-align: center;
-
-            position: relative;
-
-            z-index: 2;
-        }
-
-
-        .signature-line {
-            height: 43px;
-
-            border-bottom:
-                1px solid rgba(255,255,255,.35);
-
-            display: flex;
-
-            align-items: flex-end;
-
-            justify-content: center;
-
-            padding-bottom: 5px;
-        }
-
-
-        .signature-line img {
-            max-width: 100px;
-            max-height: 35px;
-
-            object-fit: contain;
-        }
-
-
-        .signature-text {
-            font-family: "Playfair Display", serif;
-
-            font-size: 17px;
-
-            font-style: italic;
-
-            color: #ccfbf1;
-        }
-
-
-        .signature-label {
-            margin-top: 6px;
-
-            color: #99f6e4;
-
-            font-size: 7px;
-
-            letter-spacing: 1.2px;
-
-            text-transform: uppercase;
-        }
-
-
-        /* =========================================================
-           RIGHT CONTENT
-        ========================================================= */
-
-        .content {
+        .resume-page-wrapper {
             width: 100%;
-            height: 21cm;
+            padding: 8px 0 60px;
+        }
 
-            padding: 22px 25px;
-
+        .resume-sheet {
+            width: 297mm;
+            height: 210mm;
+            min-height: 210mm;
+            margin: 0 auto;
+            background: var(--paper);
+            position: relative;
             overflow: hidden;
-
+            box-shadow: 0 3px 8px rgba(0,0,0,.08), 0 22px 50px rgba(20,35,30,.13);
             display: flex;
-
             flex-direction: column;
         }
 
 
         /* =========================================================
-           SECTION
-        ========================================================= */
+                   TOP HEADER
+                   ========================================================= */
 
-        .section {
-            margin-bottom: 13px;
-
+        .resume-header {
+            height: 76mm;
+            display: grid;
+            grid-template-columns: 58% 42%;
             flex-shrink: 0;
         }
 
 
-        .section-header {
+        /* =========================================================
+                   HEADER LEFT
+                   ========================================================= */
+
+        .header-left {
+            padding: 17mm 13mm 11mm 16mm;
             display: flex;
-
             align-items: center;
-
-            gap: 7px;
-
-            margin-bottom: 7px;
+            gap: 10mm;
+            position: relative;
+            
         }
 
+            .header-left::before {
+                content: "";
+                position: absolute;
+                top: 0;
+                left: 0;
+                width: 6px;
+                height: 100%;
+                background: var(--accent);
+            }
 
-        .section-number {
-            width: 22px;
-            height: 22px;
 
-            min-width: 22px;
+        /* =========================================================
+                   PHOTO
+                   ========================================================= */
 
-            border-radius: 6px;
+        .photo-box {
+            width: 43mm;
+            height: 49mm;
+            flex: 0 0 43mm;
+            overflow: hidden;
+            background: #edf2f0;
+            border: 1px solid #d6dfdb;
+            position: relative;
+        }
 
-            background: #ccfbf1;
+            .photo-box img {
+                width: 100%;
+                height: 100%;
+                object-fit: cover;
+                display: block;
+            }
 
-            color: #0f766e;
-
+        .photo-placeholder {
+            width: 100%;
+            height: 100%;
             display: flex;
-
             align-items: center;
             justify-content: center;
-
-            font-size: 7px;
-
-            font-weight: 800;
-        }
-
-
-        .section-title {
-            margin: 0;
-
-            color: #115e59;
-
-            font-size: 11px;
-
-            font-weight: 800;
-
-            letter-spacing: .3px;
-        }
-
-
-        .section-line {
-            flex: 1;
-
-            height: 1px;
-
-            background: #dcebea;
+            color: #87928e;
+            font-size: 34px;
         }
 
 
         /* =========================================================
-           OBJECTIVE / AIM
-        ========================================================= */
+                   IDENTITY
+                   ========================================================= */
 
-        .objective-grid {
-            display: grid;
-
-            grid-template-columns: 1fr 1fr;
-
-            gap: 9px;
+        .identity {
+            min-width: 0;
+            flex: 1;
         }
 
-
-        .objective-card {
-            min-height: 60px;
-
-            padding: 9px 11px;
-
-            background: #f0fdfa;
-
-            border:
-                1px solid #d8efeb;
-
-            border-radius: 9px;
-        }
-
-
-        .objective-label {
-            font-size: 7px;
-
+        .candidate-name {
+            margin: 0;
+            font-family: "Manrope", sans-serif;
+            font-size: 30px;
+            line-height: 1.05;
             font-weight: 800;
-
-            color: #0f766e;
-
-            letter-spacing: .8px;
-
-            text-transform: uppercase;
-
-            margin-bottom: 4px;
-        }
-
-
-        .objective-text {
-            font-size: 8px;
-
-            line-height: 1.45;
-
-            color: #475569;
-
+            letter-spacing: -1px;
+            color: var(--ink);
             word-break: break-word;
         }
 
+        .candidate-role {
+            margin-top: 6px;
+            color: var(--accent);
+            font-size: 12px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+        }
+
+        .identity-line {
+            width: 46px;
+            height: 3px;
+            background: var(--accent);
+            margin: 10px 0 12px;
+        }
+
 
         /* =========================================================
-           EDUCATION
-        ========================================================= */
+                   CONTACT
+                   ========================================================= */
 
-        .education-list {
-            border:
-                1px solid #e4eeee;
+        .contact-list {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
 
-            border-radius: 8px;
+        .contact-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 8px;
+            font-size: 9.7px;
+            line-height: 1.35;
+            color: var(--text);
+            word-break: break-word;
+        }
 
+            .contact-item i {
+                width: 15px;
+                flex: 0 0 15px;
+                color: var(--accent);
+                font-size: 10px;
+                margin-top: 2px;
+            }
+
+
+        /* =========================================================
+                   HEADER RIGHT
+                   ========================================================= */
+
+        .header-right {
+            padding: 15mm 14mm 11mm 12mm;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .header-label {
+            display: inline-flex;
+            align-self: flex-start;
+            background: var(--primary);
+            color: #fff;
+            padding: 7px 18px;
+            border-radius: 0 18px 18px 0;
+            font-family: "Manrope", sans-serif;
+            font-size: 11px;
+            font-weight: 800;
+            letter-spacing: .5px;
+            text-transform: uppercase;
+            margin-bottom: 13px;
+        }
+
+        .header-summary {
+            font-size: 10.3px;
+            line-height: 1.65;
+            color: var(--text);
+            margin: 0;
+        }
+
+
+        /* =========================================================
+                   MAIN BODY
+                   ========================================================= */
+
+        .resume-body {
+            flex: 1;
+            display: grid;
+            grid-template-columns: 58% 42%;
+            min-height: 0;
+        }
+
+
+        /* =========================================================
+                   LEFT BODY
+                   ========================================================= */
+
+        .body-left {
+            padding: 8mm 11mm 8mm 16mm;
+            min-width: 0;
             overflow: hidden;
         }
 
 
-        .education-row {
-            display: grid;
+        /* =========================================================
+                   RIGHT BODY
+                   ========================================================= */
 
-            grid-template-columns:
-                1.25fr .7fr 1.7fr;
-
-            border-bottom:
-                1px solid #e7eeee;
+        .body-right {
+            padding: 0mm 5mm 8mm 11mm;
+            min-width: 0;
+            overflow: hidden;
         }
 
 
-        .education-row:last-child {
-            border-bottom: none;
+        /* =========================================================
+                   SECTION
+                   ========================================================= */
+
+        .resume-section {
+            margin-bottom: 12px;
+            break-inside: avoid;
+            page-break-inside: avoid;
         }
 
-
-        .education-cell {
-            padding: 6px 8px;
-
-            font-size: 7.5px;
-
-            color: #64748b;
-
-            border-right:
-                1px solid #e7eeee;
-
-            line-height: 1.25;
-
-            word-break: break-word;
-        }
+            .resume-section:last-child {
+                margin-bottom: 0;
+            }
 
 
-        .education-cell:last-child {
-            border-right: none;
-        }
+        /* =========================================================
+                   SECTION TITLE
+                   ========================================================= */
 
-
-        .education-head {
-            background: #f0fdfa;
-
-            color: #0f766e;
-
-            font-size: 7px;
-
+        .section-title {
+            display: inline-flex;
+            align-items: center;
+            background: var(--primary);
+            color: #fff;
+            padding: 6px 18px 6px 14px;
+            border-radius: 0 18px 18px 0;
+            font-family: "Manrope", sans-serif;
+            font-size: 10.8px;
             font-weight: 800;
-
+            line-height: 1;
             text-transform: uppercase;
-
-            letter-spacing: .5px;
+            letter-spacing: .45px;
+            margin-bottom: 8px;
         }
 
-
-        .education-name {
-            color: #134e4a;
-
-            font-weight: 700;
-        }
+            .section-title i {
+                font-size: 9px;
+                margin-right: 7px;
+                color: #b9e3dc;
+            }
 
 
         /* =========================================================
-           BOTTOM AREA
-        ========================================================= */
+                   PROFILE
+                   ========================================================= */
 
-        .bottom-grid {
-            display: grid;
-
-            grid-template-columns:
-                .85fr 1.35fr .9fr;
-
-            gap: 9px;
-
-            width: 100%;
-        }
-
-
-        .bottom-card {
-            min-height: 72px;
-
-            background: #f8fafc;
-
-            border:
-                1px solid #e5eeee;
-
-            border-radius: 9px;
-
-            padding: 9px;
-        }
-
-
-        .bottom-title {
-            color: #115e59;
-
-            font-size: 7px;
-
-            font-weight: 800;
-
-            text-transform: uppercase;
-
-            letter-spacing: .7px;
-
-            margin-bottom: 7px;
-        }
-
-
-        /* =========================================================
-           LANGUAGES
-        ========================================================= */
-
-        .language-list {
-            display: flex;
-
-            flex-wrap: wrap;
-
-            gap: 5px;
-        }
-
-
-        .language {
-            padding: 5px 7px;
-
-            border-radius: 20px;
-
-            background: #ecfdf5;
-
-            border:
-                1px solid #d1fae5;
-
-            color: #047857;
-
-            font-size: 7px;
-
-            font-weight: 700;
-        }
-
-
-        /* =========================================================
-           SKILLS
-        ========================================================= */
-
-        .skills-list {
-            display: flex;
-
-            flex-wrap: wrap;
-
-            gap: 5px;
-        }
-
-
-        .skill {
-            padding: 5px 7px;
-
-            border-radius: 5px;
-
-            border:
-                1px solid #dce8e7;
-
-            background: #ffffff;
-
-            color: #334155;
-
-            font-size: 7px;
-
-            font-weight: 600;
-
-            line-height: 1.2;
-        }
-
-
-        /* =========================================================
-           REFERENCE
-        ========================================================= */
-
-        .reference-list {
+        .profile-text {
             margin: 0;
+            font-size: 10.2px;
+            line-height: 1.62;
+            color: var(--text);
+            max-width: 100%;
+        }
 
+
+        /* =========================================================
+                   TWO INNER COLUMNS
+                   ========================================================= */
+
+        .inner-two-column {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10mm;
+            min-width: 0;
+        }
+
+
+        /* =========================================================
+                   EDUCATION
+                   ========================================================= */
+
+        .education-item {
+            position: relative;
+            padding-left: 12px;
+            margin-bottom: 9px;
+            border-left: 2px solid var(--accent);
+            break-inside: avoid;
+        }
+
+            .education-item:last-child {
+                margin-bottom: 0;
+            }
+
+        .education-title {
+            font-family: "Manrope", sans-serif;
+            font-size: 10px;
+            font-weight: 800;
+            color: var(--ink);
+            line-height: 1.3;
+        }
+
+        .education-meta {
+            font-size: 9.3px;
+            color: var(--muted);
+            line-height: 1.45;
+            margin-top: 2px;
+        }
+
+
+        /* =========================================================
+                   INTERNSHIPS
+                   ========================================================= */
+
+        .experience-item {
+            position: relative;
+            padding: 0 0 10px 14px;
+            margin-bottom: 9px;
+            border-left: 2px solid var(--accent);
+            break-inside: avoid;
+            page-break-inside: avoid;
+        }
+
+            .experience-item:last-child {
+                margin-bottom: 0;
+                padding-bottom: 0;
+            }
+
+        .experience-dot {
+            position: absolute;
+            width: 7px;
+            height: 7px;
+            border-radius: 50%;
+            background: var(--accent);
+            left: -4.5px;
+            top: 4px;
+        }
+
+        .experience-title {
+            font-family: "Manrope", sans-serif;
+            font-size: 10.4px;
+            font-weight: 800;
+            color: var(--ink);
+            line-height: 1.3;
+        }
+
+        .experience-company {
+            font-size: 9.8px;
+            font-weight: 600;
+            color: var(--accent);
+            margin-top: 2px;
+            line-height: 1.35;
+        }
+
+        .experience-meta {
+            font-size: 9px;
+            color: var(--muted);
+            margin-top: 2px;
+            line-height: 1.35;
+        }
+
+
+        /* =========================================================
+                   SKILLS
+                   ========================================================= */
+
+        .skill-group {
+            margin-bottom: 8px;
+        }
+
+            .skill-group:last-child {
+                margin-bottom: 0;
+            }
+
+        .skill-name {
+            font-family: "Manrope", sans-serif;
+            font-size: 9.7px;
+            font-weight: 800;
+            color: var(--ink);
+            margin-bottom: 4px;
+        }
+
+        .skill-value {
+            font-size: 9.3px;
+            line-height: 1.5;
+            color: var(--text);
+            padding-bottom: 6px;
+            border-bottom: 1px solid var(--soft-line);
+        }
+
+        .skill-group:last-child .skill-value {
+            border-bottom: 0;
+        }
+
+
+        /* =========================================================
+                   ACHIEVEMENTS
+                   ========================================================= */
+
+        .achievement-list {
+            margin: 0;
             padding: 0;
-
             list-style: none;
         }
 
+            .achievement-list li {
+                position: relative;
+                padding-left: 13px;
+                margin-bottom: 5px;
+                font-size: 9.5px;
+                line-height: 1.45;
+                color: var(--text);
+            }
 
-        .reference-list li {
-            position: relative;
+                .achievement-list li:last-child {
+                    margin-bottom: 0;
+                }
 
-            padding-left: 10px;
+                .achievement-list li::before {
+                    content: "";
+                    position: absolute;
+                    width: 5px;
+                    height: 5px;
+                    border-radius: 50%;
+                    background: var(--accent);
+                    left: 0;
+                    top: 6px;
+                }
 
-            margin-bottom: 5px;
 
-            color: #64748b;
+        /* =========================================================
+                   PREFERENCE
+                   ========================================================= */
 
-            font-size: 7.5px;
-
-            line-height: 1.35;
-
-            word-break: break-word;
+        .preference-box {
+            background: var(--accent-soft);
+            border-left: 3px solid var(--accent);
+            padding: 8px 10px;
+            font-size: 9.5px;
+            line-height: 1.55;
+            color: var(--text);
         }
 
+        .preference-line {
+            margin: 0 0 3px;
+        }
 
-        .reference-list li::before {
-            content: "";
+            .preference-line:last-child {
+                margin-bottom: 0;
+            }
 
-            width: 3px;
-            height: 3px;
-
-            border-radius: 50%;
-
-            background: #14b8a6;
-
-            position: absolute;
-
-            left: 0;
-
-            top: 5px;
+        .preference-label {
+            font-weight: 800;
+            color: var(--primary);
         }
 
 
         /* =========================================================
-           EMPTY
-        ========================================================= */
+                   LANGUAGES
+                   ========================================================= */
 
-        .empty {
-            color: #94a3b8;
+        .language-list {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 5px 15px;
+        }
 
-            font-size: 7.5px;
+        .language-item {
+            font-size: 9.5px;
+            color: var(--text);
+            padding-bottom: 5px;
+            border-bottom: 1px solid var(--soft-line);
+        }
 
-            font-style: italic;
-
-            line-height: 1.4;
+        .language-star {
+            color: var(--accent);
+            font-size: 8.5px;
+            margin-left: 2px;
         }
 
 
         /* =========================================================
-           PRINT - A4 LANDSCAPE
-        ========================================================= */
+                   HOBBIES
+                   ========================================================= */
 
-        @@page {
-            size: A4 landscape;
-
+        .hobbies-text {
+            font-size: 9.5px;
+            line-height: 1.5;
+            color: var(--text);
             margin: 0;
         }
 
 
+        /* =========================================================
+                   LINKS
+                   ========================================================= */
+
+        .links-list {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        .link-item {
+            display: flex;
+            gap: 8px;
+            align-items: flex-start;
+            font-size: 9.2px;
+            line-height: 1.4;
+            word-break: break-word;
+        }
+
+            .link-item i {
+                color: var(--accent);
+                width: 13px;
+                flex: 0 0 13px;
+                margin-top: 2px;
+            }
+
+
+        /* =========================================================
+                   REFERENCES
+                   ========================================================= */
+
+        .references-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+        }
+
+        .reference-item {
+            padding: 7px 8px;
+            border: 1px solid var(--line);
+            border-top: 2px solid var(--accent);
+            min-width: 0;
+            break-inside: avoid;
+        }
+
+        .reference-name {
+            font-family: "Manrope", sans-serif;
+            font-size: 9.5px;
+            font-weight: 800;
+            color: var(--ink);
+            margin-bottom: 2px;
+        }
+
+        .reference-detail {
+            font-size: 8.8px;
+            color: var(--text);
+            line-height: 1.45;
+            word-break: break-word;
+        }
+
+
+        /* =========================================================
+                   FOOTER ACCENT
+                   ========================================================= */
+
+        .resume-footer-line {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            height: 4px;
+            width: 100%;
+            background: var(--primary);
+        }
+
+
+        /* =========================================================
+                   THEMES
+                   ========================================================= */
+
+        .resume-sheet[data-theme="teal"] {
+            --primary: #163f3b;
+            --accent: #0f766e;
+            --accent-soft: #e8f4f1;
+        }
+
+        .resume-sheet[data-theme="blue"] {
+            --primary: #163b5c;
+            --accent: #1976a8;
+            --accent-soft: #eaf4fa;
+        }
+
+        .resume-sheet[data-theme="burgundy"] {
+            --primary: #51252b;
+            --accent: #a94450;
+            --accent-soft: #f8edef;
+        }
+
+        .resume-sheet[data-theme="olive"] {
+            --primary: #3e4930;
+            --accent: #71833f;
+            --accent-soft: #f0f3e8;
+        }
+
+        .resume-sheet[data-theme="slate"] {
+            --primary: #273640;
+            --accent: #527d91;
+            --accent-soft: #edf3f5;
+        }
+
+        .resume-sheet[data-theme="brown"] {
+            --primary: #4b3528;
+            --accent: #a56b3d;
+            --accent-soft: #f7eee8;
+        }
+
+
+        /* =========================================================
+                   MOBILE / FIT
+                   ========================================================= */
+
+        @@media (max-width: 1150px) {
+
+            body {
+                background: #ffffff;
+            }
+
+            .theme-switcher {
+                max-width: calc(100% - 20px);
+                justify-content: center;
+                flex-wrap: wrap;
+                margin-top: 12px;
+            }
+
+            .resume-page-wrapper {
+                padding: 8px 0 30px;
+                overflow: hidden;
+            }
+
+            .resume-sheet {
+                margin: 0;
+                transform-origin: top left;
+            }
+        }
+
+
+        /* =========================================================
+                   SMALL SCREEN
+                   ========================================================= */
+
+        @@media (max-width: 700px) {
+
+            .theme-switcher {
+                margin-bottom: 8px;
+            }
+
+            .theme-switcher-label {
+                width: 100%;
+                text-align: center;
+                margin-bottom: 2px;
+            }
+        }
+
+
+        /* =========================================================
+                   PRINT
+                   ========================================================= */
+
         @@media print {
+
+            * {
+                -webkit-print-color-adjust: exact !important;
+                print-color-adjust: exact !important;
+                color-adjust: exact !important;
+            }
 
             html,
             body {
                 width: 297mm;
                 height: 210mm;
-
                 margin: 0;
                 padding: 0;
-
                 background: #ffffff;
             }
 
+                body * {
+                    visibility: hidden;
+                }
 
-            body {
-                -webkit-print-color-adjust: exact;
-                print-color-adjust: exact;
+            .resume-sheet,
+            .resume-sheet * {
+                visibility: visible;
             }
 
-
-            .resume-wrapper {
-                width: 297mm;
-                height: 210mm;
-
-                display: block;
+            .theme-switcher {
+                display: none !important;
             }
 
-
-            .resume {
+            .resume-page-wrapper {
                 width: 297mm;
                 height: 210mm;
-
-                min-height: 210mm;
-                max-height: 210mm;
-
                 margin: 0;
-
-                box-shadow: none;
-
-                border-radius: 0;
-            }
-        }
-
-
-        /* =========================================================
-           SCREEN - SMALLER LAPTOP
-        ========================================================= */
-
-        @@media (max-width: 1100px) {
-
-            body {
-                padding: 15px;
-            }
-
-            .resume {
-                transform-origin: top center;
-            }
-        }
-
-
-        /* =========================================================
-           MOBILE
-        ========================================================= */
-
-        @@media (max-width: 850px) {
-
-            body {
                 padding: 0;
+                background: #ffffff;
+                overflow: visible;
             }
 
-            .resume-wrapper {
-                overflow-x: auto;
-
-                justify-content: flex-start;
+            .resume-sheet {
+                width: 297mm;
+                height: 210mm;
+                min-height: 210mm;
+                margin: 0;
+                border-radius: 0;
+                box-shadow: none;
+                transform: none !important;
+                overflow: hidden;
             }
 
-            .resume {
-                flex-shrink: 0;
+            .resume-section,
+            .experience-item,
+            .education-item,
+            .reference-item {
+                break-inside: avoid !important;
+                page-break-inside: avoid !important;
+            }
+
+            @@page {
+                size: A4 landscape;
+                margin: 0;
             }
         }
 
@@ -1091,608 +924,1514 @@
 
 <body>
 
-<div class="resume-wrapper">
 
-    <div class="resume">
+    <!-- =========================================================
+         THEME SWITCHER
+         ========================================================= -->
 
+    <div class="theme-switcher">
 
-        <!-- =====================================================
-             LEFT SIDEBAR
-        ====================================================== -->
+        <span class="theme-switcher-label">
+            Resume Theme
+        </span>
 
-        <aside class="sidebar">
+        <div class="theme-swatch active"
+             data-theme="teal"
+             style="background:#0f766e;"
+             title="Teal">
+        </div>
 
+        <div class="theme-swatch"
+             data-theme="blue"
+             style="background:#1976a8;"
+             title="Blue">
+        </div>
 
-            <!-- PROFILE -->
+        <div class="theme-swatch"
+             data-theme="burgundy"
+             style="background:#a94450;"
+             title="Burgundy">
+        </div>
 
-            <div class="profile">
+        <div class="theme-swatch"
+             data-theme="olive"
+             style="background:#71833f;"
+             title="Olive">
+        </div>
 
-                <div class="profile-image">
+        <div class="theme-swatch"
+             data-theme="slate"
+             style="background:#527d91;"
+             title="Slate">
+        </div>
 
-                    @if (!string.IsNullOrWhiteSpace(Model.ProfilePic))
-                    {
-                        <img src="@Model.ProfilePic"
-                             alt="@Model.CandidateName" />
-                    }
-                    else
-                    {
-                        <span class="profile-letter">
-                            @(string.IsNullOrWhiteSpace(Model.CandidateName)
-                                ? "C"
-                                : Model.CandidateName.Substring(0, 1).ToUpper())
-                        </span>
-                    }
+        <div class="theme-swatch"
+             data-theme="brown"
+             style="background:#a56b3d;"
+             title="Brown">
+        </div>
 
-                </div>
-
-
-                <h1 class="profile-name">
-                    @(string.IsNullOrWhiteSpace(Model.CandidateName)
-                        ? "Candidate Name"
-                        : Model.CandidateName)
-                </h1>
-
-
-                <div class="profile-title">
-                    Candidate Resume
-                </div>
-
-            </div>
-
-
-            <!-- =================================================
-                 CONTACT
-            ================================================== -->
-
-            <div class="sidebar-section">
-
-                <div class="sidebar-heading">
-                    Contact
-                </div>
+    </div>
 
 
-                <div class="contact-item">
+    <!-- =========================================================
+         RESUME
+         ========================================================= -->
 
-                    <div class="contact-icon">
-                        ✉
-                    </div>
+    <div class="resume-page-wrapper"
+         id="resumeWrapper">
 
-                    <div>
-                        @(string.IsNullOrWhiteSpace(Model.CandidateEmail)
-                            ? "Email not available"
-                            : Model.CandidateEmail)
-                    </div>
-
-                </div>
-
-
-                <div class="contact-item">
-
-                    <div class="contact-icon">
-                        ☎
-                    </div>
-
-                    <div>
-                        @(string.IsNullOrWhiteSpace(Model.CandidatePhone)
-                            ? "Phone not available"
-                            : Model.CandidatePhone)
-                    </div>
-
-                </div>
-
-
-                <div class="contact-item">
-
-                    <div class="contact-icon">
-                        ⌖
-                    </div>
-
-                    <div>
-                        @(string.IsNullOrWhiteSpace(address)
-                            ? "Address not available"
-                            : address)
-                    </div>
-
-                </div>
-
-            </div>
+        <div class="resume-sheet"
+             id="resumeSheet"
+             data-theme="teal">
 
 
             <!-- =================================================
-                 PERSONAL DETAILS
-            ================================================== -->
+                 HEADER
+                 ================================================= -->
 
-            <div class="sidebar-section">
+            <header class="resume-header">
 
-                <div class="sidebar-heading">
-                    Personal Details
-                </div>
 
+                <!-- =============================================
+                     LEFT HEADER
+                     ============================================= -->
 
-                <div class="personal-item">
+                <div class="header-left">
 
-                    <span class="personal-label">
-                        Gender
-                    </span>
 
-                    <span class="personal-value">
-                        @(string.IsNullOrWhiteSpace(Model.Gender)
-                            ? "—"
-                            : Model.Gender)
-                    </span>
+                    <!-- PHOTO -->
 
-                </div>
+                    <div class="photo-box">
 
-
-                <div class="personal-item">
-
-                    <span class="personal-label">
-                        Divyang
-                    </span>
-
-                    <span class="personal-value">
-                        @(Model.Divyang ? "Yes" : "No")
-                    </span>
-
-                </div>
-
-            </div>
-
-
-            <!-- =================================================
-                 SIGNATURE
-            ================================================== -->
-
-            <div class="signature-section">
-
-                <div class="signature-line">
-
-                    @if (!string.IsNullOrWhiteSpace(Model.Sign))
-                    {
-                        <img src="@Model.Sign"
-                             alt="Signature" />
-                    }
-                    else
-                    {
-                        <span class="signature-text">
-                            Signature
-                        </span>
-                    }
-
-                </div>
-
-
-                <div class="signature-label">
-                    Candidate Signature
-                </div>
-
-            </div>
-
-        </aside>
-
-
-        <!-- =====================================================
-             RIGHT CONTENT
-        ====================================================== -->
-
-        <main class="content">
-
-
-            <!-- =================================================
-                 OBJECTIVE + AIM
-            ================================================== -->
-
-            <section class="section">
-
-                <div class="section-header">
-
-                    <div class="section-number">
-                        01
-                    </div>
-
-                    <h2 class="section-title">
-                        Objective & Aim
-                    </h2>
-
-                    <div class="section-line"></div>
-
-                </div>
-
-
-                <div class="objective-grid">
-
-
-                    <div class="objective-card">
-
-                        <div class="objective-label">
-                            Career Objective
-                        </div>
-
-                        <div class="objective-text">
-                            @(string.IsNullOrWhiteSpace(Model.Objective)
-                                ? "Career objective has not been provided."
-                                : Model.Objective)
-                        </div>
-
-                    </div>
-
-
-                    <div class="objective-card">
-
-                        <div class="objective-label">
-                            Aim
-                        </div>
-
-                        <div class="objective-text">
-                            @(string.IsNullOrWhiteSpace(Model.Aim)
-                                ? "Aim has not been provided."
-                                : Model.Aim)
-                        </div>
-
-                    </div>
-
-                </div>
-
-            </section>
-
-
-            <!-- =================================================
-                 EDUCATION
-            ================================================== -->
-
-            <section class="section">
-
-                <div class="section-header">
-
-                    <div class="section-number">
-                        02
-                    </div>
-
-                    <h2 class="section-title">
-                        Education Detail
-                    </h2>
-
-                    <div class="section-line"></div>
-
-                </div>
-
-
-                <div class="education-list">
-
-
-                    <!-- HEADER -->
-
-                    <div class="education-row">
-
-                        <div class="education-cell education-head">
-                            Qualification
-                        </div>
-
-                        <div class="education-cell education-head">
-                            Year
-                        </div>
-
-                        <div class="education-cell education-head">
-                            Division / Stream
-                        </div>
-
-                    </div>
-
-
-                    <!-- SSC -->
-
-                    @if (Model.SSCYear.HasValue ||
-                         !string.IsNullOrWhiteSpace(Model.SSCDivision))
-                    {
-                        <div class="education-row">
-
-                            <div class="education-cell education-name">
-                                SSC
-                            </div>
-
-                            <div class="education-cell">
-                                @(Model.SSCYear?.ToString() ?? "—")
-                            </div>
-
-                            <div class="education-cell">
-                                @(string.IsNullOrWhiteSpace(Model.SSCDivision)
-                                    ? "—"
-                                    : Model.SSCDivision)
-                            </div>
-
-                        </div>
-                    }
-
-
-                    <!-- HSC / DIPLOMA -->
-
-                    @if (Model.HSCDiplomaYear.HasValue ||
-                         !string.IsNullOrWhiteSpace(Model.HSCDiplomaDivision))
-                    {
-                        <div class="education-row">
-
-                            <div class="education-cell education-name">
-                                HSC / Diploma
-                            </div>
-
-                            <div class="education-cell">
-                                @(Model.HSCDiplomaYear?.ToString() ?? "—")
-                            </div>
-
-                            <div class="education-cell">
-                                @(string.IsNullOrWhiteSpace(Model.HSCDiplomaDivision)
-                                    ? "—"
-                                    : Model.HSCDiplomaDivision)
-                            </div>
-
-                        </div>
-                    }
-
-
-                    <!-- GRADUATION -->
-
-                    @if (Model.GraduationYear.HasValue ||
-                         !string.IsNullOrWhiteSpace(Model.GraduationStream) ||
-                         !string.IsNullOrWhiteSpace(Model.OtherGraduationStream) ||
-                         !string.IsNullOrWhiteSpace(Model.GraduationDivision))
-                    {
-                        <div class="education-row">
-
-                            <div class="education-cell education-name">
-                                Graduation
-                            </div>
-
-                            <div class="education-cell">
-                                @(Model.GraduationYear?.ToString() ?? "—")
-                            </div>
-
-                            <div class="education-cell">
-
-                                @if (!string.IsNullOrWhiteSpace(graduationStream))
-                                {
-                                    @graduationStream
-                                }
-
-                                @if (!string.IsNullOrWhiteSpace(Model.GraduationDivision))
-                                {
-                                    <span>
-                                        @(string.IsNullOrWhiteSpace(graduationStream)
-                                            ? ""
-                                            : " • ")
-                                        @Model.GraduationDivision
-                                    </span>
-                                }
-
-                            </div>
-
-                        </div>
-                    }
-
-
-                    <!-- POST GRADUATION -->
-
-                    @if (Model.PGYear.HasValue ||
-                         !string.IsNullOrWhiteSpace(Model.PGStream) ||
-                         !string.IsNullOrWhiteSpace(Model.OtherPGSpecialization) ||
-                         !string.IsNullOrWhiteSpace(Model.PGDivision))
-                    {
-                        <div class="education-row">
-
-                            <div class="education-cell education-name">
-                                Post Graduation
-                            </div>
-
-                            <div class="education-cell">
-                                @(Model.PGYear?.ToString() ?? "—")
-                            </div>
-
-                            <div class="education-cell">
-
-                                @if (!string.IsNullOrWhiteSpace(pgStream))
-                                {
-                                    @pgStream
-                                }
-
-                                @if (!string.IsNullOrWhiteSpace(Model.PGDivision))
-                                {
-                                    <span>
-                                        @(string.IsNullOrWhiteSpace(pgStream)
-                                            ? ""
-                                            : " • ")
-                                        @Model.PGDivision
-                                    </span>
-                                }
-
-                            </div>
-
-                        </div>
-                    }
-
-
-                    <!-- PHD -->
-
-                    @if (Model.PhDYear.HasValue ||
-                         !string.IsNullOrWhiteSpace(Model.PhDStatus) ||
-                         !string.IsNullOrWhiteSpace(Model.PhDTopic))
-                    {
-                        <div class="education-row">
-
-                            <div class="education-cell education-name">
-                                Ph.D.
-                            </div>
-
-                            <div class="education-cell">
-                                @(Model.PhDYear?.ToString() ?? "—")
-                            </div>
-
-                            <div class="education-cell">
-
-                                @if (!string.IsNullOrWhiteSpace(Model.PhDStatus))
-                                {
-                                    @Model.PhDStatus
-                                }
-
-                                @if (!string.IsNullOrWhiteSpace(Model.PhDTopic))
-                                {
-                                    <span>
-                                        @(string.IsNullOrWhiteSpace(Model.PhDStatus)
-                                            ? ""
-                                            : " • ")
-                                        @Model.PhDTopic
-                                    </span>
-                                }
-
-                            </div>
-
-                        </div>
-                    }
-
-                </div>
-
-            </section>
-
-
-            <!-- =================================================
-                 BOTTOM HORIZONTAL AREA
-            ================================================== -->
-
-            <section class="section">
-
-                <div class="section-header">
-
-                    <div class="section-number">
-                        03
-                    </div>
-
-                    <h2 class="section-title">
-                        Additional Details
-                    </h2>
-
-                    <div class="section-line"></div>
-
-                </div>
-
-
-                <div class="bottom-grid">
-
-
-                    <!-- =================================================
-                         LANGUAGES
-                    ================================================== -->
-
-                    <div class="bottom-card">
-
-                        <div class="bottom-title">
-                            Languages
-                        </div>
-
-
-                        @if (languages.Any())
+                        @if (Has(p.sPhoto))
                         {
-
-                            <div class="language-list">
-
-                                @foreach (var language in languages)
-                                {
-                                    <span class="language">
-                                        @language
-                                    </span>
-                                }
-
-                            </div>
-
+                            <img src="@p.sPhoto"
+                                 alt="Candidate Photo" />
                         }
                         else
                         {
-                            <div class="empty">
-                                Languages have not been provided.
+                            <div class="photo-placeholder">
+                                <i class="fa-solid fa-user"></i>
                             </div>
                         }
 
                     </div>
 
 
-                    <!-- =================================================
-                         SKILLS
-                    ================================================== -->
+                    <!-- IDENTITY -->
 
-                    <div class="bottom-card">
+                    <div class="identity">
 
-                        <div class="bottom-title">
-                            Skills
+                        <h1 class="candidate-name">
+                            @candidateName
+                        </h1>
+
+
+                        <div class="candidate-role">
+
+                            @GetLookupName(
+                                     Model.InternshipFellowshipType,
+                                     p.Internship_FellowshipType
+                                     )
+
                         </div>
 
 
-                        @if (skills.Any())
-                        {
+                        <div class="identity-line"></div>
 
-                            <div class="skills-list">
 
-                                @foreach (var skill in skills.Distinct())
-                                {
-                                    <span class="skill">
-                                        @skill
+                        <!-- CONTACT -->
+
+                        <div class="contact-list">
+
+
+                            @if (Has(Model.CandidatePhone))
+                            {
+                                <div class="contact-item">
+
+                                    <i class="fa-solid fa-phone"></i>
+
+                                    <span>
+                                        @Model.CandidatePhone
                                     </span>
+
+                                </div>
+                            }
+
+
+                            @if (Has(Model.CandidateEmail))
+                            {
+                                <div class="contact-item">
+
+                                    <i class="fa-solid fa-envelope"></i>
+
+                                    <span>
+                                        @Model.CandidateEmail
+                                    </span>
+
+                                </div>
+                            }
+
+
+                            @if (
+                            Has(p.CountryID) ||
+                            Has(p.StateID) ||
+                            Has(p.CityID) ||
+                            Has(p.Pincode)
+                            )
+                            {
+                                <div class="contact-item">
+
+                                    <i class="fa-solid fa-location-dot"></i>
+
+                                    <span id="rvAddress"
+                                          data-country-id="@p.CountryID"
+                                          data-state-id="@p.StateID"
+                                          data-city-id="@p.CityID"
+                                          data-pincode="@p.Pincode">
+
+                                        @if (Has(p.Pincode))
+                                        {
+                                            @p.Pincode
+                                        }
+                                        else
+                                        {
+                                            <text>-</text>
+                                        }
+
+                                    </span>
+
+                                </div>
+                            }
+
+
+                            @if (Has(p.GitHub))
+                            {
+                                <div class="contact-item">
+
+                                    <i class="fa-brands fa-github"></i>
+
+                                    <span>
+                                        @p.GitHub
+                                    </span>
+
+                                </div>
+                            }
+
+
+                            @if (Has(p.Linkedin))
+                            {
+                                <div class="contact-item">
+
+                                    <i class="fa-brands fa-linkedin"></i>
+
+                                    <span>
+                                        @p.Linkedin
+                                    </span>
+
+                                </div>
+                            }
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <!-- =============================================
+                     RIGHT HEADER
+                     ============================================= -->
+
+                <div class="header-right">
+
+                    <div class="header-label">
+                        Profile
+                    </div>
+
+
+                    @if (Has(p.Objective))
+                    {
+                        <p class="header-summary">
+                            @p.Objective
+                        </p>
+                    }
+
+                </div>
+
+            </header>
+
+
+            <!-- =================================================
+                 BODY
+                 ================================================= -->
+
+            <main class="resume-body">
+
+
+                <!-- =================================================
+                     LEFT CONTENT
+                     ================================================= -->
+
+                <section class="body-left">
+
+
+                    <!-- =============================================
+                         EDUCATION + SKILLS
+                         ============================================= -->
+
+                    <div class="inner-two-column">
+
+
+                        <!-- EDUCATION -->
+                        @if (
+                        HasNum(p.PG_Year) ||
+                        HasNum(p.Graduation_Year) ||
+                        HasNum(p.HSC_DIPLOMA_YEAR) ||
+                        HasNum(p.SSC_YEAR)
+                        )
+                        {
+                            <div class="resume-section">
+
+                                <div class="section-title">
+
+                                    <i class="fa-solid fa-graduation-cap"></i>
+
+                                    Education
+
+                                </div>
+
+
+                                @if (HasNum(p.PG_Year))
+                                {
+                                    <div class="education-item">
+
+                                        <div class="education-title">
+
+                                            @GetLookupName(
+                                                     Model.Streams,
+                                                     p.PG_Stream
+                                                     )
+
+                                            — Post Graduation
+
+                                        </div>
+
+                                        <div class="education-meta">
+
+                                            @p.PG_Year
+
+                                            @if (
+                                           Has(
+                                           GetLookupName(
+                                           Model.Divisions,
+                                           p.PG_Division
+                                           )
+                                           )
+                                           )
+                                            {
+                                                <span>
+                                                    ·
+                                                    @GetLookupName(
+                                                             Model.Divisions,
+                                                             p.PG_Division
+                                                             )
+                                                </span>
+                                            }
+
+                                        </div>
+
+                                    </div>
+                                }
+
+
+                                @if (HasNum(p.Graduation_Year))
+                                {
+                                    <div class="education-item">
+
+                                        <div class="education-title">
+
+                                            @GetLookupName(
+                                                     Model.Streams,
+                                                     p.Graduation_Stream
+                                                     )
+
+                                            — Graduation
+
+                                        </div>
+
+                                        <div class="education-meta">
+
+                                            @p.Graduation_Year
+
+                                            @if (
+                                           Has(
+                                           GetLookupName(
+                                           Model.Divisions,
+                                           p.Graduation_Division
+                                           )
+                                           )
+                                           )
+                                            {
+                                                <span>
+                                                    ·
+                                                    @GetLookupName(
+                                                             Model.Divisions,
+                                                             p.Graduation_Division
+                                                             )
+                                                </span>
+                                            }
+
+                                        </div>
+
+                                    </div>
+                                }
+
+
+                                @if (HasNum(p.HSC_DIPLOMA_YEAR))
+                                {
+                                    <div class="education-item">
+
+                                        <div class="education-title">
+                                            HSC / Diploma
+                                        </div>
+
+                                        <div class="education-meta">
+
+                                            @p.HSC_DIPLOMA_YEAR
+
+                                            @if (
+                                           Has(
+                                           GetLookupName(
+                                           Model.Divisions,
+                                           p.HSC_DIPLOMA_DIVISION
+                                           )
+                                           )
+                                           )
+                                            {
+                                                <span>
+                                                    ·
+                                                    @GetLookupName(
+                                                             Model.Divisions,
+                                                             p.HSC_DIPLOMA_DIVISION
+                                                             )
+                                                </span>
+                                            }
+
+                                        </div>
+
+                                    </div>
+                                }
+
+
+                                @if (HasNum(p.SSC_YEAR))
+                                {
+                                    <div class="education-item">
+
+                                        <div class="education-title">
+                                            SSC / 10th
+                                        </div>
+
+                                        <div class="education-meta">
+
+                                            @p.SSC_YEAR
+
+                                            @if (
+                                           Has(
+                                           GetLookupName(
+                                           Model.Divisions,
+                                           p.SSC_DIVISION
+                                           )
+                                           )
+                                           )
+                                            {
+                                                <span>
+                                                    ·
+                                                    @GetLookupName(
+                                                             Model.Divisions,
+                                                             p.SSC_DIVISION
+                                                             )
+                                                </span>
+                                            }
+
+                                        </div>
+
+                                    </div>
                                 }
 
                             </div>
+                        }
+
+
+                        <!-- SKILLS -->
+                        @{
+
+                            var skillGroups =
+                            new[]
+                            {
+                        ("Technical", p.sTechnicalSkillIDs),
+                        ("Medical", p.sMedicalSkillIDs),
+                        ("Non-Technical", p.sNonTechnicalSkillIDs)
+            }
+                            .Where(x => Has(x.Item2))
+                            .ToList();
 
                         }
-                        else
+
+
+                        @if (skillGroups.Any())
                         {
-                            <div class="empty">
-                                Skills have not been provided.
+                            <div class="resume-section">
+
+                                <div class="section-title">
+
+                                    <i class="fa-solid fa-bolt"></i>
+
+                                    Skills
+
+                                </div>
+
+
+                                @foreach (var g in skillGroups)
+                                {
+                                    <div class="skill-group">
+
+                                        <div class="skill-name">
+                                            @g.Item1
+                                        </div>
+
+                                        <div class="skill-value">
+                                            @g.Item2
+                                        </div>
+
+                                    </div>
+                                }
+
                             </div>
                         }
 
                     </div>
 
 
-                    <!-- =================================================
-                         REFERENCES
-                    ================================================== -->
+                    <!-- =============================================
+                         ACHIEVEMENTS
+                         ============================================= -->
+                    @{
 
-                    <div class="bottom-card">
-
-                        <div class="bottom-title">
-                            Reference
-                        </div>
-
-
-                        @if (references.Any())
+                        var achievements =
+                        new[]
                         {
+                    p.Achievements_Certification1,
+                    p.Achievements_Certification2,
+                    p.Achievements_Certification3
+            }
+                        .Where(Has)
+                        .ToList();
 
-                            <ul class="reference-list">
+                    }
 
-                                @foreach (var reference in references)
+
+                    @if (achievements.Any())
+                    {
+                        <div class="resume-section">
+
+                            <div class="section-title">
+
+                                <i class="fa-solid fa-award"></i>
+
+                                Achievements & Certifications
+
+                            </div>
+
+
+                            <ul class="achievement-list">
+
+                                @foreach (var achievement in achievements)
                                 {
                                     <li>
-                                        @reference
+                                        @achievement
                                     </li>
                                 }
 
                             </ul>
 
-                        }
-                        else
-                        {
-                            <div class="empty">
-                                No reference provided.
+                        </div>
+                    }
+
+
+                    <!-- =============================================
+                         LINKS
+                         ============================================= -->
+                    @if (Has(p.GitHub) || Has(p.Linkedin))
+                    {
+                        <div class="resume-section">
+
+                            <div class="section-title">
+
+                                <i class="fa-solid fa-link"></i>
+
+                                Professional Links
+
                             </div>
+
+
+                            <div class="links-list">
+
+                                @if (Has(p.GitHub))
+                                {
+                                    <div class="link-item">
+
+                                        <i class="fa-brands fa-github"></i>
+
+                                        <span>
+                                            @p.GitHub
+                                        </span>
+
+                                    </div>
+                                }
+
+
+                                @if (Has(p.Linkedin))
+                                {
+                                    <div class="link-item">
+
+                                        <i class="fa-brands fa-linkedin"></i>
+
+                                        <span>
+                                            @p.Linkedin
+                                        </span>
+
+                                    </div>
+                                }
+
+                            </div>
+
+                        </div>
+                    }
+
+
+                    <!-- =============================================
+                         HOBBIES
+                         ============================================= -->
+                    @if (Has(p.sHobbies))
+                    {
+                        <div class="resume-section">
+
+                            <div class="section-title">
+
+                                <i class="fa-solid fa-heart"></i>
+
+                                Hobbies
+
+                            </div>
+
+
+                            <p class="hobbies-text">
+                                @p.sHobbies
+                            </p>
+
+                        </div>
+                    }
+
+                </section>
+
+
+                <!-- =================================================
+                     RIGHT CONTENT
+                     ================================================= -->
+
+                <section class="body-right">
+
+
+                    <!-- =============================================
+                         INTERNSHIP EXPERIENCE
+                         ============================================= -->
+                    @{
+
+                        var internships =
+                        new[]
+                        {
+                    new
+                    {
+                    Name = p.sOrgName1,
+                    Title = p.sOrgIntTitle1,
+                    Duration = p.sOrgIntDuration1,
+                    Status = p.sOrgIntStatus1
+                    },
+
+                    new
+                    {
+                    Name = p.sOrgName2,
+                    Title = p.sOrgIntTitle2,
+                    Duration = p.sOrgIntDuration2,
+                    Status = p.sOrgIntStatus2
+                    },
+
+                    new
+                    {
+                    Name = p.sOrgName3,
+                    Title = p.sOrgIntTitle3,
+                    Duration = p.sOrgIntDuration3,
+                    Status = p.sOrgIntStatus3
+                    },
+
+                    new
+                    {
+                    Name = p.sOrgName4,
+                    Title = p.sOrgIntTitle4,
+                    Duration = p.sOrgIntDuration4,
+                    Status = p.sOrgIntStatus4
+                    }
+            }
+                        .Where(x => Has(x.Name))
+                        .ToList();
+
+                    }
+
+
+                    @if (internships.Any())
+                    {
+                        <div class="resume-section">
+
+                            <div class="section-title">
+
+                                <i class="fa-solid fa-briefcase"></i>
+
+                                Internship Experience
+
+                            </div>
+
+
+                            @foreach (var it in internships)
+                            {
+                                <div class="experience-item">
+
+                                    <span class="experience-dot"></span>
+
+
+                                    <div class="experience-title">
+
+                                        @GetLookupName(
+                                                 Model.InternshipTitles,
+                                                 it.Title
+                                                 )
+
+                                    </div>
+
+
+                                    <div class="experience-company">
+
+                                        @it.Name
+
+                                    </div>
+
+
+                                    <div class="experience-meta">
+
+                                        @GetLookupName(
+                                                 Model.InternshipDurations,
+                                                 it.Duration
+                                                 )
+
+
+                                        @if (
+                                       Has(
+                                       GetLookupName(
+                                       Model.InternshipStatuses,
+                                       it.Status
+                                       )
+                                       )
+                                       )
+                                        {
+                                            <span>
+
+                                                ·
+
+                                                @GetLookupName(
+                                                         Model.InternshipStatuses,
+                                                         it.Status
+                                                         )
+
+                                            </span>
+                                        }
+
+                                    </div>
+
+                                </div>
+                            }
+
+                        </div>
+                    }
+
+
+                    <!-- =============================================
+                         PREFERENCE
+                         ============================================= -->
+                    @{
+
+                        var prefType =
+                        GetLookupName(
+                        Model.InternshipFellowshipType,
+                        p.Internship_FellowshipType
+                        );
+
+                    }
+
+
+                    @if (
+                    Has(p.Preferred_City) ||
+                    Has(p.Preferred_State) ||
+                    Has(p.Preferred_Country) ||
+                    Has(prefType)
+                    )
+                    {
+                        <div class="resume-section">
+
+                            <div class="section-title">
+
+                                <i class="fa-solid fa-location-crosshairs"></i>
+
+                                Internship / Fellowship Preference
+
+                            </div>
+
+
+                            <div class="preference-box">
+
+                                @if (Has(prefType))
+                                {
+                                    <p class="preference-line">
+
+                                        <span class="preference-label">
+                                            Type:
+                                        </span>
+
+                                        @prefType
+
+                                    </p>
+                                }
+
+
+                                @if (
+                               Has(p.Preferred_City) ||
+                               Has(p.Preferred_State) ||
+                               Has(p.Preferred_Country)
+                               )
+                                {
+                                    <p class="preference-line">
+
+                                        <span class="preference-label">
+                                            Location:
+                                        </span>
+
+                                        @string.Join(
+                                                 ", ",
+                                                 new[]
+                                                 {
+                                p.Preferred_City,
+                                p.Preferred_State,
+                                p.Preferred_Country
+                                }
+                                                 .Where(Has)
+                                                 )
+
+                                    </p>
+                                }
+
+                            </div>
+
+                        </div>
+                    }
+
+
+                    <!-- =============================================
+                         LANGUAGES
+                         ============================================= -->
+                    @{
+
+                        var langItems =
+                        new List<(string Lang, string Star)>();
+
+
+                        for (int i = 1; i <= 8; i++)
+                        {
+                            var lang =
+                            typeof(
+                            ErJobPortal.Models.CandidateProfileModel
+                            )
+                            .GetProperty($"sLanguage{i}")
+                            ?.GetValue(p)
+                            ?.ToString();
+
+
+                            var star =
+                            typeof(
+                            ErJobPortal.Models.CandidateProfileModel
+                            )
+                            .GetProperty($"sLanguageStar{i}")
+                            ?.GetValue(p)
+                            ?.ToString();
+
+
+                            if (Has(lang))
+                            {
+                                langItems.Add(
+                                (lang, star)
+                                );
+                            }
                         }
 
-                    </div>
-
-                </div>
-
-            </section>
+                    }
 
 
-        </main>
+                    @if (langItems.Any())
+                    {
+                        <div class="resume-section">
+
+                            <div class="section-title">
+
+                                <i class="fa-solid fa-language"></i>
+
+                                Languages
+
+                            </div>
+
+
+                            <div class="language-list">
+
+                                @foreach (var l in langItems)
+                                {
+                                    <div class="language-item">
+
+                                        @l.Lang
+
+
+                                        @if (Has(l.Star))
+                                        {
+                                            <span class="language-star">
+                                                — @l.Star&#9733;
+                                            </span>
+                                        }
+
+                                    </div>
+                                }
+
+                            </div>
+
+                        </div>
+                    }
+
+
+                    <!-- =============================================
+                         REFERENCES
+                         ============================================= -->
+                    @if (
+                    Has(p.sRefName1) ||
+                    Has(p.sRefName2)
+                    )
+                    {
+                        <div class="resume-section">
+
+                            <div class="section-title">
+
+                                <i class="fa-solid fa-users"></i>
+
+                                References
+
+                            </div>
+
+
+                            <div class="references-grid">
+
+
+                                @if (Has(p.sRefName1))
+                                {
+                                    <div class="reference-item">
+
+                                        <div class="reference-name">
+                                            @p.sRefName1
+                                        </div>
+
+
+                                        <div class="reference-detail">
+
+                                            @GetLookupName(
+                                                     Model.Relationships,
+                                                     p.sRefRelationName1
+                                                     )
+
+
+                                            @if (Has(p.sLocation1))
+                                            {
+                                                <br />
+                                                @p.sLocation1
+                                            }
+
+
+                                            @if (Has(p.sMobile1))
+                                            {
+                                                <br />
+                                                <span>
+                                                    Tel: @p.sMobile1
+                                                </span>
+                                            }
+
+                                        </div>
+
+                                    </div>
+                                }
+
+
+                                @if (Has(p.sRefName2))
+                                {
+                                    <div class="reference-item">
+
+                                        <div class="reference-name">
+                                            @p.sRefName2
+                                        </div>
+
+
+                                        <div class="reference-detail">
+
+                                            @GetLookupName(
+                                                     Model.Relationships,
+                                                     p.sRefRelationName2
+                                                     )
+
+
+                                            @if (Has(p.sLocation2))
+                                            {
+                                                <br />
+                                                @p.sLocation2
+                                            }
+
+
+                                            @if (Has(p.sMobile2))
+                                            {
+                                                <br />
+                                                <span>
+                                                    Tel: @p.sMobile2
+                                                </span>
+                                            }
+
+                                        </div>
+
+                                    </div>
+                                }
+
+                            </div>
+
+                        </div>
+                    }
+
+                </section>
+
+            </main>
+
+
+            <!-- FOOTER ACCENT -->
+
+            <div class="resume-footer-line"></div>
+
+        </div>
 
     </div>
 
-</div>
+
+    <!-- =========================================================
+         ADDRESS RESOLUTION
+         ========================================================= -->
+
+    <script>
+
+        document.addEventListener(
+            "DOMContentLoaded",
+            function () {
+
+                var addressEl =
+                    document.getElementById("rvAddress");
+
+
+                if (!addressEl)
+                    return;
+
+
+                var countryID =
+                    addressEl.getAttribute(
+                        "data-country-id"
+                    ) || "";
+
+
+                var stateID =
+                    addressEl.getAttribute(
+                        "data-state-id"
+                    ) || "";
+
+
+                var cityID =
+                    addressEl.getAttribute(
+                        "data-city-id"
+                    ) || "";
+
+
+                var pincode =
+                    addressEl.getAttribute(
+                        "data-pincode"
+                    ) || "";
+
+
+                function renderAddress(
+                    cityName,
+                    stateName,
+                    countryName
+                ) {
+
+                    var parts =
+                        [
+                            cityName,
+                            stateName,
+                            countryName,
+                            pincode
+                        ]
+                        .filter(function (value) {
+
+                            return value &&
+                                value.trim() !== "";
+
+                        });
+
+
+                    addressEl.textContent =
+                        parts.length
+                            ? parts.join(", ")
+                            : "-";
+
+                }
+
+
+                if (!countryID) {
+                    return;
+                }
+
+
+                fetch("/Location/GetCountries")
+
+                    .then(function (res) {
+                        return res.json();
+                    })
+
+
+                    .then(function (countries) {
+
+                        var country =
+                            countries.find(
+                                function (c) {
+
+                                    return String(c.id) ===
+                                        String(countryID);
+
+                                }
+                            );
+
+
+                        var countryName =
+                            country
+                                ? country.name
+                                : "";
+
+
+                        var countryCode =
+                            country
+                                ? country.iso2
+                                : countryID;
+
+
+                        if (!stateID) {
+
+                            renderAddress(
+                                "",
+                                "",
+                                countryName
+                            );
+
+                            return;
+
+                        }
+
+
+                        fetch(
+                            "/Location/GetStates?countryCode=" +
+                            encodeURIComponent(
+                                countryCode
+                            )
+                        )
+
+                        .then(function (res) {
+                            return res.json();
+                        })
+
+
+                        .then(function (states) {
+
+                            var state =
+                                states.find(
+                                    function (s) {
+
+                                        return String(s.id) ===
+                                            String(stateID);
+
+                                    }
+                                );
+
+
+                            var stateName =
+                                state
+                                    ? state.name
+                                    : "";
+
+
+                            var stateCode =
+                                state
+                                    ? (
+                                        state.stateCode ||
+                                        (
+                                            String(state.id)
+                                                .split(":")[1] ||
+                                            state.id
+                                        )
+                                    )
+                                    : "";
+
+
+                            if (!cityID) {
+
+                                renderAddress(
+                                    "",
+                                    stateName,
+                                    countryName
+                                );
+
+                                return;
+
+                            }
+
+
+                            fetch(
+                                "/Location/GetCities?countryCode=" +
+                                encodeURIComponent(
+                                    countryCode
+                                ) +
+                                "&stateCode=" +
+                                encodeURIComponent(
+                                    stateCode
+                                )
+                            )
+
+                            .then(function (res) {
+                                return res.json();
+                            })
+
+
+                            .then(function (cities) {
+
+                                var city =
+                                    cities.find(
+                                        function (c) {
+
+                                            return String(c.id) ===
+                                                String(cityID);
+
+                                        }
+                                    );
+
+
+                                var cityName =
+                                    city
+                                        ? city.name
+                                        : "";
+
+
+                                renderAddress(
+                                    cityName,
+                                    stateName,
+                                    countryName
+                                );
+
+                            })
+
+
+                            .catch(function () {
+
+                                renderAddress(
+                                    "",
+                                    stateName,
+                                    countryName
+                                );
+
+                            });
+
+                        })
+
+
+                        .catch(function () {
+
+                            renderAddress(
+                                "",
+                                "",
+                                countryName
+                            );
+
+                        });
+
+                    })
+
+
+                    .catch(function (err) {
+
+                        console.log(
+                            "Address resolution error:",
+                            err
+                        );
+
+                    });
+
+            }
+
+        );
+
+    </script>
+
+
+    <!-- =========================================================
+         A4 FIT
+         ========================================================= -->
+
+    <script>
+
+        (function () {
+
+            var sheet =
+                document.getElementById(
+                    "resumeSheet"
+                );
+
+
+            var wrapper =
+                document.getElementById(
+                    "resumeWrapper"
+                );
+
+
+            if (!sheet || !wrapper)
+                return;
+
+
+            function fitSheet() {
+
+                if (
+                    window.matchMedia(
+                        "print"
+                    ).matches
+                ) {
+                    return;
+                }
+
+
+                sheet.style.transform = "none";
+
+                wrapper.style.height = "";
+
+
+                if (window.innerWidth > 1150) {
+                    return;
+                }
+
+
+                var sheetW =
+                    sheet.offsetWidth;
+
+
+                var sheetH =
+                    sheet.offsetHeight;
+
+
+                var scale =
+                    Math.min(
+                        1,
+                        window.innerWidth /
+                        sheetW
+                    );
+
+
+                sheet.style.transform =
+                    "scale(" +
+                    scale +
+                    ")";
+
+
+                wrapper.style.height =
+                    (
+                        sheetH * scale +
+                        30
+                    ) +
+                    "px";
+
+            }
+
+
+            window.addEventListener(
+                "resize",
+                fitSheet
+            );
+
+
+            window.addEventListener(
+                "load",
+                fitSheet
+            );
+
+
+            fitSheet();
+
+        })();
+
+    </script>
+
+
+    <!-- =========================================================
+         THEME SWITCHER
+         ========================================================= -->
+
+    <script>
+
+        document.addEventListener(
+            "DOMContentLoaded",
+            function () {
+
+                const resumeSheet =
+                    document.getElementById(
+                        "resumeSheet"
+                    );
+
+
+                const swatches =
+                    document.querySelectorAll(
+                        ".theme-swatch"
+                    );
+
+
+                if (
+                    !resumeSheet ||
+                    !swatches.length
+                ) {
+                    return;
+                }
+
+
+                const savedTheme =
+                    localStorage.getItem(
+                        "resumeTheme"
+                    );
+
+
+                if (savedTheme) {
+
+                    resumeSheet.setAttribute(
+                        "data-theme",
+                        savedTheme
+                    );
+
+
+                    swatches.forEach(
+                        function (swatch) {
+
+                            swatch.classList.remove(
+                                "active"
+                            );
+
+
+                            if (
+                                swatch.dataset.theme ===
+                                savedTheme
+                            ) {
+
+                                swatch.classList.add(
+                                    "active"
+                                );
+
+                            }
+
+                        }
+                    );
+
+                }
+
+
+                swatches.forEach(
+                    function (swatch) {
+
+                        swatch.addEventListener(
+                            "click",
+                            function () {
+
+                                const theme =
+                                    this.dataset.theme;
+
+
+                                if (!theme)
+                                    return;
+
+
+                                resumeSheet.setAttribute(
+                                    "data-theme",
+                                    theme
+                                );
+
+
+                                swatches.forEach(
+                                    function (item) {
+
+                                        item.classList.remove(
+                                            "active"
+                                        );
+
+                                    }
+                                );
+
+
+                                this.classList.add(
+                                    "active"
+                                );
+
+
+                                localStorage.setItem(
+                                    "resumeTheme",
+                                    theme
+                                );
+
+                            }
+                        );
+
+                    }
+                );
+
+            }
+        );
+
+    </script>
+
+
+    <!-- =========================================================
+         DOWNLOAD / PDF
+         ========================================================= -->
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
+    <script src="~/js/resume-download.js"></script>
+
 
 </body>
 
