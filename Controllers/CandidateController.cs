@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Configuration;
 using System.Data;
+using System.Reflection;
 
 namespace ErJobPortal.Controllers
 {
@@ -173,6 +174,9 @@ namespace ErJobPortal.Controllers
             List<OrgPostM> traineeAppliedPosts = TraineeApplyToPostList(candidateId.Value);
             ViewBag.TraineeAppliedPosts = traineeAppliedPosts;
 
+
+    
+
             return View();
         }
 
@@ -341,20 +345,14 @@ namespace ErJobPortal.Controllers
         private List<OrgPostM> GetMatchingJobsForCandidate(int candidateId)
         {
             List<OrgPostM> posts = new List<OrgPostM>();
-
-            string connectionString =
-                _configuration.GetConnectionString("DefaultConnection")!;
+            string connectionString = _configuration.GetConnectionString("DefaultConnection")!;
 
             using (SqlConnection con = new SqlConnection(connectionString))
-            using (SqlCommand cmd = new SqlCommand(
-                "GetMatchingJobsForCandidate", con))
+            using (SqlCommand cmd = new SqlCommand("GetMatchingJobsForCandidate", con))
             {
                 cmd.CommandType = CommandType.StoredProcedure;
-
                 cmd.Parameters.Add("@CandidateID", SqlDbType.Int).Value = candidateId;
-
                 con.Open();
-
                 using (SqlDataReader dr = cmd.ExecuteReader())
                 {
                     while (dr.Read())
@@ -369,6 +367,7 @@ namespace ErJobPortal.Controllers
                             dr["PostID"] != DBNull.Value
                             ? Convert.ToInt32(dr["PostID"])
                             : 0;
+
 
                         // =============================================
                         // ORGANIZATION
@@ -431,7 +430,24 @@ namespace ErJobPortal.Controllers
                             dr["InternshipFellowshipType"] != DBNull.Value
                             ? dr["InternshipFellowshipType"].ToString()!
                             : "";
+                        // =============================================
+                        // REQUIRED TRAINEES
+                        // =============================================
 
+                        post.nRequiredTrainees =
+                            dr["nRequiredTrainees"] != DBNull.Value
+                            ? Convert.ToInt32(dr["nRequiredTrainees"])
+                            : 0;
+
+
+                        // =============================================
+                        // START DATE
+                        // =============================================
+
+                        post.dStartDate =
+                            dr["dStartDate"] != DBNull.Value
+                            ? Convert.ToDateTime(dr["dStartDate"])
+                            : (DateTime?)null;
                         // =============================================
                         // FACILITIES
                         // =============================================
@@ -460,6 +476,8 @@ namespace ErJobPortal.Controllers
 
             return posts;
         }
+
+
         [Route("Candidate/OrgList/{id?}")]
         public IActionResult OrgList(string? id)
         {
@@ -2741,8 +2759,56 @@ namespace ErJobPortal.Controllers
                 return NotFound();
             }
 
+            // =========================================================
+            // GET MATCHING / SUITABLE JOBS FOR LOGGED-IN CANDIDATE
+            // =========================================================
+
+            List<OrgPostM> matchingJobs =
+                GetMatchingJobsForCandidate(candidateId.Value);
+
+
+            // =========================================================
+            // MONTHLY SUITABLE OPENINGS
+            // =========================================================
+
+            int currentYear = DateTime.Now.Year;
+
+            int[] suitableOpeningsMonthly = new int[12];
+
+            foreach (var job in matchingJobs)
+            {
+                if (!job.dStartDate.HasValue)
+                    continue;
+
+                DateTime startDate = job.dStartDate.Value;
+
+                // Only current year's jobs
+                if (startDate.Year != currentYear)
+                    continue;
+
+                int monthIndex = startDate.Month - 1;
+
+                int requiredTrainees = job.nRequiredTrainees;
+
+                if (requiredTrainees < 0)
+                    requiredTrainees = 0;
+
+                suitableOpeningsMonthly[monthIndex] +=
+                    requiredTrainees;
+            }
+
+
+            // =========================================================
+            // SEND DATA TO VIEW
+            // =========================================================
+
             ViewBag.CandidateCode = candidateCode;
             ViewBag.CandidateID = candidateId.Value;
+
+            ViewBag.ChartYear = currentYear;
+
+            ViewBag.SuitableOpeningsMonthly =
+                suitableOpeningsMonthly;
 
             return View();
         }
@@ -3393,6 +3459,48 @@ namespace ErJobPortal.Controllers
             return appliedPosts;
         }
 
+        #endregion
+
+
+        #region "Chart1"
+        private void PrepareSuitableOpeningChart(int candidateId, CandidateDashboardViewModel model)
+        {
+            // Get matching/suitable jobs for trainee
+            List<OrgPostM> matchingJobs = GetMatchingJobsForCandidate(candidateId);
+
+            // Initialize all 12 months with 0
+            string[] months =
+            {
+        "Jan", "Feb", "Mar", "Apr", "May", "Jun",
+        "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"
+    };
+
+            int[] monthlyOpenings = new int[12];
+
+            foreach (var job in matchingJobs)
+            {
+                // Make sure date exists
+                if (job.dStartDate == null)
+                    continue;
+
+                DateTime startDate = job.dStartDate.Value;
+
+                int requiredTrainees = job.nRequiredTrainees;
+
+                if (requiredTrainees < 0)
+                    requiredTrainees = 0;
+
+                int monthIndex = startDate.Month - 1;
+
+                monthlyOpenings[monthIndex] += requiredTrainees;
+            }
+
+            model.SuitableOpeningMonths =
+                months.ToList();
+
+            model.SuitableOpeningCounts =
+                monthlyOpenings.ToList();
+        }
         #endregion
     }
 }
