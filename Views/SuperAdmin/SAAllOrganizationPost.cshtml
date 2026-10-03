@@ -26,154 +26,242 @@
 
                 <thead>
                     <tr>
-                        <th>Sr. No</th>
-                        <th>Post Creation Date</th>
-                        <th>Organization Name</th>
-                        <th>View Post</th>
+
+                        <th>Sr.<br />No</th>
+
+                        <th>Post<br />Creation<br />Date</th>
+
                         <th>Position</th>
-                        <th>No. of Required Trainee</th>
-                        <th>Eligible Trainee</th>
+
+                        <th>Action</th>
+
+                        <th>No. of<br />Required<br />Trainee</th>
+
+                        <th>Eligible<br />Trainee</th>
+
                         <th>Gender</th>
-                        <th>Minimum Qualification</th>
+
+                        <th>Minimum<br />Qualification</th>
+
                         <th>Location</th>
-                        <th>Working Hours Per Day</th>
-                        <th>Weekly Working Days</th>
-                        <th>Internship Type</th>
-                        <th>Internship / Fellowship Type</th>
-                        <th>Total Charges</th>
-                        <th>Training Involved</th>
-                        <th>Internship Duration</th>
-                        <th>Facilities Available</th>
-                        <th>Internship Mode</th>
-                        <th>Divyang Allowed</th>
+
+                        <th>Working<br />Hours Per<br />Day</th>
+
+                        <th>Weekly Working<br />Days</th>
+
+                        <th>Internship<br />Type</th>
+
+                        <th>Internship / Fellowship<br />Type</th>
+
+                        <th>Training<br />Involved</th>
+
+                        <th>Internship<br />Duration</th>
+
+                        <th>Facilities<br />Available</th>
+
+                        <th>Internship<br />Mode</th>
+
+                        <th>Divyang<br />Allowed</th>
+
                         <th>Status</th>
+
                     </tr>
                 </thead>
 
                 <tbody>
 
-                    <tr>
+                    @{
+                        int srNo = 1;
+                    }
 
-                        <td class="master-id">1</td>
+                    @foreach (var item in Model)
+                    {
+                        <tr>
 
-                        <td>25-09-2026</td>
+                            <!-- Sr. No -->
+                            <td>
+                                @srNo
+                            </td>
 
-                        <td>ItNetworkZ</td>
 
-                        <td>
-                           <a asp-controller="Organization"
-   asp-action="OrgViewPost"
-   asp-route-id="1"
-   class="resume-view-btn"
-   title="View Post">
-    <i class="fas fa-eye"></i>
-</a>
-                        </td>
+                            <!-- Post Creation Date -->
+                            <td>
+                                @(item.dRegisterDate == DateTime.MinValue
+                                                        ? ""
+                                                        : item.dRegisterDate.ToString("dd-MM-yyyy"))
+                            </td>
 
-                        <td>.NET Trainee</td>
 
-                        <td>10</td>
+                            <!-- Position -->
+                            <td>
+                                @item.sPositionName
+                            </td>
 
-                        <td>Graduate / Final Year</td>
 
-                        <td>Any</td>
+                            @*    <!-- Action radhika22-09--> *@
+                            <td>
 
-                        <td>B.E / B.Tech / MCA</td>
+                                <div class="action">
 
-                        <td>Nagpur</td>
+                                    <a asp-action="ViewOrgPost"
+                                       asp-route-id="@item.nID"
+                                       title="View">
 
-                        <td>8 Hours</td>
+                                        <i class="fa-solid fa-eye"></i>
 
-                        <td>5 Days</td>
+                                    </a>
 
-                        <td>Internship</td>
+                                    <a asp-action="EditPost"
+                                       asp-route-id="@item.nID"
+                                       title="Edit">
 
-                        <td>Internship</td>
+                                        <i class="fa-solid fa-pen-to-square"></i>
 
-                        <td>Free</td>
+                                    </a>
 
-                        <td>Yes</td>
+                                </div>
 
-                        <td>3 Months</td>
+                            </td>
 
-                        <td>
-                            Certificate,
-                            Training,
-                            Placement Assistance
-                        </td>
 
-                        <td>Offline</td>
+                            <!-- Required Trainees -->
+                            <td>
+                                @item.nRequiredTrainees
+                            </td>
 
-                        <td>Yes</td>
 
-                        <td>
-                            <span class="master-status">
-                                Active
-                            </span>
-                        </td>
+                            <!-- Eligible Trainee -->
+                            <!-- Eligible Trainee -->
+                            <td>
+                                <a asp-controller="Organization"
+                                   asp-action="EligibleTrainees"
+                                   asp-route-id="@item.nID"
+                                   asp-route-orgID="@item.nOrgID"
+                                   class="trainee">
+                                    @item.MatchingTraineeCount
+                                </a>
+                            </td>
 
-                    </tr>
 
-                    <tr>
+                            <!-- Gender -->
+                            <td>
+                                @item.sGenderName
+                            </td>
 
-                        <td class="master-id">2</td>
 
-                        <td>24-09-2026</td>
+                            <!-- Minimum Qualification -->
+                            <td>
+                                @item.sMinimumQualificationName
+                            </td>
 
-                        <td>ItNetworkZ</td>
 
-                        <td>
-                        <a asp-controller="Organization"
-   asp-action="OrgViewPost"
-   asp-route-id="2"
-   class="resume-view-btn"
-   title="View Post">
-    <i class="fas fa-eye"></i>
-</a>
-                        </td>
 
-                        <td>React JS Trainee</td>
+                            <!-- Location -->
+                            <td>
+                                <div class="location">
 
-                        <td>5</td>
+                                    @item.sCountryName
+                                    <br />
 
-                        <td>Graduate</td>
+                                    @item.sStateName
+                                    <br />
 
-                        <td>Any</td>
+                                    @item.nCityName
 
-                        <td>B.E / B.Tech / BCA / MCA</td>
+                                </div>
+                            </td>
 
-                        <td>Nagpur</td>
+                            <!-- Working Hours -->
+                            <td>
+                                @item.sWorkingHours
+                            </td>
 
-                        <td>8 Hours</td>
 
-                        <td>5 Days</td>
+                            <!-- Working Days -->
+                            <td>
 
-                        <td>Internship</td>
+                                <div class="days">
+                                    @item.sWorkingDays
+                                </div>
 
-                        <td>Fellowship</td>
+                            </td>
 
-                        <td>₹2,000</td>
 
-                        <td>Yes</td>
+                            <!-- Internship Type -->
+                            <td>
+                                @item.sInternshipTypeName
+                            </td>
 
-                        <td>6 Months</td>
 
-                        <td>
-                            Certificate,
-                            Training
-                        </td>
+                            <!-- Internship Fellowship Type -->
+                            <td>
+                                @item.sInternshipFellowshipTypeName
+                            </td>
 
-                        <td>Hybrid</td>
 
-                        <td>No</td>
+                            <!-- Training Involved -->
+                            <td>
+                                @item.sTrainingInvolvedName
+                            </td>
 
-                        <td>
-                            <span class="master-status">
-                                Active
-                            </span>
-                        </td>
 
-                    </tr>
+                            <!-- Internship Duration -->
+                            <td>
+                                @item.sInternshipDurationName
+                            </td>
+
+
+                            <!-- Facilities -->
+                            <td>
+
+                                @if (!string.IsNullOrWhiteSpace(item.sFacilities))
+                                {
+                                    <i class="fa-solid fa-wifi wifi"
+                                       title="@item.sFacilities">
+                                    </i>
+                                }
+                                else
+                                {
+                                    <span>-</span>
+                                }
+
+                            </td>
+
+
+                            <!-- Internship Mode -->
+                            <td>
+                                @item.sInternshipModeName
+                            </td>
+
+
+                            <!-- Divyang -->
+                            <td>
+
+                                @(string.IsNullOrWhiteSpace(item.sDivyang)
+                                                        ? "No"
+                                                        : item.sDivyang)
+
+                            </td>
+
+
+                            <!-- Status -->
+                            <td>
+
+                                <button type="button"
+                                        class="status @(item.nBit ? "enabled" : "disabled")"
+                                        data-id="@item.nID"
+                                        onclick="togglePostStatus(this)">
+
+                                    @(item.nBit ? "Enabled" : "Disabled")
+
+                                </button>
+
+                            </td>
+
+                        </tr>
+
+                        srNo++;
+                    }
 
                 </tbody>
 

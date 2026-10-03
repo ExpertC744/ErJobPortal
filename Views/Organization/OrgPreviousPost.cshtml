@@ -197,11 +197,21 @@
                             </td>
 
                             <td>
+                                <form asp-controller="Organization"
+                                      asp-action="ToggleOrgPreviousPostStatus"
+                                      method="post"
+                                      style="display:inline;">
 
-                                <span class="master-status">
-                                    @(Model.nBit ? "Enabled" : "Disabled")
-                                </span>
+                                    <input type="hidden" name="id" value="@Model.nID" />
 
+                                    <button type="submit"
+                                            class="master-status @(Model.nBit ? "status-enabled" : "status-disabled")">
+
+                                        @(Model.nBit ? "Enabled" : "Disabled")
+
+                                    </button>
+
+                                </form>
                             </td>
 
                         </tr>
@@ -221,10 +231,53 @@
         <div id="previousPostPageInfo"
              class="master-page-info text-center d-none">
         </div>
+        </div>
+        <script>
+                    function toggleOrgPreviousPostStatus(id, button) {
+
+                        fetch('/Organization/ToggleOrgPreviousPostStatus', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/x-www-form-urlencoded'
+                            },
+                            body: 'id=' + encodeURIComponent(id)
+                        })
+                        .then(response => response.json())
+                        .then(data => {
+
+                            if (data.success) {
+
+                                if (data.enabled) {
+
+                                    button.textContent = "Enabled";
+
+                                    button.classList.remove("status-disabled");
+                                    button.classList.add("status-enabled");
+
+                                } else {
+
+                                    button.textContent = "Disabled";
+
+                                    button.classList.remove("status-enabled");
+                                    button.classList.add("status-disabled");
+                                }
+
+                            } else {
+
+                                alert(data.message);
+                            }
+                        })
+                        .catch(error => {
+
+                            console.error(error);
+                            alert("Unable to update post status.");
+                        });
+                    }
+        </script>
 
     </div>
 
-</div>
+
 
 
 <!-- =========================================================

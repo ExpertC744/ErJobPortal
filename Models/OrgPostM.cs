@@ -72,7 +72,7 @@ namespace ErJobPortal.Models
         [Range(1, int.MaxValue, ErrorMessage = "Please select a valid internship duration.")]
         public int nInternshipDurationID { get; set; }
 
-        public DateTime dStartDate { get; set; }
+        public DateTime? dStartDate { get; set; }
         public DateTime dCompletionDate { get; set; }
 
         // Mode
