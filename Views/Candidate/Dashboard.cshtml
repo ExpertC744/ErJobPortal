@@ -591,6 +591,34 @@
             font-size: 9px;
         }
     }
+
+    /* =========================================================
+           VIEW BUTTON
+        ========================================================= */
+
+    .sa-view-btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        padding: 6px 10px;
+        border-radius: 7px;
+        background: #e8f5f1;
+        color: #1e7b67;
+        text-decoration: none;
+        font-size: 10px;
+        font-weight: 700;
+        transition: all .2s ease;
+    }
+
+        .sa-view-btn:hover {
+            background: #1e7b67;
+            color: #ffffff;
+            text-decoration: none;
+        }
+
+        .sa-view-btn i {
+            font-size: 9px;
+        }
 </style>
 @if (TempData["ApplyMessage"] != null)
 {
@@ -657,12 +685,17 @@
 
                 </div>
 
-                <a asp-controller="Candidate"
-                   asp-action="OrgList"
-                   class="stat-link">
-                    View Details
-                    <i class="fas fa-arrow-right"></i>
-                </a>
+                @* radhika02-10 *@
+                <div class="stat-bottom">
+                    <a asp-controller="Candidate"
+                       asp-action="OrgList"
+                       class="sa-view-btn">
+
+                        View Details
+                        <i class="fas fa-arrow-right"></i>
+
+                    </a>
+                </div>
 
             </div>
         </div>
@@ -714,6 +747,7 @@
         </div>
 
 
+        @* radhika02-09 *@
         <div class="col-xl-3 col-md-6 mb-4">
             <div class="stat-card">
 
@@ -721,27 +755,38 @@
                     <i class="fas fa-paper-plane"></i>
                 </div>
 
+                @{
+                    var traineeAppliedPosts = ViewBag.TraineeAppliedPosts;
+                    int applicationsSentCount = traineeAppliedPosts == null
+                    ? 0
+                    : ((System.Collections.ICollection)traineeAppliedPosts).Count;
+                }
+
                 <div class="stat-title">
                     Applications Sent
                 </div>
 
                 <div class="stat-number">
-                    25
+                    @applicationsSentCount
                 </div>
 
                 <div class="stat-bottom">
+
                     <a asp-controller="Candidate"
                        asp-action="TraineeApplied"
-                       class="stat-link">
-                        View Details
-                        <i class="fas fa-arrow-right"></i>
-                    </a>
+                       asp-route-id="@ViewBag.CandidateCode"
+                       class="sa-view-btn">
 
+                        View Details
+
+
+                        <i class="fas fa-arrow-right"></i>
+
+                    </a>
                 </div>
 
             </div>
         </div>
-
     </div>
 
 

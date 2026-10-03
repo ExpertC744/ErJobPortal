@@ -4017,11 +4017,15 @@ WHERE nID = @nID
             return candidateChartData;
         }
 
-
+        #region "Elebible Trianee"
         [HttpGet]
-        [Route("Organization/EligibleTrainees/{id}")]
-        public IActionResult EligibleTrainees(int id, string orgCode)
+        [Route("Organization/EligibleTrainees/{id:int}")]
+        public IActionResult EligibleTrainees(int id, string? orgCode)
         {
+            // =====================================================
+            // GET ORGANIZATION ID FROM SESSION
+            // =====================================================
+
             int? sessionOrgID = HttpContext.Session.GetInt32("OrgID");
 
             if (sessionOrgID == null)
@@ -4041,8 +4045,13 @@ WHERE nID = @nID
                 {
                     cmd.CommandType = CommandType.StoredProcedure;
 
-                    cmd.Parameters.Add("@nID", SqlDbType.Int).Value = id;
-                    cmd.Parameters.Add("@OrganizationID", SqlDbType.Int).Value = orgID;
+                    // Post ID
+                    cmd.Parameters.Add("@nID", SqlDbType.Int)
+                        .Value = id;
+
+                    // Organization ID from SESSION
+                    cmd.Parameters.Add("@OrganizationID", SqlDbType.Int)
+                        .Value = orgID;
 
                     con.Open();
 
@@ -4159,16 +4168,175 @@ WHERE nID = @nID
                 }
             }
 
-            // IMPORTANT:
-            // id = PostID
-            // orgCode = Organization Code
+            // =====================================================
+            // SEND DATA TO VIEW
+            // =====================================================
 
             ViewBag.PostID = id;
-            ViewBag.OrgCode = orgCode;
+
+            // If orgCode was passed in URL, use it.
+            // Otherwise use session OrgID.
+            ViewBag.OrgCode = string.IsNullOrWhiteSpace(orgCode)
+                ? orgID.ToString()
+                : orgCode;
 
             return View(trainees);
         }
+        #endregion
 
+        #region "Shortlist/Reject the Candidate"
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public IActionResult UpdateCandidateStatus(int candidateId, int postId, int status)
+        {
+            // =====================================================
+            // ORGANIZATION LOGIN CHECK
+            // =====================================================
+            int? sessionOrgID = HttpContext.Session.GetInt32("OrgID");
+            if (sessionOrgID == null)
+            {
+                return RedirectToAction("OrganizationLogin", "Account");
+            }
+            int orgID = sessionOrgID.Value;
+            // =====================================================
+            // ONLY ALLOW
+            // 1 = Shortlisted
+            // 2 = Rejected
+            // =====================================================
+            if (status != 1 && status != 2)
+            {
+                return RedirectToAction("EligibleTrainees", new { id = postId });
+            }
+            string connectionString = _configuration.GetConnectionString("DefaultConnection")!;
+            using (SqlConnection con = new SqlConnection(connectionString))
+            {
+                using (SqlCommand cmd = new SqlCommand("SP_UpdateOrgCandidateStatus", con))
+                {
+                    cmd.CommandType = CommandType.StoredProcedure;
+                    cmd.Parameters.Add("@CandidateID", SqlDbType.Int).Value = candidateId;
+                    cmd.Parameters.Add("@PostID", SqlDbType.Int).Value = postId;
+                    cmd.Parameters.Add("@OrganizationID", SqlDbType.Int).Value = orgID;
+                    cmd.Parameters.Add("@Status", SqlDbType.Int).Value = status;
+                    con.Open();
+                    cmd.ExecuteNonQuery();
+                }
+            }
+
+            return RedirectToAction("EligibleTrainees", new { id = postId });
+        }
+
+        #endregion
+
+        #region "Update Final Selection Status"
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public IActionResult UpdateCandidateFinalStatus(int candidateId, int postId, int finalStatus, int comment)
+        {
+            // =====================================================
+            // ORGANIZATION LOGIN CHECK
+            // =====================================================
+
+            int? sessionOrgID = HttpContext.Session.GetInt32("OrgID");
+            if (sessionOrgID == null)
+            {
+                return RedirectToAction("OrganizationLogin", "Account");
+            }
+            int orgID = sessionOrgID.Value;
+
+            // =====================================================
+            // VALIDATE FINAL STATUS
+            // 0 = Select
+            // 1 = Hold
+            // 2 = Rejected
+            // 3 = Shortlisted
+            // =====================================================
+            if (finalStatus < 1 || finalStatus > 3)
+            {
+                return RedirectToAction("EligibleTrainees", new { id = postId, orgCode = orgID });
+            }
+
+            // =====================================================
+            // VALIDATE COMMENT ACCORDING TO FINAL STATUS
+            // =====================================================
+
+            bool validComment = false;
+            if (finalStatus == 1)
+            {
+                // Hold
+                // Only:
+                // 1 = On Hold May Consider
+
+                validComment = comment == 1;
+            }
+            else if (finalStatus == 2)
+            {
+                // Rejected
+                // 0 = Select
+                // 1 = Skills not Up to the mark
+                // 2 = High Expectations
+                // 3 = Other
+
+                validComment = comment >= 0 && comment <= 3;
+            }
+            else if (finalStatus == 3)
+            {
+                // Shortlisted
+                // 0 = Select
+                // 1 = OL under Process
+                validComment = comment == 0 || comment == 1;
+            }
+
+            if (!validComment)
+            {
+                return RedirectToAction("EligibleTrainees", new { id = postId, orgCode = orgID });
+            }
+
+            // =====================================================
+            // UPDATE DATABASE
+            // =====================================================
+            string connectionString = _configuration.GetConnectionString("DefaultConnection")!;
+            using (SqlConnection con = new SqlConnection(connectionString))
+            {
+                using (SqlCommand cmd = new SqlCommand("SP_UpdateOrgCandidateFinalStatus", con))
+                {
+                    cmd.CommandType = CommandType.StoredProcedure;
+                    cmd.Parameters.Add("@CandidateID", SqlDbType.Int).Value = candidateId;
+
+                    cmd.Parameters.Add(
+                        "@PostID",
+                        SqlDbType.Int).Value =
+                        postId;
+
+                    cmd.Parameters.Add(
+                        "@OrganizationID",
+                        SqlDbType.Int).Value =
+                        orgID;
+
+                    cmd.Parameters.Add(
+                        "@FinalStatus",
+                        SqlDbType.Int).Value =
+                        finalStatus;
+
+                    cmd.Parameters.Add(
+                        "@Comment",
+                        SqlDbType.Int).Value =
+                        comment;
+
+                    con.Open();
+                    cmd.ExecuteNonQuery();
+                }
+            }
+
+
+            // =====================================================
+            // BACK TO ELIGIBLE TRAINEES
+            // =====================================================
+
+            return RedirectToAction("EligibleTrainees", new { id = postId, orgCode = orgID });
+        }
+
+        #endregion
 
         // khushi 01-10-26
         [HttpGet]
