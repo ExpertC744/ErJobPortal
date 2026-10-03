@@ -2496,17 +2496,8 @@ ORDER BY SAF.nID DESC, OFB.nID DESC;
         #region "Elegible Trainee"
         [HttpGet]
         [Route("SuperAdmin/EligibleTrainees/{id:int}")]
-        public IActionResult EligibleTrainees(int id, string orgCode)
+        public IActionResult EligibleTrainees(int id, int orgID)
         {
-            //int? sessionOrgID = HttpContext.Session.GetInt32("OrgID");
-
-            //if (sessionOrgID == null)
-            //{
-            //    return RedirectToAction("OrganizationLogin", "Account");
-            //}
-
-            //int orgID = sessionOrgID.Value;
-
             List<EligibleTraineeM> trainees = new List<EligibleTraineeM>();
 
             using (SqlConnection con = new SqlConnection(
@@ -2517,8 +2508,11 @@ ORDER BY SAF.nID DESC, OFB.nID DESC;
                 {
                     cmd.CommandType = CommandType.StoredProcedure;
 
+                    // Post ID
                     cmd.Parameters.Add("@nID", SqlDbType.Int).Value = id;
-                    cmd.Parameters.Add("@OrganizationID", SqlDbType.Int).Value = orgCode;
+
+                    // Organization ID
+                    cmd.Parameters.Add("@OrganizationID", SqlDbType.Int).Value = orgID;
 
                     con.Open();
 
@@ -2635,12 +2629,8 @@ ORDER BY SAF.nID DESC, OFB.nID DESC;
                 }
             }
 
-            // IMPORTANT:
-            // id = PostID
-            // orgCode = Organization Code
-
             ViewBag.PostID = id;
-            ViewBag.OrgCode = orgCode;
+            ViewBag.OrgID = orgID;
 
             return View(trainees);
         }
