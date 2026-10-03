@@ -38,16 +38,14 @@ img {
 }
 
 .resume-sheet {
-   
     --border: #dce2e4;
     --muted: #718087;
     --photo: 30mm;
     position: relative;
-    width: 279mm;
-    min-width: 279mm;
-    height: 210mm;
-    min-height: 210mm;
-    max-height: 210mm;
+    width: 1123px;
+    min-width: 1123px;
+    height: 794px;
+    min-height: 794px;
     display: flex;
     flex-direction: column;
     background: #fff;
