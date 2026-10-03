@@ -100,29 +100,30 @@ img{max-width:100%;display:block}
 .preference-item:last-child{margin-bottom:0}
 .preference-item strong{color:var(--theme);font-weight:700}
 
-/* TWENTY - Corner colour block (photo + name), 2-column info panel, wide content */
-.resume-sheet{display:grid;grid-template-columns:34mm 76mm 1fr;grid-template-rows:56mm 1fr}
-.resume-header,.resume-body{display:contents}
-.photo-wrapper{grid-column:1;grid-row:1;display:flex;align-items:center;justify-content:center;background:var(--theme)}
-.profile-photo{--photo:24mm;border-radius:8px;border:3px solid rgba(255,255,255,.85)}
-.profile-placeholder{--photo:24mm;border-radius:8px;border:3px solid rgba(255,255,255,.85);background:var(--theme-soft)}
-.header-info{grid-column:2;grid-row:1;display:flex;flex-direction:column;justify-content:center;padding:0 8mm 0 2mm;background:var(--theme);min-width:0}
-.candidate-name{font-size:22px;color:#fff}
-.candidate-role{margin-top:6px;font-size:9px;letter-spacing:1.6px;color:var(--theme-light)}
-.header-accent{width:36px;height:3px;margin-top:9px;background:var(--theme-light)}
-.header-contact{grid-column:3;grid-row:1;display:flex;flex-direction:column;justify-content:center;gap:7px;padding:0 12mm;border-bottom:1px solid var(--border)}
-.header-contact-item{color:#26323a}
-.header-contact-item i{color:var(--theme)}
-.left-column{grid-column:1/3;grid-row:2;column-count:2;column-gap:8mm;background:var(--theme-soft);padding:5mm 9mm 4mm 10mm}
-.right-column{grid-column:3;grid-row:2;padding:5mm 12mm 4mm 12mm}
-.left-column .section-icon,.left-column .section-title-line{display:none}
-.left-column .section-heading{padding-bottom:3px;border-bottom:1px solid var(--theme-light)}
-.right-column .section-icon{border-radius:5px}
+/* SEVENTEEN - Header band + timeline experience/education, tinted info column on the RIGHT */
+.resume-header{height:40mm;display:grid;grid-template-columns:44mm 1fr 76mm;align-items:center;background:var(--theme)}
+.photo-wrapper{grid-column:1;grid-row:1;display:flex;align-items:center;justify-content:center}
+.profile-photo{--photo:26mm;border-radius:50%;border:3px solid #fff}
+.profile-placeholder{--photo:26mm;border-radius:50%;border:3px solid #fff;background:var(--theme-soft)}
+.header-info{grid-column:2;grid-row:1;padding:0 6mm 0 2mm;min-width:0}
+.candidate-name{font-size:28px;color:#fff}
+.candidate-role{margin-top:6px;font-size:10px;color:var(--theme-light)}
+.header-accent{width:44px;height:3px;margin-top:10px;background:var(--theme-light)}
+.header-contact{grid-column:3;grid-row:1;display:flex;flex-direction:column;gap:6px;padding-left:8mm;border-left:1px solid rgba(255,255,255,.3);min-width:0}
+.header-contact-item{color:#fff}
+.header-contact-item i{color:var(--theme-light)}
+.resume-body{grid-template-columns:1fr 72mm}
+.right-column{grid-column:1;grid-row:1;padding:5mm 10mm 4mm 12mm}
+.left-column{grid-column:2;grid-row:1;background:var(--theme-soft);padding:5mm 8mm 4mm 8mm}
+.section-icon{border-radius:5px}
+.resume-section:has(.experience-item){display:block}
+.resume-section:has(.experience-item)>.section-heading{margin-bottom:8px}
+.education-list{display:block}
+.experience-item,.education-item{position:relative;margin-left:5px;padding:0 0 9px 18px;border-left:2px solid var(--theme-light)}
+.experience-item:last-child,.education-item:last-child{padding-bottom:0}
+.experience-item::before,.education-item::before{content:"";position:absolute;left:-7px;top:1px;width:12px;height:12px;border-radius:50%;background:#fff;border:3px solid var(--theme)}
 .skill-list{padding:5px 8px;background:#fff;border-radius:5px}
-.experience-item{padding-top:4px;border-top:2px solid var(--theme-light)}
-.education-item{padding:6px 9px;background:var(--theme-soft);border-radius:5px}
-.achievement-item{padding:4px 10px;background:var(--theme-soft);border-radius:14px}
-.reference-item{padding:6px 9px;background:var(--theme-soft);border-radius:5px}
+.reference-item{padding:6px 9px;background:var(--theme-soft);border-radius:6px}
 
 /* =========================================================
    RESPONSIVE - SAME SHEET (279mm x 210mm), ONLY ZOOM OUT

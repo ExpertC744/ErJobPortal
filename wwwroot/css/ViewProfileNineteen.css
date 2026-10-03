@@ -100,29 +100,31 @@ img{max-width:100%;display:block}
 .preference-item:last-child{margin-bottom:0}
 .preference-item strong{color:var(--theme);font-weight:700}
 
-/* TWENTY - Corner colour block (photo + name), 2-column info panel, wide content */
-.resume-sheet{display:grid;grid-template-columns:34mm 76mm 1fr;grid-template-rows:56mm 1fr}
-.resume-header,.resume-body{display:contents}
-.photo-wrapper{grid-column:1;grid-row:1;display:flex;align-items:center;justify-content:center;background:var(--theme)}
-.profile-photo{--photo:24mm;border-radius:8px;border:3px solid rgba(255,255,255,.85)}
-.profile-placeholder{--photo:24mm;border-radius:8px;border:3px solid rgba(255,255,255,.85);background:var(--theme-soft)}
-.header-info{grid-column:2;grid-row:1;display:flex;flex-direction:column;justify-content:center;padding:0 8mm 0 2mm;background:var(--theme);min-width:0}
-.candidate-name{font-size:22px;color:#fff}
-.candidate-role{margin-top:6px;font-size:9px;letter-spacing:1.6px;color:var(--theme-light)}
-.header-accent{width:36px;height:3px;margin-top:9px;background:var(--theme-light)}
-.header-contact{grid-column:3;grid-row:1;display:flex;flex-direction:column;justify-content:center;gap:7px;padding:0 12mm;border-bottom:1px solid var(--border)}
-.header-contact-item{color:#26323a}
-.header-contact-item i{color:var(--theme)}
-.left-column{grid-column:1/3;grid-row:2;column-count:2;column-gap:8mm;background:var(--theme-soft);padding:5mm 9mm 4mm 10mm}
-.right-column{grid-column:3;grid-row:2;padding:5mm 12mm 4mm 12mm}
-.left-column .section-icon,.left-column .section-title-line{display:none}
-.left-column .section-heading{padding-bottom:3px;border-bottom:1px solid var(--theme-light)}
-.right-column .section-icon{border-radius:5px}
-.skill-list{padding:5px 8px;background:#fff;border-radius:5px}
-.experience-item{padding-top:4px;border-top:2px solid var(--theme-light)}
-.education-item{padding:6px 9px;background:var(--theme-soft);border-radius:5px}
-.achievement-item{padding:4px 10px;background:var(--theme-soft);border-radius:14px}
-.reference-item{padding:6px 9px;background:var(--theme-soft);border-radius:5px}
+/* NINETEEN - Pastel header with soft circles, contact chips, pill headings */
+.resume-header{height:46mm;display:grid;grid-template-columns:44mm 1fr;grid-template-rows:1fr auto;background:var(--theme-soft);overflow:hidden;border-bottom:2px solid var(--theme-light)}
+.resume-header::before{content:"";position:absolute;right:-10mm;top:-26mm;width:80mm;height:80mm;border-radius:50%;background:var(--theme-light);opacity:.35}
+.resume-header::after{content:"";position:absolute;right:62mm;bottom:-34mm;width:56mm;height:56mm;border-radius:50%;background:var(--theme-light);opacity:.25}
+.photo-wrapper,.header-info,.header-contact{position:relative;z-index:1}
+.photo-wrapper{grid-column:1;grid-row:1/3;display:flex;align-items:center;justify-content:center}
+.profile-photo{--photo:30mm;border-radius:18px;border:4px solid #fff;box-shadow:0 5px 14px rgba(20,40,50,.18)}
+.profile-placeholder{--photo:30mm;border-radius:18px;border:4px solid #fff;background:#fff}
+.header-info{grid-column:2;grid-row:1;align-self:end;padding:0 10mm 3mm 2mm;min-width:0}
+.candidate-name{font-size:30px;color:var(--theme-dark)}
+.candidate-role{margin-top:5px;font-size:10.5px;color:var(--theme)}
+.header-accent{display:none}
+.header-contact{grid-column:2;grid-row:2;display:flex;flex-direction:row;flex-wrap:wrap;gap:5px 7px;padding:0 10mm 5mm 2mm}
+.header-contact-item{padding:3px 11px;background:#fff;border:1px solid var(--theme-light);border-radius:20px;color:var(--theme-dark);align-items:center}
+.header-contact-item i{margin-top:0;color:var(--theme)}
+.resume-body{grid-template-columns:96mm 1fr}
+.left-column{padding:5mm 8mm 4mm 12mm}
+.right-column{padding:5mm 12mm 4mm 8mm}
+.section-icon,.section-title-line{display:none}
+.section-title{padding:2px 12px;border-radius:12px;background:var(--theme);color:#fff;font-size:9.8px}
+.skill-list{padding:5px 9px;background:var(--theme-soft);border-radius:8px}
+.experience-item{padding:6px 10px;background:var(--theme-soft);border-radius:10px}
+.education-item{padding:6px 10px;border:1px solid var(--theme-light);border-radius:10px}
+.achievement-item{padding:4px 11px;background:var(--theme-soft);border-radius:16px}
+.reference-item{padding:6px 10px;border:1px solid var(--theme-light);border-radius:10px}
 
 /* =========================================================
    RESPONSIVE - SAME SHEET (279mm x 210mm), ONLY ZOOM OUT
