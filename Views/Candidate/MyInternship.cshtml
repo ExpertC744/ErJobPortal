@@ -10,29 +10,29 @@
 
 <div class="container-fluid">
 
-
+  
 
 
     <!-- MASTER TABLE CARD -->
     <div class="master-table-container">
 
-
+        
 
 
         <!-- TABLE -->
         <div class="table-responsive">
-            <!-- PAGE HEADING -->
-            <div class="mb-4">
+              <!-- PAGE HEADING -->
+    <div class="mb-4">
 
-                <h1 class="mb-2">
-                    My Internship
-                </h1>
+        <h1 class="mb-2">
+            My Internship
+        </h1>
 
-                <p class="mb-0 text-muted">
-                    @ViewBag.CandidateCode
-                </p>
+        <p class="mb-0 text-muted">
+            HN236383503368076
+        </p>
 
-            </div>
+    </div>
             <table id="candidateTable"
                    class="master-data-table">
 
@@ -59,65 +59,65 @@
                 </thead>
 
 
-                <tbody>
+              <tbody>
 
-                    @if (Model != null && Model.Count > 0)
+    @if (Model != null && Model.Count > 0)
+    {
+        int srNo = 1;
+
+        foreach (var item in Model)
+        {
+            <tr>
+
+                <!-- SR NO -->
+                <td class="master-id">
+                    @srNo
+                </td>
+
+                <!-- ORGANIZATION NAME -->
+                <td>
+                    @item.OrganizationName
+                </td>
+
+                <!-- POSITION -->
+                <td>
+                    @item.Position
+                </td>
+
+                <!-- LOCATION -->
+                <td>
+                    @item.Location
+                </td>
+
+                <!-- INTERNSHIP / FELLOWSHIP TYPE -->
+                <td>
+                    @item.InternshipFellowshipType
+                </td>
+
+                <!-- FACILITIES -->
+                <td>
+                    @item.Facilities
+                </td>
+
+                <!-- APPLY STATUS -->
+                <td>
+
+                    @if (!string.IsNullOrWhiteSpace(item.ApplyStatus))
                     {
-                        int srNo = 1;
-
-                        foreach (var item in Model)
-                        {
-                            <tr>
-
-                                <!-- SR NO -->
-                                <td class="master-id">
-                                    @srNo
-                                </td>
-
-                                <!-- ORGANIZATION NAME -->
-                                <td>
-                                    @item.OrganizationName
-                                </td>
-
-                                <!-- POSITION -->
-                                <td>
-                                    @item.Position
-                                </td>
-
-                                <!-- LOCATION -->
-                                <td>
-                                    @item.Location
-                                </td>
-
-                                <!-- INTERNSHIP / FELLOWSHIP TYPE -->
-                                <td>
-                                    @item.InternshipFellowshipType
-                                </td>
-
-                                <!-- FACILITIES -->
-                                <td>
-                                    @item.Facilities
-                                </td>
-
-                                <!-- APPLY STATUS -->
-                                <td>
-
-                                    @if (!string.IsNullOrWhiteSpace(item.ApplyStatus))
-                                    {
-                                        <span class="master-status">
-                                            @item.ApplyStatus
-                                        </span>
-                                    }
-
-                                </td>
-
-                            </tr>
-
-                            srNo++;
-                        }
+                        <span class="master-status">
+                            @item.ApplyStatus
+                        </span>
                     }
 
-                </tbody>
+                </td>
+
+            </tr>
+
+            srNo++;
+        }
+    }
+
+</tbody>
 
             </table>
 

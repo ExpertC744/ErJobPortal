@@ -175,7 +175,7 @@ namespace ErJobPortal.Controllers
             ViewBag.TraineeAppliedPosts = traineeAppliedPosts;
 
 
-
+    
 
             return View();
         }
@@ -1962,7 +1962,7 @@ namespace ErJobPortal.Controllers
             {
                 return NotFound("Candidate registration not found.");
             }
-            List<OrgPostM> internshipPosts = GetMatchingJobsForCandidate(candidateId.Value);
+                List<OrgPostM> internshipPosts = GetMatchingJobsForCandidate(candidateId.Value);
             ViewBag.InternshipPosts = internshipPosts;
             // Your code to get internship details using id
 
@@ -2337,21 +2337,17 @@ namespace ErJobPortal.Controllers
                 }
             }
         }
-        // shrirang 03/10/26
+
         // =========================================================
         // MY INTERNSHIP radhika24-09
         // =========================================================
-        // =========================================================
-        // MY INTERNSHIP
-        // =========================================================
-
         [HttpGet]
         [Route("Candidate/MyInternship/{id?}")]
         public IActionResult MyInternship(string? id)
         {
-            // =========================================================
-            // GET LOGGED-IN CANDIDATE ID
-            // =========================================================
+            // =====================================================
+            // GET CANDIDATE ID FROM SESSION
+            // =====================================================
 
             int? candidateId =
                 HttpContext.Session.GetInt32("CandidateID");
@@ -2363,11 +2359,9 @@ namespace ErJobPortal.Controllers
                     "Account");
             }
 
-            // =========================================================
+            // =====================================================
             // GET CANDIDATE CODE
-            // IMPORTANT:
-            // GetCandidateCode() already gets CandidateID from Session
-            // =========================================================
+            // =====================================================
 
             string? candidateCode = GetCandidateCode();
 
@@ -2377,98 +2371,46 @@ namespace ErJobPortal.Controllers
                     "Candidate code could not be generated.");
             }
 
-            // =========================================================
+            // =====================================================
             // IF URL DOES NOT HAVE CANDIDATE CODE
-            // =========================================================
+            // REDIRECT TO CODE URL
+            // =====================================================
 
             if (string.IsNullOrEmpty(id))
             {
                 return RedirectToAction(
                     "MyInternship",
                     "Candidate",
-                    new
-                    {
-                        id = candidateCode
-                    });
+                    new { id = candidateCode });
             }
 
-            // =========================================================
+            // =====================================================
             // VALIDATE CANDIDATE CODE
-            // =========================================================
+            // =====================================================
 
-            if (!string.Equals(
-                id,
-                candidateCode,
-                StringComparison.OrdinalIgnoreCase))
+            if (id != candidateCode)
             {
                 return NotFound();
             }
 
-            // =========================================================
-            // GET APPLIED INTERNSHIPS
-            // =========================================================
+            // =====================================================
+            // SEND CANDIDATE INFORMATION TO VIEW
+            // =====================================================
 
-            List<OrgPostM> appliedPosts =
-                TraineeApplyToPostList(candidateId.Value);
-
-            // =========================================================
-            // CONVERT TO MY INTERNSHIP VIEW MODEL
-            // =========================================================
-
-            List<MyInternshipViewModel> myInternships =
-                appliedPosts.Select(post => new MyInternshipViewModel
-                {
-                    OrganizationName =
-                        post.sName ?? "",
-
-                    Position =
-                        post.sPositionName ?? "",
-
-                    Location =
-                        string.Join(
-                            ", ",
-                            new[]
-                            {
-                        post.nCityName,
-                        post.sStateName,
-                        post.sCountryName
-                            }
-                            .Where(x =>
-                                !string.IsNullOrWhiteSpace(x))
-                        ),
-
-                    InternshipFellowshipType =
-                        post.sInternshipFellowshipTypeName ?? "",
-
-                    Facilities =
-                        post.sFacilities ?? "",
-
-                    ApplyStatus =
-                        post.IsApplied
-                            ? "Applied"
-                            : ""
-                })
-                .ToList();
-
-            // =========================================================
-            // VIEW BAG
-            // =========================================================
-
-            ViewBag.CandidateCode =
-                candidateCode;
-
-            ViewBag.CandidateID =
-                candidateId.Value;
+            ViewBag.CandidateCode = candidateCode;
+            ViewBag.CandidateID = candidateId.Value;
 
             ViewBag.CandidateName =
-                HttpContext.Session.GetString(
-                    "CandidateName");
+                HttpContext.Session.GetString("CandidateName");
 
             ViewBag.CandidateEmail =
-                HttpContext.Session.GetString(
-                    "CandidateEmail");
+                HttpContext.Session.GetString("CandidateEmail");
 
-            return View(myInternships);
+            // =====================================================
+            // OPEN MyInternship.cshtml
+            // =====================================================
+
+            return View();
         }
 
         // =========================================================
@@ -3317,7 +3259,7 @@ namespace ErJobPortal.Controllers
                 "Candidate",
                 new { id = candidateCode });
         }
-
+         
         #endregion
 
         #region "TR Apply to Post List Called"
