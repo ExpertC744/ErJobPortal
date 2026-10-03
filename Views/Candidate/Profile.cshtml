@@ -1333,27 +1333,38 @@
             </div>
 
 
+                        @*shrirang 02/10/26*@
             <!-- ======================= RESUME PROFILE ======================= -->
             @{
-                var resumeCount = 12;      // was 8
-                var pageSize = 8;       // images shown at first and per click                                  // shows r1 ... r8 (set 12 for all)
-                var resumeExts = new[] { "jpeg", "jpg", "png", "webp" };
+    var resumeCount = 12;
+    var pageSize = 8;
+    var resumeExts = new[] { "jpeg", "jpg", "png", "webp" };
 
-                var savedResume = Model.Profile?.GetType()
-                .GetProperty("sResumeTemplate")?
-                .GetValue(Model.Profile)?.ToString() ?? "";
+    // =========================================================
+    // GET SAVED DEFAULT RESUME PROFILE
+    // Resume_Profile contains 1, 2, 3...
+    // =========================================================
 
-                // Finds the real file name in wwwroot/Resume (any of the extensions above)
-                string FindResume(int n)
-                {
-                    foreach (var ext in resumeExts)
-                    {
-                        var path = System.IO.Path.Combine(Env.WebRootPath, "Resume", $"r{n}.{ext}");
-                        if (System.IO.File.Exists(path)) return $"r{n}.{ext}";
-                    }
-                    return $"r{n}.jpeg";   // fallback
-                }
-            }
+    int savedResumeProfile =
+        Model.Profile?.Resume_Profile ?? 1;
+
+    // Finds the actual image file
+    string FindResume(int n)
+    {
+        foreach (var ext in resumeExts)
+        {
+            var path = System.IO.Path.Combine(
+                Env.WebRootPath,
+                "Resume",
+                $"r{n}.{ext}");
+
+            if (System.IO.File.Exists(path))
+                return $"r{n}.{ext}";
+        }
+
+        return $"r{n}.jpeg";
+    }
+}
 
             <div class="card mb-4 profile-section-card" id="section-resume">
 
@@ -1379,9 +1390,9 @@
 
                                     <span class="resume-option-title">
                                         <input type="radio"
-                                               name="resumeTemplate"
-                                               value="@key"
-                                        @(savedResume == key ? "checked" : "") />
+       name="resumeTemplate"
+       value="@key"
+       @(savedResumeProfile == i ? "checked" : "") />
                                         Profile Preview @i
                                     </span>
 
