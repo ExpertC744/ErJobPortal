@@ -2769,14 +2769,60 @@
 
 							@* Radhika 21-09 *@
 
-							<a asp-controller="Resume"
-							   asp-action="Resume"
-							   asp-route-id="@Context.Session.GetInt32("CandidateID")"
-							   class="profile-submenu-link">
+														@*shrirang 02/10/26*@
+							@{
+    var candidateId = Context.Session.GetInt32("CandidateID");
+    var resumeProfile = ViewBag.ResumeProfile as int?;
+}
 
-								View Profile
+@if (resumeProfile == 1)
+{
+    <a asp-controller="Resume"
+       asp-action="ViewProfileOne"
+       asp-route-id="@candidateId"
+       class="profile-submenu-link"
+       target="_blank">
 
-							</a>
+        View Profile
+
+    </a>
+}
+else if (resumeProfile == 2)
+{
+    <a asp-controller="Resume"
+       asp-action="ViewProfileTwo"
+       asp-route-id="@candidateId"
+       class="profile-submenu-link"
+       target="_blank">
+
+        View Profile
+
+    </a>
+}
+else if (resumeProfile == 3)
+{
+    <a asp-controller="Resume"
+       asp-action="ViewProfileThree"
+       asp-route-id="@candidateId"
+       class="profile-submenu-link"
+       target="_blank">
+
+        View Profile
+
+    </a>
+}
+else
+{
+    <a asp-controller="Resume"
+       asp-action="Resume"
+       asp-route-id="@candidateId"
+       class="profile-submenu-link"
+       target="_blank">
+
+        View Profile
+
+    </a>
+}
 
 							<a asp-controller="Candidate"
 							   asp-action="customResumeBuilder"
@@ -3705,7 +3751,7 @@
 							</a>
 
 							<a asp-controller="SuperAdmin"
-							   asp-action="SAAllOrganizationPost" asp-route-id="1">
+							   asp-action="SAOrgPostList" asp-route-id="1">
 								Org Posts
 							</a>
 
