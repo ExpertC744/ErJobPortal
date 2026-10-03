@@ -246,6 +246,7 @@ body {
     align-items: stretch;
 }
 
+
 .left-column {
     flex: 0 0 245px;
     width: 245px;
