@@ -176,7 +176,7 @@ namespace ErJobPortal.Controllers
 
 
 
-
+            List<OrgPostM> matchingJobs = GetMatchingJobsForCandidate(candidateId.Value);
 
 
             /// =========================================================
