@@ -110,34 +110,33 @@ img{max-width:100%;display:block}
 .preference-item:last-child{margin-bottom:0}
 .preference-item strong{color:var(--theme);font-weight:700}
 
-/* THIRTEEN - Timeline spine with dot headings, light info column on the RIGHT */
-.resume-header{height:34mm;display:grid;grid-template-columns:40mm 1fr 76mm;align-items:center;background:var(--theme-soft);border-left:6mm solid var(--theme);border-bottom:1px solid var(--border)}
-.photo-wrapper{grid-column:1;grid-row:1;display:flex;align-items:center;padding-left:6mm}
-.profile-photo{--photo:22mm;border-radius:50%;border:3px solid #fff;box-shadow:0 2px 8px rgba(20,40,50,.2)}
-.profile-placeholder{--photo:22mm;border-radius:50%;border:3px solid #fff}
-.header-info{grid-column:2;grid-row:1;padding:0 6mm 0 4mm;min-width:0}
-.candidate-name{font-style:italic;font-size:28px}
-.candidate-role{margin-top:5px;font-size:10px;color:var(--accent)}
+/* FIFTEEN - Poster header: giant name + full-bleed photo, newspaper 2-column content */
+.resume-header{height:58mm;display:grid;grid-template-columns:1fr 58mm;grid-template-rows:1fr auto;background:var(--theme-soft);border-bottom:4px solid var(--theme)}
+.header-info{grid-column:1;grid-row:1;align-self:end;padding:0 10mm 4mm 14mm;min-width:0}
+.candidate-name{font-size:40px;text-transform:uppercase;letter-spacing:2px;line-height:1.05}
+.candidate-role{margin-top:8px;font-size:11px;color:var(--accent)}
 .header-accent{display:none}
-.header-contact{grid-column:3;grid-row:1;display:flex;flex-direction:column;gap:5px;padding-left:8mm;border-left:1px solid var(--border);min-width:0}
-.header-contact-item{color:#4a5b63}
-.header-contact-item i{color:var(--theme)}
+.header-contact{grid-column:1;grid-row:2;display:flex;flex-direction:row;flex-wrap:wrap;gap:3px 20px;padding:0 10mm 5mm 14mm}
+.header-contact-item{color:#4a5b63;align-items:center}
+.header-contact-item i{margin-top:0;color:var(--theme)}
+.photo-wrapper{grid-column:2;grid-row:1/3;display:block}
+.profile-photo{--photo:58mm;width:58mm;height:54mm;min-width:58mm;border-radius:0}
+.profile-placeholder{--photo:58mm;width:58mm;height:54mm;min-width:58mm;border:0;border-radius:0;background:var(--theme);color:#fff;font-size:44px}
 
-.resume-body{grid-template-columns:1fr 66mm}
-.right-column{grid-column:1;grid-row:1;position:relative;padding:5mm 10mm 4mm 19mm}
-.right-column::before{content:"";position:absolute;left:11mm;top:0;bottom:0;width:2px;background:var(--border)}
-.left-column{grid-column:2;grid-row:1;border-left:1px dashed var(--theme);padding:5mm 8mm 4mm 7mm;background:#fff}
-.right-column .section-heading{position:relative}
-.right-column .section-heading::before{content:"";position:absolute;left:calc(-8mm - 7px);top:50%;transform:translateY(-50%);width:14px;height:14px;border-radius:50%;background:#fff;border:3px solid var(--theme)}
-.section-icon{display:none}
-.section-title{font-family:"Playfair Display",Georgia,serif;font-size:12.5px;text-transform:none;letter-spacing:.3px}
-.left-column .section-heading{padding:2px 8px;background:var(--theme-soft);border-radius:3px}
-.left-column .section-title{font-size:11.5px}
-.left-column .section-title-line{display:none}
-.skill-list{border:0;border-left:0;padding:2px 0}
-.experience-item{background:#fff;border:1px solid var(--border);border-left:1px solid var(--border);border-top:3px solid var(--accent)}
-.education-item{background:#fff;border:1px solid var(--border);border-top:3px solid var(--theme)}
-.reference-item{background:#fff;border:1px solid var(--border);border-left:3px solid var(--accent)}
+.resume-body{grid-template-columns:70mm 1fr}
+.left-column{background:#fff;border-right:3px solid var(--theme-soft);padding:5mm 7mm 4mm 10mm}
+.right-column{column-count:2;column-gap:10mm;padding:5mm 10mm 4mm 9mm}
+.right-column>.resume-section:has(.summary){column-span:all}
+.resume-section:has(.experience-item){grid-template-columns:1fr}
+.education-list,.achievement-list,.reference-grid{grid-template-columns:1fr}
+.section-icon,.section-title-line{display:none}
+.section-heading{margin-bottom:7px}
+.section-title{padding-bottom:3px;border-bottom:3px solid var(--accent);font-size:10.5px;letter-spacing:1.5px}
+.summary{background:none;border-left:0;border-radius:0;padding:0;font-size:10px}
+.experience-item{background:none;border-left:2px dotted var(--theme);padding:2px 0 2px 9px}
+.education-item{border-top:0;border-left:4px solid var(--theme)}
+.achievement-item{border:0;background:none;padding:2px 0}
+.reference-item{background:var(--theme-soft);border-left:0;border-top:3px solid var(--theme)}
 
 /* =========================================================
    RESPONSIVE - SAME SHEET (279mm x 210mm), ONLY ZOOM OUT
