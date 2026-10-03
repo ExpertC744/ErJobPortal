@@ -3691,14 +3691,14 @@ else
 							 class="sidebar-submenu collapse">
 
 							 <a asp-controller="SuperAdmin"
-       asp-action="TraineeReg"
-       asp-route-id="1">
-        <span>Trainee Registrations</span>
+							   asp-action="SATrainees"
+							   asp-route-id="1">
+								<span>Trainee Registrations</span>
 
-    </a>
+							</a>
 
 							<a asp-controller="SuperAdmin"
-							   asp-action="Profiles" asp-route-id="1">
+							   asp-action="SATraineeProfileList" asp-route-id="1">
 								Trainee Profiles
 							</a>
 
@@ -3746,12 +3746,12 @@ else
 							</a>
 
 							<a asp-controller="SuperAdmin"
-							   asp-action="Profiles" asp-route-id="1">
-								Org Profiles
+							   asp-action="SAOrgProfileList" asp-route-id="1">
+								Org Profile
 							</a>
 
 							<a asp-controller="SuperAdmin"
-							   asp-action="SAOrgPostList" asp-route-id="1">
+							   asp-action="SAAllOrganizationPost" asp-route-id="1">
 								Org Posts
 							</a>
 
