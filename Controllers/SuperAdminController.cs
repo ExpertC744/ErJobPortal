@@ -155,7 +155,340 @@ namespace ErJobPortal.Controllers
             return View(organization);
         }
 
+        [HttpGet]
+        [Route("SuperAdmin/AddObjective/{id:int}")]
+        public IActionResult AddObjective()
+        {
+            return View();
+        }
 
+        [HttpGet]
+        [Route("SuperAdmin/ViewObjective/{id:int}")]
+        public IActionResult ViewObjective()
+        {
+            List<SAObjectiveM> objectives = new List<SAObjectiveM>();
+
+            string connectionString =
+                _configuration.GetConnectionString("DefaultConnection");
+
+            // Get Objectives
+            using (SqlConnection cn = new SqlConnection(connectionString))
+            {
+                using (SqlCommand cmd = new SqlCommand("SP_GetObjective", cn))
+                {
+                    cmd.CommandType = CommandType.StoredProcedure;
+
+                    cn.Open();
+
+                    using (SqlDataReader reader = cmd.ExecuteReader())
+                    {
+                        while (reader.Read())
+                        {
+                            objectives.Add(new SAObjectiveM
+                            {
+                                nID = Convert.ToInt32(reader["nID"]),
+                                nGenderID = Convert.ToInt32(reader["nGenderID"]),
+                                sObjective = reader["sObjective"]?.ToString() ?? "",
+                                dCreatedDate = Convert.ToDateTime(reader["dCreatedDate"]),
+                                nBit = Convert.ToBoolean(reader["nBit"]),
+                                nSABit = Convert.ToBoolean(reader["nSABit"])
+                            });
+                        }
+                    }
+                }
+            }
+
+            // Get Gender Names
+            Dictionary<int, string> genderNames =
+                new Dictionary<int, string>();
+
+            using (SqlConnection cn = new SqlConnection(connectionString))
+            {
+                using (SqlCommand cmd = new SqlCommand("SP_GetGender", cn))
+                {
+                    cmd.CommandType = CommandType.StoredProcedure;
+
+                    cn.Open();
+
+                    using (SqlDataReader reader = cmd.ExecuteReader())
+                    {
+                        while (reader.Read())
+                        {
+                            int id = Convert.ToInt32(reader["nID"]);
+                            string name = reader["sName"]?.ToString() ?? "";
+
+                            genderNames[id] = name;
+                        }
+                    }
+                }
+            }
+
+            ViewBag.GenderNames = genderNames;
+
+            return View(objectives);
+        }
+
+        // sanidhya 02/10/26
+        // =========================================================
+        // EDIT OBJECTIVE - GET
+        // URL:
+        // /SuperAdmin/EditObjective/1004
+        // =========================================================
+        // sanidhya 02/10/26
+        // =========================================================
+        // EDIT OBJECTIVE - GET
+        // URL:
+        // /SuperAdmin/EditObjective/1004
+        // =========================================================
+        [HttpGet]
+        [Route("SuperAdmin/EditObjective/{id:int}")]
+        public IActionResult EditObjective(int id)
+        {
+            SAObjectiveM model = null;
+
+            string connectionString =
+                _configuration.GetConnectionString("DefaultConnection");
+
+            using (SqlConnection cn = new SqlConnection(connectionString))
+            {
+                cn.Open();
+
+                string query = @"
+    SELECT
+        nID,
+        nGenderID,
+        sObjective,
+        dCreatedDate,
+        nBit,
+        nSABit
+    FROM tblObjective
+    WHERE nID = @nID";
+
+                using (SqlCommand cmd = new SqlCommand(query, cn))
+                {
+                    cmd.Parameters.Add("@nID", SqlDbType.Int).Value = id;
+
+                    using (SqlDataReader reader = cmd.ExecuteReader())
+                    {
+                        if (reader.Read())
+                        {
+                            model = new SAObjectiveM
+                            {
+                                nID = reader["nID"] != DBNull.Value
+                                    ? Convert.ToInt32(reader["nID"])
+                                    : 0,
+
+                                nGenderID = reader["nGenderID"] != DBNull.Value
+                                    ? Convert.ToInt32(reader["nGenderID"])
+                                    : 0,
+
+                                sObjective = reader["sObjective"] != DBNull.Value
+                                    ? reader["sObjective"].ToString()
+                                    : "",
+
+                                dCreatedDate = reader["dCreatedDate"] != DBNull.Value
+                                    ? Convert.ToDateTime(reader["dCreatedDate"])
+                                    : DateTime.Now,
+
+                                nBit = reader["nBit"] != DBNull.Value &&
+                                       Convert.ToBoolean(reader["nBit"]),
+
+                                nSABit = reader["nSABit"] != DBNull.Value &&
+                                         Convert.ToBoolean(reader["nSABit"])
+                            };
+                        }
+                    }
+                }
+            }
+
+            if (model == null)
+            {
+                return NotFound();
+            }
+
+            return View(model);
+        }
+
+        // =========================================================
+        // EDIT OBJECTIVE - POST
+        // =========================================================
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public IActionResult EditObjective(SAObjectiveM model)
+        {
+            if (model.nGenderID <= 0)
+            {
+                ModelState.AddModelError("nGenderID", "Please select gender.");
+            }
+
+            if (string.IsNullOrWhiteSpace(model.sObjective))
+            {
+                ModelState.AddModelError("sObjective", "Please enter objective.");
+            }
+
+            if (!ModelState.IsValid)
+            {
+                return View(model);
+            }
+
+            try
+            {
+                string connectionString =
+                    _configuration.GetConnectionString("DefaultConnection");
+
+                using (SqlConnection cn = new SqlConnection(connectionString))
+                {
+                    cn.Open();
+
+                    string query = @"
+        UPDATE tblObjective
+        SET
+            nGenderID = @nGenderID,
+            sObjective = @sObjective
+        WHERE nID = @nID";
+
+                    using (SqlCommand cmd = new SqlCommand(query, cn))
+                    {
+                        cmd.Parameters.Add("@nID", SqlDbType.Int)
+                            .Value = model.nID;
+
+                        cmd.Parameters.Add("@nGenderID", SqlDbType.Int)
+                            .Value = model.nGenderID;
+
+                        cmd.Parameters.Add("@sObjective", SqlDbType.NVarChar, -1)
+                            .Value = model.sObjective.Trim();
+
+                        int rowsAffected = cmd.ExecuteNonQuery();
+
+                        if (rowsAffected == 0)
+                        {
+                            return NotFound();
+                        }
+                    }
+                }
+
+                TempData["SuccessMessage"] =
+                    "Objective updated successfully.";
+
+                return RedirectToAction("ViewObjective", new { id = 1 });
+            }
+            catch (Exception ex)
+            {
+                ModelState.AddModelError(
+                    "",
+                    "Unable to update objective: " + ex.Message);
+
+                return View(model);
+            }
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> AddObjective(SAObjectiveM model)
+        {
+            if (model.nGenderID <= 0)
+            {
+                return Json(new
+                {
+                    success = false,
+                    message = "Please select gender."
+                });
+            }
+
+            if (string.IsNullOrWhiteSpace(model.sObjective))
+            {
+                return Json(new
+                {
+                    success = false,
+                    message = "Please enter objective."
+                });
+            }
+
+            try
+            {
+                string connectionString =
+                    _configuration.GetConnectionString("DefaultConnection");
+
+                using (SqlConnection cn = new SqlConnection(connectionString))
+                {
+                    using (SqlCommand cmd =
+                           new SqlCommand("SP_AddObjective", cn))
+                    {
+                        cmd.CommandType = CommandType.StoredProcedure;
+
+                        cmd.Parameters.Add("@nGenderID", SqlDbType.Int)
+                            .Value = model.nGenderID;
+
+                        cmd.Parameters.Add("@sObjective", SqlDbType.NVarChar)
+                            .Value = model.sObjective.Trim();
+
+                        await cn.OpenAsync();
+
+                        await cmd.ExecuteNonQueryAsync();
+                    }
+                }
+
+                return Json(new
+                {
+                    success = true,
+                    message = "Objective added successfully."
+                });
+            }
+            catch (Exception ex)
+            {
+                return Json(new
+                {
+                    success = false,
+                    message = "Error: " + ex.Message
+                });
+            }
+        }
+
+
+        // ==========================================
+        // CHANGE OBJECTIVE STATUS
+        // ==========================================
+        [HttpPost]
+        public async Task<IActionResult> ChangeStatus(int id, bool status)
+        {
+            try
+            {
+                string connectionString =
+                    _configuration.GetConnectionString("DefaultConnection");
+
+                using (SqlConnection cn = new SqlConnection(connectionString))
+                {
+                    using (SqlCommand cmd =
+                           new SqlCommand("SP_ChangeObjectiveStatus", cn))
+                    {
+                        cmd.CommandType = CommandType.StoredProcedure;
+
+                        cmd.Parameters.Add("@nID", SqlDbType.Int)
+                            .Value = id;
+
+                        cmd.Parameters.Add("@nBit", SqlDbType.Bit)
+                            .Value = status;
+
+                        await cn.OpenAsync();
+
+                        await cmd.ExecuteNonQueryAsync();
+                    }
+                }
+
+                return Json(new
+                {
+                    success = true,
+                    message = "Status changed successfully."
+                });
+            }
+            catch (Exception ex)
+            {
+                return Json(new
+                {
+                    success = false,
+                    message = "Error: " + ex.Message
+                });
+            }
+        }
 
         [HttpGet]
         [Route("SuperAdmin/SAOrgPostList/{id:int}")]
@@ -477,186 +810,186 @@ namespace ErJobPortal.Controllers
             }
         }
 
-        [HttpGet]
-        [Route("SuperAdmin/AddObjective/{id:int}")]
-        public IActionResult AddObjective()
-        {
-            return View();
-        }
+        //[HttpGet]
+        //[Route("SuperAdmin/AddObjective/{id:int}")]
+        //public IActionResult AddObjective()
+        //{
+        //    return View();
+        //}
 
-        [HttpGet]
-        [Route("SuperAdmin/ViewObjective/{id:int}")]
-        public IActionResult ViewObjective()
-        {
-            List<SAObjectiveM> objectives = new List<SAObjectiveM>();
+        //[HttpGet]
+        //[Route("SuperAdmin/ViewObjective/{id:int}")]
+        //public IActionResult ViewObjective()
+        //{
+        //    List<SAObjectiveM> objectives = new List<SAObjectiveM>();
 
-            string connectionString =
-                _configuration.GetConnectionString("DefaultConnection");
+        //    string connectionString =
+        //        _configuration.GetConnectionString("DefaultConnection");
 
-            // Get Objectives
-            using (SqlConnection cn = new SqlConnection(connectionString))
-            {
-                using (SqlCommand cmd = new SqlCommand("SP_GetObjective", cn))
-                {
-                    cmd.CommandType = CommandType.StoredProcedure;
+        //    // Get Objectives
+        //    using (SqlConnection cn = new SqlConnection(connectionString))
+        //    {
+        //        using (SqlCommand cmd = new SqlCommand("SP_GetObjective", cn))
+        //        {
+        //            cmd.CommandType = CommandType.StoredProcedure;
 
-                    cn.Open();
+        //            cn.Open();
 
-                    using (SqlDataReader reader = cmd.ExecuteReader())
-                    {
-                        while (reader.Read())
-                        {
-                            objectives.Add(new SAObjectiveM
-                            {
-                                nID = Convert.ToInt32(reader["nID"]),
-                                nGenderID = Convert.ToInt32(reader["nGenderID"]),
-                                sObjective = reader["sObjective"]?.ToString() ?? "",
-                                dCreatedDate = Convert.ToDateTime(reader["dCreatedDate"]),
-                                nBit = Convert.ToBoolean(reader["nBit"]),
-                                nSABit = Convert.ToBoolean(reader["nSABit"])
-                            });
-                        }
-                    }
-                }
-            }
+        //            using (SqlDataReader reader = cmd.ExecuteReader())
+        //            {
+        //                while (reader.Read())
+        //                {
+        //                    objectives.Add(new SAObjectiveM
+        //                    {
+        //                        nID = Convert.ToInt32(reader["nID"]),
+        //                        nGenderID = Convert.ToInt32(reader["nGenderID"]),
+        //                        sObjective = reader["sObjective"]?.ToString() ?? "",
+        //                        dCreatedDate = Convert.ToDateTime(reader["dCreatedDate"]),
+        //                        nBit = Convert.ToBoolean(reader["nBit"]),
+        //                        nSABit = Convert.ToBoolean(reader["nSABit"])
+        //                    });
+        //                }
+        //            }
+        //        }
+        //    }
 
-            // Get Gender Names
-            Dictionary<int, string> genderNames =
-                new Dictionary<int, string>();
+        //    // Get Gender Names
+        //    Dictionary<int, string> genderNames =
+        //        new Dictionary<int, string>();
 
-            using (SqlConnection cn = new SqlConnection(connectionString))
-            {
-                using (SqlCommand cmd = new SqlCommand("SP_GetGender", cn))
-                {
-                    cmd.CommandType = CommandType.StoredProcedure;
+        //    using (SqlConnection cn = new SqlConnection(connectionString))
+        //    {
+        //        using (SqlCommand cmd = new SqlCommand("SP_GetGender", cn))
+        //        {
+        //            cmd.CommandType = CommandType.StoredProcedure;
 
-                    cn.Open();
+        //            cn.Open();
 
-                    using (SqlDataReader reader = cmd.ExecuteReader())
-                    {
-                        while (reader.Read())
-                        {
-                            int id = Convert.ToInt32(reader["nID"]);
-                            string name = reader["sName"]?.ToString() ?? "";
+        //            using (SqlDataReader reader = cmd.ExecuteReader())
+        //            {
+        //                while (reader.Read())
+        //                {
+        //                    int id = Convert.ToInt32(reader["nID"]);
+        //                    string name = reader["sName"]?.ToString() ?? "";
 
-                            genderNames[id] = name;
-                        }
-                    }
-                }
-            }
+        //                    genderNames[id] = name;
+        //                }
+        //            }
+        //        }
+        //    }
 
-            ViewBag.GenderNames = genderNames;
+        //    ViewBag.GenderNames = genderNames;
 
-            return View(objectives);
-        }
+        //    return View(objectives);
+        //}
 
-        [HttpPost]
-        public async Task<IActionResult> AddObjective(SAObjectiveM model)
-        {
-            if (model.nGenderID <= 0)
-            {
-                return Json(new
-                {
-                    success = false,
-                    message = "Please select gender."
-                });
-            }
+        //[HttpPost]
+        //public async Task<IActionResult> AddObjective(SAObjectiveM model)
+        //{
+        //    if (model.nGenderID <= 0)
+        //    {
+        //        return Json(new
+        //        {
+        //            success = false,
+        //            message = "Please select gender."
+        //        });
+        //    }
 
-            if (string.IsNullOrWhiteSpace(model.sObjective))
-            {
-                return Json(new
-                {
-                    success = false,
-                    message = "Please enter objective."
-                });
-            }
+        //    if (string.IsNullOrWhiteSpace(model.sObjective))
+        //    {
+        //        return Json(new
+        //        {
+        //            success = false,
+        //            message = "Please enter objective."
+        //        });
+        //    }
 
-            try
-            {
-                string connectionString =
-                    _configuration.GetConnectionString("DefaultConnection");
+        //    try
+        //    {
+        //        string connectionString =
+        //            _configuration.GetConnectionString("DefaultConnection");
 
-                using (SqlConnection cn = new SqlConnection(connectionString))
-                {
-                    using (SqlCommand cmd =
-                           new SqlCommand("SP_AddObjective", cn))
-                    {
-                        cmd.CommandType = CommandType.StoredProcedure;
+        //        using (SqlConnection cn = new SqlConnection(connectionString))
+        //        {
+        //            using (SqlCommand cmd =
+        //                   new SqlCommand("SP_AddObjective", cn))
+        //            {
+        //                cmd.CommandType = CommandType.StoredProcedure;
 
-                        cmd.Parameters.Add("@nGenderID", SqlDbType.Int)
-                            .Value = model.nGenderID;
+        //                cmd.Parameters.Add("@nGenderID", SqlDbType.Int)
+        //                    .Value = model.nGenderID;
 
-                        cmd.Parameters.Add("@sObjective", SqlDbType.NVarChar)
-                            .Value = model.sObjective.Trim();
+        //                cmd.Parameters.Add("@sObjective", SqlDbType.NVarChar)
+        //                    .Value = model.sObjective.Trim();
 
-                        await cn.OpenAsync();
+        //                await cn.OpenAsync();
 
-                        await cmd.ExecuteNonQueryAsync();
-                    }
-                }
+        //                await cmd.ExecuteNonQueryAsync();
+        //            }
+        //        }
 
-                return Json(new
-                {
-                    success = true,
-                    message = "Objective added successfully."
-                });
-            }
-            catch (Exception ex)
-            {
-                return Json(new
-                {
-                    success = false,
-                    message = "Error: " + ex.Message
-                });
-            }
-        }
+        //        return Json(new
+        //        {
+        //            success = true,
+        //            message = "Objective added successfully."
+        //        });
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        return Json(new
+        //        {
+        //            success = false,
+        //            message = "Error: " + ex.Message
+        //        });
+        //    }
+        //}
 
 
-        // ==========================================
-        // CHANGE OBJECTIVE STATUS
-        // ==========================================
-        [HttpPost]
-        public async Task<IActionResult> ChangeStatus(int id, bool status)
-        {
-            try
-            {
-                string connectionString =
-                    _configuration.GetConnectionString("DefaultConnection");
+        //// ==========================================
+        //// CHANGE OBJECTIVE STATUS
+        //// ==========================================
+        //[HttpPost]
+        //public async Task<IActionResult> ChangeStatus(int id, bool status)
+        //{
+        //    try
+        //    {
+        //        string connectionString =
+        //            _configuration.GetConnectionString("DefaultConnection");
 
-                using (SqlConnection cn = new SqlConnection(connectionString))
-                {
-                    using (SqlCommand cmd =
-                           new SqlCommand("SP_ChangeObjectiveStatus", cn))
-                    {
-                        cmd.CommandType = CommandType.StoredProcedure;
+        //        using (SqlConnection cn = new SqlConnection(connectionString))
+        //        {
+        //            using (SqlCommand cmd =
+        //                   new SqlCommand("SP_ChangeObjectiveStatus", cn))
+        //            {
+        //                cmd.CommandType = CommandType.StoredProcedure;
 
-                        cmd.Parameters.Add("@nID", SqlDbType.Int)
-                            .Value = id;
+        //                cmd.Parameters.Add("@nID", SqlDbType.Int)
+        //                    .Value = id;
 
-                        cmd.Parameters.Add("@nBit", SqlDbType.Bit)
-                            .Value = status;
+        //                cmd.Parameters.Add("@nBit", SqlDbType.Bit)
+        //                    .Value = status;
 
-                        await cn.OpenAsync();
+        //                await cn.OpenAsync();
 
-                        await cmd.ExecuteNonQueryAsync();
-                    }
-                }
+        //                await cmd.ExecuteNonQueryAsync();
+        //            }
+        //        }
 
-                return Json(new
-                {
-                    success = true,
-                    message = "Status changed successfully."
-                });
-            }
-            catch (Exception ex)
-            {
-                return Json(new
-                {
-                    success = false,
-                    message = "Error: " + ex.Message
-                });
-            }
-        }
+        //        return Json(new
+        //        {
+        //            success = true,
+        //            message = "Status changed successfully."
+        //        });
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        return Json(new
+        //        {
+        //            success = false,
+        //            message = "Error: " + ex.Message
+        //        });
+        //    }
+        //}
 
 
         [HttpGet]
@@ -2150,10 +2483,162 @@ ORDER BY SAF.nID DESC, OFB.nID DESC;
             return View();
         }
         [HttpGet]
+        [Route("SuperAdmin/SAAllOrganizationPost")]
         public IActionResult SAAllOrganizationPost()
         {
-            return View();
+            List<OrgPostM> posts = new List<OrgPostM>();
+
+            string connectionString =
+                _configuration.GetConnectionString("DefaultConnection");
+
+            using (SqlConnection con = new SqlConnection(connectionString))
+            {
+                using (SqlCommand cmd = new SqlCommand(
+                    "SP_GetSAOrgPostsWithMatchingTraineeCount", con))
+                {
+                    cmd.CommandType = CommandType.StoredProcedure;
+
+                    con.Open();
+
+                    using (SqlDataReader dr = cmd.ExecuteReader())
+                    {
+                        while (dr.Read())
+                        {
+                            OrgPostM item = new OrgPostM();
+
+                            item.nID = dr["nID"] == DBNull.Value
+                                ? 0
+                                : Convert.ToInt32(dr["nID"]);
+
+                            item.nPositionID = dr["nPositionID"] == DBNull.Value
+                                ? 0
+                                : Convert.ToInt32(dr["nPositionID"]);
+
+                            item.sPositionName =
+                                dr["sPositionName"]?.ToString() ?? "";
+
+                            item.nRequiredTrainees =
+                                dr["nRequiredTrainees"] == DBNull.Value
+                                    ? 0
+                                    : Convert.ToInt32(dr["nRequiredTrainees"]);
+
+                            item.MatchingTraineeCount =
+                                dr["MatchingTraineeCount"] == DBNull.Value
+                                    ? 0
+                                    : Convert.ToInt32(dr["MatchingTraineeCount"]);
+
+                            item.nGenderID =
+                                dr["nGenderID"] == DBNull.Value
+                                    ? 0
+                                    : Convert.ToInt32(dr["nGenderID"]);
+
+                            item.sGenderName =
+                                dr["sGenderName"]?.ToString() ?? "";
+
+                            item.nMinimumQualificationID =
+                                dr["nMinimumQualificationID"] == DBNull.Value
+                                    ? 0
+                                    : Convert.ToInt32(dr["nMinimumQualificationID"]);
+
+                            item.sMinimumQualificationName =
+                                dr["sMinimumQualificationName"]?.ToString() ?? "";
+
+                            item.sCountryName =
+                                dr["sCountryName"]?.ToString() ?? "";
+
+                            item.sStateName =
+                                dr["sStateName"]?.ToString() ?? "";
+
+                            item.nCityName =
+                                dr["nCityName"]?.ToString() ?? "";
+
+                            item.sWorkingHours =
+                                dr["sWorkingHours"]?.ToString() ?? "";
+
+                            item.nInternshipTypeID =
+                                dr["nInternshipTypeID"] == DBNull.Value
+                                    ? 0
+                                    : Convert.ToInt32(dr["nInternshipTypeID"]);
+
+                            item.sInternshipTypeName =
+                                dr["sInternshipTypeName"]?.ToString() ?? "";
+
+                            item.sWorkingShift =
+                                dr["sWorkingShift"]?.ToString() ?? "";
+
+                            item.nInternshipFellowshipTypeID =
+                                dr["nInternshipFellowshipTypeID"] == DBNull.Value
+                                    ? 0
+                                    : Convert.ToInt32(dr["nInternshipFellowshipTypeID"]);
+
+                            item.sInternshipFellowshipTypeName =
+                                dr["sInternshipFellowshipTypeName"]?.ToString() ?? "";
+
+                            item.nTrainingInvolvedID =
+                                dr["nTrainingInvolvedID"] == DBNull.Value
+                                    ? 0
+                                    : Convert.ToInt32(dr["nTrainingInvolvedID"]);
+
+                            item.sTrainingInvolvedName =
+                                dr["sTrainingInvolvedName"]?.ToString() ?? "";
+
+                            item.nInternshipDurationID =
+                                dr["nInternshipDurationID"] == DBNull.Value
+                                    ? 0
+                                    : Convert.ToInt32(dr["nInternshipDurationID"]);
+
+                            item.sInternshipDurationName =
+                                dr["sInternshipDurationName"]?.ToString() ?? "";
+
+                            item.nInternshipModeID =
+                                dr["nInternshipModeID"] == DBNull.Value
+                                    ? 0
+                                    : Convert.ToInt32(dr["nInternshipModeID"]);
+
+                            item.sInternshipModeName =
+                                dr["sInternshipModeName"]?.ToString() ?? "";
+
+                            item.sDivyang =
+                                dr["sDivyang"]?.ToString() ?? "";
+
+                            item.sWorkingDays =
+                                dr["sWorkingDays"]?.ToString() ?? "";
+
+                            item.sFacilities =
+                                dr["sFacilities"]?.ToString() ?? "";
+
+                            item.dRegisterDate =
+    dr["dRegisterDate"] == DBNull.Value
+        ? DateTime.MinValue
+        : Convert.ToDateTime(dr["dRegisterDate"]);
+
+                            item.dModDate =
+    dr["dModDate"] == DBNull.Value
+        ? DateTime.MinValue
+        : Convert.ToDateTime(dr["dModDate"]);
+
+                            item.nBit =
+                                dr["nBit"] != DBNull.Value &&
+                                Convert.ToBoolean(dr["nBit"]);
+
+                            item.nSABit =
+                                dr["nSABit"] != DBNull.Value &&
+                                Convert.ToBoolean(dr["nSABit"]);
+
+                            item.nOrgID =
+                                dr["nOrgID"] == DBNull.Value
+                                    ? 0
+                                    : Convert.ToInt32(dr["nOrgID"]);
+
+                            posts.Add(item);
+                        }
+                    }
+                }
+            }
+
+            return View(posts);
         }
+
         [HttpGet]
         public IActionResult SAFinalSelection()
         {
@@ -2340,5 +2825,148 @@ ORDER BY SAF.nID DESC, OFB.nID DESC;
         {
             return View();
         }
+
+        #region "Elegible Trainee"
+        [HttpGet]
+        [Route("SuperAdmin/EligibleTrainees/{id:int}")]
+        public IActionResult EligibleTrainees(int id, int orgID)
+        {
+            List<EligibleTraineeM> trainees = new List<EligibleTraineeM>();
+
+            using (SqlConnection con = new SqlConnection(
+                _configuration.GetConnectionString("DefaultConnection")))
+            {
+                using (SqlCommand cmd = new SqlCommand(
+                    "SP_GetCandidatesByPost", con))
+                {
+                    cmd.CommandType = CommandType.StoredProcedure;
+
+                    // Post ID
+                    cmd.Parameters.Add("@nID", SqlDbType.Int).Value = id;
+
+                    // Organization ID
+                    cmd.Parameters.Add("@OrganizationID", SqlDbType.Int).Value = orgID;
+
+                    con.Open();
+
+                    using (SqlDataReader dr = cmd.ExecuteReader())
+                    {
+                        while (dr.Read())
+                        {
+                            EligibleTraineeM item = new EligibleTraineeM();
+
+                            item.CandidateID =
+                                Convert.ToInt32(dr["CandidateID"]);
+
+                            item.Name =
+                                dr["Name"] == DBNull.Value
+                                    ? ""
+                                    : dr["Name"].ToString();
+
+                            item.EmailID =
+                                dr["EmailID"] == DBNull.Value
+                                    ? ""
+                                    : dr["EmailID"].ToString();
+
+                            item.Gender =
+                                dr["Gender"] == DBNull.Value
+                                    ? null
+                                    : Convert.ToInt32(dr["Gender"]);
+
+                            item.DateOfBirth =
+                                dr["DateOfBirth"] == DBNull.Value
+                                    ? null
+                                    : Convert.ToDateTime(dr["DateOfBirth"]);
+
+                            item.PostID =
+                                Convert.ToInt32(dr["PostID"]);
+
+                            item.GenderRequired =
+                                dr["GenderRequired"] == DBNull.Value
+                                    ? null
+                                    : Convert.ToInt32(dr["GenderRequired"]);
+
+                            item.InternshipType =
+                                dr["InternshipType"] == DBNull.Value
+                                    ? null
+                                    : Convert.ToInt32(dr["InternshipType"]);
+
+                            item.MinQualification =
+                                dr["MinQualification"] == DBNull.Value
+                                    ? null
+                                    : Convert.ToInt32(dr["MinQualification"]);
+
+                            item.MaxQualification =
+                                dr["MaxQualification"] == DBNull.Value
+                                    ? null
+                                    : Convert.ToInt32(dr["MaxQualification"]);
+
+                            item.MedicalSkill =
+                                dr["MedicalSkill"] == DBNull.Value
+                                    ? ""
+                                    : dr["MedicalSkill"].ToString();
+
+                            item.TechnicalSkill =
+                                dr["TechnicalSkill"] == DBNull.Value
+                                    ? ""
+                                    : dr["TechnicalSkill"].ToString();
+
+                            item.NonTechnicalSkill =
+                                dr["NonTechnicalSkill"] == DBNull.Value
+                                    ? ""
+                                    : dr["NonTechnicalSkill"].ToString();
+
+                            item.MedicalSkillNames =
+                                dr["MedicalSkillNames"] == DBNull.Value
+                                    ? ""
+                                    : dr["MedicalSkillNames"].ToString();
+
+                            item.TechnicalSkillNames =
+                                dr["TechnicalSkillNames"] == DBNull.Value
+                                    ? ""
+                                    : dr["TechnicalSkillNames"].ToString();
+
+                            item.NonTechnicalSkillNames =
+                                dr["NonTechnicalSkillNames"] == DBNull.Value
+                                    ? ""
+                                    : dr["NonTechnicalSkillNames"].ToString();
+
+                            item.MatchedSkillType =
+                                dr["MatchedSkillType"] == DBNull.Value
+                                    ? ""
+                                    : dr["MatchedSkillType"].ToString();
+
+                            item.CApply =
+                                dr["CApply"] == DBNull.Value
+                                    ? null
+                                    : Convert.ToInt32(dr["CApply"]);
+
+                            item.Status =
+                                dr["Status"] == DBNull.Value
+                                    ? ""
+                                    : dr["Status"].ToString();
+
+                            item.FinalStatus =
+                                dr["FinalStatus"] == DBNull.Value
+                                    ? ""
+                                    : dr["FinalStatus"].ToString();
+
+                            item.Comment =
+                                dr["Comment"] == DBNull.Value
+                                    ? ""
+                                    : dr["Comment"].ToString();
+
+                            trainees.Add(item);
+                        }
+                    }
+                }
+            }
+
+            ViewBag.PostID = id;
+            ViewBag.OrgID = orgID;
+
+            return View(trainees);
+        }
+        #endregion
     }
 }
