@@ -2,76 +2,7 @@
 
 @model ResumeViewModel
 
-<style>
-    /* =========================================================
-   RESUME NAVIGATION
-========================================================= */
 
-.resume-navigation {
-    position: fixed;
-    left: 22px;
-    top: 50%;
-    transform: translateY(-50%);
-    z-index: 2000;
-
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-}
-
-.resume-nav-btn {
-    width: 42px;
-    height: 42px;
-
-    display: flex;
-    align-items: center;
-    justify-content: center;
-
-    background: #ffffff;
-    color: #526987;
-
-    border: 1px solid #dfe4ea;
-    border-radius: 50%;
-
-    text-decoration: none;
-
-    box-shadow: 0 5px 18px rgba(0, 0, 0, 0.12);
-
-    transition:
-        transform 0.2s ease,
-        background 0.2s ease,
-        color 0.2s ease;
-}
-
-.resume-nav-btn:hover {
-    transform: scale(1.08);
-    background: #526987;
-    color: #ffffff;
-}
-
-.resume-nav-btn i {
-    font-size: 14px;
-}
-
-@@media (max-width: 1000px) {
-
-    .resume-navigation {
-        left: 8px;
-    }
-
-    .resume-nav-btn {
-        width: 36px;
-        height: 36px;
-    }
-}
-
-@@media print {
-
-    .resume-navigation {
-        display: none !important;
-    }
-}
-</style>
 
 @{
 /*
@@ -83,7 +14,7 @@ RESUME MASTER LAYOUT
 
     ViewProfileFour
         -> viewprofilefour.css
-
+        00
     ViewProfileFive
         -> viewprofilefive.css
 
@@ -392,7 +323,76 @@ string GetSkillNames(
 <meta name="viewport"
       content="width=device-width, initial-scale=1.0" />
 
+<style>
+    /* =========================================================
+   RESUME NAVIGATION
+========================================================= */
 
+.resume-navigation {
+    position: fixed;
+    left: 22px;
+    top: 50%;
+    transform: translateY(-50%);
+    z-index: 2000;
+
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.resume-nav-btn {
+    width: 42px;
+    height: 42px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    background: #ffffff;
+    color: #526987;
+
+    border: 1px solid #dfe4ea;
+    border-radius: 50%;
+
+    text-decoration: none;
+
+    box-shadow: 0 5px 18px rgba(0, 0, 0, 0.12);
+
+    transition:
+        transform 0.2s ease,
+        background 0.2s ease,
+        color 0.2s ease;
+}
+
+.resume-nav-btn:hover {
+    transform: scale(1.08);
+    background: #526987;
+    color: #ffffff;
+}
+
+.resume-nav-btn i {
+    font-size: 14px;
+}
+
+@@media (max-width: 1000px) {
+
+    .resume-navigation {
+        left: 8px;
+    }
+
+    .resume-nav-btn {
+        width: 36px;
+        height: 36px;
+    }
+}
+
+@@media print {
+
+    .resume-navigation {
+        display: none !important;
+    }
+}
+</style>
 <!-- =====================================================
      TITLE
 ====================================================== -->
