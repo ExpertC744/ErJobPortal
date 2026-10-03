@@ -1978,11 +1978,25 @@ namespace ErJobPortal.Controllers
         {
             // id = CD080900080701
 
-            if (string.IsNullOrEmpty(id))
+            int? candidateId = HttpContext.Session.GetInt32("CandidateID");
+
+            if (candidateId == null)
             {
-                return RedirectToAction("Dashboard");
+                return RedirectToAction("CandidateLogin", "Account");
             }
 
+            // =========================================================
+            // GET CANDIDATE REGISTRATION DETAILS
+            // =========================================================
+
+            var candidate = _repository.GetCandidateRegistrationDetails(candidateId.Value);
+
+            if (candidate == null)
+            {
+                return NotFound("Candidate registration not found.");
+            }
+                List<OrgPostM> internshipPosts = GetMatchingJobsForCandidate(candidateId.Value);
+            ViewBag.InternshipPosts = internshipPosts;
             // Your code to get internship details using id
 
             return View();
@@ -2793,8 +2807,7 @@ namespace ErJobPortal.Controllers
                 if (requiredTrainees < 0)
                     requiredTrainees = 0;
 
-                suitableOpeningsMonthly[monthIndex] +=
-                    requiredTrainees;
+                suitableOpeningsMonthly[monthIndex] += requiredTrainees;
             }
 
 
@@ -2807,8 +2820,7 @@ namespace ErJobPortal.Controllers
 
             ViewBag.ChartYear = currentYear;
 
-            ViewBag.SuitableOpeningsMonthly =
-                suitableOpeningsMonthly;
+            ViewBag.SuitableOpeningsMonthly = suitableOpeningsMonthly;
 
             return View();
         }
