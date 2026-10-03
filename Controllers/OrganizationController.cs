@@ -78,18 +78,23 @@ namespace ErJobPortal.Controllers
 
             if (orgId == null)
             {
-                return RedirectToAction("OrganizationLogin", "Account");
+                return RedirectToAction(
+                    "OrganizationLogin",
+                    "Account");
             }
 
             // =====================================================
             // GET ORGANIZATION REGISTRATION DETAILS
             // =====================================================
 
-            var organization = _repository.GetOrganizationRegistrationDetails(orgId.Value);
+            var organization =
+                _repository.GetOrganizationRegistrationDetails(
+                    orgId.Value);
 
             if (organization == null)
             {
-                return NotFound("Organization registration not found.");
+                return NotFound(
+                    "Organization registration not found.");
             }
 
             // =====================================================
@@ -98,7 +103,8 @@ namespace ErJobPortal.Controllers
 
             if (organization.Value.RegDate == null)
             {
-                return BadRequest("Organization Registration Date is missing.");
+                return BadRequest(
+                    "Organization Registration Date is missing.");
             }
 
             // =====================================================
@@ -150,10 +156,17 @@ namespace ErJobPortal.Controllers
             // SESSION DATA
             // =====================================================
 
-            ViewBag.OrgID = orgId.Value;
-            ViewBag.OrgName = HttpContext.Session.GetString("OrgName");
-            ViewBag.OrgEmail = HttpContext.Session.GetString("OrgEmail");
-            ViewBag.OrgCode = organizationCode;
+            ViewBag.OrgID =
+                orgId.Value;
+
+            ViewBag.OrgName =
+                HttpContext.Session.GetString("OrgName");
+
+            ViewBag.OrgEmail =
+                HttpContext.Session.GetString("OrgEmail");
+
+            ViewBag.OrgCode =
+                organizationCode;
 
             // =====================================================
             // DASHBOARD COUNTS
@@ -161,10 +174,24 @@ namespace ErJobPortal.Controllers
 
             int traineeRegistrationCount = 0;
             int organizationRegistrationCount = 0;
+
             int internshipEligibleCount = 0;
-            List<int> monthlyCandidateRegistrations = Enumerable.Repeat(0, 12).ToList();
-            string connectionString = _configuration.GetConnectionString("DefaultConnection");
-            using (SqlConnection con = new SqlConnection(connectionString))
+
+            List<int> monthlyCandidateRegistrations =
+                Enumerable.Repeat(0, 12).ToList();
+
+            List<OrganizationChartViewModel> areaChartData =
+    new List<OrganizationChartViewModel>();
+
+            List<OrganizationChartViewModel> barChartData =
+                new List<OrganizationChartViewModel>();
+
+            string connectionString =
+                _configuration.GetConnectionString(
+                    "DefaultConnection");
+
+            using (SqlConnection con =
+                   new SqlConnection(connectionString))
             {
                 con.Open();
 
@@ -173,14 +200,14 @@ namespace ErJobPortal.Controllers
                 // =================================================
 
                 string query = @"
-            SELECT
-                (SELECT COUNT(nID)
-                 FROM tblCandidateRegister)
-                    AS CandidateCount,
+        SELECT
+            (SELECT COUNT(nID)
+             FROM tblCandidateRegister)
+                AS CandidateCount,
 
-                (SELECT COUNT(nID)
-                 FROM tblOrgRegistration)
-                    AS OrganizationCount;";
+            (SELECT COUNT(nID)
+             FROM tblOrgRegistration)
+                AS OrganizationCount;";
 
                 using (SqlCommand cmd =
                        new SqlCommand(query, con))
@@ -204,9 +231,9 @@ namespace ErJobPortal.Controllers
                 // =================================================
 
                 string eligibleQuery = @"
-            SELECT COUNT(nID)
-            FROM tblCandidateRegister
-            WHERE ISNULL(nBit, 1) = 1;";
+        SELECT COUNT(nID)
+        FROM tblCandidateRegister
+        WHERE ISNULL(nBit, 1) = 1;";
 
                 using (SqlCommand cmd =
                        new SqlCommand(
@@ -229,32 +256,43 @@ namespace ErJobPortal.Controllers
                 // =================================================
 
                 string monthlyQuery = @"
-            SELECT
-                MONTH(RegDate)
-                    AS RegistrationMonth,
+        SELECT
+            MONTH(RegDate)
+                AS RegistrationMonth,
 
-                COUNT(nID)
-                    AS RegistrationCount
+            COUNT(nID)
+                AS RegistrationCount
 
-            FROM tblCandidateRegister
+        FROM tblCandidateRegister
 
-            WHERE YEAR(RegDate) =
-                  YEAR(GETDATE())
+        WHERE YEAR(RegDate) =
+              YEAR(GETDATE())
 
-            GROUP BY
-                MONTH(RegDate)
+        GROUP BY
+            MONTH(RegDate)
 
-            ORDER BY
-                MONTH(RegDate);";
+        ORDER BY
+            MONTH(RegDate);";
 
-                using (SqlCommand cmd = new SqlCommand(monthlyQuery, con))
-                using (SqlDataReader dr = cmd.ExecuteReader())
+                using (SqlCommand cmd =
+                       new SqlCommand(
+                           monthlyQuery,
+                           con))
+                using (SqlDataReader dr =
+                       cmd.ExecuteReader())
                 {
                     while (dr.Read())
                     {
-                        int month = Convert.ToInt32(dr["RegistrationMonth"]);
-                        int count = Convert.ToInt32(dr["RegistrationCount"]);
-                        if (month >= 1 && month <= 12)
+                        int month =
+                            Convert.ToInt32(
+                                dr["RegistrationMonth"]);
+
+                        int count =
+                            Convert.ToInt32(
+                                dr["RegistrationCount"]);
+
+                        if (month >= 1 &&
+                            month <= 12)
                         {
                             monthlyCandidateRegistrations[
                                 month - 1] = count;
@@ -265,15 +303,23 @@ namespace ErJobPortal.Controllers
                 // GET ORGANIZATION POSTS FOR DASHBOARD
                 // =====================================================
 
-                List<OrgPostM> organizationPosts = new List<OrgPostM>();
+                List<OrgPostM> organizationPosts =
+                    new List<OrgPostM>();
 
-                using (SqlCommand cmd = new SqlCommand("SP_GetOrganizationDashboardPosts", con))
+                using (SqlCommand cmd =
+                       new SqlCommand(
+                           "SP_GetOrganizationDashboardPosts",
+                           con))
                 {
-                    cmd.CommandType = CommandType.StoredProcedure;
+                    cmd.CommandType =
+                        CommandType.StoredProcedure;
 
-                    cmd.Parameters.AddWithValue("@nOrgID", orgId.Value);
+                    cmd.Parameters.AddWithValue(
+                        "@nOrgID",
+                        orgId.Value);
 
-                    using (SqlDataReader dr = cmd.ExecuteReader())
+                    using (SqlDataReader dr =
+                           cmd.ExecuteReader())
                     {
                         while (dr.Read())
                         {
@@ -320,10 +366,108 @@ namespace ErJobPortal.Controllers
                             organizationPosts.Add(post);
                         }
                     }
-                    
-                }
-                ViewBag.OrganizationPosts = organizationPosts;
+                    ViewBag.OrganizationPosts =
+    organizationPosts;
 
+
+                    // =====================================================
+                    // ELIGIBLE TRAINEE CHART
+                    // =====================================================
+
+                    List<OrgPostM> posts =
+      new List<OrgPostM>();
+
+                    using (SqlCommand chartCmd =
+                           new SqlCommand(
+                               "SP_GetOrgPostsWithMatchingTraineeCount",
+                               con))
+                    {
+                        chartCmd.CommandType =
+                            CommandType.StoredProcedure;
+
+                        chartCmd.Parameters.AddWithValue(
+                            "@nOrgID",
+                            orgId.Value);
+
+                        using (SqlDataReader dr =
+                               chartCmd.ExecuteReader())
+                        {
+                            while (dr.Read())
+                            {
+                                OrgPostM item =
+                                    new OrgPostM();
+
+                                item.nID =
+                                    dr["nID"] == DBNull.Value
+                                    ? 0
+                                    : Convert.ToInt32(
+                                        dr["nID"]);
+
+                                item.MatchingTraineeCount =
+                                    dr["MatchingTraineeCount"] == DBNull.Value
+                                    ? 0
+                                    : Convert.ToInt32(
+                                        dr["MatchingTraineeCount"]);
+
+                                item.dRegisterDate =
+                                    dr["dRegisterDate"] == DBNull.Value
+                                    ? null
+                                    : Convert.ToDateTime(
+                                        dr["dRegisterDate"]);
+
+                                item.nOrgID =
+                                    dr["nOrgID"] == DBNull.Value
+                                    ? orgId.Value
+                                    : Convert.ToInt32(
+                                        dr["nOrgID"]);
+
+                                posts.Add(item);
+                            }
+                        }
+                    }
+
+
+                    // =====================================================
+                    // CONVERT TO CHART DATA
+                    // =====================================================
+
+                    areaChartData =
+                        posts
+                            .Where(x =>
+                                x.dRegisterDate.HasValue)
+                            .GroupBy(x => new
+                            {
+                                Year =
+                                    x.dRegisterDate.Value.Year,
+
+                                Month =
+                                    x.dRegisterDate.Value.Month
+                            })
+                            .Select(g =>
+                                new OrganizationChartViewModel
+                                {
+                                    PostYear =
+                                        g.Key.Year,
+
+                                    PostMonth =
+                                        g.Key.Month,
+
+                                    TotalEligibleTrainees =
+                                        g.Sum(x =>
+                                            x.MatchingTraineeCount)
+                                })
+                            .OrderBy(x => x.PostYear)
+                            .ThenBy(x => x.PostMonth)
+                            .ToList();
+
+
+                    // =====================================================
+                    // CANDIDATE REGISTRATION CHART
+                    // =====================================================
+
+                    barChartData =
+                        GetBarChartData();
+                }
                 // =====================================================
                 // GET APPLIED TRAINEES POST DATA FOR DASHBOARD
                 // =====================================================
@@ -417,9 +561,11 @@ namespace ErJobPortal.Controllers
             ViewBag.MonthlyCandidateRegistrations =
                 monthlyCandidateRegistrations;
 
+            ViewBag.AreaChartData =
+    areaChartData;
 
-            
-
+            ViewBag.BarChartData =
+                barChartData;
 
             // =====================================================
             // RETURN VIEW
@@ -3606,23 +3752,135 @@ WHERE nID = @nID
                 HttpContext.Session.GetString("OrgName")
                 ?? "";
 
-            // Existing organization area chart
-            List<OrganizationChartViewModel> areaChartData =
-                GetAreaChartData(orgId.Value);
+            // =====================================================
+            // 1. ELIGIBLE TRAINEE CHART
+            //    USING OrgPostM.MatchingTraineeCount
+            // =====================================================
 
-            // Candidate registration chart
+            List<OrgPostM> posts =
+                new List<OrgPostM>();
+
+            using (SqlConnection con =
+                new SqlConnection(
+                    _configuration.GetConnectionString("DefaultConnection")))
+            {
+                using (SqlCommand cmd =
+                    new SqlCommand(
+                        "SP_GetOrgPostsWithMatchingTraineeCount",
+                        con))
+                {
+                    cmd.CommandType =
+                        CommandType.StoredProcedure;
+
+                    cmd.Parameters.AddWithValue(
+                        "@nOrgID",
+                        orgId.Value);
+
+                    con.Open();
+
+                    using (SqlDataReader dr =
+                        cmd.ExecuteReader())
+                    {
+                        while (dr.Read())
+                        {
+                            OrgPostM item =
+                                new OrgPostM();
+
+                            item.nID =
+                                dr["nID"] == DBNull.Value
+                                ? 0
+                                : Convert.ToInt32(
+                                    dr["nID"]);
+
+                            item.MatchingTraineeCount =
+                                dr["MatchingTraineeCount"] == DBNull.Value
+                                ? 0
+                                : Convert.ToInt32(
+                                    dr["MatchingTraineeCount"]);
+
+                            item.dRegisterDate =
+                                dr["dRegisterDate"] == DBNull.Value
+                                ? null
+                                : Convert.ToDateTime(
+                                    dr["dRegisterDate"]);
+
+                            item.nOrgID =
+                                dr["nOrgID"] == DBNull.Value
+                                ? orgId.Value
+                                : Convert.ToInt32(
+                                    dr["nOrgID"]);
+
+                            posts.Add(item);
+                        }
+                    }
+                }
+            }
+
+
+            // =====================================================
+            // CONVERT OrgPostM DATA TO CHART DATA
+            // =====================================================
+
+            List<OrganizationChartViewModel> areaChartData =
+                posts
+                    .Where(x =>
+                        x.dRegisterDate.HasValue)
+                    .GroupBy(x => new
+                    {
+                        Year =
+                            x.dRegisterDate.Value.Year,
+
+                        Month =
+                            x.dRegisterDate.Value.Month
+                    })
+                    .Select(g =>
+                        new OrganizationChartViewModel
+                        {
+                            PostYear =
+                                g.Key.Year,
+
+                            PostMonth =
+                                g.Key.Month,
+
+                            TotalEligibleTrainees =
+                                g.Sum(x =>
+                                    x.MatchingTraineeCount)
+                        })
+                    .OrderBy(x => x.PostYear)
+                    .ThenBy(x => x.PostMonth)
+                    .ToList();
+
+
+            // =====================================================
+            // 2. CANDIDATE REGISTRATION CHART
+            // =====================================================
+
             List<OrganizationChartViewModel> barChartData =
                 GetBarChartData();
+
+
+            // =====================================================
+            // ORGANIZATION NAME
+            // =====================================================
 
             ViewBag.OrganizationName =
                 organizationName;
 
+
+            // =====================================================
+            // VIEW MODEL
+            // =====================================================
+
             var viewModel =
                 new OrganizationChartsViewModel
                 {
-                    AreaChartData = areaChartData,
-                    BarChartData = barChartData
+                    AreaChartData =
+                        areaChartData,
+
+                    BarChartData =
+                        barChartData
                 };
+
 
             return View(viewModel);
         }
@@ -3759,11 +4017,15 @@ WHERE nID = @nID
             return candidateChartData;
         }
 
-
+        #region "Elebible Trianee"
         [HttpGet]
-        [Route("Organization/EligibleTrainees/{id}")]
-        public IActionResult EligibleTrainees(int id, string orgCode)
+        [Route("Organization/EligibleTrainees/{id:int}")]
+        public IActionResult EligibleTrainees(int id, string? orgCode)
         {
+            // =====================================================
+            // GET ORGANIZATION ID FROM SESSION
+            // =====================================================
+
             int? sessionOrgID = HttpContext.Session.GetInt32("OrgID");
 
             if (sessionOrgID == null)
@@ -3783,8 +4045,13 @@ WHERE nID = @nID
                 {
                     cmd.CommandType = CommandType.StoredProcedure;
 
-                    cmd.Parameters.Add("@nID", SqlDbType.Int).Value = id;
-                    cmd.Parameters.Add("@OrganizationID", SqlDbType.Int).Value = orgID;
+                    // Post ID
+                    cmd.Parameters.Add("@nID", SqlDbType.Int)
+                        .Value = id;
+
+                    // Organization ID from SESSION
+                    cmd.Parameters.Add("@OrganizationID", SqlDbType.Int)
+                        .Value = orgID;
 
                     con.Open();
 
@@ -3901,16 +4168,175 @@ WHERE nID = @nID
                 }
             }
 
-            // IMPORTANT:
-            // id = PostID
-            // orgCode = Organization Code
+            // =====================================================
+            // SEND DATA TO VIEW
+            // =====================================================
 
             ViewBag.PostID = id;
-            ViewBag.OrgCode = orgCode;
+
+            // If orgCode was passed in URL, use it.
+            // Otherwise use session OrgID.
+            ViewBag.OrgCode = string.IsNullOrWhiteSpace(orgCode)
+                ? orgID.ToString()
+                : orgCode;
 
             return View(trainees);
         }
+        #endregion
 
+        #region "Shortlist/Reject the Candidate"
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public IActionResult UpdateCandidateStatus(int candidateId, int postId, int status)
+        {
+            // =====================================================
+            // ORGANIZATION LOGIN CHECK
+            // =====================================================
+            int? sessionOrgID = HttpContext.Session.GetInt32("OrgID");
+            if (sessionOrgID == null)
+            {
+                return RedirectToAction("OrganizationLogin", "Account");
+            }
+            int orgID = sessionOrgID.Value;
+            // =====================================================
+            // ONLY ALLOW
+            // 1 = Shortlisted
+            // 2 = Rejected
+            // =====================================================
+            if (status != 1 && status != 2)
+            {
+                return RedirectToAction("EligibleTrainees", new { id = postId });
+            }
+            string connectionString = _configuration.GetConnectionString("DefaultConnection")!;
+            using (SqlConnection con = new SqlConnection(connectionString))
+            {
+                using (SqlCommand cmd = new SqlCommand("SP_UpdateOrgCandidateStatus", con))
+                {
+                    cmd.CommandType = CommandType.StoredProcedure;
+                    cmd.Parameters.Add("@CandidateID", SqlDbType.Int).Value = candidateId;
+                    cmd.Parameters.Add("@PostID", SqlDbType.Int).Value = postId;
+                    cmd.Parameters.Add("@OrganizationID", SqlDbType.Int).Value = orgID;
+                    cmd.Parameters.Add("@Status", SqlDbType.Int).Value = status;
+                    con.Open();
+                    cmd.ExecuteNonQuery();
+                }
+            }
+
+            return RedirectToAction("EligibleTrainees", new { id = postId });
+        }
+
+        #endregion
+
+        #region "Update Final Selection Status"
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public IActionResult UpdateCandidateFinalStatus(int candidateId, int postId, int finalStatus, int comment)
+        {
+            // =====================================================
+            // ORGANIZATION LOGIN CHECK
+            // =====================================================
+
+            int? sessionOrgID = HttpContext.Session.GetInt32("OrgID");
+            if (sessionOrgID == null)
+            {
+                return RedirectToAction("OrganizationLogin", "Account");
+            }
+            int orgID = sessionOrgID.Value;
+
+            // =====================================================
+            // VALIDATE FINAL STATUS
+            // 0 = Select
+            // 1 = Hold
+            // 2 = Rejected
+            // 3 = Shortlisted
+            // =====================================================
+            if (finalStatus < 1 || finalStatus > 3)
+            {
+                return RedirectToAction("EligibleTrainees", new { id = postId, orgCode = orgID });
+            }
+
+            // =====================================================
+            // VALIDATE COMMENT ACCORDING TO FINAL STATUS
+            // =====================================================
+
+            bool validComment = false;
+            if (finalStatus == 1)
+            {
+                // Hold
+                // Only:
+                // 1 = On Hold May Consider
+
+                validComment = comment == 1;
+            }
+            else if (finalStatus == 2)
+            {
+                // Rejected
+                // 0 = Select
+                // 1 = Skills not Up to the mark
+                // 2 = High Expectations
+                // 3 = Other
+
+                validComment = comment >= 0 && comment <= 3;
+            }
+            else if (finalStatus == 3)
+            {
+                // Shortlisted
+                // 0 = Select
+                // 1 = OL under Process
+                validComment = comment == 0 || comment == 1;
+            }
+
+            if (!validComment)
+            {
+                return RedirectToAction("EligibleTrainees", new { id = postId, orgCode = orgID });
+            }
+
+            // =====================================================
+            // UPDATE DATABASE
+            // =====================================================
+            string connectionString = _configuration.GetConnectionString("DefaultConnection")!;
+            using (SqlConnection con = new SqlConnection(connectionString))
+            {
+                using (SqlCommand cmd = new SqlCommand("SP_UpdateOrgCandidateFinalStatus", con))
+                {
+                    cmd.CommandType = CommandType.StoredProcedure;
+                    cmd.Parameters.Add("@CandidateID", SqlDbType.Int).Value = candidateId;
+
+                    cmd.Parameters.Add(
+                        "@PostID",
+                        SqlDbType.Int).Value =
+                        postId;
+
+                    cmd.Parameters.Add(
+                        "@OrganizationID",
+                        SqlDbType.Int).Value =
+                        orgID;
+
+                    cmd.Parameters.Add(
+                        "@FinalStatus",
+                        SqlDbType.Int).Value =
+                        finalStatus;
+
+                    cmd.Parameters.Add(
+                        "@Comment",
+                        SqlDbType.Int).Value =
+                        comment;
+
+                    con.Open();
+                    cmd.ExecuteNonQuery();
+                }
+            }
+
+
+            // =====================================================
+            // BACK TO ELIGIBLE TRAINEES
+            // =====================================================
+
+            return RedirectToAction("EligibleTrainees", new { id = postId, orgCode = orgID });
+        }
+
+        #endregion
 
         // khushi 01-10-26
         [HttpGet]

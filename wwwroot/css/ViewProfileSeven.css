@@ -9,22 +9,19 @@ html{-webkit-text-size-adjust:100%}
 body{background:#e6eaed;color:#27343c;font-family:"Inter",Arial,sans-serif;font-size:9.6px;line-height:1.45;overflow-x:hidden;-webkit-font-smoothing:antialiased}
 img{max-width:100%;display:block}
 
-.resume-page-wrapper{position:relative;top:65px;width:100%;display:flex;justify-content:center;align-items:flex-start;padding:24px 12px 90px;overflow-x:hidden}
-
-/* top navigation toolbar (prev / next / print / download / themes) - always visible, above the sheet */
-.resume-top-toolbar{position:absolute;top:12px;left:50%;transform:translateX(-50%);z-index:99999;display:flex}
+.resume-page-wrapper{width:100%;display:flex;justify-content:center;align-items:flex-start;padding:70px 0 30px}
 
 .resume-sheet{
-    --theme:#1f4e68;--theme-dark:#173c50;--theme-soft:#e9f0f4;--accent:#b4773c;--theme-light:#a9d4ea;--border:#dce2e4;--muted:#718087;--photo:30mm;
+    --theme:#1f4e68;--theme-dark:#173c50;--theme-soft:#e9f0f4;--accent:#b4773c;--border:#dce2e4;--muted:#718087;--photo:30mm;
     position:relative;width:279mm;min-width:279mm;height:210mm;min-height:210mm;max-height:210mm;
     display:flex;flex-direction:column;background:#fff;color:#27343c;overflow:hidden;
     box-shadow:0 12px 40px rgba(20,40,50,.16)
 }
-.resume-sheet[data-theme="blue"]{--theme:#1f4e68;--theme-dark:#173c50;--theme-soft:#e9f0f4;--accent:#b4773c;--theme-light:#a9d4ea;--border:#d3e0e8}
-.resume-sheet[data-theme="teal"]{--theme:#176b68;--theme-dark:#115250;--theme-soft:#e6f2f1;--accent:#a87842;--theme-light:#8fe0da;--border:#cde4e2}
-.resume-sheet[data-theme="slate"]{--theme:#455a64;--theme-dark:#34444c;--theme-soft:#edf1f3;--accent:#b4773c;--theme-light:#b9cad3;--border:#dbe1e5}
-.resume-sheet[data-theme="brown"]{--theme:#765536;--theme-dark:#5c4129;--theme-soft:#f4eee8;--accent:#3f6f55;--theme-light:#e6c5a0;--border:#e8dccf}
-.resume-sheet[data-theme="green"]{--theme:#3f6f55;--theme-dark:#305641;--theme-soft:#ecf3ee;--accent:#a4783e;--theme-light:#a8e0c3;--border:#d4e4da}
+.resume-sheet[data-theme="blue"]{--theme:#1f4e68;--theme-dark:#173c50;--theme-soft:#e9f0f4;--accent:#b4773c}
+.resume-sheet[data-theme="teal"]{--theme:#176b68;--theme-dark:#115250;--theme-soft:#e6f2f1;--accent:#a87842}
+.resume-sheet[data-theme="slate"]{--theme:#455a64;--theme-dark:#34444c;--theme-soft:#edf1f3;--accent:#b4773c}
+.resume-sheet[data-theme="brown"]{--theme:#765536;--theme-dark:#5c4129;--theme-soft:#f4eee8;--accent:#3f6f55}
+.resume-sheet[data-theme="green"]{--theme:#3f6f55;--theme-dark:#305641;--theme-soft:#ecf3ee;--accent:#a4783e}
 
 /* structure */
 .resume-header{position:relative;flex:none;width:100%}
@@ -110,60 +107,62 @@ img{max-width:100%;display:block}
 .preference-item:last-child{margin-bottom:0}
 .preference-item strong{color:var(--theme);font-weight:700}
 
-/* THIRTEEN - Timeline spine with dot headings, light info column on the RIGHT */
-.resume-header{height:34mm;display:grid;grid-template-columns:40mm 1fr 76mm;align-items:center;background:var(--theme-soft);border-left:6mm solid var(--theme);border-bottom:1px solid var(--border)}
-.photo-wrapper{grid-column:1;grid-row:1;display:flex;align-items:center;padding-left:6mm}
-.profile-photo{--photo:22mm;border-radius:50%;border:3px solid #fff;box-shadow:0 2px 8px rgba(20,40,50,.2)}
-.profile-placeholder{--photo:22mm;border-radius:50%;border:3px solid #fff}
-.header-info{grid-column:2;grid-row:1;padding:0 6mm 0 4mm;min-width:0}
-.candidate-name{font-style:italic;font-size:28px}
-.candidate-role{margin-top:5px;font-size:10px;color:var(--accent)}
-.header-accent{display:none}
-.header-contact{grid-column:3;grid-row:1;display:flex;flex-direction:column;gap:5px;padding-left:8mm;border-left:1px solid var(--border);min-width:0}
-.header-contact-item{color:#4a5b63}
-.header-contact-item i{color:var(--theme)}
+/* =========================================================
+   TEMPLATE SEVEN  -  Full-height dark sidebar
+   ========================================================= */
+.resume-sheet::before{content:"";position:absolute;left:0;top:0;bottom:0;width:78mm;background:var(--theme);z-index:0}
+.resume-sheet::after{content:"";position:absolute;left:78mm;top:0;bottom:0;width:3px;background:var(--accent);z-index:0}
+.resume-header,.resume-body{z-index:1}
 
-.resume-body{grid-template-columns:1fr 66mm}
-.right-column{grid-column:1;grid-row:1;position:relative;padding:5mm 10mm 4mm 19mm}
-.right-column::before{content:"";position:absolute;left:11mm;top:0;bottom:0;width:2px;background:var(--border)}
-.left-column{grid-column:2;grid-row:1;border-left:1px dashed var(--theme);padding:5mm 8mm 4mm 7mm;background:#fff}
-.right-column .section-heading{position:relative}
-.right-column .section-heading::before{content:"";position:absolute;left:calc(-8mm - 7px);top:50%;transform:translateY(-50%);width:14px;height:14px;border-radius:50%;background:#fff;border:3px solid var(--theme)}
-.section-icon{display:none}
-.section-title{font-family:"Playfair Display",Georgia,serif;font-size:12.5px;text-transform:none;letter-spacing:.3px}
-.left-column .section-heading{padding:2px 8px;background:var(--theme-soft);border-radius:3px}
-.left-column .section-title{font-size:11.5px}
-.left-column .section-title-line{display:none}
-.skill-list{border:0;border-left:0;padding:2px 0}
-.experience-item{background:#fff;border:1px solid var(--border);border-left:1px solid var(--border);border-top:3px solid var(--accent)}
-.education-item{background:#fff;border:1px solid var(--border);border-top:3px solid var(--theme)}
-.reference-item{background:#fff;border:1px solid var(--border);border-left:3px solid var(--accent)}
+.resume-header{height:52mm;display:grid;grid-template-columns:78mm 1fr;align-items:center;background:linear-gradient(90deg,transparent 0 81mm,var(--theme-soft) 81mm 100%)}
+.photo-wrapper{grid-column:1;grid-row:1;display:flex;justify-content:center;align-items:center}
+.profile-photo{--photo:34mm;border-radius:50%;border:4px solid #fff;box-shadow:0 6px 20px rgba(0,0,0,.28)}
+.profile-placeholder{--photo:34mm;border-radius:50%;border:4px solid #fff}
+.header-info{grid-column:2;grid-row:1;padding:0 12mm 0 14mm;min-width:0}
+.candidate-name{font-size:33px}
+.candidate-role{margin-top:8px;font-size:10.5px;color:var(--accent)}
+.header-accent{width:56px;height:3px;margin-top:12px;background:var(--theme);border-radius:2px}
+.header-contact{display:none}
+
+.resume-body{grid-template-columns:78mm 1fr}
+.left-column{padding:5mm 8mm 5mm 9mm;color:#fff}
+.right-column{padding:6mm 11mm 5mm 12mm}
+
+/* left (dark) */
+.left-column .section-icon{background:var(--accent)}
+.left-column .section-title{color:#fff}
+.left-column .section-title-line{background:rgba(255,255,255,.22)}
+.left-column .info-icon{background:rgba(255,255,255,.14);color:#fff}
+.left-column .info-label{color:rgba(255,255,255,.6)}
+.left-column .info-value{color:#fff}
+.left-column .skill-group-title{color:rgba(255,255,255,.65)}
+.left-column .skill-list{background:rgba(255,255,255,.09);border-color:rgba(255,255,255,.16);border-left-color:var(--accent);color:#eef3f5}
+.left-column .language-row{border-bottom-color:rgba(255,255,255,.16)}
+.left-column .language-name{color:#fff}
+.left-column .language-level{color:rgba(255,255,255,.72)}
+.left-column .interest-box{color:#e6edf0}
+.left-column .social-item{color:#e6edf0}
+.left-column .social-item i{color:#fff}
+
+/* right (light) */
+.right-column .section-icon{border-radius:4px;background:var(--theme-soft);color:var(--theme)}
+.experience-item{background:#fff;border:1px solid var(--border);border-top:3px solid var(--theme)}
+.education-item{border-top:0;border-left:3px solid var(--accent)}
+.reference-item{border-left-color:var(--accent)}
 
 /* =========================================================
-   RESPONSIVE - SAME SHEET (279mm x 210mm), ONLY ZOOM OUT
-   12px space is always kept on the left/right of the sheet
+   RESPONSIVE - SAME SHEET, ONLY ZOOM OUT
    ========================================================= */
-@media (max-width:1100px){.resume-sheet{zoom:0.98}}
-@media (max-width:1060px){.resume-sheet{zoom:0.94}}
-@media (max-width:1020px){.resume-sheet{zoom:0.90}}
-@media (max-width:980px){.resume-sheet{zoom:0.86}}
-@media (max-width:940px){.resume-sheet{zoom:0.83}}
-@media (max-width:900px){.resume-sheet{zoom:0.79}}
-@media (max-width:860px){.resume-sheet{zoom:0.75}}
-@media (max-width:820px){.resume-sheet{zoom:0.71}}
-@media (max-width:780px){.resume-sheet{zoom:0.67}}
-@media (max-width:740px){.resume-sheet{zoom:0.64}}
-@media (max-width:700px){.resume-sheet{zoom:0.60}}
-@media (max-width:660px){.resume-sheet{zoom:0.56}}
-@media (max-width:620px){.resume-sheet{zoom:0.52}}
-@media (max-width:580px){.resume-sheet{zoom:0.48}}
-@media (max-width:540px){.resume-sheet{zoom:0.45}}
-@media (max-width:500px){.resume-sheet{zoom:0.41}}
-@media (max-width:460px){.resume-sheet{zoom:0.37}}
-@media (max-width:420px){.resume-sheet{zoom:0.33}}
-@media (max-width:380px){.resume-sheet{zoom:0.29}}
-@media (max-width:340px){.resume-sheet{zoom:0.26}}
-@media (max-width:340px){.resume-sheet{zoom:.24}}
+@media (max-width:1100px){.resume-sheet{zoom:.93}}
+@media (max-width:1000px){.resume-sheet{zoom:.84}}
+@media (max-width:900px){.resume-sheet{zoom:.75}}
+@media (max-width:800px){.resume-sheet{zoom:.66}}
+@media (max-width:700px){.resume-sheet{zoom:.56}}
+@media (max-width:600px){.resume-sheet{zoom:.47}}
+@media (max-width:500px){.resume-page-wrapper{padding-top:60px}.resume-sheet{zoom:.40}}
+@media (max-width:430px){.resume-sheet{zoom:.35}}
+@media (max-width:380px){.resume-sheet{zoom:.31}}
+@media (max-width:340px){.resume-sheet{zoom:.27}}
 
 /* =========================================================
    PRINT - 27.9cm x 21cm
@@ -171,8 +170,7 @@ img{max-width:100%;display:block}
 @page{size:279mm 210mm;margin:0}
 @media print{
     html,body{width:279mm;height:210mm;margin:0;padding:0;background:#fff!important;overflow:hidden}
-    .resume-page-wrapper{position:static;top:0;display:block;width:279mm;padding:0;margin:0;overflow:visible}
+    .resume-page-wrapper{display:block;width:279mm;padding:0;margin:0}
     .resume-sheet{zoom:1!important;width:279mm;min-width:279mm;height:210mm;margin:0;box-shadow:none}
-    .resume-top-toolbar,.resume-navigation,.resume-theme-switcher{display:none!important}
     .resume-sheet,.resume-sheet *,.resume-sheet *::before,.resume-sheet *::after{-webkit-print-color-adjust:exact;print-color-adjust:exact}
 }

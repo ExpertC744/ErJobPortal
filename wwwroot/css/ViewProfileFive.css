@@ -83,6 +83,8 @@ body {
 ========================================================= */
 
 .resume-page-wrapper {
+    position: relative;
+    top: 65px;
     width: 100%;
     display: flex;
     justify-content: center;
@@ -245,7 +247,7 @@ body {
     display: flex;
     align-items: stretch;
 }
- 
+
 
 .left-column {
     flex: 0 0 245px;
@@ -909,3 +911,5 @@ body {
         display: none !important;
     }
 }
+
+/*--------------*/

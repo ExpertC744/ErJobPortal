@@ -33,8 +33,8 @@
 <style>
 
     /* =====================================================
-               TRAINEE MONTHLY ANALYTICS
-               ===================================================== */
+                   TRAINEE MONTHLY ANALYTICS
+                   ===================================================== */
 
     .analytics-card {
         background: #ffffff;
@@ -52,8 +52,8 @@
 
 
     /* =====================================================
-               CHART HEADER
-               ===================================================== */
+                   CHART HEADER
+                   ===================================================== */
 
     .analytics-header {
         min-height: 52px;
@@ -85,8 +85,8 @@
 
 
     /* =====================================================
-               CHART BODY
-               ===================================================== */
+                   CHART BODY
+                   ===================================================== */
 
     .analytics-body {
         padding: 18px 16px 14px;
@@ -106,8 +106,8 @@
 
 
     /* =====================================================
-               LEGEND
-               ===================================================== */
+                   LEGEND
+                   ===================================================== */
 
     .chart-legend {
         display: flex;
@@ -134,8 +134,8 @@
 
 
     /* =====================================================
-               AXIS TEXT
-               ===================================================== */
+                   AXIS TEXT
+                   ===================================================== */
 
     .chart-axis-text {
         fill: #667085;
@@ -145,8 +145,8 @@
 
 
     /* =====================================================
-               GRID
-               ===================================================== */
+                   GRID
+                   ===================================================== */
 
     .chart-grid {
         stroke: #e6eaed;
@@ -160,8 +160,8 @@
 
 
     /* =====================================================
-               LINE CHART
-               ===================================================== */
+                   LINE CHART
+                   ===================================================== */
 
     .chart-line {
         fill: none;
@@ -183,8 +183,8 @@
 
 
     /* =====================================================
-               BAR CHART
-               ===================================================== */
+                   BAR CHART
+                   ===================================================== */
 
     .chart-bar {
         fill: #1e7b67;
@@ -197,8 +197,8 @@
 
 
     /* =====================================================
-               CURRENT VALUE
-               ===================================================== */
+                   CURRENT VALUE
+                   ===================================================== */
 
     .analytics-value {
         text-align: center;
@@ -209,8 +209,8 @@
 
 
     /* =====================================================
-               FOOTER
-               ===================================================== */
+                   FOOTER
+                   ===================================================== */
 
     .analytics-footer {
         border-top: 1px solid #edf0f2;
@@ -226,8 +226,8 @@
 
 
     /* =====================================================
-               MOBILE
-               ===================================================== */
+                   MOBILE
+                   ===================================================== */
 
     @@media (max-width: 767px) {
 
@@ -738,43 +738,15 @@
 
 </div>
 
-
 <script>
 
     document.addEventListener("DOMContentLoaded", function () {
-
-
-        // =====================================================
-        // CANDIDATE DATA FROM C#
-        // =====================================================
-
-        const candidateData =
-        @Html.Raw(
-                System.Text.Json.JsonSerializer.Serialize(
-                                barData.Select(x => new
-                                {
-                                            year = x.RegistrationYear,
-                                            month = x.RegistrationMonth,
-                                            count = x.TotalRegistrations
-                                })
-                )
-                );
-
-
-        // =====================================================
-        // CURRENT YEAR
-        // =====================================================
-
-        const currentYear =
-            new Date().getFullYear();
-
 
         // =====================================================
         // MONTH NAMES
         // =====================================================
 
         const monthNames = [
-
             "Jan",
             "Feb",
             "Mar",
@@ -787,27 +759,491 @@
             "Oct",
             "Nov",
             "Dec"
-
         ];
+
+
+        // =====================================================
+        // CURRENT YEAR
+        // =====================================================
+
+        const currentYear = new Date().getFullYear();
+
+
+        // =====================================================
+        // =====================================================
+        // 1. ELIGIBLE TRAINEE CHART
+        // =====================================================
+        // =====================================================
+
+
+        // =====================================================
+        // DATA FROM C#
+        // =====================================================
+
+        const eligibleData =
+            @Html.Raw(
+                    System.Text.Json.JsonSerializer.Serialize(
+                                    areaData.Select(x => new
+                                    {
+                                                year = x.PostYear,
+                                                month = x.PostMonth,
+                                                count = x.TotalEligibleTrainees
+                                    })
+                    )
+                        );
+
+
+        console.log(
+            "Eligible Data From C#:",
+            eligibleData
+        );
 
 
         // =====================================================
         // CREATE 12 MONTHS
         // =====================================================
 
-        const months = [];
+        const eligibleMonths = [];
 
 
-        for (let i = 0; i < 12; i++) {
+        for (let i = 1; i <= 12; i++) {
 
-            months.push({
+            eligibleMonths.push({
 
                 year: currentYear,
 
-                month: i + 1,
+                month: i,
 
                 label:
-                    monthNames[i] +
+                    monthNames[i - 1] +
+                    " " +
+                    String(currentYear).slice(-2),
+
+                count: 0
+
+            });
+
+        }
+
+
+        // =====================================================
+        // PUT DATABASE VALUES INTO MONTHS
+        // =====================================================
+
+        if (Array.isArray(eligibleData)) {
+
+            eligibleData.forEach(function (item) {
+
+                const itemYear =
+                    Number(item.year);
+
+                const itemMonth =
+                    Number(item.month);
+
+                const itemCount =
+                    Number(item.count) || 0;
+
+
+                const found =
+                    eligibleMonths.find(function (x) {
+
+                        return (
+                            x.year === itemYear &&
+                            x.month === itemMonth
+                        );
+
+                    });
+
+
+                if (found) {
+
+                    /*
+                     * IMPORTANT:
+                     * Do NOT add the value again.
+                     *
+                     * SP should already return the
+                     * monthly eligible trainee total.
+                     */
+
+                    found.count = itemCount;
+
+                }
+
+            });
+
+        }
+
+
+        console.log(
+            "Eligible Monthly Data:",
+            eligibleMonths
+        );
+
+
+        // =====================================================
+        // CHART SETTINGS
+        // =====================================================
+
+        const eligibleChartLeft = 60;
+
+        const eligibleChartRight = 735;
+
+        const eligibleChartTop = 30;
+
+        const eligibleChartBottom = 255;
+
+        const eligibleChartHeight =
+            eligibleChartBottom -
+            eligibleChartTop;
+
+        const eligibleChartWidth =
+            eligibleChartRight -
+            eligibleChartLeft;
+
+        const eligibleMonthGap =
+            eligibleChartWidth / 11;
+
+
+        // =====================================================
+        // Y AXIS ALWAYS 0 TO 100
+        // =====================================================
+
+        const eligibleYAxisMax = 100;
+
+
+        // =====================================================
+        // CREATE POINTS
+        // =====================================================
+
+        const eligiblePointsData = [];
+
+
+        eligibleMonths.forEach(function (item, index) {
+
+            const x =
+                eligibleChartLeft +
+                (
+                    index *
+                    eligibleMonthGap
+                );
+
+
+            const value =
+                Math.max(
+                    0,
+                    Math.min(
+                        Number(item.count) || 0,
+                        eligibleYAxisMax
+                    )
+                );
+
+
+            const y =
+                eligibleChartBottom -
+                (
+                    (
+                        value /
+                        eligibleYAxisMax
+                    ) *
+                    eligibleChartHeight
+                );
+
+
+            eligiblePointsData.push({
+
+                x: x,
+
+                y: y,
+
+                count: value,
+
+                label: item.label
+
+            });
+
+        });
+
+
+        // =====================================================
+        // DRAW LINE
+        // =====================================================
+
+        const eligibleLine =
+            document.getElementById(
+                "eligibleLine"
+            );
+
+
+        if (eligibleLine) {
+
+            eligibleLine.setAttribute(
+                "points",
+
+                eligiblePointsData
+                    .map(function (p) {
+
+                        return (
+                            p.x +
+                            "," +
+                            p.y
+                        );
+
+                    })
+                    .join(" ")
+            );
+
+        }
+
+
+        // =====================================================
+        // DRAW AREA
+        // =====================================================
+
+        const eligibleArea =
+            document.getElementById(
+                "eligibleArea"
+            );
+
+
+        if (eligibleArea) {
+
+            let areaPoints =
+                eligiblePointsData
+                    .map(function (p) {
+
+                        return (
+                            p.x +
+                            "," +
+                            p.y
+                        );
+
+                    })
+                    .join(" ");
+
+
+            areaPoints +=
+                " " +
+                eligibleChartRight +
+                "," +
+                eligibleChartBottom;
+
+
+            areaPoints +=
+                " " +
+                eligibleChartLeft +
+                "," +
+                eligibleChartBottom;
+
+
+            eligibleArea.setAttribute(
+                "points",
+                areaPoints
+            );
+
+        }
+
+
+        // =====================================================
+        // DRAW POINTS
+        // =====================================================
+
+        const eligiblePoints =
+            document.getElementById(
+                "eligiblePoints"
+            );
+
+
+        if (eligiblePoints) {
+
+            eligiblePoints.innerHTML = "";
+
+
+            eligiblePointsData.forEach(
+                function (p) {
+
+                    const circle =
+                        document.createElementNS(
+                            "http://www.w3.org/2000/svg",
+                            "circle"
+                        );
+
+
+                    circle.setAttribute(
+                        "cx",
+                        p.x
+                    );
+
+
+                    circle.setAttribute(
+                        "cy",
+                        p.y
+                    );
+
+
+                    circle.setAttribute(
+                        "r",
+                        "4"
+                    );
+
+
+                    circle.setAttribute(
+                        "class",
+                        "chart-point"
+                    );
+
+
+                    // =================================================
+                    // TOOLTIP
+                    // =================================================
+
+                    const title =
+                        document.createElementNS(
+                            "http://www.w3.org/2000/svg",
+                            "title"
+                        );
+
+
+                    title.textContent =
+                        p.label +
+                        " : " +
+                        p.count +
+                        " eligible trainee(s)";
+
+
+                    circle.appendChild(
+                        title
+                    );
+
+
+                    eligiblePoints.appendChild(
+                        circle
+                    );
+
+                }
+            );
+
+        }
+
+
+        // =====================================================
+        // ELIGIBLE MONTH LABELS
+        // =====================================================
+
+        const eligibleMonthsElement =
+            document.getElementById(
+                "eligibleMonths"
+            );
+
+
+        if (eligibleMonthsElement) {
+
+            eligibleMonthsElement.innerHTML = "";
+
+
+            eligibleMonths.forEach(
+                function (item, index) {
+
+                    const text =
+                        document.createElementNS(
+                            "http://www.w3.org/2000/svg",
+                            "text"
+                        );
+
+
+                    const x =
+                        eligibleChartLeft +
+                        (
+                            index *
+                            eligibleMonthGap
+                        );
+
+
+                    text.setAttribute(
+                        "x",
+                        x
+                    );
+
+
+                    text.setAttribute(
+                        "y",
+                        eligibleChartBottom + 20
+                    );
+
+
+                    text.setAttribute(
+                        "text-anchor",
+                        "middle"
+                    );
+
+
+                    text.setAttribute(
+                        "class",
+                        "chart-axis-text"
+                    );
+
+
+                    text.textContent =
+                        item.label;
+
+
+                    eligibleMonthsElement.appendChild(
+                        text
+                    );
+
+                }
+            );
+
+        }
+
+
+
+        // =====================================================
+        // =====================================================
+        // 2. CANDIDATE REGISTRATION CHART
+        // =====================================================
+        // =====================================================
+
+
+        // =====================================================
+        // DATA FROM C#
+        // =====================================================
+
+        const candidateData =
+            @Html.Raw(
+                                        System.Text.Json.JsonSerializer.Serialize(
+                                                        barData.Select(x => new
+                                                        {
+                                                                    year = x.RegistrationYear,
+                                                                    month = x.RegistrationMonth,
+                                                                    count = x.TotalRegistrations
+                                                        })
+                                        )
+                        );
+
+
+        console.log(
+            "Candidate Data From C#:",
+            candidateData
+        );
+
+
+        // =====================================================
+        // CREATE 12 MONTHS
+        // =====================================================
+
+        const registrationMonths = [];
+
+
+        for (let i = 1; i <= 12; i++) {
+
+            registrationMonths.push({
+
+                year: currentYear,
+
+                month: i,
+
+                label:
+                    monthNames[i - 1] +
                     " " +
                     String(currentYear).slice(-2),
 
@@ -826,27 +1262,32 @@
 
             candidateData.forEach(function (item) {
 
+                const itemYear =
+                    Number(item.year);
+
+                const itemMonth =
+                    Number(item.month);
+
+                const itemCount =
+                    Number(item.count) || 0;
+
 
                 const found =
-                    months.find(function (x) {
+                    registrationMonths.find(
+                        function (x) {
 
-                        return (
+                            return (
+                                x.year === itemYear &&
+                                x.month === itemMonth
+                            );
 
-                            x.year === Number(item.year)
-
-                            &&
-
-                            x.month === Number(item.month)
-
-                        );
-
-                    });
+                        }
+                    );
 
 
                 if (found) {
 
-                    found.count =
-                        Number(item.count) || 0;
+                    found.count = itemCount;
 
                 }
 
@@ -859,54 +1300,35 @@
         // CHART SETTINGS
         // =====================================================
 
-        const chartLeft = 60;
+        const registrationChartLeft = 60;
 
-        const chartRight = 735;
+        const registrationChartRight = 735;
 
-        const chartTop = 30;
+        const registrationChartTop = 30;
 
-        const chartBottom = 255;
+        const registrationChartBottom = 255;
 
-        const chartWidth =
-            chartRight - chartLeft;
+        const registrationChartHeight =
+            registrationChartBottom -
+            registrationChartTop;
 
+        const registrationChartWidth =
+            registrationChartRight -
+            registrationChartLeft;
 
-        const monthGap =
-            chartWidth / 11;
-
-
-        // =====================================================
-        // GET MAX VALUE
-        // =====================================================
-
-        const maxValue =
-            Math.max(
-                ...months.map(x => x.count),
-                1
-            );
+        const registrationMonthGap =
+            registrationChartWidth / 11;
 
 
         // =====================================================
-        // IMPORTANT
-        // =====================================================
-        // Y AXIS IS ALWAYS 0 TO 100
-        //
-        // August = 6
-        // September = 8
-        //
-        // Therefore:
-        //
-        // 6 / 100 = 6%
-        // 8 / 100 = 8%
-        //
-        // The bars will NOT be converted to 60 or 80.
+        // Y AXIS = 0 TO 100
         // =====================================================
 
-        const yAxisMax = 100;
+        const registrationYAxisMax = 100;
 
 
         // =====================================================
-        // REGISTRATION BAR CHART
+        // BARS
         // =====================================================
 
         const registrationBars =
@@ -915,204 +1337,189 @@
             );
 
 
-        const barWidth = 30;
+        if (registrationBars) {
+
+            registrationBars.innerHTML = "";
+
+            const barWidth = 30;
 
 
-        months.forEach(function (item, index) {
+            registrationMonths.forEach(
+                function (item, index) {
+
+                    const x =
+                        registrationChartLeft +
+                        (
+                            index *
+                            registrationMonthGap
+                        ) -
+                        (
+                            barWidth / 2
+                        );
 
 
-            // =================================================
-            // BAR X POSITION
-            // =================================================
-
-            const x =
-                chartLeft +
-                (index * monthGap) -
-                (barWidth / 2);
-
-
-            // =================================================
-            // BAR HEIGHT
-            // =================================================
-            //
-            // Example:
-            //
-            // count = 6
-            //
-            // 6 / 100 * 225
-            //
-            // = 13.5 pixels
-            //
-            // count = 8
-            //
-            // 8 / 100 * 225
-            //
-            // = 18 pixels
-            //
-            // =================================================
-
-            const barHeight =
-                (item.count / yAxisMax) *
-                (chartBottom - chartTop);
+                    const value =
+                        Math.max(
+                            0,
+                            Math.min(
+                                Number(item.count) || 0,
+                                registrationYAxisMax
+                            )
+                        );
 
 
-            // =================================================
-            // BAR Y POSITION
-            // =================================================
-
-            const y =
-                chartBottom - barHeight;
-
-
-            // =================================================
-            // CREATE RECTANGLE
-            // =================================================
-
-            const rect =
-                document.createElementNS(
-                    "http://www.w3.org/2000/svg",
-                    "rect"
-                );
+                    const barHeight =
+                        (
+                            value /
+                            registrationYAxisMax
+                        ) *
+                        registrationChartHeight;
 
 
-            rect.setAttribute(
-                "x",
-                x
+                    const y =
+                        registrationChartBottom -
+                        barHeight;
+
+
+                    const rect =
+                        document.createElementNS(
+                            "http://www.w3.org/2000/svg",
+                            "rect"
+                        );
+
+
+                    rect.setAttribute(
+                        "x",
+                        x
+                    );
+
+
+                    rect.setAttribute(
+                        "y",
+                        y
+                    );
+
+
+                    rect.setAttribute(
+                        "width",
+                        barWidth
+                    );
+
+
+                    rect.setAttribute(
+                        "height",
+                        barHeight
+                    );
+
+
+                    rect.setAttribute(
+                        "class",
+                        "chart-bar"
+                    );
+
+
+                    // =================================================
+                    // TOOLTIP
+                    // =================================================
+
+                    const title =
+                        document.createElementNS(
+                            "http://www.w3.org/2000/svg",
+                            "title"
+                        );
+
+
+                    title.textContent =
+                        item.label +
+                        " : " +
+                        value +
+                        " candidate(s)";
+
+
+                    rect.appendChild(
+                        title
+                    );
+
+
+                    registrationBars.appendChild(
+                        rect
+                    );
+
+                }
             );
 
-
-            rect.setAttribute(
-                "y",
-                y
-            );
-
-
-            rect.setAttribute(
-                "width",
-                barWidth
-            );
-
-
-            rect.setAttribute(
-                "height",
-                Math.max(
-                    barHeight,
-                    0
-                )
-            );
-
-
-            rect.setAttribute(
-                "class",
-                "chart-bar"
-            );
-
-
-            // =================================================
-            // TOOLTIP
-            // =================================================
-
-            const title =
-                document.createElementNS(
-                    "http://www.w3.org/2000/svg",
-                    "title"
-                );
-
-
-            title.textContent =
-                item.label +
-                " : " +
-                item.count +
-                " candidate(s)";
-
-
-            rect.appendChild(title);
-
-
-            // =================================================
-            // ADD BAR
-            // =================================================
-
-            registrationBars.appendChild(
-                rect
-            );
-
-        });
+        }
 
 
         // =====================================================
         // REGISTRATION MONTH LABELS
         // =====================================================
 
-        const registrationMonths =
+        const registrationMonthsElement =
             document.getElementById(
                 "registrationMonths"
             );
 
 
-        months.forEach(function (item, index) {
+        if (registrationMonthsElement) {
+
+            registrationMonthsElement.innerHTML = "";
 
 
-            const text =
-                document.createElementNS(
-                    "http://www.w3.org/2000/svg",
-                    "text"
-                );
+            registrationMonths.forEach(
+                function (item, index) {
+
+                    const text =
+                        document.createElementNS(
+                            "http://www.w3.org/2000/svg",
+                            "text"
+                        );
 
 
-            const x =
-                chartLeft +
-                (index * monthGap);
+                    const x =
+                        registrationChartLeft +
+                        (
+                            index *
+                            registrationMonthGap
+                        );
 
 
-            text.setAttribute(
-                "x",
-                x
+                    text.setAttribute(
+                        "x",
+                        x
+                    );
+
+
+                    text.setAttribute(
+                        "y",
+                        registrationChartBottom + 20
+                    );
+
+
+                    text.setAttribute(
+                        "text-anchor",
+                        "middle"
+                    );
+
+
+                    text.setAttribute(
+                        "class",
+                        "chart-axis-text"
+                    );
+
+
+                    text.textContent =
+                        item.label;
+
+
+                    registrationMonthsElement.appendChild(
+                        text
+                    );
+
+                }
             );
 
-
-            text.setAttribute(
-                "y",
-                chartBottom + 20
-            );
-
-
-            text.setAttribute(
-                "text-anchor",
-                "middle"
-            );
-
-
-            text.setAttribute(
-                "class",
-                "chart-axis-text"
-            );
-
-
-            text.textContent =
-                item.label;
-
-
-            registrationMonths.appendChild(
-                text
-            );
-
-        });
-
-
-        // =====================================================
-        // TOTAL CANDIDATE REGISTRATIONS
-        // =====================================================
-
-        const totalCandidates =
-            months.reduce(
-                function (total, item) {
-
-                    return total + item.count;
-
-                },
-                0
-            );
+        }
 
 
         // =====================================================
@@ -1120,17 +1527,16 @@
         // =====================================================
 
         console.log(
-            "Candidate registrations:",
-            totalCandidates
+            "FINAL ELIGIBLE MONTHS:",
+            eligibleMonths
         );
-
 
         console.log(
-            "Candidate monthly data:",
-            months
+            "FINAL REGISTRATION MONTHS:",
+            registrationMonths
         );
-
 
     });
 
 </script>
+

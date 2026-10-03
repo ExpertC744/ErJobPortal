@@ -69,18 +69,43 @@ var resumeCss =
     actionName?.ToLowerInvariant() switch
     {
         "viewprofilefour" =>
-            "~/css/viewprofilefour.css",
+    "~/css/viewprofilefour.css",
 
-        "viewprofilefive" =>
-            "~/css/viewprofilefive.css",
+"viewprofilefive" =>
+    "~/css/viewprofilefive.css",
 
-        "viewprofilesix" =>
-            "~/css/viewprofilesix.css",
-            "viewprofileNine" =>
-            "~/css/ViewProfileNine.css",
+"viewprofilesix" =>
+    "~/css/ViewProfileSix.css",
 
-        _ =>
-            ""
+"viewprofileseven" =>
+    "~/css/viewprofileseven.css",
+
+"viewprofileeight" =>
+    "~/css/viewprofileeight.css",
+
+"viewprofilenine" =>
+    "~/css/viewprofilenine.css",
+
+"viewprofileten" =>
+    "~/css/viewprofileten.css",
+
+"viewprofileeleven" =>
+    "~/css/viewprofileeleven.css",
+
+"viewprofiletwelve" =>
+    "~/css/viewprofiletwelve.css",
+
+"viewprofilethirteen" =>
+    "~/css/viewprofilethirteen.css",
+
+"viewprofilefourteen" =>
+    "~/css/viewprofilefourteen.css",
+
+"viewprofilefifteen" =>
+    "~/css/viewprofilefifteen.css",
+
+_ =>
+    ""
     };
 
 }
@@ -324,71 +349,203 @@ string GetSkillNames(
       content="width=device-width, initial-scale=1.0" />
 
 <style>
-    /* =========================================================
-   RESUME NAVIGATION
+/* =========================================================
+   FIXED RESUME TOP TOOLBAR
 ========================================================= */
 
-.resume-navigation {
-    position: fixed;
-    left: 22px;
-    top: 50%;
-    transform: translateY(-50%);
-    z-index: 2000;
-
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-}
-
-.resume-nav-btn {
-    width: 42px;
-    height: 42px;
-
+.resume-top-toolbar {
+    position: absolute;
+    top: 12px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 99999;
     display: flex;
     align-items: center;
     justify-content: center;
+    gap: 6px;
+    padding: 6px 8px;
+    background: #ffffff;
+    border: 1px solid #dce3e8;
+    border-radius: 12px;
+    box-shadow: 0 6px 22px rgba(15, 23, 42, 0.16);
+    white-space: nowrap;
+}
 
+
+/* =========================================================
+   TOOLBAR BUTTON
+========================================================= */
+
+.resume-toolbar-btn {
+    width: 40px;
+    height: 40px;
+    flex: 0 0 40px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid #dce3e8;
+    border-radius: 8px;
     background: #ffffff;
     color: #526987;
-
-    border: 1px solid #dfe4ea;
-    border-radius: 50%;
-
     text-decoration: none;
-
-    box-shadow: 0 5px 18px rgba(0, 0, 0, 0.12);
-
-    transition:
-        transform 0.2s ease,
-        background 0.2s ease,
-        color 0.2s ease;
+    cursor: pointer;
+    transition: background 0.18s ease, color 0.18s ease, border-color 0.18s ease, transform 0.18s ease;
 }
 
-.resume-nav-btn:hover {
-    transform: scale(1.08);
-    background: #526987;
-    color: #ffffff;
-}
 
-.resume-nav-btn i {
-    font-size: 14px;
-}
-
-@@media (max-width: 1000px) {
-
-    .resume-navigation {
-        left: 8px;
+    .resume-toolbar-btn:hover {
+        background: #1f4e68;
+        border-color: #1f4e68;
+        color: #ffffff;
+        transform: translateY(-1px);
     }
 
-    .resume-nav-btn {
+
+    .resume-toolbar-btn i {
+        font-size: 14px;
+    }
+
+
+/* =========================================================
+   DIVIDER
+========================================================= */
+
+.resume-toolbar-divider {
+    width: 1px;
+    height: 25px;
+    background: #d9e0e5;
+    margin: 0 3px;
+}
+
+
+/* =========================================================
+   THEME AREA
+========================================================= */
+
+.resume-toolbar-themes {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding-left: 2px;
+}
+
+
+/* =========================================================
+   THEME CIRCLE
+========================================================= */
+
+.resume-toolbar-theme {
+    width: 27px;
+    height: 27px;
+    flex: 0 0 27px;
+    padding: 0;
+    border: 2px solid #ffffff;
+    border-radius: 50%;
+    background: var(--theme-color);
+    box-shadow: 0 0 0 1px #c7d0d7;
+    cursor: pointer;
+    transition: transform 0.18s ease, box-shadow 0.18s ease;
+}
+
+
+    .resume-toolbar-theme:hover {
+        transform: scale(1.1);
+    }
+
+
+    .resume-toolbar-theme.active {
+        box-shadow: 0 0 0 2px var(--theme-color);
+    }
+
+
+/* =========================================================
+   MOBILE / TABLET
+========================================================= */
+
+@@media (max-width: 700px) {
+
+    .resume-top-toolbar {
+        top: 8px;
+        max-width: calc(100vw - 16px);
+        overflow-x: auto;
+        justify-content: flex-start;
+        scrollbar-width: none;
+        -ms-overflow-style: none;
+    }
+
+
+        .resume-top-toolbar::-webkit-scrollbar {
+            display: none;
+        }
+
+
+    .resume-toolbar-btn {
         width: 36px;
         height: 36px;
+        flex-basis: 36px;
+    }
+
+
+    .resume-toolbar-theme {
+        width: 24px;
+        height: 24px;
+        flex-basis: 24px;
+    }
+
+
+    .resume-toolbar-divider {
+        height: 22px;
     }
 }
+
+
+/* =========================================================
+   SMALL MOBILE
+========================================================= */
+
+@@media (max-width: 420px) {
+
+    .resume-top-toolbar {
+        top: 6px;
+        padding: 5px 6px;
+        gap: 4px;
+        border-radius: 10px;
+    }
+
+
+    .resume-toolbar-btn {
+        width: 32px;
+        height: 32px;
+        flex-basis: 32px;
+    }
+
+
+        .resume-toolbar-btn i {
+            font-size: 12px;
+        }
+
+
+    .resume-toolbar-theme {
+        width: 20px;
+        height: 20px;
+        flex-basis: 20px;
+    }
+
+
+    .resume-toolbar-divider {
+        height: 20px;
+        margin: 0 1px;
+    }
+}
+
+
+/* =========================================================
+   PRINT
+========================================================= */
 
 @@media print {
 
-    .resume-navigation {
+    .resume-top-toolbar {
         display: none !important;
     }
 }
@@ -455,7 +612,15 @@ var resumeActions = new[]
 "ViewProfileFour",
 "ViewProfileFive",
 "ViewProfileSix",
-"ViewProfileNine"
+"ViewProfileSeven",
+"ViewProfileEight",
+"ViewProfileNine",
+"ViewProfileTen",
+"ViewProfileEleven",
+"ViewProfileTwelve",
+"ViewProfileThirteen",
+"ViewProfileFourteen",
+"ViewProfileFifteen"
 };
 
 var currentAction = actionName ?? "";
@@ -483,40 +648,116 @@ var currentId =
     ViewContext.RouteData.Values["id"]?.ToString();
 
 }
-
 <!-- =========================================================
-     PREVIOUS / NEXT RESUME
-========================================================== -->
+     FIXED RESUME TOOLBAR
+========================================================= -->
 
-<div class="resume-navigation">
+<div class="resume-top-toolbar">
 
-@if (!string.IsNullOrWhiteSpace(previousAction))
-{
-    <a href="@Url.Action(
-                 previousAction,
-                 "Resume",
-                 new { id = currentId })"
-       class="resume-nav-btn"
-       title="Previous Resume">
+    <!-- PREVIOUS -->
+    @if (!string.IsNullOrWhiteSpace(previousAction))
+    {
+        <a href="@Url.Action(
+                     previousAction,
+                     "Resume",
+                     new { id = currentId })"
+           class="resume-toolbar-btn"
+           title="Previous Resume"
+           aria-label="Previous Resume">
 
-        <i class="fa-solid fa-chevron-left"></i>
+            <i class="fa-solid fa-chevron-left"></i>
 
-    </a>
-}
+        </a>
+    }
 
-@if (!string.IsNullOrWhiteSpace(nextAction))
-{
-    <a href="@Url.Action(
-                 nextAction,
-                 "Resume",
-                 new { id = currentId })"
-       class="resume-nav-btn"
-       title="Next Resume">
+    <!-- NEXT -->
+    @if (!string.IsNullOrWhiteSpace(nextAction))
+    {
+        <a href="@Url.Action(
+                     nextAction,
+                     "Resume",
+                     new { id = currentId })"
+           class="resume-toolbar-btn"
+           title="Next Resume"
+           aria-label="Next Resume">
 
-        <i class="fa-solid fa-chevron-right"></i>
+            <i class="fa-solid fa-chevron-right"></i>
 
-    </a>
-}
+        </a>
+    }
+
+    <!-- DIVIDER -->
+    <div class="resume-toolbar-divider"></div>
+
+    <!-- PRINT -->
+    <button type="button"
+            class="resume-toolbar-btn"
+            data-resume-action="print"
+            title="Print Resume"
+            aria-label="Print Resume">
+
+        <i class="fa-solid fa-print"></i>
+
+    </button>
+
+    <!-- DOWNLOAD -->
+    <button type="button"
+            class="resume-toolbar-btn"
+            data-resume-action="download"
+            title="Download PDF"
+            aria-label="Download PDF">
+
+        <i class="fa-solid fa-download"></i>
+
+    </button>
+
+    <!-- DIVIDER -->
+    <div class="resume-toolbar-divider"></div>
+
+    <!-- THEMES -->
+    <div class="resume-toolbar-themes">
+
+        <button type="button"
+                class="resume-toolbar-theme"
+                data-theme="blue"
+                style="--theme-color:#1f4e68"
+                title="Blue Theme"
+                aria-label="Blue Theme">
+        </button>
+
+        <button type="button"
+                class="resume-toolbar-theme"
+                data-theme="teal"
+                style="--theme-color:#176b68"
+                title="Teal Theme"
+                aria-label="Teal Theme">
+        </button>
+
+        <button type="button"
+                class="resume-toolbar-theme"
+                data-theme="slate"
+                style="--theme-color:#455a64"
+                title="Slate Theme"
+                aria-label="Slate Theme">
+        </button>
+
+        <button type="button"
+                class="resume-toolbar-theme"
+                data-theme="brown"
+                style="--theme-color:#765536"
+                title="Brown Theme"
+                aria-label="Brown Theme">
+        </button>
+
+        <button type="button"
+                class="resume-toolbar-theme"
+                data-theme="green"
+                style="--theme-color:#3f6f55"
+                title="Green Theme"
+                aria-label="Green Theme">
+        </button>
+
+    </div>
 
 </div>
 
@@ -1815,7 +2056,7 @@ var currentId =
 <!-- =========================================================
      THEME SWITCHER
 ========================================================== -->
-
+@* 
 <div class="resume-theme-switcher">
 
 <button type="button"
@@ -1848,7 +2089,7 @@ var currentId =
         style="--theme-color:#3f6f55">
 </button>
 
-</div>
+</div> *@
 
 
 
@@ -1866,87 +2107,92 @@ var currentId =
                THEME
             ================================================= */
 
-            const sheet =
-                document.getElementById(
-                    "resumeSheet"
-                );
+       /* =================================================
+   THEME
+================================================= */
 
-            const themeButtons =
-                document.querySelectorAll(
-                    ".theme-swatch"
-                );
-
-
-            const savedTheme =
-                localStorage.getItem(
-                    "resumeThemeV7"
-                ) || "blue";
+const sheet =
+    document.getElementById(
+        "resumeSheet"
+    );
 
 
-            if (sheet) {
-
-                sheet.setAttribute(
-                    "data-theme",
-                    savedTheme
-                );
-
-            }
+const themeButtons =
+    document.querySelectorAll(
+        ".resume-toolbar-theme"
+    );
 
 
-            themeButtons.forEach(
-                function (button) {
-
-                    button.classList.toggle(
-                        "active",
-                        button.dataset.theme ===
-                        savedTheme
-                    );
+const savedTheme =
+    localStorage.getItem(
+        "resumeThemeV7"
+    ) || "blue";
 
 
-                    button.addEventListener(
-                        "click",
-                        function () {
+if (sheet) {
 
-                            const theme =
-                                this.dataset.theme;
+    sheet.setAttribute(
+        "data-theme",
+        savedTheme
+    );
 
-
-                            if (sheet) {
-
-                                sheet.setAttribute(
-                                    "data-theme",
-                                    theme
-                                );
-
-                            }
+}
 
 
-                            themeButtons.forEach(
-                                function (item) {
+themeButtons.forEach(
+    function (button) {
 
-                                    item.classList.remove(
-                                        "active"
-                                    );
-
-                                }
-                            );
-
-
-                            this.classList.add(
-                                "active"
-                            );
+        button.classList.toggle(
+            "active",
+            button.dataset.theme ===
+            savedTheme
+        );
 
 
-                            localStorage.setItem(
-                                "resumeThemeV7",
-                                theme
-                            );
+        button.addEventListener(
+            "click",
+            function () {
 
-                        }
+                const theme =
+                    this.dataset.theme;
+
+
+                if (sheet) {
+
+                    sheet.setAttribute(
+                        "data-theme",
+                        theme
                     );
 
                 }
-            );
+
+
+                themeButtons.forEach(
+                    function (item) {
+
+                        item.classList.remove(
+                            "active"
+                        );
+
+                    }
+                );
+
+
+                this.classList.add(
+                    "active"
+                );
+
+
+                localStorage.setItem(
+                    "resumeThemeV7",
+                    theme
+                );
+
+            }
+        );
+
+    }
+);
 
 
             /* =================================================
