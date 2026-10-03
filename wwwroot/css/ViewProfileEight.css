@@ -1,0 +1,555 @@
+﻿<style >
+/* =========================================================
+                   ROOT
+                ========================================================== */
+:root {
+    --primary: #263b47;
+    --primary-light: #edf2f3;
+    --accent: #b4773c;
+    --accent-light: #f5ece3;
+    --text: #27343c;
+    --muted: #718087;
+    --border: #dce2e4;
+    --soft: #f6f7f7;
+    --white: #ffffff;
+}
+
+
+/* =========================================================
+                   RESET
+                ========================================================== */
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+
+html,
+body {
+    width: 100%;
+    min-height: 100%;
+}
+
+
+body {
+    background: #e9edef;
+    color: var(--text);
+    font-family: "DM Sans", Arial, sans-serif;
+}
+
+
+/* =========================================================
+                   THEME SWITCHER
+                ========================================================== */
+
+.theme-switcher {
+    width: 297mm;
+    max-width: calc(100% - 30px);
+    margin: 14px auto 10px;
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    gap: 8px;
+}
+
+
+    .theme-switcher span {
+        font-size: 9px;
+        font-weight: 700;
+        color: var(--muted);
+        text-transform: uppercase;
+        letter-spacing: .6px;
+    }
+
+
+.theme-swatch {
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    border: 2px solid white;
+    cursor: pointer;
+    box-shadow: 0 1px 5px rgba(0,0,0,.15);
+}
+
+
+    .theme-swatch.active {
+        box-shadow: 0 0 0 2px white, 0 0 0 4px var(--swatch);
+    }
+
+
+/* =========================================================
+                   RESUME PAGE WRAPPER
+                ========================================================== */
+
+.resume-page-wrapper {
+    display: flex;
+    justify-content: center;
+    padding: 5px 0 25px;
+}
+
+
+/* =========================================================
+                   RESUME SHEET
+                   A4 LANDSCAPE
+                   297mm x 210mm
+                ========================================================== */
+
+.resume-sheet {
+    width: 297mm;
+    height: 210mm;
+    background: #ffffff;
+    box-shadow: 0 12px 40px rgba(20,40,50,.14);
+    overflow: hidden;
+    display: grid;
+    grid-template-columns: 26% 46% 28%;
+    --theme-main: #00796b;
+    --theme-dark: #1a1a1a;
+    --text-dark: #333333;
+    --text-light: #777777;
+}
+
+
+    /* =========================================================
+                   THEMES
+                ========================================================== */
+
+    .resume-sheet[data-theme="teal"] {
+        --theme-main: #00796b;
+        --theme-dark: #1a1a1a;
+    }
+
+
+    .resume-sheet[data-theme="navy"] {
+        --theme-main: #1e3a8a;
+        --theme-dark: #0f172a;
+    }
+
+
+    .resume-sheet[data-theme="crimson"] {
+        --theme-main: #9f1239;
+        --theme-dark: #27060e;
+    }
+
+
+    .resume-sheet[data-theme="emerald"] {
+        --theme-main: #059669;
+        --theme-dark: #064e3b;
+    }
+
+
+    .resume-sheet[data-theme="slate"] {
+        --theme-main: #475569;
+        --theme-dark: #0f172a;
+    }
+
+
+/* =========================================================
+                   LEFT COLUMN
+                ========================================================== */
+
+.col-left {
+    background: #ffffff;
+    padding: 12mm 10mm;
+    border-right: 1px solid var(--border);
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    gap: 15px;
+}
+
+
+/* =========================================================
+                   MIDDLE COLUMN
+                ========================================================== */
+
+.col-mid {
+    background: #ffffff;
+    padding: 12mm 12mm;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    gap: 12px;
+}
+
+
+/* =========================================================
+                   RIGHT COLUMN
+                ========================================================== */
+
+.col-right {
+    display: flex;
+    flex-direction: column;
+    background: var(--theme-main);
+    color: #ffffff;
+    height: 100%;
+}
+
+
+.col-right-top {
+    padding: 12mm 10mm;
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+
+.col-right-bottom {
+    background: var(--theme-dark);
+    padding: 10mm;
+    margin-top: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+
+/* =========================================================
+                   PHOTO
+                ========================================================== */
+
+.photo-wrap {
+    position: relative;
+    width: 40mm;
+    height: 40mm;
+    min-width: 40mm;
+    min-height: 40mm;
+    margin: 0 auto;
+    border-radius: 50%;
+    border: 3px solid var(--theme-main);
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #f1f5f9;
+}
+
+
+.photo {
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+
+.photo-placeholder {
+    font-size: 35px;
+    color: #cbd5e1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 100%;
+}
+
+
+/* =========================================================
+                   LEFT SECTION HEADERS
+                ========================================================== */
+
+.section-header-left {
+    font-family: "Montserrat", sans-serif;
+    font-size: 11.5px;
+    font-weight: 800;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    margin-bottom: 6px;
+    color: #111;
+}
+
+
+.profile-text {
+    font-size: 10px;
+    line-height: 1.5;
+    color: var(--text-light);
+    text-align: justify;
+}
+
+
+/* =========================================================
+                   SKILLS
+                ========================================================== */
+
+.skill-list-left {
+    list-style: none;
+    padding: 0;
+    margin-top: 4px;
+}
+
+
+    .skill-list-left li {
+        font-size: 10px;
+        font-weight: 600;
+        color: var(--text-dark);
+        margin-bottom: 4px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+
+.skill-dots {
+    color: var(--theme-main);
+    font-size: 10px;
+    letter-spacing: 1px;
+}
+
+
+/* =========================================================
+                   MIDDLE INTRO
+                ========================================================== */
+
+.intro-small {
+    font-size: 14px;
+    font-weight: 400;
+    color: var(--text-dark);
+    margin-bottom: 2px;
+}
+
+
+.intro-large {
+    font-family: "Montserrat", sans-serif;
+    font-size: 24px;
+    font-weight: 700;
+    color: #111;
+    padding-bottom: 6px;
+    border-bottom: 2px solid var(--theme-main);
+    margin-bottom: 8px;
+    line-height: 1.2;
+}
+
+
+.intro-role {
+    font-weight: 500;
+    font-size: 14px;
+    color: var(--text-light);
+}
+
+
+/* =========================================================
+                   MIDDLE SECTION HEADER
+                ========================================================== */
+
+.section-header-mid {
+    font-family: "Montserrat", sans-serif;
+    font-size: 11.5px;
+    font-weight: 800;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    margin-bottom: 10px;
+    color: #111;
+}
+
+
+/* =========================================================
+                   EXPERIENCE
+                ========================================================== */
+
+.exp-item {
+    margin-bottom: 10px;
+    break-inside: avoid;
+}
+
+
+.exp-date {
+    font-size: 9.5px;
+    font-weight: 700;
+    color: var(--theme-main);
+    margin-bottom: 2px;
+}
+
+
+.exp-title {
+    font-family: "Montserrat", sans-serif;
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: #111;
+    border-bottom: 1px solid var(--border);
+    padding-bottom: 2px;
+    margin-bottom: 3px;
+    display: inline-block;
+}
+
+
+.exp-company {
+    font-size: 10.5px;
+    font-weight: 600;
+    color: var(--text-dark);
+    margin-bottom: 2px;
+}
+
+
+.exp-desc {
+    font-size: 9.5px;
+    line-height: 1.5;
+    color: var(--text-light);
+}
+
+
+/* =========================================================
+                   RIGHT COLUMN HEADERS
+                ========================================================== */
+
+.section-header-right {
+    font-family: "Montserrat", sans-serif;
+    font-size: 11.5px;
+    font-weight: 800;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    margin-bottom: 8px;
+    color: white;
+}
+
+
+/* =========================================================
+                   CONTACT
+                ========================================================== */
+
+.contact-item {
+    font-size: 9.5px;
+    line-height: 1.5;
+    margin-bottom: 4px;
+    color: rgba(255,255,255,0.95);
+    word-break: break-word;
+}
+
+
+/* =========================================================
+                   EDUCATION
+                ========================================================== */
+
+.edu-item {
+    margin-bottom: 8px;
+}
+
+
+.edu-date {
+    font-size: 9px;
+    font-weight: 700;
+    color: rgba(255,255,255,0.8);
+    margin-bottom: 2px;
+}
+
+
+.edu-title {
+    font-family: "Montserrat", sans-serif;
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    border-bottom: 1px solid rgba(255,255,255,0.3);
+    padding-bottom: 2px;
+    margin-bottom: 2px;
+    display: inline-block;
+}
+
+
+.edu-sub {
+    font-size: 9px;
+    color: rgba(255,255,255,0.95);
+}
+
+
+/* =========================================================
+                   REFERENCES
+                ========================================================== */
+
+.ref-item {
+    margin-bottom: 8px;
+}
+
+
+.ref-name {
+    font-size: 10.5px;
+    font-weight: 700;
+    color: white;
+}
+
+
+.ref-detail {
+    font-size: 9px;
+    color: rgba(255,255,255,0.8);
+    margin-top: 1px;
+}
+
+
+/* =========================================================
+                   RESPONSIVE
+                ========================================================== */
+
+@@media (max-width: 1200px) {
+
+    .theme-switcher {
+        width: 100%;
+        padding-left: 12px;
+        padding-right: 12px;
+    }
+
+
+    .resume-sheet {
+        transform: scale(.75);
+        transform-origin: top center;
+        margin-bottom: -45mm;
+    }
+}
+
+
+@@media (max-width: 768px) {
+
+    .resume-sheet {
+        transform: scale(.5);
+        margin-bottom: -100mm;
+    }
+}
+
+
+/* =========================================================
+                   PRINT
+                ========================================================== */
+
+@@media print {
+
+    html,
+    body {
+        width: 297mm;
+        height: 210mm;
+        background: white;
+    }
+
+
+    .theme-switcher {
+        display: none !important;
+    }
+
+
+    .resume-page-wrapper {
+        padding: 0;
+    }
+
+
+    .resume-sheet {
+        width: 297mm;
+        height: 210mm;
+        margin: 0;
+        box-shadow: none;
+        transform: none;
+    }
+
+
+    @@page {
+        size: A4 landscape;
+        margin: 0;
+    }
+
+
+    * {
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+    }
+}
+
+</style >

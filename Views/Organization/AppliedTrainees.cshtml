@@ -1,4 +1,6 @@
-﻿@{
+﻿@model List<ErJobPortal.Models.OrgPostM>
+
+@{
     Layout = "~/Views/Shared/_DashboardLayout.cshtml";
 
     ViewData["Title"] = "Applied Trainees";
@@ -8,26 +10,25 @@
 
 <div class="container-fluid applied-trainees-page">
 
-  
-
-
     <!-- MASTER TABLE -->
     <div class="master-table-container">
-         
+
+        <!-- PAGE HEADER -->
+        <div class="page-header mb-4">
+
+            <h1>
+                Applied Trainees
+            </h1>
+
+            <p>
+                @ViewBag.OrgCode
+            </p>
+
+        </div>
+
         <!-- TABLE -->
         <div class="table-responsive">
-              <!-- PAGE HEADER -->
-    <div class="page-header mb-4">
 
-        <h1>
-            Applied Trainees
-        </h1>
-
-        <p>
-            At738034692839
-        </p>
-
-    </div>
             <table id="appliedTraineesTable"
                    class="master-data-table">
 
@@ -59,97 +60,94 @@
 
                 </thead>
 
-
                 <tbody>
 
-                    <!-- STATIC SAMPLE DATA -->
+                    @{
+                        int srNo = 1;
+                    }
 
-                    <tr>
+                    @if (Model != null && Model.Any())
+                    {
+                        foreach (var item in Model)
+                        {
+                            <tr>
 
-                        <td class="master-id">
-                            1
-                        </td>
+                                <!-- Sr. No. -->
+                                <td class="master-id">
+                                    @srNo
+                                </td>
 
-                        <td>
-                            25-09-2026
-                        </td>
+                                <!-- Date -->
+                                <td>
+                                    @(item.dStartDate.HasValue
+                                                                ? item.dStartDate.Value.ToString("dd-MM-yyyy")
+                                                                : "")
+                                </td>
 
-                        <td>
-                            .Net Trainee
-                        </td>
+                                <!-- Position -->
+                                <td>
+                                    @item.sPositionName
+                                </td>
 
-                        <td class="text-center">
+                                <!-- View Post -->
+                                <td class="text-center">
 
-                            <a href="#"
-                               class="resume-view-btn"
-                               title="View Post">
+                                    <a asp-controller="Organization"
+                                       asp-action="ViewOrgPost"
+                                       asp-route-id="@item.nID"
+                                       class="resume-view-btn"
+                                       title="View Post">
 
-                                <i class="fas fa-eye"></i>
+                                        <i class="fas fa-eye"></i>
 
-                            </a>
+                                    </a>
 
-                        </td>
+                                </td>
 
-                        <td class="text-center">
+                                <!-- Applied Trainees -->
+                                <td class="text-center">
 
-                            <a href="#"
-                               class="resume-view-btn"
-                               title="View Applied Trainees">
+                                    <a asp-controller="Organization"
+                                       asp-action="AppliedTraineeList"
+                                       asp-route-id="@item.nID"
+                                       class="resume-view-btn"
+                                       title="View Applied Trainees">
 
-                                <i class="fas fa-users"></i>
+                                        <i class="fas fa-users"></i>
 
-                            </a>
+                                        @* Optional count *@
+                                        <span>
+                                            @item.MatchingTraineeCount
+                                        </span>
 
-                        </td>
+                                    </a>
 
-                    </tr>
+                                </td>
 
-                    <tr>
+                            </tr>
 
-                        <td class="master-id">
-                            2
-                        </td>
+                            srNo++;
+                        }
+                    }
+                    else
+                    {
+                        <tr>
 
-                        <td>
-                            24-09-2026
-                        </td>
+                            <td colspan="5"
+                                class="text-center">
 
-                        <td>
-                            React JS Trainee
-                        </td>
+                                No applied trainees found.
 
-                        <td class="text-center">
+                            </td>
 
-                            <a href="#"
-                               class="resume-view-btn"
-                               title="View Post">
-
-                                <i class="fas fa-eye"></i>
-
-                            </a>
-
-                        </td>
-
-                        <td class="text-center">
-
-                            <a href="#"
-                               class="resume-view-btn"
-                               title="View Applied Trainees">
-
-                                <i class="fas fa-users"></i>
-
-                            </a>
-
-                        </td>
-
-                    </tr>
+                        </tr>
+                    }
 
                 </tbody>
 
             </table>
 
         </div>
-
 
         <!-- PAGE INFORMATION -->
         <div id="appliedTraineesPageInfo"

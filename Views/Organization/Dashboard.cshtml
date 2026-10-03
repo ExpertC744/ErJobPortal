@@ -4,6 +4,9 @@
     ViewData["Title"] = "Organization Dashboard";
     ViewData["Panel"] = "Organization";
     ViewData["UserName"] = "Organization";
+    var appliedTraineePosts =
+        ViewBag.AppliedTraineePosts as List<ErJobPortal.Models.OrgPostM>
+        ?? new List<ErJobPortal.Models.OrgPostM>();
 }
 
 <link href="~/css/orgdashboard.css" rel="stylesheet" />
@@ -370,6 +373,7 @@
                 @* radhika25-09 *@
                 <a asp-controller="Organization"
                    asp-action="AppliedTrainees"
+                   asp-route-id="@ViewBag.OrgCode"
                    class="stat-link">
                     View Interviews
                     <i class="fas fa-arrow-right"></i>
@@ -1143,9 +1147,6 @@
         <!-- MASTER TABLE CARD -->
         <div class="master-table-container">
 
-
-
-
             <!-- MASTER TABLE -->
             <div class="table-responsive">
 
@@ -1164,78 +1165,80 @@
 
                     <tbody>
 
-                        @{
-                            int counter = 1;
-                        }
+                        @if (appliedTraineePosts.Any())
+                {
+                    int srNo = 1;
 
-                        @if (Model != null && Model.Any())
-                        {
-                            foreach (var item in Model)
-                            {
-                                <tr>
+                    foreach (var item in appliedTraineePosts)
+                    {
+                        <tr>
 
-                                    <!-- Sr. No. -->
-                                    <td class="master-id">
-                                        @counter
-                                    </td>
+                            <!-- Sr. No. -->
+                            <td class="master-id">
+                                @srNo
+                            </td>
 
-                                    <!-- Date -->
-                                    <td>
-                                        @(item.dRegisterDate.HasValue
-                                                                        ? item.dRegisterDate.Value.ToString("dd/MM/yyyy")
-                                                                        : "-")
-                                    </td>
+                            <!-- Date -->
+                            <td>
+                                @(item.dStartDate.HasValue
+                                    ? item.dStartDate.Value.ToString("dd-MM-yyyy")
+                                    : "")
+                            </td>
 
-                                    <!-- Position -->
-                                    <td>
-                                        <div class="job-info">
+                            <!-- Position -->
+                            <td>
+                                @item.sPositionName
+                            </td>
 
-                                            <div class="job-icon">
-                                                <i class="fas fa-briefcase"></i>
-                                            </div>
+                            <!-- View Post -->
+                            <td class="text-center">
 
-                                            <div>
-                                                <strong>
-                                                    @item.sPositionName
-                                                </strong>
-                                            </div>
-
-                                        </div>
-                                    </td>
-
-                                    <!-- View Post -->
-                                    <td>
-                                        <a href="@Url.Action(
-                                                                                                                                                             "PostDetails",
-                                                                                                                                                             "Organization",
-                                                                                                                                                             new { id = item.nID })"
-                                   class="view-post-btn"
+                                <a asp-controller="Organization"
+                                   asp-action="ViewOrgPost"
+                                   asp-route-id="@item.nID"
+                                   class="resume-view-btn"
                                    title="View Post">
 
-                                            <i class="fas fa-eye"></i>
+                                    <i class="fas fa-eye"></i>
 
-                                        </a>
-                                    </td>
+                                </a>
 
-                                    <!-- Applied Trainees -->
-                                    <td>
-                                        <a href="@Url.Action(
-                                                                                                                                             "TraineeList",
-                                                                                                                                             "Organization",
-                                                                                                                                             new { id = item.nID })"
-                                   class="applied-trainee-link">
+                            </td>
 
-                                            @item.AppliedTraineeCount
+                            <!-- Applied Trainees -->
+                            <td class="text-center">
 
-                                        </a>
-                                    </td>
+                                <a asp-controller="Organization"
+                                   asp-action="AppliedTraineeList"
+                                   asp-route-id="@item.nID"
+                                   class="resume-view-btn"
+                                   title="View Applied Trainees">
 
-                                </tr>
+                                    <i class="fas fa-users"></i>
 
-                                                counter++;
-                            }
-                        }
+                                    <span>
+                                        @item.MatchingTraineeCount
+                                    </span>
 
+                                </a>
+
+                            </td>
+
+                        </tr>
+
+                        srNo++;
+                    }
+                }
+                else
+                {
+                    <tr>
+                        <td colspan="5" class="text-center">
+                            No applied trainees found.
+                        </td>
+                    </tr>
+                }
+                  
+                    
                     </tbody>
 
                 </table>

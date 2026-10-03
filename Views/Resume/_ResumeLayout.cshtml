@@ -1,0 +1,196 @@
+﻿@model ErJobPortal.Models.ResumeViewModel
+
+@{
+    Layout = null;
+
+    var p = Model.Profile;
+
+    var candidateName = Model.CandidateName?.Trim();
+    var candidateEmail = Model.CandidateEmail?.Trim();
+    var candidatePhone = Model.CandidatePhone?.Trim();
+
+    var resumeCss = ViewData["ResumeCss"]?.ToString()
+                    ?? "ViewProfileOne.css";
+
+    var resumeClass = ViewData["ResumeClass"]?.ToString()
+                      ?? "resume-one";
+}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0" />
+
+    <title>
+        @(string.IsNullOrWhiteSpace(candidateName)
+            ? "Resume"
+            : candidateName + " - Resume")
+    </title>
+
+    <!-- Common Resume CSS -->
+    <link rel="stylesheet"
+          href="~/css/ResumeLayout.css"
+          asp-append-version="true" />
+
+    <!-- Template-specific CSS -->
+    <link rel="stylesheet"
+          href="~/css/@resumeCss"
+          asp-append-version="true" />
+</head>
+
+<body class="@resumeClass">
+
+    <main class="resume-page">
+
+        <!-- ==========================================
+             HEADER
+             ========================================== -->
+
+        <section class="resume-header">
+
+            <div class="candidate-photo">
+                @if (!string.IsNullOrWhiteSpace(p?.sPhoto))
+                {
+                    <img src="@p.sPhoto"
+                         alt="@candidateName" />
+                }
+            </div>
+
+            <div class="candidate-basic-info">
+
+                <h1>
+                    @candidateName
+                </h1>
+
+                @if (!string.IsNullOrWhiteSpace(candidateEmail))
+                {
+                    <div class="contact-item">
+                        @candidateEmail
+                    </div>
+                }
+
+                @if (!string.IsNullOrWhiteSpace(candidatePhone))
+                {
+                    <div class="contact-item">
+                        @candidatePhone
+                    </div>
+                }
+
+            </div>
+
+        </section>
+
+
+        <!-- ==========================================
+             MAIN RESUME
+             ========================================== -->
+
+        <section class="resume-content">
+
+            <!-- LEFT / SIDEBAR -->
+            <aside class="resume-sidebar">
+
+                <!-- Skills -->
+                <section class="resume-section skills-section">
+
+                    <h2>Skills</h2>
+
+                    @* Your existing skill-resolution code goes here *@
+
+                </section>
+
+
+                <!-- Languages -->
+                <section class="resume-section languages-section">
+
+                    <h2>Languages</h2>
+
+                    @* Your existing language code goes here *@
+
+                </section>
+
+
+                <!-- Contact -->
+                <section class="resume-section contact-section">
+
+                    <h2>Contact</h2>
+
+                    @if (!string.IsNullOrWhiteSpace(candidateEmail))
+                    {
+                        <p>@candidateEmail</p>
+                    }
+
+                    @if (!string.IsNullOrWhiteSpace(candidatePhone))
+                    {
+                        <p>@candidatePhone</p>
+                    }
+
+                </section>
+
+            </aside>
+
+
+            <!-- RIGHT / MAIN -->
+            <div class="resume-main">
+
+                <!-- Profile -->
+                <section class="resume-section profile-section">
+
+                    <h2>Profile</h2>
+
+                    @* Existing profile/about data *@
+
+                </section>
+
+
+                <!-- Education -->
+                <section class="resume-section education-section">
+
+                    <h2>Education</h2>
+
+                    @* Existing SSC / HSC / Graduation / PG / PhD
+                       data and lookup code *@
+
+                </section>
+
+
+                <!-- Internship / Experience -->
+                <section class="resume-section experience-section">
+
+                    <h2>Experience</h2>
+
+                    @* Existing internship / experience data *@
+
+                </section>
+
+
+                <!-- Achievements -->
+                <section class="resume-section achievements-section">
+
+                    <h2>Achievements</h2>
+
+                    @* Existing achievement data *@
+
+                </section>
+
+
+                <!-- References -->
+                <section class="resume-section references-section">
+
+                    <h2>References</h2>
+
+                    @* Existing reference data *@
+
+                </section>
+
+            </div>
+
+        </section>
+
+    </main>
+
+</body>
+</html>

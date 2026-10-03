@@ -1,0 +1,747 @@
+﻿/* =========================================================
+VIEW PROFILE FOUR
+========================================================= */
+
+{
+    --resume-blue: #526987;
+    --resume-blue-dark: #303b4f;
+    --resume-text: #303b4f;
+    --resume-muted: #68717d;
+    --resume-light: #f6f8fb;
+    --resume-border: #dfe4ea;
+    --resume-white: #ffffff;
+}
+
+/* =========================================================
+GLOBAL
+========================================================= */
+
+{
+    box-sizing: border-box;
+}
+
+html,
+body {
+    margin: 0;
+    padding: 0;
+    background: #e9edf2;
+    font-family: "Segoe UI", Arial, sans-serif;
+    color: var(--resume-text);
+}
+
+body {
+    min-height: 100vh;
+}
+
+/* =========================================================
+RESUME PAGE
+========================================================= */
+
+.resume-page-wrapper {
+    width: 100%;
+    min-height: 100vh;
+    padding: 30px 20px 60px;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+}
+
+/* =========================================================
+A4 LANDSCAPE SHEET
+========================================================= */
+
+.resume-sheet {
+    width: 297mm;
+    min-height: 210mm;
+    background: var(--resume-white);
+    position: relative;
+    overflow: hidden;
+    margin: 0 auto;
+    box-shadow: 0 10px 35px rgba(48, 59, 79, 0.16);
+}
+
+/* =========================================================
+HEADER
+========================================================= */
+
+.resume-header {
+    width: 100%;
+    min-height: 42mm;
+    display: grid;
+    grid-template-columns: 32mm 1fr auto;
+    align-items: center;
+    padding: 12mm 14mm;
+    background: var(--resume-white);
+    border-bottom: 1px solid var(--resume-border);
+}
+
+/* =========================================================
+PHOTO
+========================================================= */
+
+.photo-wrapper {
+    width: 27mm;
+    height: 27mm;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.profile-photo,
+.profile-placeholder {
+    width: 27mm;
+    height: 27mm;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 3px solid var(--resume-blue);
+}
+
+.profile-placeholder {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--resume-light);
+    color: var(--resume-blue);
+    font-size: 28px;
+}
+
+/* =========================================================
+HEADER INFORMATION
+========================================================= */
+
+.header-info {
+    padding: 0 10mm;
+}
+
+.candidate-name {
+    margin: 0;
+    color: var(--resume-blue-dark);
+    font-size: 29px;
+    font-weight: 700;
+    line-height: 1.1;
+    letter-spacing: 0.2px;
+}
+
+.candidate-role {
+    margin-top: 6px;
+    color: var(--resume-blue);
+    font-size: 14px;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+}
+
+.header-accent {
+    width: 55px;
+    height: 3px;
+    margin-top: 10px;
+    background: var(--resume-blue);
+}
+
+/* =========================================================
+HEADER CONTACT
+========================================================= */
+
+.header-contact {
+    min-width: 52mm;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.header-contact-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: var(--resume-muted);
+    font-size: 11px;
+    line-height: 1.35;
+}
+
+    .header-contact-item i {
+        width: 15px;
+        color: var(--resume-blue);
+        text-align: center;
+    }
+
+/* =========================================================
+RESUME BODY
+========================================================= */
+
+.resume-body {
+    display: grid;
+    grid-template-columns: 76mm 1fr;
+    width: 100%;
+}
+
+/* =========================================================
+LEFT COLUMN
+========================================================= */
+
+.left-column {
+    background: var(--resume-light);
+    border-right: 1px solid var(--resume-border);
+    padding: 10mm 8mm;
+}
+
+.right-column {
+    padding: 10mm 12mm;
+}
+
+/* =========================================================
+SECTION
+========================================================= */
+
+.resume-section {
+    margin-bottom: 8mm;
+}
+
+    .resume-section:last-child {
+        margin-bottom: 0;
+    }
+
+/* =========================================================
+SECTION HEADING
+========================================================= */
+
+.section-heading {
+    display: flex;
+    align-items: center;
+    width: 100%;
+    margin-bottom: 5mm;
+}
+
+.section-icon {
+    width: 25px;
+    height: 25px;
+    min-width: 25px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 8px;
+    border-radius: 4px;
+    background: var(--resume-blue);
+    color: #ffffff;
+    font-size: 11px;
+}
+
+.section-title {
+    color: var(--resume-blue-dark);
+    font-size: 13px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    white-space: nowrap;
+}
+
+.section-title-line {
+    height: 1px;
+    flex: 1;
+    margin-left: 10px;
+    background: var(--resume-border);
+}
+
+/* =========================================================
+CONTACT
+========================================================= */
+
+.info-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 9px;
+    margin-bottom: 13px;
+}
+
+    .info-item:last-child {
+        margin-bottom: 0;
+    }
+
+.info-icon {
+    width: 22px;
+    min-width: 22px;
+    color: var(--resume-blue);
+    text-align: center;
+    padding-top: 2px;
+}
+
+.info-content {
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+}
+
+.info-label {
+    margin-bottom: 2px;
+    color: var(--resume-muted);
+    font-size: 9px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.info-value {
+    color: var(--resume-text);
+    font-size: 10.5px;
+    line-height: 1.4;
+    overflow-wrap: anywhere;
+}
+
+/* =========================================================
+SKILLS
+========================================================= */
+
+.skill-group {
+    margin-bottom: 12px;
+}
+
+    .skill-group:last-child {
+        margin-bottom: 0;
+    }
+
+.skill-group-title {
+    margin-bottom: 4px;
+    color: var(--resume-blue-dark);
+    font-size: 10px;
+    font-weight: 700;
+}
+
+.skill-list {
+    color: var(--resume-muted);
+    font-size: 10px;
+    line-height: 1.6;
+}
+
+/* =========================================================
+LANGUAGES
+========================================================= */
+
+.language-list {
+    display: flex;
+    flex-direction: column;
+    gap: 7px;
+}
+
+.language-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    border-bottom: 1px solid var(--resume-border);
+    padding-bottom: 5px;
+}
+
+    .language-row:last-child {
+        border-bottom: none;
+        padding-bottom: 0;
+    }
+
+.language-name {
+    color: var(--resume-text);
+    font-size: 10.5px;
+    font-weight: 600;
+}
+
+.language-level {
+    color: var(--resume-blue);
+    font-size: 9px;
+    font-weight: 600;
+}
+
+/* =========================================================
+INTERESTS / PREFERRED LOCATION
+========================================================= */
+
+.interest-box {
+    color: var(--resume-muted);
+    font-size: 10.5px;
+    line-height: 1.6;
+}
+
+/* =========================================================
+SOCIAL LINKS
+========================================================= */
+
+.social-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    margin-bottom: 8px;
+    color: var(--resume-muted);
+    font-size: 10px;
+    line-height: 1.4;
+    overflow-wrap: anywhere;
+}
+
+    .social-item:last-child {
+        margin-bottom: 0;
+    }
+
+    .social-item i {
+        width: 16px;
+        min-width: 16px;
+        color: var(--resume-blue);
+        padding-top: 1px;
+    }
+
+/* =========================================================
+PROFESSIONAL PROFILE
+========================================================= */
+
+.summary {
+    color: var(--resume-muted);
+    font-size: 11px;
+    line-height: 1.65;
+    text-align: justify;
+}
+
+/* =========================================================
+EXPERIENCE
+========================================================= */
+
+.experience-item {
+    position: relative;
+    margin-bottom: 14px;
+    padding-left: 17px;
+}
+
+    .experience-item:last-child {
+        margin-bottom: 0;
+    }
+
+    .experience-item::before {
+        content: "";
+        position: absolute;
+        left: 0;
+        top: 5px;
+        width: 7px;
+        height: 7px;
+        border-radius: 50%;
+        background: var(--resume-blue);
+    }
+
+.experience-title {
+    color: var(--resume-blue-dark);
+    font-size: 11.5px;
+    font-weight: 700;
+    line-height: 1.35;
+}
+
+.experience-company {
+    margin-top: 3px;
+    color: var(--resume-text);
+    font-size: 10.5px;
+    font-weight: 600;
+}
+
+.experience-meta {
+    margin-top: 3px;
+    color: var(--resume-muted);
+    font-size: 9.5px;
+}
+
+/* =========================================================
+EDUCATION
+========================================================= */
+
+.education-list {
+    display: flex;
+    flex-direction: column;
+    gap: 13px;
+}
+
+.education-item {
+    padding-left: 17px;
+    position: relative;
+}
+
+    .education-item::before {
+        content: "";
+        position: absolute;
+        left: 0;
+        top: 5px;
+        width: 7px;
+        height: 7px;
+        border-radius: 50%;
+        background: var(--resume-blue);
+    }
+
+.education-title {
+    color: var(--resume-blue-dark);
+    font-size: 11.5px;
+    font-weight: 700;
+}
+
+.education-meta {
+    margin-top: 3px;
+    color: var(--resume-muted);
+    font-size: 9.5px;
+    line-height: 1.45;
+}
+
+/* =========================================================
+ACHIEVEMENTS
+========================================================= */
+
+.achievement-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.achievement-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    color: var(--resume-muted);
+    font-size: 10.5px;
+    line-height: 1.5;
+}
+
+    .achievement-item i {
+        color: var(--resume-blue);
+        margin-top: 3px;
+        flex-shrink: 0;
+    }
+
+/* =========================================================
+REFERENCES
+========================================================= */
+
+.reference-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px;
+}
+
+.reference-item {
+    padding: 10px 12px;
+    background: var(--resume-light);
+    border: 1px solid var(--resume-border);
+    border-left: 3px solid var(--resume-blue);
+}
+
+.reference-name {
+    color: var(--resume-blue-dark);
+    font-size: 11px;
+    font-weight: 700;
+}
+
+.reference-relation {
+    margin-top: 2px;
+    color: var(--resume-blue);
+    font-size: 9px;
+    font-weight: 600;
+}
+
+.reference-detail {
+    display: flex;
+    align-items: flex-start;
+    gap: 6px;
+    margin-top: 5px;
+    color: var(--resume-muted);
+    font-size: 9px;
+    line-height: 1.4;
+}
+
+    .reference-detail i {
+        width: 12px;
+        color: var(--resume-blue);
+        padding-top: 1px;
+    }
+
+/* =========================================================
+CAREER PREFERENCE
+========================================================= */
+
+.preference-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 5px;
+    margin-bottom: 7px;
+    color: var(--resume-muted);
+    font-size: 10.5px;
+    line-height: 1.5;
+}
+
+    .preference-item:last-child {
+        margin-bottom: 0;
+    }
+
+    .preference-item strong {
+        color: var(--resume-blue-dark);
+        white-space: nowrap;
+    }
+
+/* =========================================================
+THEME SWITCHER
+========================================================= */
+
+.resume-theme-switcher {
+    position: fixed;
+    left: 22px;
+    top: 22px;
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    padding: 8px 10px;
+    background: #ffffff;
+    border: 1px solid var(--resume-border);
+    border-radius: 30px;
+    box-shadow: 0 5px 20px rgba(48, 59, 79, 0.15);
+}
+
+.theme-swatch {
+    width: 22px;
+    height: 22px;
+    padding: 0;
+    border: 2px solid #ffffff;
+    border-radius: 50%;
+    background: var(--theme-color);
+    cursor: pointer;
+    box-shadow: 0 0 0 1px var(--resume-border);
+}
+
+    .theme-swatch.active {
+        box-shadow: 0 0 0 2px #ffffff, 0 0 0 3px var(--theme-color);
+    }
+
+/* =========================================================
+RESPONSIVE
+========================================================= */
+
+@media (max-width: 1000px) {
+
+    body {
+        background: #ffffff;
+    }
+
+    .resume-page-wrapper {
+        overflow-x: auto;
+        padding: 10px 0 40px;
+        display: block;
+    }
+
+    .resume-sheet {
+        margin: 0 auto;
+    }
+}
+
+@media (max-width: 700px) {
+
+    .resume-page-wrapper {
+        overflow-x: auto;
+    }
+
+    .resume-sheet {
+        transform-origin: top center;
+    }
+
+    .resume-theme-switcher {
+        right: 10px;
+        bottom: 10px;
+    }
+}
+
+/* =========================================================
+PRINT
+========================================================= */
+
+@media print {
+
+    * {
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+        color-adjust: exact !important;
+    }
+
+    @page {
+        size: A4 landscape;
+        margin: 0;
+    }
+
+    html,
+    body {
+        width: 297mm;
+        height: 210mm;
+        margin: 0;
+        padding: 0;
+        background: #ffffff !important;
+    }
+
+    .resume-page-wrapper {
+        width: 297mm;
+        min-height: 210mm;
+        padding: 0;
+        margin: 0;
+        display: block;
+        overflow: visible;
+    }
+
+    .resume-sheet {
+        width: 297mm;
+        height: 210mm;
+        min-height: 210mm;
+        margin: 0;
+        box-shadow: none;
+        border: none;
+        overflow: hidden;
+        transform: none !important;
+    }
+
+    .resume-theme-switcher {
+        display: none !important;
+    }
+}
+/* =========================================================
+RESUME THEMES
+========================================================= */
+
+.resume-sheet[data-theme="blue"] {
+    --resume-blue: #526987;
+    --resume-blue-dark: #303b4f;
+    --resume-text: #303b4f;
+    --resume-muted: #68717d;
+    --resume-light: #f6f8fb;
+    --resume-border: #dfe4ea;
+    --resume-white: #ffffff;
+}
+
+.resume-sheet[data-theme="teal"] {
+    --resume-blue: #176b68;
+    --resume-blue-dark: #104f4d;
+    --resume-text: #294545;
+    --resume-muted: #647777;
+    --resume-light: #f2f8f7;
+    --resume-border: #d8e6e4;
+    --resume-white: #ffffff;
+}
+
+.resume-sheet[data-theme="slate"] {
+    --resume-blue: #455a64;
+    --resume-blue-dark: #263238;
+    --resume-text: #37474f;
+    --resume-muted: #69777d;
+    --resume-light: #f4f6f7;
+    --resume-border: #d9dfe2;
+    --resume-white: #ffffff;
+}
+
+.resume-sheet[data-theme="brown"] {
+    --resume-blue: #765536;
+    --resume-blue-dark: #4e3827;
+    --resume-text: #50443a;
+    --resume-muted: #81766c;
+    --resume-light: #f8f4ef;
+    --resume-border: #e5dcd2;
+    --resume-white: #ffffff;
+}
+
+.resume-sheet[data-theme="green"] {
+    --resume-blue: #3f6f55;
+    --resume-blue-dark: #2c503e;
+    --resume-text: #3e5046;
+    --resume-muted: #718078;
+    --resume-light: #f2f7f4;
+    --resume-border: #d9e5de;
+    --resume-white: #ffffff;
+}

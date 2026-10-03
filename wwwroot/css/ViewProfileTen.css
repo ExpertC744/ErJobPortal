@@ -1,0 +1,383 @@
+﻿<style >
+:root {
+    --primary: #263b47;
+    --accent: #b4773c;
+    --text: #27343c;
+    --muted: #718087;
+    --border: #dce2e4;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+html, body {
+    width: 100%;
+    min-height: 100%;
+}
+
+body {
+    background: #e9edef;
+    font-family: "DM Sans", Arial, sans-serif;
+    color: var(--text);
+}
+
+.btn-edit {
+    background: #ffffff;
+    color: var(--primary);
+    border: 1px solid var(--border) !important;
+}
+
+.btn-print {
+    background: var(--primary);
+    color: white;
+}
+
+.btn-download {
+    background: var(--accent);
+    color: white;
+}
+
+/* THEME SWITCHER */
+.theme-switcher {
+    width: 297mm;
+    max-width: calc(100% - 30px);
+    margin: 0 auto 10px;
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    gap: 8px;
+}
+
+    .theme-switcher span {
+        font-size: 9px;
+        font-weight: 700;
+        color: var(--muted);
+        text-transform: uppercase;
+        letter-spacing: .6px;
+    }
+
+.theme-swatch {
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    border: 2px solid white;
+    cursor: pointer;
+    box-shadow: 0 1px 5px rgba(0,0,0,.15);
+}
+
+    .theme-swatch.active {
+        box-shadow: 0 0 0 2px white, 0 0 0 4px var(--swatch);
+    }
+
+/* RESUME SHEET: HORIZONTAL A4 */
+.resume-page-wrapper {
+    display: flex;
+    justify-content: center;
+    padding: 5px 0 25px;
+}
+
+.resume-sheet {
+    width: 297mm;
+    height: 210mm;
+    background: #ffffff;
+    box-shadow: 0 15px 35px rgba(0,0,0,.1);
+    overflow: hidden;
+    display: flex;
+    /* Theme Variables matching the unique Canva style */
+    --theme-left-bg: #8c7365; /* Default warm brown */
+    --theme-left-text: #ffffff;
+    --theme-heading: #8c7365;
+    --theme-right-bg: #fdfdfc; /* Very subtle off-white/cream */
+    --theme-right-text: #4a4a4a;
+}
+
+    .resume-sheet[data-theme="navy"] {
+        --theme-left-bg: #2a3b4c;
+        --theme-heading: #2a3b4c;
+    }
+
+    .resume-sheet[data-theme="teal"] {
+        --theme-left-bg: #2b6766;
+        --theme-heading: #2b6766;
+    }
+
+    .resume-sheet[data-theme="olive"] {
+        --theme-left-bg: #5f6b55;
+        --theme-heading: #5f6b55;
+    }
+
+    .resume-sheet[data-theme="blue"] {
+        --theme-left-bg: #355e7e;
+        --theme-heading: #355e7e;
+    }
+
+    .resume-sheet[data-theme="brown"] {
+        --theme-left-bg: #8c7365;
+        --theme-heading: #8c7365;
+    }
+/* Reference Image Color */
+
+/* LAYOUT COLUMNS */
+.col-left {
+    width: 33%;
+    display: flex;
+    flex-direction: column;
+    background: var(--theme-left-bg);
+    color: var(--theme-left-text);
+}
+
+.col-right {
+    width: 67%;
+    background: var(--theme-right-bg);
+    color: var(--theme-right-text);
+    padding: 16mm 18mm;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    font-family: "Inter", sans-serif;
+}
+
+/* LEFT COLUMN DETAILS */
+.edge-photo-container {
+    width: 100%;
+    height: 90mm; /* Fixed height for top block */
+    background: rgba(255,255,255,0.1);
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.edge-photo {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.edge-placeholder {
+    font-size: 50px;
+    color: rgba(255,255,255,0.5);
+}
+
+.left-content {
+    padding: 12mm 12mm;
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+}
+
+.left-name {
+    font-family: "Montserrat", sans-serif;
+    font-size: 32px;
+    font-weight: 800;
+    line-height: 1.1;
+    margin-bottom: 4px;
+}
+
+.left-role {
+    font-family: "Inter", sans-serif;
+    font-size: 11px;
+    font-weight: 400;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    color: rgba(255,255,255,0.85);
+}
+
+.left-section-title {
+    font-family: "Montserrat", sans-serif;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    border-bottom: 1px solid rgba(255,255,255,0.3);
+    padding-bottom: 6px;
+    margin-bottom: 10px;
+}
+
+.contact-list {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.contact-item {
+    font-size: 10px;
+    font-weight: 300;
+    line-height: 1.4;
+    color: rgba(255,255,255,0.9);
+    word-break: break-word;
+}
+
+.lang-list {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.lang-item {
+    font-size: 10px;
+    font-weight: 300;
+    color: rgba(255,255,255,0.9);
+}
+
+/* RIGHT COLUMN DETAILS */
+.right-section {
+    margin-bottom: 2px;
+}
+
+.right-title {
+    font-family: "Montserrat", sans-serif;
+    font-size: 13.5px;
+    font-weight: 800;
+    color: var(--theme-heading);
+    text-transform: uppercase;
+    letter-spacing: 2.5px;
+    margin-bottom: 8px;
+}
+
+.profile-text {
+    font-size: 10px;
+    font-weight: 300;
+    line-height: 1.7;
+    color: var(--theme-right-text);
+    text-align: justify;
+}
+
+.edu-item {
+    margin-bottom: 8px;
+}
+
+.edu-degree {
+    font-size: 10.5px;
+    font-weight: 600;
+    color: var(--theme-heading);
+    margin-bottom: 2px;
+}
+
+.edu-school {
+    font-size: 10px;
+    font-weight: 400;
+    color: var(--theme-right-text);
+    margin-bottom: 2px;
+}
+
+.edu-meta {
+    font-size: 9px;
+    color: #777;
+    font-weight: 300;
+    font-style: italic;
+}
+
+.exp-item {
+    margin-bottom: 10px;
+}
+
+.exp-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    margin-bottom: 4px;
+}
+
+.exp-role {
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--theme-heading);
+}
+
+.exp-company {
+    font-size: 10px;
+    font-weight: 400;
+    color: var(--theme-right-text);
+}
+
+.exp-meta {
+    font-size: 9px;
+    color: #777;
+    font-style: italic;
+    font-weight: 300;
+}
+
+.exp-bullets {
+    list-style-type: disc;
+    padding-left: 14px;
+    margin-top: 4px;
+}
+
+    .exp-bullets li {
+        font-size: 10px;
+        font-weight: 300;
+        line-height: 1.5;
+        color: var(--theme-right-text);
+        margin-bottom: 3px;
+    }
+
+.skill-list {
+    list-style-type: disc;
+    padding-left: 14px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 4px 15px;
+}
+
+    .skill-list li {
+        font-size: 10px;
+        font-weight: 300;
+        color: var(--theme-right-text);
+        line-height: 1.4;
+    }
+
+/* RESPONSIVE & PRINT */
+@@media (max-width: 1200px) {
+    .theme-switcher {
+        width: 100%;
+        padding: 0 15px;
+    }
+
+    .resume-sheet {
+        transform: scale(0.85);
+        transform-origin: top center;
+        margin-bottom: -30mm;
+    }
+}
+
+@@media (max-width: 992px) {
+    .resume-sheet {
+        transform: scale(0.65);
+        margin-bottom: -70mm;
+    }
+}
+
+@@media print {
+    html, body {
+        width: 297mm;
+        height: 210mm;
+        background: white;
+    }
+
+    .theme-switcher {
+        display: none !important;
+    }
+
+    .resume-page-wrapper {
+        padding: 0;
+    }
+
+    .resume-sheet {
+        width: 297mm;
+        height: 210mm;
+        margin: 0;
+        box-shadow: none;
+        transform: none;
+    }
+
+    @@page {
+        size: A4 landscape;
+        margin: 0;
+    }
+}
+
+</style >
