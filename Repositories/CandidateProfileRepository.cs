@@ -1445,6 +1445,7 @@ WHERE CandidateID = @CandidateID";
         // =========================================================
         // GET CANDIDATE BASIC INFO (NAME, EMAIL, PHONE)
         // =========================================================
+
         // shrirang 02/10/26
         public CandidateBasicInfoModel? GetCandidateBasicInfo(int candidateId)
         {
@@ -1674,5 +1675,49 @@ WHERE nID = @CandidateID";
 
             return result;
         }
+
+        // shrirang 02/10/26
+        // =========================================================
+        // UPDATE RESUME PROFILE
+        // =========================================================
+
+        public void UpdateResumeProfile(
+            int candidateID,
+            int resumeProfile)
+        {
+            using SqlConnection con = _db.GetConnection();
+
+            con.Open();
+
+            // Make sure candidate profile exists
+            EnsureProfileExists(
+                con,
+                candidateID);
+
+            string sql = @"
+UPDATE tblCandidateProfile
+SET
+    Resume_Profile = @Resume_Profile,
+    ModDate = GETDATE()
+WHERE CandidateID = @CandidateID";
+
+            using SqlCommand cmd =
+                new SqlCommand(sql, con);
+
+            // Candidate ID
+            cmd.Parameters.Add(
+                "@CandidateID",
+                SqlDbType.Int
+            ).Value = candidateID;
+
+            // Resume Profile
+            cmd.Parameters.Add(
+                "@Resume_Profile",
+                SqlDbType.Int
+            ).Value = resumeProfile;
+
+            cmd.ExecuteNonQuery();
+        }
+
     }
 }
