@@ -1016,10 +1016,15 @@ GetOrganizationRegistrationDetails(int orgId)
                 sProfileImage,
                 nCollegeCode,
                 sCollegeName,
+                sPassword,
                 RegDate,
                 ModDate,
                 nBit,
-                nSABit
+                nSABit,
+                sOTP,
+                nBranch,
+                nPassoutYear,
+                nDepartment
             FROM tblCandidateRegister
             WHERE nBit = 1
             ORDER BY nID DESC";
@@ -1040,19 +1045,19 @@ GetOrganizationRegistrationDetails(int orgId)
 
                                 sFName = dr["sFName"] == DBNull.Value
                                     ? ""
-                                    : dr["sFName"].ToString()!,
+                                    : dr["sFName"].ToString(),
 
                                 sLName = dr["sLName"] == DBNull.Value
                                     ? ""
-                                    : dr["sLName"].ToString()!,
+                                    : dr["sLName"].ToString(),
 
                                 sMobile = dr["sMobile"] == DBNull.Value
                                     ? ""
-                                    : dr["sMobile"].ToString()!,
+                                    : dr["sMobile"].ToString(),
 
                                 sEmail = dr["sEmail"] == DBNull.Value
                                     ? ""
-                                    : dr["sEmail"].ToString()!,
+                                    : dr["sEmail"].ToString(),
 
                                 DOB = dr["DOB"] == DBNull.Value
                                     ? null
@@ -1064,7 +1069,7 @@ GetOrganizationRegistrationDetails(int orgId)
 
                                 sProfileImage = dr["sProfileImage"] == DBNull.Value
                                     ? ""
-                                    : dr["sProfileImage"].ToString()!,
+                                    : dr["sProfileImage"].ToString(),
 
                                 nCollegeCode = dr["nCollegeCode"] == DBNull.Value
                                     ? 0
@@ -1073,6 +1078,10 @@ GetOrganizationRegistrationDetails(int orgId)
                                 sCollegeName = dr["sCollegeName"] == DBNull.Value
                                     ? 0
                                     : Convert.ToInt32(dr["sCollegeName"]),
+
+                                sPassword = dr["sPassword"] == DBNull.Value
+                                    ? ""
+                                    : dr["sPassword"].ToString(),
 
                                 RegDate = dr["RegDate"] == DBNull.Value
                                     ? null
@@ -1086,7 +1095,23 @@ GetOrganizationRegistrationDetails(int orgId)
                                        Convert.ToBoolean(dr["nBit"]),
 
                                 nSABit = dr["nSABit"] != DBNull.Value &&
-                                         Convert.ToBoolean(dr["nSABit"])
+                                         Convert.ToBoolean(dr["nSABit"]),
+
+                                sOTP = dr["sOTP"] == DBNull.Value
+                                    ? ""
+                                    : dr["sOTP"].ToString(),
+
+                                nBranch = dr["nBranch"] == DBNull.Value
+                                    ? null
+                                    : Convert.ToInt32(dr["nBranch"]),
+
+                                nPassoutYear = dr["nPassoutYear"] == DBNull.Value
+                                    ? null
+                                    : Convert.ToInt32(dr["nPassoutYear"]),
+
+                                nDepartment = dr["nDepartment"] == DBNull.Value
+                                    ? null
+                                    : Convert.ToInt32(dr["nDepartment"])
                             };
 
                             list.Add(model);
@@ -1098,6 +1123,59 @@ GetOrganizationRegistrationDetails(int orgId)
             return list;
         }
 
+
+        public bool ToggleCandidateStatus(int id)
+        {
+            using (SqlConnection cn = _db.GetConnection())
+            {
+                string query = @"
+            UPDATE tblCandidateRegister
+            SET nBit = CASE 
+                            WHEN nBit = 1 THEN 0
+                            ELSE 1
+                       END,
+                ModDate = GETDATE()
+            WHERE nID = @nID";
+
+                using (SqlCommand cmd = new SqlCommand(query, cn))
+                {
+                    cmd.Parameters.AddWithValue("@nID", id);
+
+                    cn.Open();
+
+                    int rows = cmd.ExecuteNonQuery();
+
+                    return rows > 0;
+                }
+            }
+        }
+
+        public bool GetCandidateStatus(int id)
+        {
+            using (SqlConnection cn = _db.GetConnection())
+            {
+                string query = @"
+            SELECT nBit
+            FROM tblCandidateRegister
+            WHERE nID = @nID";
+
+                using (SqlCommand cmd = new SqlCommand(query, cn))
+                {
+                    cmd.Parameters.AddWithValue("@nID", id);
+
+                    cn.Open();
+
+                    object result = cmd.ExecuteScalar();
+
+                    if (result == null || result == DBNull.Value)
+                    {
+                        return false;
+                    }
+
+                    return Convert.ToBoolean(result);
+                }
+            }
+        }
         #endregion
 
         #region Super Admin Organization List
