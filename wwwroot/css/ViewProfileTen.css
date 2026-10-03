@@ -38,7 +38,10 @@ img {
 }
 
 .resume-sheet {
-   
+    --theme: #1f4e68;
+    --theme-dark: #173c50;
+    --theme-soft: #e9f0f4;
+    --accent: #b4773c;
     --border: #dce2e4;
     --muted: #718087;
     --photo: 30mm;
@@ -60,35 +63,35 @@ img {
         --theme: #1f4e68;
         --theme-dark: #173c50;
         --theme-soft: #e9f0f4;
-        --theme: #b4773c
+        --accent: #b4773c
     }
 
     .resume-sheet[data-theme="teal"] {
         --theme: #176b68;
         --theme-dark: #115250;
         --theme-soft: #e6f2f1;
-        --theme: #a87842
+        --accent: #a87842
     }
 
     .resume-sheet[data-theme="slate"] {
         --theme: #455a64;
         --theme-dark: #34444c;
         --theme-soft: #edf1f3;
-        --theme: #b4773c
+        --accent: #b4773c
     }
 
     .resume-sheet[data-theme="brown"] {
         --theme: #765536;
         --theme-dark: #5c4129;
         --theme-soft: #f4eee8;
-        --theme: #3f6f55
+        --accent: #3f6f55
     }
 
     .resume-sheet[data-theme="green"] {
         --theme: #3f6f55;
         --theme-dark: #305641;
         --theme-soft: #ecf3ee;
-        --theme: #a4783e
+        --accent: #a4783e
     }
 
 /* structure */
@@ -280,7 +283,7 @@ img {
     font-weight: 800;
     text-transform: uppercase;
     letter-spacing: .8px;
-    color: var(--theme)
+    color: var(--accent)
 }
 
 .skill-list {
@@ -319,14 +322,14 @@ img {
 .language-level {
     font-size: 8px;
     font-weight: 700;
-    color:var(--theme);
+    color: #706868;
     white-space: nowrap
 }
 
 /* interests / links */
 .interest-box {
     padding-left: 9px;
-    border-left: 2px solid var(--theme);
+    border-left: 2px solid #706868;
     font-size: 9.6px;
     line-height: 1.5;
     color: #65747b;
@@ -387,7 +390,7 @@ img {
     min-width: 0;
     padding: 6px 9px;
     background: #f7f8f8;
-    border-left: 3px solid var(--theme)
+    border-left: 3px solid var(--accent)
 }
 
 .experience-title {
@@ -440,7 +443,7 @@ img {
     font-size: 8.9px;
     line-height: 1.4;
     font-weight: 600;
-    color: var(--theme);
+    color: #706868;
     overflow-wrap: anywhere
 }
 
@@ -467,7 +470,7 @@ img {
 
     .achievement-item i {
         margin-top: 2px;
-        color: var(--theme);
+        color: #706868;
         font-size: 10.2px;
         flex-shrink: 0
     }
@@ -501,7 +504,7 @@ img {
     margin-top: 1px;
     font-size: 8.8px;
     font-weight: 600;
-    color: var(--theme);
+    color: #706868;
     overflow-wrap: anywhere
 }
 
@@ -543,16 +546,24 @@ img {
     }
 
 /* =========================================================
-   TEMPLATE NINE  -  Executive minimal / serif / double rule
+   TEMPLATE TEN  -  Bold creative: gradient header with circles,
+   filled heading bars, numbered experience cards
+   (no clip-path, so PDF export renders identically)
    ========================================================= */
 .resume-header {
-    height: 46mm;
+    height: 52mm;
     display: grid;
-    grid-template-columns: 48mm 1fr 78mm;
+    grid-template-columns: 54mm 1fr 68mm;
     align-items: center;
-    padding-right: 12mm;
-    background: #fff;
-    border-bottom: 4px double var(--theme)
+    padding-right: 10mm;
+    background: linear-gradient(120deg,var(--theme),var(--theme-dark));
+    color: #fff;
+    overflow: hidden
+}
+
+.photo-wrapper, .header-info, .header-contact {
+    position: relative;
+    z-index: 1
 }
 
 .photo-wrapper {
@@ -564,49 +575,42 @@ img {
 }
 
 .profile-photo {
-    --photo: 28mm;
-    border-radius: 50%;
+    --photo: 32mm;
+    border-radius: 4px;
     border: 3px solid #fff;
-    box-shadow: 0 0 0 2px var(--theme)
 }
 
 .profile-placeholder {
-    --photo: 28mm;
-    border-radius: 50%;
+    --photo: 32mm;
+    border-radius: 4px;
     border: 3px solid #fff;
-    box-shadow: 0 0 0 2px var(--theme)
 }
 
 .header-info {
     grid-column: 2;
     grid-row: 1;
-    padding: 0 8mm 0 6mm;
+    padding: 0 8mm 0 5mm;
     min-width: 0
 }
 
 .candidate-name {
-    font-size: 25px;
-    text-transform: uppercase;
-    letter-spacing: 3px;
-    color: var(--text,#1e2c33)
+    font-size: 32px;
+    color: #fff
 }
 
 .candidate-role {
-    margin-top: 7px;
-    font-family: "Playfair Display",Georgia,serif;
-    font-size: 11.5px;
-    font-style: italic;
-    font-weight: 600;
-    text-transform: none;
-    letter-spacing: .6px;
-    color: var(--theme)
+    display: inline-block;
+    margin-top: 9px;
+    padding: 3px 10px;
+    background: #706868;
+    color: #fff;
+    font-size: 10px;
+    letter-spacing: 1.4px;
+    border-radius: 2px
 }
 
 .header-accent {
-    width: 60px;
-    height: 2px;
-    margin-top: 11px;
-    background: var(--theme)
+    display: none
 }
 
 .header-contact {
@@ -615,115 +619,109 @@ img {
     display: flex;
     flex-direction: column;
     gap: 7px;
-    padding-left: 9mm;
-    border-left: 1px solid var(--border);
+    padding-left: 8mm;
+    border-left: 1px solid rgba(255,255,255,.3);
     min-width: 0
 }
 
 .header-contact-item {
-    color: #4a5b63
+    color: #fff
 }
 
     .header-contact-item i {
-        width: 19px;
-        height: 19px;
-        min-width: 19px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        margin-top: 0;
-        border: 1px solid var(--theme);
-        border-radius: 50%;
-        color: var(--theme);
-        font-size: 8px
+        color: rgba(255,255,255,.9)
     }
 
 .resume-body {
-    grid-template-columns: 66mm 1fr
+    grid-template-columns: 72mm 1fr
 }
 
 .left-column {
-    background: #fafafa;
-    border-right: 1px solid var(--border);
-    padding: 6mm 8mm 5mm 11mm
+    background: var(--theme-soft);
+    padding: 6mm 7mm 5mm 9mm
 }
 
 .right-column {
-    padding: 6mm 12mm 5mm 11mm
+    padding: 6mm 10mm 5mm 10mm
+}
+
+.section-heading {
+    padding: 4px 8px;
+    margin-bottom: 7px;
+    background: var(--theme);
+    border-radius: 3px
 }
 
 .section-icon {
-    display: none
+    width: 16px;
+    height: 16px;
+    min-width: 16px;
+    background: rgba(255,255,255,.22)
+}
+
+.section-title {
+    color: #fff
 }
 
 .section-title-line {
     display: none
 }
 
-.section-heading {
-    padding-bottom: 3px;
-    border-bottom: 1px solid var(--theme);
-    margin-bottom: 7px
-}
-
-.section-title {
-    font-family: "Playfair Display",Georgia,serif;
-    font-size: 10.5px;
-    letter-spacing: 1.6px
-}
-
-.info-icon {
-    background: none;
-    border: 1px solid var(--border);
-    border-radius: 50%
-}
-
 .skill-list {
-    background: none;
     border: 0;
-    border-left: 0;
-    border-radius: 0;
-    padding: 0;
-    font-size: 9.2px;
-    line-height: 1.6
+    border-radius: 4px;
+    box-shadow: 0 1px 3px rgba(20,40,50,.08)
+}
+
+.language-row {
+    border-bottom: 1px dashed rgba(0,0,0,.14)
 }
 
 .summary {
-    background: none;
-    border-left: 0;
-    border-radius: 0;
-    padding: 0;
-    font-size: 9.5px;
-    line-height: 1.7;
-    color: #3f4f56
+    background: #fff;
+    border: 1px solid var(--border);
+}
+
+.resume-section:has(.experience-item) {
+    counter-reset: exp
 }
 
 .experience-item {
-    background: none;
-    border-left: 1px solid var(--theme);
-    padding: 1px 0 1px 10px
+    position: relative;
+    counter-increment: exp;
+    padding: 6px 9px 6px 36px;
+    background: #fff;
+    border: 1px solid var(--border);
+    border-radius: 4px
 }
 
+    .experience-item::before {
+        content: counter(exp,decimal-leading-zero);
+        position: absolute;
+        left: 9px;
+        top: 5px;
+        font-family: "Playfair Display",Georgia,serif;
+        font-size: 17px;
+        font-weight: 700;
+        color: #706868;
+        opacity: .85
+    }
+
 .education-item {
-    background: none;
     border-top: 0;
-    border-left: 2px solid var(--theme);
-    padding: 1px 0 1px 9px
+    background: var(--theme-soft)
 }
 
 .achievement-item {
-    border: 0;
-    border-bottom: 1px solid var(--border);
-    border-radius: 0;
-    padding: 4px 0;
-    background: none
+    border-radius: 20px;
+    background: var(--theme-soft);
+    border-color: transparent
 }
 
 .reference-item {
-    background: none;
     border-left: 0;
-    border-top: 1px solid var(--theme);
-    padding: 5px 0 0
+    border-top: 3px solid var(--theme);
+    background: var(--theme-soft)
 }
 
 /* =========================================================

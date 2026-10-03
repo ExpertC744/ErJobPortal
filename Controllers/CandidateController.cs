@@ -175,9 +175,111 @@ namespace ErJobPortal.Controllers
             ViewBag.TraineeAppliedPosts = traineeAppliedPosts;
 
 
-    
 
-            return View();
+            List<OrgPostM> matchingJobs = GetMatchingJobsForCandidate(candidateId.Value);
+
+
+            /// =========================================================
+            // CHART DATA
+            // =========================================================
+
+            SAChartsViewModel chartModel = new SAChartsViewModel();
+
+
+
+            using (SqlConnection con =
+                   new SqlConnection(connectionString))
+            {
+                using (SqlCommand cmd =
+                       new SqlCommand("SP_GetSACharts", con))
+                {
+                    cmd.CommandType = CommandType.StoredProcedure;
+
+                    con.Open();
+
+                    using (SqlDataReader reader =
+                           cmd.ExecuteReader())
+                    {
+                        // =====================================================
+                        // RESULT SET 1 - CANDIDATE DATA
+                        // =====================================================
+
+                        while (reader.Read())
+                        {
+                            chartModel.CandidateData.Add(
+                                new SAChartData
+                                {
+                                    Year = Convert.ToInt32(reader["Year"]),
+                                    Month = Convert.ToInt32(reader["Month"]),
+                                    TotalCount = Convert.ToInt32(reader["TotalCount"])
+                                });
+                        }
+
+                        // =====================================================
+                        // RESULT SET 2 - INTERNSHIP POST DATA
+                        // =====================================================
+
+                        if (reader.NextResult())
+                        {
+                            while (reader.Read())
+                            {
+                                chartModel.InternshipPostData.Add(
+                                    new SAChartData
+                                    {
+                                        Year = Convert.ToInt32(reader["Year"]),
+                                        Month = Convert.ToInt32(reader["Month"]),
+                                        TotalCount = Convert.ToInt32(reader["TotalCount"])
+                                    });
+                            }
+                        }
+                    }
+                }
+            }
+
+
+            // =========================================================
+            // MONTHLY SUITABLE OPENINGS
+            // =========================================================
+
+            int currentYear = DateTime.Now.Year;
+
+            int[] suitableOpeningsMonthly = new int[12];
+
+            foreach (var job in matchingJobs)
+            {
+                if (!job.dStartDate.HasValue)
+                    continue;
+
+                DateTime startDate = job.dStartDate.Value;
+
+                if (startDate.Year != currentYear)
+                    continue;
+
+                int monthIndex = startDate.Month - 1;
+
+                int requiredTrainees = job.nRequiredTrainees;
+
+                if (requiredTrainees < 0)
+                    requiredTrainees = 0;
+
+                if (monthIndex >= 0 && monthIndex < 12)
+                {
+                    suitableOpeningsMonthly[monthIndex] +=
+                        requiredTrainees;
+                }
+            }
+
+
+            // =========================================================
+            // SEND CHART DATA TO DASHBOARD VIEW
+            // =========================================================
+
+            ViewBag.ChartYear = currentYear;
+
+            ViewBag.SuitableOpeningsMonthly =
+                suitableOpeningsMonthly;
+
+            return View(chartModel);
         }
 
         // ==========================================
@@ -1945,11 +2047,25 @@ namespace ErJobPortal.Controllers
         {
             // id = CD080900080701
 
-            if (string.IsNullOrEmpty(id))
+            int? candidateId = HttpContext.Session.GetInt32("CandidateID");
+
+            if (candidateId == null)
             {
-                return RedirectToAction("Dashboard");
+                return RedirectToAction("CandidateLogin", "Account");
             }
 
+            // =========================================================
+            // GET CANDIDATE REGISTRATION DETAILS
+            // =========================================================
+
+            var candidate = _repository.GetCandidateRegistrationDetails(candidateId.Value);
+
+            if (candidate == null)
+            {
+                return NotFound("Candidate registration not found.");
+            }
+            List<OrgPostM> internshipPosts = GetMatchingJobsForCandidate(candidateId.Value);
+            ViewBag.InternshipPosts = internshipPosts;
             // Your code to get internship details using id
 
             return View();
@@ -2323,17 +2439,21 @@ namespace ErJobPortal.Controllers
                 }
             }
         }
-
+        // shrirang 03/10/26
         // =========================================================
         // MY INTERNSHIP radhika24-09
         // =========================================================
+        // =========================================================
+        // MY INTERNSHIP
+        // =========================================================
+
         [HttpGet]
         [Route("Candidate/MyInternship/{id?}")]
         public IActionResult MyInternship(string? id)
         {
-            // =====================================================
-            // GET CANDIDATE ID FROM SESSION
-            // =====================================================
+            // =========================================================
+            // GET LOGGED-IN CANDIDATE ID
+            // =========================================================
 
             int? candidateId =
                 HttpContext.Session.GetInt32("CandidateID");
@@ -2345,9 +2465,11 @@ namespace ErJobPortal.Controllers
                     "Account");
             }
 
-            // =====================================================
+            // =========================================================
             // GET CANDIDATE CODE
-            // =====================================================
+            // IMPORTANT:
+            // GetCandidateCode() already gets CandidateID from Session
+            // =========================================================
 
             string? candidateCode = GetCandidateCode();
 
@@ -2357,46 +2479,98 @@ namespace ErJobPortal.Controllers
                     "Candidate code could not be generated.");
             }
 
-            // =====================================================
+            // =========================================================
             // IF URL DOES NOT HAVE CANDIDATE CODE
-            // REDIRECT TO CODE URL
-            // =====================================================
+            // =========================================================
 
             if (string.IsNullOrEmpty(id))
             {
                 return RedirectToAction(
                     "MyInternship",
                     "Candidate",
-                    new { id = candidateCode });
+                    new
+                    {
+                        id = candidateCode
+                    });
             }
 
-            // =====================================================
+            // =========================================================
             // VALIDATE CANDIDATE CODE
-            // =====================================================
+            // =========================================================
 
-            if (id != candidateCode)
+            if (!string.Equals(
+                id,
+                candidateCode,
+                StringComparison.OrdinalIgnoreCase))
             {
                 return NotFound();
             }
 
-            // =====================================================
-            // SEND CANDIDATE INFORMATION TO VIEW
-            // =====================================================
+            // =========================================================
+            // GET APPLIED INTERNSHIPS
+            // =========================================================
 
-            ViewBag.CandidateCode = candidateCode;
-            ViewBag.CandidateID = candidateId.Value;
+            List<OrgPostM> appliedPosts =
+                TraineeApplyToPostList(candidateId.Value);
+
+            // =========================================================
+            // CONVERT TO MY INTERNSHIP VIEW MODEL
+            // =========================================================
+
+            List<MyInternshipViewModel> myInternships =
+                appliedPosts.Select(post => new MyInternshipViewModel
+                {
+                    OrganizationName =
+                        post.sName ?? "",
+
+                    Position =
+                        post.sPositionName ?? "",
+
+                    Location =
+                        string.Join(
+                            ", ",
+                            new[]
+                            {
+                        post.nCityName,
+                        post.sStateName,
+                        post.sCountryName
+                            }
+                            .Where(x =>
+                                !string.IsNullOrWhiteSpace(x))
+                        ),
+
+                    InternshipFellowshipType =
+                        post.sInternshipFellowshipTypeName ?? "",
+
+                    Facilities =
+                        post.sFacilities ?? "",
+
+                    ApplyStatus =
+                        post.IsApplied
+                            ? "Applied"
+                            : ""
+                })
+                .ToList();
+
+            // =========================================================
+            // VIEW BAG
+            // =========================================================
+
+            ViewBag.CandidateCode =
+                candidateCode;
+
+            ViewBag.CandidateID =
+                candidateId.Value;
 
             ViewBag.CandidateName =
-                HttpContext.Session.GetString("CandidateName");
+                HttpContext.Session.GetString(
+                    "CandidateName");
 
             ViewBag.CandidateEmail =
-                HttpContext.Session.GetString("CandidateEmail");
+                HttpContext.Session.GetString(
+                    "CandidateEmail");
 
-            // =====================================================
-            // OPEN MyInternship.cshtml
-            // =====================================================
-
-            return View();
+            return View(myInternships);
         }
 
         // =========================================================
@@ -2690,11 +2864,17 @@ namespace ErJobPortal.Controllers
         // CHARTS
         // =========================================================
 
+        //khushi 02-10
         [HttpGet]
         [Route("Candidate/Charts/{id?}")]
         public IActionResult Charts(string? id)
         {
-            int? candidateId = HttpContext.Session.GetInt32("CandidateID");
+            // =========================================================
+            // CHECK CANDIDATE SESSION
+            // =========================================================
+
+            int? candidateId =
+                HttpContext.Session.GetInt32("CandidateID");
 
             if (candidateId == null || candidateId <= 0)
             {
@@ -2702,6 +2882,11 @@ namespace ErJobPortal.Controllers
                     "CandidateLogin",
                     "Account");
             }
+
+
+            // =========================================================
+            // GET CANDIDATE CODE
+            // =========================================================
 
             string? candidateCode = GetCandidateCode();
 
@@ -2711,23 +2896,35 @@ namespace ErJobPortal.Controllers
                     "Candidate code could not be generated.");
             }
 
-            // If candidate code is missing from URL
+
+            // =========================================================
+            // IF ID IS MISSING FROM URL
+            // =========================================================
+
             if (string.IsNullOrEmpty(id))
             {
                 return RedirectToAction(
                     "Charts",
                     "Candidate",
-                    new { id = candidateCode });
+                    new
+                    {
+                        id = candidateCode
+                    });
             }
 
-            // Validate candidate code
+
+            // =========================================================
+            // VALIDATE CANDIDATE CODE
+            // =========================================================
+
             if (id != candidateCode)
             {
                 return NotFound();
             }
 
+
             // =========================================================
-            // GET MATCHING / SUITABLE JOBS FOR LOGGED-IN CANDIDATE
+            // GET MATCHING / SUITABLE JOBS
             // =========================================================
 
             List<OrgPostM> matchingJobs =
@@ -2740,25 +2937,36 @@ namespace ErJobPortal.Controllers
 
             int currentYear = DateTime.Now.Year;
 
-            int[] suitableOpeningsMonthly = new int[12];
+            int[] suitableOpeningsMonthly =
+                new int[12];
+
 
             foreach (var job in matchingJobs)
             {
                 if (!job.dStartDate.HasValue)
                     continue;
 
-                DateTime startDate = job.dStartDate.Value;
+
+                DateTime startDate =
+                    job.dStartDate.Value;
+
 
                 // Only current year's jobs
                 if (startDate.Year != currentYear)
                     continue;
 
-                int monthIndex = startDate.Month - 1;
 
-                int requiredTrainees = job.nRequiredTrainees;
+                int monthIndex =
+                    startDate.Month - 1;
+
+
+                int requiredTrainees =
+                    job.nRequiredTrainees;
+
 
                 if (requiredTrainees < 0)
                     requiredTrainees = 0;
+
 
                 suitableOpeningsMonthly[monthIndex] +=
                     requiredTrainees;
@@ -2766,19 +2974,115 @@ namespace ErJobPortal.Controllers
 
 
             // =========================================================
-            // SEND DATA TO VIEW
+            // GET INTERNSHIP POST DATA
+            // FROM SP_GetSACharts
             // =========================================================
 
-            ViewBag.CandidateCode = candidateCode;
-            ViewBag.CandidateID = candidateId.Value;
+            SAChartsViewModel model =
+                new SAChartsViewModel();
 
-            ViewBag.ChartYear = currentYear;
+
+            string connectionString =
+                _configuration.GetConnectionString(
+                    "DefaultConnection");
+
+
+            using (SqlConnection con =
+                   new SqlConnection(connectionString))
+            {
+                using (SqlCommand cmd =
+                       new SqlCommand(
+                           "SP_GetSACharts",
+                           con))
+                {
+                    cmd.CommandType =
+                        CommandType.StoredProcedure;
+
+
+                    con.Open();
+
+
+                    using (SqlDataReader reader =
+                           cmd.ExecuteReader())
+                    {
+                        // =================================================
+                        // 1. CANDIDATE DATA
+                        // =================================================
+
+                        while (reader.Read())
+                        {
+                            model.CandidateData.Add(
+                                new SAChartData
+                                {
+                                    Year =
+                                        Convert.ToInt32(
+                                            reader["Year"]),
+
+                                    Month =
+                                        Convert.ToInt32(
+                                            reader["Month"]),
+
+                                    TotalCount =
+                                        Convert.ToInt32(
+                                            reader["TotalCount"])
+                                });
+                        }
+
+
+                        // =================================================
+                        // 2. INTERNSHIP POST DATA
+                        // =================================================
+
+                        if (reader.NextResult())
+                        {
+                            while (reader.Read())
+                            {
+                                model.InternshipPostData.Add(
+                                    new SAChartData
+                                    {
+                                        Year =
+                                            Convert.ToInt32(
+                                                reader["Year"]),
+
+                                        Month =
+                                            Convert.ToInt32(
+                                                reader["Month"]),
+
+                                        TotalCount =
+                                            Convert.ToInt32(
+                                                reader["TotalCount"])
+                                    });
+                            }
+                        }
+                    }
+                }
+            }
+
+
+            // =========================================================
+            // SEND CANDIDATE DATA TO VIEW
+            // =========================================================
+
+            ViewBag.CandidateCode =
+                candidateCode;
+
+            ViewBag.CandidateID =
+                candidateId.Value;
+
+            ViewBag.ChartYear =
+                currentYear;
 
             ViewBag.SuitableOpeningsMonthly =
                 suitableOpeningsMonthly;
 
-            return View();
+
+            // =========================================================
+            // RETURN SAME VIEW WITH MODEL
+            // =========================================================
+
+            return View(model);
         }
+
 
 
         // shrirang 29/09/26
@@ -3247,7 +3551,7 @@ namespace ErJobPortal.Controllers
                 "Candidate",
                 new { id = candidateCode });
         }
-         
+
         #endregion
 
         #region "TR Apply to Post List Called"

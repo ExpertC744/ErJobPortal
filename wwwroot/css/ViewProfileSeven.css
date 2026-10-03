@@ -108,26 +108,47 @@ img{max-width:100%;display:block}
 .preference-item strong{color:var(--theme);font-weight:700}
 
 /* =========================================================
-   TEMPLATE SIX  -  Classic band header + tinted photo panel
+   TEMPLATE SEVEN  -  Full-height dark sidebar
    ========================================================= */
-.resume-header{height:50mm;display:grid;grid-template-columns:1fr 50mm 60mm;align-items:center;padding-right:9mm;border-bottom:1px solid var(--border);overflow:hidden}
-.resume-header::after{content:"";position:absolute;left:0;top:0;width:7px;height:100%;background:var(--theme)}
-.resume-header::before{content:"";position:absolute;right:0;top:0;bottom:0;width:119mm;background:var(--theme-soft);clip-path:polygon(10mm 0,100% 0,100% 100%,0 100%)}
-.header-info{position:relative;z-index:1;grid-column:1;grid-row:1;padding:0 8mm 0 16mm;min-width:0}
-.candidate-name{font-size:31px}
-.candidate-role{margin-top:7px;font-size:10.5px}
-.header-accent{width:44px;height:3px;margin-top:11px;border-radius:2px;background:var(--accent)}
-.photo-wrapper{position:relative;z-index:1;grid-column:2;grid-row:1;display:flex;align-items:center;padding:0 8mm 0 14mm}
-.profile-photo{--photo:28mm;border-radius:6px;border:4px solid #fff;box-shadow:0 5px 18px rgba(30,50,60,.18)}
-.profile-placeholder{--photo:28mm;border-radius:6px}
-.header-contact{position:relative;z-index:1;grid-column:3;grid-row:1;display:flex;flex-direction:column;gap:7px;min-width:0}
-.header-contact-item{color:#50626a}
-.header-contact-item i{color:var(--accent)}
+.resume-sheet::before{content:"";position:absolute;left:0;top:0;bottom:0;width:78mm;background:var(--theme);z-index:0}
+.resume-sheet::after{content:"";position:absolute;left:78mm;top:0;bottom:0;width:3px;background:var(--accent);z-index:0}
+.resume-header,.resume-body{z-index:1}
 
-.resume-body{grid-template-columns:72mm 1fr}
-.left-column{background:#f8f9f9;border-right:1px solid var(--border);padding:6mm 7mm 5mm 10mm}
-.right-column{padding:6mm 10mm 5mm 9mm}
-.experience-item{background:#f7f8f8;border-left:3px solid var(--accent)}
+.resume-header{height:52mm;display:grid;grid-template-columns:78mm 1fr;align-items:center;background:linear-gradient(90deg,transparent 0 81mm,var(--theme-soft) 81mm 100%)}
+.photo-wrapper{grid-column:1;grid-row:1;display:flex;justify-content:center;align-items:center}
+.profile-photo{--photo:34mm;border-radius:50%;border:4px solid #fff;box-shadow:0 6px 20px rgba(0,0,0,.28)}
+.profile-placeholder{--photo:34mm;border-radius:50%;border:4px solid #fff}
+.header-info{grid-column:2;grid-row:1;padding:0 12mm 0 14mm;min-width:0}
+.candidate-name{font-size:33px}
+.candidate-role{margin-top:8px;font-size:10.5px;color:var(--accent)}
+.header-accent{width:56px;height:3px;margin-top:12px;background:var(--theme);border-radius:2px}
+.header-contact{display:none}
+
+.resume-body{grid-template-columns:78mm 1fr}
+.left-column{padding:5mm 8mm 5mm 9mm;color:#fff}
+.right-column{padding:6mm 11mm 5mm 12mm}
+
+/* left (dark) */
+.left-column .section-icon{background:var(--accent)}
+.left-column .section-title{color:#fff}
+.left-column .section-title-line{background:rgba(255,255,255,.22)}
+.left-column .info-icon{background:rgba(255,255,255,.14);color:#fff}
+.left-column .info-label{color:rgba(255,255,255,.6)}
+.left-column .info-value{color:#fff}
+.left-column .skill-group-title{color:rgba(255,255,255,.65)}
+.left-column .skill-list{background:rgba(255,255,255,.09);border-color:rgba(255,255,255,.16);border-left-color:var(--accent);color:#eef3f5}
+.left-column .language-row{border-bottom-color:rgba(255,255,255,.16)}
+.left-column .language-name{color:#fff}
+.left-column .language-level{color:rgba(255,255,255,.72)}
+.left-column .interest-box{color:#e6edf0}
+.left-column .social-item{color:#e6edf0}
+.left-column .social-item i{color:#fff}
+
+/* right (light) */
+.right-column .section-icon{border-radius:4px;background:var(--theme-soft);color:var(--theme)}
+.experience-item{background:#fff;border:1px solid var(--border);border-top:3px solid var(--theme)}
+.education-item{border-top:0;border-left:3px solid var(--accent)}
+.reference-item{border-left-color:var(--accent)}
 
 /* =========================================================
    RESPONSIVE - SAME SHEET, ONLY ZOOM OUT

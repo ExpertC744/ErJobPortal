@@ -108,26 +108,33 @@ img{max-width:100%;display:block}
 .preference-item strong{color:var(--theme);font-weight:700}
 
 /* =========================================================
-   TEMPLATE SIX  -  Classic band header + tinted photo panel
+   TEMPLATE EIGHT  -  Colour banner header + RIGHT sidebar
    ========================================================= */
-.resume-header{height:50mm;display:grid;grid-template-columns:1fr 50mm 60mm;align-items:center;padding-right:9mm;border-bottom:1px solid var(--border);overflow:hidden}
-.resume-header::after{content:"";position:absolute;left:0;top:0;width:7px;height:100%;background:var(--theme)}
-.resume-header::before{content:"";position:absolute;right:0;top:0;bottom:0;width:119mm;background:var(--theme-soft);clip-path:polygon(10mm 0,100% 0,100% 100%,0 100%)}
-.header-info{position:relative;z-index:1;grid-column:1;grid-row:1;padding:0 8mm 0 16mm;min-width:0}
-.candidate-name{font-size:31px}
-.candidate-role{margin-top:7px;font-size:10.5px}
-.header-accent{width:44px;height:3px;margin-top:11px;border-radius:2px;background:var(--accent)}
-.photo-wrapper{position:relative;z-index:1;grid-column:2;grid-row:1;display:flex;align-items:center;padding:0 8mm 0 14mm}
-.profile-photo{--photo:28mm;border-radius:6px;border:4px solid #fff;box-shadow:0 5px 18px rgba(30,50,60,.18)}
-.profile-placeholder{--photo:28mm;border-radius:6px}
-.header-contact{position:relative;z-index:1;grid-column:3;grid-row:1;display:flex;flex-direction:column;gap:7px;min-width:0}
-.header-contact-item{color:#50626a}
-.header-contact-item i{color:var(--accent)}
+.resume-header{height:48mm;display:grid;grid-template-columns:50mm 1fr 68mm;align-items:center;padding-right:10mm;background:linear-gradient(110deg,var(--theme),var(--theme-dark));border-bottom:3px solid var(--accent);color:#fff}
+.photo-wrapper{grid-column:1;grid-row:1;display:flex;align-items:center;padding-left:14mm}
+.profile-photo{--photo:30mm;border-radius:50%;border:3px solid #fff;box-shadow:0 5px 16px rgba(0,0,0,.3)}
+.profile-placeholder{--photo:30mm;border-radius:50%;border:3px solid #fff}
+.header-info{grid-column:2;grid-row:1;padding:0 8mm 0 6mm;min-width:0}
+.candidate-name{font-size:31px;color:#fff}
+.candidate-role{margin-top:7px;font-size:10.5px;color:rgba(255,255,255,.82)}
+.header-accent{width:40px;height:3px;margin-top:11px;border-radius:2px;background:rgba(255,255,255,.75)}
+.header-contact{grid-column:3;grid-row:1;display:flex;flex-direction:column;gap:7px;padding-left:8mm;border-left:1px solid rgba(255,255,255,.3);min-width:0}
+.header-contact-item{color:#fff}
+.header-contact-item i{color:rgba(255,255,255,.85)}
 
-.resume-body{grid-template-columns:72mm 1fr}
-.left-column{background:#f8f9f9;border-right:1px solid var(--border);padding:6mm 7mm 5mm 10mm}
-.right-column{padding:6mm 10mm 5mm 9mm}
-.experience-item{background:#f7f8f8;border-left:3px solid var(--accent)}
+.resume-body{grid-template-columns:1fr 76mm;grid-template-areas:"main side"}
+.right-column{grid-area:main;padding:6mm 9mm 5mm 12mm}
+.left-column{grid-area:side;background:var(--theme-soft);border-left:1px solid var(--border);padding:6mm 9mm 5mm 8mm}
+
+.section-heading{padding-bottom:4px;border-bottom:1.5px solid var(--theme)}
+.section-icon{width:auto;height:auto;min-width:0;background:none;color:var(--accent);font-size:10px}
+.section-title-line{display:none}
+.info-icon{background:#fff}
+.skill-list{border-color:rgba(0,0,0,.06)}
+.experience-item{background:#fff;border:1px solid var(--border);border-left:0;border-top:3px solid var(--accent);box-shadow:0 1px 4px rgba(20,40,50,.06)}
+.education-item{background:#fff;border:1px solid var(--border);border-top:0;border-left:3px solid var(--theme)}
+.achievement-item{border-radius:14px;background:var(--theme-soft);border-color:transparent}
+.reference-item{background:#fff;border:1px solid var(--border);border-left:3px solid var(--accent)}
 
 /* =========================================================
    RESPONSIVE - SAME SHEET, ONLY ZOOM OUT

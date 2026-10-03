@@ -2483,10 +2483,162 @@ ORDER BY SAF.nID DESC, OFB.nID DESC;
             return View();
         }
         [HttpGet]
+        [Route("SuperAdmin/SAAllOrganizationPost")]
         public IActionResult SAAllOrganizationPost()
         {
-            return View();
+            List<OrgPostM> posts = new List<OrgPostM>();
+
+            string connectionString =
+                _configuration.GetConnectionString("DefaultConnection");
+
+            using (SqlConnection con = new SqlConnection(connectionString))
+            {
+                using (SqlCommand cmd = new SqlCommand(
+                    "SP_GetSAOrgPostsWithMatchingTraineeCount", con))
+                {
+                    cmd.CommandType = CommandType.StoredProcedure;
+
+                    con.Open();
+
+                    using (SqlDataReader dr = cmd.ExecuteReader())
+                    {
+                        while (dr.Read())
+                        {
+                            OrgPostM item = new OrgPostM();
+
+                            item.nID = dr["nID"] == DBNull.Value
+                                ? 0
+                                : Convert.ToInt32(dr["nID"]);
+
+                            item.nPositionID = dr["nPositionID"] == DBNull.Value
+                                ? 0
+                                : Convert.ToInt32(dr["nPositionID"]);
+
+                            item.sPositionName =
+                                dr["sPositionName"]?.ToString() ?? "";
+
+                            item.nRequiredTrainees =
+                                dr["nRequiredTrainees"] == DBNull.Value
+                                    ? 0
+                                    : Convert.ToInt32(dr["nRequiredTrainees"]);
+
+                            item.MatchingTraineeCount =
+                                dr["MatchingTraineeCount"] == DBNull.Value
+                                    ? 0
+                                    : Convert.ToInt32(dr["MatchingTraineeCount"]);
+
+                            item.nGenderID =
+                                dr["nGenderID"] == DBNull.Value
+                                    ? 0
+                                    : Convert.ToInt32(dr["nGenderID"]);
+
+                            item.sGenderName =
+                                dr["sGenderName"]?.ToString() ?? "";
+
+                            item.nMinimumQualificationID =
+                                dr["nMinimumQualificationID"] == DBNull.Value
+                                    ? 0
+                                    : Convert.ToInt32(dr["nMinimumQualificationID"]);
+
+                            item.sMinimumQualificationName =
+                                dr["sMinimumQualificationName"]?.ToString() ?? "";
+
+                            item.sCountryName =
+                                dr["sCountryName"]?.ToString() ?? "";
+
+                            item.sStateName =
+                                dr["sStateName"]?.ToString() ?? "";
+
+                            item.nCityName =
+                                dr["nCityName"]?.ToString() ?? "";
+
+                            item.sWorkingHours =
+                                dr["sWorkingHours"]?.ToString() ?? "";
+
+                            item.nInternshipTypeID =
+                                dr["nInternshipTypeID"] == DBNull.Value
+                                    ? 0
+                                    : Convert.ToInt32(dr["nInternshipTypeID"]);
+
+                            item.sInternshipTypeName =
+                                dr["sInternshipTypeName"]?.ToString() ?? "";
+
+                            item.sWorkingShift =
+                                dr["sWorkingShift"]?.ToString() ?? "";
+
+                            item.nInternshipFellowshipTypeID =
+                                dr["nInternshipFellowshipTypeID"] == DBNull.Value
+                                    ? 0
+                                    : Convert.ToInt32(dr["nInternshipFellowshipTypeID"]);
+
+                            item.sInternshipFellowshipTypeName =
+                                dr["sInternshipFellowshipTypeName"]?.ToString() ?? "";
+
+                            item.nTrainingInvolvedID =
+                                dr["nTrainingInvolvedID"] == DBNull.Value
+                                    ? 0
+                                    : Convert.ToInt32(dr["nTrainingInvolvedID"]);
+
+                            item.sTrainingInvolvedName =
+                                dr["sTrainingInvolvedName"]?.ToString() ?? "";
+
+                            item.nInternshipDurationID =
+                                dr["nInternshipDurationID"] == DBNull.Value
+                                    ? 0
+                                    : Convert.ToInt32(dr["nInternshipDurationID"]);
+
+                            item.sInternshipDurationName =
+                                dr["sInternshipDurationName"]?.ToString() ?? "";
+
+                            item.nInternshipModeID =
+                                dr["nInternshipModeID"] == DBNull.Value
+                                    ? 0
+                                    : Convert.ToInt32(dr["nInternshipModeID"]);
+
+                            item.sInternshipModeName =
+                                dr["sInternshipModeName"]?.ToString() ?? "";
+
+                            item.sDivyang =
+                                dr["sDivyang"]?.ToString() ?? "";
+
+                            item.sWorkingDays =
+                                dr["sWorkingDays"]?.ToString() ?? "";
+
+                            item.sFacilities =
+                                dr["sFacilities"]?.ToString() ?? "";
+
+                            item.dRegisterDate =
+    dr["dRegisterDate"] == DBNull.Value
+        ? DateTime.MinValue
+        : Convert.ToDateTime(dr["dRegisterDate"]);
+
+                            item.dModDate =
+    dr["dModDate"] == DBNull.Value
+        ? DateTime.MinValue
+        : Convert.ToDateTime(dr["dModDate"]);
+
+                            item.nBit =
+                                dr["nBit"] != DBNull.Value &&
+                                Convert.ToBoolean(dr["nBit"]);
+
+                            item.nSABit =
+                                dr["nSABit"] != DBNull.Value &&
+                                Convert.ToBoolean(dr["nSABit"]);
+
+                            item.nOrgID =
+                                dr["nOrgID"] == DBNull.Value
+                                    ? 0
+                                    : Convert.ToInt32(dr["nOrgID"]);
+
+                            posts.Add(item);
+                        }
+                    }
+                }
+            }
+
+            return View(posts);
         }
+
         [HttpGet]
         public IActionResult SAFinalSelection()
         {
@@ -2673,5 +2825,148 @@ ORDER BY SAF.nID DESC, OFB.nID DESC;
         {
             return View();
         }
+
+        #region "Elegible Trainee"
+        [HttpGet]
+        [Route("SuperAdmin/EligibleTrainees/{id:int}")]
+        public IActionResult EligibleTrainees(int id, int orgID)
+        {
+            List<EligibleTraineeM> trainees = new List<EligibleTraineeM>();
+
+            using (SqlConnection con = new SqlConnection(
+                _configuration.GetConnectionString("DefaultConnection")))
+            {
+                using (SqlCommand cmd = new SqlCommand(
+                    "SP_GetCandidatesByPost", con))
+                {
+                    cmd.CommandType = CommandType.StoredProcedure;
+
+                    // Post ID
+                    cmd.Parameters.Add("@nID", SqlDbType.Int).Value = id;
+
+                    // Organization ID
+                    cmd.Parameters.Add("@OrganizationID", SqlDbType.Int).Value = orgID;
+
+                    con.Open();
+
+                    using (SqlDataReader dr = cmd.ExecuteReader())
+                    {
+                        while (dr.Read())
+                        {
+                            EligibleTraineeM item = new EligibleTraineeM();
+
+                            item.CandidateID =
+                                Convert.ToInt32(dr["CandidateID"]);
+
+                            item.Name =
+                                dr["Name"] == DBNull.Value
+                                    ? ""
+                                    : dr["Name"].ToString();
+
+                            item.EmailID =
+                                dr["EmailID"] == DBNull.Value
+                                    ? ""
+                                    : dr["EmailID"].ToString();
+
+                            item.Gender =
+                                dr["Gender"] == DBNull.Value
+                                    ? null
+                                    : Convert.ToInt32(dr["Gender"]);
+
+                            item.DateOfBirth =
+                                dr["DateOfBirth"] == DBNull.Value
+                                    ? null
+                                    : Convert.ToDateTime(dr["DateOfBirth"]);
+
+                            item.PostID =
+                                Convert.ToInt32(dr["PostID"]);
+
+                            item.GenderRequired =
+                                dr["GenderRequired"] == DBNull.Value
+                                    ? null
+                                    : Convert.ToInt32(dr["GenderRequired"]);
+
+                            item.InternshipType =
+                                dr["InternshipType"] == DBNull.Value
+                                    ? null
+                                    : Convert.ToInt32(dr["InternshipType"]);
+
+                            item.MinQualification =
+                                dr["MinQualification"] == DBNull.Value
+                                    ? null
+                                    : Convert.ToInt32(dr["MinQualification"]);
+
+                            item.MaxQualification =
+                                dr["MaxQualification"] == DBNull.Value
+                                    ? null
+                                    : Convert.ToInt32(dr["MaxQualification"]);
+
+                            item.MedicalSkill =
+                                dr["MedicalSkill"] == DBNull.Value
+                                    ? ""
+                                    : dr["MedicalSkill"].ToString();
+
+                            item.TechnicalSkill =
+                                dr["TechnicalSkill"] == DBNull.Value
+                                    ? ""
+                                    : dr["TechnicalSkill"].ToString();
+
+                            item.NonTechnicalSkill =
+                                dr["NonTechnicalSkill"] == DBNull.Value
+                                    ? ""
+                                    : dr["NonTechnicalSkill"].ToString();
+
+                            item.MedicalSkillNames =
+                                dr["MedicalSkillNames"] == DBNull.Value
+                                    ? ""
+                                    : dr["MedicalSkillNames"].ToString();
+
+                            item.TechnicalSkillNames =
+                                dr["TechnicalSkillNames"] == DBNull.Value
+                                    ? ""
+                                    : dr["TechnicalSkillNames"].ToString();
+
+                            item.NonTechnicalSkillNames =
+                                dr["NonTechnicalSkillNames"] == DBNull.Value
+                                    ? ""
+                                    : dr["NonTechnicalSkillNames"].ToString();
+
+                            item.MatchedSkillType =
+                                dr["MatchedSkillType"] == DBNull.Value
+                                    ? ""
+                                    : dr["MatchedSkillType"].ToString();
+
+                            item.CApply =
+                                dr["CApply"] == DBNull.Value
+                                    ? null
+                                    : Convert.ToInt32(dr["CApply"]);
+
+                            item.Status =
+                                dr["Status"] == DBNull.Value
+                                    ? ""
+                                    : dr["Status"].ToString();
+
+                            item.FinalStatus =
+                                dr["FinalStatus"] == DBNull.Value
+                                    ? ""
+                                    : dr["FinalStatus"].ToString();
+
+                            item.Comment =
+                                dr["Comment"] == DBNull.Value
+                                    ? ""
+                                    : dr["Comment"].ToString();
+
+                            trainees.Add(item);
+                        }
+                    }
+                }
+            }
+
+            ViewBag.PostID = id;
+            ViewBag.OrgID = orgID;
+
+            return View(trainees);
+        }
+        #endregion
     }
 }
