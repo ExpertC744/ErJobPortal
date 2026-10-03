@@ -1,19 +1,32 @@
-﻿@{
+﻿@* @model ErJobPortal.Models.OrganizationChartsViewModel *@
+
+@{
     Layout = "~/Views/Shared/_DashboardLayout.cshtml";
 
     ViewData["Title"] = "Organization Dashboard";
     ViewData["Panel"] = "Organization";
     ViewData["UserName"] = "Organization";
+
     var appliedTraineePosts =
-        ViewBag.AppliedTraineePosts as List<ErJobPortal.Models.OrgPostM>
-        ?? new List<ErJobPortal.Models.OrgPostM>();
+     ViewBag.AppliedTraineePosts as List<ErJobPortal.Models.OrgPostM>
+     ?? new List<ErJobPortal.Models.OrgPostM>();
+
+    var areaData =
+       ViewBag.AreaChartData
+       as List<ErJobPortal.Models.OrganizationChartViewModel>
+       ?? new List<ErJobPortal.Models.OrganizationChartViewModel>();
+
+    var barData =
+        ViewBag.BarChartData
+        as List<ErJobPortal.Models.OrganizationChartViewModel>
+        ?? new List<ErJobPortal.Models.OrganizationChartViewModel>();
 }
 
 <link href="~/css/orgdashboard.css" rel="stylesheet" />
 <style>
 
     /* =====================================================
-       1TRAINEE MONTHLY ANALYTICS @* Radhika29-09 *@
+           1TRAINEE MONTHLY ANALYTICS @* Radhika29-09 *@
     ===================================================== */
 
     .analytics-card {
@@ -1147,6 +1160,9 @@
         <!-- MASTER TABLE CARD -->
         <div class="master-table-container">
 
+
+
+
             <!-- MASTER TABLE -->
             <div class="table-responsive">
 
@@ -1166,79 +1182,79 @@
                     <tbody>
 
                         @if (appliedTraineePosts.Any())
-                {
-                    int srNo = 1;
+                        {
+                            int srNo = 1;
 
-                    foreach (var item in appliedTraineePosts)
-                    {
-                        <tr>
+                            foreach (var item in appliedTraineePosts)
+                            {
+                                <tr>
 
-                            <!-- Sr. No. -->
-                            <td class="master-id">
-                                @srNo
-                            </td>
+                                    <!-- Sr. No. -->
+                                    <td class="master-id">
+                                        @srNo
+                                    </td>
 
-                            <!-- Date -->
-                            <td>
-                                @(item.dStartDate.HasValue
-                                    ? item.dStartDate.Value.ToString("dd-MM-yyyy")
-                                    : "")
-                            </td>
+                                    <!-- Date -->
+                                    <td>
+                                        @(item.dStartDate.HasValue
+                                                                        ? item.dStartDate.Value.ToString("dd-MM-yyyy")
+                                                                        : "")
+                                    </td>
 
-                            <!-- Position -->
-                            <td>
-                                @item.sPositionName
-                            </td>
+                                    <!-- Position -->
+                                    <td>
+                                        @item.sPositionName
+                                    </td>
 
-                            <!-- View Post -->
-                            <td class="text-center">
+                                    <!-- View Post -->
+                                    <td class="text-center">
 
-                                <a asp-controller="Organization"
-                                   asp-action="ViewOrgPost"
-                                   asp-route-id="@item.nID"
-                                   class="resume-view-btn"
-                                   title="View Post">
+                                        <a asp-controller="Organization"
+                                           asp-action="ViewOrgPost"
+                                           asp-route-id="@item.nID"
+                                           class="resume-view-btn"
+                                           title="View Post">
 
-                                    <i class="fas fa-eye"></i>
+                                            <i class="fas fa-eye"></i>
 
-                                </a>
+                                        </a>
 
-                            </td>
+                                    </td>
 
-                            <!-- Applied Trainees -->
-                            <td class="text-center">
+                                    <!-- Applied Trainees -->
+                                    <td class="text-center">
 
-                                <a asp-controller="Organization"
-                                   asp-action="AppliedTraineeList"
-                                   asp-route-id="@item.nID"
-                                   class="resume-view-btn"
-                                   title="View Applied Trainees">
+                                        <a asp-controller="Organization"
+                                           asp-action="AppliedTraineeList"
+                                           asp-route-id="@item.nID"
+                                           class="resume-view-btn"
+                                           title="View Applied Trainees">
 
-                                    <i class="fas fa-users"></i>
+                                            <i class="fas fa-users"></i>
 
-                                    <span>
-                                        @item.MatchingTraineeCount
-                                    </span>
+                                            <span>
+                                                @item.MatchingTraineeCount
+                                            </span>
 
-                                </a>
+                                        </a>
 
-                            </td>
+                                    </td>
 
-                        </tr>
+                                </tr>
 
-                        srNo++;
-                    }
-                }
-                else
-                {
-                    <tr>
-                        <td colspan="5" class="text-center">
-                            No applied trainees found.
-                        </td>
-                    </tr>
-                }
-                  
-                    
+                                srNo++;
+                            }
+                        }
+                        else
+                        {
+                            <tr>
+                                <td colspan="5" class="text-center">
+                                    No applied trainees found.
+                                </td>
+                            </tr>
+                        }
+
+
                     </tbody>
 
                 </table>
@@ -1253,749 +1269,812 @@
 
         </div>
 
-        <script>
-            $(document).ready(function () {
-
-                $('#organizationJobsTable').DataTable({
-                    paging: true,
-                    searching: true,
-                    ordering: true,
-                    info: true,
-                    responsive: true,
-
-                    pageLength: 10,
-
-                    lengthMenu: [
-                        [5, 10, 25, 50, -1],
-                        [5, 10, 25, 50, "All"]
-                    ],
-
-                    columnDefs: [
-                        {
-                            targets: 0,
-                            orderable: false,
-                            searchable: false
-                        },
-                        {
-                            targets: 3,
-                            orderable: false,
-                            searchable: false
-                        },
-                        {
-                            targets: 4,
-                            orderable: false,
-                            searchable: false
-                        }
-                    ],
-
-                    language: {
-                        search: "Search:",
-                        searchPlaceholder: "Search posts...",
-                        lengthMenu: "Show _MENU_ entries",
-                        info: "Showing _START_ to _END_ of _TOTAL_ posts",
-                        infoEmpty: "No posts available",
-                        zeroRecords: "No matching posts found",
-                        emptyTable: "No post records found",
-                        paginate: {
-                            first: "First",
-                            last: "Last",
-                            next: "Next",
-                            previous: "Previous"
-                        }
-                    },
-
-                    order: [
-                        [1, 'desc']
-                    ],
-
-                    drawCallback: function () {
-
-                        var api = this.api();
-
-                        api.rows({
-                            page: 'current'
-                        }).every(function (rowIdx, tableLoop, rowLoop) {
-
-                            var index =
-                                rowLoop +
-                                1;
-
-                            $(this.node())
-                                .find('td:first')
-                                .text(index);
-
-                        });
-
-                    }
-
-                });
-
-            });
-        </script>
 
     </div>
 
+    <script>
+
+        document.addEventListener("DOMContentLoaded", function () {
+
+        // =====================================================
+        // MONTH NAMES
+        // =====================================================
+
+        const monthNames = [
+        "Jan",
+        "Feb",
+        "Mar",
+        "Apr",
+        "May",
+        "Jun",
+        "Jul",
+        "Aug",
+        "Sep",
+        "Oct",
+        "Nov",
+        "Dec"
+        ];
+
+
+        // =====================================================
+        // CURRENT YEAR
+        // =====================================================
+
+        const currentYear = new Date().getFullYear();
+
+
+        // =====================================================
+        // =====================================================
+        // 1. ELIGIBLE TRAINEE CHART
+        // =====================================================
+        // =====================================================
+
+
+        // =====================================================
+        // DATA FROM C#
+        // =====================================================
+
+        const eligibleData =
+        @Html.Raw(
+                System.Text.Json.JsonSerializer.Serialize(
+                                areaData.Select(x => new
+                                {
+                                        year = x.PostYear,
+                                        month = x.PostMonth,
+                                        count = x.TotalEligibleTrainees
+                                })
+                )
+                );
+
+
+        console.log(
+        "Eligible Data From C#:",
+        eligibleData
+        );
+
+
+        // =====================================================
+        // CREATE 12 MONTHS
+        // =====================================================
+
+        const eligibleMonths = [];
+
+
+        for (let i = 1; i <= 12; i++) {
+
+        eligibleMonths.push({
+
+        year: currentYear,
+
+        month: i,
+
+        label:
+        monthNames[i - 1] +
+        " " +
+        String(currentYear).slice(-2),
+
+        count: 0
+
+        });
+
+        }
+
+
+        // =====================================================
+        // PUT DATABASE VALUES INTO MONTHS
+        // =====================================================
+
+        if (Array.isArray(eligibleData)) {
+
+        eligibleData.forEach(function (item) {
+
+        const itemYear =
+        Number(item.year);
+
+        const itemMonth =
+        Number(item.month);
+
+        const itemCount =
+        Number(item.count) || 0;
+
+
+        const found =
+        eligibleMonths.find(function (x) {
+
+        return (
+        x.year === itemYear &&
+        x.month === itemMonth
+        );
+
+        });
+
+
+        if (found) {
+
+        /*
+        * IMPORTANT:
+        * Do NOT add the value again.
+        *
+        * SP should already return the
+        * monthly eligible trainee total.
+        */
+
+        found.count = itemCount;
+
+        }
+
+        });
+
+        }
+
+
+        console.log(
+        "Eligible Monthly Data:",
+        eligibleMonths
+        );
+
+
+        // =====================================================
+        // CHART SETTINGS
+        // =====================================================
+
+        const eligibleChartLeft = 60;
+
+        const eligibleChartRight = 735;
+
+        const eligibleChartTop = 30;
+
+        const eligibleChartBottom = 255;
+
+        const eligibleChartHeight =
+        eligibleChartBottom -
+        eligibleChartTop;
+
+        const eligibleChartWidth =
+        eligibleChartRight -
+        eligibleChartLeft;
+
+        const eligibleMonthGap =
+        eligibleChartWidth / 11;
+
+
+        // =====================================================
+        // Y AXIS ALWAYS 0 TO 100
+        // =====================================================
+
+        const eligibleYAxisMax = 100;
+
+
+        // =====================================================
+        // CREATE POINTS
+        // =====================================================
+
+        const eligiblePointsData = [];
+
+
+        eligibleMonths.forEach(function (item, index) {
+
+        const x =
+        eligibleChartLeft +
+        (
+        index *
+        eligibleMonthGap
+        );
+
+
+        const value =
+        Math.max(
+        0,
+        Math.min(
+        Number(item.count) || 0,
+        eligibleYAxisMax
+        )
+        );
+
+
+        const y =
+        eligibleChartBottom -
+        (
+        (
+        value /
+        eligibleYAxisMax
+        ) *
+        eligibleChartHeight
+        );
+
+
+        eligiblePointsData.push({
+
+        x: x,
+
+        y: y,
+
+        count: value,
+
+        label: item.label
+
+        });
+
+        });
+
+
+        // =====================================================
+        // DRAW LINE
+        // =====================================================
+
+        const eligibleLine =
+        document.getElementById(
+        "eligibleLine"
+        );
+
+
+        if (eligibleLine) {
+
+        eligibleLine.setAttribute(
+        "points",
+
+        eligiblePointsData
+        .map(function (p) {
+
+        return (
+        p.x +
+        "," +
+        p.y
+        );
+
+        })
+        .join(" ")
+        );
+
+        }
+
+
+        // =====================================================
+        // DRAW AREA
+        // =====================================================
+
+        const eligibleArea =
+        document.getElementById(
+        "eligibleArea"
+        );
+
+
+        if (eligibleArea) {
+
+        let areaPoints =
+        eligiblePointsData
+        .map(function (p) {
+
+        return (
+        p.x +
+        "," +
+        p.y
+        );
+
+        })
+        .join(" ");
+
+
+        areaPoints +=
+        " " +
+        eligibleChartRight +
+        "," +
+        eligibleChartBottom;
+
+
+        areaPoints +=
+        " " +
+        eligibleChartLeft +
+        "," +
+        eligibleChartBottom;
+
+
+        eligibleArea.setAttribute(
+        "points",
+        areaPoints
+        );
+
+        }
+
+
+        // =====================================================
+        // DRAW POINTS
+        // =====================================================
+
+        const eligiblePoints =
+        document.getElementById(
+        "eligiblePoints"
+        );
+
+
+        if (eligiblePoints) {
+
+        eligiblePoints.innerHTML = "";
+
+
+        eligiblePointsData.forEach(
+        function (p) {
+
+        const circle =
+        document.createElementNS(
+        "http://www.w3.org/2000/svg",
+        "circle"
+        );
+
+
+        circle.setAttribute(
+        "cx",
+        p.x
+        );
+
+
+        circle.setAttribute(
+        "cy",
+        p.y
+        );
+
+
+        circle.setAttribute(
+        "r",
+        "4"
+        );
+
+
+        circle.setAttribute(
+        "class",
+        "chart-point"
+        );
+
+
+        // =================================================
+        // TOOLTIP
+        // =================================================
+
+        const title =
+        document.createElementNS(
+        "http://www.w3.org/2000/svg",
+        "title"
+        );
+
+
+        title.textContent =
+        p.label +
+        " : " +
+        p.count +
+        " eligible trainee(s)";
+
+
+        circle.appendChild(
+        title
+        );
+
+
+        eligiblePoints.appendChild(
+        circle
+        );
+
+        }
+        );
+
+        }
+
+
+        // =====================================================
+        // ELIGIBLE MONTH LABELS
+        // =====================================================
+
+        const eligibleMonthsElement =
+        document.getElementById(
+        "eligibleMonths"
+        );
+
+
+        if (eligibleMonthsElement) {
+
+        eligibleMonthsElement.innerHTML = "";
+
+
+        eligibleMonths.forEach(
+        function (item, index) {
+
+        const text =
+        document.createElementNS(
+        "http://www.w3.org/2000/svg",
+        "text"
+        );
+
+
+        const x =
+        eligibleChartLeft +
+        (
+        index *
+        eligibleMonthGap
+        );
+
+
+        text.setAttribute(
+        "x",
+        x
+        );
+
+
+        text.setAttribute(
+        "y",
+        eligibleChartBottom + 20
+        );
+
+
+        text.setAttribute(
+        "text-anchor",
+        "middle"
+        );
+
+
+        text.setAttribute(
+        "class",
+        "chart-axis-text"
+        );
+
+
+        text.textContent =
+        item.label;
+
+
+        eligibleMonthsElement.appendChild(
+        text
+        );
+
+        }
+        );
+
+        }
+
+
+
+        // =====================================================
+        // =====================================================
+        // 2. CANDIDATE REGISTRATION CHART
+        // =====================================================
+        // =====================================================
+
+
+        // =====================================================
+        // DATA FROM C#
+        // =====================================================
+
+        const candidateData =
+        @Html.Raw(
+                                System.Text.Json.JsonSerializer.Serialize(
+                                                barData.Select(x => new
+                                                {
+                                                        year = x.RegistrationYear,
+                                                        month = x.RegistrationMonth,
+                                                        count = x.TotalRegistrations
+                                                })
+                                )
+                );
+
+
+        console.log(
+        "Candidate Data From C#:",
+        candidateData
+        );
+
+
+        // =====================================================
+        // CREATE 12 MONTHS
+        // =====================================================
+
+        const registrationMonths = [];
+
+
+        for (let i = 1; i <= 12; i++) {
+
+        registrationMonths.push({
+
+        year: currentYear,
+
+        month: i,
+
+        label:
+        monthNames[i - 1] +
+        " " +
+        String(currentYear).slice(-2),
+
+        count: 0
+
+        });
+
+        }
+
+
+        // =====================================================
+        // PUT DATABASE DATA INTO MONTHS
+        // =====================================================
+
+        if (Array.isArray(candidateData)) {
+
+        candidateData.forEach(function (item) {
+
+        const itemYear =
+        Number(item.year);
+
+        const itemMonth =
+        Number(item.month);
+
+        const itemCount =
+        Number(item.count) || 0;
+
+
+        const found =
+        registrationMonths.find(
+        function (x) {
+
+        return (
+        x.year === itemYear &&
+        x.month === itemMonth
+        );
+
+        }
+        );
+
+
+        if (found) {
+
+        found.count = itemCount;
+
+        }
+
+        });
+
+        }
+
+
+        // =====================================================
+        // CHART SETTINGS
+        // =====================================================
+
+        const registrationChartLeft = 60;
+
+        const registrationChartRight = 735;
+
+        const registrationChartTop = 30;
+
+        const registrationChartBottom = 255;
+
+        const registrationChartHeight =
+        registrationChartBottom -
+        registrationChartTop;
+
+        const registrationChartWidth =
+        registrationChartRight -
+        registrationChartLeft;
+
+        const registrationMonthGap =
+        registrationChartWidth / 11;
+
+
+        // =====================================================
+        // Y AXIS = 0 TO 100
+        // =====================================================
+
+        const registrationYAxisMax = 100;
+
+
+        // =====================================================
+        // BARS
+        // =====================================================
+
+        const registrationBars =
+        document.getElementById(
+        "registrationBars"
+        );
+
+
+        if (registrationBars) {
+
+        registrationBars.innerHTML = "";
+
+        const barWidth = 30;
+
+
+        registrationMonths.forEach(
+        function (item, index) {
+
+        const x =
+        registrationChartLeft +
+        (
+        index *
+        registrationMonthGap
+        ) -
+        (
+        barWidth / 2
+        );
+
+
+        const value =
+        Math.max(
+        0,
+        Math.min(
+        Number(item.count) || 0,
+        registrationYAxisMax
+        )
+        );
+
+
+        const barHeight =
+        (
+        value /
+        registrationYAxisMax
+        ) *
+        registrationChartHeight;
+
+
+        const y =
+        registrationChartBottom -
+        barHeight;
+
+
+        const rect =
+        document.createElementNS(
+        "http://www.w3.org/2000/svg",
+        "rect"
+        );
+
+
+        rect.setAttribute(
+        "x",
+        x
+        );
+
+
+        rect.setAttribute(
+        "y",
+        y
+        );
+
+
+        rect.setAttribute(
+        "width",
+        barWidth
+        );
+
+
+        rect.setAttribute(
+        "height",
+        barHeight
+        );
+
+
+        rect.setAttribute(
+        "class",
+        "chart-bar"
+        );
+
+
+        // =================================================
+        // TOOLTIP
+        // =================================================
+
+        const title =
+        document.createElementNS(
+        "http://www.w3.org/2000/svg",
+        "title"
+        );
+
+
+        title.textContent =
+        item.label +
+        " : " +
+        value +
+        " candidate(s)";
+
+
+        rect.appendChild(
+        title
+        );
+
+
+        registrationBars.appendChild(
+        rect
+        );
+
+        }
+        );
+
+        }
+
+
+        // =====================================================
+        // REGISTRATION MONTH LABELS
+        // =====================================================
+
+        const registrationMonthsElement =
+        document.getElementById(
+        "registrationMonths"
+        );
+
+
+        if (registrationMonthsElement) {
+
+        registrationMonthsElement.innerHTML = "";
+
+
+        registrationMonths.forEach(
+        function (item, index) {
+
+        const text =
+        document.createElementNS(
+        "http://www.w3.org/2000/svg",
+        "text"
+        );
+
+
+        const x =
+        registrationChartLeft +
+        (
+        index *
+        registrationMonthGap
+        );
+
+
+        text.setAttribute(
+        "x",
+        x
+        );
+
+
+        text.setAttribute(
+        "y",
+        registrationChartBottom + 20
+        );
+
+
+        text.setAttribute(
+        "text-anchor",
+        "middle"
+        );
+
+
+        text.setAttribute(
+        "class",
+        "chart-axis-text"
+        );
+
+
+        text.textContent =
+        item.label;
+
+
+        registrationMonthsElement.appendChild(
+        text
+        );
+
+        }
+        );
+
+        }
+
+
+        // =====================================================
+        // DEBUG
+        // =====================================================
+
+        console.log(
+        "FINAL ELIGIBLE MONTHS:",
+        eligibleMonths
+        );
+
+        console.log(
+        "FINAL REGISTRATION MONTHS:",
+        registrationMonths
+        );
+
+        });
+
+    </script>
 </div>
 
 
 @* //radhika29-09 *@
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
-<script>
-
-    document.addEventListener("DOMContentLoaded", function () {
-
-    /* =====================================================
-    MONTHS
-    ===================================================== */
-
-    const months = [
-    "Jan 26",
-    "Feb 26",
-    "Mar 26",
-    "Apr 26",
-    "May 26",
-    "Jun 26",
-    "Jul 26",
-    "Aug 26",
-    "Sep 26",
-    "Oct 26",
-    "Nov 26",
-    "Dec 26"
-    ];
-
-
-    /* =====================================================
-    FIXED Y AXIS
-
-    IMPORTANT:
-    0 to 100 means:
-    value 6 = 6
-    value 20 = 20
-    value 50 = 50
-    value 80 = 80
-    value 100 = 100
-    ===================================================== */
-
-    const yAxisMax = 100;
-
-
-    /* =====================================================
-    CHART POSITION
-    ===================================================== */
-
-    const chartLeft = 60;
-    const chartRight = 735;
-    const chartTop = 30;
-    const chartBottom = 255;
-
-    const chartHeight =
-    chartBottom - chartTop;
-
-    const chartWidth =
-    chartRight - chartLeft;
-
-    const monthGap =
-    chartWidth / 11;
-
-
-    /* =====================================================
-    ELIGIBLE TRAINEES DATA
-
-    Replace this later with your database data.
-    ===================================================== */
-
-    const eligibleData = [
-    3,
-    5,
-    4,
-    7,
-    8,
-    6,
-    9,
-    11,
-    10,
-    13,
-    12,
-    15
-    ];
-
-
-    /* =====================================================
-    REGISTRATION DATA FROM C#
-    ===================================================== */
-
-    const rawRegistrationData =
-    @Html.Raw(
-        System.Text.Json.JsonSerializer.Serialize(
-                ViewBag.MonthlyCandidateRegistrations
-                ?? new object[0]
-        )
-        );
-
-
-    /* =====================================================
-    CREATE 12 MONTH DATA
-    ===================================================== */
-
-    let registrationData =
-    new Array(12).fill(0);
-
-
-    /* =====================================================
-    READ REGISTRATION DATA
-    ===================================================== */
-
-    if (Array.isArray(rawRegistrationData)) {
-
-    rawRegistrationData.forEach(function (item, index) {
-
-    if (index >= 12) {
-    return;
-    }
-
-
-    /* ---------------------------------------------
-    If backend directly returns number
-    --------------------------------------------- */
-
-    if (typeof item === "number") {
-
-    registrationData[index] =
-    Number(item) || 0;
-
-    }
-
-
-    /* ---------------------------------------------
-    If backend returns object
-    --------------------------------------------- */
-
-    else if (item) {
-
-    registrationData[index] =
-    Number(
-    item.count ??
-    item.Count ??
-    item.total ??
-    item.Total ??
-    item.value ??
-    item.Value ??
-    0
-    ) || 0;
-
-    }
-
-    });
-
-    }
-
-
-    console.log(
-    "Registration Data:",
-    registrationData
-    );
-
-
-    /* =====================================================
-    =====================================================
-    ELIGIBLE TRAINEE LINE CHART
-    =====================================================
-    ===================================================== */
-
-    const eligibleLine =
-    document.getElementById(
-    "eligibleLine"
-    );
-
-
-    const eligibleArea =
-    document.getElementById(
-    "eligibleArea"
-    );
-
-
-    const eligiblePointGroup =
-    document.getElementById(
-    "eligiblePoints"
-    );
-
-
-    const eligibleMonths =
-    document.getElementById(
-    "eligibleMonths"
-    );
-
-
-    /* =====================================================
-    CREATE ELIGIBLE LINE POINTS
-    ===================================================== */
-
-    const eligiblePoints = [];
-
-
-    eligibleData.forEach(function (value, index) {
-
-    /*
-    * IMPORTANT:
-    *
-    * value / 100
-    *
-    * Therefore:
-    *
-    * 6  = 6%
-    * 20 = 20%
-    * 50 = 50%
-    * 100 = 100%
-    */
-
-    const x =
-    chartLeft +
-    (index * monthGap);
-
-
-    const y =
-    chartBottom -
-    (
-    (Number(value) / yAxisMax)
-    * chartHeight
-    );
-
-
-    eligiblePoints.push(
-    `${x},${y}`
-    );
-
-    });
-
-
-    /* =====================================================
-    DRAW ELIGIBLE LINE
-    ===================================================== */
-
-    if (eligibleLine) {
-
-    eligibleLine.setAttribute(
-    "points",
-    eligiblePoints.join(" ")
-    );
-
-    }
-
-
-    /* =====================================================
-    DRAW ELIGIBLE AREA
-    ===================================================== */
-
-    if (eligibleArea) {
-
-    const areaPoints = [
-
-    `${chartLeft},${chartBottom}`,
-
-    ...eligiblePoints,
-
-    `${chartRight},${chartBottom}`
-
-    ];
-
-
-    eligibleArea.setAttribute(
-    "points",
-    areaPoints.join(" ")
-    );
-
-    }
-
-
-    /* =====================================================
-    CLEAR OLD POINTS
-    ===================================================== */
-
-    if (eligiblePointGroup) {
-
-    eligiblePointGroup.innerHTML = "";
-
-    }
-
-
-    /* =====================================================
-    DRAW ELIGIBLE POINTS
-    ===================================================== */
-
-    eligibleData.forEach(function (value, index) {
-
-    const x =
-    chartLeft +
-    (index * monthGap);
-
-
-    const y =
-    chartBottom -
-    (
-    (Number(value) / yAxisMax)
-    * chartHeight
-    );
-
-
-    const circle =
-    document.createElementNS(
-    "http://www.w3.org/2000/svg",
-    "circle"
-    );
-
-
-    circle.setAttribute(
-    "cx",
-    x
-    );
-
-
-    circle.setAttribute(
-    "cy",
-    y
-    );
-
-
-    circle.setAttribute(
-    "r",
-    "4"
-    );
-
-
-    circle.setAttribute(
-    "class",
-    "chart-point"
-    );
-
-
-    /* Tooltip */
-
-    const title =
-    document.createElementNS(
-    "http://www.w3.org/2000/svg",
-    "title"
-    );
-
-
-    title.textContent =
-    months[index] +
-    " : " +
-    value +
-    " eligible trainee(s)";
-
-
-    circle.appendChild(title);
-
-
-    if (eligiblePointGroup) {
-
-    eligiblePointGroup.appendChild(
-    circle
-    );
-
-    }
-
-    });
-
-
-    /* =====================================================
-    ELIGIBLE MONTH LABELS
-    ===================================================== */
-
-    if (eligibleMonths) {
-
-    eligibleMonths.innerHTML = "";
-
-
-    months.forEach(function (month, index) {
-
-    const text =
-    document.createElementNS(
-    "http://www.w3.org/2000/svg",
-    "text"
-    );
-
-
-    const x =
-    chartLeft +
-    (index * monthGap);
-
-
-    text.setAttribute(
-    "x",
-    x
-    );
-
-
-    text.setAttribute(
-    "y",
-    chartBottom + 20
-    );
-
-
-    text.setAttribute(
-    "text-anchor",
-    "middle"
-    );
-
-
-    text.setAttribute(
-    "class",
-    "chart-axis-text"
-    );
-
-
-    text.textContent =
-    month;
-
-
-    eligibleMonths.appendChild(
-    text
-    );
-
-    });
-
-    }
-
-
-    /* =====================================================
-    =====================================================
-    REGISTRATION BAR CHART
-    =====================================================
-    ===================================================== */
-
-    const registrationBars =
-    document.getElementById(
-    "registrationBars"
-    );
-
-
-    if (registrationBars) {
-
-    registrationBars.innerHTML = "";
-
-    }
-
-
-    const barWidth = 30;
-
-
-    registrationData.forEach(function (value, index) {
-
-    const numericValue =
-    Number(value) || 0;
-
-
-    /* ---------------------------------------------
-    BAR X POSITION
-    --------------------------------------------- */
-
-    const x =
-    chartLeft +
-    (index * monthGap) -
-    (barWidth / 2);
-
-
-    /* ---------------------------------------------
-    BAR HEIGHT
-
-    IMPORTANT:
-
-    6 / 100
-
-    means 6% of chart height.
-
-    Therefore 6 stays visually at 6.
-    --------------------------------------------- */
-
-    const barHeight =
-    (
-    numericValue /
-    yAxisMax
-    ) *
-    chartHeight;
-
-
-    /* ---------------------------------------------
-    BAR Y POSITION
-    --------------------------------------------- */
-
-    const y =
-    chartBottom -
-    barHeight;
-
-
-    /* ---------------------------------------------
-    CREATE SVG RECT
-    --------------------------------------------- */
-
-    const rect =
-    document.createElementNS(
-    "http://www.w3.org/2000/svg",
-    "rect"
-    );
-
-
-    rect.setAttribute(
-    "x",
-    x
-    );
-
-
-    rect.setAttribute(
-    "y",
-    y
-    );
-
-
-    rect.setAttribute(
-    "width",
-    barWidth
-    );
-
-
-    rect.setAttribute(
-    "height",
-    Math.max(
-    barHeight,
-    0
-    )
-    );
-
-
-    rect.setAttribute(
-    "class",
-    "chart-bar"
-    );
-
-
-    /* =================================================
-    TOOLTIP
-    ================================================= */
-
-    const title =
-    document.createElementNS(
-    "http://www.w3.org/2000/svg",
-    "title"
-    );
-
-
-    title.textContent =
-    months[index] +
-    " : " +
-    numericValue +
-    " candidate(s)";
-
-
-    rect.appendChild(
-    title
-    );
-
-
-    if (registrationBars) {
-
-    registrationBars.appendChild(
-    rect
-    );
-
-    }
-
-    });
-
-
-    /* =====================================================
-    REGISTRATION MONTH LABELS
-    ===================================================== */
-
-    const registrationMonths =
-    document.getElementById(
-    "registrationMonths"
-    );
-
-
-    if (registrationMonths) {
-
-    registrationMonths.innerHTML = "";
-
-
-    months.forEach(function (month, index) {
-
-    const text =
-    document.createElementNS(
-    "http://www.w3.org/2000/svg",
-    "text"
-    );
-
-
-    const x =
-    chartLeft +
-    (index * monthGap);
-
-
-    text.setAttribute(
-    "x",
-    x
-    );
-
-
-    text.setAttribute(
-    "y",
-    chartBottom + 20
-    );
-
-
-    text.setAttribute(
-    "text-anchor",
-    "middle"
-    );
-
-
-    text.setAttribute(
-    "class",
-    "chart-axis-text"
-    );
-
-
-    text.textContent =
-    month;
-
-
-    registrationMonths.appendChild(
-    text
-    );
-
-    });
-
-    }
-
-
-    /* =====================================================
-    CONSOLE CHECK
-    ===================================================== */
-
-    const totalRegistrations =
-    registrationData.reduce(
-    function (total, value) {
-
-    return total +
-    (Number(value) || 0);
-
-    },
-    0
-    );
-
-
-    console.log(
-    "Monthly Registration Data:",
-    registrationData
-    );
-
-
-    console.log(
-    "Total Registrations:",
-    totalRegistrations
-    );
-
-    });
-
-</script>

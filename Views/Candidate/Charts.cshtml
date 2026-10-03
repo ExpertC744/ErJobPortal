@@ -1,4 +1,4 @@
-﻿@* Radhika30-09 *@
+﻿@model ErJobPortal.Models.SAChartsViewModel
 
 <link rel="stylesheet"
       href="~/css/Charts.css"
@@ -11,6 +11,7 @@
     ViewData["Panel"] = "Candidate";
     ViewData["UserName"] = "Candidate";
 }
+
 
 <div class="candidate-charts-page">
 
@@ -175,8 +176,8 @@
 
             </div>
 
-        </div>
 
+        </div>
 
     </div>
 
@@ -210,20 +211,108 @@
 
 
     /* =====================================================
-       2. LINE / AREA CHART
+       2. SUITABLE OPENINGS DATA
+       DATA COMES FROM CANDIDATE CONTROLLER
     ===================================================== */
 
-    function drawLineChart(svgId, values) {
+    const suitableOpeningsMonthly =
+        @Html.Raw(
+                System.Text.Json.JsonSerializer.Serialize(
+                                ViewBag.SuitableOpeningsMonthly
+                                                ?? new int[12]
+                )
+                );
 
-        const svg = document.getElementById(svgId);
 
-        if (!svg) {
-            console.error("SVG not found:", svgId);
+    /* =====================================================
+       3. INTERNSHIP POST DATA
+       DATA COMES FROM SP_GetSACharts
+    ===================================================== */
+
+    const internshipPostData =
+        @Html.Raw(
+                                System.Text.Json.JsonSerializer.Serialize(
+                                                Model?.InternshipPostData ??
+                                                new List<ErJobPortal.Models.SAChartData>()
+                                )
+                );
+
+
+    /* =====================================================
+       4. CONVERT INTERNSHIP DATA TO 12 MONTH ARRAY
+    ===================================================== */
+
+    const internshipPostsMonthly =
+        new Array(12).fill(0);
+
+
+    if (internshipPostData.length > 0)
+    {
+        /*
+         * Get latest year available
+         * from SP_GetSACharts
+         */
+
+        const latestYear =
+            Math.max(
+                ...internshipPostData.map(
+                    x => x.Year
+                )
+            );
+
+
+        /*
+         * Put monthly values
+         * into Jan-Dec array
+         */
+
+        internshipPostData
+            .filter(x => x.Year === latestYear)
+            .forEach(x => {
+
+                const monthIndex =
+                    x.Month - 1;
+
+
+                if (
+                    monthIndex >= 0 &&
+                    monthIndex < 12
+                )
+                {
+                    internshipPostsMonthly[monthIndex] =
+                        x.TotalCount;
+                }
+
+            });
+    }
+
+
+    /* =====================================================
+       5. LINE / AREA CHART
+    ===================================================== */
+
+    function drawLineChart(svgId, values)
+    {
+        const svg =
+            document.getElementById(svgId);
+
+
+        if (!svg)
+        {
+            console.error(
+                "SVG not found:",
+                svgId
+            );
+
             return;
         }
 
-        if (!values || values.length !== 12) {
 
+        if (
+            !values ||
+            values.length !== 12
+        )
+        {
             console.error(
                 "Invalid line chart data:",
                 values
@@ -234,15 +323,11 @@
 
 
         const width = 700;
-
         const height = 240;
 
         const left = 48;
-
         const right = 12;
-
         const top = 25;
-
         const bottom = 38;
 
 
@@ -257,21 +342,7 @@
            MAX VALUE
         ================================================= */
 
-        const maxValue =
-            Math.max(...values, 1);
-
-
-        const yStep =
-            maxValue <= 10
-                ? 2
-                : Math.ceil(maxValue / 4);
-
-
-        const maxY =
-            Math.max(
-                yStep * 4,
-                Math.ceil(maxValue / yStep) * yStep
-            );
+       const maxY = 100;
 
 
         let html = "";
@@ -281,16 +352,20 @@
            HORIZONTAL GRID + Y AXIS
         ================================================= */
 
-        for (let i = 0; i <= 4; i++) {
-
+        for (let i = 0; i <= 4; i++)
+        {
             const value =
                 maxY -
-                (i * maxY / 4);
+                (
+                    i * maxY / 4
+                );
 
 
             const y =
                 top +
-                (i * chartHeight / 4);
+                (
+                    i * chartHeight / 4
+                );
 
 
             html += `
@@ -317,11 +392,15 @@
            VERTICAL GRID + MONTHS
         ================================================= */
 
-        chartMonths.forEach((month, index) => {
-
+        chartMonths.forEach(
+            (month, index) =>
+        {
             const x =
                 left +
-                (index * chartWidth / 11);
+                (
+                    index *
+                    chartWidth / 11
+                );
 
 
             html += `
@@ -344,7 +423,6 @@
                     ${month}
                 </text>
             `;
-
         });
 
 
@@ -376,17 +454,25 @@
         ================================================= */
 
         const points =
-            values.map((value, index) => {
+            values.map(
+                (value, index) =>
+            {
 
                 const x =
                     left +
-                    (index * chartWidth / 11);
+                    (
+                        index *
+                        chartWidth / 11
+                    );
 
 
                 const y =
                     top +
                     chartHeight -
-                    ((value / maxY) * chartHeight);
+                    (
+                        (value / maxY) *
+                        chartHeight
+                    );
 
 
                 return {
@@ -400,7 +486,10 @@
 
         const pointString =
             points
-                .map(p => `${p.x},${p.y}`)
+                .map(
+                    p =>
+                        `${p.x},${p.y}`
+                )
                 .join(" ");
 
 
@@ -438,7 +527,9 @@
            POINTS
         ================================================= */
 
-        points.forEach(point => {
+        points.forEach(
+            point =>
+        {
 
             html += `
                 <circle
@@ -448,6 +539,7 @@
                     class="chart-point">
 
                     <title>
+                        ${chartMonths[points.indexOf(point)]}:
                         ${point.value} openings
                     </title>
 
@@ -462,22 +554,21 @@
         ================================================= */
 
         svg.innerHTML = html;
-
     }
 
 
     /* =====================================================
-       3. BAR CHART
+       6. BAR CHART
     ===================================================== */
 
-    function drawBarChart(svgId, values) {
-
+    function drawBarChart(svgId, values)
+    {
         const svg =
             document.getElementById(svgId);
 
 
-        if (!svg) {
-
+        if (!svg)
+        {
             console.error(
                 "SVG not found:",
                 svgId
@@ -487,8 +578,11 @@
         }
 
 
-        if (!values || values.length !== 12) {
-
+        if (
+            !values ||
+            values.length !== 12
+        )
+        {
             console.error(
                 "Invalid bar chart data:",
                 values
@@ -499,15 +593,11 @@
 
 
         const width = 700;
-
         const height = 240;
 
         const left = 48;
-
         const right = 12;
-
         const top = 25;
-
         const bottom = 38;
 
 
@@ -518,16 +608,16 @@
             height - top - bottom;
 
 
-        const maxValue =
-            Math.max(...values, 1);
+        /* =================================================
+           MAX VALUE
+        ================================================= */
 
-
-        const maxY =
-            Math.ceil(maxValue / 10) * 10 || 10;
+       const maxY = 100;
 
 
         const barSpace =
-            chartWidth / values.length;
+            chartWidth /
+            values.length;
 
 
         const barWidth =
@@ -541,16 +631,20 @@
            Y AXIS + GRID
         ================================================= */
 
-        for (let i = 0; i <= 4; i++) {
-
+        for (let i = 0; i <= 4; i++)
+        {
             const value =
                 maxY -
-                (i * maxY / 4);
+                (
+                    i * maxY / 4
+                );
 
 
             const y =
                 top +
-                (i * chartHeight / 4);
+                (
+                    i * chartHeight / 4
+                );
 
 
             html += `
@@ -577,12 +671,18 @@
            VERTICAL GRID + MONTHS
         ================================================= */
 
-        chartMonths.forEach((month, index) => {
+        chartMonths.forEach(
+            (month, index) =>
+        {
 
             const centerX =
                 left +
-                (index * barSpace) +
-                (barSpace / 2);
+                (
+                    index * barSpace
+                ) +
+                (
+                    barSpace / 2
+                );
 
 
             html += `
@@ -633,22 +733,32 @@
            BARS
         ================================================= */
 
-        values.forEach((value, index) => {
+        values.forEach(
+            (value, index) =>
+        {
 
             const centerX =
                 left +
-                (index * barSpace) +
-                (barSpace / 2);
+                (
+                    index * barSpace
+                ) +
+                (
+                    barSpace / 2
+                );
 
 
             const barHeight =
-                (value / maxY) *
+                (
+                    value / maxY
+                ) *
                 chartHeight;
 
 
             const x =
                 centerX -
-                (barWidth / 2);
+                (
+                    barWidth / 2
+                );
 
 
             const y =
@@ -682,49 +792,11 @@
         ================================================= */
 
         svg.innerHTML = html;
-
     }
 
 
     /* =====================================================
-       4. SUITABLE OPENINGS DATA
-
-       DATA COMES FROM CANDIDATE CONTROLLER
-    ===================================================== */
-
-    const suitableOpeningsMonthly =
-        @Html.Raw(
-            System.Text.Json.JsonSerializer.Serialize(
-                    ViewBag.SuitableOpeningsMonthly
-                            ?? new int[12]
-            )
-                );
-
-
-    /* =====================================================
-       5. INTERNSHIP POSTS DATA
-
-       KEEPING YOUR CURRENT DATA FOR NOW
-    ===================================================== */
-
-    const internshipPostsMonthly = [
-        4,
-        7,
-        5,
-        9,
-        12,
-        10,
-        15,
-        18,
-        14,
-        20,
-        17,
-        23
-    ];
-
-
-    /* =====================================================
-       6. DRAW BOTH CHARTS
+       7. DRAW BOTH CHARTS
     ===================================================== */
 
     drawLineChart(
