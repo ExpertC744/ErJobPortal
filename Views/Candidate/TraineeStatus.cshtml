@@ -10,19 +10,11 @@
 
 <div class="container-fluid">
 
-   
-
-
     <!-- =====================================================
          MASTER TABLE CARD
     ====================================================== -->
 
     <div class="master-table-container">
-
-
-      
-
-
         <!-- =================================================
              TABLE
         ================================================== -->
@@ -109,9 +101,7 @@
                                 <!-- FINAL STATUS -->
 
                                 <td>
-
-                                    @if (!string.IsNullOrWhiteSpace(
-                                        item.FinalStatus))
+                                    @if (!string.IsNullOrWhiteSpace(item.FinalStatus))
                                     {
                                         <span class="master-status">
                                             @item.FinalStatus
@@ -119,19 +109,17 @@
                                     }
                                     else
                                     {
-                                        <span>
-                                            -
-                                        </span>
+                                        <span>-</span>
                                     }
-
-                                </td>
+                        </td>
 
 
                                 <!-- REGISTRATION DATE -->
 
-                                <td>
-                                    @item.RegistrationDate?
-                                        .ToString("dd-MM-yyyy")
+                        <td>
+                            @(item.RegistrationDate.HasValue
+                                                        ? item.RegistrationDate.Value.ToString("dd-MM-yyyy")
+                                                        : "-")
                                 </td>
 
                             </tr>

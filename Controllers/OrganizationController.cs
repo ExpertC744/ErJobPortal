@@ -4338,6 +4338,135 @@ WHERE nID = @nID
 
         #endregion
 
+        #region "Selected Trainees"
+
+        [HttpGet]
+        [Route("Organization/SelectedTrainees")]
+        public IActionResult SelectedTrainees(string? orgCode)
+        {
+            // =====================================================
+            // GET ORGANIZATION ID FROM SESSION
+            // =====================================================
+
+            int? sessionOrgID = HttpContext.Session.GetInt32("OrgID");
+
+            if (sessionOrgID == null)
+            {
+                return RedirectToAction("OrganizationLogin", "Account");
+            }
+
+            int orgID = sessionOrgID.Value;
+
+            List<OrgFinalSelectionM> selectedTrainees =
+                new List<OrgFinalSelectionM>();
+
+            // =====================================================
+            // GET SELECTED TRAINEES
+            // =====================================================
+
+            using (SqlConnection con = new SqlConnection(_configuration.GetConnectionString("DefaultConnection")))
+            {
+                using (SqlCommand cmd = new SqlCommand(
+                    "SP_GetOrgFinalSelection", con))
+                {
+                    cmd.CommandType = CommandType.StoredProcedure;
+
+                    cmd.Parameters.Add("@OrgID", SqlDbType.Int)
+                        .Value = orgID;
+
+                    con.Open();
+
+                    using (SqlDataReader dr = cmd.ExecuteReader())
+                    {
+                        while (dr.Read())
+                        {
+                            OrgFinalSelectionM item =
+                                new OrgFinalSelectionM();
+
+                            item.SrNo =
+                                dr["SrNo"] == DBNull.Value
+                                    ? 0
+                                    : Convert.ToInt32(dr["SrNo"]);
+
+                            item.FinalSelectionID =
+                                dr["FinalSelectionID"] == DBNull.Value
+                                    ? 0
+                                    : Convert.ToInt32(dr["FinalSelectionID"]);
+
+                            item.OrganizationID =
+                                dr["OrganizationID"] == DBNull.Value
+                                    ? 0
+                                    : Convert.ToInt32(dr["OrganizationID"]);
+
+                            item.CandidateID =
+                                dr["CandidateID"] == DBNull.Value
+                                    ? 0
+                                    : Convert.ToInt32(dr["CandidateID"]);
+
+                            item.PostID =
+                                dr["PostID"] == DBNull.Value
+                                    ? 0
+                                    : Convert.ToInt32(dr["PostID"]);
+
+                            item.PostDate =
+                                dr["PostDate"] == DBNull.Value
+                                    ? null
+                                    : Convert.ToDateTime(dr["PostDate"]);
+
+                            item.PositionName =
+                                dr["PositionName"] == DBNull.Value
+                                    ? ""
+                                    : dr["PositionName"].ToString();
+
+                            item.TraineeName =
+                                dr["TraineeName"] == DBNull.Value
+                                    ? ""
+                                    : dr["TraineeName"].ToString();
+
+                            item.EmailID =
+                                dr["EmailID"] == DBNull.Value
+                                    ? ""
+                                    : dr["EmailID"].ToString();
+
+                            item.TraineeSkills =
+                                dr["TraineeSkills"] == DBNull.Value
+                                    ? ""
+                                    : dr["TraineeSkills"].ToString();
+
+                            item.ResumeCandidateID =
+                                dr["ResumeCandidateID"] == DBNull.Value
+                                    ? 0
+                                    : Convert.ToInt32(
+                                        dr["ResumeCandidateID"]);
+
+                            selectedTrainees.Add(item);
+                        }
+                    }
+                }
+            }
+
+            // =====================================================
+            // ORGANIZATION CODE
+            // =====================================================
+
+            ViewBag.OrgCode = string.IsNullOrWhiteSpace(orgCode)
+                ? orgID.ToString()
+                : orgCode;
+
+            ViewBag.OrganizationID = orgID;
+
+            // =====================================================
+            // TOTAL SELECTED TRAINEES
+            // =====================================================
+
+            ViewBag.TotalSelectedTrainees =
+                selectedTrainees.Count;
+
+            return View(selectedTrainees);
+        }
+
+        #endregion
+
         // khushi 01-10-26
         [HttpGet]
         public IActionResult RepostOrgPost(int id)
