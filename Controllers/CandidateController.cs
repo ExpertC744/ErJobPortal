@@ -2575,7 +2575,6 @@ namespace ErJobPortal.Controllers
         // =========================================================
         // ORGANIZATION INTERESTED
         // =========================================================
-
         [HttpGet]
         [Route("Candidate/OrganizationInterested/{id?}")]
         public IActionResult OrganizationInterested(string? id)
@@ -2626,13 +2625,16 @@ namespace ErJobPortal.Controllers
             // VALIDATE CANDIDATE CODE
             // =====================================================
 
-            if (id != candidateCode)
+            if (!string.Equals(
+                    id,
+                    candidateCode,
+                    StringComparison.OrdinalIgnoreCase))
             {
                 return NotFound();
             }
 
             // =====================================================
-            // GET ORGANIZATION DATA
+            // ORGANIZATION LIST
             // =====================================================
 
             List<OrganizationInterestedViewModel> organizations =
@@ -2642,22 +2644,30 @@ namespace ErJobPortal.Controllers
                 _configuration.GetConnectionString(
                     "DefaultConnection");
 
+            // =====================================================
+            // CALL STORED PROCEDURE
+            // =====================================================
+
             using (SqlConnection con =
                    new SqlConnection(connectionString))
             {
-                string query = @"
-      SELECT
-          nID,
-          sOrgName,
-          sOrgUrl,
-          sName,
-          sDesignation
-      FROM tblOrgRegistration
-      ORDER BY nID DESC";
-
                 using (SqlCommand cmd =
-                       new SqlCommand(query, con))
+                       new SqlCommand(
+                           "SP_TraineeOrganizationInterested",
+                           con))
                 {
+                    cmd.CommandType =
+                        CommandType.StoredProcedure;
+
+                    // =============================================
+                    // LOGGED-IN CANDIDATE ID
+                    // =============================================
+
+                    cmd.Parameters.Add(
+                        "@CandidateID",
+                        SqlDbType.Int).Value =
+                            candidateId.Value;
+
                     con.Open();
 
                     using (SqlDataReader dr =
@@ -2668,32 +2678,60 @@ namespace ErJobPortal.Controllers
                             organizations.Add(
                                 new OrganizationInterestedViewModel
                                 {
+                                    // =================================
+                                    // ID
+                                    // =================================
+
                                     ID =
-                                        dr["nID"] != DBNull.Value
-                                        ? Convert.ToInt32(dr["nID"])
+                                        dr["OrganizationID"] != DBNull.Value
+                                        ? Convert.ToInt32(
+                                            dr["OrganizationID"])
                                         : 0,
 
+                                    // =================================
+                                    // ORGANIZATION NAME
+                                    // =================================
+
                                     OrganizationName =
-                                        dr["sOrgName"] != DBNull.Value
-                                        ? dr["sOrgName"].ToString()
+                                        dr["OrganizationName"] != DBNull.Value
+                                        ? dr["OrganizationName"].ToString()
                                         : "",
+
+                                    // =================================
+                                    // ORGANIZATION URL
+                                    // =================================
 
                                     OrganizationUrl =
-                                        dr["sOrgUrl"] != DBNull.Value
-                                        ? dr["sOrgUrl"].ToString()
+                                        dr["OrganizationUrl"] != DBNull.Value
+                                        ? dr["OrganizationUrl"].ToString()
                                         : "",
+
+                                    // =================================
+                                    // CONTACT PERSON
+                                    // =================================
 
                                     ContactPersonName =
-                                        dr["sName"] != DBNull.Value
-                                        ? dr["sName"].ToString()
+                                        dr["ContactPersonName"] != DBNull.Value
+                                        ? dr["ContactPersonName"].ToString()
                                         : "",
+
+                                    // =================================
+                                    // DESIGNATION
+                                    // =================================
 
                                     Designation =
-                                        dr["sDesignation"] != DBNull.Value
-                                        ? dr["sDesignation"].ToString()
+                                        dr["Designation"] != DBNull.Value
+                                        ? dr["Designation"].ToString()
                                         : "",
 
-                                    ApplyStatus = "Interested"
+                                    // =================================
+                                    // APPLY STATUS
+                                    // =================================
+
+                                    ApplyStatus =
+                                        dr["ApplyStatus"] != DBNull.Value
+                                        ? dr["ApplyStatus"].ToString()
+                                        : "-"
                                 });
                         }
                     }
@@ -2701,11 +2739,14 @@ namespace ErJobPortal.Controllers
             }
 
             // =====================================================
-            // SEND DATA TO VIEW
+            // VIEW BAG
             // =====================================================
 
-            ViewBag.CandidateCode = candidateCode;
-            ViewBag.CandidateID = candidateId.Value;
+            ViewBag.CandidateCode =
+                candidateCode;
+
+            ViewBag.CandidateID =
+                candidateId.Value;
 
             ViewBag.CandidateName =
                 HttpContext.Session.GetString(
@@ -2715,8 +2756,153 @@ namespace ErJobPortal.Controllers
                 HttpContext.Session.GetString(
                     "CandidateEmail");
 
+            // =====================================================
+            // RETURN VIEW
+            // =====================================================
+
             return View(organizations);
         }
+        //  [HttpGet]
+        //  [Route("Candidate/OrganizationInterested/{id?}")]
+        //  public IActionResult OrganizationInterested(string? id)
+        //  {
+        //      // =====================================================
+        //      // GET LOGGED-IN CANDIDATE ID
+        //      // =====================================================
+
+        //      int? candidateId =
+        //          HttpContext.Session.GetInt32("CandidateID");
+
+        //      if (candidateId == null || candidateId <= 0)
+        //      {
+        //          return RedirectToAction(
+        //              "CandidateLogin",
+        //              "Account");
+        //      }
+
+        //      // =====================================================
+        //      // GET CANDIDATE CODE
+        //      // =====================================================
+
+        //      string? candidateCode = GetCandidateCode();
+
+        //      if (string.IsNullOrEmpty(candidateCode))
+        //      {
+        //          return NotFound(
+        //              "Candidate code could not be generated.");
+        //      }
+
+        //      // =====================================================
+        //      // IF URL DOES NOT HAVE CANDIDATE CODE
+        //      // REDIRECT TO CODE URL
+        //      // =====================================================
+
+        //      if (string.IsNullOrEmpty(id))
+        //      {
+        //          return RedirectToAction(
+        //              "OrganizationInterested",
+        //              "Candidate",
+        //              new
+        //              {
+        //                  id = candidateCode
+        //              });
+        //      }
+
+        //      // =====================================================
+        //      // VALIDATE CANDIDATE CODE
+        //      // =====================================================
+
+        //      if (id != candidateCode)
+        //      {
+        //          return NotFound();
+        //      }
+
+        //      // =====================================================
+        //      // GET ORGANIZATION DATA
+        //      // =====================================================
+
+        //      List<OrganizationInterestedViewModel> organizations =
+        //          new List<OrganizationInterestedViewModel>();
+
+        //      string connectionString =
+        //          _configuration.GetConnectionString(
+        //              "DefaultConnection");
+
+        //      using (SqlConnection con =
+        //             new SqlConnection(connectionString))
+        //      {
+        //          string query = @"
+        //SELECT
+        //    nID,
+        //    sOrgName,
+        //    sOrgUrl,
+        //    sName,
+        //    sDesignation
+        //FROM tblOrgRegistration
+        //ORDER BY nID DESC";
+
+        //          using (SqlCommand cmd =
+        //                 new SqlCommand(query, con))
+        //          {
+        //              con.Open();
+
+        //              using (SqlDataReader dr =
+        //                     cmd.ExecuteReader())
+        //              {
+        //                  while (dr.Read())
+        //                  {
+        //                      organizations.Add(
+        //                          new OrganizationInterestedViewModel
+        //                          {
+        //                              ID =
+        //                                  dr["nID"] != DBNull.Value
+        //                                  ? Convert.ToInt32(dr["nID"])
+        //                                  : 0,
+
+        //                              OrganizationName =
+        //                                  dr["sOrgName"] != DBNull.Value
+        //                                  ? dr["sOrgName"].ToString()
+        //                                  : "",
+
+        //                              OrganizationUrl =
+        //                                  dr["sOrgUrl"] != DBNull.Value
+        //                                  ? dr["sOrgUrl"].ToString()
+        //                                  : "",
+
+        //                              ContactPersonName =
+        //                                  dr["sName"] != DBNull.Value
+        //                                  ? dr["sName"].ToString()
+        //                                  : "",
+
+        //                              Designation =
+        //                                  dr["sDesignation"] != DBNull.Value
+        //                                  ? dr["sDesignation"].ToString()
+        //                                  : "",
+
+        //                              ApplyStatus = "Interested"
+        //                          });
+        //                  }
+        //              }
+        //          }
+        //      }
+
+        //      // =====================================================
+        //      // SEND DATA TO VIEW
+        //      // =====================================================
+
+        //      ViewBag.CandidateCode = candidateCode;
+        //      ViewBag.CandidateID = candidateId.Value;
+
+        //      ViewBag.CandidateName =
+        //          HttpContext.Session.GetString(
+        //              "CandidateName");
+
+        //      ViewBag.CandidateEmail =
+        //          HttpContext.Session.GetString(
+        //              "CandidateEmail");
+
+        //      return View(organizations);
+        //  }
 
 
         // =========================================================
