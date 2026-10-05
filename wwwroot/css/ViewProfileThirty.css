@@ -1,780 +1,846 @@
-/* ============================================================
-   VIEWPROFILETHIRTY
-   MASTHEAD + ARCH PHOTO | THREE-COLUMN BODY | A4 LANDSCAPE
-   ============================================================ */
+/* =========================================================
+   VIEWPROFILETHIRTY  -  MIDNIGHT  -  LANDSCAPE RESUME (A4 29.7cm x 21cm)
+   File: ~/css/viewprofilethirty.css
 
-/* ============================================================
-   1. ROOT / THEME
-   ============================================================ */
+   Style  : Full dark-mode resume: ink page, theme-accent highlights, translucent panels.
+   Sheet  : 1123px x 794px  (= 297mm x 210mm @ 96dpi)
+   Zoom   : Layout never reflows, sheet is only zoomed out
+   Themes : blue | teal | slate | brown | green
+========================================================= */
 
-:root {
-    --accent: #2f4b6e;
-    --btn: #2f4b6e;
-    --paper: #f7f8fa;
-    --ink: #1f2630;
-    --soft: #5d6673;
-    --track: #dde2e8;
-    --line: #cdd3db;
-    --page-bg: #e5e8ec;
-    --font: "Karla", "Segoe UI", Arial, sans-serif;
+/* =========================================================
+   THEMES
+   --primary / --primary-dark : main colours
+   --soft / --soft-border     : tinted backgrounds + lines
+   --accent                   : light tint (for dark areas)
+   --ink                      : very dark shade of the theme
+   --card / --page / --heading: surfaces (templates may change)
+========================================================= */
+
+.resume-sheet {
+    --primary: #1f4e68;
+    --primary-dark: #163a4f;
+    --soft: #eaf1f5;
+    --soft-border: #d3e0e8;
+    --accent: #7fc3e3;
+    --ink: #0e2431;
+    --text: #2b3440;
+    --muted: #6b7785;
+    --card: #ffffff;
+    --page: #ffffff;
+    --heading: var(--primary);
 }
 
-    :root[data-theme="olive"] {
-        --accent: #6f7a3d;
-        --btn: #6f7a3d;
+    .resume-sheet[data-theme="blue"] {
+        --primary: #1f4e68;
+        --primary-dark: #163a4f;
+        --soft: #eaf1f5;
+        --soft-border: #d3e0e8;
+        --accent: #7fc3e3;
+        --ink: #0e2431;
     }
 
-    :root[data-theme="plum"] {
-        --accent: #7a4a72;
-        --btn: #7a4a72;
+    .resume-sheet[data-theme="teal"] {
+        --primary: #176b68;
+        --primary-dark: #0f4f4c;
+        --soft: #e7f3f2;
+        --soft-border: #cde4e2;
+        --accent: #72d1cc;
+        --ink: #0a2a29;
     }
 
-    :root[data-theme="clay"] {
-        --accent: #a4553f;
-        --btn: #a4553f;
+    .resume-sheet[data-theme="slate"] {
+        --primary: #455a64;
+        --primary-dark: #33444c;
+        --soft: #eef1f3;
+        --soft-border: #dbe1e5;
+        --accent: #a9c2ce;
+        --ink: #1a2429;
     }
 
-    :root[data-theme="teal"] {
-        --accent: #1f6f6b;
-        --btn: #1f6f6b;
+    .resume-sheet[data-theme="brown"] {
+        --primary: #765536;
+        --primary-dark: #583e26;
+        --soft: #f6efe8;
+        --soft-border: #e8dccf;
+        --accent: #e0b07f;
+        --ink: #2a1c10;
     }
 
+    .resume-sheet[data-theme="green"] {
+        --primary: #3f6f55;
+        --primary-dark: #2d5340;
+        --soft: #ebf3ee;
+        --soft-border: #d4e4da;
+        --accent: #8fd0a9;
+        --ink: #13271c;
+    }
 
-/* ============================================================
-   2. GLOBAL
-   ============================================================ */
-
-* {
+*, *::before, *::after {
     box-sizing: border-box;
 }
 
-html,
-body {
+html, body {
     margin: 0;
     padding: 0;
 }
 
-html {
-    min-height: 100%;
+body {
+    font-family: 'Inter', 'Segoe UI', Arial, sans-serif;
+    font-size: 11.5px;
+    line-height: 1.45;
+    color: #2b3440;
+    background: #e6eaf0;
+    -webkit-font-smoothing: antialiased;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
 }
 
-body {
-    min-height: 100vh;
-    background: var(--page-bg);
-    color: var(--ink);
-    font-family: var(--font);
+/* =========================================================
+   PAGE WRAPPER + SHEET (LANDSCAPE A4 1123 x 794)
+========================================================= */
+
+.resume-page-wrapper {
+    position: relative;
+    top: 65px;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    padding: 24px 12px 90px;
     overflow-x: hidden;
 }
 
-
-/* ============================================================
-   3. TOOLBAR
-   NOTE:
-   DO NOT GIVE A4 WIDTH/HEIGHT HERE
-   ============================================================ */
-
-.resume-toolbar {
-    width: 100%;
-    max-width: 1200px;
-    margin: 20px auto 10px;
-    padding: 0 20px;
-    display: flex;
-    justify-content: flex-end;
-    align-items: center;
-    gap: 8px;
-}
-
-.toolbar-btn {
-    border: 0;
-    border-radius: 7px;
-    padding: 9px 15px;
-    font-family: inherit;
-    font-size: 11px;
-    font-weight: 600;
-    text-decoration: none;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    gap: 7px;
-    cursor: pointer;
-    transition: transform .2s ease, box-shadow .2s ease, opacity .2s ease;
-}
-
-    .toolbar-btn:hover {
-        transform: translateY(-2px);
-    }
-
-    .toolbar-btn:disabled {
-        opacity: .6;
-        cursor: not-allowed;
-        transform: none;
-    }
-
-.toolbar-edit {
-    background: #ffffff;
-    color: #222;
-    border: 1px solid #cfcfcf;
-}
-
-.toolbar-print {
-    background: #222;
-    color: #fff;
-}
-
-.toolbar-download {
-    background: var(--btn);
-    color: #fff;
-}
-
-
-/* ============================================================
-   4. THEME SWITCHER
-   NOTE:
-   DO NOT GIVE A4 WIDTH/HEIGHT HERE
-   ============================================================ */
-
-.theme-switcher {
-    width: 100%;
-    max-width: 1200px;
-    margin: 0 auto 14px;
-    padding: 0 20px;
-    display: flex;
-    align-items: center;
-    justify-content: flex-end;
-    gap: 9px;
-}
-
-    .theme-switcher > span {
-        font-size: 11px;
-        font-weight: 600;
-        color: #6b6b6b;
-        margin-right: 2px;
-    }
-
-.theme-swatch {
-    width: 22px;
-    height: 22px;
-    padding: 0;
-    border-radius: 50%;
-    border: 2px solid #fff;
-    cursor: pointer;
-    box-shadow: 0 0 0 1px #bdbdbd;
-    transition: transform .2s ease, box-shadow .2s ease;
-}
-
-    .theme-swatch:hover {
-        transform: scale(1.12);
-    }
-
-    .theme-swatch:focus-visible {
-        outline: 2px solid #222;
-        outline-offset: 2px;
-    }
-
-    .theme-swatch.active {
-        box-shadow: 0 0 0 2px #222;
-    }
-
-
-/* ============================================================
-   5. RESUME CONTAINER
-   ============================================================ */
-
-.resume-container {
-    width: 100%;
-    padding: 5px 0 50px;
-    overflow-x: auto;
-    overflow-y: visible;
-    -webkit-overflow-scrolling: touch;
-}
-
-
-/* ============================================================
-   6. A4 LANDSCAPE RESUME PAGE
-   THIS IS THE ONLY ELEMENT WITH A4 SIZE
-   ============================================================ */
-
 .resume-sheet {
-    position: relative;
-    /* =========================
-       EXACT A4 LANDSCAPE
-       ========================= */
-    width: 297mm;
-    height: 210mm;
-    min-width: 297mm;
-    min-height: 210mm;
-    max-width: 297mm;
-    max-height: 210mm;
-    margin: 0 auto;
-    background: var(--paper);
-    border-top: 4mm solid var(--accent);
-    counter-reset: sec;
+    width: 1123px;
+    min-width: 1123px;
+    height: 794px;
+    min-height: 794px;
+    background: var(--page);
+    color: var(--text);
+    box-shadow: 0 10px 40px rgba(20, 35, 55, 0.18);
     display: flex;
     flex-direction: column;
     overflow: hidden;
-    box-shadow: 0 20px 55px rgba(0, 0, 0, .18);
+    transform-origin: top center;
 }
 
+/* =========================================================
+   HEADER (base)
+========================================================= */
 
-/* ============================================================
-   7. SHARED COMPONENTS
-   ============================================================ */
-
-.block {
-    min-width: 0;
+.resume-header {
+    position: relative;
+    flex: 0 0 auto;
+    display: flex;
+    align-items: center;
+    gap: 22px;
+    padding: 20px 34px 18px;
+    background: var(--primary);
+    color: #ffffff;
 }
 
-.heading {
-    margin: 0 0 3mm;
-    font-size: 12px;
-    font-weight: 700;
-    letter-spacing: 1.6px;
-    line-height: 1.25;
-    text-transform: uppercase;
-    color: var(--ink);
-}
-
-.body-text {
-    margin: 0;
-    font-size: 9.5px;
-    line-height: 1.65;
-    color: var(--ink);
-}
-
-
-/* ============================================================
-   8. PHOTO
-   ============================================================ */
-
-.photo-frame {
+.photo-wrapper {
+    flex: 0 0 auto;
+    width: 92px;
+    height: 92px;
+    padding: 3px;
+    border-radius: 50%;
+    background: #ffffff;
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.25);
     overflow: hidden;
-    background: var(--track);
-    flex-shrink: 0;
 }
 
-.profile-photo,
-.profile-placeholder {
+.profile-photo {
+    display: block;
     width: 100%;
     height: 100%;
     object-fit: cover;
-    display: block;
+    border-radius: 50%;
 }
 
 .profile-placeholder {
+    width: 100%;
+    height: 100%;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 48px;
-    color: #fff;
-    background: var(--accent);
+    border-radius: 50%;
+    background: var(--soft);
+    color: var(--primary);
+    font-size: 36px;
 }
 
-
-/* ============================================================
-   9. PROFILE HEADER
-   ============================================================ */
-
-.profile-name {
-    margin: 0;
-    line-height: 1.05;
-    word-break: break-word;
-    font-family: "DM Serif Display", Georgia, serif;
-    font-weight: 400;
-    font-size: 44px;
-    letter-spacing: -.5px;
-    color: var(--ink);
-}
-
-.profile-role {
-    margin-top: 2mm;
-    font-size: 12px;
-    font-weight: 600;
-    letter-spacing: 4px;
-    text-transform: uppercase;
-    color: var(--accent);
-}
-
-
-/* ============================================================
-   10. CONTACT
-   ============================================================ */
-
-.contact-list {
-    display: flex;
-    flex-direction: column;
-    gap: 2.2mm;
-}
-
-.contact-row {
-    display: flex;
-    align-items: center;
-    gap: 2.6mm;
+.header-info {
+    flex: 1 1 auto;
     min-width: 0;
 }
 
-    .contact-row i {
-        width: 5mm;
-        flex-shrink: 0;
-        text-align: center;
-        font-size: 9px;
-        color: var(--accent);
-    }
-
-    .contact-row span {
-        min-width: 0;
-        font-size: 9.5px;
-        line-height: 1.4;
-        word-break: break-word;
-    }
-
-
-/* ============================================================
-   11. PREFERRED LOCATION / MISSION
-   ============================================================ */
-
-.pref-list {
-    display: flex;
-    flex-direction: column;
-    gap: 2.4mm;
-}
-
-    .pref-list small {
-        display: block;
-        margin-bottom: .6mm;
-        font-size: 7.5px;
-        letter-spacing: 1.2px;
-        text-transform: uppercase;
-        color: var(--soft);
-    }
-
-    .pref-list strong {
-        display: block;
-        font-size: 9.5px;
-        font-weight: 600;
-        line-height: 1.4;
-    }
-
-
-/* ============================================================
-   12. EXPERIENCE / EDUCATION
-   ============================================================ */
-
-.exp-list,
-.edu-list {
-    display: flex;
-    flex-direction: column;
-    gap: 3.4mm;
-}
-
-.exp-item,
-.edu-item {
-    display: grid;
-    grid-template-columns: 1fr;
-    row-gap: .5mm;
-    align-items: start;
-}
-
-.exp-date,
-.edu-year {
-    font-size: 9px;
+.candidate-name {
+    margin: 0;
+    font-family: 'Playfair Display', Georgia, serif;
+    font-size: 30px;
     font-weight: 700;
-    line-height: 1.4;
-    letter-spacing: .3px;
-    color: var(--accent);
-}
-
-.exp-title,
-.edu-title {
-    font-size: 11px;
-    font-weight: 700;
-    line-height: 1.35;
-}
-
-.exp-org,
-.edu-sub {
-    font-size: 9.5px;
-    line-height: 1.4;
-    color: var(--ink);
+    line-height: 1.15;
+    letter-spacing: 0.3px;
+    color: #ffffff;
     word-break: break-word;
 }
 
-.exp-status,
-.edu-note {
-    margin-top: .6mm;
-    font-size: 9px;
-    line-height: 1.4;
-    color: var(--soft);
+.candidate-role {
+    margin-top: 4px;
+    font-size: 13px;
+    font-weight: 500;
+    letter-spacing: 0.4px;
+    color: rgba(255, 255, 255, 0.85);
 }
 
-    .exp-status i {
-        margin-right: 4px;
-        color: var(--accent);
-    }
-
-.c2 .exp-list {
-    gap: 4.4mm;
+.header-accent {
+    width: 56px;
+    height: 3px;
+    margin-top: 10px;
+    border-radius: 3px;
+    background: rgba(255, 255, 255, 0.75);
 }
 
-
-/* ============================================================
-   13. ACHIEVEMENTS
-   ============================================================ */
-
-.achievement-list {
-    list-style: none;
-    margin: 0;
-    padding: 0;
+.header-contact {
+    flex: 0 0 auto;
     display: flex;
     flex-direction: column;
-    gap: 1.8mm;
+    gap: 6px;
+    max-width: 300px;
 }
 
-    .achievement-list li {
+.header-contact-item {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    font-size: 11.5px;
+    color: #ffffff;
+}
+
+    .header-contact-item i {
+        flex: 0 0 auto;
+        width: 22px;
+        height: 22px;
         display: flex;
-        gap: 7px;
-        font-size: 9.5px;
-        line-height: 1.5;
+        align-items: center;
+        justify-content: center;
+        border-radius: 50%;
+        background: rgba(255, 255, 255, 0.18);
+        font-size: 10px;
     }
 
-    .achievement-list i {
-        margin-top: 2px;
-        font-size: 9px;
-        color: var(--accent);
+    .header-contact-item span {
+        min-width: 0;
+        word-break: break-word;
+        overflow-wrap: anywhere;
     }
 
+/* =========================================================
+   BODY (base)
+========================================================= */
 
-/* ============================================================
-   14. SKILLS
-   ============================================================ */
-
-.skill-group {
-    margin-bottom: 2.4mm;
-}
-
-.skill-group-title {
-    margin-bottom: 1mm;
-    font-size: 7.5px;
-    font-weight: 700;
-    letter-spacing: 1.2px;
-    text-transform: uppercase;
-    color: var(--soft);
-}
-
-.skill-list {
-    list-style: none;
-    margin: 0;
-    padding: 0;
+.resume-body {
+    flex: 1 1 auto;
+    min-height: 0;
     display: flex;
-    flex-direction: column;
-    gap: .9mm;
+    align-items: stretch;
 }
 
-    .skill-list li {
-        position: relative;
-        padding-left: 4mm;
-        font-size: 9.5px;
-        line-height: 1.4;
-    }
-
-        .skill-list li::before {
-            content: "";
-            position: absolute;
-            left: .5mm;
-            top: .58em;
-            width: 1.3mm;
-            height: 1.3mm;
-            border-radius: 50%;
-            background: var(--accent);
-        }
-
-
-/* ============================================================
-   15. LANGUAGES
-   ============================================================ */
-
-.lang-row {
-    margin-bottom: 2.2mm;
-}
-
-.lang-name {
-    margin-bottom: .8mm;
-    font-size: 9.5px;
-}
-
-.skill-bar {
-    width: 100%;
-    height: 1.7mm;
-    background: var(--track);
+.left-column {
+    flex: 0 0 245px;
+    width: 245px;
+    min-height: 0;
+    padding: 16px 16px 16px 22px;
+    background: var(--soft);
+    border-right: 1px solid var(--soft-border);
     overflow: hidden;
 }
 
-    .skill-bar span {
-        display: block;
-        height: 100%;
-        background: var(--accent);
+.right-column {
+    flex: 1 1 auto;
+    min-width: 0;
+    min-height: 0;
+    padding: 16px 26px 16px 24px;
+    background: transparent;
+    column-count: 2;
+    column-gap: 26px;
+    column-fill: balance;
+    overflow: hidden;
+}
+
+/* =========================================================
+   SECTIONS
+========================================================= */
+
+.resume-section {
+    margin-bottom: 13px;
+    break-inside: avoid;
+    page-break-inside: avoid;
+}
+
+    .resume-section:last-child {
+        margin-bottom: 0;
     }
 
-
-/* ============================================================
-   16. REFERENCES
-   ============================================================ */
-
-.ref-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    column-gap: 7mm;
-    row-gap: 3mm;
+.right-column > .resume-section:has(.summary) {
+    column-span: all;
+    margin-bottom: 13px;
 }
 
-.ref-item {
-    min-width: 0;
-}
-
-.ref-name {
-    font-size: 10.5px;
-    font-weight: 700;
-    line-height: 1.3;
-}
-
-.ref-rel {
-    margin-bottom: .6mm;
-    font-size: 9.5px;
-    line-height: 1.4;
-    color: var(--soft);
-}
-
-.ref-line {
-    font-size: 8.5px;
-    line-height: 1.45;
-    color: var(--soft);
-    word-break: break-word;
-}
-
-
-/* ============================================================
-   17. HOBBIES
-   ============================================================ */
-
-.hobby-tags {
+.section-heading {
     display: flex;
-    flex-wrap: wrap;
-    gap: 1.4mm;
+    align-items: center;
+    gap: 7px;
+    margin-bottom: 8px;
 }
 
-.hobby-tag {
-    padding: .9mm 2.8mm;
-    border: 1px solid var(--accent);
-    border-radius: 2mm;
-    font-size: 8.5px;
-    line-height: 1.35;
-    color: var(--accent);
+.section-icon {
+    flex: 0 0 auto;
+    width: 22px;
+    height: 22px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 5px;
+    background: var(--primary);
+    color: #ffffff;
+    font-size: 10.5px;
 }
 
-
-/* ============================================================
-   18. MASTHEAD
-   ============================================================ */
-
-.masthead {
-    display: grid;
-    grid-template-columns: 1fr 34mm;
-    column-gap: 10mm;
-    align-items: end;
-    padding: 9mm 0 5mm;
-    margin: 0 14mm;
-    border-bottom: 1px solid var(--ink);
+.section-title {
+    flex: 0 1 auto;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.2px;
+    color: var(--heading);
 }
 
-.name-block {
-    min-width: 0;
+.section-title-line {
+    flex: 1 1 auto;
+    min-width: 10px;
+    height: 1px;
+    background: var(--soft-border);
 }
 
-.arch {
-    width: 34mm;
-    height: 42mm;
-    margin-bottom: -5mm;
+/* CONTACT */
+.info-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    margin-bottom: 7px;
 }
 
-    .arch .photo-frame {
-        width: 100%;
-        height: 100%;
-        border-radius: 17mm 17mm 0 0;
-        border: 1mm solid var(--paper);
-        box-shadow: 0 0 0 .5mm var(--accent);
+    .info-item:last-child {
+        margin-bottom: 0;
     }
 
-
-/* ============================================================
-   19. THREE COLUMN BODY
-   ============================================================ */
-
-.body-cols {
-    flex: 1;
-    display: grid;
-    grid-template-columns: 24% 40% 1fr;
-    padding: 9mm 14mm 11mm;
-    min-width: 0;
+.info-icon {
+    flex: 0 0 auto;
+    width: 22px;
+    height: 22px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    background: var(--card);
+    border: 1px solid var(--soft-border);
+    color: var(--heading);
+    font-size: 10px;
 }
 
-.c1,
-.c2,
-.c3 {
+.info-content {
+    flex: 1 1 auto;
     min-width: 0;
     display: flex;
     flex-direction: column;
-    gap: 5.5mm;
 }
 
-.c1 {
-    padding-right: 6mm;
+.info-label {
+    font-size: 9.5px;
+    font-weight: 600;
+    line-height: 1.25;
+    color: var(--muted);
 }
 
-.c2 {
-    padding: 0 7mm;
-    border-left: 1px solid var(--line);
-    border-right: 1px solid var(--line);
+.info-value {
+    font-size: 11px;
+    font-weight: 500;
+    line-height: 1.35;
+    color: var(--text);
+    word-break: break-word;
+    overflow-wrap: anywhere;
 }
 
-.c3 {
-    padding-left: 7mm;
+/* SKILLS */
+.skill-group {
+    margin-bottom: 8px;
 }
 
+    .skill-group:last-child {
+        margin-bottom: 0;
+    }
 
-/* ============================================================
-   20. SECTION HEADINGS
-   ============================================================ */
-
-.heading {
-    display: inline-block;
-    padding-bottom: 1.4mm;
-    margin-bottom: 3mm;
+.skill-group-title {
+    margin-bottom: 3px;
     font-size: 11px;
     font-weight: 700;
-    letter-spacing: 2px;
-    color: var(--ink);
+    color: var(--text);
+}
+
+.skill-list {
+    padding: 6px 8px;
+    background: var(--card);
+    border: 1px solid var(--soft-border);
+    border-left: 3px solid var(--heading);
+    border-radius: 4px;
+    font-size: 10.8px;
+    line-height: 1.5;
+    color: var(--text);
+    word-break: break-word;
+}
+
+/* LANGUAGES */
+.language-list {
+    display: flex;
+    flex-direction: column;
+}
+
+.language-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 6px;
+    padding: 4px 0;
+    border-bottom: 1px dashed var(--soft-border);
+}
+
+    .language-row:last-child {
+        border-bottom: 0;
+    }
+
+.language-name {
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--text);
+}
+
+.language-level {
+    flex: 0 0 auto;
+    padding: 1px 8px;
+    border-radius: 20px;
+    background: var(--primary);
+    color: #ffffff;
+    font-size: 9.5px;
+    font-weight: 600;
+    line-height: 1.5;
+}
+
+/* INTERESTS / PREFERRED LOCATION */
+.interest-box {
+    padding: 6px 9px;
+    background: var(--card);
+    border: 1px solid var(--soft-border);
+    border-radius: 5px;
+    font-size: 10.8px;
+    line-height: 1.5;
+    color: var(--text);
+    word-break: break-word;
+}
+
+/* SOCIAL */
+.social-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 7px;
+    margin-bottom: 6px;
+    font-size: 10.5px;
+    color: var(--text);
+}
+
+    .social-item:last-child {
+        margin-bottom: 0;
+    }
+
+    .social-item i {
+        flex: 0 0 auto;
+        margin-top: 1px;
+        font-size: 13px;
+        color: var(--heading);
+    }
+
+    .social-item span {
+        min-width: 0;
+        word-break: break-all;
+        overflow-wrap: anywhere;
+    }
+
+/* PROFESSIONAL PROFILE */
+.summary {
+    padding: 8px 12px;
+    background: var(--soft);
+    border-left: 4px solid var(--heading);
+    border-radius: 0 5px 5px 0;
+    font-size: 11.3px;
+    line-height: 1.6;
+    color: var(--text);
+    text-align: justify;
+    word-break: break-word;
+    white-space: pre-line;
+}
+
+/* EXPERIENCE */
+.experience-item {
+    position: relative;
+    margin-left: 5px;
+    padding: 0 0 10px 16px;
+    border-left: 2px solid var(--soft-border);
+    break-inside: avoid;
+    page-break-inside: avoid;
+}
+
+    .experience-item:last-child {
+        padding-bottom: 0;
+    }
+
+    .experience-item::before {
+        content: "";
+        position: absolute;
+        left: -7px;
+        top: 3px;
+        width: 12px;
+        height: 12px;
+        border-radius: 50%;
+        background: var(--page);
+        border: 3px solid var(--heading);
+    }
+
+.experience-title {
+    font-size: 12px;
+    font-weight: 700;
+    line-height: 1.3;
+    color: var(--text);
+}
+
+.experience-company {
+    margin-top: 1px;
+    font-size: 11.3px;
+    font-weight: 600;
+    color: var(--heading);
+}
+
+.experience-meta {
+    margin-top: 2px;
+    font-size: 10.5px;
+    color: var(--muted);
+}
+
+/* EDUCATION */
+.education-list {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.education-item {
+    padding: 6px 10px;
+    background: var(--card);
+    border: 1px solid var(--soft-border);
+    border-left: 4px solid var(--heading);
+    border-radius: 4px;
+    break-inside: avoid;
+    page-break-inside: avoid;
+}
+
+.education-title {
+    font-size: 11.8px;
+    font-weight: 700;
+    line-height: 1.3;
+    color: var(--text);
+}
+
+.education-meta {
+    margin-top: 1px;
+    font-size: 10.5px;
+    color: var(--muted);
+}
+
+/* ACHIEVEMENTS */
+.achievement-list {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.achievement-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 7px;
+    font-size: 11.3px;
+    line-height: 1.45;
+    color: var(--text);
+}
+
+    .achievement-item i {
+        flex: 0 0 auto;
+        margin-top: 2px;
+        font-size: 11.5px;
+        color: var(--heading);
+    }
+
+    .achievement-item span {
+        min-width: 0;
+        word-break: break-word;
+    }
+
+/* REFERENCES */
+.reference-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 7px;
+}
+
+.reference-item {
+    padding: 7px 10px;
+    background: var(--soft);
+    border: 1px solid var(--soft-border);
+    border-radius: 5px;
+    break-inside: avoid;
+    page-break-inside: avoid;
+}
+
+.reference-name {
+    font-size: 11.8px;
+    font-weight: 700;
+    color: var(--text);
+}
+
+.reference-relation {
+    margin-bottom: 3px;
+    font-size: 10.5px;
+    font-weight: 600;
+    color: var(--heading);
+}
+
+.reference-detail {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-top: 2px;
+    font-size: 10.5px;
+    color: var(--muted);
+}
+
+    .reference-detail i {
+        width: 11px;
+        text-align: center;
+        font-size: 10px;
+        color: var(--heading);
+    }
+
+/* CAREER PREFERENCE */
+.preference-item {
+    margin-bottom: 5px;
+    font-size: 11.3px;
+    line-height: 1.5;
+    color: var(--text);
+}
+
+    .preference-item:last-child {
+        margin-bottom: 0;
+    }
+
+    .preference-item strong {
+        margin-right: 4px;
+        font-weight: 700;
+        color: var(--heading);
+    }
+
+/* =========================================================
+   MIDNIGHT  -  TEMPLATE SPECIFIC
+========================================================= */
+
+.resume-sheet[data-theme] {
+    --page: var(--ink);
+    --card: rgba(255, 255, 255, 0.06);
+    --soft: rgba(255, 255, 255, 0.06);
+    --soft-border: rgba(255, 255, 255, 0.15);
+    --text: #e6edf2;
+    --muted: #a3b2be;
+    --heading: var(--accent);
+}
+
+.resume-header {
+    padding: 20px 34px 18px;
+    background: linear-gradient(110deg, var(--primary-dark), var(--ink));
     border-bottom: 2px solid var(--accent);
 }
 
-.body-text {
-    font-size: 10px;
-    line-height: 1.7;
+.photo-wrapper { box-shadow: 0 0 0 3px var(--accent); }
+.candidate-name { font-size: 32px; }
+.candidate-role { color: var(--accent); letter-spacing: 1.5px; text-transform: uppercase; font-size: 12px; }
+.header-accent { background: var(--accent); }
+.header-contact-item i { background: var(--accent); color: var(--ink); }
+
+.left-column {
+    background: rgba(255, 255, 255, 0.04);
+    border-right: 1px solid rgba(255, 255, 255, 0.1);
 }
 
-.c1 .contact-row span {
-    font-size: 9px;
-}
+.section-icon { background: var(--accent); color: var(--ink); }
+.language-level { background: var(--accent); color: var(--ink); }
+.skill-group-title { color: var(--accent); }
+.summary { background: rgba(255, 255, 255, 0.06); }
+.experience-item { border-left-color: rgba(255, 255, 255, 0.2); }
+.info-icon { background: rgba(255, 255, 255, 0.08); }
 
-.c1 .hobby-tag {
-    border-color: var(--accent);
-    color: var(--accent);
-}
+/* =========================================================
+   RESPONSIVE  -  ZOOM OUT ONLY (sheet = 1123px wide)
+   zoom = (screen width - 28px) / 1123
+   Layout never reflows, the sheet is only made smaller.
+========================================================= */
 
-.c3 .ref-grid {
-    grid-template-columns: 1fr 1fr;
-}
-
-
-/* ============================================================
-   21. RESPONSIVE
-   IMPORTANT:
-   RESUME REMAINS EXACTLY A4.
-   ONLY THE OUTER PAGE SCROLLS.
-   ============================================================ */
-
-@media (max-width: 1200px) {
-
-    body {
-        overflow-x: hidden;
+@media (max-width: 1150px) {
+    .resume-page-wrapper {
+        padding: 14px 12px 80px;
     }
+}
 
-    .resume-toolbar,
-    .theme-switcher {
-        max-width: none;
-        padding-left: 15px;
-        padding-right: 15px;
-    }
-
-    .resume-container {
-        overflow-x: auto;
-        overflow-y: visible;
-        padding: 10px 0 40px;
-    }
-
+@media (max-width: 1140px) {
     .resume-sheet {
-        margin-left: 10px;
-        margin-right: 10px;
+        zoom: 0.99;
     }
 }
 
-
-@media (max-width: 700px) {
-
-    .resume-toolbar {
-        justify-content: center;
-        flex-wrap: wrap;
-        margin-top: 15px;
-    }
-
-    .theme-switcher {
-        justify-content: center;
-        flex-wrap: wrap;
-        margin-bottom: 10px;
-    }
-
-    .toolbar-btn {
-        padding: 8px 11px;
-        font-size: 10px;
+@media (max-width: 1100px) {
+    .resume-sheet {
+        zoom: 0.95;
     }
 }
 
+@media (max-width: 1040px) {
+    .resume-sheet {
+        zoom: 0.9;
+    }
+}
 
-/* ============================================================
-   22. PRINT
-   ONLY RESUME PAGE IS A4
-   ============================================================ */
+@media (max-width: 980px) {
+    .resume-sheet {
+        zoom: 0.84;
+    }
+}
+
+@media (max-width: 920px) {
+    .resume-sheet {
+        zoom: 0.79;
+    }
+}
+
+@media (max-width: 860px) {
+    .resume-sheet {
+        zoom: 0.74;
+    }
+}
+
+@media (max-width: 800px) {
+    .resume-sheet {
+        zoom: 0.68;
+    }
+}
+
+@media (max-width: 740px) {
+    .resume-sheet {
+        zoom: 0.63;
+    }
+}
+
+@media (max-width: 680px) {
+    .resume-sheet {
+        zoom: 0.58;
+    }
+}
+
+@media (max-width: 620px) {
+    .resume-sheet {
+        zoom: 0.52;
+    }
+}
+
+@media (max-width: 560px) {
+    .resume-sheet {
+        zoom: 0.47;
+    }
+}
+
+@media (max-width: 500px) {
+    .resume-sheet {
+        zoom: 0.42;
+    }
+}
+
+@media (max-width: 450px) {
+    .resume-sheet {
+        zoom: 0.37;
+    }
+}
+
+@media (max-width: 400px) {
+    .resume-sheet {
+        zoom: 0.33;
+    }
+}
+
+@media (max-width: 360px) {
+    .resume-sheet {
+        zoom: 0.29;
+    }
+}
+
+@media (max-width: 320px) {
+    .resume-sheet {
+        zoom: 0.26;
+    }
+}
+
+/* =========================================================
+   PRINT  -  A4 LANDSCAPE
+========================================================= */
+
+@page {
+    size: 297mm 210mm;
+    margin: 0;
+}
 
 @media print {
-
-    html,
-    body {
-        width: auto;
-        height: auto;
-        min-width: 0;
-        min-height: 0;
-        margin: 0;
-        padding: 0;
-        background: #fff;
-        overflow: visible;
-        -webkit-print-color-adjust: exact;
-        print-color-adjust: exact;
-    }
-
-    .resume-toolbar,
-    .theme-switcher {
-        display: none !important;
-    }
-
-    .resume-container {
+    html, body {
+        background: #ffffff;
         width: 297mm;
-        margin: 0;
+        height: 210mm;
+    }
+
+    .resume-page-wrapper {
+        position: static;
+        top: 0;
         padding: 0;
+        display: block;
         overflow: visible;
     }
 
     .resume-sheet {
+        zoom: 1 !important;
         width: 297mm;
-        height: 210mm;
         min-width: 297mm;
+        height: 210mm;
         min-height: 210mm;
-        max-width: 297mm;
-        max-height: 210mm;
         margin: 0;
         box-shadow: none;
-        overflow: hidden;
+        page-break-after: avoid;
     }
 
-    @page {
-        size: A4 landscape;
-        margin: 0;
+    .resume-top-toolbar,
+    .resume-theme-switcher,
+    .resume-navigation {
+        display: none !important;
     }
 }
