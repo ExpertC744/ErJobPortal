@@ -1,6 +1,7 @@
 ﻿using ErJobPortal.Data;
 using ErJobPortal.Models;
 using Microsoft.Data.SqlClient;
+using Microsoft.Extensions.Configuration;
 using System.Data;
 
 namespace ErJobPortal.Repositories
@@ -1437,6 +1438,285 @@ WHERE CandidateID = @CandidateID";
             }
 
             return reader.GetValue(index)?.ToString();
+        }
+
+        //
+
+        // =========================================================
+        // GET CANDIDATE BASIC INFO (NAME, EMAIL, PHONE)
+        // =========================================================
+
+        // shrirang 02/10/26
+        public CandidateBasicInfoModel? GetCandidateBasicInfo(int candidateId)
+        {
+            using SqlConnection con = _db.GetConnection();
+
+            const string sql = @"
+SELECT
+    nID,
+    sFName,
+    sLName,
+    sEmail,
+    sMobile
+FROM tblCandidateRegister
+WHERE nID = @CandidateID";
+
+            using SqlCommand cmd = new SqlCommand(sql, con);
+
+            cmd.Parameters.AddWithValue("@CandidateID", candidateId);
+
+            con.Open();
+
+            using SqlDataReader reader = cmd.ExecuteReader();
+
+            if (reader.Read())
+            {
+                return new CandidateBasicInfoModel
+                {
+                    CandidateID = Convert.ToInt32(reader["nID"]),
+                    sFName = reader["sFName"]?.ToString() ?? "",
+                    sLName = reader["sLName"]?.ToString() ?? "",
+                    sEmail = reader["sEmail"]?.ToString() ?? "",
+                    sMobile = reader["sMobile"]?.ToString() ?? ""
+                };
+            }
+
+            return null;
+        }
+
+        // shrirang 30/09/26
+        public List<CandidateSkillOption> GetMedicalSkills()
+        {
+            List<CandidateSkillOption> list =
+                new List<CandidateSkillOption>();
+
+            using SqlConnection con = _db.GetConnection();
+
+            string sql = @"
+    SELECT
+        nMedicalSkillID,
+        sMedicalSkillName
+    FROM tblMedicalSkills
+    ORDER BY nMedicalSkillID;
+";
+
+            using SqlCommand cmd = new SqlCommand(sql, con);
+
+            con.Open();
+
+            using SqlDataReader reader = cmd.ExecuteReader();
+
+            while (reader.Read())
+            {
+                list.Add(new CandidateSkillOption
+                {
+                    ID = Convert.ToInt32(
+                        reader["nMedicalSkillID"]
+                    ),
+
+                    Name = reader["sMedicalSkillName"]?.ToString()
+                           ?? string.Empty
+                });
+            }
+
+            return list;
+        }
+
+
+        public List<CandidateSkillOption> GetTechnicalSkills()
+        {
+            List<CandidateSkillOption> list =
+                new List<CandidateSkillOption>();
+
+            using SqlConnection con = _db.GetConnection();
+
+            string sql = @"
+    SELECT
+        nTechnicalSkillID,
+        sTechnicalSkillName
+    FROM tblTechnicalSkills
+    ORDER BY nTechnicalSkillID;
+";
+
+            using SqlCommand cmd = new SqlCommand(sql, con);
+
+            con.Open();
+
+            using SqlDataReader reader = cmd.ExecuteReader();
+
+            while (reader.Read())
+            {
+                list.Add(new CandidateSkillOption
+                {
+                    ID = Convert.ToInt32(
+                        reader["nTechnicalSkillID"]
+                    ),
+
+                    Name = reader["sTechnicalSkillName"]?.ToString()
+                           ?? string.Empty
+                });
+            }
+
+            return list;
+        }
+
+        public List<CandidateSkillOption> GetNonTechnicalSkills()
+        {
+            List<CandidateSkillOption> list =
+                new List<CandidateSkillOption>();
+
+            using SqlConnection con = _db.GetConnection();
+
+            string sql = @"
+    SELECT
+        nNonTechnicalSkillID,
+        sNonTechnicalSkillName
+    FROM tblNonTechnicalSkills
+    ORDER BY nNonTechnicalSkillID;
+";
+
+            using SqlCommand cmd = new SqlCommand(sql, con);
+
+            con.Open();
+
+            using SqlDataReader reader = cmd.ExecuteReader();
+
+            while (reader.Read())
+            {
+                list.Add(new CandidateSkillOption
+                {
+                    ID = Convert.ToInt32(
+                        reader["nNonTechnicalSkillID"]
+                    ),
+
+                    Name = reader["sNonTechnicalSkillName"]?.ToString()
+                           ?? string.Empty
+                });
+            }
+
+            return list;
+        }
+
+        public string GetSkillNames(
+    string? skillIds,
+    string tableName,
+    string idColumn,
+    string nameColumn)
+        {
+            if (string.IsNullOrWhiteSpace(skillIds))
+                return string.Empty;
+
+            List<string> skillNames = new List<string>();
+
+            using SqlConnection con = _db.GetConnection();
+
+            string query = $@"
+    SELECT {nameColumn}
+    FROM {tableName}
+    WHERE {idColumn} IN
+    (
+        SELECT TRY_CAST(value AS INT)
+        FROM STRING_SPLIT(@SkillIds, ',')
+        WHERE TRY_CAST(value AS INT) IS NOT NULL
+    )
+    ORDER BY {idColumn};";
+
+            using SqlCommand cmd = new SqlCommand(query, con);
+
+            cmd.Parameters.Add(
+                "@SkillIds",
+                SqlDbType.VarChar,
+                1000
+            ).Value = skillIds;
+
+            con.Open();
+
+            using SqlDataReader dr = cmd.ExecuteReader();
+
+            while (dr.Read())
+            {
+                if (dr[nameColumn] != DBNull.Value)
+                {
+                    skillNames.Add(
+                        dr[nameColumn].ToString() ?? string.Empty
+                    );
+                }
+            }
+
+            return string.Join(", ", skillNames);
+        }
+        //end
+
+
+        public int ApplyForPost(int orgId, int candidateId, int postId)
+        {
+            int result = 0;
+
+            using (SqlConnection con = _db.GetConnection())
+            {
+                using (SqlCommand cmd = new SqlCommand("SP_AddFinalSection", con))
+                {
+                    cmd.CommandType = CommandType.StoredProcedure;
+
+                    cmd.Parameters.Add("@OrgD", SqlDbType.Int).Value = orgId;
+                    cmd.Parameters.Add("@CandidateID", SqlDbType.Int).Value = candidateId;
+                    cmd.Parameters.Add("@Postid", SqlDbType.Int).Value = postId;
+
+                    con.Open();
+
+                    object? value = cmd.ExecuteScalar();
+
+                    if (value != null && value != DBNull.Value)
+                    {
+                        result = Convert.ToInt32(value);
+                    }
+                }
+            }
+
+            return result;
+        }
+
+        // shrirang 02/10/26
+        // =========================================================
+        // UPDATE RESUME PROFILE
+        // =========================================================
+
+        public void UpdateResumeProfile(
+            int candidateID,
+            int resumeProfile)
+        {
+            using SqlConnection con = _db.GetConnection();
+
+            con.Open();
+
+            // Make sure candidate profile exists
+            EnsureProfileExists(
+                con,
+                candidateID);
+
+            string sql = @"
+UPDATE tblCandidateProfile
+SET
+    Resume_Profile = @Resume_Profile,
+    ModDate = GETDATE()
+WHERE CandidateID = @CandidateID";
+
+            using SqlCommand cmd =
+                new SqlCommand(sql, con);
+
+            // Candidate ID
+            cmd.Parameters.Add(
+                "@CandidateID",
+                SqlDbType.Int
+            ).Value = candidateID;
+
+            // Resume Profile
+            cmd.Parameters.Add(
+                "@Resume_Profile",
+                SqlDbType.Int
+            ).Value = resumeProfile;
+
+            cmd.ExecuteNonQuery();
         }
 
     }

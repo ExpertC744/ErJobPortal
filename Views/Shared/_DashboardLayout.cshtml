@@ -2769,14 +2769,60 @@
 
 							@* Radhika 21-09 *@
 
-							<a asp-controller="Resume"
-							   asp-action="Resume"
-							   asp-route-id="@Context.Session.GetInt32("CandidateID")"
-							   class="profile-submenu-link">
+														@*shrirang 02/10/26*@
+							@{
+    var candidateId = Context.Session.GetInt32("CandidateID");
+    var resumeProfile = ViewBag.ResumeProfile as int?;
+}
 
-								View Profile
+@if (resumeProfile == 1)
+{
+    <a asp-controller="Resume"
+       asp-action="ViewProfileOne"
+       asp-route-id="@candidateId"
+       class="profile-submenu-link"
+       target="_blank">
 
-							</a>
+        View Profile
+
+    </a>
+}
+else if (resumeProfile == 2)
+{
+    <a asp-controller="Resume"
+       asp-action="ViewProfileFour"
+       asp-route-id="@candidateId"
+       class="profile-submenu-link"
+       target="_blank">
+
+        View Profile
+
+    </a>
+}
+else if (resumeProfile == 3)
+{
+    <a asp-controller="Resume"
+       asp-action="ViewProfileThree"
+       asp-route-id="@candidateId"
+       class="profile-submenu-link"
+       target="_blank">
+
+        View Profile
+
+    </a>
+}
+else
+{
+    <a asp-controller="Resume"
+       asp-action="Resume"
+       asp-route-id="@candidateId"
+       class="profile-submenu-link"
+       target="_blank">
+
+        View Profile
+
+    </a>
+}
 
 							<a asp-controller="Candidate"
 							   asp-action="customResumeBuilder"
@@ -2785,21 +2831,32 @@
 								Custom Resume
 							</a>
 
+ 
 
-                            <a asp-controller="Candidate"
-                               asp-action="ViewOrgProfile"
-                               asp-route-id="@Context.Session.GetInt32("CandidateID")"
-                               class="profile-submenu-link">
-                                Custom Resume
-                            </a>
+							@* shrirang 01/10/26 *@
 
-                            <a asp-controller="Candidate"
-                               asp-action="customResumeBuilder"
-                               class="profile-submenu-link">
+							<a asp-controller="Candidate"
+							   asp-action="Profile"
+							   class="profile-submenu-link">
 
-                                Edit Profile
+								@if (ViewBag.HasCandidateProfile == true)
+								{
+									<span>
+										<i class="fas fa-user-edit me-1"></i>
+										Edit Profile
+									</span>
+								}
+								else
+								{
+									<span>
+										<i class="fas fa-user-plus me-1"></i>
+										Create Profile
+									</span>
+								}
 
 							</a>
+
+							@* end *@
 
 						</div>
 
@@ -2837,7 +2894,7 @@
                               
 
 <a asp-controller="Candidate"
-   asp-action="MyInternship"
+							   asp-action="TraineeApplied"
    asp-route-id="@ViewBag.CandidateCode"    
    class="profile-submenu-link">
 
@@ -3066,6 +3123,7 @@
 			{
 				var orgCode = ViewBag.OrgCode?.ToString();
 				orgCode = Context.Request.RouteValues["id"]?.ToString();
+				//var orgCode = Context.Session.GetString("OrgCode");
 				<div class="sidebar-section">
 
 					<!-- ================= DASHBOARD ================= -->
@@ -3167,7 +3225,7 @@
 							</a>
 
 							<a asp-controller="Organization"
-							   asp-action="FinalSelection"
+							   asp-action="SelectedTrainees"
 							   asp-route-id="@orgCode"
 							   class="profile-submenu-link">
 								Final Selection
@@ -3202,7 +3260,7 @@
 						<div class="profile-submenu" id="historySubmenu">
 
 							<a asp-controller="Organization"
-							   asp-action="PreviousPost"
+							   asp-action="OrgPreviousPost"
 							   asp-route-id="@orgCode"
 							   class="profile-submenu-link">
 								Previous Post
@@ -3237,7 +3295,7 @@
 						<div class="profile-submenu" id="chartsSubmenu">
 
 							<a asp-controller="Organization"
-							   asp-action="PostInfo"
+							   asp-action="OrgCharts"
 							   asp-route-id="@orgCode"
 							   class="profile-submenu-link">
 								Post Info
@@ -3341,6 +3399,246 @@
 				//session
 				int? orgID = Context.Session.GetInt32("OrgID");
 			}
+			@* shrirang 23/09/26 TPO *@
+			
+			
+			<!-- ================= TPO ================= -->
+			@if (ViewData["Panel"]?.ToString() == "TPO")
+			{
+				var tpoId = Context.Session.GetInt32("TPOID");
+
+				<div class="sidebar-section candidate-sidebar">
+
+					<!-- ================= DASHBOARD ================= -->
+
+					<a asp-controller="TPO"
+					   asp-action="Dashboard"
+					   class="sidebar-link active">
+
+						<span class="menu-icon">
+							<i class="fas fa-chart-pie"></i>
+						</span>
+
+						<span class="menu-text">
+							Dashboard
+						</span>
+
+					</a>
+
+
+					<!-- ================= PROFILE ================= -->
+
+					<div class="sidebar-dropdown">
+
+						<div class="sidebar-link"
+							 onclick="toggleSidebarMenu('tpoProfileSubmenu', 'tpoProfileArrow')">
+
+							<span class="menu-icon">
+								<i class="fas fa-id-card"></i>
+							</span>
+
+							<span class="menu-text">
+								Profile
+							</span>
+
+							<span class="profile-arrow"
+								  id="tpoProfileArrow">
+
+								<i class="fas fa-chevron-right"></i>
+
+							</span>
+
+						</div>
+
+
+						<div class="profile-submenu"
+							 id="tpoProfileSubmenu">
+
+							<a asp-controller="TPO"
+							   asp-action="Profile"
+							   class="profile-submenu-link">
+
+								View Profile
+
+							</a>
+
+							<a asp-controller="TPO"
+							   asp-action="EditProfile"
+							   class="profile-submenu-link">
+
+								Edit Profile
+
+							</a>
+
+						</div>
+
+					</div>
+
+
+					<!-- ================= SCHEDULER ================= -->
+
+					<a asp-controller="TPO"
+					   asp-action="Scheduler"
+					   class="sidebar-link">
+
+						<span class="menu-icon">
+							<i class="fas fa-calendar-alt"></i>
+						</span>
+
+						<span class="menu-text">
+							Scheduler
+						</span>
+
+					</a>
+
+
+					<!-- ================= TRAINEES INFO ================= -->
+
+					<a asp-controller="TPO"
+					   asp-action="TraineesInfo"
+					   class="sidebar-link">
+
+						<span class="menu-icon">
+							<i class="fas fa-users"></i>
+						</span>
+
+						<span class="menu-text">
+							Trainees Info
+						</span>
+
+					</a>
+
+
+					<!-- ================= CREATE USER ================= -->
+
+					<a asp-controller="TPO"
+					   asp-action="CreateUser"
+					   class="sidebar-link">
+
+						<span class="menu-icon">
+							<i class="fas fa-user-plus"></i>
+						</span>
+
+						<span class="menu-text">
+							Create User
+						</span>
+
+					</a>
+
+
+					<!-- ================= NOTIFICATION / EVENT ================= -->
+
+					<a asp-controller="TPO"
+					   asp-action="AddNotificationEvent"
+					   class="sidebar-link">
+
+						<span class="menu-icon">
+							<i class="fas fa-bell"></i>
+						</span>
+
+						<span class="menu-text">
+							Add Notification/Event
+						</span>
+
+					</a>
+
+
+					<!-- ================= FEEDBACK ================= -->
+
+					<a asp-controller="TPO"
+					   asp-action="Feedback"
+					   class="sidebar-link">
+
+						<span class="menu-icon">
+							<i class="fas fa-comment-dots"></i>
+						</span>
+
+						<span class="menu-text">
+							Feedback
+						</span>
+
+					</a>
+
+
+					<!-- ================= SETTINGS ================= -->
+
+					
+					<!-- ================= SETTINGS ================= -->
+
+<div class="sidebar-dropdown">
+
+				<div class="sidebar-link"
+					 onclick="toggleSidebarMenu('tpoSettingsSubmenu', 'tpoSettingsArrow')">
+
+					<span class="menu-icon">
+						<i class="fas fa-cog"></i>
+					</span>
+
+					<span class="menu-text">
+						Settings
+					</span>
+
+					<span class="profile-arrow"
+						  id="tpoSettingsArrow">
+
+						<i class="fas fa-chevron-right"></i>
+
+					</span>
+
+				</div>
+
+
+				<div class="profile-submenu"
+					 id="tpoSettingsSubmenu">
+
+					<!-- RESET PASSWORD -->
+
+					<a asp-controller="Account"
+					   asp-action="TPORestPassword"
+					   class="profile-submenu-link">
+
+						<i class="fas fa-key me-2"></i>
+						Reset Password
+
+					</a>
+
+
+					<!-- FORGOT PASSWORD -->
+
+					<a asp-controller="Account"
+					   asp-action="TPOForgotPassword"
+					   class="profile-submenu-link">
+
+						<i class="fas fa-unlock-alt me-2"></i>
+						Forgot Password
+
+					</a>
+
+				</div>
+
+</div>
+
+					<!-- ================= LOGOUT ================= -->
+					@*  <div class="sidebar-logout">
+
+            <a asp-controller="Account"
+               asp-action="Logout"
+               class="logout-link">
+
+                <span class="menu-icon">
+                    <i class="fas fa-right-from-bracket"></i>
+                </span>
+
+                <span class="menu-text">
+                    Logout
+                </span>
+
+            </a>
+
+        </div> *@
+
+				</div>
+			}
 
 
 			<!-- ================= SUPER ADMIN ================= -->
@@ -3392,18 +3690,20 @@
 						<div id="traineeMenu"
 							 class="sidebar-submenu collapse">
 
-							<a asp-controller="Trainee"
-							   asp-action="SATrainees" asp-route-id="1">
-								Trainee Registrations
+							 <a asp-controller="SuperAdmin"
+							   asp-action="SATrainees"
+							   asp-route-id="1">
+								<span>Trainee Registrations</span>
+
 							</a>
 
-							<a asp-controller="Trainee"
-							   asp-action="Profiles" asp-route-id="1">
+							<a asp-controller="SuperAdmin"
+							   asp-action="SATraineeProfileList" asp-route-id="1">
 								Trainee Profiles
 							</a>
 
-							<a asp-controller="Trainee"
-							   asp-action="Status" asp-route-id="1">
+							<a asp-controller="SuperAdmin"
+							   asp-action="SATraineeSelection" asp-route-id="1">
 								Trainee Status
 							</a>
 
@@ -3440,23 +3740,23 @@
 						<div id="organizationMenu"
 							 class="sidebar-submenu collapse">
 
-							<a asp-controller="Organization"
-							   asp-action="Registration" asp-route-id="1">
+							<a asp-controller="SuperAdmin"
+							   asp-action="SAOrganizationList" asp-route-id="1">
 								Org Registration
 							</a>
 
-							<a asp-controller="Organization"
-							   asp-action="Profiles" asp-route-id="1">
-								Org Profiles
+							<a asp-controller="SuperAdmin"
+							   asp-action="SAOrgProfileList" asp-route-id="1">
+								Org Profile
 							</a>
 
-							<a asp-controller="Organization"
-							   asp-action="Posts" asp-route-id="1">
+							<a asp-controller="SuperAdmin"
+							   asp-action="SAAllOrganizationPost" asp-route-id="1">
 								Org Posts
 							</a>
 
-							<a asp-controller="Organization"
-							   asp-action="FinalSelectionDetails" asp-route-id="1">
+							<a asp-controller="SuperAdmin"
+							   asp-action="SAFinalSelection" asp-route-id="1">
 								Final Selection Details
 							</a>
 
@@ -3493,8 +3793,8 @@
 						<div id="chartsMenu"
 							 class="sidebar-submenu collapse">
 
-							<a asp-controller="Charts"
-							   asp-action="Index" asp-route-id="1">
+							<a asp-controller="SuperAdmin"
+							   asp-action="SACharts" asp-route-id="1">
 								Charts
 							</a>
 
@@ -3531,28 +3831,28 @@
 						<div id="advertisementMenu"
 							 class="sidebar-submenu collapse">
 
-							<a asp-controller="Advertisement"
-							   asp-action="AddAdv" asp-route-id="1">
+							<a asp-controller="SuperAdmin"
+							   asp-action="SAAddAdvertisement" asp-route-id="1">
 								Add Adv
 							</a>
 
-							<a asp-controller="Advertisement"
-							   asp-action="Index" asp-route-id="1">
+							<a asp-controller="SuperAdmin"
+							   asp-action="SAAdvertisementList" asp-route-id="1">
 								View All Adv
 							</a>
 
-							<a asp-controller="Advertisement"
-							   asp-action="Receipt" asp-route-id="1">
+							<a asp-controller="SuperAdmin"
+							   asp-action="SABillingDetails" asp-route-id="1">
 								Receipt
 							</a>
 
-							<a asp-controller="Advertisement"
-							   asp-action="Invoice" asp-route-id="1">
+							<a asp-controller="SuperAdmin"
+							   asp-action="SAInvoiceDetails" asp-route-id="1">
 								Invoice
 							</a>
 
-							<a asp-controller="Advertisement"
-							   asp-action="BillingController" asp-route-id="1">
+							<a asp-controller="SuperAdmin"
+							   asp-action="SABillingControl" asp-route-id="1">
 								Billing Controller
 							</a>
 
@@ -3806,7 +4106,22 @@
 							<div class="dropdown-divider"></div>
 
 
-							<a href="#"
+							@* =========================================================
+							MY PROFILE / RESET PASSWORD / FORGOT PASSWORD
+							DYNAMIC ACCORDING TO LOGGED-IN USER
+							========================================================= *@
+
+
+						@* =========================================================
+											CANDIDATE
+						========================================================= *@
+
+						@if (ViewData["Panel"]?.ToString() == "Candidate")
+						{
+							<!-- CANDIDATE MY PROFILE -->
+
+							<a asp-controller="Candidate"
+							   asp-action="Dashboard"
 							   class="user-dropdown-item">
 
 								<span class="dropdown-item-icon">
@@ -3820,7 +4135,10 @@
 							</a>
 
 
-							<a href="#"
+							<!-- CANDIDATE RESET PASSWORD -->
+
+							<a asp-controller="Account"
+							   asp-action="CandidateResetPassword"
 							   class="user-dropdown-item">
 
 								<span class="dropdown-item-icon">
@@ -3832,6 +4150,199 @@
 								</span>
 
 							</a>
+
+
+							<!-- CANDIDATE FORGOT PASSWORD -->
+
+							<a asp-controller="Account"
+							   asp-action="CandidateForgotPassword"
+							   class="user-dropdown-item">
+
+								<span class="dropdown-item-icon">
+									<i class="fas fa-unlock-alt"></i>
+								</span>
+
+								<span>
+									Forgot Password
+								</span>
+
+							</a>
+						}
+
+
+						@* =========================================================
+											ORGANIZATION
+						========================================================= *@
+
+						else if (ViewData["Panel"]?.ToString() == "Organization")
+						{
+							<!-- ORGANIZATION MY PROFILE -->
+
+							<a asp-controller="Organization"
+							   asp-action="Dashboard"
+							   class="user-dropdown-item">
+
+								<span class="dropdown-item-icon">
+									<i class="fas fa-user"></i>
+								</span>
+
+								<span>
+									My Profile
+								</span>
+
+							</a>
+
+
+							<!-- ORGANIZATION RESET PASSWORD -->
+
+							<a asp-controller="Account"
+							   asp-action="OrganizationResetPassword"
+							   class="user-dropdown-item">
+
+								<span class="dropdown-item-icon">
+									<i class="fas fa-key"></i>
+								</span>
+
+								<span>
+									Reset Password
+								</span>
+
+							</a>
+
+
+							<!-- ORGANIZATION FORGOT PASSWORD -->
+
+							<a asp-controller="Account"
+							   asp-action="OrganizationForgotPassword"
+							   class="user-dropdown-item">
+
+								<span class="dropdown-item-icon">
+									<i class="fas fa-unlock-alt"></i>
+								</span>
+
+								<span>
+									Forgot Password
+								</span>
+
+							</a>
+						}
+
+
+						@* =========================================================
+											 TPO
+						========================================================= *@
+
+						else if (ViewData["Panel"]?.ToString() == "TPO")
+						{
+							<!-- TPO MY PROFILE -->
+
+							<a asp-controller="TPO"
+							   asp-action="Profile"
+							   class="user-dropdown-item">
+
+								<span class="dropdown-item-icon">
+									<i class="fas fa-user"></i>
+								</span>
+
+								<span>
+									My Profile
+								</span>
+
+							</a>
+
+
+							<!-- TPO RESET PASSWORD -->
+
+							<a asp-controller="Account"
+							   asp-action="TPORestPassword"
+							   class="user-dropdown-item">
+
+								<span class="dropdown-item-icon">
+									<i class="fas fa-key"></i>
+								</span>
+
+								<span>
+									Reset Password
+								</span>
+
+							</a>
+
+
+							<!-- TPO FORGOT PASSWORD -->
+
+							<a asp-controller="Account"
+							   asp-action="TPOForgotPassword"
+							   class="user-dropdown-item">
+
+								<span class="dropdown-item-icon">
+									<i class="fas fa-unlock-alt"></i>
+								</span>
+
+								<span>
+									Forgot Password
+								</span>
+
+							</a>
+						}
+
+
+						@* =========================================================
+SUPER ADMIN
+========================================================= *@
+
+						else if (ViewData["Panel"]?.ToString() == "SuperAdmin")
+						{
+							<!-- SUPER ADMIN MY PROFILE -->
+
+							<a asp-controller="SuperAdmin"
+							   asp-action="Dashboard"
+							   asp-route-id="1"
+							   class="user-dropdown-item">
+
+								<span class="dropdown-item-icon">
+									<i class="fas fa-user"></i>
+								</span>
+
+								<span>
+									My Profile
+								</span>
+
+							</a>
+
+
+							<!-- SUPER ADMIN RESET PASSWORD -->
+
+							<a asp-controller="SuperAdmin"
+							   asp-action="ResetPassword"
+							   class="user-dropdown-item">
+
+								<span class="dropdown-item-icon">
+									<i class="fas fa-key"></i>
+								</span>
+
+								<span>
+									Reset Password
+								</span>
+
+							</a>
+
+
+							<!-- SUPER ADMIN FORGOT PASSWORD -->
+
+							<a asp-controller="SuperAdmin"
+							   asp-action="ForgotPassword"
+							   class="user-dropdown-item">
+
+								<span class="dropdown-item-icon">
+									<i class="fas fa-unlock-alt"></i>
+								</span>
+
+								<span>
+									Forgot Password
+								</span>
+
+							</a>
+						}
 
 
 							<div class="dropdown-divider"></div>

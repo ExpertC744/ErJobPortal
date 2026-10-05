@@ -1,0 +1,1542 @@
+﻿@model ErJobPortal.Models.OrganizationChartsViewModel
+
+@{
+    Layout = "~/Views/Shared/_DashboardLayout.cshtml";
+
+    ViewData["Title"] = "Charts";
+    ViewData["Panel"] = "Organization";
+    ViewData["UserName"] = "Organization";
+
+    var areaData = Model?.AreaChartData
+        ?? new List<ErJobPortal.Models.OrganizationChartViewModel>();
+
+    var barData = Model?.BarChartData
+        ?? new List<ErJobPortal.Models.OrganizationChartViewModel>();
+
+    var latestEligibleTrainees = areaData.Any()
+        ? areaData
+            .OrderByDescending(x => x.PostYear)
+            .ThenByDescending(x => x.PostMonth)
+            .First()
+            .TotalEligibleTrainees
+        : 0;
+
+    var latestRegistrations = barData.Any()
+        ? barData
+            .OrderByDescending(x => x.RegistrationYear)
+            .ThenByDescending(x => x.RegistrationMonth)
+            .First()
+            .TotalRegistrations
+        : 0;
+}
+
+<style>
+
+    /* =====================================================
+                   TRAINEE MONTHLY ANALYTICS
+                   ===================================================== */
+
+    .analytics-card {
+        background: #ffffff;
+        border: 1px solid #dfe5e8;
+        border-radius: 14px;
+        overflow: hidden;
+        height: 100%;
+        box-shadow: 0 4px 14px rgba(15, 23, 42, 0.04);
+        transition: all .25s ease;
+    }
+
+        .analytics-card:hover {
+            box-shadow: 0 8px 24px rgba(15, 23, 42, 0.08);
+        }
+
+
+    /* =====================================================
+                   CHART HEADER
+                   ===================================================== */
+
+    .analytics-header {
+        min-height: 52px;
+        padding: 0 18px;
+        display: flex;
+        align-items: center;
+        gap: 11px;
+        border-bottom: 1px solid #dfe5e8;
+        background: #ffffff;
+    }
+
+    .analytics-header-icon {
+        width: 25px;
+        height: 25px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #1e7b67;
+        font-size: 17px;
+    }
+
+    .analytics-header h5 {
+        margin: 0;
+        color: #16324f;
+        font-size: 17px;
+        font-weight: 500;
+        letter-spacing: .1px;
+    }
+
+
+    /* =====================================================
+                   CHART BODY
+                   ===================================================== */
+
+    .analytics-body {
+        padding: 18px 16px 14px;
+    }
+
+    .chart-wrapper {
+        position: relative;
+        width: 100%;
+        height: 235px;
+    }
+
+        .chart-wrapper svg {
+            width: 100%;
+            height: 100%;
+            display: block;
+        }
+
+
+    /* =====================================================
+                   LEGEND
+                   ===================================================== */
+
+    .chart-legend {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        gap: 8px;
+        margin-bottom: 4px;
+        color: #667085;
+        font-size: 12px;
+    }
+
+    .legend-box {
+        width: 50px;
+        height: 16px;
+        border: 2px solid #1e7b67;
+        background: rgba(30, 123, 103, .14);
+    }
+
+    .legend-box-bar {
+        width: 50px;
+        height: 16px;
+        background: #1e7b67;
+    }
+
+
+    /* =====================================================
+                   AXIS TEXT
+                   ===================================================== */
+
+    .chart-axis-text {
+        fill: #667085;
+        font-size: 11px;
+        font-family: Arial, sans-serif;
+    }
+
+
+    /* =====================================================
+                   GRID
+                   ===================================================== */
+
+    .chart-grid {
+        stroke: #e6eaed;
+        stroke-width: 1;
+    }
+
+    .chart-axis {
+        stroke: #cfd6da;
+        stroke-width: 1;
+    }
+
+
+    /* =====================================================
+                   LINE CHART
+                   ===================================================== */
+
+    .chart-line {
+        fill: none;
+        stroke: #1e7b67;
+        stroke-width: 2.5;
+        stroke-linecap: round;
+        stroke-linejoin: round;
+    }
+
+    .chart-area {
+        fill: rgba(30, 123, 103, .14);
+    }
+
+    .chart-point {
+        fill: #ffffff;
+        stroke: #1e7b67;
+        stroke-width: 2;
+    }
+
+
+    /* =====================================================
+                   BAR CHART
+                   ===================================================== */
+
+    .chart-bar {
+        fill: #1e7b67;
+        transition: opacity .2s ease;
+    }
+
+        .chart-bar:hover {
+            opacity: .78;
+        }
+
+
+    /* =====================================================
+                   CURRENT VALUE
+                   ===================================================== */
+
+    .analytics-value {
+        text-align: center;
+        margin-top: 5px;
+        color: #667085;
+        font-size: 11px;
+    }
+
+
+    /* =====================================================
+                   FOOTER
+                   ===================================================== */
+
+    .analytics-footer {
+        border-top: 1px solid #edf0f2;
+        padding: 10px 16px;
+        color: #7a8494;
+        font-size: 11px;
+    }
+
+        .analytics-footer i {
+            color: #1e7b67;
+            margin-right: 5px;
+        }
+
+
+    /* =====================================================
+                   MOBILE
+                   ===================================================== */
+
+    @@media (max-width: 767px) {
+
+        .analytics-header {
+            min-height: 48px;
+            padding: 0 14px;
+        }
+
+            .analytics-header h5 {
+                font-size: 15px;
+            }
+
+        .analytics-body {
+            padding: 15px 10px 10px;
+        }
+
+        .chart-wrapper {
+            height: 210px;
+        }
+
+        .chart-axis-text {
+            font-size: 9px;
+        }
+    }
+</style>
+
+
+<div class="candidate-charts-page">
+
+    <!-- =====================================================
+         PAGE HEADING
+         ===================================================== -->
+
+    <div class="charts-heading">
+
+        <h1>Charts</h1>
+
+        <p>
+            @ViewContext.RouteData.Values["id"]
+        </p>
+
+    </div>
+
+
+    <!-- =====================================================
+         TRAINEE CHARTS
+         ===================================================== -->
+
+    <div class="row g-4 mb-4">
+
+
+        <!-- =================================================
+             NO. OF TRAINEE ELIGIBLE FOR INTERNSHIP
+             ================================================= -->
+
+        <div class="col-xl-6 col-lg-6 col-md-12">
+
+            <div class="analytics-card">
+
+
+                <!-- HEADER -->
+
+                <div class="analytics-header">
+
+                    <div class="analytics-header-icon">
+
+                        <i class="fas fa-chart-area"></i>
+
+                    </div>
+
+                    <h5>
+                        No. of Trainee eligible for internship
+                    </h5>
+
+                </div>
+
+
+                <!-- BODY -->
+
+                <div class="analytics-body">
+
+
+                    <!-- LEGEND -->
+
+                    <div class="chart-legend">
+
+                        <span class="legend-box"></span>
+
+                        <span>
+                            Total Eligible Trainees
+                        </span>
+
+                    </div>
+
+
+                    <!-- SVG -->
+
+                    <div class="chart-wrapper">
+
+                        <svg id="eligibleTraineeSvg"
+                             viewBox="0 0 760 300"
+                             preserveAspectRatio="none">
+
+
+                            <!-- =========================
+                                 GRID
+                                 ========================= -->
+
+                            <line class="chart-grid"
+                                  x1="60"
+                                  y1="30"
+                                  x2="735"
+                                  y2="30" />
+
+                            <line class="chart-grid"
+                                  x1="60"
+                                  y1="75"
+                                  x2="735"
+                                  y2="75" />
+
+                            <line class="chart-grid"
+                                  x1="60"
+                                  y1="120"
+                                  x2="735"
+                                  y2="120" />
+
+                            <line class="chart-grid"
+                                  x1="60"
+                                  y1="165"
+                                  x2="735"
+                                  y2="165" />
+
+                            <line class="chart-grid"
+                                  x1="60"
+                                  y1="210"
+                                  x2="735"
+                                  y2="210" />
+
+                            <line class="chart-grid"
+                                  x1="60"
+                                  y1="255"
+                                  x2="735"
+                                  y2="255" />
+
+
+                            <!-- =========================
+                                 AXIS
+                                 ========================= -->
+
+                            <line class="chart-axis"
+                                  x1="60"
+                                  y1="30"
+                                  x2="60"
+                                  y2="255" />
+
+                            <line class="chart-axis"
+                                  x1="60"
+                                  y1="255"
+                                  x2="735"
+                                  y2="255" />
+
+
+                            <!-- =========================
+                                 Y AXIS
+                                 ========================= -->
+
+                            <text class="chart-axis-text"
+                                  x="48"
+                                  y="259"
+                                  text-anchor="end">
+                                0
+                            </text>
+
+                            <text class="chart-axis-text"
+                                  x="48"
+                                  y="214"
+                                  text-anchor="end">
+                                20
+                            </text>
+
+                            <text class="chart-axis-text"
+                                  x="48"
+                                  y="169"
+                                  text-anchor="end">
+                                40
+                            </text>
+
+                            <text class="chart-axis-text"
+                                  x="48"
+                                  y="124"
+                                  text-anchor="end">
+                                60
+                            </text>
+
+                            <text class="chart-axis-text"
+                                  x="48"
+                                  y="79"
+                                  text-anchor="end">
+                                80
+                            </text>
+
+                            <text class="chart-axis-text"
+                                  x="48"
+                                  y="34"
+                                  text-anchor="end">
+                                100
+                            </text>
+
+
+                            <!-- =========================
+                                 Y AXIS TITLE
+                                 ========================= -->
+
+                            <text class="chart-axis-text"
+                                  transform="translate(16 165) rotate(-90)"
+                                  text-anchor="middle">
+
+                                Total Eligible Trainees
+
+                            </text>
+
+
+                            <!-- =========================
+                                 AREA
+                                 ========================= -->
+
+                            <polygon id="eligibleArea"
+                                     class="chart-area"
+                                     points="" />
+
+
+                            <!-- =========================
+                                 LINE
+                                 ========================= -->
+
+                            <polyline id="eligibleLine"
+                                      class="chart-line"
+                                      points="" />
+
+
+                            <!-- =========================
+                                 POINTS
+                                 ========================= -->
+
+                            <g id="eligiblePoints"></g>
+
+
+                            <!-- =========================
+                                 X AXIS TITLE
+                                 ========================= -->
+
+                            <text class="chart-axis-text"
+                                  x="397"
+                                  y="292"
+                                  text-anchor="middle">
+
+                                Month Year
+
+                            </text>
+
+
+                            <!-- MONTHS -->
+
+                            <g id="eligibleMonths"></g>
+
+                        </svg>
+
+                    </div>
+
+                </div>
+
+
+                <!-- FOOTER -->
+
+                <div class="analytics-footer">
+
+                    <i class="fas fa-chart-line"></i>
+
+                    Monthly eligible trainee trend
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+
+        <!-- =================================================
+             TOTAL REGISTRATION PER MONTH
+             ================================================= -->
+
+        <div class="col-xl-6 col-lg-6 col-md-12">
+
+            <div class="analytics-card">
+
+
+                <!-- HEADER -->
+
+                <div class="analytics-header">
+
+                    <div class="analytics-header-icon">
+
+                        <i class="fas fa-chart-bar"></i>
+
+                    </div>
+
+                    <h5>
+                        Candidate Registration Per Month
+                    </h5>
+
+                </div>
+
+
+                <!-- BODY -->
+
+                <div class="analytics-body">
+
+
+                    <!-- LEGEND -->
+
+                    <div class="chart-legend">
+
+                        <span class="legend-box-bar"></span>
+
+                        <span>
+                            Total Candidate Registrations
+                        </span>
+
+                    </div>
+
+
+                    <!-- SVG -->
+
+                    <div class="chart-wrapper">
+
+                        <svg id="registrationSvg"
+                             viewBox="0 0 760 300"
+                             preserveAspectRatio="none">
+
+
+                            <!-- =========================
+                                 GRID
+                                 ========================= -->
+
+                            <line class="chart-grid"
+                                  x1="60"
+                                  y1="30"
+                                  x2="735"
+                                  y2="30" />
+
+                            <line class="chart-grid"
+                                  x1="60"
+                                  y1="75"
+                                  x2="735"
+                                  y2="75" />
+
+                            <line class="chart-grid"
+                                  x1="60"
+                                  y1="120"
+                                  x2="735"
+                                  y2="120" />
+
+                            <line class="chart-grid"
+                                  x1="60"
+                                  y1="165"
+                                  x2="735"
+                                  y2="165" />
+
+                            <line class="chart-grid"
+                                  x1="60"
+                                  y1="210"
+                                  x2="735"
+                                  y2="210" />
+
+                            <line class="chart-grid"
+                                  x1="60"
+                                  y1="255"
+                                  x2="735"
+                                  y2="255" />
+
+
+                            <!-- =========================
+                                 AXIS
+                                 ========================= -->
+
+                            <line class="chart-axis"
+                                  x1="60"
+                                  y1="30"
+                                  x2="60"
+                                  y2="255" />
+
+                            <line class="chart-axis"
+                                  x1="60"
+                                  y1="255"
+                                  x2="735"
+                                  y2="255" />
+
+
+                            <!-- =========================
+                                 Y AXIS
+                                 ALWAYS 0 TO 100
+                                 ========================= -->
+
+                            <text class="chart-axis-text"
+                                  x="48"
+                                  y="259"
+                                  text-anchor="end">
+                                0
+                            </text>
+
+                            <text class="chart-axis-text"
+                                  x="48"
+                                  y="214"
+                                  text-anchor="end">
+                                20
+                            </text>
+
+                            <text class="chart-axis-text"
+                                  x="48"
+                                  y="169"
+                                  text-anchor="end">
+                                40
+                            </text>
+
+                            <text class="chart-axis-text"
+                                  x="48"
+                                  y="124"
+                                  text-anchor="end">
+                                60
+                            </text>
+
+                            <text class="chart-axis-text"
+                                  x="48"
+                                  y="79"
+                                  text-anchor="end">
+                                80
+                            </text>
+
+                            <text class="chart-axis-text"
+                                  x="48"
+                                  y="34"
+                                  text-anchor="end">
+                                100
+                            </text>
+
+
+                            <!-- =========================
+                                 Y AXIS TITLE
+                                 ========================= -->
+
+                            <text class="chart-axis-text"
+                                  transform="translate(16 165) rotate(-90)"
+                                  text-anchor="middle">
+
+                                No. of Trainees
+
+                            </text>
+
+
+                            <!-- =========================
+                                 BARS
+                                 ========================= -->
+
+                            <g id="registrationBars"></g>
+
+
+                            <!-- =========================
+                                 X AXIS TITLE
+                                 ========================= -->
+
+                            <text class="chart-axis-text"
+                                  x="397"
+                                  y="292"
+                                  text-anchor="middle">
+
+                                Month Year
+
+                            </text>
+
+
+                            <!-- MONTHS -->
+
+                            <g id="registrationMonths"></g>
+
+                        </svg>
+
+                    </div>
+
+                </div>
+
+
+                <!-- FOOTER -->
+
+                <div class="analytics-footer">
+
+                    <i class="fas fa-chart-line"></i>
+
+                    Monthly trainee registration trend
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+<script>
+
+    document.addEventListener("DOMContentLoaded", function () {
+
+        // =====================================================
+        // MONTH NAMES
+        // =====================================================
+
+        const monthNames = [
+            "Jan",
+            "Feb",
+            "Mar",
+            "Apr",
+            "May",
+            "Jun",
+            "Jul",
+            "Aug",
+            "Sep",
+            "Oct",
+            "Nov",
+            "Dec"
+        ];
+
+
+        // =====================================================
+        // CURRENT YEAR
+        // =====================================================
+
+        const currentYear = new Date().getFullYear();
+
+
+        // =====================================================
+        // =====================================================
+        // 1. ELIGIBLE TRAINEE CHART
+        // =====================================================
+        // =====================================================
+
+
+        // =====================================================
+        // DATA FROM C#
+        // =====================================================
+
+        const eligibleData =
+            @Html.Raw(
+                    System.Text.Json.JsonSerializer.Serialize(
+                                    areaData.Select(x => new
+                                    {
+                                                year = x.PostYear,
+                                                month = x.PostMonth,
+                                                count = x.TotalEligibleTrainees
+                                    })
+                    )
+                        );
+
+
+        console.log(
+            "Eligible Data From C#:",
+            eligibleData
+        );
+
+
+        // =====================================================
+        // CREATE 12 MONTHS
+        // =====================================================
+
+        const eligibleMonths = [];
+
+
+        for (let i = 1; i <= 12; i++) {
+
+            eligibleMonths.push({
+
+                year: currentYear,
+
+                month: i,
+
+                label:
+                    monthNames[i - 1] +
+                    " " +
+                    String(currentYear).slice(-2),
+
+                count: 0
+
+            });
+
+        }
+
+
+        // =====================================================
+        // PUT DATABASE VALUES INTO MONTHS
+        // =====================================================
+
+        if (Array.isArray(eligibleData)) {
+
+            eligibleData.forEach(function (item) {
+
+                const itemYear =
+                    Number(item.year);
+
+                const itemMonth =
+                    Number(item.month);
+
+                const itemCount =
+                    Number(item.count) || 0;
+
+
+                const found =
+                    eligibleMonths.find(function (x) {
+
+                        return (
+                            x.year === itemYear &&
+                            x.month === itemMonth
+                        );
+
+                    });
+
+
+                if (found) {
+
+                    /*
+                     * IMPORTANT:
+                     * Do NOT add the value again.
+                     *
+                     * SP should already return the
+                     * monthly eligible trainee total.
+                     */
+
+                    found.count = itemCount;
+
+                }
+
+            });
+
+        }
+
+
+        console.log(
+            "Eligible Monthly Data:",
+            eligibleMonths
+        );
+
+
+        // =====================================================
+        // CHART SETTINGS
+        // =====================================================
+
+        const eligibleChartLeft = 60;
+
+        const eligibleChartRight = 735;
+
+        const eligibleChartTop = 30;
+
+        const eligibleChartBottom = 255;
+
+        const eligibleChartHeight =
+            eligibleChartBottom -
+            eligibleChartTop;
+
+        const eligibleChartWidth =
+            eligibleChartRight -
+            eligibleChartLeft;
+
+        const eligibleMonthGap =
+            eligibleChartWidth / 11;
+
+
+        // =====================================================
+        // Y AXIS ALWAYS 0 TO 100
+        // =====================================================
+
+        const eligibleYAxisMax = 100;
+
+
+        // =====================================================
+        // CREATE POINTS
+        // =====================================================
+
+        const eligiblePointsData = [];
+
+
+        eligibleMonths.forEach(function (item, index) {
+
+            const x =
+                eligibleChartLeft +
+                (
+                    index *
+                    eligibleMonthGap
+                );
+
+
+            const value =
+                Math.max(
+                    0,
+                    Math.min(
+                        Number(item.count) || 0,
+                        eligibleYAxisMax
+                    )
+                );
+
+
+            const y =
+                eligibleChartBottom -
+                (
+                    (
+                        value /
+                        eligibleYAxisMax
+                    ) *
+                    eligibleChartHeight
+                );
+
+
+            eligiblePointsData.push({
+
+                x: x,
+
+                y: y,
+
+                count: value,
+
+                label: item.label
+
+            });
+
+        });
+
+
+        // =====================================================
+        // DRAW LINE
+        // =====================================================
+
+        const eligibleLine =
+            document.getElementById(
+                "eligibleLine"
+            );
+
+
+        if (eligibleLine) {
+
+            eligibleLine.setAttribute(
+                "points",
+
+                eligiblePointsData
+                    .map(function (p) {
+
+                        return (
+                            p.x +
+                            "," +
+                            p.y
+                        );
+
+                    })
+                    .join(" ")
+            );
+
+        }
+
+
+        // =====================================================
+        // DRAW AREA
+        // =====================================================
+
+        const eligibleArea =
+            document.getElementById(
+                "eligibleArea"
+            );
+
+
+        if (eligibleArea) {
+
+            let areaPoints =
+                eligiblePointsData
+                    .map(function (p) {
+
+                        return (
+                            p.x +
+                            "," +
+                            p.y
+                        );
+
+                    })
+                    .join(" ");
+
+
+            areaPoints +=
+                " " +
+                eligibleChartRight +
+                "," +
+                eligibleChartBottom;
+
+
+            areaPoints +=
+                " " +
+                eligibleChartLeft +
+                "," +
+                eligibleChartBottom;
+
+
+            eligibleArea.setAttribute(
+                "points",
+                areaPoints
+            );
+
+        }
+
+
+        // =====================================================
+        // DRAW POINTS
+        // =====================================================
+
+        const eligiblePoints =
+            document.getElementById(
+                "eligiblePoints"
+            );
+
+
+        if (eligiblePoints) {
+
+            eligiblePoints.innerHTML = "";
+
+
+            eligiblePointsData.forEach(
+                function (p) {
+
+                    const circle =
+                        document.createElementNS(
+                            "http://www.w3.org/2000/svg",
+                            "circle"
+                        );
+
+
+                    circle.setAttribute(
+                        "cx",
+                        p.x
+                    );
+
+
+                    circle.setAttribute(
+                        "cy",
+                        p.y
+                    );
+
+
+                    circle.setAttribute(
+                        "r",
+                        "4"
+                    );
+
+
+                    circle.setAttribute(
+                        "class",
+                        "chart-point"
+                    );
+
+
+                    // =================================================
+                    // TOOLTIP
+                    // =================================================
+
+                    const title =
+                        document.createElementNS(
+                            "http://www.w3.org/2000/svg",
+                            "title"
+                        );
+
+
+                    title.textContent =
+                        p.label +
+                        " : " +
+                        p.count +
+                        " eligible trainee(s)";
+
+
+                    circle.appendChild(
+                        title
+                    );
+
+
+                    eligiblePoints.appendChild(
+                        circle
+                    );
+
+                }
+            );
+
+        }
+
+
+        // =====================================================
+        // ELIGIBLE MONTH LABELS
+        // =====================================================
+
+        const eligibleMonthsElement =
+            document.getElementById(
+                "eligibleMonths"
+            );
+
+
+        if (eligibleMonthsElement) {
+
+            eligibleMonthsElement.innerHTML = "";
+
+
+            eligibleMonths.forEach(
+                function (item, index) {
+
+                    const text =
+                        document.createElementNS(
+                            "http://www.w3.org/2000/svg",
+                            "text"
+                        );
+
+
+                    const x =
+                        eligibleChartLeft +
+                        (
+                            index *
+                            eligibleMonthGap
+                        );
+
+
+                    text.setAttribute(
+                        "x",
+                        x
+                    );
+
+
+                    text.setAttribute(
+                        "y",
+                        eligibleChartBottom + 20
+                    );
+
+
+                    text.setAttribute(
+                        "text-anchor",
+                        "middle"
+                    );
+
+
+                    text.setAttribute(
+                        "class",
+                        "chart-axis-text"
+                    );
+
+
+                    text.textContent =
+                        item.label;
+
+
+                    eligibleMonthsElement.appendChild(
+                        text
+                    );
+
+                }
+            );
+
+        }
+
+
+
+        // =====================================================
+        // =====================================================
+        // 2. CANDIDATE REGISTRATION CHART
+        // =====================================================
+        // =====================================================
+
+
+        // =====================================================
+        // DATA FROM C#
+        // =====================================================
+
+        const candidateData =
+            @Html.Raw(
+                                        System.Text.Json.JsonSerializer.Serialize(
+                                                        barData.Select(x => new
+                                                        {
+                                                                    year = x.RegistrationYear,
+                                                                    month = x.RegistrationMonth,
+                                                                    count = x.TotalRegistrations
+                                                        })
+                                        )
+                        );
+
+
+        console.log(
+            "Candidate Data From C#:",
+            candidateData
+        );
+
+
+        // =====================================================
+        // CREATE 12 MONTHS
+        // =====================================================
+
+        const registrationMonths = [];
+
+
+        for (let i = 1; i <= 12; i++) {
+
+            registrationMonths.push({
+
+                year: currentYear,
+
+                month: i,
+
+                label:
+                    monthNames[i - 1] +
+                    " " +
+                    String(currentYear).slice(-2),
+
+                count: 0
+
+            });
+
+        }
+
+
+        // =====================================================
+        // PUT DATABASE DATA INTO MONTHS
+        // =====================================================
+
+        if (Array.isArray(candidateData)) {
+
+            candidateData.forEach(function (item) {
+
+                const itemYear =
+                    Number(item.year);
+
+                const itemMonth =
+                    Number(item.month);
+
+                const itemCount =
+                    Number(item.count) || 0;
+
+
+                const found =
+                    registrationMonths.find(
+                        function (x) {
+
+                            return (
+                                x.year === itemYear &&
+                                x.month === itemMonth
+                            );
+
+                        }
+                    );
+
+
+                if (found) {
+
+                    found.count = itemCount;
+
+                }
+
+            });
+
+        }
+
+
+        // =====================================================
+        // CHART SETTINGS
+        // =====================================================
+
+        const registrationChartLeft = 60;
+
+        const registrationChartRight = 735;
+
+        const registrationChartTop = 30;
+
+        const registrationChartBottom = 255;
+
+        const registrationChartHeight =
+            registrationChartBottom -
+            registrationChartTop;
+
+        const registrationChartWidth =
+            registrationChartRight -
+            registrationChartLeft;
+
+        const registrationMonthGap =
+            registrationChartWidth / 11;
+
+
+        // =====================================================
+        // Y AXIS = 0 TO 100
+        // =====================================================
+
+        const registrationYAxisMax = 100;
+
+
+        // =====================================================
+        // BARS
+        // =====================================================
+
+        const registrationBars =
+            document.getElementById(
+                "registrationBars"
+            );
+
+
+        if (registrationBars) {
+
+            registrationBars.innerHTML = "";
+
+            const barWidth = 30;
+
+
+            registrationMonths.forEach(
+                function (item, index) {
+
+                    const x =
+                        registrationChartLeft +
+                        (
+                            index *
+                            registrationMonthGap
+                        ) -
+                        (
+                            barWidth / 2
+                        );
+
+
+                    const value =
+                        Math.max(
+                            0,
+                            Math.min(
+                                Number(item.count) || 0,
+                                registrationYAxisMax
+                            )
+                        );
+
+
+                    const barHeight =
+                        (
+                            value /
+                            registrationYAxisMax
+                        ) *
+                        registrationChartHeight;
+
+
+                    const y =
+                        registrationChartBottom -
+                        barHeight;
+
+
+                    const rect =
+                        document.createElementNS(
+                            "http://www.w3.org/2000/svg",
+                            "rect"
+                        );
+
+
+                    rect.setAttribute(
+                        "x",
+                        x
+                    );
+
+
+                    rect.setAttribute(
+                        "y",
+                        y
+                    );
+
+
+                    rect.setAttribute(
+                        "width",
+                        barWidth
+                    );
+
+
+                    rect.setAttribute(
+                        "height",
+                        barHeight
+                    );
+
+
+                    rect.setAttribute(
+                        "class",
+                        "chart-bar"
+                    );
+
+
+                    // =================================================
+                    // TOOLTIP
+                    // =================================================
+
+                    const title =
+                        document.createElementNS(
+                            "http://www.w3.org/2000/svg",
+                            "title"
+                        );
+
+
+                    title.textContent =
+                        item.label +
+                        " : " +
+                        value +
+                        " candidate(s)";
+
+
+                    rect.appendChild(
+                        title
+                    );
+
+
+                    registrationBars.appendChild(
+                        rect
+                    );
+
+                }
+            );
+
+        }
+
+
+        // =====================================================
+        // REGISTRATION MONTH LABELS
+        // =====================================================
+
+        const registrationMonthsElement =
+            document.getElementById(
+                "registrationMonths"
+            );
+
+
+        if (registrationMonthsElement) {
+
+            registrationMonthsElement.innerHTML = "";
+
+
+            registrationMonths.forEach(
+                function (item, index) {
+
+                    const text =
+                        document.createElementNS(
+                            "http://www.w3.org/2000/svg",
+                            "text"
+                        );
+
+
+                    const x =
+                        registrationChartLeft +
+                        (
+                            index *
+                            registrationMonthGap
+                        );
+
+
+                    text.setAttribute(
+                        "x",
+                        x
+                    );
+
+
+                    text.setAttribute(
+                        "y",
+                        registrationChartBottom + 20
+                    );
+
+
+                    text.setAttribute(
+                        "text-anchor",
+                        "middle"
+                    );
+
+
+                    text.setAttribute(
+                        "class",
+                        "chart-axis-text"
+                    );
+
+
+                    text.textContent =
+                        item.label;
+
+
+                    registrationMonthsElement.appendChild(
+                        text
+                    );
+
+                }
+            );
+
+        }
+
+
+        // =====================================================
+        // DEBUG
+        // =====================================================
+
+        console.log(
+            "FINAL ELIGIBLE MONTHS:",
+            eligibleMonths
+        );
+
+        console.log(
+            "FINAL REGISTRATION MONTHS:",
+            registrationMonths
+        );
+
+    });
+
+</script>
+

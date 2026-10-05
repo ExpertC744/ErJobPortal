@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Configuration;
 using System.Data;
+using System.Reflection;
 
 namespace ErJobPortal.Controllers
 {
@@ -28,25 +29,19 @@ namespace ErJobPortal.Controllers
             if (candidateId == null || candidateId <= 0)
                 return null;
 
-            var candidate =
-                _repository.GetCandidateRegistrationDetails(candidateId.Value);
+            var candidate = _repository.GetCandidateRegistrationDetails(candidateId.Value);
 
-            if (candidate == null ||
-                candidate.Value.DOB == null ||
-                candidate.Value.RegDate == null)
+            if (candidate == null || candidate.Value.DOB == null || candidate.Value.RegDate == null)
             {
                 return null;
             }
 
-            string candidateCode =
-                "CD" +
-                candidate.Value.DOB.Value.ToString("ddMMyy") +
-                candidate.Value.RegDate.Value.ToString("MMdd") +
-                candidate.Value.CandidateID.ToString("D2");
+            string candidateCode = "CD" + candidate.Value.DOB.Value.ToString("ddMMyy") + candidate.Value.RegDate.Value.ToString("MMdd") + candidate.Value.CandidateID.ToString("D2");
 
             return candidateCode;
         }
 
+        // shrirang 01/10/26
         // =========================================================
         // DASHBOARD
         // =========================================================
@@ -55,23 +50,18 @@ namespace ErJobPortal.Controllers
         [ResponseCache(NoStore = true, Location = ResponseCacheLocation.None)]
         public IActionResult Dashboard(string? id)
         {
-            int? candidateId =
-                HttpContext.Session.GetInt32("CandidateID");
+            int? candidateId = HttpContext.Session.GetInt32("CandidateID");
 
             if (candidateId == null)
             {
-                return RedirectToAction(
-                    "CandidateLogin",
-                    "Account");
+                return RedirectToAction("CandidateLogin", "Account");
             }
 
             // =========================================================
             // GET CANDIDATE REGISTRATION DETAILS
             // =========================================================
 
-            var candidate =
-                _repository.GetCandidateRegistrationDetails(
-                    candidateId.Value);
+            var candidate = _repository.GetCandidateRegistrationDetails(candidateId.Value);
 
             if (candidate == null)
             {
@@ -85,8 +75,7 @@ namespace ErJobPortal.Controllers
             if (candidate.Value.DOB == null ||
                 candidate.Value.RegDate == null)
             {
-                return BadRequest(
-                    "Candidate DOB or Registration Date is missing.");
+                return BadRequest("Candidate DOB or Registration Date is missing.");
             }
 
             // =========================================================
@@ -106,8 +95,7 @@ namespace ErJobPortal.Controllers
             // CD080599072601
             // =========================================================
 
-            string candidateCode =
-                "CD" +
+            string candidateCode = "CD" +
                 candidate.Value.DOB.Value.ToString("ddMMyy") +
                 candidate.Value.RegDate.Value.ToString("MMdd") +
                 candidate.Value.CandidateID.ToString("D2");
@@ -119,10 +107,7 @@ namespace ErJobPortal.Controllers
 
             if (string.IsNullOrEmpty(id))
             {
-                return RedirectToAction(
-                    "Dashboard",
-                    "Candidate",
-                    new { id = candidateCode });
+                return RedirectToAction("Dashboard", "Candidate", new { id = candidateCode });
             }
 
             // =========================================================
@@ -139,45 +124,33 @@ namespace ErJobPortal.Controllers
             // EXISTING DASHBOARD CODE
             // =========================================================
 
-            ViewBag.CandidateID =
-                candidateId;
+            ViewBag.CandidateID = candidateId;
 
-            ViewBag.CandidateName =
-                HttpContext.Session.GetString(
-                    "CandidateName");
+            ViewBag.CandidateName = HttpContext.Session.GetString("CandidateName");
 
-            ViewBag.CandidateEmail =
-                HttpContext.Session.GetString(
-                    "CandidateEmail");
+            ViewBag.CandidateEmail = HttpContext.Session.GetString("CandidateEmail");
 
-            ViewBag.CandidateCode =
-                candidateCode;
+            ViewBag.CandidateCode = candidateCode;
 
+            // =========================================================
+            // CHECK WHETHER CANDIDATE HAS ENTERED ANY PROFILE DATA
+            // =========================================================
+
+            CandidateProfileModel? candidateProfile = _repo.GetProfile(candidateId.Value);
+            ViewBag.HasCandidateProfile = HasCandidateProfileData(candidateProfile);
+            //end
             // =========================================================
             // ORGANIZATION COUNT
             // =========================================================
-
             int organizationRegistrationCount = 0;
-
-            string connectionString =
-                _configuration.GetConnectionString(
-                    "DefaultConnection");
-
-            using (SqlConnection con =
-                   new SqlConnection(connectionString))
+            string connectionString = _configuration.GetConnectionString("DefaultConnection");
+            using (SqlConnection con = new SqlConnection(connectionString))
             {
                 con.Open();
-
-                string query = @"
-     SELECT COUNT(nID)
-     FROM tblOrgRegistration;";
-
-                using (SqlCommand cmd =
-                       new SqlCommand(query, con))
+                string query = @"SELECT COUNT(nID) FROM tblOrgRegistration;";
+                using (SqlCommand cmd = new SqlCommand(query, con))
                 {
-                    organizationRegistrationCount =
-                        Convert.ToInt32(
-                            cmd.ExecuteScalar());
+                    organizationRegistrationCount = Convert.ToInt32(cmd.ExecuteScalar());
                 }
             }
 
@@ -185,50 +158,447 @@ namespace ErJobPortal.Controllers
             // ORGANIZATION LIST
             // =========================================================
 
-            List<OrganizationUser> organizations =
-                _repository.GetAllOrganizationList();
+            List<OrganizationUser> organizations = _repository.GetAllOrganizationList();
+            ViewBag.OrganizationRegistrationCount = organizationRegistrationCount;
+            ViewBag.Organizations = organizations;
 
-            ViewBag.OrganizationRegistrationCount =
-                organizationRegistrationCount;
+            // =========================================================
+            // MATCHING INTERNSHIP POSTS
+            // =========================================================
+            List<OrgPostM> internshipPosts = GetMatchingJobsForCandidate(candidateId.Value);
+            ViewBag.InternshipPosts = internshipPosts;
 
-            ViewBag.Organizations =
-                organizations;
+            // =========================================================
+            // TRAINEE APPLIED POSTS
+            // =========================================================
+            List<OrgPostM> traineeAppliedPosts = TraineeApplyToPostList(candidateId.Value);
+            ViewBag.TraineeAppliedPosts = traineeAppliedPosts;
 
-            return View();
+
+
+            List<OrgPostM> matchingJobs = GetMatchingJobsForCandidate(candidateId.Value);
+
+
+            /// =========================================================
+            // CHART DATA
+            // =========================================================
+
+            SAChartsViewModel chartModel = new SAChartsViewModel();
+
+
+
+            using (SqlConnection con =
+                   new SqlConnection(connectionString))
+            {
+                using (SqlCommand cmd =
+                       new SqlCommand("SP_GetSACharts", con))
+                {
+                    cmd.CommandType = CommandType.StoredProcedure;
+
+                    con.Open();
+
+                    using (SqlDataReader reader =
+                           cmd.ExecuteReader())
+                    {
+                        // =====================================================
+                        // RESULT SET 1 - CANDIDATE DATA
+                        // =====================================================
+
+                        while (reader.Read())
+                        {
+                            chartModel.CandidateData.Add(
+                                new SAChartData
+                                {
+                                    Year = Convert.ToInt32(reader["Year"]),
+                                    Month = Convert.ToInt32(reader["Month"]),
+                                    TotalCount = Convert.ToInt32(reader["TotalCount"])
+                                });
+                        }
+
+                        // =====================================================
+                        // RESULT SET 2 - INTERNSHIP POST DATA
+                        // =====================================================
+
+                        if (reader.NextResult())
+                        {
+                            while (reader.Read())
+                            {
+                                chartModel.InternshipPostData.Add(
+                                    new SAChartData
+                                    {
+                                        Year = Convert.ToInt32(reader["Year"]),
+                                        Month = Convert.ToInt32(reader["Month"]),
+                                        TotalCount = Convert.ToInt32(reader["TotalCount"])
+                                    });
+                            }
+                        }
+                    }
+                }
+            }
+
+
+            // =========================================================
+            // MONTHLY SUITABLE OPENINGS
+            // =========================================================
+
+            int currentYear = DateTime.Now.Year;
+
+            int[] suitableOpeningsMonthly = new int[12];
+
+            foreach (var job in matchingJobs)
+            {
+                if (!job.dStartDate.HasValue)
+                    continue;
+
+                DateTime startDate = job.dStartDate.Value;
+
+                if (startDate.Year != currentYear)
+                    continue;
+
+                int monthIndex = startDate.Month - 1;
+
+                int requiredTrainees = job.nRequiredTrainees;
+
+                if (requiredTrainees < 0)
+                    requiredTrainees = 0;
+
+                if (monthIndex >= 0 && monthIndex < 12)
+                {
+                    suitableOpeningsMonthly[monthIndex] +=
+                        requiredTrainees;
+                }
+            }
+
+
+            // =========================================================
+            // SEND CHART DATA TO DASHBOARD VIEW
+            // =========================================================
+
+            ViewBag.ChartYear = currentYear;
+
+            ViewBag.SuitableOpeningsMonthly =
+                suitableOpeningsMonthly;
+
+            return View(chartModel);
         }
-
 
         // ==========================================
         // ORGANIZATION LIST
         // ==========================================
+        // =============================================================
+        // GET MATCHING INTERNSHIP POSTS FOR CANDIDATE
+        // =============================================================
+        //[HttpGet]
+        //private List<OrgPostM> GetMatchingJobsForCandidate(int candidateId)
+        //{
+        //    List<OrgPostM> posts = new List<OrgPostM>();
+        //    string connectionString = _configuration.GetConnectionString("DefaultConnection")!;
+        //    using (SqlConnection con = new SqlConnection(connectionString))
+        //    {
+        //        using (SqlCommand cmd = new SqlCommand("GetMatchingJobsForCandidate", con))
+        //        {
+        //            // =====================================================
+        //            // STORED PROCEDURE
+        //            // =====================================================
+
+        //            cmd.CommandType = CommandType.StoredProcedure;
+
+        //            // =====================================================
+        //            // CANDIDATE ID
+        //            // =====================================================
+
+        //            cmd.Parameters.Add("@CandidateID", SqlDbType.Int).Value = candidateId;
+        //            con.Open();
+        //            using (SqlDataReader dr = cmd.ExecuteReader())
+        //            {
+        //                while (dr.Read())
+        //                {
+        //                    OrgPostM post = new OrgPostM();
+
+        //                    // =================================================
+        //                    // POST ID
+        //                    // SP: fj.nID AS PostID
+        //                    // =================================================
+
+        //                    post.nID = dr["PostID"] != DBNull.Value ? Convert.ToInt32(dr["PostID"]) : 0;
+
+        //                    // =================================================
+        //                    // ORGANIZATION ID
+        //                    // SP: fj.nOrgID AS OrgID
+        //                    // =================================================
+
+        //                    post.nOrgID = dr["OrgID"] != DBNull.Value ? Convert.ToInt32(dr["OrgID"]) : 0;
+        //                    post.sName = dr["OrganizationName"] != DBNull.Value ? dr["OrganizationName"].ToString()! : "";
+
+        //                    // =================================================
+        //                    // POSITION ID
+        //                    // SP: fj.nPositionID AS PositionID
+        //                    // =================================================
+
+        //                    post.nPositionID =
+        //                        dr["PositionID"] != DBNull.Value
+        //                        ? Convert.ToInt32(
+        //                            dr["PositionID"])
+        //                        : 0;
+
+
+        //                    // =================================================
+        //                    // POSITION NAME
+        //                    // SP: fj.PositionName
+        //                    // =================================================
+
+        //                    post.sPositionName =
+        //                        dr["PositionName"] != DBNull.Value
+        //                        ? dr["PositionName"]
+        //                            .ToString()!
+        //                        : "";
+
+
+        //                    // =================================================
+        //                    // COUNTRY
+        //                    // SP: fj.sCountryName AS Country
+        //                    // =================================================
+
+        //                    post.sCountryName =
+        //                        dr["Country"] != DBNull.Value
+        //                        ? dr["Country"]
+        //                            .ToString()!
+        //                        : "";
+
+
+        //                    // =================================================
+        //                    // STATE
+        //                    // SP: fj.sStateName AS State
+        //                    // =================================================
+
+        //                    post.sStateName =
+        //                        dr["State"] != DBNull.Value
+        //                        ? dr["State"]
+        //                            .ToString()!
+        //                        : "";
+
+
+        //                    // =================================================
+        //                    // CITY
+        //                    // SP: fj.nCityName AS City
+        //                    // =================================================
+
+        //                    post.nCityName =
+        //                        dr["City"] != DBNull.Value
+        //                        ? dr["City"]
+        //                            .ToString()!
+        //                        : "";
+
+
+        //                    // =================================================
+        //                    // FELLOWSHIP TYPE ID
+        //                    // SP: InternshipFellowshipType
+        //                    // =================================================
+
+        //                    // =============================================================
+        //                    // FELLOWSHIP TYPE ID
+        //                    // =============================================================
+
+        //                    post.nInternshipFellowshipTypeID =
+        //                        dr["InternshipFellowshipTypeID"] != DBNull.Value
+        //                        ? Convert.ToInt32(
+        //                            dr["InternshipFellowshipTypeID"])
+        //                        : 0;
+
+
+        //                    // =============================================================
+        //                    // FELLOWSHIP TYPE NAME
+        //                    // =============================================================
+
+        //                    post.sInternshipFellowshipTypeName = dr["InternshipFellowshipType"] != DBNull.Value ? dr["InternshipFellowshipType"].ToString()! : "";
+        //                    // =================================================
+        //                    // FACILITIES
+        //                    // SP: fj.sFacilities
+        //                    // =================================================
+
+        //                    post.sFacilities =
+        //                        dr["sFacilities"] != DBNull.Value
+        //                        ? dr["sFacilities"]
+        //                            .ToString()!
+        //                        : "";
+
+
+        //                    // =================================================
+        //                    // APPLICATION STATUS
+        //                    // SP: ISNULL(jas.CApply, 0) AS CApply
+        //                    // =================================================
+
+        //                    post.IsApplied = dr["CApply"] != DBNull.Value && Convert.ToInt32(dr["CApply"]) == 1;
+
+        //                    // =================================================
+        //                    // ADD TO LIST
+        //                    // =================================================
+
+        //                    posts.Add(post);
+        //                }
+        //            }
+        //        }
+        //    }
+
+        //    return posts;
+        //}
+
         [HttpGet]
+        private List<OrgPostM> GetMatchingJobsForCandidate(int candidateId)
+        {
+            List<OrgPostM> posts = new List<OrgPostM>();
+            string connectionString = _configuration.GetConnectionString("DefaultConnection")!;
+
+            using (SqlConnection con = new SqlConnection(connectionString))
+            using (SqlCommand cmd = new SqlCommand("GetMatchingJobsForCandidate", con))
+            {
+                cmd.CommandType = CommandType.StoredProcedure;
+                cmd.Parameters.Add("@CandidateID", SqlDbType.Int).Value = candidateId;
+                con.Open();
+                using (SqlDataReader dr = cmd.ExecuteReader())
+                {
+                    while (dr.Read())
+                    {
+                        OrgPostM post = new OrgPostM();
+
+                        // =============================================
+                        // POST
+                        // =============================================
+
+                        post.nID =
+                            dr["PostID"] != DBNull.Value
+                            ? Convert.ToInt32(dr["PostID"])
+                            : 0;
+
+
+                        // =============================================
+                        // ORGANIZATION
+                        // =============================================
+
+                        post.nOrgID =
+                            dr["OrgID"] != DBNull.Value
+                            ? Convert.ToInt32(dr["OrgID"])
+                            : 0;
+
+                        post.sName =
+                            dr["OrganizationName"] != DBNull.Value
+                            ? dr["OrganizationName"].ToString()!
+                            : "";
+
+                        // =============================================
+                        // POSITION
+                        // =============================================
+
+                        post.nPositionID =
+                            dr["PositionID"] != DBNull.Value
+                            ? Convert.ToInt32(dr["PositionID"])
+                            : 0;
+
+                        post.sPositionName =
+                            dr["PositionName"] != DBNull.Value
+                            ? dr["PositionName"].ToString()!
+                            : "";
+
+                        // =============================================
+                        // LOCATION
+                        // =============================================
+
+                        post.sCountryName =
+                            dr["Country"] != DBNull.Value
+                            ? dr["Country"].ToString()!
+                            : "";
+
+                        post.sStateName =
+                            dr["State"] != DBNull.Value
+                            ? dr["State"].ToString()!
+                            : "";
+
+                        post.nCityName =
+                            dr["City"] != DBNull.Value
+                            ? dr["City"].ToString()!
+                            : "";
+
+                        // =============================================
+                        // INTERNSHIP / FELLOWSHIP TYPE
+                        // =============================================
+
+                        post.nInternshipFellowshipTypeID =
+                            dr["InternshipFellowshipTypeID"] != DBNull.Value
+                            ? Convert.ToInt32(
+                                dr["InternshipFellowshipTypeID"])
+                            : 0;
+
+                        post.sInternshipFellowshipTypeName =
+                            dr["InternshipFellowshipType"] != DBNull.Value
+                            ? dr["InternshipFellowshipType"].ToString()!
+                            : "";
+                        // =============================================
+                        // REQUIRED TRAINEES
+                        // =============================================
+
+                        post.nRequiredTrainees =
+                            dr["nRequiredTrainees"] != DBNull.Value
+                            ? Convert.ToInt32(dr["nRequiredTrainees"])
+                            : 0;
+
+
+                        // =============================================
+                        // START DATE
+                        // =============================================
+
+                        post.dStartDate =
+                            dr["dStartDate"] != DBNull.Value
+                            ? Convert.ToDateTime(dr["dStartDate"])
+                            : (DateTime?)null;
+                        // =============================================
+                        // FACILITIES
+                        // =============================================
+
+                        post.sFacilities =
+                            dr["sFacilities"] != DBNull.Value
+                            ? dr["sFacilities"].ToString()!
+                            : "";
+
+                        // =============================================
+                        // APPLICATION STATUS
+                        // =============================================
+
+                        post.IsApplied =
+                            dr["CApply"] != DBNull.Value &&
+                            Convert.ToInt32(dr["CApply"]) == 1;
+
+                        // =============================================
+                        // ADD
+                        // =============================================
+
+                        posts.Add(post);
+                    }
+                }
+            }
+
+            return posts;
+        }
+
+
         [Route("Candidate/OrgList/{id?}")]
         public IActionResult OrgList(string? id)
         {
-            int? candidateId =
-                HttpContext.Session.GetInt32("CandidateID");
+            int? candidateId = HttpContext.Session.GetInt32("CandidateID");
 
             if (candidateId == null || candidateId <= 0)
             {
-                return RedirectToAction(
-                    "CandidateLogin",
-                    "Account");
+                return RedirectToAction("CandidateLogin", "Account");
             }
 
             string? candidateCode = GetCandidateCode();
-
             if (string.IsNullOrEmpty(candidateCode))
             {
                 return NotFound("Candidate code could not be generated.");
             }
-
             // If URL does not contain candidate code, add it
             if (string.IsNullOrEmpty(id))
             {
-                return RedirectToAction(
-                    "OrgList",
-                    "Candidate",
-                    new { id = candidateCode });
+                return RedirectToAction("OrgList", "Candidate", new { id = candidateCode });
             }
 
             // Prevent another/wrong candidate code
@@ -237,8 +607,7 @@ namespace ErJobPortal.Controllers
                 return NotFound();
             }
 
-            List<OrganizationUser> organization =
-                _repository.GetAllOrganizationList();
+            List<OrganizationUser> organization = _repository.GetAllOrganizationList();
 
             ViewBag.CandidateCode = candidateCode;
             ViewBag.CandidateID = candidateId.Value;
@@ -253,14 +622,11 @@ namespace ErJobPortal.Controllers
             // =========================================================
             // GET CANDIDATE ID FROM SESSION
             // =========================================================
-            int? candidateId =
-                HttpContext.Session.GetInt32("CandidateID");
+            int? candidateId = HttpContext.Session.GetInt32("CandidateID");
 
             if (candidateId == null || candidateId <= 0)
             {
-                return RedirectToAction(
-                    "CandidateLogin",
-                    "Account");
+                return RedirectToAction("CandidateLogin", "Account");
             }
 
             // =========================================================
@@ -381,26 +747,32 @@ namespace ErJobPortal.Controllers
             return View(vm);
         }
 
-
+        // shrirang 30-09-26
         // =========================================================
         // LOAD ALL DROPDOWNS
         // =========================================================
 
-        private CandidateProfileViewModel LoadProfileDropdowns(
-    CandidateProfileModel profile)
+        private CandidateProfileViewModel LoadProfileDropdowns(CandidateProfileModel profile)
         {
             return new CandidateProfileViewModel
             {
                 Profile = profile,
 
-                Divisions =
-                    _repo.GetDivisions(),
+                // =====================================================
+                // EDUCATION
+                // =====================================================
 
-                Streams =
-                    _repo.GetStreams(),
+                Divisions = _repo.GetDivisions(),
+
+                Streams = _repo.GetStreams(),
 
                 GraduationStatuses =
                     _repo.GetGraduationStatuses(),
+
+
+                // =====================================================
+                // INTERNSHIP / FELLOWSHIP
+                // =====================================================
 
                 InternshipFellowshipType =
                     _repo.GetInternshipFellowshipType(),
@@ -414,8 +786,27 @@ namespace ErJobPortal.Controllers
                 InternshipStatuses =
                     _repo.GetInternshipStatuses(),
 
+
+                // =====================================================
+                // REFERENCES
+                // =====================================================
+
                 Relationships =
-                    _repo.GetRelationships()
+                    _repo.GetRelationships(),
+
+
+                // =====================================================
+                // SKILLS
+                // =====================================================
+
+                MedicalSkills =
+                    _repo.GetMedicalSkills(),
+
+                TechnicalSkills =
+                    _repo.GetTechnicalSkills(),
+
+                NonTechnicalSkills =
+                    _repo.GetNonTechnicalSkills()
             };
         }
 
@@ -472,7 +863,6 @@ namespace ErJobPortal.Controllers
 
             return RedirectToAction("Profile");
         }
-
 
         // =====================================================
         // UPDATE INTERNSHIP / FELLOWSHIP PREFERENCE
@@ -607,7 +997,6 @@ namespace ErJobPortal.Controllers
             return RedirectToAction("Profile");
         }
 
-
         // =========================================================
         // UPDATE ACHIEVEMENTS
         // =========================================================
@@ -631,7 +1020,6 @@ namespace ErJobPortal.Controllers
 
             return RedirectToAction("Profile");
         }
-
 
         // =========================================================
         // UPDATE LINKS
@@ -657,7 +1045,6 @@ namespace ErJobPortal.Controllers
             return RedirectToAction("Profile");
         }
 
-
         // shrirang 24/09/26
         // =========================================================
         // UPDATE OBJECTIVE
@@ -669,8 +1056,7 @@ namespace ErJobPortal.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult UpdateObjective(
-            [Bind(Prefix = "Profile")] CandidateProfileModel model)
+        public IActionResult UpdateObjective([Bind(Prefix = "Profile")] CandidateProfileModel model)
         {
             int? candidateId =
                 HttpContext.Session.GetInt32("CandidateID");
@@ -728,8 +1114,6 @@ namespace ErJobPortal.Controllers
             return RedirectToAction("Profile");
         }
 
-
-
         // =========================================================
         // UPDATE SKILLS
         // =========================================================
@@ -753,7 +1137,6 @@ namespace ErJobPortal.Controllers
 
             return RedirectToAction("Profile");
         }
-
 
         // =========================================================
         // UPDATE DOCUMENTS / HOBBIES
@@ -959,7 +1342,6 @@ namespace ErJobPortal.Controllers
             return RedirectToAction("Index", "Home");
         }
 
-
         // =========================================================
         // NO CACHE
         // =========================================================
@@ -970,8 +1352,6 @@ namespace ErJobPortal.Controllers
             Response.Headers["Pragma"] = "no-cache";
             Response.Headers["Expires"] = "0";
         }
-
-
 
         // =========================================================
         // CANDIDATE CREATE FEEDBACK - GET
@@ -1078,15 +1458,12 @@ namespace ErJobPortal.Controllers
             return View(feedback);
         }
 
-
-
         // =========================================================
         // CANDIDATE FEEDBACK - CREATE - POST
         // =========================================================
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult CreateFeedback(
-            CandidateFeedbackViewModel model)
+        public IActionResult CreateFeedback(CandidateFeedbackViewModel model)
         {
             // =====================================================
             // GET CANDIDATE ID FROM SESSION
@@ -1314,8 +1691,6 @@ namespace ErJobPortal.Controllers
                 "CreateFeedback");
         }
 
-
-
         // shrirang 27/08/26
 
         //[HttpPost]
@@ -1488,8 +1863,7 @@ namespace ErJobPortal.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult UpdateInternshipDetails(
-            [Bind(Prefix = "Profile")] CandidateProfileModel model)
+        public IActionResult UpdateInternshipDetails([Bind(Prefix = "Profile")] CandidateProfileModel model)
         {
             // =====================================================
             // GET CANDIDATE ID FROM SESSION
@@ -1627,6 +2001,11 @@ namespace ErJobPortal.Controllers
         // =========================================================
         // VIEW PROFILE
         // =========================================================
+        // shrirang 02/10/26
+        // =========================================================
+        // VIEW PROFILE
+        // Opens candidate's selected/default resume template
+        // =========================================================
 
         [HttpGet]
         [ResponseCache(
@@ -1634,9 +2013,9 @@ namespace ErJobPortal.Controllers
             Location = ResponseCacheLocation.None)]
         public IActionResult ViewProfile()
         {
-            // -----------------------------------------------------
+            // =====================================================
             // GET LOGGED-IN CANDIDATE
-            // -----------------------------------------------------
+            // =====================================================
 
             int? candidateId =
                 HttpContext.Session.GetInt32("CandidateID");
@@ -1648,59 +2027,19 @@ namespace ErJobPortal.Controllers
                     "Account");
             }
 
-            // -----------------------------------------------------
-            // ALWAYS LOAD FRESH DATA FROM DATABASE
-            // -----------------------------------------------------
+            // =====================================================
+            // REDIRECT TO RESUME CONTROLLER
+            // ResumeController.Resume() will read
+            // Resume_Profile and open the correct template.
+            // =====================================================
 
-            CandidateProfileModel? profile =
-                _repo.GetProfile(candidateId.Value);
-
-            // -----------------------------------------------------
-            // IF PROFILE DOES NOT EXIST
-            // -----------------------------------------------------
-
-            if (profile == null)
-            {
-                profile = new CandidateProfileModel
+            return RedirectToAction(
+                "Resume",
+                "Resume",
+                new
                 {
-                    CandidateID = candidateId.Value
-                };
-            }
-
-            // -----------------------------------------------------
-            // LOAD PROFILE + ALL LOOKUP LISTS
-            // -----------------------------------------------------
-
-            CandidateProfileViewModel vm =
-                LoadProfileDropdowns(profile);
-
-            // -----------------------------------------------------
-            // CANDIDATE INFORMATION
-            // -----------------------------------------------------
-
-            ViewBag.CandidateID =
-                candidateId.Value;
-
-            ViewBag.CandidateName =
-                HttpContext.Session.GetString("CandidateName");
-
-            ViewBag.CandidateEmail =
-                HttpContext.Session.GetString("CandidateEmail");
-
-            // -----------------------------------------------------
-            // PREVENT BROWSER CACHE
-            // -----------------------------------------------------
-
-            Response.Headers["Cache-Control"] =
-                "no-cache, no-store, must-revalidate";
-
-            Response.Headers["Pragma"] =
-                "no-cache";
-
-            Response.Headers["Expires"] =
-                "0";
-
-            return View(vm);
+                    id = candidateId.Value
+                });
         }
 
         [HttpGet]
@@ -1708,11 +2047,25 @@ namespace ErJobPortal.Controllers
         {
             // id = CD080900080701
 
-            if (string.IsNullOrEmpty(id))
+            int? candidateId = HttpContext.Session.GetInt32("CandidateID");
+
+            if (candidateId == null)
             {
-                return RedirectToAction("Dashboard");
+                return RedirectToAction("CandidateLogin", "Account");
             }
 
+            // =========================================================
+            // GET CANDIDATE REGISTRATION DETAILS
+            // =========================================================
+
+            var candidate = _repository.GetCandidateRegistrationDetails(candidateId.Value);
+
+            if (candidate == null)
+            {
+                return NotFound("Candidate registration not found.");
+            }
+            List<OrgPostM> internshipPosts = GetMatchingJobsForCandidate(candidateId.Value);
+            ViewBag.InternshipPosts = internshipPosts;
             // Your code to get internship details using id
 
             return View();
@@ -1728,8 +2081,7 @@ namespace ErJobPortal.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult UpdateInternshipPreference(
-            [Bind(Prefix = "Profile")] CandidateProfileModel model)
+        public IActionResult UpdateInternshipPreference([Bind(Prefix = "Profile")] CandidateProfileModel model)
         {
             // =====================================================
             // GET CANDIDATE ID FROM SESSION
@@ -2087,17 +2439,21 @@ namespace ErJobPortal.Controllers
                 }
             }
         }
-
+        // shrirang 03/10/26
         // =========================================================
         // MY INTERNSHIP radhika24-09
         // =========================================================
+        // =========================================================
+        // MY INTERNSHIP
+        // =========================================================
+
         [HttpGet]
         [Route("Candidate/MyInternship/{id?}")]
         public IActionResult MyInternship(string? id)
         {
-            // =====================================================
-            // GET CANDIDATE ID FROM SESSION
-            // =====================================================
+            // =========================================================
+            // GET LOGGED-IN CANDIDATE ID
+            // =========================================================
 
             int? candidateId =
                 HttpContext.Session.GetInt32("CandidateID");
@@ -2109,9 +2465,11 @@ namespace ErJobPortal.Controllers
                     "Account");
             }
 
-            // =====================================================
+            // =========================================================
             // GET CANDIDATE CODE
-            // =====================================================
+            // IMPORTANT:
+            // GetCandidateCode() already gets CandidateID from Session
+            // =========================================================
 
             string? candidateCode = GetCandidateCode();
 
@@ -2121,46 +2479,98 @@ namespace ErJobPortal.Controllers
                     "Candidate code could not be generated.");
             }
 
-            // =====================================================
+            // =========================================================
             // IF URL DOES NOT HAVE CANDIDATE CODE
-            // REDIRECT TO CODE URL
-            // =====================================================
+            // =========================================================
 
             if (string.IsNullOrEmpty(id))
             {
                 return RedirectToAction(
                     "MyInternship",
                     "Candidate",
-                    new { id = candidateCode });
+                    new
+                    {
+                        id = candidateCode
+                    });
             }
 
-            // =====================================================
+            // =========================================================
             // VALIDATE CANDIDATE CODE
-            // =====================================================
+            // =========================================================
 
-            if (id != candidateCode)
+            if (!string.Equals(
+                id,
+                candidateCode,
+                StringComparison.OrdinalIgnoreCase))
             {
                 return NotFound();
             }
 
-            // =====================================================
-            // SEND CANDIDATE INFORMATION TO VIEW
-            // =====================================================
+            // =========================================================
+            // GET APPLIED INTERNSHIPS
+            // =========================================================
 
-            ViewBag.CandidateCode = candidateCode;
-            ViewBag.CandidateID = candidateId.Value;
+            List<OrgPostM> appliedPosts =
+                TraineeApplyToPostList(candidateId.Value);
+
+            // =========================================================
+            // CONVERT TO MY INTERNSHIP VIEW MODEL
+            // =========================================================
+
+            List<MyInternshipViewModel> myInternships =
+                appliedPosts.Select(post => new MyInternshipViewModel
+                {
+                    OrganizationName =
+                        post.sName ?? "",
+
+                    Position =
+                        post.sPositionName ?? "",
+
+                    Location =
+                        string.Join(
+                            ", ",
+                            new[]
+                            {
+                        post.nCityName,
+                        post.sStateName,
+                        post.sCountryName
+                            }
+                            .Where(x =>
+                                !string.IsNullOrWhiteSpace(x))
+                        ),
+
+                    InternshipFellowshipType =
+                        post.sInternshipFellowshipTypeName ?? "",
+
+                    Facilities =
+                        post.sFacilities ?? "",
+
+                    ApplyStatus =
+                        post.IsApplied
+                            ? "Applied"
+                            : ""
+                })
+                .ToList();
+
+            // =========================================================
+            // VIEW BAG
+            // =========================================================
+
+            ViewBag.CandidateCode =
+                candidateCode;
+
+            ViewBag.CandidateID =
+                candidateId.Value;
 
             ViewBag.CandidateName =
-                HttpContext.Session.GetString("CandidateName");
+                HttpContext.Session.GetString(
+                    "CandidateName");
 
             ViewBag.CandidateEmail =
-                HttpContext.Session.GetString("CandidateEmail");
+                HttpContext.Session.GetString(
+                    "CandidateEmail");
 
-            // =====================================================
-            // OPEN MyInternship.cshtml
-            // =====================================================
-
-            return View();
+            return View(myInternships);
         }
 
         // =========================================================
@@ -2454,10 +2864,15 @@ namespace ErJobPortal.Controllers
         // CHARTS
         // =========================================================
 
+        //khushi 02-10
         [HttpGet]
         [Route("Candidate/Charts/{id?}")]
         public IActionResult Charts(string? id)
         {
+            // =========================================================
+            // CHECK CANDIDATE SESSION
+            // =========================================================
+
             int? candidateId =
                 HttpContext.Session.GetInt32("CandidateID");
 
@@ -2468,6 +2883,11 @@ namespace ErJobPortal.Controllers
                     "Account");
             }
 
+
+            // =========================================================
+            // GET CANDIDATE CODE
+            // =========================================================
+
             string? candidateCode = GetCandidateCode();
 
             if (string.IsNullOrEmpty(candidateCode))
@@ -2476,25 +2896,1125 @@ namespace ErJobPortal.Controllers
                     "Candidate code could not be generated.");
             }
 
-            // If candidate code is missing from URL
+
+            // =========================================================
+            // IF ID IS MISSING FROM URL
+            // =========================================================
+
             if (string.IsNullOrEmpty(id))
             {
                 return RedirectToAction(
                     "Charts",
                     "Candidate",
-                    new { id = candidateCode });
+                    new
+                    {
+                        id = candidateCode
+                    });
             }
 
-            // Validate candidate code
+
+            // =========================================================
+            // VALIDATE CANDIDATE CODE
+            // =========================================================
+
             if (id != candidateCode)
             {
                 return NotFound();
             }
 
-            ViewBag.CandidateCode = candidateCode;
-            ViewBag.CandidateID = candidateId.Value;
+
+            // =========================================================
+            // GET MATCHING / SUITABLE JOBS
+            // =========================================================
+
+            List<OrgPostM> matchingJobs =
+                GetMatchingJobsForCandidate(candidateId.Value);
+
+
+            // =========================================================
+            // MONTHLY SUITABLE OPENINGS
+            // =========================================================
+
+            int currentYear = DateTime.Now.Year;
+
+            int[] suitableOpeningsMonthly =
+                new int[12];
+
+
+            foreach (var job in matchingJobs)
+            {
+                if (!job.dStartDate.HasValue)
+                    continue;
+
+
+                DateTime startDate =
+                    job.dStartDate.Value;
+
+
+                // Only current year's jobs
+                if (startDate.Year != currentYear)
+                    continue;
+
+
+                int monthIndex =
+                    startDate.Month - 1;
+
+
+                int requiredTrainees =
+                    job.nRequiredTrainees;
+
+
+                if (requiredTrainees < 0)
+                    requiredTrainees = 0;
+
+
+                suitableOpeningsMonthly[monthIndex] +=
+                    requiredTrainees;
+            }
+
+
+            // =========================================================
+            // GET INTERNSHIP POST DATA
+            // FROM SP_GetSACharts
+            // =========================================================
+
+            SAChartsViewModel model =
+                new SAChartsViewModel();
+
+
+            string connectionString =
+                _configuration.GetConnectionString(
+                    "DefaultConnection");
+
+
+            using (SqlConnection con =
+                   new SqlConnection(connectionString))
+            {
+                using (SqlCommand cmd =
+                       new SqlCommand(
+                           "SP_GetSACharts",
+                           con))
+                {
+                    cmd.CommandType =
+                        CommandType.StoredProcedure;
+
+
+                    con.Open();
+
+
+                    using (SqlDataReader reader =
+                           cmd.ExecuteReader())
+                    {
+                        // =================================================
+                        // 1. CANDIDATE DATA
+                        // =================================================
+
+                        while (reader.Read())
+                        {
+                            model.CandidateData.Add(
+                                new SAChartData
+                                {
+                                    Year =
+                                        Convert.ToInt32(
+                                            reader["Year"]),
+
+                                    Month =
+                                        Convert.ToInt32(
+                                            reader["Month"]),
+
+                                    TotalCount =
+                                        Convert.ToInt32(
+                                            reader["TotalCount"])
+                                });
+                        }
+
+
+                        // =================================================
+                        // 2. INTERNSHIP POST DATA
+                        // =================================================
+
+                        if (reader.NextResult())
+                        {
+                            while (reader.Read())
+                            {
+                                model.InternshipPostData.Add(
+                                    new SAChartData
+                                    {
+                                        Year =
+                                            Convert.ToInt32(
+                                                reader["Year"]),
+
+                                        Month =
+                                            Convert.ToInt32(
+                                                reader["Month"]),
+
+                                        TotalCount =
+                                            Convert.ToInt32(
+                                                reader["TotalCount"])
+                                    });
+                            }
+                        }
+                    }
+                }
+            }
+
+
+            // =========================================================
+            // SEND CANDIDATE DATA TO VIEW
+            // =========================================================
+
+            ViewBag.CandidateCode =
+                candidateCode;
+
+            ViewBag.CandidateID =
+                candidateId.Value;
+
+            ViewBag.ChartYear =
+                currentYear;
+
+            ViewBag.SuitableOpeningsMonthly =
+                suitableOpeningsMonthly;
+
+
+            // =========================================================
+            // RETURN SAME VIEW WITH MODEL
+            // =========================================================
+
+            return View(model);
+        }
+
+
+
+        // shrirang 29/09/26
+        // =========================================================
+        // GET CAREER OBJECTIVE DRAFTS
+        // =========================================================
+
+        [HttpGet]
+        public IActionResult GetCareerObjectives(int genderID)
+        {
+            List<SAObjectiveM> objectives = new List<SAObjectiveM>();
+
+            try
+            {
+                string connectionString =
+                    _configuration.GetConnectionString("DefaultConnection");
+
+                using (SqlConnection cn =
+                       new SqlConnection(connectionString))
+                {
+                    using (SqlCommand cmd =
+                           new SqlCommand("SP_GetObjective", cn))
+                    {
+                        cmd.CommandType =
+                            CommandType.StoredProcedure;
+
+                        cn.Open();
+
+                        using (SqlDataReader reader =
+                               cmd.ExecuteReader())
+                        {
+                            while (reader.Read())
+                            {
+                                bool isEnabled =
+                                    reader["nBit"] != DBNull.Value &&
+                                    Convert.ToBoolean(reader["nBit"]);
+
+                                if (!isEnabled)
+                                {
+                                    continue;
+                                }
+
+                                int objectiveGenderID =
+                                    reader["nGenderID"] != DBNull.Value
+                                    ? Convert.ToInt32(reader["nGenderID"])
+                                    : 0;
+
+                                // =========================================
+                                // FILTER BY SELECTED GENDER
+                                // =========================================
+
+                                if (objectiveGenderID != genderID)
+                                {
+                                    continue;
+                                }
+
+                                objectives.Add(new SAObjectiveM
+                                {
+                                    nID =
+                                        Convert.ToInt32(reader["nID"]),
+
+                                    nGenderID =
+                                        objectiveGenderID,
+
+                                    sObjective =
+                                        reader["sObjective"]?.ToString()
+                                        ?? string.Empty,
+
+                                    dCreatedDate =
+                                        reader["dCreatedDate"] != DBNull.Value
+                                        ? Convert.ToDateTime(
+                                            reader["dCreatedDate"])
+                                        : DateTime.MinValue,
+
+                                    nBit = isEnabled,
+
+                                    nSABit =
+                                        reader["nSABit"] != DBNull.Value &&
+                                        Convert.ToBoolean(
+                                            reader["nSABit"])
+                                });
+                            }
+                        }
+                    }
+                }
+
+                objectives =
+                    objectives
+                        .OrderBy(x => x.nID)
+                        .ToList();
+
+                return Json(new
+                {
+                    success = true,
+
+                    objectives = objectives.Select(x => new
+                    {
+                        x.nID,
+                        x.nGenderID,
+                        x.sObjective
+                    }).ToList()
+                });
+            }
+            catch (Exception ex)
+            {
+                return Json(new
+                {
+                    success = false,
+                    message = ex.Message
+                });
+            }
+        }
+
+
+        // =========================================================
+        // CUSTOM RESUME BUILDER
+        // Supports:
+        // /Candidate/customResumeBuilder/2
+        //
+        // Also supports:
+        // /Candidate/customResumeBuilder/CD080599072601
+        // =========================================================
+
+        [HttpGet]
+        [Route("Candidate/customResumeBuilder/{id?}")]
+        [ResponseCache(
+            NoStore = true,
+            Location = ResponseCacheLocation.None)]
+        public IActionResult CustomResumeBuilder(string? id)
+        {
+            // =====================================================
+            // GET LOGGED-IN CANDIDATE ID
+            // =====================================================
+
+            int? candidateId =
+                HttpContext.Session.GetInt32("CandidateID");
+
+            if (candidateId == null || candidateId <= 0)
+            {
+                return RedirectToAction(
+                    "CandidateLogin",
+                    "Account");
+            }
+
+            // =====================================================
+            // GET CANDIDATE CODE
+            // =====================================================
+
+            string? candidateCode = GetCandidateCode();
+
+            if (string.IsNullOrEmpty(candidateCode))
+            {
+                return NotFound(
+                    "Candidate code could not be generated.");
+            }
+
+            // =====================================================
+            // IF NO ID IS PASSED
+            // REDIRECT TO CANDIDATE CODE URL
+            // =====================================================
+
+            if (string.IsNullOrWhiteSpace(id))
+            {
+                return RedirectToAction(
+                    "CustomResumeBuilder",
+                    "Candidate",
+                    new
+                    {
+                        id = candidateCode
+                    });
+            }
+
+            // =====================================================
+            // VALIDATE URL
+            //
+            // The URL can contain:
+            //
+            // 1. Candidate ID
+            //    /customResumeBuilder/2
+            //
+            // 2. Candidate Code
+            //    /customResumeBuilder/CD080599072601
+            //
+            // But it MUST belong to the logged-in candidate.
+            // =====================================================
+
+            bool validCandidate = false;
+
+            // -----------------------------------------------------
+            // CASE 1: NUMERIC CANDIDATE ID
+            // -----------------------------------------------------
+
+            if (int.TryParse(id, out int urlCandidateId))
+            {
+                if (urlCandidateId == candidateId.Value)
+                {
+                    validCandidate = true;
+                }
+            }
+
+            // -----------------------------------------------------
+            // CASE 2: CANDIDATE CODE
+            // -----------------------------------------------------
+
+            if (!validCandidate &&
+                string.Equals(
+                    id,
+                    candidateCode,
+                    StringComparison.OrdinalIgnoreCase))
+            {
+                validCandidate = true;
+            }
+
+            // =====================================================
+            // WRONG CANDIDATE
+            // =====================================================
+
+            if (!validCandidate)
+            {
+                return NotFound();
+            }
+
+            // =====================================================
+            // GET PROFILE
+            // =====================================================
+
+            CandidateProfileModel? profile =
+                _repo.GetProfile(candidateId.Value);
+
+            // =====================================================
+            // IF PROFILE DOES NOT EXIST
+            // =====================================================
+
+            if (profile == null)
+            {
+                profile = new CandidateProfileModel
+                {
+                    CandidateID = candidateId.Value
+                };
+            }
+
+            // =====================================================
+            // LOAD RESUME VIEW MODEL
+            // =====================================================
+
+            ResumeViewModel vm =
+     new ResumeViewModel
+     {
+         Profile = profile,
+
+         Relationships =
+             _repo.GetRelationships(),
+
+         Streams =
+             _repo.GetStreams(),
+
+         Divisions =
+             _repo.GetDivisions(),
+
+         InternshipFellowshipType =
+             _repo.GetInternshipFellowshipType(),
+
+         InternshipTitles =
+             _repo.GetInternshipTitles(),
+
+         InternshipDurations =
+             _repo.GetInternshipDurations(),
+
+         InternshipStatuses =
+             _repo.GetInternshipStatuses()
+     };
+
+            // =====================================================
+            // VIEW BAG
+            // =====================================================
+
+            ViewBag.CandidateID =
+                candidateId.Value;
+
+            ViewBag.CandidateCode =
+                candidateCode;
+
+            ViewBag.CandidateName =
+                HttpContext.Session.GetString(
+                    "CandidateName");
+
+            ViewBag.CandidateEmail =
+                HttpContext.Session.GetString(
+                    "CandidateEmail");
+
+            // =====================================================
+            // OPEN VIEW
+            // =====================================================
+
+            return View(
+                "~/Views/Candidate/customResumeBuilder.cshtml",
+                vm);
+        }
+
+        //radhika29-09
+        [HttpGet]
+        public IActionResult InternshipPostDetails()
+        {
+            int candidateId = Convert.ToInt32(HttpContext.Session.GetString("CandidateID"));
+            List<OrgPostM> posts = GetMatchingJobsForCandidate(candidateId);
+            ViewBag.InternshipPosts = posts;
 
             return View();
+        }
+
+        // shrirang 01/10/26
+        private bool HasCandidateProfileData(CandidateProfileModel? profile)
+        {
+            if (profile == null)
+                return false;
+
+            // CandidateID is generated by the system.
+            // It should not count as profile data.
+            var ignoredProperties = new HashSet<string>
+{
+    nameof(CandidateProfileModel.CandidateID)
+};
+
+            var properties =
+                typeof(CandidateProfileModel).GetProperties();
+
+            foreach (var property in properties)
+            {
+                if (ignoredProperties.Contains(property.Name))
+                    continue;
+
+                object? value =
+                    property.GetValue(profile);
+
+                // NULL = no data
+                if (value == null)
+                    continue;
+
+                // STRING fields
+                if (value is string stringValue)
+                {
+                    if (!string.IsNullOrWhiteSpace(stringValue))
+                    {
+                        return true;
+                    }
+
+                    continue;
+                }
+
+                // Nullable<T>
+                Type propertyType =
+                    Nullable.GetUnderlyingType(property.PropertyType)
+                    ?? property.PropertyType;
+
+                // Value type
+                if (propertyType.IsValueType)
+                {
+                    object? defaultValue =
+                        Activator.CreateInstance(propertyType);
+
+                    if (!Equals(value, defaultValue))
+                    {
+                        return true;
+                    }
+
+                    continue;
+                }
+
+                // Other reference types
+                return true;
+            }
+
+            return false;
+        }
+
+        //radhika29-09
+        //[HttpGet]
+        //public IActionResult InternshipPostDetails()
+        //{
+        //    return View();
+        //}
+
+
+        #region "Apply for the Post"
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public IActionResult ApplyToPost(int postId, int orgId)
+        {
+            // ==========================================
+            // CHECK CANDIDATE LOGIN
+            // ==========================================
+
+            int? candidateId =
+                HttpContext.Session.GetInt32("CandidateID");
+
+            if (candidateId == null)
+            {
+                return RedirectToAction(
+                    "CandidateLogin",
+                    "Account");
+            }
+
+            // ==========================================
+            // GET CANDIDATE REGISTRATION DETAILS
+            // ==========================================
+
+            var candidate =
+                _repository.GetCandidateRegistrationDetails(
+                    candidateId.Value);
+
+            if (candidate == null ||
+                candidate.Value.DOB == null ||
+                candidate.Value.RegDate == null)
+            {
+                return BadRequest(
+                    "Candidate information is missing.");
+            }
+
+            // ==========================================
+            // CREATE CANDIDATE CODE
+            // ==========================================
+
+            string candidateCode = "CD" +
+                candidate.Value.DOB.Value.ToString("ddMMyy") +
+                candidate.Value.RegDate.Value.ToString("MMdd") +
+                candidate.Value.CandidateID.ToString("D2");
+
+            // ==========================================
+            // APPLY
+            // ==========================================
+
+            int result =
+                _repo.ApplyForPost(
+                    orgId,
+                    candidateId.Value,
+                    postId);
+
+            // ==========================================
+            // SUCCESS
+            // ==========================================
+
+            if (result == 1)
+            {
+                TempData["ApplyMessage"] =
+                    "Application submitted successfully.";
+
+                TempData["ApplyMessageType"] =
+                    "success";
+            }
+            else
+            {
+                TempData["ApplyMessage"] =
+                    "You have already applied for this post.";
+
+                TempData["ApplyMessageType"] =
+                    "info";
+            }
+
+            // ==========================================
+            // REDIRECT SAME DASHBOARD PAGE
+            // ==========================================
+
+            return RedirectToAction(
+                "Dashboard",
+                "Candidate",
+                new { id = candidateCode });
+        }
+
+        #endregion
+
+        #region "TR Apply to Post List Called"
+
+        [HttpGet]
+        [ResponseCache(NoStore = true, Location = ResponseCacheLocation.None)]
+        public IActionResult TraineeApplied()
+        {
+            int? candidateId = HttpContext.Session.GetInt32("CandidateID");
+
+            if (candidateId == null)
+            {
+                return RedirectToAction("CandidateLogin", "Account");
+            }
+
+            // Candidate registration details
+            var candidate = _repository.GetCandidateRegistrationDetails(candidateId.Value);
+
+            if (candidate == null)
+            {
+                return NotFound("Candidate registration not found.");
+            }
+
+            if (candidate.Value.DOB == null || candidate.Value.RegDate == null)
+            {
+                return BadRequest(
+                    "Candidate DOB or Registration Date is missing.");
+            }
+
+            // Candidate Code
+            string candidateCode = "CD" +
+                candidate.Value.DOB.Value.ToString("ddMMyy") +
+                candidate.Value.RegDate.Value.ToString("MMdd") +
+                candidate.Value.CandidateID.ToString("D2");
+
+            ViewBag.CandidateID = candidateId.Value;
+            ViewBag.CandidateName = HttpContext.Session.GetString("CandidateName");
+            ViewBag.CandidateEmail = HttpContext.Session.GetString("CandidateEmail");
+            ViewBag.CandidateCode = candidateCode;
+
+            // =========================================================
+            // GET APPLIED POSTS
+            // =========================================================
+
+            List<OrgPostM> traineeAppliedPosts = TraineeApplyToPostList(candidateId.Value);
+
+            ViewBag.TraineeAppliedPosts = traineeAppliedPosts;
+
+            return View();
+        }
+        // =============================================================
+        // GET TRAINEE APPLIED POSTS
+        // =============================================================
+        [HttpGet]
+        private List<OrgPostM> TraineeApplyToPostList(int candidateId)
+        {
+            List<OrgPostM> appliedPosts = new List<OrgPostM>();
+
+            string connectionString = _configuration.GetConnectionString("DefaultConnection")!;
+
+            using (SqlConnection con = new SqlConnection(connectionString))
+            {
+                using (SqlCommand cmd = new SqlCommand("SP_CandidateAppliedToPost", con))
+                {
+                    cmd.CommandType = CommandType.StoredProcedure;
+
+                    // =====================================================
+                    // CANDIDATE ID
+                    // =====================================================
+                    cmd.Parameters.Add("@CandidateID", SqlDbType.Int).Value = candidateId;
+
+                    con.Open();
+
+                    using (SqlDataReader dr = cmd.ExecuteReader())
+                    {
+                        while (dr.Read())
+                        {
+                            OrgPostM post = new OrgPostM();
+
+                            // =================================================
+                            // POST ID
+                            // =================================================
+                            post.nID =
+                                dr["PostID"] != DBNull.Value
+                                ? Convert.ToInt32(dr["PostID"])
+                                : 0;
+
+                            // =================================================
+                            // ORGANIZATION ID
+                            // =================================================
+                            post.nOrgID =
+                                dr["OrgD"] != DBNull.Value
+                                ? Convert.ToInt32(dr["OrgD"])
+                                : 0;
+
+                            // =================================================
+                            // ORGANIZATION NAME
+                            // SP: org.sOrgName AS OrganizationName
+                            // =================================================
+                            post.sName =
+                                dr["OrganizationName"] != DBNull.Value
+                                ? dr["OrganizationName"].ToString()!
+                                : "";
+
+                            // =================================================
+                            // POSITION NAME
+                            // SP: pp.sName AS Position
+                            // =================================================
+                            post.sPositionName =
+                                dr["Position"] != DBNull.Value
+                                ? dr["Position"].ToString()!
+                                : "";
+
+                            // =================================================
+                            // COUNTRY
+                            // SP: np.sCountryName AS CountryName
+                            // =================================================
+                            post.sCountryName =
+                                dr["CountryName"] != DBNull.Value
+                                ? dr["CountryName"].ToString()!
+                                : "";
+
+                            // =================================================
+                            // STATE
+                            // SP: np.sStateName AS StateName
+                            // =================================================
+                            post.sStateName =
+                                dr["StateName"] != DBNull.Value
+                                ? dr["StateName"].ToString()!
+                                : "";
+
+                            // =================================================
+                            // CITY
+                            // SP: np.nCityName AS CityName
+                            // =================================================
+                            post.nCityName =
+                                dr["CityName"] != DBNull.Value
+                                ? dr["CityName"].ToString()!
+                                : "";
+
+                            // =================================================
+                            // INTERNSHIP / FELLOWSHIP TYPE
+                            // SP: sf.sName AS StipendFees
+                            // =================================================
+                            post.sInternshipFellowshipTypeName =
+                                dr["StipendFees"] != DBNull.Value
+                                ? dr["StipendFees"].ToString()!
+                                : "";
+
+                            // =================================================
+                            // FACILITIES
+                            // SP: np.sFacilities AS FacilityAvailable
+                            // =================================================
+                            post.sFacilities =
+                                dr["FacilityAvailable"] != DBNull.Value
+                                ? dr["FacilityAvailable"].ToString()!
+                                : "";
+
+                            // =================================================
+                            // APPLICATION STATUS
+                            // SP: fs.CApply
+                            // =================================================
+                            post.IsApplied =
+                                dr["CApply"] != DBNull.Value &&
+                                Convert.ToInt32(dr["CApply"]) == 1;
+
+                            // =================================================
+                            // ADD TO LIST
+                            // =================================================
+                            appliedPosts.Add(post);
+                        }
+                    }
+                }
+            }
+
+            return appliedPosts;
+        }
+
+        #endregion
+
+
+        #region "Chart1"
+        private void PrepareSuitableOpeningChart(int candidateId, CandidateDashboardViewModel model)
+        {
+            // Get matching/suitable jobs for trainee
+            List<OrgPostM> matchingJobs = GetMatchingJobsForCandidate(candidateId);
+
+            // Initialize all 12 months with 0
+            string[] months =
+            {
+        "Jan", "Feb", "Mar", "Apr", "May", "Jun",
+        "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"
+    };
+
+            int[] monthlyOpenings = new int[12];
+
+            foreach (var job in matchingJobs)
+            {
+                // Make sure date exists
+                if (job.dStartDate == null)
+                    continue;
+
+                DateTime startDate = job.dStartDate.Value;
+
+                int requiredTrainees = job.nRequiredTrainees;
+
+                if (requiredTrainees < 0)
+                    requiredTrainees = 0;
+
+                int monthIndex = startDate.Month - 1;
+
+                monthlyOpenings[monthIndex] += requiredTrainees;
+            }
+
+            model.SuitableOpeningMonths =
+                months.ToList();
+
+            model.SuitableOpeningCounts =
+                monthlyOpenings.ToList();
+        }
+        #endregion
+
+
+
+
+        // shrirang 02/10/26
+
+        // =========================================================
+        // UPDATE RESUME TEMPLATE
+        // =========================================================
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public IActionResult UpdateResumeTemplate(
+            int candidateID,
+            string resumeTemplate)
+        {
+            // =====================================================
+            // GET LOGGED-IN CANDIDATE
+            // =====================================================
+
+            int? sessionCandidateId =
+                HttpContext.Session.GetInt32("CandidateID");
+
+            if (sessionCandidateId == null ||
+                sessionCandidateId <= 0)
+            {
+                return RedirectToAction(
+                    "CandidateLogin",
+                    "Account");
+            }
+
+            // =====================================================
+            // NEVER TRUST CANDIDATE ID FROM FORM
+            // =====================================================
+
+            candidateID = sessionCandidateId.Value;
+
+            // =====================================================
+            // VALIDATE RESUME TEMPLATE
+            // =====================================================
+
+            if (string.IsNullOrWhiteSpace(resumeTemplate))
+            {
+                TempData["Error"] =
+                    "Please select a resume profile.";
+
+                return RedirectToAction("Profile");
+            }
+
+            // =====================================================
+            // CONVERT r1 / r2 / r3 ... TO INTEGER
+            // =====================================================
+
+            if (!resumeTemplate.StartsWith("r",
+                StringComparison.OrdinalIgnoreCase))
+            {
+                TempData["Error"] =
+                    "Invalid resume profile selected.";
+
+                return RedirectToAction("Profile");
+            }
+
+            string numberPart =
+                resumeTemplate.Substring(1);
+
+            if (!int.TryParse(
+                numberPart,
+                out int resumeProfile))
+            {
+                TempData["Error"] =
+                    "Invalid resume profile selected.";
+
+                return RedirectToAction("Profile");
+            }
+
+            // =====================================================
+            // DEFAULT VALIDATION
+            // =====================================================
+
+            if (resumeProfile <= 0)
+            {
+                TempData["Error"] =
+                    "Invalid resume profile selected.";
+
+                return RedirectToAction("Profile");
+            }
+
+            // =====================================================
+            // SAVE SELECTED RESUME PROFILE
+            // =====================================================
+
+            _repo.UpdateResumeProfile(
+                candidateID,
+                resumeProfile);
+
+            // =====================================================
+            // SUCCESS
+            // =====================================================
+
+            TempData["Success"] =
+                $"Resume Profile {resumeProfile} selected successfully.";
+
+            return RedirectToAction("Profile");
+        }
+
+        // shrirang 02/10/26
+
+        // =============================================================
+        // GET ALL ACTIVE ORGANIZATION POSTS FOR CANDIDATE
+        // =============================================================
+
+        [HttpGet]
+        private List<OrgPostM> GetAllOrganizationPostsForCandidate(int candidateId)
+        {
+            List<OrgPostM> posts = new List<OrgPostM>();
+
+            string connectionString =
+                _configuration.GetConnectionString("DefaultConnection")!;
+
+            using (SqlConnection con =
+                   new SqlConnection(connectionString))
+            {
+                string query = @"
+SELECT
+    p.nID AS PostID,
+    p.nOrgID AS OrgID,
+
+    org.sOrgName AS OrganizationName,
+
+    pp.sName AS PositionName,
+
+    p.sCountryName AS Country,
+    p.sStateName AS State,
+    p.nCityName AS City,
+
+    sf.sName AS InternshipFellowshipType,
+
+    p.sFacilities,
+
+    CASE
+        WHEN ISNULL(jas.CApply, 0) = 1
+            THEN 1
+        ELSE 0
+    END AS CApply
+
+FROM tblOrgPost p
+
+LEFT JOIN tblOrgRegistration org
+    ON org.nID = p.nOrgID
+
+LEFT JOIN tblPosition pp
+    ON pp.nID = p.nPositionID
+
+LEFT JOIN tblStipendFees sf
+    ON sf.nID = p.nInternshipFellowshipTypeID
+
+LEFT JOIN tblJobApplicationStatus jas
+    ON jas.nPostID = p.nID
+    AND jas.nCandidateID = @CandidateID
+
+WHERE
+    ISNULL(p.nBit, 1) = 1
+    AND ISNULL(p.nSABit, 1) = 1
+
+ORDER BY
+    p.nID DESC;";
+
+                using (SqlCommand cmd =
+                       new SqlCommand(query, con))
+                {
+                    cmd.CommandType = CommandType.Text;
+
+                    cmd.Parameters.Add(
+                        "@CandidateID",
+                        SqlDbType.Int
+                    ).Value = candidateId;
+
+                    con.Open();
+
+                    using (SqlDataReader dr =
+                           cmd.ExecuteReader())
+                    {
+                        while (dr.Read())
+                        {
+                            OrgPostM post = new OrgPostM();
+
+                            post.nID =
+                                dr["PostID"] != DBNull.Value
+                                ? Convert.ToInt32(dr["PostID"])
+                                : 0;
+
+                            post.nOrgID =
+                                dr["OrgID"] != DBNull.Value
+                                ? Convert.ToInt32(dr["OrgID"])
+                                : 0;
+
+                            post.sName =
+                                dr["OrganizationName"] != DBNull.Value
+                                ? dr["OrganizationName"].ToString()!
+                                : "";
+
+                            post.sPositionName =
+                                dr["PositionName"] != DBNull.Value
+                                ? dr["PositionName"].ToString()!
+                                : "";
+
+                            post.sCountryName =
+                                dr["Country"] != DBNull.Value
+                                ? dr["Country"].ToString()!
+                                : "";
+
+                            post.sStateName =
+                                dr["State"] != DBNull.Value
+                                ? dr["State"].ToString()!
+                                : "";
+
+                            post.nCityName =
+                                dr["City"] != DBNull.Value
+                                ? dr["City"].ToString()!
+                                : "";
+
+                            post.sInternshipFellowshipTypeName =
+                                dr["InternshipFellowshipType"] != DBNull.Value
+                                ? dr["InternshipFellowshipType"].ToString()!
+                                : "";
+
+                            post.sFacilities =
+                                dr["sFacilities"] != DBNull.Value
+                                ? dr["sFacilities"].ToString()!
+                                : "";
+
+                            post.IsApplied =
+                                dr["CApply"] != DBNull.Value &&
+                                Convert.ToInt32(dr["CApply"]) == 1;
+
+                            posts.Add(post);
+                        }
+                    }
+                }
+            }
+
+            return posts;
         }
     }
 }

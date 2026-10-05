@@ -1,0 +1,145 @@
+﻿@{
+    Layout = "~/Views/Shared/_DashboardLayout.cshtml";
+
+    ViewData["Title"] = "Organization Registration List";
+    ViewData["Panel"] = "SuperAdmin";
+    ViewData["UserName"] = "ItNetworkZ";
+}
+
+<div class="container-fluid organization-registration-page">
+
+   
+
+
+    <!-- MASTER TABLE -->
+    <div class="master-table-container">
+
+        
+
+        <!-- TABLE -->
+        <div class="table-responsive">
+             <!-- PAGE HEADER -->
+    <div class="mb-4">
+
+        <h1 class="mb-2">
+            Organization Registration List
+        </h1>
+
+        <p class="mb-0 text-muted">
+            ItNetworkZ
+        </p>
+
+    </div>
+            <table id="organizationRegistrationTable"
+                   class="master-data-table">
+
+                <thead>
+
+                    <tr>
+
+                        <th>
+                            Sr. No
+                        </th>
+
+                        <th>
+                            Registration Date
+                        </th>
+
+                        <th>
+                            Organization Name
+                        </th>
+
+                        <th>
+                            Organization URL
+                        </th>
+
+                        <th>
+                            Contact Person Name
+                        </th>
+
+                        <th>
+                            Contact No
+                        </th>
+
+                        <th>
+                            Designation
+                        </th>
+
+                        <th>
+                            Email ID
+                        </th>
+
+                        <th>
+                            Status
+                        </th>
+
+                    </tr>
+
+                </thead>
+
+
+                <tbody>
+
+                    <!-- STATIC DATA -->
+
+                    <tr>
+
+                        <td class="master-id">
+                            1
+                        </td>
+
+                        <td>
+                            25-09-2026
+                        </td>
+
+                        <td>
+                            ItNetworkZ
+                        </td>
+
+                        <td>
+                            <a href="https://1trainee.com"
+                               target="_blank"
+                               class="text-primary text-decoration-none">
+                                1trainee.com
+                            </a>
+                        </td>
+
+                        <td>
+                            Sarang Sir
+                        </td>
+
+                        <td>
+                            9876543210
+                        </td>
+
+                        <td>
+                            HR Manager
+                        </td>
+
+                        <td>
+                            hr@itnetworkz.com
+                        </td>
+
+                        <td>
+                            <span class="master-status">
+                                Active
+                            </span>
+                        </td>
+
+                    </tr>
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+
+        <!-- PAGE INFORMATION -->
+        <div id="organizationRegistrationPageInfo"
+             class="master-page-info text-center d-none">
+        </div>
+
+    </div>
+
+</div>

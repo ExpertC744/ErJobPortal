@@ -1,0 +1,2490 @@
+﻿@using ErJobPortal.Models
+
+@model ResumeViewModel
+
+
+
+@{
+/*
+============================================================
+RESUME MASTER LAYOUT
+============================================================
+
+    This layout contains the complete resume HTML.
+
+    ViewProfileFour
+        -> viewprofilefour.css
+        00
+    ViewProfileFive
+        -> viewprofilefive.css
+
+    ViewProfileSix
+        -> viewprofilesix.css
+
+    IMPORTANT:
+    Only ONE resume design CSS file is loaded.
+*/
+
+IgnoreBody();
+
+var p = Model.Profile;
+
+var candidateName =
+    Model.CandidateName?.Trim();
+
+var candidateRole =
+    GetLookupName(
+        Model.InternshipFellowshipType,
+        p.Internship_FellowshipType
+    );
+
+/*
+    Hide "Paid by Trainee"
+*/
+if (string.Equals(
+    candidateRole,
+    "Paid by Trainee",
+    StringComparison.OrdinalIgnoreCase))
+{
+    candidateRole = "";
+}
+
+/*
+    ============================================================
+    CURRENT ACTION
+    ============================================================
+*/
+
+var actionName =
+    ViewContext.RouteData.Values["action"]?.ToString();
+
+
+/*
+    ============================================================
+    LOAD ONLY CURRENT RESUME CSS
+    ============================================================
+*/
+
+var resumeCss =
+    actionName?.ToLowerInvariant() switch
+    {
+        "viewprofilefour" =>
+    "~/css/viewprofilefour.css",
+
+"viewprofilefive" =>
+    "~/css/viewprofilefive.css",
+
+"viewprofilesix" =>
+    "~/css/ViewProfileSix.css",
+
+"viewprofileseven" =>
+    "~/css/viewprofileseven.css",
+
+"viewprofileeight" =>
+    "~/css/viewprofileeight.css",
+
+"viewprofilenine" =>
+    "~/css/viewprofilenine.css",
+
+"viewprofileten" =>
+    "~/css/viewprofileten.css",
+
+"viewprofileeleven" =>
+    "~/css/viewprofileeleven.css",
+
+"viewprofiletwelve" =>
+    "~/css/viewprofiletwelve.css",
+
+"viewprofilethirteen" =>
+    "~/css/viewprofilethirteen.css",
+
+"viewprofilefourteen" =>
+    "~/css/viewprofilefourteen.css",
+
+"viewprofilefifteen" =>
+    "~/css/viewprofilefifteen.css",
+
+"viewprofilesixteen" =>
+    "~/css/viewprofilesixteen.css",
+
+"viewprofileseventeen" =>
+    "~/css/viewprofileseventeen.css",
+
+"viewprofileeighteen" =>
+    "~/css/viewprofileeighteen.css",
+
+"viewprofilenineteen" =>
+    "~/css/viewprofilenineteen.css",
+
+"viewprofiletwenty" =>
+    "~/css/viewprofiletwenty.css",
+
+_ =>
+    ""
+    };
+
+}
+
+@functions
+{
+
+/* =========================================================
+   CHECK STRING
+========================================================== */
+
+bool Has(string value)
+{
+    return !string.IsNullOrWhiteSpace(value);
+}
+
+
+/* =========================================================
+   CHECK ANY VALUE
+========================================================== */
+
+bool HasValue(object value)
+{
+    if (value == null)
+        return false;
+
+    var text =
+        value.ToString();
+
+    return
+        !string.IsNullOrWhiteSpace(text)
+        &&
+        text != "0";
+}
+
+
+/* =========================================================
+   CHECK NULLABLE NUMBER
+========================================================== */
+
+bool HasNum(int? value)
+{
+    return
+        value.HasValue
+        &&
+        value.Value != 0;
+}
+
+
+/* =========================================================
+   LOOKUP NAME
+========================================================== */
+
+string GetLookupName(
+    System.Collections.IEnumerable list,
+    object id)
+{
+    if (
+        list == null ||
+        id == null ||
+        string.IsNullOrWhiteSpace(
+            id.ToString())
+    )
+    {
+        return "";
+    }
+
+    var requestedId =
+        id.ToString()?.Trim();
+
+    foreach (var item in list)
+    {
+        if (item == null)
+            continue;
+
+        var idProperty =
+            item.GetType()
+                .GetProperty("ID");
+
+        var nameProperty =
+            item.GetType()
+                .GetProperty("Name");
+
+        if (
+            idProperty == null ||
+            nameProperty == null
+        )
+        {
+            continue;
+        }
+
+        var itemId =
+            idProperty
+                .GetValue(item)?
+                .ToString()?
+                .Trim();
+
+        if (
+            string.Equals(
+                itemId,
+                requestedId,
+                StringComparison.OrdinalIgnoreCase)
+        )
+        {
+            return
+                nameProperty
+                    .GetValue(item)?
+                    .ToString()?
+                    .Trim()
+                ?? "";
+        }
+    }
+
+    return "";
+}
+
+
+/* =========================================================
+   LANGUAGE LEVEL
+   1 = Beginner
+   2 = Intermediate
+   3 = Advance
+   4 = Expert
+========================================================== */
+
+string GetLanguageLevel(object level)
+{
+    if (level == null)
+        return "";
+
+    return
+        level
+            .ToString()?
+            .Trim()
+        switch
+        {
+            "1" => "Beginner",
+            "2" => "Intermediate",
+            "3" => "Advance",
+            "4" => "Expert",
+            _ => ""
+        };
+}
+
+
+/* =========================================================
+   RESOLVE SKILL IDS
+========================================================== */
+
+string GetSkillNames(
+    string skillIDs,
+    System.Collections.IEnumerable skills)
+{
+    if (
+        string.IsNullOrWhiteSpace(skillIDs) ||
+        skills == null
+    )
+    {
+        return "";
+    }
+
+    var selectedIds =
+        new HashSet<string>(
+            skillIDs.Split(
+                new[]
+                {
+                    ',',
+                    ';',
+                    '|',
+                    '\n',
+                    '\r'
+                },
+                StringSplitOptions.RemoveEmptyEntries
+            )
+            .Select(
+                x => x.Trim()
+            ),
+            StringComparer.OrdinalIgnoreCase
+        );
+
+    var names =
+        new List<string>();
+
+    foreach (var skill in skills)
+    {
+        if (skill == null)
+            continue;
+
+        var idProperty =
+            skill.GetType()
+                .GetProperty("ID");
+
+        var nameProperty =
+            skill.GetType()
+                .GetProperty("Name");
+
+        if (
+            idProperty == null ||
+            nameProperty == null
+        )
+        {
+            continue;
+        }
+
+        var id =
+            idProperty
+                .GetValue(skill)?
+                .ToString()?
+                .Trim();
+
+        var name =
+            nameProperty
+                .GetValue(skill)?
+                .ToString()?
+                .Trim();
+
+        if (
+            !string.IsNullOrWhiteSpace(id) &&
+            !string.IsNullOrWhiteSpace(name) &&
+            selectedIds.Contains(id)
+        )
+        {
+            names.Add(name);
+        }
+    }
+
+    return string.Join(", ", names);
+}
+
+}
+
+<!DOCTYPE html>
+
+<html lang="en">
+
+<head>
+
+<meta charset="utf-8" />
+
+<meta name="viewport"
+      content="width=device-width, initial-scale=1.0" />
+
+<style>
+/* =========================================================
+   FIXED RESUME TOP TOOLBAR
+========================================================= */
+
+.resume-top-toolbar {
+    position: absolute;
+    top: 12px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 99999;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    padding: 6px 8px;
+    background: #ffffff;
+    border: 1px solid #dce3e8;
+    border-radius: 12px;
+    box-shadow: 0 6px 22px rgba(15, 23, 42, 0.16);
+    white-space: nowrap;
+}
+
+
+/* =========================================================
+   TOOLBAR BUTTON
+========================================================= */
+
+.resume-toolbar-btn {
+    width: 40px;
+    height: 40px;
+    flex: 0 0 40px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid #dce3e8;
+    border-radius: 8px;
+    background: #ffffff;
+    color: #526987;
+    text-decoration: none;
+    cursor: pointer;
+    transition: background 0.18s ease, color 0.18s ease, border-color 0.18s ease, transform 0.18s ease;
+}
+
+
+    .resume-toolbar-btn:hover {
+        background: #1f4e68;
+        border-color: #1f4e68;
+        color: #ffffff;
+        transform: translateY(-1px);
+    }
+
+
+    .resume-toolbar-btn i {
+        font-size: 14px;
+    }
+
+
+/* =========================================================
+   DIVIDER
+========================================================= */
+
+.resume-toolbar-divider {
+    width: 1px;
+    height: 25px;
+    background: #d9e0e5;
+    margin: 0 3px;
+}
+
+
+/* =========================================================
+   THEME AREA
+========================================================= */
+
+.resume-toolbar-themes {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding-left: 2px;
+}
+
+
+/* =========================================================
+   THEME CIRCLE
+========================================================= */
+
+.resume-toolbar-theme {
+    width: 27px;
+    height: 27px;
+    flex: 0 0 27px;
+    padding: 0;
+    border: 2px solid #ffffff;
+    border-radius: 50%;
+    background: var(--theme-color);
+    box-shadow: 0 0 0 1px #c7d0d7;
+    cursor: pointer;
+    transition: transform 0.18s ease, box-shadow 0.18s ease;
+}
+
+
+    .resume-toolbar-theme:hover {
+        transform: scale(1.1);
+    }
+
+
+    .resume-toolbar-theme.active {
+        box-shadow: 0 0 0 2px var(--theme-color);
+    }
+
+
+/* =========================================================
+   MOBILE / TABLET
+========================================================= */
+
+@@media (max-width: 700px) {
+
+    .resume-top-toolbar {
+        top: 8px;
+        max-width: calc(100vw - 16px);
+        overflow-x: auto;
+        justify-content: flex-start;
+        scrollbar-width: none;
+        -ms-overflow-style: none;
+    }
+
+
+        .resume-top-toolbar::-webkit-scrollbar {
+            display: none;
+        }
+
+
+    .resume-toolbar-btn {
+        width: 36px;
+        height: 36px;
+        flex-basis: 36px;
+    }
+
+
+    .resume-toolbar-theme {
+        width: 24px;
+        height: 24px;
+        flex-basis: 24px;
+    }
+
+
+    .resume-toolbar-divider {
+        height: 22px;
+    }
+}
+
+
+/* =========================================================
+   SMALL MOBILE
+========================================================= */
+
+@@media (max-width: 420px) {
+
+    .resume-top-toolbar {
+        top: 6px;
+        padding: 5px 6px;
+        gap: 4px;
+        border-radius: 10px;
+    }
+
+
+    .resume-toolbar-btn {
+        width: 32px;
+        height: 32px;
+        flex-basis: 32px;
+    }
+
+
+        .resume-toolbar-btn i {
+            font-size: 12px;
+        }
+
+
+    .resume-toolbar-theme {
+        width: 20px;
+        height: 20px;
+        flex-basis: 20px;
+    }
+
+
+    .resume-toolbar-divider {
+        height: 20px;
+        margin: 0 1px;
+    }
+}
+
+
+/* =========================================================
+   PRINT
+========================================================= */
+
+@@media print {
+
+    .resume-top-toolbar {
+        display: none !important;
+    }
+}
+</style>
+<!-- =====================================================
+     TITLE
+====================================================== -->
+
+<title>
+    @(Has(candidateName)
+        ? candidateName + " - Resume"
+        : "Resume")
+</title>
+
+
+<!-- =====================================================
+     GOOGLE FONTS
+====================================================== -->
+
+<link rel="preconnect"
+      href="https://fonts.googleapis.com" />
+
+<link rel="preconnect"
+      href="https://fonts.gstatic.com"
+      crossorigin />
+
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Playfair+Display:wght@600;700&display=swap"
+      rel="stylesheet" />
+
+
+<!-- =====================================================
+     FONT AWESOME
+====================================================== -->
+
+<link rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+
+
+<!-- =====================================================
+     CURRENT RESUME CSS ONLY
+====================================================== -->
+
+@if (!string.IsNullOrWhiteSpace(resumeCss))
+{
+    <link rel="stylesheet"
+          href="@Url.Content(resumeCss)" />
+}
+
+</head>
+
+<body>
+
+<!-- =========================================================
+     RESUME PAGE
+========================================================== -->
+
+<!-- =========================================================
+     RESUME NAVIGATION
+========================================================== -->
+
+@{
+var resumeActions = new[]
+{
+    "ViewProfileFour",
+    "ViewProfileFive",
+    "ViewProfileSix",
+    "ViewProfileSeven",
+    "ViewProfileEight",
+    "ViewProfileNine",
+    "ViewProfileTen",
+    "ViewProfileEleven",
+    "ViewProfileTwelve",
+    "ViewProfileThirteen",
+    "ViewProfileFourteen",
+    "ViewProfileFifteen",
+
+    "ViewProfileSixteen",
+    "ViewProfileSeventeen",
+    "ViewProfileEighteen",
+    "ViewProfileNineteen",
+    "ViewProfileTwenty"
+};
+
+var currentAction = actionName ?? "";
+
+var currentIndex = Array.FindIndex(
+    resumeActions,
+    x => string.Equals(
+        x,
+        currentAction,
+        StringComparison.OrdinalIgnoreCase)
+);
+
+var previousAction =
+    currentIndex > 0
+        ? resumeActions[currentIndex - 1]
+        : null;
+
+var nextAction =
+    currentIndex >= 0 &&
+    currentIndex < resumeActions.Length - 1
+        ? resumeActions[currentIndex + 1]
+        : null;
+
+var currentId =
+    ViewContext.RouteData.Values["id"]?.ToString();
+
+}
+<!-- =========================================================
+     FIXED RESUME TOOLBAR
+========================================================= -->
+
+<div class="resume-top-toolbar">
+
+    <!-- PREVIOUS -->
+    @if (!string.IsNullOrWhiteSpace(previousAction))
+    {
+        <a href="@Url.Action(
+                     previousAction,
+                     "Resume",
+                     new { id = currentId })"
+           class="resume-toolbar-btn"
+           title="Previous Resume"
+           aria-label="Previous Resume">
+
+            <i class="fa-solid fa-chevron-left"></i>
+
+        </a>
+    }
+
+    <!-- NEXT -->
+    @if (!string.IsNullOrWhiteSpace(nextAction))
+    {
+        <a href="@Url.Action(
+                     nextAction,
+                     "Resume",
+                     new { id = currentId })"
+           class="resume-toolbar-btn"
+           title="Next Resume"
+           aria-label="Next Resume">
+
+            <i class="fa-solid fa-chevron-right"></i>
+
+        </a>
+    }
+
+    <!-- DIVIDER -->
+    <div class="resume-toolbar-divider"></div>
+
+    <!-- PRINT -->
+    <button type="button"
+            class="resume-toolbar-btn"
+            data-resume-action="print"
+            title="Print Resume"
+            aria-label="Print Resume">
+
+        <i class="fa-solid fa-print"></i>
+
+    </button>
+
+    <!-- DOWNLOAD -->
+    <button type="button"
+            class="resume-toolbar-btn"
+            data-resume-action="download"
+            title="Download PDF"
+            aria-label="Download PDF">
+
+        <i class="fa-solid fa-download"></i>
+
+    </button>
+
+    <!-- DIVIDER -->
+    <div class="resume-toolbar-divider"></div>
+
+    <!-- THEMES -->
+    <div class="resume-toolbar-themes">
+
+        <button type="button"
+                class="resume-toolbar-theme"
+                data-theme="blue"
+                style="--theme-color:#1f4e68"
+                title="Blue Theme"
+                aria-label="Blue Theme">
+        </button>
+
+        <button type="button"
+                class="resume-toolbar-theme"
+                data-theme="teal"
+                style="--theme-color:#176b68"
+                title="Teal Theme"
+                aria-label="Teal Theme">
+        </button>
+
+        <button type="button"
+                class="resume-toolbar-theme"
+                data-theme="slate"
+                style="--theme-color:#455a64"
+                title="Slate Theme"
+                aria-label="Slate Theme">
+        </button>
+
+        <button type="button"
+                class="resume-toolbar-theme"
+                data-theme="brown"
+                style="--theme-color:#765536"
+                title="Brown Theme"
+                aria-label="Brown Theme">
+        </button>
+
+        <button type="button"
+                class="resume-toolbar-theme"
+                data-theme="green"
+                style="--theme-color:#3f6f55"
+                title="Green Theme"
+                aria-label="Green Theme">
+        </button>
+
+    </div>
+
+</div>
+
+<div class="resume-page-wrapper">
+
+<div class="resume-sheet"
+     id="resumeSheet"
+     data-theme="blue">
+
+
+    <!-- =====================================================
+         HEADER
+    ====================================================== -->
+
+    <header class="resume-header">
+
+
+        <!-- =================================================
+             PHOTO
+        ================================================== -->
+
+        <div class="photo-wrapper">
+
+            @if (Has(p.sPhoto))
+            {
+                <img src="@p.sPhoto"
+                     class="profile-photo"
+                     alt="Candidate Photo" />
+            }
+            else
+            {
+                <div class="profile-placeholder">
+
+                    <i class="fa fa-user"></i>
+
+                </div>
+            }
+
+        </div>
+
+
+        <!-- =================================================
+             NAME / ROLE
+        ================================================== -->
+
+        <div class="header-info">
+
+            @if (Has(candidateName))
+            {
+                <h1 class="candidate-name">
+                    @candidateName
+                </h1>
+            }
+
+
+            @if (Has(candidateRole))
+            {
+                <div class="candidate-role">
+                    @candidateRole
+                </div>
+            }
+
+
+            <div class="header-accent"></div>
+
+        </div>
+
+
+        <!-- =================================================
+             HEADER CONTACT
+        ================================================== -->
+
+        <div class="header-contact">
+
+            @if (Has(Model.CandidatePhone))
+            {
+                <div class="header-contact-item">
+
+                    <i class="fa fa-phone"></i>
+
+                    <span>
+                        @Model.CandidatePhone
+                    </span>
+
+                </div>
+            }
+
+
+            @if (Has(Model.CandidateEmail))
+            {
+                <div class="header-contact-item">
+
+                    <i class="fa fa-envelope"></i>
+
+                    <span>
+                        @Model.CandidateEmail
+                    </span>
+
+                </div>
+            }
+
+
+            <div class="header-contact-item">
+
+                <i class="fa fa-location-dot"></i>
+
+                <span id="resumeAddress">
+
+                    @if (HasValue(p.Pincode))
+                    {
+                        @p.Pincode
+                    }
+
+                </span>
+
+            </div>
+
+        </div>
+
+    </header>
+
+
+
+    <!-- =====================================================
+         RESUME BODY
+    ====================================================== -->
+
+    <div class="resume-body">
+
+
+        <!-- =================================================
+             LEFT COLUMN
+        ================================================== -->
+
+        <aside class="left-column">
+
+
+            <!-- =================================================
+                 CONTACT
+            ================================================== -->
+
+            @if (
+                Has(Model.CandidatePhone) ||
+                Has(Model.CandidateEmail) ||
+                HasValue(p.Pincode)
+            )
+            {
+                <section class="resume-section">
+
+                    <div class="section-heading">
+
+                        <div class="section-icon">
+                            <i class="fa fa-address-card"></i>
+                        </div>
+
+                        <div class="section-title">
+                            Contact
+                        </div>
+
+                        <div class="section-title-line"></div>
+
+                    </div>
+
+
+                    @if (Has(Model.CandidatePhone))
+                    {
+                        <div class="info-item">
+
+                            <div class="info-icon">
+                                <i class="fa fa-phone"></i>
+                            </div>
+
+                            <div class="info-content">
+
+                                <span class="info-label">
+                                    Phone
+                                </span>
+
+                                <span class="info-value">
+                                    @Model.CandidatePhone
+                                </span>
+
+                            </div>
+
+                        </div>
+                    }
+
+
+                    @if (Has(Model.CandidateEmail))
+                    {
+                        <div class="info-item">
+
+                            <div class="info-icon">
+                                <i class="fa fa-envelope"></i>
+                            </div>
+
+                            <div class="info-content">
+
+                                <span class="info-label">
+                                    Email
+                                </span>
+
+                                <span class="info-value">
+                                    @Model.CandidateEmail
+                                </span>
+
+                            </div>
+
+                        </div>
+                    }
+
+
+                    <div class="info-item">
+
+                        <div class="info-icon">
+                            <i class="fa fa-location-dot"></i>
+                        </div>
+
+                        <div class="info-content">
+
+                            <span class="info-label">
+                                Location
+                            </span>
+
+                            <span class="info-value"
+                                  id="resumeAddressLeft">
+
+                                @if (HasValue(p.Pincode))
+                                {
+                                    @p.Pincode
+                                }
+
+                            </span>
+
+                        </div>
+
+                    </div>
+
+                </section>
+            }
+
+
+
+            <!-- =================================================
+                 SKILLS
+            ================================================== -->
+
+            @{
+                var technicalSkills =
+                    GetSkillNames(
+                        p.sTechnicalSkillIDs,
+                        Model.TechnicalSkills
+                    );
+
+                var medicalSkills =
+                    GetSkillNames(
+                        p.sMedicalSkillIDs,
+                        Model.MedicalSkills
+                    );
+
+                var nonTechnicalSkills =
+                    GetSkillNames(
+                        p.sNonTechnicalSkillIDs,
+                        Model.NonTechnicalSkills
+                    );
+            }
+
+
+            @if (
+                Has(technicalSkills) ||
+                Has(medicalSkills) ||
+                Has(nonTechnicalSkills)
+            )
+            {
+                <section class="resume-section">
+
+                    <div class="section-heading">
+
+                        <div class="section-icon">
+                            <i class="fa fa-layer-group"></i>
+                        </div>
+
+                        <div class="section-title">
+                            Skills
+                        </div>
+
+                        <div class="section-title-line"></div>
+
+                    </div>
+
+
+                    @if (Has(technicalSkills))
+                    {
+                        <div class="skill-group">
+
+                            <div class="skill-group-title">
+                                Technical Skills
+                            </div>
+
+                            <div class="skill-list">
+                                @technicalSkills
+                            </div>
+
+                        </div>
+                    }
+
+
+                    @if (Has(medicalSkills))
+                    {
+                        <div class="skill-group">
+
+                            <div class="skill-group-title">
+                                Medical Skills
+                            </div>
+
+                            <div class="skill-list">
+                                @medicalSkills
+                            </div>
+
+                        </div>
+                    }
+
+
+                    @if (Has(nonTechnicalSkills))
+                    {
+                        <div class="skill-group">
+
+                            <div class="skill-group-title">
+                                Non-Technical Skills
+                            </div>
+
+                            <div class="skill-list">
+                                @nonTechnicalSkills
+                            </div>
+
+                        </div>
+                    }
+
+                </section>
+            }
+
+
+
+            <!-- =================================================
+                 LANGUAGES
+            ================================================== -->
+
+            @{
+                var languages =
+                    new List<(string Name, string Level)>();
+
+                for (int i = 1; i <= 8; i++)
+                {
+                    var languageProperty =
+                        typeof(CandidateProfileModel)
+                            .GetProperty(
+                                $"sLanguage{i}"
+                            );
+
+                    var levelProperty =
+                        typeof(CandidateProfileModel)
+                            .GetProperty(
+                                $"sLanguageStar{i}"
+                            );
+
+                    var language =
+                        languageProperty?
+                            .GetValue(p)?
+                            .ToString()?
+                            .Trim();
+
+                    var level =
+                        levelProperty?
+                            .GetValue(p);
+
+                    var levelName =
+                        GetLanguageLevel(level);
+
+                    if (Has(language))
+                    {
+                        languages.Add(
+                            (
+                                language,
+                                levelName
+                            )
+                        );
+                    }
+                }
+            }
+
+
+            @if (languages.Any())
+            {
+                <section class="resume-section">
+
+                    <div class="section-heading">
+
+                        <div class="section-icon">
+                            <i class="fa fa-language"></i>
+                        </div>
+
+                        <div class="section-title">
+                            Languages
+                        </div>
+
+                        <div class="section-title-line"></div>
+
+                    </div>
+
+
+                    <div class="language-list">
+
+                        @foreach (var language in languages)
+                        {
+                            <div class="language-row">
+
+                                <span class="language-name">
+                                    @language.Name
+                                </span>
+
+                                @if (Has(language.Level))
+                                {
+                                    <span class="language-level">
+                                        @language.Level
+                                    </span>
+                                }
+
+                            </div>
+                        }
+
+                    </div>
+
+                </section>
+            }
+
+
+
+            <!-- =================================================
+                 INTERESTS
+            ================================================== -->
+
+            @if (Has(p.sHobbies))
+            {
+                <section class="resume-section">
+
+                    <div class="section-heading">
+
+                        <div class="section-icon">
+                            <i class="fa fa-heart"></i>
+                        </div>
+
+                        <div class="section-title">
+                            Interests
+                        </div>
+
+                        <div class="section-title-line"></div>
+
+                    </div>
+
+
+                    <div class="interest-box">
+                        @p.sHobbies
+                    </div>
+
+                </section>
+            }
+
+
+
+            <!-- =================================================
+                 SOCIAL LINKS
+            ================================================== -->
+
+            @if (
+                Has(p.GitHub) ||
+                Has(p.Linkedin)
+            )
+            {
+                <section class="resume-section">
+
+                    <div class="section-heading">
+
+                        <div class="section-icon">
+                            <i class="fa fa-link"></i>
+                        </div>
+
+                        <div class="section-title">
+                            Links
+                        </div>
+
+                        <div class="section-title-line"></div>
+
+                    </div>
+
+
+                    @if (Has(p.GitHub))
+                    {
+                        <div class="social-item">
+
+                            <i class="fa-brands fa-github"></i>
+
+                            <span>
+                                @p.GitHub
+                            </span>
+
+                        </div>
+                    }
+
+
+                    @if (Has(p.Linkedin))
+                    {
+                        <div class="social-item">
+
+                            <i class="fa-brands fa-linkedin"></i>
+
+                            <span>
+                                @p.Linkedin
+                            </span>
+
+                        </div>
+                    }
+
+                </section>
+            }
+
+
+
+            <!-- =================================================
+                 PREFERRED LOCATION
+            ================================================== -->
+
+            @if (
+                Has(p.Preferred_City) ||
+                Has(p.Preferred_State) ||
+                Has(p.Preferred_Country)
+            )
+            {
+                <section class="resume-section">
+
+                    <div class="section-heading">
+
+                        <div class="section-icon">
+                            <i class="fa fa-location-arrow"></i>
+                        </div>
+
+                        <div class="section-title">
+                            Preferred Location
+                        </div>
+
+                        <div class="section-title-line"></div>
+
+                    </div>
+
+
+                    <div class="interest-box">
+
+                        @string.Join(
+                            ", ",
+                            new[]
+                            {
+                                p.Preferred_City,
+                                p.Preferred_State,
+                                p.Preferred_Country
+                            }
+                            .Where(Has)
+                        )
+
+                    </div>
+
+                </section>
+            }
+
+        </aside>
+
+
+
+        <!-- =================================================
+             RIGHT COLUMN
+        ================================================== -->
+
+        <main class="right-column">
+
+
+            <!-- =================================================
+                 PROFESSIONAL PROFILE
+            ================================================== -->
+
+            @if (Has(p.Objective))
+            {
+                <section class="resume-section">
+
+                    <div class="section-heading">
+
+                        <div class="section-icon">
+                            <i class="fa fa-user-tie"></i>
+                        </div>
+
+                        <div class="section-title">
+                            Professional Profile
+                        </div>
+
+                        <div class="section-title-line"></div>
+
+                    </div>
+
+
+                    <div class="summary">
+                        @p.Objective
+                    </div>
+
+                </section>
+            }
+
+
+
+            <!-- =================================================
+                 INTERNSHIP / EXPERIENCE
+            ================================================== -->
+
+            @{
+                var experiences =
+                    new[]
+                    {
+                        new
+                        {
+                            Organization = p.sOrgName1,
+                            Title = p.sOrgIntTitle1,
+                            Duration = p.sOrgIntDuration1,
+                            Status = p.sOrgIntStatus1
+                        },
+
+                        new
+                        {
+                            Organization = p.sOrgName2,
+                            Title = p.sOrgIntTitle2,
+                            Duration = p.sOrgIntDuration2,
+                            Status = p.sOrgIntStatus2
+                        },
+
+                        new
+                        {
+                            Organization = p.sOrgName3,
+                            Title = p.sOrgIntTitle3,
+                            Duration = p.sOrgIntDuration3,
+                            Status = p.sOrgIntStatus3
+                        },
+
+                        new
+                        {
+                            Organization = p.sOrgName4,
+                            Title = p.sOrgIntTitle4,
+                            Duration = p.sOrgIntDuration4,
+                            Status = p.sOrgIntStatus4
+                        }
+                    }
+                    .Where(x => Has(x.Organization))
+                    .ToList();
+            }
+
+
+            @if (experiences.Any())
+            {
+                <section class="resume-section">
+
+                    <div class="section-heading">
+
+                        <div class="section-icon">
+                            <i class="fa fa-briefcase"></i>
+                        </div>
+
+                        <div class="section-title">
+                            Internship / Experience
+                        </div>
+
+                        <div class="section-title-line"></div>
+
+                    </div>
+
+
+                    @foreach (var experience in experiences)
+                    {
+                        var title =
+                            GetLookupName(
+                                Model.InternshipTitles,
+                                experience.Title
+                            );
+
+                        var duration =
+                            GetLookupName(
+                                Model.InternshipDurations,
+                                experience.Duration
+                            );
+
+                        var status =
+                            GetLookupName(
+                                Model.InternshipStatuses,
+                                experience.Status
+                            );
+
+
+                        <div class="experience-item">
+
+                            @if (Has(title))
+                            {
+                                <div class="experience-title">
+                                    @title
+                                </div>
+                            }
+
+
+                            <div class="experience-company">
+                                @experience.Organization
+                            </div>
+
+
+                            @if (
+                                Has(duration) ||
+                                Has(status)
+                            )
+                            {
+                                <div class="experience-meta">
+
+                                    @if (Has(duration))
+                                    {
+                                        <span>
+                                            @duration
+                                        </span>
+                                    }
+
+                                    @if (
+                                        Has(duration) &&
+                                        Has(status)
+                                    )
+                                    {
+                                        <span>
+                                            &nbsp;•&nbsp;
+                                        </span>
+                                    }
+
+                                    @if (Has(status))
+                                    {
+                                        <span>
+                                            @status
+                                        </span>
+                                    }
+
+                                </div>
+                            }
+
+                        </div>
+                    }
+
+                </section>
+            }
+
+
+
+            <!-- =================================================
+                 EDUCATION
+            ================================================== -->
+
+            @if (
+                HasNum(p.PG_Year) ||
+                HasNum(p.Graduation_Year) ||
+                HasNum(p.HSC_DIPLOMA_YEAR) ||
+                HasNum(p.SSC_YEAR)
+            )
+            {
+                <section class="resume-section">
+
+                    <div class="section-heading">
+
+                        <div class="section-icon">
+                            <i class="fa fa-graduation-cap"></i>
+                        </div>
+
+                        <div class="section-title">
+                            Education
+                        </div>
+
+                        <div class="section-title-line"></div>
+
+                    </div>
+
+
+                    <div class="education-list">
+
+
+                        <!-- =================================================
+                             PG
+                        ================================================== -->
+
+                        @if (HasNum(p.PG_Year))
+                        {
+                            var pgStream =
+                                GetLookupName(
+                                    Model.Streams,
+                                    p.PG_Stream
+                                );
+
+                            var pgDivision =
+                                GetLookupName(
+                                    Model.Divisions,
+                                    p.PG_Division
+                                );
+
+
+                            <div class="education-item">
+
+                                <div class="education-title">
+
+                                    @if (Has(pgStream))
+                                    {
+                                        @pgStream
+                                    }
+                                    else
+                                    {
+                                        <span>
+                                            Post Graduation
+                                        </span>
+                                    }
+
+                                </div>
+
+
+                                <div class="education-meta">
+
+                                    Post Graduation
+                                    &nbsp;•&nbsp;
+                                    @p.PG_Year
+
+                                    @if (Has(pgDivision))
+                                    {
+                                        <span>
+                                            &nbsp;•&nbsp;
+                                            @pgDivision
+                                        </span>
+                                    }
+
+                                </div>
+
+                            </div>
+                        }
+
+
+
+                        <!-- =================================================
+                             GRADUATION
+                        ================================================== -->
+
+                        @if (HasNum(p.Graduation_Year))
+                        {
+                            var graduationStream =
+                                GetLookupName(
+                                    Model.Streams,
+                                    p.Graduation_Stream
+                                );
+
+                            var graduationDivision =
+                                GetLookupName(
+                                    Model.Divisions,
+                                    p.Graduation_Division
+                                );
+
+
+                            <div class="education-item">
+
+                                <div class="education-title">
+
+                                    @if (Has(graduationStream))
+                                    {
+                                        @graduationStream
+                                    }
+                                    else
+                                    {
+                                        <span>
+                                            Graduation
+                                        </span>
+                                    }
+
+                                </div>
+
+
+                                <div class="education-meta">
+
+                                    Graduation
+                                    &nbsp;•&nbsp;
+                                    @p.Graduation_Year
+
+                                    @if (Has(graduationDivision))
+                                    {
+                                        <span>
+                                            &nbsp;•&nbsp;
+                                            @graduationDivision
+                                        </span>
+                                    }
+
+                                </div>
+
+                            </div>
+                        }
+
+
+
+                        <!-- =================================================
+                             HSC / DIPLOMA
+                        ================================================== -->
+
+                        @if (HasNum(p.HSC_DIPLOMA_YEAR))
+                        {
+                            var hscDivision =
+                                GetLookupName(
+                                    Model.Divisions,
+                                    p.HSC_DIPLOMA_DIVISION
+                                );
+
+
+                            <div class="education-item">
+
+                                <div class="education-title">
+                                    HSC / Diploma
+                                </div>
+
+
+                                <div class="education-meta">
+
+                                    @p.HSC_DIPLOMA_YEAR
+
+                                    @if (Has(hscDivision))
+                                    {
+                                        <span>
+                                            &nbsp;•&nbsp;
+                                            @hscDivision
+                                        </span>
+                                    }
+
+                                </div>
+
+                            </div>
+                        }
+
+
+
+                        <!-- =================================================
+                             SSC
+                        ================================================== -->
+
+                        @if (HasNum(p.SSC_YEAR))
+                        {
+                            var sscDivision =
+                                GetLookupName(
+                                    Model.Divisions,
+                                    p.SSC_DIVISION
+                                );
+
+
+                            <div class="education-item">
+
+                                <div class="education-title">
+                                    SSC / 10th
+                                </div>
+
+
+                                <div class="education-meta">
+
+                                    @p.SSC_YEAR
+
+                                    @if (Has(sscDivision))
+                                    {
+                                        <span>
+                                            &nbsp;•&nbsp;
+                                            @sscDivision
+                                        </span>
+                                    }
+
+                                </div>
+
+                            </div>
+                        }
+
+                    </div>
+
+                </section>
+            }
+
+
+
+            <!-- =================================================
+                 ACHIEVEMENTS
+            ================================================== -->
+
+            @{
+                var achievements =
+                    new[]
+                    {
+                        p.Achievements_Certification1,
+                        p.Achievements_Certification2,
+                        p.Achievements_Certification3
+                    }
+                    .Where(Has)
+                    .ToList();
+            }
+
+
+            @if (achievements.Any())
+            {
+                <section class="resume-section">
+
+                    <div class="section-heading">
+
+                        <div class="section-icon">
+                            <i class="fa fa-award"></i>
+                        </div>
+
+                        <div class="section-title">
+                            Certifications & Awards
+                        </div>
+
+                        <div class="section-title-line"></div>
+
+                    </div>
+
+
+                    <div class="achievement-list">
+
+                        @foreach (var achievement in achievements)
+                        {
+                            <div class="achievement-item">
+
+                                <i class="fa fa-circle-check"></i>
+
+                                <span>
+                                    @achievement
+                                </span>
+
+                            </div>
+                        }
+
+                    </div>
+
+                </section>
+            }
+
+
+
+            <!-- =================================================
+                 REFERENCES
+            ================================================== -->
+
+            @if (
+                Has(p.sRefName1) ||
+                Has(p.sRefName2)
+            )
+            {
+                <section class="resume-section">
+
+                    <div class="section-heading">
+
+                        <div class="section-icon">
+                            <i class="fa fa-user-group"></i>
+                        </div>
+
+                        <div class="section-title">
+                            References
+                        </div>
+
+                        <div class="section-title-line"></div>
+
+                    </div>
+
+
+                    <div class="reference-grid">
+
+
+                        <!-- =================================================
+                             REFERENCE 1
+                        ================================================== -->
+
+                        @if (Has(p.sRefName1))
+                        {
+                            var relation1 =
+                                GetLookupName(
+                                    Model.Relationships,
+                                    p.sRefRelationName1
+                                );
+
+
+                            <div class="reference-item">
+
+                                <div class="reference-name">
+                                    @p.sRefName1
+                                </div>
+
+
+                                @if (Has(relation1))
+                                {
+                                    <div class="reference-relation">
+                                        @relation1
+                                    </div>
+                                }
+
+
+                                @if (Has(p.sLocation1))
+                                {
+                                    <div class="reference-detail">
+
+                                        <i class="fa fa-location-dot"></i>
+
+                                        @p.sLocation1
+
+                                    </div>
+                                }
+
+
+                                @if (Has(p.sMobile1))
+                                {
+                                    <div class="reference-detail">
+
+                                        <i class="fa fa-phone"></i>
+
+                                        @p.sMobile1
+
+                                    </div>
+                                }
+
+                            </div>
+                        }
+
+
+
+                        <!-- =================================================
+                             REFERENCE 2
+                        ================================================== -->
+
+                        @if (Has(p.sRefName2))
+                        {
+                            var relation2 =
+                                GetLookupName(
+                                    Model.Relationships,
+                                    p.sRefRelationName2
+                                );
+
+
+                            <div class="reference-item">
+
+                                <div class="reference-name">
+                                    @p.sRefName2
+                                </div>
+
+
+                                @if (Has(relation2))
+                                {
+                                    <div class="reference-relation">
+                                        @relation2
+                                    </div>
+                                }
+
+
+                                @if (Has(p.sLocation2))
+                                {
+                                    <div class="reference-detail">
+
+                                        <i class="fa fa-location-dot"></i>
+
+                                        @p.sLocation2
+
+                                    </div>
+                                }
+
+
+                                @if (Has(p.sMobile2))
+                                {
+                                    <div class="reference-detail">
+
+                                        <i class="fa fa-phone"></i>
+
+                                        @p.sMobile2
+
+                                    </div>
+                                }
+
+                            </div>
+                        }
+
+                    </div>
+
+                </section>
+            }
+
+
+
+            <!-- =================================================
+                 CAREER PREFERENCE
+            ================================================== -->
+
+            @{
+                var internshipType =
+                    GetLookupName(
+                        Model.InternshipFellowshipType,
+                        p.Internship_FellowshipType
+                    );
+
+                if (string.Equals(
+                    internshipType,
+                    "Paid by Trainee",
+                    StringComparison.OrdinalIgnoreCase))
+                {
+                    internshipType = "";
+                }
+            }
+
+
+            @if (
+                Has(internshipType) ||
+                Has(p.Preferred_City) ||
+                Has(p.Preferred_State) ||
+                Has(p.Preferred_Country)
+            )
+            {
+                <section class="resume-section">
+
+                    <div class="section-heading">
+
+                        <div class="section-icon">
+                            <i class="fa fa-bullseye"></i>
+                        </div>
+
+                        <div class="section-title">
+                            Career Preference
+                        </div>
+
+                        <div class="section-title-line"></div>
+
+                    </div>
+
+
+                    @if (Has(internshipType))
+                    {
+                        <div class="preference-item">
+
+                            <strong>
+                                Type:
+                            </strong>
+
+                            <span>
+                                @internshipType
+                            </span>
+
+                        </div>
+                    }
+
+
+                    @if (
+                        Has(p.Preferred_City) ||
+                        Has(p.Preferred_State) ||
+                        Has(p.Preferred_Country)
+                    )
+                    {
+                        <div class="preference-item">
+
+                            <strong>
+                                Preferred Location:
+                            </strong>
+
+                            <span>
+
+                                @string.Join(
+                                    ", ",
+                                    new[]
+                                    {
+                                        p.Preferred_City,
+                                        p.Preferred_State,
+                                        p.Preferred_Country
+                                    }
+                                    .Where(Has)
+                                )
+
+                            </span>
+
+                        </div>
+                    }
+
+                </section>
+            }
+
+        </main>
+
+    </div>
+
+</div>
+
+</div>
+
+
+
+<!-- =========================================================
+     THEME SWITCHER
+========================================================== -->
+@* 
+<div class="resume-theme-switcher">
+
+<button type="button"
+        class="theme-swatch active"
+        data-theme="blue"
+        style="--theme-color:#1f4e68">
+</button>
+
+<button type="button"
+        class="theme-swatch"
+        data-theme="teal"
+        style="--theme-color:#176b68">
+</button>
+
+<button type="button"
+        class="theme-swatch"
+        data-theme="slate"
+        style="--theme-color:#455a64">
+</button>
+
+<button type="button"
+        class="theme-swatch"
+        data-theme="brown"
+        style="--theme-color:#765536">
+</button>
+
+<button type="button"
+        class="theme-swatch"
+        data-theme="green"
+        style="--theme-color:#3f6f55">
+</button>
+
+</div> *@
+
+
+
+<!-- =========================================================
+     JAVASCRIPT
+========================================================== -->
+
+<script>
+
+    document.addEventListener(
+        "DOMContentLoaded",
+        function () {
+
+            /* =================================================
+               THEME
+            ================================================= */
+
+       /* =================================================
+   THEME
+================================================= */
+
+const sheet =
+    document.getElementById(
+        "resumeSheet"
+    );
+
+
+const themeButtons =
+    document.querySelectorAll(
+        ".resume-toolbar-theme"
+    );
+
+
+const savedTheme =
+    localStorage.getItem(
+        "resumeThemeV7"
+    ) || "blue";
+
+
+if (sheet) {
+
+    sheet.setAttribute(
+        "data-theme",
+        savedTheme
+    );
+
+}
+
+
+themeButtons.forEach(
+    function (button) {
+
+        button.classList.toggle(
+            "active",
+            button.dataset.theme ===
+            savedTheme
+        );
+
+
+        button.addEventListener(
+            "click",
+            function () {
+
+                const theme =
+                    this.dataset.theme;
+
+
+                if (sheet) {
+
+                    sheet.setAttribute(
+                        "data-theme",
+                        theme
+                    );
+
+                }
+
+
+                themeButtons.forEach(
+                    function (item) {
+
+                        item.classList.remove(
+                            "active"
+                        );
+
+                    }
+                );
+
+
+                this.classList.add(
+                    "active"
+                );
+
+
+                localStorage.setItem(
+                    "resumeThemeV7",
+                    theme
+                );
+
+            }
+        );
+
+    }
+);
+
+
+            /* =================================================
+               LOCATION
+            ================================================= */
+
+            const addressElements =
+                document.querySelectorAll(
+                    "#resumeAddress, #resumeAddressLeft"
+                );
+
+
+            const countryId =
+                "@p.CountryID";
+
+            const stateId =
+                "@p.StateID";
+
+            const cityId =
+                "@p.CityID";
+
+            const pincode =
+                "@p.Pincode";
+
+
+            function setAddress(
+                city,
+                state,
+                country
+            ) {
+
+                const parts = [
+                    city,
+                    state,
+                    country,
+                    pincode
+                ].filter(
+                    function (value) {
+
+                        return value &&
+                               value.trim() !== "";
+
+                    }
+                );
+
+
+                const address =
+                    parts.join(", ");
+
+
+                addressElements.forEach(
+                    function (element) {
+
+                        element.textContent =
+                            address;
+
+                    }
+                );
+
+            }
+
+
+            if (!countryId) {
+
+                return;
+
+            }
+
+
+            fetch(
+                "/Location/GetCountries"
+            )
+            .then(
+                function (response) {
+
+                    return response.json();
+
+                }
+            )
+            .then(
+                function (countries) {
+
+                    const country =
+                        countries.find(
+                            function (item) {
+
+                                return String(item.id) ===
+                                       String(countryId);
+
+                            }
+                        );
+
+
+                    const countryName =
+                        country
+                            ? country.name
+                            : "";
+
+
+                    const countryCode =
+                        country
+                            ? (
+                                country.iso2 ||
+                                country.code ||
+                                country.id
+                              )
+                            : countryId;
+
+
+                    if (!stateId) {
+
+                        setAddress(
+                            "",
+                            "",
+                            countryName
+                        );
+
+                        return null;
+
+                    }
+
+
+                    return fetch(
+                        "/Location/GetStates?countryCode=" +
+                        encodeURIComponent(
+                            countryCode
+                        )
+                    )
+                    .then(
+                        function (response) {
+
+                            return response.json();
+
+                        }
+                    )
+                    .then(
+                        function (states) {
+
+                            const state =
+                                states.find(
+                                    function (item) {
+
+                                        return String(item.id) ===
+                                               String(stateId);
+
+                                    }
+                                );
+
+
+                            const stateName =
+                                state
+                                    ? state.name
+                                    : "";
+
+
+                            const stateCode =
+                                state
+                                    ? (
+                                        state.stateCode ||
+                                        state.iso2 ||
+                                        state.id
+                                      )
+                                    : stateId;
+
+
+                            if (!cityId) {
+
+                                setAddress(
+                                    "",
+                                    stateName,
+                                    countryName
+                                );
+
+                                return null;
+
+                            }
+
+
+                            return fetch(
+                                "/Location/GetCities?countryCode=" +
+                                encodeURIComponent(
+                                    countryCode
+                                ) +
+                                "&stateCode=" +
+                                encodeURIComponent(
+                                    stateCode
+                                )
+                            )
+                            .then(
+                                function (response) {
+
+                                    return response.json();
+
+                                }
+                            )
+                            .then(
+                                function (cities) {
+
+                                    const city =
+                                        cities.find(
+                                            function (item) {
+
+                                                return String(item.id) ===
+                                                       String(cityId);
+
+                                            }
+                                        );
+
+
+                                    const cityName =
+                                        city
+                                            ? city.name
+                                            : "";
+
+
+                                    setAddress(
+                                        cityName,
+                                        stateName,
+                                        countryName
+                                    );
+
+                                }
+                            );
+
+                        }
+                    );
+
+                }
+            )
+            .catch(
+                function (error) {
+
+                    console.error(
+                        "Resume location error:",
+                        error
+                    );
+
+                }
+            );
+
+        }
+    );
+
+
+    /* =========================================================
+       RESUME FILE NAME
+    ========================================================== */
+
+    window.resumeFileName =
+        @Html.Raw(
+            System.Text.Json.JsonSerializer.Serialize(
+                string.IsNullOrWhiteSpace(candidateName)
+                    ? "Candidate"
+                    : candidateName
+            )
+        );
+
+</script>
+
+
+
+<!-- =========================================================
+     PDF LIBRARIES
+========================================================== -->
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
+<script src="~/js/resume-download.js"></script>
+
+</body>
+
+</html>

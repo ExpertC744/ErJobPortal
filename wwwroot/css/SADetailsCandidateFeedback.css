@@ -1,0 +1,246 @@
+﻿ 
+/* ================================
+               MAIN PAGE
+               ================================ */
+.feedback-details-page {
+    width: 100%;
+    min-height: 100vh;
+    padding: 20px 30px;
+    box-sizing: border-box;
+    background: #ffffff;
+}
+
+
+/* ================================
+               MAIN CARD
+               ================================ */
+
+.feedback-details-card {
+    width: 830px;
+    max-width: calc(100% - 100px);
+    margin: 0 auto;
+    background: #eef4ff;
+    border-top: 6px solid #1687ff;
+    border-radius: 18px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.10);
+    padding: 30px;
+    box-sizing: border-box;
+}
+
+
+/* ================================
+               CANDIDATE HEADER
+               ================================ */
+
+.candidate-header {
+    display: flex;
+    align-items: center;
+    gap: 80px;
+    margin-bottom: 30px;
+}
+
+
+.candidate-image-box {
+    width: 215px;
+    height: 125px;
+    background: #ffffff;
+    border-radius: 12px;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+
+.candidate-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+
+.no-image {
+    font-size: 16px;
+    color: #777;
+}
+
+
+.candidate-name {
+    margin: 0;
+    font-size: 30px;
+    font-weight: 700;
+    color: #111111;
+}
+
+
+/* ================================
+               QUESTION / ANSWER ROW
+               ================================ */
+
+.feedback-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    column-gap: 55px;
+    margin-top: 30px;
+}
+
+
+.question-title,
+.answer-title {
+    font-size: 18px;
+    font-weight: 700;
+    color: #111111;
+    margin-bottom: 16px;
+}
+
+
+.question-text,
+.answer-text {
+    font-size: 16px;
+    line-height: 1.45;
+    color: #606a78;
+    word-break: break-word;
+}
+
+
+.answer-text {
+    color: #555555;
+}
+
+
+/* ================================
+               STAR RATING
+               ================================ */
+
+.star {
+    font-size: 20px;
+    margin-right: 2px;
+}
+
+.star-filled {
+    color: #555555;
+}
+
+.star-empty {
+    color: #b7b7b7;
+}
+
+
+/* ================================
+               STATUS
+               ================================ */
+
+.feedback-status {
+    margin-top: 30px;
+    padding-top: 20px;
+    border-top: 1px solid #d8dfeb;
+    font-size: 16px;
+}
+
+
+.status-enabled {
+    color: #198754;
+    font-weight: 700;
+}
+
+
+.status-disabled {
+    color: #dc3545;
+    font-weight: 700;
+}
+
+
+/* ================================
+               RIGHT SIDE BUTTONS
+               ================================ */
+
+.side-buttons {
+    position: fixed;
+    right: 25px;
+    top: 60px;
+    display: flex;
+    flex-direction: column;
+    gap: 30px;
+    z-index: 1000;
+}
+
+
+.side-button {
+    width: 53px;
+    height: 35px;
+    background: #168cf5;
+    color: #ffffff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-decoration: none;
+    font-size: 17px;
+    border-radius: 0;
+}
+
+
+    .side-button:hover {
+        background: #0877dc;
+        color: #ffffff;
+    }
+
+
+/* ================================
+               MOBILE
+               ================================ */
+
+@media (max-width: 900px) {
+
+    .feedback-details-page {
+        padding: 15px;
+    }
+
+    .feedback-details-card {
+        width: 100%;
+        max-width: 100%;
+        padding: 25px;
+    }
+
+    .candidate-header {
+        gap: 25px;
+    }
+
+    .candidate-name {
+        font-size: 24px;
+    }
+
+    .feedback-row {
+        grid-template-columns: 1fr;
+        row-gap: 15px;
+    }
+
+    .side-buttons {
+        position: static;
+        flex-direction: row;
+        justify-content: flex-end;
+        margin-bottom: 20px;
+    }
+}
+
+
+/* ================================
+               PRINT
+               ================================ */
+
+@media print {
+
+    .side-buttons {
+        display: none;
+    }
+
+    .feedback-details-page {
+        padding: 0;
+    }
+
+    .feedback-details-card {
+        margin: 0 auto;
+        box-shadow: none;
+    }
+}
+ 

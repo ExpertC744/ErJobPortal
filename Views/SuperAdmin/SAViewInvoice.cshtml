@@ -1,0 +1,1042 @@
+﻿@{
+    Layout = null;
+
+    ViewData["Title"] = "Invoice";
+
+    var invoiceId = "1034";
+    var invoiceDate = "28-09-2026";
+
+    var clientName = "ABC";
+    var companyName = "ABC";
+    var address = "Laxmi Nagar";
+
+    var advertisementStartDate = "23-12-2024";
+
+    var totalCharges = "1200.00";
+    var cgst = "0.00";
+    var sgst = "0.00";
+    var grandTotal = "1200.00";
+
+    var amountInWords = "One Thousand Two Hundred Rupees Only";
+}
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="utf-8" />
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0" />
+
+    <title>Invoice - @invoiceId</title>
+
+    <link rel="stylesheet"
+          href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
+
+    <style>
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            background: #f4f8f7;
+            color: #0f172a;
+            font-family: Arial, Helvetica, sans-serif;
+        }
+
+        /* =========================================
+           PAGE
+           ========================================= */
+
+        .invoice-wrapper {
+            width: 210mm;
+            min-height: auto;
+            margin: 25px auto;
+            background: #ffffff;
+            border: 1px solid #dce7e5;
+            border-radius: 12px;
+            box-shadow: 0 8px 30px rgba(15, 23, 42, .08);
+            overflow: hidden;
+        }
+
+
+        /* =========================================
+           HEADER
+           ========================================= */
+
+        .invoice-header {
+            padding: 24px 28px 20px;
+            border-bottom: 1px solid #e2ecea;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 20px;
+        }
+
+        .company-logo {
+            width: 125px;
+            height: 70px;
+            display: flex;
+            align-items: center;
+            justify-content: flex-start;
+        }
+
+        .company-logo img {
+            max-width: 115px;
+            max-height: 65px;
+            object-fit: contain;
+        }
+
+        .company-information {
+            flex: 1;
+            text-align: center;
+        }
+
+        .company-information h1 {
+            margin: 0 0 5px;
+            color: #0f172a;
+            font-family: Georgia, serif;
+            font-size: 21px;
+            font-weight: 700;
+        }
+
+        .company-information p {
+            margin: 2px 0;
+            color: #475569;
+            font-size: 10px;
+            line-height: 1.4;
+        }
+
+        .company-information .website {
+            color: #0d9488;
+            font-weight: 700;
+        }
+
+        .trainee-brand {
+            width: 115px;
+            text-align: right;
+        }
+
+        .trainee-brand img {
+            max-width: 95px;
+            max-height: 55px;
+            object-fit: contain;
+        }
+
+        .trainee-brand-text {
+            color: #0d9488;
+            font-size: 17px;
+            font-weight: 800;
+            letter-spacing: .5px;
+        }
+
+
+        /* =========================================
+           INVOICE TITLE
+           ========================================= */
+
+        .invoice-title-area {
+            padding: 18px 28px 12px;
+            text-align: center;
+        }
+
+        .invoice-title-area h2 {
+            margin: 0;
+            color: #0f172a;
+            font-family: Georgia, serif;
+            font-size: 25px;
+            font-weight: 700;
+        }
+
+        .invoice-title-area p {
+            margin: 5px 0 0;
+            color: #0d9488;
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: .4px;
+        }
+
+
+        /* =========================================
+           BILL TO
+           ========================================= */
+
+        .content-area {
+            padding: 0 28px 25px;
+        }
+
+        .section-heading {
+            margin-bottom: 8px;
+            padding: 8px 12px;
+            background: #ecf8f6;
+            border: 1px solid #d2eeea;
+            border-radius: 6px;
+            color: #0f766e;
+            font-size: 12px;
+            font-weight: 700;
+        }
+
+        .bill-section {
+            margin-bottom: 15px;
+        }
+
+        .bill-content {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            border: 1px solid #dce7e5;
+            border-radius: 7px;
+            overflow: hidden;
+        }
+
+        .bill-item {
+            min-height: 55px;
+            padding: 10px 12px;
+            border-right: 1px solid #dce7e5;
+            background: #ffffff;
+        }
+
+        .bill-item:last-child {
+            border-right: 0;
+        }
+
+        .bill-label {
+            display: block;
+            margin-bottom: 5px;
+            color: #64748b;
+            font-size: 9px;
+            text-transform: uppercase;
+            letter-spacing: .4px;
+        }
+
+        .bill-value {
+            color: #0f172a;
+            font-size: 11px;
+            font-weight: 600;
+        }
+
+
+        /* =========================================
+           INVOICE INFORMATION
+           ========================================= */
+
+        .invoice-info {
+            margin-bottom: 15px;
+            border: 1px solid #dce7e5;
+            border-radius: 7px;
+            overflow: hidden;
+        }
+
+        .invoice-info table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .invoice-info th {
+            padding: 8px 10px;
+            background: #f5faf9;
+            border-right: 1px solid #dce7e5;
+            color: #64748b;
+            font-size: 9px;
+            font-weight: 700;
+            text-transform: uppercase;
+        }
+
+        .invoice-info td {
+            padding: 10px;
+            border-top: 1px solid #dce7e5;
+            border-right: 1px solid #dce7e5;
+            color: #0f172a;
+            font-size: 11px;
+            font-weight: 600;
+        }
+
+        .invoice-info th:last-child,
+        .invoice-info td:last-child {
+            border-right: 0;
+        }
+
+
+        /* =========================================
+           DESCRIPTION
+           ========================================= */
+
+        .description-section {
+            margin-bottom: 16px;
+        }
+
+        .description-table {
+            width: 100%;
+            border-collapse: collapse;
+            border: 1px solid #dce7e5;
+            border-radius: 7px;
+            overflow: hidden;
+        }
+
+        .description-table th {
+            padding: 9px 12px;
+            background: #f5faf9;
+            border-bottom: 1px solid #dce7e5;
+            color: #334155;
+            font-size: 10px;
+            font-weight: 700;
+            text-align: left;
+        }
+
+        .description-table th:last-child {
+            text-align: right;
+        }
+
+        .description-table td {
+            padding: 8px 12px;
+            border-bottom: 1px solid #e2e8f0;
+            color: #475569;
+            font-size: 10px;
+        }
+
+        .description-table td:last-child {
+            color: #0f172a;
+            text-align: right;
+            font-weight: 600;
+        }
+
+        .description-table tr:last-child td {
+            border-bottom: 0;
+        }
+
+        .description-table .grand-total td {
+            background: #ecf8f6;
+            color: #0f766e;
+            font-size: 11px;
+            font-weight: 800;
+        }
+
+        .description-table .amount-words td:last-child {
+            font-weight: 500;
+            font-style: italic;
+        }
+
+
+        /* =========================================
+           BANK + STATUS
+           ========================================= */
+
+        .bottom-grid {
+            display: grid;
+            grid-template-columns: 1fr 220px;
+            gap: 15px;
+            margin-top: 5px;
+        }
+
+        .bank-section {
+            border: 1px solid #dce7e5;
+            border-radius: 7px;
+            overflow: hidden;
+        }
+
+        .bank-header {
+            padding: 8px 12px;
+            background: #ecf8f6;
+            color: #0f766e;
+            font-size: 12px;
+            font-weight: 700;
+        }
+
+        .bank-content {
+            padding: 10px 12px;
+        }
+
+        .bank-content p {
+            margin: 2px 0;
+            color: #475569;
+            font-size: 9px;
+            line-height: 1.35;
+        }
+
+        .bank-content strong {
+            color: #0f172a;
+        }
+
+
+        .payment-status {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            border: 1px solid #d2eeea;
+            border-radius: 7px;
+            background: #f5fcfb;
+            padding: 15px;
+        }
+
+        .payment-status i {
+            margin-bottom: 8px;
+            color: #0d9488;
+            font-size: 25px;
+        }
+
+        .payment-status small {
+            margin-bottom: 6px;
+            color: #64748b;
+            font-size: 9px;
+            text-transform: uppercase;
+        }
+
+        .payment-status strong {
+            color: #0f766e;
+            font-size: 11px;
+            letter-spacing: .3px;
+        }
+
+
+        /* =========================================
+           NOTES
+           ========================================= */
+
+        .notes-section {
+            margin-top: 16px;
+            padding-top: 10px;
+            border-top: 1px solid #dce7e5;
+        }
+
+        .notes-section h4 {
+            margin: 0 0 6px;
+            color: #0f172a;
+            font-size: 10px;
+            font-weight: 700;
+        }
+
+        .notes-section ul {
+            margin: 0;
+            padding-left: 18px;
+        }
+
+        .notes-section li {
+            margin-bottom: 3px;
+            color: #64748b;
+            font-size: 8.5px;
+        }
+
+
+        /* =========================================
+           THANK YOU
+           ========================================= */
+
+        .thank-you {
+            margin-top: 12px;
+            padding: 10px;
+            border-radius: 6px;
+            background: #ecf8f6;
+            color: #0f766e;
+            text-align: center;
+            font-family: Georgia, serif;
+            font-size: 11px;
+            font-weight: 700;
+        }
+
+
+        /* =========================================
+           FOOTER
+           ========================================= */
+
+        .invoice-footer {
+            padding: 12px 28px;
+            background: #f8fbfa;
+            border-top: 1px solid #e2ecea;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .invoice-footer span {
+            color: #94a3b8;
+            font-size: 8px;
+        }
+
+        .invoice-footer strong {
+            color: #0d9488;
+        }
+
+
+        /* =========================================
+           ACTION BUTTONS
+           ========================================= */
+
+        .invoice-actions {
+            position: fixed;
+            right: 20px;
+            top: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            z-index: 999;
+        }
+
+        .invoice-action {
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 0;
+            border-radius: 7px;
+            background: #0d9488;
+            color: #ffffff;
+            text-decoration: none;
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(15, 118, 110, .18);
+        }
+
+        .invoice-action:hover {
+            background: #0f766e;
+            color: #ffffff;
+        }
+
+
+        /* =========================================
+           RESPONSIVE
+           ========================================= */
+
+        @@media (max-width: 900px) {
+
+            .invoice-wrapper {
+                width: calc(100% - 30px);
+                min-height: auto;
+                margin: 15px auto;
+            }
+
+            .invoice-actions {
+                right: 10px;
+                top: 10px;
+            }
+
+        }
+
+
+        @@media (max-width: 650px) {
+
+            .invoice-wrapper {
+                width: 100%;
+                margin: 0;
+                border-radius: 0;
+                border: 0;
+            }
+
+            .invoice-header {
+                padding: 18px;
+                flex-direction: column;
+                text-align: center;
+            }
+
+            .company-logo,
+            .trainee-brand {
+                width: 100%;
+                justify-content: center;
+                text-align: center;
+            }
+
+            .content-area {
+                padding: 0 15px 20px;
+            }
+
+            .bill-content {
+                grid-template-columns: 1fr;
+            }
+
+            .bill-item {
+                border-right: 0;
+                border-bottom: 1px solid #dce7e5;
+            }
+
+            .bill-item:last-child {
+                border-bottom: 0;
+            }
+
+            .invoice-info {
+                overflow-x: auto;
+            }
+
+            .bottom-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .invoice-footer {
+                padding: 12px 15px;
+            }
+
+        }
+
+
+        /* =========================================
+           PRINT
+           ========================================= */
+
+        @@media print {
+
+            body {
+                background: #ffffff;
+            }
+
+            .invoice-wrapper {
+                width: 210mm;
+                min-height: 297mm;
+                margin: 0;
+                border: 0;
+                border-radius: 0;
+                box-shadow: none;
+            }
+
+            .invoice-actions {
+                display: none !important;
+            }
+
+        }
+
+    </style>
+
+</head>
+
+<body>
+
+
+    <!-- ACTION BUTTONS -->
+
+    <div class="invoice-actions">
+
+        <a href="@Url.Action("Index", "SuperAdmin")"
+           class="invoice-action"
+           title="Home">
+
+            <i class="fas fa-home"></i>
+
+        </a>
+
+        <button type="button"
+                class="invoice-action"
+                onclick="window.print();"
+                title="Print">
+
+            <i class="fas fa-print"></i>
+
+        </button>
+
+        <button type="button"
+                class="invoice-action"
+                onclick="window.print();"
+                title="Download">
+
+            <i class="fas fa-download"></i>
+
+        </button>
+
+    </div>
+
+
+    <!-- INVOICE -->
+
+    <div class="invoice-wrapper"
+         id="invoicePage">
+
+
+        <!-- HEADER -->
+
+        <div class="invoice-header">
+
+            <div class="company-logo">
+
+                <img src="/img/core-img/Logo.png"
+                     alt="IT-NetworkZ Logo" />
+
+            </div>
+
+
+            <div class="company-information">
+
+                <h1>
+                    IT-NetworkZ Infosystems Pvt. Ltd.
+                </h1>
+
+                <p>
+                    P-5/A 102 Akanksha Building, RPTS Rd, Laxminagar,
+                    Nagpur, Maharashtra 440022
+                </p>
+
+                <p>
+                    Phone: 096659 99900
+                </p>
+
+                <p class="website">
+                    Website: www.it-networkz.com
+                </p>
+
+            </div>
+
+
+            <div class="trainee-brand">
+
+                <div class="trainee-brand-text">
+                    1TRAINEE
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- TITLE -->
+
+        <div class="invoice-title-area">
+
+            <h2>
+                INVOICE
+            </h2>
+
+            <p>
+                1TRAINEE ADVERTISEMENT
+            </p>
+
+        </div>
+
+
+        <div class="content-area">
+
+
+            <!-- BILL TO -->
+
+            <div class="bill-section">
+
+                <div class="section-heading">
+                    <i class="fas fa-user me-1"></i>
+                    BILL TO
+                </div>
+
+                <div class="bill-content">
+
+                    <div class="bill-item">
+
+                        <span class="bill-label">
+                            Client Name
+                        </span>
+
+                        <span class="bill-value">
+                            @clientName
+                        </span>
+
+                    </div>
+
+
+                    <div class="bill-item">
+
+                        <span class="bill-label">
+                            Company Name
+                        </span>
+
+                        <span class="bill-value">
+                            @companyName
+                        </span>
+
+                    </div>
+
+
+                    <div class="bill-item">
+
+                        <span class="bill-label">
+                            Address
+                        </span>
+
+                        <span class="bill-value">
+                            @address
+                        </span>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <!-- INVOICE INFORMATION -->
+
+            <div class="invoice-info">
+
+                <table>
+
+                    <thead>
+
+                        <tr>
+
+                            <th>
+                                Date
+                            </th>
+
+                            <th>
+                                Invoice ID
+                            </th>
+
+                            <th>
+                                Client Name
+                            </th>
+
+                            <th>
+                                Adv. Start Date
+                            </th>
+
+                        </tr>
+
+                    </thead>
+
+                    <tbody>
+
+                        <tr>
+
+                            <td>
+                                @invoiceDate
+                            </td>
+
+                            <td>
+                                @invoiceId
+                            </td>
+
+                            <td>
+                                @clientName
+                            </td>
+
+                            <td>
+                                @advertisementStartDate
+                            </td>
+
+                        </tr>
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+
+            <!-- DESCRIPTION -->
+
+            <div class="description-section">
+
+                <div class="section-heading">
+                    <i class="fas fa-file-invoice-dollar me-1"></i>
+                    DESCRIPTION
+                </div>
+
+                <table class="description-table">
+
+                    <thead>
+
+                        <tr>
+
+                            <th>
+                                Details
+                            </th>
+
+                            <th>
+                                Amount
+                            </th>
+
+                        </tr>
+
+                    </thead>
+
+                    <tbody>
+
+                        <tr>
+
+                            <td>
+                                Total Charges
+                            </td>
+
+                            <td>
+                                ₹ @totalCharges
+                            </td>
+
+                        </tr>
+
+                        <tr>
+
+                            <td>
+                                CGST 9%
+                            </td>
+
+                            <td>
+                                ₹ @cgst
+                            </td>
+
+                        </tr>
+
+                        <tr>
+
+                            <td>
+                                SGST 9%
+                            </td>
+
+                            <td>
+                                ₹ @sgst
+                            </td>
+
+                        </tr>
+
+                        <tr class="grand-total">
+
+                            <td>
+                                Grand Total
+                            </td>
+
+                            <td>
+                                ₹ @grandTotal
+                            </td>
+
+                        </tr>
+
+                        <tr class="amount-words">
+
+                            <td>
+                                In Words
+                            </td>
+
+                            <td>
+                                @amountInWords
+                            </td>
+
+                        </tr>
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+
+            <!-- BANK + PAYMENT -->
+
+            <div class="bottom-grid">
+
+
+                <div class="bank-section">
+
+                    <div class="bank-header">
+                        <i class="fas fa-building-columns me-1"></i>
+                        Bank Details
+                    </div>
+
+                    <div class="bank-content">
+
+                        <p>
+                            <strong>IndusInd Bank</strong>
+                        </p>
+
+                        <p>
+                            Account No.: 252628062015
+                        </p>
+
+                        <p>
+                            Account Type: Current Account
+                        </p>
+
+                        <p>
+                            IFSC: INDB0000025
+                        </p>
+
+                        <p>
+                            ITNetworkZ Infosystems Pvt Ltd.
+                        </p>
+
+                        <p>
+                            CIN: U72200MH2015PTC266007
+                        </p>
+
+                        <p>
+                            GST: 27AADCI8640L1Z6
+                        </p>
+
+                    </div>
+
+                </div>
+
+
+                <div class="payment-status">
+
+                    <i class="fas fa-circle-check"></i>
+
+                    <small>
+                        Payment Status
+                    </small>
+
+                    <strong>
+                        PAYMENT COMPLETED
+                    </strong>
+
+                </div>
+
+            </div>
+
+
+            <!-- NOTES -->
+
+            <div class="notes-section">
+
+                <h4>
+                    Note
+                </h4>
+
+                <ul>
+
+                    <li>
+                        If you have any query / suggestion please contact
+                        09665999900 / contact@it-networkz.com
+                    </li>
+
+                    <li>
+                        If cheque / DD, should be in favor of
+                        IT-NetworkZ Infosystems Pvt. Ltd.
+                    </li>
+
+                    <li>
+                        Make cheque payable to IT-NetworkZ Infosystems Pvt. Ltd.
+                    </li>
+
+                </ul>
+
+            </div>
+
+
+            <!-- THANK YOU -->
+
+            <div class="thank-you">
+
+                Thank You For Your Business!
+
+            </div>
+
+
+        </div>
+
+
+        <!-- FOOTER -->
+
+        <div class="invoice-footer">
+
+            <span>
+                Powered by www.1trainee.com
+            </span>
+
+            <span>
+                <strong>1Trainee</strong>
+            </span>
+
+        </div>
+
+
+    </div>
+
+
+</body>
+
+</html>

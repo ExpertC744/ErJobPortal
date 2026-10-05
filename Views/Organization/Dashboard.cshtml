@@ -1,13 +1,210 @@
-﻿@{
+﻿@* @model ErJobPortal.Models.OrganizationChartsViewModel *@
+
+@{
     Layout = "~/Views/Shared/_DashboardLayout.cshtml";
 
     ViewData["Title"] = "Organization Dashboard";
     ViewData["Panel"] = "Organization";
     ViewData["UserName"] = "Organization";
-}
- 
-<link href="~/css/orgdashboard.css" rel="stylesheet" />
 
+    var appliedTraineePosts =
+     ViewBag.AppliedTraineePosts as List<ErJobPortal.Models.OrgPostM>
+     ?? new List<ErJobPortal.Models.OrgPostM>();
+
+    var areaData =
+       ViewBag.AreaChartData
+       as List<ErJobPortal.Models.OrganizationChartViewModel>
+       ?? new List<ErJobPortal.Models.OrganizationChartViewModel>();
+
+    var barData =
+        ViewBag.BarChartData
+        as List<ErJobPortal.Models.OrganizationChartViewModel>
+        ?? new List<ErJobPortal.Models.OrganizationChartViewModel>();
+}
+
+<link href="~/css/orgdashboard.css" rel="stylesheet" />
+<style>
+
+    /* =====================================================
+           1TRAINEE MONTHLY ANALYTICS @* Radhika29-09 *@
+    ===================================================== */
+
+    .analytics-card {
+        background: #ffffff;
+        border: 1px solid #dfe5e8;
+        border-radius: 14px;
+        overflow: hidden;
+        height: 100%;
+        box-shadow: 0 4px 14px rgba(15, 23, 42, 0.04);
+        transition: all .25s ease;
+    }
+
+    .analytics-card:hover {
+        box-shadow: 0 8px 24px rgba(15, 23, 42, 0.08);
+    }
+
+    /* Chart Header */
+    .analytics-header {
+        min-height: 52px;
+        padding: 0 18px;
+        display: flex;
+        align-items: center;
+        gap: 11px;
+        border-bottom: 1px solid #dfe5e8;
+        background: #ffffff;
+    }
+
+    .analytics-header-icon {
+        width: 25px;
+        height: 25px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #1e7b67;
+        font-size: 17px;
+    }
+
+    .analytics-header h5 {
+        margin: 0;
+        color: #16324f;
+        font-size: 17px;
+        font-weight: 500;
+        letter-spacing: .1px;
+    }
+
+    /* Chart Body */
+    .analytics-body {
+        padding: 18px 16px 14px;
+    }
+
+    .chart-wrapper {
+        position: relative;
+        width: 100%;
+        height: 235px;
+    }
+
+        .chart-wrapper svg {
+            width: 100%;
+            height: 100%;
+            display: block;
+        }
+
+    /* Legend */
+    .chart-legend {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        gap: 8px;
+        margin-bottom: 4px;
+        color: #667085;
+        font-size: 12px;
+    }
+
+    .legend-box {
+        width: 50px;
+        height: 16px;
+        border: 2px solid #1e7b67;
+        background: rgba(30, 123, 103, .14);
+    }
+
+    .legend-box-bar {
+        width: 50px;
+        height: 16px;
+        background: #1e7b67;
+    }
+
+    /* Axis text */
+    .chart-axis-text {
+        fill: #667085;
+        font-size: 11px;
+        font-family: Arial, sans-serif;
+    }
+
+    /* Grid */
+    .chart-grid {
+        stroke: #e6eaed;
+        stroke-width: 1;
+    }
+
+    .chart-axis {
+        stroke: #cfd6da;
+        stroke-width: 1;
+    }
+
+    /* Line chart */
+    .chart-line {
+        fill: none;
+        stroke: #1e7b67;
+        stroke-width: 2.5;
+        stroke-linecap: round;
+        stroke-linejoin: round;
+    }
+
+    .chart-area {
+        fill: rgba(30, 123, 103, .14);
+    }
+
+    .chart-point {
+        fill: #ffffff;
+        stroke: #1e7b67;
+        stroke-width: 2;
+    }
+
+    /* Bar chart */
+    .chart-bar {
+        fill: #1e7b67;
+        transition: opacity .2s ease;
+    }
+
+        .chart-bar:hover {
+            opacity: .78;
+        }
+
+    /* Current value */
+    .analytics-value {
+        text-align: center;
+        margin-top: 5px;
+        color: #667085;
+        font-size: 11px;
+    }
+
+    /* Footer */
+    .analytics-footer {
+        border-top: 1px solid #edf0f2;
+        padding: 10px 16px;
+        color: #7a8494;
+        font-size: 11px;
+    }
+
+        .analytics-footer i {
+            color: #1e7b67;
+            margin-right: 5px;
+        }
+
+    @@media (max-width: 767px) {
+
+        .analytics-header {
+            min-height: 48px;
+            padding: 0 14px;
+        }
+
+            .analytics-header h5 {
+                font-size: 15px;
+            }
+
+        .analytics-body {
+            padding: 15px 10px 10px;
+        }
+
+        .chart-wrapper {
+            height: 210px;
+        }
+
+        .chart-axis-text {
+            font-size: 9px;
+        }
+    }
+</style>
 <!-- =========================================================
      DASHBOARD
 ========================================================= -->
@@ -139,7 +336,7 @@
                     </span>
 
                 </div>
-
+                @* radhika25-09 *@
                 <span class="stat-label">
                     Top Search
                 </span>
@@ -149,7 +346,7 @@
                 </div>
 
                 <a asp-controller="Organization"
-                   asp-action="Candidates"
+                   asp-action="OrgTopSearch"
                    class="stat-link">
                     View Candidates
                     <i class="fas fa-arrow-right"></i>
@@ -186,9 +383,10 @@
                 <div class="stat-number">
                     @ViewBag.TraineesApplied
                 </div>
-
+                @* radhika25-09 *@
                 <a asp-controller="Organization"
-                   asp-action="Interviews"
+                   asp-action="AppliedTrainees"
+                   asp-route-id="@ViewBag.OrgCode"
                    class="stat-link">
                     View Interviews
                     <i class="fas fa-arrow-right"></i>
@@ -200,141 +398,352 @@
     </div>
 
     <!-- =====================================================
-     TRAINEE CHARTS
-====================================================== -->
+         TRAINEE CHARTS @* Radhika29-09 *@
+    ===================================================== -->
+    <div class="row g-4 mb-4">
 
-<div class="row g-4 mb-4">
+        <!-- =========================================
+             NO. OF TRAINEE ELIGIBLE FOR INTERNSHIP
+        ========================================== -->
 
-    <!-- =================================================
-         CHART 1
-         ELIGIBLE TRAINEES
-    ================================================== -->
+        <div class="col-xl-6 col-lg-6 col-md-12">
 
-    <div class="col-xl-6 col-lg-6 col-md-12">
+            <div class="analytics-card">
 
-        <div class="org-chart-card">
+                <!-- Header -->
+                <div class="analytics-header">
 
-            <!-- HEADER -->
-
-            <div class="chart-card-header">
-
-                <div>
-
-                    <div class="chart-title">
-                        No. of Trainee Eligible for Internship
+                    <div class="analytics-header-icon">
+                        <i class="fas fa-chart-area"></i>
                     </div>
 
-                    <div class="chart-number">
-                        @ViewBag.InternshipEligibleCount
+                    <h5>
+                        No. of Trainee eligible for internship
+                    </h5>
+
+                </div>
+
+
+                <!-- Body -->
+                <div class="analytics-body">
+
+                    <!-- Legend -->
+                    <div class="chart-legend">
+
+                        <span class="legend-box"></span>
+
+                        <span>
+                            Total Eligible Trainees
+                        </span>
+
                     </div>
 
-                    <div class="chart-subtitle">
-                        Current eligible trainees
+
+                    <!-- SVG Chart -->
+                    <div class="chart-wrapper">
+
+                        <svg id="eligibleTraineeSvg"
+                             viewBox="0 0 760 300"
+                             preserveAspectRatio="none">
+
+                            <!-- Grid -->
+                            <line class="chart-grid"
+                                  x1="60" y1="30"
+                                  x2="735" y2="30" />
+
+                            <line class="chart-grid"
+                                  x1="60" y1="75"
+                                  x2="735" y2="75" />
+
+                            <line class="chart-grid"
+                                  x1="60" y1="120"
+                                  x2="735" y2="120" />
+
+                            <line class="chart-grid"
+                                  x1="60" y1="165"
+                                  x2="735" y2="165" />
+
+                            <line class="chart-grid"
+                                  x1="60" y1="210"
+                                  x2="735" y2="210" />
+
+                            <line class="chart-grid"
+                                  x1="60" y1="255"
+                                  x2="735" y2="255" />
+
+
+                            <!-- Axis -->
+                            <line class="chart-axis"
+                                  x1="60" y1="30"
+                                  x2="60" y2="255" />
+
+                            <line class="chart-axis"
+                                  x1="60" y1="255"
+                                  x2="735" y2="255" />
+
+
+                            <!-- Y Axis -->
+                            <text class="chart-axis-text"
+                                  x="48" y="259"
+                                  text-anchor="end">
+                                0
+                            </text>
+
+                            <text class="chart-axis-text"
+                                  x="48" y="214"
+                                  text-anchor="end">
+                                20
+                            </text>
+
+                            <text class="chart-axis-text"
+                                  x="48" y="169"
+                                  text-anchor="end">
+                                40
+                            </text>
+
+                            <text class="chart-axis-text"
+                                  x="48" y="124"
+                                  text-anchor="end">
+                                60
+                            </text>
+
+                            <text class="chart-axis-text"
+                                  x="48" y="79"
+                                  text-anchor="end">
+                                80
+                            </text>
+
+                            <text class="chart-axis-text"
+                                  x="48" y="34"
+                                  text-anchor="end">
+                                100
+                            </text>
+
+
+                            <!-- Y Axis Title -->
+                            <text class="chart-axis-text"
+                                  transform="translate(16 165) rotate(-90)"
+                                  text-anchor="middle">
+
+                                Total Eligible Trainees
+
+                            </text>
+
+
+                            <!-- Area -->
+                            <polygon id="eligibleArea"
+                                     class="chart-area"
+                                     points="" />
+
+
+                            <!-- Line -->
+                            <polyline id="eligibleLine"
+                                      class="chart-line"
+                                      points="" />
+
+
+                            <!-- Points -->
+                            <g id="eligiblePoints"></g>
+
+
+                            <!-- X Axis -->
+                            <text class="chart-axis-text"
+                                  x="397"
+                                  y="292"
+                                  text-anchor="middle">
+
+                                Month Year
+
+                            </text>
+
+                            <g id="eligibleMonths"></g>
+
+                        </svg>
+
                     </div>
 
                 </div>
 
 
-                <div class="chart-icon">
+                <!-- Footer -->
+                <div class="analytics-footer">
 
-                    <i class="fas fa-user-graduate"></i>
+                    <i class="fas fa-chart-line"></i>
 
-                </div>
-
-            </div>
-
-
-            <!-- CHART -->
-
-            <div class="chart-wrapper">
-
-                <canvas id="internshipEligibleChart"></canvas>
-
-            </div>
-
-
-            <!-- FOOTER -->
-
-            <div class="chart-footer">
-
-                <i class="fas fa-chart-line"></i>
-
-                <span>
                     Monthly eligible trainee trend
-                </span>
+
+                </div>
 
             </div>
 
         </div>
 
-    </div>
 
+        <!-- =========================================
+             TOTAL REGISTRATION PER MONTH
+        ========================================== -->
 
-    <!-- =================================================
-         CHART 2
-         TOTAL REGISTRATION PER MONTH
-    ================================================== -->
+        <div class="col-xl-6 col-lg-6 col-md-12">
 
-    <div class="col-xl-6 col-lg-6 col-md-12">
+            <div class="analytics-card">
 
-        <div class="org-chart-card">
+                <!-- Header -->
+                <div class="analytics-header">
 
-            <!-- HEADER -->
+                    <div class="analytics-header-icon">
+                        <i class="fas fa-chart-bar"></i>
+                    </div>
 
-            <div class="chart-card-header">
-
-                <div>
-
-                    <div class="chart-title">
+                    <h5>
                         Total Registration Per Month
+                    </h5>
+
+                </div>
+
+
+                <!-- Body -->
+                <div class="analytics-body">
+
+                    <!-- Legend -->
+                    <div class="chart-legend">
+
+                        <span class="legend-box-bar"></span>
+
+                        <span>
+                            Total Registrations
+                        </span>
+
                     </div>
 
-                    <div class="chart-number">
-                        @ViewBag.TraineeRegistrationCount
-                    </div>
 
-                    <div class="chart-subtitle">
-                        Total trainee registrations
+                    <!-- SVG Chart -->
+                    <div class="chart-wrapper">
+
+                        <svg id="registrationSvg"
+                             viewBox="0 0 760 300"
+                             preserveAspectRatio="none">
+
+                            <!-- Grid -->
+                            <line class="chart-grid"
+                                  x1="60" y1="30"
+                                  x2="735" y2="30" />
+
+                            <line class="chart-grid"
+                                  x1="60" y1="75"
+                                  x2="735" y2="75" />
+
+                            <line class="chart-grid"
+                                  x1="60" y1="120"
+                                  x2="735" y2="120" />
+
+                            <line class="chart-grid"
+                                  x1="60" y1="165"
+                                  x2="735" y2="165" />
+
+                            <line class="chart-grid"
+                                  x1="60" y1="210"
+                                  x2="735" y2="210" />
+
+                            <line class="chart-grid"
+                                  x1="60" y1="255"
+                                  x2="735" y2="255" />
+
+
+                            <!-- Axis -->
+                            <line class="chart-axis"
+                                  x1="60" y1="30"
+                                  x2="60" y2="255" />
+
+                            <line class="chart-axis"
+                                  x1="60" y1="255"
+                                  x2="735" y2="255" />
+
+
+                            <!-- Y Axis -->
+                            <text class="chart-axis-text"
+                                  x="48" y="259"
+                                  text-anchor="end">
+                                0
+                            </text>
+
+                            <text class="chart-axis-text"
+                                  x="48" y="214"
+                                  text-anchor="end">
+                                20
+                            </text>
+
+                            <text class="chart-axis-text"
+                                  x="48" y="169"
+                                  text-anchor="end">
+                                40
+                            </text>
+
+                            <text class="chart-axis-text"
+                                  x="48" y="124"
+                                  text-anchor="end">
+                                60
+                            </text>
+
+                            <text class="chart-axis-text"
+                                  x="48" y="79"
+                                  text-anchor="end">
+                                80
+                            </text>
+
+                            <text class="chart-axis-text"
+                                  x="48" y="34"
+                                  text-anchor="end">
+                                100
+                            </text>
+
+
+                            <!-- Y Axis Title -->
+                            <text class="chart-axis-text"
+                                  transform="translate(16 165) rotate(-90)"
+                                  text-anchor="middle">
+
+                                No. of Trainees
+
+                            </text>
+
+
+                            <!-- Bars -->
+                            <g id="registrationBars"></g>
+
+
+                            <!-- X Axis Title -->
+                            <text class="chart-axis-text"
+                                  x="397"
+                                  y="292"
+                                  text-anchor="middle">
+
+                                Month Year
+
+                            </text>
+
+                            <g id="registrationMonths"></g>
+
+                        </svg>
+
                     </div>
 
                 </div>
 
 
-                <div class="chart-icon">
+                <!-- Footer -->
+                <div class="analytics-footer">
 
-                    <i class="fas fa-building"></i>
+                    <i class="fas fa-chart-line"></i>
 
-                </div>
-
-            </div>
-
-
-            <!-- CHART -->
-
-            <div class="chart-wrapper">
-
-                <canvas id="monthlyRegistrationChart"></canvas>
-
-            </div>
-
-
-            <!-- FOOTER -->
-
-            <div class="chart-footer">
-
-                <i class="fas fa-chart-line"></i>
-
-                <span>
                     Monthly trainee registration trend
-                </span>
+
+                </div>
 
             </div>
 
         </div>
 
     </div>
-
-</div>
 
 
     <!-- =====================================================
@@ -728,11 +1137,11 @@
             <div>
 
                 <h5>
-                    Active Job Openings
+                    Applied Trainees
                 </h5>
 
                 <p>
-                    Overview of your current job positions
+                    Applied Trainees Details
                 </p>
 
             </div>
@@ -747,7 +1156,7 @@
 
         </div>
 
-
+        @* khushi 29-09 *@
         <!-- MASTER TABLE CARD -->
         <div class="master-table-container">
 
@@ -761,596 +1170,90 @@
                        class="master-data-table">
 
                     <thead>
-
                         <tr>
-
-                            <th>Sr. No</th>
-
-                            <th>Job Position</th>
-
-                            <th>Applications</th>
-
-                            <th>Shortlisted</th>
-
-                            <th>Posted Date</th>
-
-                            <th>Status</th>
-
+                            <th>Sr. No.</th>
+                            <th>Date</th>
+                            <th>Position</th>
+                            <th>View Post</th>
+                            <th>Applied Trainees</th>
                         </tr>
-
                     </thead>
-
 
                     <tbody>
 
-                        <!-- ================================================= -->
-                        <!-- JOB 1 -->
-                        <!-- ================================================= -->
+                        @if (appliedTraineePosts.Any())
+                        {
+                            int srNo = 1;
+
+                            foreach (var item in appliedTraineePosts)
+                            {
+                                <tr>
+
+                                    <!-- Sr. No. -->
+                                    <td class="master-id">
+                                        @srNo
+                                    </td>
+
+                                    <!-- Date -->
+                                    <td>
+                                        @(item.dStartDate.HasValue
+                                                                        ? item.dStartDate.Value.ToString("dd-MM-yyyy")
+                                                                        : "")
+                                    </td>
+
+                                    <!-- Position -->
+                                    <td>
+                                        @item.sPositionName
+                                    </td>
+
+                                    <!-- View Post -->
+                                    <td class="text-center">
+
+                                        <a asp-controller="Organization"
+                                           asp-action="ViewOrgPost"
+                                           asp-route-id="@item.nID"
+                                           class="resume-view-btn"
+                                           title="View Post">
+
+                                            <i class="fas fa-eye"></i>
+
+                                        </a>
+
+                                    </td>
+
+                                    <!-- Applied Trainees -->
+                                    <td class="text-center">
+
+                                        <a asp-controller="Organization"
+                                           asp-action="AppliedTraineeList"
+                                           asp-route-id="@item.nID"
+                                           class="resume-view-btn"
+                                           title="View Applied Trainees">
+
+                                            <i class="fas fa-users"></i>
+
+                                            <span>
+                                                @item.MatchingTraineeCount
+                                            </span>
+
+                                        </a>
+
+                                    </td>
+
+                                </tr>
+
+                                srNo++;
+                            }
+                        }
+                        else
+                        {
+                            <tr>
+                                <td colspan="5" class="text-center">
+                                    No applied trainees found.
+                                </td>
+                            </tr>
+                        }
 
-                        <tr>
-
-                            <td class="master-id">
-                                1
-                            </td>
-
-                            <td>
-
-                                <div class="job-info">
-
-                                    <div class="job-icon">
-                                        <i class="fas fa-code"></i>
-                                    </div>
-
-                                    <div>
-
-                                        <strong>
-                                            React Developer
-                                        </strong>
-
-                                        <small>
-                                            Full Time · Remote
-                                        </small>
-
-                                    </div>
-
-                                </div>
-
-                            </td>
-
-                            <td>
-                                42
-                            </td>
-
-                            <td>
-                                12
-                            </td>
-
-                            <td>
-                                12 Aug 2026
-                            </td>
-
-                            <td>
-
-                                <span class="job-status">
-                                    Active
-                                </span>
-
-                            </td>
-
-                        </tr>
-
-
-                        <!-- ================================================= -->
-                        <!-- JOB 2 -->
-                        <!-- ================================================= -->
-
-                        <tr>
-
-                            <td class="master-id">
-                                2
-                            </td>
-
-                            <td>
-
-                                <div class="job-info">
-
-                                    <div class="job-icon">
-                                        <i class="fas fa-paintbrush"></i>
-                                    </div>
-
-                                    <div>
-
-                                        <strong>
-                                            UI/UX Designer
-                                        </strong>
-
-                                        <small>
-                                            Full Time · Hybrid
-                                        </small>
-
-                                    </div>
-
-                                </div>
-
-                            </td>
-
-                            <td>
-                                28
-                            </td>
-
-                            <td>
-                                8
-                            </td>
-
-                            <td>
-                                10 Aug 2026
-                            </td>
-
-                            <td>
-
-                                <span class="job-status">
-                                    Active
-                                </span>
-
-                            </td>
-
-                        </tr>
-
-
-                        <!-- ================================================= -->
-                        <!-- JOB 3 -->
-                        <!-- ================================================= -->
-
-                        <tr>
-
-                            <td class="master-id">
-                                3
-                            </td>
-
-                            <td>
-
-                                <div class="job-info">
-
-                                    <div class="job-icon">
-                                        <i class="fas fa-server"></i>
-                                    </div>
-
-                                    <div>
-
-                                        <strong>
-                                            .NET Developer
-                                        </strong>
-
-                                        <small>
-                                            Full Time · On-site
-                                        </small>
-
-                                    </div>
-
-                                </div>
-
-                            </td>
-
-                            <td>
-                                31
-                            </td>
-
-                            <td>
-                                10
-                            </td>
-
-                            <td>
-                                08 Aug 2026
-                            </td>
-
-                            <td>
-
-                                <span class="job-status">
-                                    Active
-                                </span>
-
-                            </td>
-
-                        </tr>
-
-
-                        <!-- ================================================= -->
-                        <!-- JOB 4 -->
-                        <!-- ================================================= -->
-
-                        <tr>
-
-                            <td class="master-id">
-                                4
-                            </td>
-
-                            <td>
-
-                                <div class="job-info">
-
-                                    <div class="job-icon">
-                                        <i class="fas fa-database"></i>
-                                    </div>
-
-                                    <div>
-
-                                        <strong>
-                                            Database Administrator
-                                        </strong>
-
-                                        <small>
-                                            Full Time · Remote
-                                        </small>
-
-                                    </div>
-
-                                </div>
-
-                            </td>
-
-                            <td>
-                                19
-                            </td>
-
-                            <td>
-                                6
-                            </td>
-
-                            <td>
-                                05 Aug 2026
-                            </td>
-
-                            <td>
-
-                                <span class="job-status">
-                                    Active
-                                </span>
-
-                            </td>
-
-                        </tr>
-
-
-                        <!-- ================================================= -->
-                        <!-- JOB 5 -->
-                        <!-- ================================================= -->
-
-                        <tr>
-
-                            <td class="master-id">
-                                5
-                            </td>
-
-                            <td>
-
-                                <div class="job-info">
-
-                                    <div class="job-icon">
-                                        <i class="fas fa-mobile-screen"></i>
-                                    </div>
-
-                                    <div>
-
-                                        <strong>
-                                            Mobile App Developer
-                                        </strong>
-
-                                        <small>
-                                            Full Time · Hybrid
-                                        </small>
-
-                                    </div>
-
-                                </div>
-
-                            </td>
-
-                            <td>
-                                36
-                            </td>
-
-                            <td>
-                                11
-                            </td>
-
-                            <td>
-                                02 Aug 2026
-                            </td>
-
-                            <td>
-
-                                <span class="job-status">
-                                    Active
-                                </span>
-
-                            </td>
-
-                        </tr>
-
-
-                        <!-- ================================================= -->
-                        <!-- JOB 6 -->
-                        <!-- ================================================= -->
-
-                        <tr>
-
-                            <td class="master-id">
-                                6
-                            </td>
-
-                            <td>
-
-                                <div class="job-info">
-
-                                    <div class="job-icon">
-                                        <i class="fas fa-chart-line"></i>
-                                    </div>
-
-                                    <div>
-
-                                        <strong>
-                                            Business Analyst
-                                        </strong>
-
-                                        <small>
-                                            Full Time · On-site
-                                        </small>
-
-                                    </div>
-
-                                </div>
-
-                            </td>
-
-                            <td>
-                                24
-                            </td>
-
-                            <td>
-                                7
-                            </td>
-
-                            <td>
-                                30 Jul 2026
-                            </td>
-
-                            <td>
-
-                                <span class="job-status">
-                                    Active
-                                </span>
-
-                            </td>
-
-                        </tr>
-
-
-                        <!-- ================================================= -->
-                        <!-- JOB 7 -->
-                        <!-- ================================================= -->
-
-                        <tr>
-
-                            <td class="master-id">
-                                7
-                            </td>
-
-                            <td>
-
-                                <div class="job-info">
-
-                                    <div class="job-icon">
-                                        <i class="fas fa-cloud"></i>
-                                    </div>
-
-                                    <div>
-
-                                        <strong>
-                                            Cloud Engineer
-                                        </strong>
-
-                                        <small>
-                                            Full Time · Remote
-                                        </small>
-
-                                    </div>
-
-                                </div>
-
-                            </td>
-
-                            <td>
-                                17
-                            </td>
-
-                            <td>
-                                5
-                            </td>
-
-                            <td>
-                                27 Jul 2026
-                            </td>
-
-                            <td>
-
-                                <span class="job-status">
-                                    Active
-                                </span>
-
-                            </td>
-
-                        </tr>
-
-
-                        <!-- ================================================= -->
-                        <!-- JOB 8 -->
-                        <!-- ================================================= -->
-
-                        <tr>
-
-                            <td class="master-id">
-                                8
-                            </td>
-
-                            <td>
-
-                                <div class="job-info">
-
-                                    <div class="job-icon">
-                                        <i class="fas fa-shield-halved"></i>
-                                    </div>
-
-                                    <div>
-
-                                        <strong>
-                                            Cyber Security Analyst
-                                        </strong>
-
-                                        <small>
-                                            Full Time · Hybrid
-                                        </small>
-
-                                    </div>
-
-                                </div>
-
-                            </td>
-
-                            <td>
-                                21
-                            </td>
-
-                            <td>
-                                9
-                            </td>
-
-                            <td>
-                                25 Jul 2026
-                            </td>
-
-                            <td>
-
-                                <span class="job-status">
-                                    Active
-                                </span>
-
-                            </td>
-
-                        </tr>
-
-
-                        <!-- ================================================= -->
-                        <!-- JOB 9 -->
-                        <!-- ================================================= -->
-
-                        <tr>
-
-                            <td class="master-id">
-                                9
-                            </td>
-
-                            <td>
-
-                                <div class="job-info">
-
-                                    <div class="job-icon">
-                                        <i class="fas fa-gears"></i>
-                                    </div>
-
-                                    <div>
-
-                                        <strong>
-                                            DevOps Engineer
-                                        </strong>
-
-                                        <small>
-                                            Full Time · Remote
-                                        </small>
-
-                                    </div>
-
-                                </div>
-
-                            </td>
-
-                            <td>
-                                29
-                            </td>
-
-                            <td>
-                                8
-                            </td>
-
-                            <td>
-                                20 Jul 2026
-                            </td>
-
-                            <td>
-
-                                <span class="job-status">
-                                    Active
-                                </span>
-
-                            </td>
-
-                        </tr>
-
-
-                        <!-- ================================================= -->
-                        <!-- JOB 10 -->
-                        <!-- ================================================= -->
-
-                        <tr>
-
-                            <td class="master-id">
-                                10
-                            </td>
-
-                            <td>
-
-                                <div class="job-info">
-
-                                    <div class="job-icon">
-                                        <i class="fas fa-pen-ruler"></i>
-                                    </div>
-
-                                    <div>
-
-                                        <strong>
-                                            Product Designer
-                                        </strong>
-
-                                        <small>
-                                            Full Time · Hybrid
-                                        </small>
-
-                                    </div>
-
-                                </div>
-
-                            </td>
-
-                            <td>
-                                33
-                            </td>
-
-                            <td>
-                                13
-                            </td>
-
-                            <td>
-                                18 Jul 2026
-                            </td>
-
-                            <td>
-
-                                <span class="job-status">
-                                    Active
-                                </span>
-
-                            </td>
-
-                        </tr>
 
                     </tbody>
 
@@ -1367,447 +1270,811 @@
         </div>
 
 
-
     </div>
 
-</div>
+    <script>
 
-   
+        document.addEventListener("DOMContentLoaded", function () {
 
+        // =====================================================
+        // MONTH NAMES
+        // =====================================================
 
-<!-- =========================================================
-     JQUERY
-========================================================= -->
-
-<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
- 
-
-        <script>
-
-    document.addEventListener("DOMContentLoaded", function () {
-
-        /* =====================================================
-           MONTHS
-        ===================================================== */
-
-        const months = [
-            "Jan",
-            "Feb",
-            "Mar",
-            "Apr",
-            "May",
-            "Jun",
-            "Jul",
-            "Aug",
-            "Sep",
-            "Oct",
-            "Nov",
-            "Dec"
+        const monthNames = [
+        "Jan",
+        "Feb",
+        "Mar",
+        "Apr",
+        "May",
+        "Jun",
+        "Jul",
+        "Aug",
+        "Sep",
+        "Oct",
+        "Nov",
+        "Dec"
         ];
 
 
-        /* =====================================================
-           MONTHLY CANDIDATE REGISTRATION DATA
-        ===================================================== */
+        // =====================================================
+        // CURRENT YEAR
+        // =====================================================
 
-        const monthlyRegistrationData =
-            @Html.Raw(
+        const currentYear = new Date().getFullYear();
+
+
+        // =====================================================
+        // =====================================================
+        // 1. ELIGIBLE TRAINEE CHART
+        // =====================================================
+        // =====================================================
+
+
+        // =====================================================
+        // DATA FROM C#
+        // =====================================================
+
+        const eligibleData =
+        @Html.Raw(
                 System.Text.Json.JsonSerializer.Serialize(
-                    ViewBag.MonthlyCandidateRegistrations
+                                areaData.Select(x => new
+                                {
+                                        year = x.PostYear,
+                                        month = x.PostMonth,
+                                        count = x.TotalEligibleTrainees
+                                })
                 )
-            );
-
-
-        /* =====================================================
-           COMMON GRADIENT
-        ===================================================== */
-
-        function createTealGradient(context) {
-
-            const chart =
-                context.chart;
-
-            const ctx =
-                chart.ctx;
-
-            const gradient =
-                ctx.createLinearGradient(
-                    0,
-                    0,
-                    0,
-                    190
-                );
-
-            gradient.addColorStop(
-                0,
-                "rgba(30, 123, 103, 0.20)"
-            );
-
-            gradient.addColorStop(
-                1,
-                "rgba(30, 123, 103, 0.01)"
-            );
-
-            return gradient;
-        }
-
-
-        /* =====================================================
-           COMMON OPTIONS
-        ===================================================== */
-
-        const commonOptions = {
-
-            responsive: true,
-
-            maintainAspectRatio: false,
-
-            interaction: {
-
-                intersect: false,
-
-                mode: "index"
-
-            },
-
-            plugins: {
-
-                legend: {
-
-                    display: false
-
-                },
-
-                tooltip: {
-
-                    backgroundColor: "#ffffff",
-
-                    titleColor: "#344054",
-
-                    bodyColor: "#1e7b67",
-
-                    borderColor: "#e1ebe8",
-
-                    borderWidth: 1,
-
-                    padding: 11,
-
-                    displayColors: false,
-
-                    titleFont: {
-
-                        size: 12,
-
-                        weight: "600"
-
-                    },
-
-                    bodyFont: {
-
-                        size: 13,
-
-                        weight: "700"
-
-                    },
-
-                    callbacks: {
-
-                        label: function (context) {
-
-                            return " " +
-                                context.parsed.y +
-                                " trainees";
-
-                        }
-
-                    }
-
-                }
-
-            },
-
-            scales: {
-
-                x: {
-
-                    grid: {
-
-                        display: false
-
-                    },
-
-                    border: {
-
-                        display: false
-
-                    },
-
-                    ticks: {
-
-                        color: "#9aa9bd",
-
-                        font: {
-
-                            size: 11
-
-                        },
-
-                        padding: 9
-
-                    }
-
-                },
-
-                y: {
-
-                    beginAtZero: true,
-
-                    grid: {
-
-                        color:
-                            "rgba(30,123,103,.07)",
-
-                        drawBorder: false
-
-                    },
-
-                    border: {
-
-                        display: false,
-
-                        dash: [4, 4]
-
-                    },
-
-                    ticks: {
-
-                        display: false
-
-                    }
-
-                }
-
-            }
-
-        };
-
-
-        /* =====================================================
-           CHART 1
-           ELIGIBLE TRAINEES
-        ===================================================== */
-
-        const eligibleCanvas =
-            document.getElementById(
-                "internshipEligibleChart"
-            );
-
-
-        if (eligibleCanvas) {
-
-            /*
-             * Currently using the total eligible count
-             * as the chart value.
-             *
-             * If you later want month-wise eligible data,
-             * we can send a second 12-month array from SQL.
-             */
-
-            const eligibleCount =
-                Number(
-                    @ViewBag.InternshipEligibleCount
                 );
 
 
-            /*
-             * Create a smooth trend representation
-             * based on the current eligible count.
-             *
-             * Replace this with monthly eligible data
-             * when your eligibility history is available.
-             */
-
-            const eligibleData = [
-
-                Math.round(eligibleCount * 0.38),
-
-                Math.round(eligibleCount * 0.46),
-
-                Math.round(eligibleCount * 0.42),
-
-                Math.round(eligibleCount * 0.55),
-
-                Math.round(eligibleCount * 0.61),
-
-                Math.round(eligibleCount * 0.52),
-
-                Math.round(eligibleCount * 0.69),
-
-                Math.round(eligibleCount * 0.78),
-
-                Math.round(eligibleCount * 0.73),
-
-                Math.round(eligibleCount * 0.87),
-
-                Math.round(eligibleCount * 0.82),
-
-                eligibleCount
-
-            ];
+        console.log(
+        "Eligible Data From C#:",
+        eligibleData
+        );
 
 
-            new Chart(
-                eligibleCanvas,
-                {
+        // =====================================================
+        // CREATE 12 MONTHS
+        // =====================================================
 
-                    type: "line",
+        const eligibleMonths = [];
 
-                    data: {
 
-                        labels: months,
+        for (let i = 1; i <= 12; i++) {
 
-                        datasets: [
+        eligibleMonths.push({
 
-                            {
+        year: currentYear,
 
-                                data: eligibleData,
+        month: i,
 
-                                borderColor:
-                                    "#1e7b67",
+        label:
+        monthNames[i - 1] +
+        " " +
+        String(currentYear).slice(-2),
 
-                                backgroundColor:
-                                    function (context) {
+        count: 0
 
-                                        return createTealGradient(
-                                            context
-                                        );
-
-                                    },
-
-                                fill: true,
-
-                                borderWidth: 3,
-
-                                tension: 0.35,
-
-                                pointRadius: function (context) {
-
-                                    return context.dataIndex === 11
-                                        ? 5
-                                        : 0;
-
-                                },
-
-                                pointHoverRadius: 5,
-
-                                pointBackgroundColor:
-                                    "#ffffff",
-
-                                pointBorderColor:
-                                    "#1e7b67",
-
-                                pointBorderWidth: 3
-
-                            }
-
-                        ]
-
-                    },
-
-                    options: commonOptions
-
-                }
-            );
+        });
 
         }
 
 
-        /* =====================================================
-           CHART 2
-           TOTAL REGISTRATION PER MONTH
-        ===================================================== */
+        // =====================================================
+        // PUT DATABASE VALUES INTO MONTHS
+        // =====================================================
 
-        const registrationCanvas =
-            document.getElementById(
-                "monthlyRegistrationChart"
-            );
+        if (Array.isArray(eligibleData)) {
+
+        eligibleData.forEach(function (item) {
+
+        const itemYear =
+        Number(item.year);
+
+        const itemMonth =
+        Number(item.month);
+
+        const itemCount =
+        Number(item.count) || 0;
 
 
-        if (registrationCanvas) {
+        const found =
+        eligibleMonths.find(function (x) {
 
-            new Chart(
-                registrationCanvas,
-                {
+        return (
+        x.year === itemYear &&
+        x.month === itemMonth
+        );
 
-                    type: "line",
+        });
 
-                    data: {
 
-                        labels: months,
+        if (found) {
 
-                        datasets: [
+        /*
+        * IMPORTANT:
+        * Do NOT add the value again.
+        *
+        * SP should already return the
+        * monthly eligible trainee total.
+        */
 
-                            {
-
-                                data:
-                                    monthlyRegistrationData,
-
-                                borderColor:
-                                    "#1e7b67",
-
-                                backgroundColor:
-                                    function (context) {
-
-                                        return createTealGradient(
-                                            context
-                                        );
-
-                                    },
-
-                                fill: true,
-
-                                borderWidth: 3,
-
-                                tension: 0.35,
-
-                                pointRadius: function (context) {
-
-                                    /*
-                                     * Only show the final point,
-                                     * exactly like your reference.
-                                     */
-
-                                    return context.dataIndex ===
-                                        monthlyRegistrationData.length - 1
-                                        ? 5
-                                        : 0;
-
-                                },
-
-                                pointHoverRadius: 5,
-
-                                pointBackgroundColor:
-                                    "#ffffff",
-
-                                pointBorderColor:
-                                    "#1e7b67",
-
-                                pointBorderWidth: 3
-
-                            }
-
-                        ]
-
-                    },
-
-                    options: commonOptions
-
-                }
-
-            );
+        found.count = itemCount;
 
         }
 
-    });
+        });
 
-</script>
+        }
+
+
+        console.log(
+        "Eligible Monthly Data:",
+        eligibleMonths
+        );
+
+
+        // =====================================================
+        // CHART SETTINGS
+        // =====================================================
+
+        const eligibleChartLeft = 60;
+
+        const eligibleChartRight = 735;
+
+        const eligibleChartTop = 30;
+
+        const eligibleChartBottom = 255;
+
+        const eligibleChartHeight =
+        eligibleChartBottom -
+        eligibleChartTop;
+
+        const eligibleChartWidth =
+        eligibleChartRight -
+        eligibleChartLeft;
+
+        const eligibleMonthGap =
+        eligibleChartWidth / 11;
+
+
+        // =====================================================
+        // Y AXIS ALWAYS 0 TO 100
+        // =====================================================
+
+        const eligibleYAxisMax = 100;
+
+
+        // =====================================================
+        // CREATE POINTS
+        // =====================================================
+
+        const eligiblePointsData = [];
+
+
+        eligibleMonths.forEach(function (item, index) {
+
+        const x =
+        eligibleChartLeft +
+        (
+        index *
+        eligibleMonthGap
+        );
+
+
+        const value =
+        Math.max(
+        0,
+        Math.min(
+        Number(item.count) || 0,
+        eligibleYAxisMax
+        )
+        );
+
+
+        const y =
+        eligibleChartBottom -
+        (
+        (
+        value /
+        eligibleYAxisMax
+        ) *
+        eligibleChartHeight
+        );
+
+
+        eligiblePointsData.push({
+
+        x: x,
+
+        y: y,
+
+        count: value,
+
+        label: item.label
+
+        });
+
+        });
+
+
+        // =====================================================
+        // DRAW LINE
+        // =====================================================
+
+        const eligibleLine =
+        document.getElementById(
+        "eligibleLine"
+        );
+
+
+        if (eligibleLine) {
+
+        eligibleLine.setAttribute(
+        "points",
+
+        eligiblePointsData
+        .map(function (p) {
+
+        return (
+        p.x +
+        "," +
+        p.y
+        );
+
+        })
+        .join(" ")
+        );
+
+        }
+
+
+        // =====================================================
+        // DRAW AREA
+        // =====================================================
+
+        const eligibleArea =
+        document.getElementById(
+        "eligibleArea"
+        );
+
+
+        if (eligibleArea) {
+
+        let areaPoints =
+        eligiblePointsData
+        .map(function (p) {
+
+        return (
+        p.x +
+        "," +
+        p.y
+        );
+
+        })
+        .join(" ");
+
+
+        areaPoints +=
+        " " +
+        eligibleChartRight +
+        "," +
+        eligibleChartBottom;
+
+
+        areaPoints +=
+        " " +
+        eligibleChartLeft +
+        "," +
+        eligibleChartBottom;
+
+
+        eligibleArea.setAttribute(
+        "points",
+        areaPoints
+        );
+
+        }
+
+
+        // =====================================================
+        // DRAW POINTS
+        // =====================================================
+
+        const eligiblePoints =
+        document.getElementById(
+        "eligiblePoints"
+        );
+
+
+        if (eligiblePoints) {
+
+        eligiblePoints.innerHTML = "";
+
+
+        eligiblePointsData.forEach(
+        function (p) {
+
+        const circle =
+        document.createElementNS(
+        "http://www.w3.org/2000/svg",
+        "circle"
+        );
+
+
+        circle.setAttribute(
+        "cx",
+        p.x
+        );
+
+
+        circle.setAttribute(
+        "cy",
+        p.y
+        );
+
+
+        circle.setAttribute(
+        "r",
+        "4"
+        );
+
+
+        circle.setAttribute(
+        "class",
+        "chart-point"
+        );
+
+
+        // =================================================
+        // TOOLTIP
+        // =================================================
+
+        const title =
+        document.createElementNS(
+        "http://www.w3.org/2000/svg",
+        "title"
+        );
+
+
+        title.textContent =
+        p.label +
+        " : " +
+        p.count +
+        " eligible trainee(s)";
+
+
+        circle.appendChild(
+        title
+        );
+
+
+        eligiblePoints.appendChild(
+        circle
+        );
+
+        }
+        );
+
+        }
+
+
+        // =====================================================
+        // ELIGIBLE MONTH LABELS
+        // =====================================================
+
+        const eligibleMonthsElement =
+        document.getElementById(
+        "eligibleMonths"
+        );
+
+
+        if (eligibleMonthsElement) {
+
+        eligibleMonthsElement.innerHTML = "";
+
+
+        eligibleMonths.forEach(
+        function (item, index) {
+
+        const text =
+        document.createElementNS(
+        "http://www.w3.org/2000/svg",
+        "text"
+        );
+
+
+        const x =
+        eligibleChartLeft +
+        (
+        index *
+        eligibleMonthGap
+        );
+
+
+        text.setAttribute(
+        "x",
+        x
+        );
+
+
+        text.setAttribute(
+        "y",
+        eligibleChartBottom + 20
+        );
+
+
+        text.setAttribute(
+        "text-anchor",
+        "middle"
+        );
+
+
+        text.setAttribute(
+        "class",
+        "chart-axis-text"
+        );
+
+
+        text.textContent =
+        item.label;
+
+
+        eligibleMonthsElement.appendChild(
+        text
+        );
+
+        }
+        );
+
+        }
+
+
+
+        // =====================================================
+        // =====================================================
+        // 2. CANDIDATE REGISTRATION CHART
+        // =====================================================
+        // =====================================================
+
+
+        // =====================================================
+        // DATA FROM C#
+        // =====================================================
+
+        const candidateData =
+        @Html.Raw(
+                                System.Text.Json.JsonSerializer.Serialize(
+                                                barData.Select(x => new
+                                                {
+                                                        year = x.RegistrationYear,
+                                                        month = x.RegistrationMonth,
+                                                        count = x.TotalRegistrations
+                                                })
+                                )
+                );
+
+
+        console.log(
+        "Candidate Data From C#:",
+        candidateData
+        );
+
+
+        // =====================================================
+        // CREATE 12 MONTHS
+        // =====================================================
+
+        const registrationMonths = [];
+
+
+        for (let i = 1; i <= 12; i++) {
+
+        registrationMonths.push({
+
+        year: currentYear,
+
+        month: i,
+
+        label:
+        monthNames[i - 1] +
+        " " +
+        String(currentYear).slice(-2),
+
+        count: 0
+
+        });
+
+        }
+
+
+        // =====================================================
+        // PUT DATABASE DATA INTO MONTHS
+        // =====================================================
+
+        if (Array.isArray(candidateData)) {
+
+        candidateData.forEach(function (item) {
+
+        const itemYear =
+        Number(item.year);
+
+        const itemMonth =
+        Number(item.month);
+
+        const itemCount =
+        Number(item.count) || 0;
+
+
+        const found =
+        registrationMonths.find(
+        function (x) {
+
+        return (
+        x.year === itemYear &&
+        x.month === itemMonth
+        );
+
+        }
+        );
+
+
+        if (found) {
+
+        found.count = itemCount;
+
+        }
+
+        });
+
+        }
+
+
+        // =====================================================
+        // CHART SETTINGS
+        // =====================================================
+
+        const registrationChartLeft = 60;
+
+        const registrationChartRight = 735;
+
+        const registrationChartTop = 30;
+
+        const registrationChartBottom = 255;
+
+        const registrationChartHeight =
+        registrationChartBottom -
+        registrationChartTop;
+
+        const registrationChartWidth =
+        registrationChartRight -
+        registrationChartLeft;
+
+        const registrationMonthGap =
+        registrationChartWidth / 11;
+
+
+        // =====================================================
+        // Y AXIS = 0 TO 100
+        // =====================================================
+
+        const registrationYAxisMax = 100;
+
+
+        // =====================================================
+        // BARS
+        // =====================================================
+
+        const registrationBars =
+        document.getElementById(
+        "registrationBars"
+        );
+
+
+        if (registrationBars) {
+
+        registrationBars.innerHTML = "";
+
+        const barWidth = 30;
+
+
+        registrationMonths.forEach(
+        function (item, index) {
+
+        const x =
+        registrationChartLeft +
+        (
+        index *
+        registrationMonthGap
+        ) -
+        (
+        barWidth / 2
+        );
+
+
+        const value =
+        Math.max(
+        0,
+        Math.min(
+        Number(item.count) || 0,
+        registrationYAxisMax
+        )
+        );
+
+
+        const barHeight =
+        (
+        value /
+        registrationYAxisMax
+        ) *
+        registrationChartHeight;
+
+
+        const y =
+        registrationChartBottom -
+        barHeight;
+
+
+        const rect =
+        document.createElementNS(
+        "http://www.w3.org/2000/svg",
+        "rect"
+        );
+
+
+        rect.setAttribute(
+        "x",
+        x
+        );
+
+
+        rect.setAttribute(
+        "y",
+        y
+        );
+
+
+        rect.setAttribute(
+        "width",
+        barWidth
+        );
+
+
+        rect.setAttribute(
+        "height",
+        barHeight
+        );
+
+
+        rect.setAttribute(
+        "class",
+        "chart-bar"
+        );
+
+
+        // =================================================
+        // TOOLTIP
+        // =================================================
+
+        const title =
+        document.createElementNS(
+        "http://www.w3.org/2000/svg",
+        "title"
+        );
+
+
+        title.textContent =
+        item.label +
+        " : " +
+        value +
+        " candidate(s)";
+
+
+        rect.appendChild(
+        title
+        );
+
+
+        registrationBars.appendChild(
+        rect
+        );
+
+        }
+        );
+
+        }
+
+
+        // =====================================================
+        // REGISTRATION MONTH LABELS
+        // =====================================================
+
+        const registrationMonthsElement =
+        document.getElementById(
+        "registrationMonths"
+        );
+
+
+        if (registrationMonthsElement) {
+
+        registrationMonthsElement.innerHTML = "";
+
+
+        registrationMonths.forEach(
+        function (item, index) {
+
+        const text =
+        document.createElementNS(
+        "http://www.w3.org/2000/svg",
+        "text"
+        );
+
+
+        const x =
+        registrationChartLeft +
+        (
+        index *
+        registrationMonthGap
+        );
+
+
+        text.setAttribute(
+        "x",
+        x
+        );
+
+
+        text.setAttribute(
+        "y",
+        registrationChartBottom + 20
+        );
+
+
+        text.setAttribute(
+        "text-anchor",
+        "middle"
+        );
+
+
+        text.setAttribute(
+        "class",
+        "chart-axis-text"
+        );
+
+
+        text.textContent =
+        item.label;
+
+
+        registrationMonthsElement.appendChild(
+        text
+        );
+
+        }
+        );
+
+        }
+
+
+        // =====================================================
+        // DEBUG
+        // =====================================================
+
+        console.log(
+        "FINAL ELIGIBLE MONTHS:",
+        eligibleMonths
+        );
+
+        console.log(
+        "FINAL REGISTRATION MONTHS:",
+        registrationMonths
+        );
+
+        });
+
+    </script>
+</div>
+
+
+@* //radhika29-09 *@
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>

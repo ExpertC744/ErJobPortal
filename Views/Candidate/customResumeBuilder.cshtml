@@ -1,5 +1,7 @@
 ﻿@model ErJobPortal.Models.ResumeViewModel
-
+@{
+    var candidateCode = ViewBag.CandidateCode?.ToString() ?? "";
+}
 @{
     Layout = null;
 
@@ -232,8 +234,8 @@
 
     <style>
         /* =========================================================
-                   ROOT & COLOR SCHEME
-                ========================================================= */
+                           ROOT & COLOR SCHEME
+                        ========================================================= */
         :root {
             --brand: #0d9488;
             --brand-dark: #0f766e;
@@ -254,8 +256,8 @@
         }
 
         /* =========================================================
-                   RESET
-                ========================================================= */
+                           RESET
+                        ========================================================= */
         * {
             box-sizing: border-box;
         }
@@ -280,8 +282,8 @@
         }
 
         /* =========================================================
-                   EDITOR LAYOUT
-                ========================================================= */
+                           EDITOR LAYOUT
+                        ========================================================= */
         .resume-editor {
             width: 100%;
             height: 100vh;
@@ -291,8 +293,8 @@
         }
 
         /* =========================================================
-                   TOP TOOLBAR
-                ========================================================= */
+                           TOP TOOLBAR
+                        ========================================================= */
         .editor-toolbar {
             height: var(--editor-header);
             min-height: var(--editor-header);
@@ -420,8 +422,8 @@
         }
 
         /* =========================================================
-                   MAIN EDITOR AREA
-                ========================================================= */
+                           MAIN EDITOR AREA
+                        ========================================================= */
         .editor-body {
             flex: 1;
             min-height: 0;
@@ -430,8 +432,8 @@
         }
 
         /* =========================================================
-                   LEFT SIDEBAR
-                ========================================================= */
+                           LEFT SIDEBAR
+                        ========================================================= */
         .left-sidebar {
             background: #fff;
             border-right: 1px solid var(--border);
@@ -531,8 +533,8 @@
         }
 
         /* =========================================================
-                   CENTER WORKSPACE
-                ========================================================= */
+                           CENTER WORKSPACE
+                        ========================================================= */
         .workspace {
             position: relative;
             min-width: 0;
@@ -580,8 +582,8 @@
         }
 
         /* =========================================================
-                   ALIGNMENT GUIDES
-                ========================================================= */
+                           ALIGNMENT GUIDES
+                        ========================================================= */
         .alignment-guide {
             position: absolute;
             pointer-events: none;
@@ -604,8 +606,8 @@
             }
 
         /* =========================================================
-                   RESUME SECTIONS
-                ========================================================= */
+                           RESUME SECTIONS
+                        ========================================================= */
         .resume-section {
             position: absolute;
             box-sizing: border-box;
@@ -658,8 +660,8 @@
         }
 
         /* =========================================================
-                   SECTION CONTROLS & RESIZE HANDLES
-                ========================================================= */
+                           SECTION CONTROLS & RESIZE HANDLES
+                        ========================================================= */
         .section-controls {
             position: absolute;
             left: 50%;
@@ -767,8 +769,8 @@
         }
 
         /* =========================================================
-                   TYPOGRAPHY & RESUME STYLES
-                ========================================================= */
+                           TYPOGRAPHY & RESUME STYLES
+                        ========================================================= */
         .classic-section {
             color: var(--ink);
         }
@@ -935,8 +937,8 @@
         }
 
         /* =========================================================
-                   RIGHT PROPERTIES SIDEBAR (POLISHED UI)
-                ========================================================= */
+                           RIGHT PROPERTIES SIDEBAR (POLISHED UI)
+                        ========================================================= */
         .right-sidebar {
             background: #ffffff;
             border-left: 1px solid var(--border);
@@ -1212,8 +1214,8 @@
         }
 
         /* =========================================================
-                   PREVIEW & TOAST
-                ========================================================= */
+                           PREVIEW & TOAST
+                        ========================================================= */
         .preview-overlay {
             position: fixed;
             inset: 0;
@@ -1275,8 +1277,8 @@
             }
 
         /* =========================================================
-                   RESPONSIVE & PRINT
-                ========================================================= */
+                           RESPONSIVE & PRINT
+                        ========================================================= */
         @@media (max-width: 1200px) {
             .editor-body {
                 grid-template-columns: 220px minmax(350px, 1fr) 280px;
@@ -1348,7 +1350,12 @@
                 <button type="button" class="toolbar-btn" id="orientationBtn">↕ <span id="orientationText">Portrait</span></button>
                 <button type="button" class="toolbar-btn" id="gridBtn"># <span>Grid</span></button>
                 <button type="button" class="toolbar-btn" id="previewBtn">▣ <span>Preview</span></button>
-                <button type="button" class="toolbar-btn primary" id="saveBtn">✓ <span>Save Layout</span></button>
+                <button type="button"
+                        id="btnSaveLayout"
+                        class="btn btn-success">
+                    <i class="fas fa-save"></i>
+                    Save Layout
+                </button>
             </div>
         </header>
 
@@ -2677,22 +2684,444 @@
             document.getElementById("previewClose").addEventListener("click", () => previewOverlay.classList.remove("active"));
 
             /* SAVE & TOAST */
-            document.getElementById("saveBtn").addEventListener("click", () => {
-                const layout = [];
-                canvas.querySelectorAll(".resume-section").forEach(s => {
-                    layout.push({
-                        id: s.dataset.id,
-                        type: s.dataset.type,
-                        left: s.style.left,
-                        top: s.style.top,
-                        width: s.style.width,
-                        height: s.style.height,
-                        visible: !s.classList.contains("hidden-section")
+                        /* =========================================================
+               SAVE & LOAD RESUME LAYOUT
+               ========================================================= */
+
+            const candidateCode = '@candidateCode';
+
+            const resumeLayoutKey =
+                "ResumeLayout_" + candidateCode;
+
+
+            /* =========================================================
+               CREATE LAYOUT DATA
+               ========================================================= */
+
+            function getResumeLayoutData() {
+
+                const sections = [];
+
+                canvas.querySelectorAll(".resume-section").forEach(section => {
+
+                    sections.push({
+                        id: section.dataset.id,
+                        type: section.dataset.type,
+
+                        style: section.getAttribute("style"),
+
+                        className: section.className,
+
+                        visible:
+                            !section.classList.contains("hidden-section"),
+
+                        html:
+                            section.innerHTML
                     });
+
                 });
-                localStorage.setItem("resume_layout", JSON.stringify(layout));
-                showToast("Layout saved successfully.");
-            });
+
+                return {
+                    orientation: state.orientation,
+                    template: state.template,
+                    zoom: state.zoom,
+                    snap: state.snap,
+                    showGrid: state.showGrid,
+
+                    sections: sections
+                };
+            }
+
+
+            /* =========================================================
+               SAVE LAYOUT TO BROWSER
+               ========================================================= */
+
+            function saveResumeLayout() {
+
+                if (!candidateCode) {
+
+                    showToast(
+                        "Candidate code not found."
+                    );
+
+                    return;
+                }
+
+                try {
+
+                    const layoutData =
+                        getResumeLayoutData();
+
+                    localStorage.setItem(
+                        resumeLayoutKey,
+                        JSON.stringify(layoutData)
+                    );
+
+                    showToast(
+                        "Layout saved successfully."
+                    );
+
+                    console.log(
+                        "Resume layout saved:",
+                        resumeLayoutKey
+                    );
+
+                }
+                catch (error) {
+
+                    console.error(
+                        "Error saving resume layout:",
+                        error
+                    );
+
+                    showToast(
+                        "Unable to save layout."
+                    );
+                }
+            }
+
+
+            /* =========================================================
+               LOAD LAYOUT FROM BROWSER
+               ========================================================= */
+
+            function loadResumeLayout() {
+
+                if (!candidateCode) {
+                    return;
+                }
+
+                try {
+
+                    const savedLayout =
+                        localStorage.getItem(
+                            resumeLayoutKey
+                        );
+
+                    if (!savedLayout) {
+
+                        console.log(
+                            "No saved layout found for:",
+                            candidateCode
+                        );
+
+                        return;
+                    }
+
+                    const layoutData =
+                        JSON.parse(savedLayout);
+
+                    if (!layoutData) {
+                        return;
+                    }
+
+
+                    /* ---------------------------------------------
+                       RESTORE ORIENTATION
+                       --------------------------------------------- */
+
+                    if (layoutData.orientation) {
+
+                        setOrientation(
+                            layoutData.orientation,
+                            false
+                        );
+                    }
+
+
+                    /* ---------------------------------------------
+                       RESTORE TEMPLATE
+                       --------------------------------------------- */
+
+                    if (layoutData.template) {
+
+                        state.template =
+                            layoutData.template;
+
+                        const templateSelect =
+                            document.getElementById(
+                                "templateSelect"
+                            );
+
+                        if (templateSelect) {
+
+                            templateSelect.value =
+                                layoutData.template;
+                        }
+
+                        applyTemplate(
+                            layoutData.template
+                        );
+                    }
+
+
+                    /* ---------------------------------------------
+                       RESTORE ZOOM
+                       --------------------------------------------- */
+
+                    if (
+                        typeof layoutData.zoom === "number"
+                    ) {
+
+                        setZoom(
+                            layoutData.zoom
+                        );
+                    }
+
+
+                    /* ---------------------------------------------
+                       RESTORE SNAP
+                       --------------------------------------------- */
+
+                    if (
+                        typeof layoutData.snap === "boolean"
+                    ) {
+
+                        state.snap =
+                            layoutData.snap;
+
+                        const snapControl =
+                            document.getElementById(
+                                "propSnap"
+                            );
+
+                        if (snapControl) {
+
+                            snapControl.checked =
+                                state.snap;
+                        }
+                    }
+
+
+                    /* ---------------------------------------------
+                       RESTORE GRID
+                       --------------------------------------------- */
+
+                    if (
+                        typeof layoutData.showGrid === "boolean"
+                    ) {
+
+                        state.showGrid =
+                            layoutData.showGrid;
+
+                        canvas.classList.toggle(
+                            "show-grid",
+                            state.showGrid
+                        );
+
+                        document
+                            .getElementById("gridBtn")
+                            ?.classList.toggle(
+                                "primary",
+                                state.showGrid
+                            );
+                    }
+
+
+                    /* ---------------------------------------------
+                       RESTORE SECTIONS
+                       --------------------------------------------- */
+
+                    if (
+                        Array.isArray(
+                            layoutData.sections
+                        )
+                    ) {
+
+                        const existingSections =
+                            new Map();
+
+                        canvas
+                            .querySelectorAll(
+                                ".resume-section"
+                            )
+                            .forEach(section => {
+
+                                existingSections.set(
+                                    section.dataset.id,
+                                    section
+                                );
+
+                            });
+
+
+                        layoutData.sections.forEach(item => {
+
+                            let section =
+                                existingSections.get(
+                                    item.id
+                                );
+
+
+                            /* -----------------------------------------
+                               CREATE SECTION IF IT NO LONGER EXISTS
+                               ----------------------------------------- */
+
+                            if (!section) {
+
+                                section =
+                                    document.createElement(
+                                        "div"
+                                    );
+
+                                canvas.appendChild(
+                                    section
+                                );
+                            }
+
+
+                            /* -----------------------------------------
+                               RESTORE BASIC DATA
+                               ----------------------------------------- */
+
+                            section.dataset.id =
+                                item.id;
+
+                            section.dataset.type =
+                                item.type;
+
+
+                            /* -----------------------------------------
+                               RESTORE CLASS
+                               ----------------------------------------- */
+
+                            if (item.className) {
+
+                                section.className =
+                                    item.className;
+                            }
+
+
+                            /* -----------------------------------------
+                               RESTORE STYLE
+                               ----------------------------------------- */
+
+                            if (item.style) {
+
+                                section.setAttribute(
+                                    "style",
+                                    item.style
+                                );
+                            }
+
+
+                            /* -----------------------------------------
+                               RESTORE HTML
+                               ----------------------------------------- */
+
+                            if (item.html) {
+
+                                section.innerHTML =
+                                    item.html;
+                            }
+
+
+                            /* -----------------------------------------
+                               RESTORE VISIBILITY
+                               ----------------------------------------- */
+
+                            section.classList.toggle(
+                                "hidden-section",
+                                item.visible === false
+                            );
+
+
+                            /* -----------------------------------------
+                               EVENTS MUST BE REATTACHED
+                               ----------------------------------------- */
+
+                            attachSectionEvents(
+                                section
+                            );
+
+                        });
+
+
+                        /* ---------------------------------------------
+                           REMOVE SECTIONS THAT ARE NOT IN SAVED LAYOUT
+                           --------------------------------------------- */
+
+                        const savedIds =
+                            new Set(
+                                layoutData.sections
+                                    .map(x => x.id)
+                            );
+
+                        canvas
+                            .querySelectorAll(
+                                ".resume-section"
+                            )
+                            .forEach(section => {
+
+                                if (
+                                    !savedIds.has(
+                                        section.dataset.id
+                                    )
+                                ) {
+
+                                    section.remove();
+                                }
+
+                            });
+                    }
+
+
+                    /* ---------------------------------------------
+                       REFRESH UI
+                       --------------------------------------------- */
+
+                    selectSection(null);
+
+                    updatePropertyPanel();
+
+                    showToast(
+                        "Saved layout restored."
+                    );
+
+                    console.log(
+                        "Resume layout restored:",
+                        resumeLayoutKey
+                    );
+
+                }
+                catch (error) {
+
+                    console.error(
+                        "Error loading resume layout:",
+                        error
+                    );
+
+                    showToast(
+                        "Unable to restore saved layout."
+                    );
+                }
+            }
+
+
+            /* =========================================================
+               SAVE BUTTON
+               ========================================================= */
+
+            const saveLayoutButton =
+                document.getElementById(
+                    "btnSaveLayout"
+                );
+
+            if (saveLayoutButton) {
+
+                saveLayoutButton.addEventListener(
+                    "click",
+                    saveResumeLayout
+                );
+            }
+
+
+            /* =========================================================
+               LOAD SAVED LAYOUT
+               ========================================================= */
+
+            loadResumeLayout();
 
             function showToast(msg) {
                 toast.textContent = msg;
@@ -2780,6 +3209,160 @@
             /* START */
             init();
         })();
+    </script>
+
+
+    <script>
+
+        // =========================================================
+        // RESUME LAYOUT STORAGE KEY
+        // =========================================================
+
+        const resumeLayoutKey =
+            "ResumeLayout_" + candidateCode;
+
+
+        // =========================================================
+        // SAVE LAYOUT
+        // =========================================================
+
+        function saveResumeLayout() {
+
+            if (!candidateCode) {
+                alert("Candidate code not found.");
+                return;
+            }
+
+            if (typeof canvas === "undefined" || !canvas) {
+                alert("Resume canvas not found.");
+                return;
+            }
+
+            try {
+
+                // Get complete Fabric.js canvas data
+                const layoutData =
+                    canvas.toJSON([
+                        "id",
+                        "name",
+                        "field",
+                        "type",
+                        "customType",
+                        "isEditable",
+                        "isResizable"
+                    ]);
+
+                // Save into browser localStorage
+                localStorage.setItem(
+                    resumeLayoutKey,
+                    JSON.stringify(layoutData)
+                );
+
+                alert("Resume layout saved successfully.");
+
+            }
+            catch (error) {
+
+                console.error(
+                    "Error saving resume layout:",
+                    error
+                );
+
+                alert(
+                    "Unable to save resume layout."
+                );
+            }
+        }
+
+
+        // =========================================================
+        // LOAD SAVED LAYOUT
+        // =========================================================
+
+        function loadSavedResumeLayout() {
+
+            if (!candidateCode) {
+                return;
+            }
+
+            if (typeof canvas === "undefined" || !canvas) {
+                return;
+            }
+
+            try {
+
+                const savedLayout =
+                    localStorage.getItem(
+                        resumeLayoutKey
+                    );
+
+                // Nothing saved previously
+                if (!savedLayout) {
+                    console.log(
+                        "No saved resume layout found."
+                    );
+
+                    return;
+                }
+
+                const layoutData =
+                    JSON.parse(savedLayout);
+
+                // Remove current/default objects
+                canvas.clear();
+
+                // Restore saved objects
+                canvas.loadFromJSON(
+                    layoutData,
+                    function () {
+
+                        canvas.renderAll();
+
+                        console.log(
+                            "Saved resume layout restored."
+                        );
+                    }
+                );
+
+            }
+            catch (error) {
+
+                console.error(
+                    "Error loading resume layout:",
+                    error
+                );
+            }
+        }
+
+
+        // =========================================================
+        // SAVE BUTTON
+        // =========================================================
+
+        document.addEventListener(
+            "DOMContentLoaded",
+            function () {
+
+                const saveButton =
+                    document.getElementById(
+                        "btnSaveLayout"
+                    );
+
+                if (saveButton) {
+
+                    saveButton.addEventListener(
+                        "click",
+                        function () {
+
+                            saveResumeLayout();
+
+                        }
+                    );
+                }
+
+            }
+        );
+
     </script>
 </body>
 </html>

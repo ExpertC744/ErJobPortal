@@ -1,0 +1,117 @@
+﻿@{
+    Layout = "~/Views/Shared/_DashboardLayout.cshtml";
+
+    ViewData["Title"] = "Taxes Details List";
+    ViewData["Panel"] = "SuperAdmin";
+    ViewData["UserName"] = "ItNetworkZ";
+}
+
+<div class="container-fluid">
+
+    <!-- Page Header -->
+    <div class="mb-4">
+        <h1 class="mb-2">Taxes Details List</h1>
+        <p class="mb-0 text-muted">ItNetworkZ</p>
+    </div>
+
+
+    <!-- Master Table -->
+    <div class="master-table-container">
+         
+        <div class="table-responsive">
+
+            <table id="taxesDetailsTable"
+                   class="master-data-table">
+
+                <thead>
+                    <tr>
+                        <th>Sr. No</th>
+                        <th>Taxes1</th>
+                        <th>Rate1</th>
+                        <th>Taxes2</th>
+                        <th>Rate2</th>
+                        <th>Taxes3</th>
+                        <th>Rate3</th>
+                        <th>Taxes4</th>
+                        <th>Rate4</th>
+                        <th>Total Tax</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+
+                    <tr>
+
+                        <td class="master-id">
+                            1
+                        </td>
+
+                        <td>
+                            GST
+                        </td>
+
+                        <td>
+                            5%
+                        </td>
+
+                        <td>
+                            CGST
+                        </td>
+
+                        <td>
+                            2.5%
+                        </td>
+
+                        <td>
+                            SGST
+                        </td>
+
+                        <td>
+                            2.5%
+                        </td>
+
+                        <td>
+                            -
+                        </td>
+
+                        <td>
+                            0%
+                        </td>
+
+                        <td>
+                            <span class="master-status">
+                                10%
+                            </span>
+                        </td>
+
+                        <td>
+
+                            <a asp-controller="SuperAdmin"
+                               asp-action="SAEditTaxesDetails"
+                               asp-route-id="1"
+                               class="resume-view-btn"
+                               title="Edit Taxes Details">
+
+                                <i class="fas fa-edit"></i>
+
+                            </a>
+
+                        </td>
+
+                    </tr>
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+
+        <div id="taxesDetailsPageInfo"
+             class="master-page-info text-center d-none">
+        </div>
+
+    </div>
+
+</div>

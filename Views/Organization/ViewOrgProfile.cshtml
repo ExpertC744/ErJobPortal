@@ -5,605 +5,146 @@
 
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
-
     <meta charset="utf-8" />
-
-    <meta name="viewport"
-          content="width=device-width, initial-scale=1.0" />
-
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
     <title>View Organization Profile - 1Trainee</title>
 
     <link rel="stylesheet"
           href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
-
     <link href="~/css/vieworgprofile.css" rel="stylesheet" />
 </head>
 
-
 <body>
 
-
-    <!-- =========================================================
-         ACTION BUTTONS
-    ========================================================= -->
-
-    <div class="profile-actions">
-
-
-        <!-- HOME -->
-
-        <button type="button"
-                class="profile-action-btn"
-                title="Home"
-                aria-label="Home"
-                onclick="goHome();">
-
-            <i class="fa-solid fa-house"></i>
-
-        </button>
-
-
-        <!-- PRINT -->
-
-        <button type="button"
-                class="profile-action-btn"
-                title="Print"
-                aria-label="Print"
-                onclick="printProfile();">
-
-            <i class="fa-solid fa-print"></i>
-
-        </button>
-
-
-        <!-- DOWNLOAD -->
-
-        <button type="button"
-                class="profile-action-btn"
-                title="Download"
-                aria-label="Download"
-                onclick="downloadProfile();">
-
-            <i class="fa-solid fa-download"></i>
-
-        </button>
-
-
-    </div>
-
-
-
-    <!-- =========================================================
-         PAGE
-    ========================================================= -->
-
     <main class="profile-page">
+        <article class="profile-card" id="organizationProfile">
 
-
-        <!-- =====================================================
-             PROFILE CARD
-        ====================================================== -->
-
-        <article class="profile-card"
-                 id="organizationProfile">
-
-
-            <!-- =================================================
-                 COVER
-            ================================================== -->
-
-            <section class="profile-cover">
-
-
-                <div class="cover-circle-one"></div>
-
-                <div class="cover-circle-two"></div>
-
-                <div class="cover-circle-three"></div>
-
-
-                <div class="cover-content">
-
-
-                    <div class="cover-label">
-
-                        <i class="fa-solid fa-building"></i>
-
-                        Organization Profile
-
-                    </div>
-
-
-                    <h1 class="cover-title">
-
-                        View Organization Profile
-
-                    </h1>
-
-
-                    <div class="cover-subtitle">
-
-                        Organization information on 1Trainee
-
-                    </div>
-
-
+            <!-- ================= COVER ================= -->
+            <header class="profile-cover">
+                <div class="profile-actions">
+                    <button type="button" class="profile-action-btn" title="Home" aria-label="Home" onclick="goHome();">
+                        <i class="fa-solid fa-house"></i>
+                    </button>
+                    <button type="button" class="profile-action-btn" title="Print" aria-label="Print" onclick="printProfile();">
+                        <i class="fa-solid fa-print"></i>
+                    </button>
+                    <button type="button" class="profile-action-btn" title="Download as PDF" aria-label="Download" onclick="downloadProfile();">
+                        <i class="fa-solid fa-download"></i>
+                    </button>
                 </div>
 
+            </header>
 
-            </section>
-
-
-
-            <!-- =================================================
-                 ORGANIZATION IDENTITY
-            ================================================== -->
-
+            <!-- ================= IDENTITY ================= -->
             <section class="organization-section">
 
-
-                <div class="organization-main">
-
-
-                    <!-- ORGANIZATION LOGO -->
-
-                    <div class="organization-logo">
-
-                        <img src="~/images/it-networkz-logo.png"
-                             alt="IT-NetworkZ Infosystems Pvt Ltd Logo" />
-
-                    </div>
-
-
-                    <!-- ORGANIZATION INFORMATION -->
-
-                    <div class="organization-info">
-
-
-                        <div class="organization-name">
-
-                            IT-NetworkZ Infosystems Pvt Ltd
-
-
-                            <span class="verified-icon"
-                                  title="Verified Organization">
-
-                                <i class="fa-solid fa-check"></i>
-
-                            </span>
-
-                        </div>
-
-
-                        <div class="organization-meta">
-
-
-                            <span>
-
-                                <i class="fa-solid fa-building"></i>
-
-                                Organization
-
-                            </span>
-
-
-                            <span class="meta-dot">
-                                •
-                            </span>
-
-
-                            <span>
-
-                                <i class="fa-solid fa-location-dot"></i>
-
-                                Nagpur, India
-
-                            </span>
-
-
-                            <span class="meta-dot">
-                                •
-                            </span>
-
-
-                            <span>
-
-                                <i class="fa-solid fa-globe"></i>
-
-                                1Trainee
-
-                            </span>
-
-
-                        </div>
-
-
-                    </div>
-
-
+                <div class="organization-logo">
+                    <img src="~/images/it-networkz-logo.png" alt="IT-NetworkZ Infosystems Pvt Ltd Logo" />
                 </div>
 
+                <h1 class="organization-name">IT-NetworkZ Infosystems Pvt Ltd</h1>
+
+                <div class="organization-meta">
+                    <span class="verified-badge">
+                        <i class="fa-solid fa-circle-check"></i> Verified Organization
+                    </span>
+                    <span class="meta-item">
+                        <i class="fa-solid fa-location-dot"></i> Nagpur, India
+                    </span>
+                    <span class="meta-item">
+                        <i class="fa-solid fa-globe"></i> 1Trainee
+                    </span>
+                </div>
 
             </section>
 
-
-
-            <!-- =================================================
-                 PROFILE BODY
-            ================================================== -->
-
+            <!-- ================= DETAILS ================= -->
             <section class="profile-body">
-
-
-                <!-- =================================================
-                     DETAILS HEADER
-                ================================================== -->
-
-                <div class="details-header">
-
-
-                    <div class="details-icon">
-
-                        <i class="fa-solid fa-list"></i>
-
-                    </div>
-
-
-                    <div class="details-title">
-
-                        Organization Information
-
-                    </div>
-
-
-                </div>
-
-
-
-                <!-- =================================================
-                     INFORMATION GRID
-                ================================================== -->
 
                 <div class="information-grid">
 
-
-                    <!-- CONTACT PERSON -->
-
                     <div class="information-card">
-
-
-                        <div class="information-top">
-
-                            <div class="information-icon">
-
-                                <i class="fa-solid fa-user"></i>
-
-                            </div>
-
-
-                            <div class="information-label">
-
-                                Contact Person Name
-
-                            </div>
-
+                        <div class="information-icon"><i class="fa-solid fa-user"></i></div>
+                        <div class="information-text">
+                            <div class="information-label">Contact Person</div>
+                            <div class="information-value">Harshada Girhe</div>
                         </div>
-
-
-                        <div class="information-value">
-
-                            Harshada Girhe
-
-                        </div>
-
-
                     </div>
 
-
-
-                    <!-- DESIGNATION -->
-
                     <div class="information-card">
-
-
-                        <div class="information-top">
-
-                            <div class="information-icon">
-
-                                <i class="fa-solid fa-briefcase"></i>
-
-                            </div>
-
-
-                            <div class="information-label">
-
-                                Designation
-
-                            </div>
-
+                        <div class="information-icon"><i class="fa-solid fa-briefcase"></i></div>
+                        <div class="information-text">
+                            <div class="information-label">Designation</div>
+                            <div class="information-value">HRM</div>
                         </div>
-
-
-                        <div class="information-value">
-
-                            HRM
-
-                        </div>
-
-
                     </div>
 
-
-
-                    <!-- COMPANY ADDRESS -->
-
                     <div class="information-card">
-
-
-                        <div class="information-top">
-
-                            <div class="information-icon">
-
-                                <i class="fa-solid fa-location-dot"></i>
-
-                            </div>
-
-
-                            <div class="information-label">
-
-                                Company Address
-
-                            </div>
-
+                        <div class="information-icon"><i class="fa-solid fa-location-dot"></i></div>
+                        <div class="information-text">
+                            <div class="information-label">Company Address</div>
+                            <div class="information-value">Laxmi Nagar, Nagpur</div>
                         </div>
-
-
-                        <div class="information-value">
-
-                            Laxmi Nagar, Nagpur
-
-                        </div>
-
-
                     </div>
 
-
-
-                    <!-- ESTABLISHMENT YEAR -->
-
                     <div class="information-card">
-
-
-                        <div class="information-top">
-
-                            <div class="information-icon">
-
-                                <i class="fa-solid fa-calendar-days"></i>
-
-                            </div>
-
-
-                            <div class="information-label">
-
-                                Establishment Year
-
-                            </div>
-
+                        <div class="information-icon"><i class="fa-solid fa-calendar-days"></i></div>
+                        <div class="information-text">
+                            <div class="information-label">Established</div>
+                            <div class="information-value">2007</div>
                         </div>
-
-
-                        <div class="information-value">
-
-                            2007
-
-                        </div>
-
-
                     </div>
 
-
-
-                    <!-- VERIFICATION EMAIL -->
-
                     <div class="information-card">
-
-
-                        <div class="information-top">
-
-                            <div class="information-icon">
-
-                                <i class="fa-solid fa-envelope"></i>
-
-                            </div>
-
-
-                            <div class="information-label">
-
-                                Verification Email
-
-                            </div>
-
+                        <div class="information-icon"><i class="fa-solid fa-envelope"></i></div>
+                        <div class="information-text">
+                            <div class="information-label">Verification Email</div>
+                            <div class="information-value">contact@it-networkz.com</div>
                         </div>
-
-
-                        <div class="information-value">
-
-                            contact@it-networkz.com
-
-                        </div>
-
-
                     </div>
 
-
-
-                    <!-- GST -->
-
                     <div class="information-card">
-
-
-                        <div class="information-top">
-
-                            <div class="information-icon">
-
-                                <i class="fa-solid fa-file-invoice"></i>
-
-                            </div>
-
-
-                            <div class="information-label">
-
-                                GST No.
-
-                            </div>
-
+                        <div class="information-icon"><i class="fa-solid fa-users"></i></div>
+                        <div class="information-text">
+                            <div class="information-label">Employee Strength</div>
+                            <div class="information-value">11-100</div>
                         </div>
-
-
-                        <div class="information-value">
-
-                            27AADCI8640L1Z6
-
-                        </div>
-
-
                     </div>
 
-
-
-                    <!-- CIN -->
-
                     <div class="information-card">
-
-
-                        <div class="information-top">
-
-                            <div class="information-icon">
-
-                                <i class="fa-solid fa-file-lines"></i>
-
-                            </div>
-
-
-                            <div class="information-label">
-
-                                CIN No.
-
-                            </div>
-
+                        <div class="information-icon"><i class="fa-solid fa-file-invoice"></i></div>
+                        <div class="information-text">
+                            <div class="information-label">GST No.</div>
+                            <div class="information-value">27AADCI8640L1Z6</div>
                         </div>
-
-
-                        <div class="information-value">
-
-                            U72200MH2015PTC266007
-
-                        </div>
-
-
                     </div>
 
-
-
-                    <!-- EMPLOYEE STRENGTH -->
-
                     <div class="information-card">
-
-
-                        <div class="information-top">
-
-                            <div class="information-icon">
-
-                                <i class="fa-solid fa-users"></i>
-
-                            </div>
-
-
-                            <div class="information-label">
-
-                                Current Employee Strength
-
-                            </div>
-
+                        <div class="information-icon"><i class="fa-solid fa-file-lines"></i></div>
+                        <div class="information-text">
+                            <div class="information-label">CIN No.</div>
+                            <div class="information-value">U72200MH2015PTC266007</div>
                         </div>
-
-
-                        <div class="information-value">
-
-                            11-100
-
-                        </div>
-
-
                     </div>
-
 
                 </div>
-
 
             </section>
 
-
-
-            <!-- =================================================
-                 FOOTER
-            ================================================== -->
-
+            <!-- ================= FOOTER ================= -->
             <footer class="profile-footer">
-
-
-                <div class="powered-by">
-
-                    Powered by
-
-                    <strong>
-                        1Trainee
-                    </strong>
-
-                </div>
-
-
+                Powered by <strong>1Trainee</strong>
             </footer>
 
-
         </article>
-
-
     </main>
 
-
-
-    <!-- =========================================================
-         JAVASCRIPT
-    ========================================================= -->
-
     <script>
-
-        function goHome() {
-
-            window.location.href = "/";
-
-        }
-
-            
-        function printProfile() {
-
-            window.print();
-
-        }
-
-
-        function downloadProfile() {
-
-            window.print();
-
-        }
-
+        function goHome() { window.location.href = "/"; }
+        function printProfile() { window.print(); }
+        function downloadProfile() { window.print(); } // choose "Save as PDF" in the print dialog
     </script>
 
-
 </body>
-
 </html>

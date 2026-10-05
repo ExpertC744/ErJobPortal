@@ -1,61 +1,385 @@
 ﻿@{
     Layout = "~/Views/Shared/_DashboardLayout.cshtml";
 
-    ViewData["Title"] = "Super Admin Dashboard";
-
+    ViewData["Title"] = "Add Objective";
     ViewData["Panel"] = "SuperAdmin";
-
     ViewData["UserName"] = "Super Admin";
 }
 
-@{
-    ViewData["Title"] = "Add Objective";
-}
+<style>
+    /* =========================================================
+       1TRAINEE - ADD OBJECTIVE FORM
+       ========================================================= */
 
-<div class="container mt-4">
+    .trainee-form-page {
+        width: 100%;
+        padding: 30px 20px 50px;
+        background: #f7faf9;
+        min-height: calc(100vh - 80px);
+    }
 
-    <div class="card shadow-sm">
+    .trainee-form-wrapper {
+        max-width: 850px;
+        margin: 0 auto;
+    }
 
-        <div class="card-header">
-            <h4 class="mb-0">Add Objective</h4>
+    /* Header */
+    .trainee-form-heading {
+        margin-bottom: 22px;
+    }
+
+    .trainee-form-heading h2 {
+        margin: 0;
+        color: #0f172a;
+        font-size: 26px;
+        font-weight: 700;
+    }
+
+    .trainee-form-heading p {
+        margin: 6px 0 0;
+        color: #64748b;
+        font-size: 14px;
+    }
+
+    /* Main Card */
+    .trainee-form-card {
+        background: #ffffff;
+        border: 1px solid #e2e8f0;
+        border-radius: 16px;
+        box-shadow: 0 8px 25px rgba(15, 118, 110, 0.08);
+        overflow: hidden;
+    }
+
+    /* Card Header */
+    .trainee-form-card-header {
+        position: relative;
+        padding: 20px 26px;
+        background: linear-gradient(135deg, #0d9488, #0f766e);
+        color: #ffffff;
+    }
+
+    .trainee-form-card-header::after {
+        content: "";
+        position: absolute;
+        width: 100px;
+        height: 100px;
+        right: -30px;
+        top: -45px;
+        border-radius: 50%;
+        background: rgba(255, 255, 255, 0.08);
+    }
+
+    .trainee-form-card-header h3 {
+        position: relative;
+        z-index: 1;
+        margin: 0;
+        font-size: 20px;
+        font-weight: 700;
+    }
+
+    .trainee-form-card-header p {
+        position: relative;
+        z-index: 1;
+        margin: 5px 0 0;
+        font-size: 13px;
+        opacity: 0.9;
+    }
+
+    /* Form Body */
+    .trainee-form-body {
+        padding: 30px;
+    }
+
+    .trainee-form-group {
+        margin-bottom: 22px;
+    }
+
+    .trainee-form-label {
+        display: block;
+        margin-bottom: 8px;
+        color: #334155;
+        font-size: 14px;
+        font-weight: 600;
+    }
+
+    .required {
+        color: #dc2626;
+        margin-left: 2px;
+    }
+
+    /* Inputs */
+    .trainee-form-input,
+    .trainee-form-select,
+    .trainee-form-textarea {
+        width: 100%;
+        border: 1px solid #cbd5e1;
+        border-radius: 9px;
+        background: #ffffff;
+        color: #0f172a;
+        font-size: 14px;
+        outline: none;
+        transition: all 0.2s ease;
+        box-sizing: border-box;
+    }
+
+    .trainee-form-input,
+    .trainee-form-select {
+        height: 46px;
+        padding: 0 14px;
+    }
+
+    .trainee-form-textarea {
+        min-height: 120px;
+        padding: 12px 14px;
+        resize: vertical;
+        line-height: 1.5;
+    }
+
+    .trainee-form-input:focus,
+    .trainee-form-select:focus,
+    .trainee-form-textarea:focus {
+        border-color: #0d9488;
+        box-shadow: 0 0 0 3px rgba(13, 148, 136, 0.10);
+    }
+
+    .trainee-form-input::placeholder,
+    .trainee-form-textarea::placeholder {
+        color: #94a3b8;
+    }
+
+    /* Validation */
+    .trainee-error {
+        display: block;
+        margin-top: 6px;
+        color: #dc2626;
+        font-size: 12px;
+        min-height: 17px;
+    }
+
+    /* Footer */
+    .trainee-form-footer {
+        display: flex;
+        justify-content: flex-end;
+        align-items: center;
+        gap: 12px;
+        padding: 20px 30px;
+        background: #f8fafc;
+        border-top: 1px solid #e2e8f0;
+    }
+
+    /* Buttons */
+    .trainee-btn {
+        border: none;
+        border-radius: 8px;
+        height: 42px;
+        padding: 0 22px;
+        font-size: 14px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.2s ease;
+    }
+
+    .trainee-btn-primary {
+        color: #ffffff;
+        background: linear-gradient(135deg, #0d9488, #0f766e);
+        box-shadow: 0 4px 10px rgba(13, 148, 136, 0.18);
+    }
+
+    .trainee-btn-primary:hover {
+        background: linear-gradient(135deg, #0f766e, #115e59);
+        transform: translateY(-1px);
+        box-shadow: 0 6px 14px rgba(13, 148, 136, 0.22);
+    }
+
+    .trainee-btn-primary:disabled {
+        opacity: 0.7;
+        cursor: not-allowed;
+        transform: none;
+    }
+
+    /* Field icon */
+    .trainee-field-icon {
+        color: #0d9488;
+        margin-right: 5px;
+    }
+
+    /* Responsive */
+    @@media (max-width: 768px) {
+
+        .trainee-form-page {
+            padding: 20px 12px 40px;
+        }
+
+        .trainee-form-heading h2 {
+            font-size: 22px;
+        }
+
+        .trainee-form-card-header {
+            padding: 18px 20px;
+        }
+
+        .trainee-form-body {
+            padding: 22px 18px;
+        }
+
+        .trainee-form-footer {
+            padding: 16px 18px;
+        }
+    }
+
+    @@media (max-width: 480px) {
+
+        .trainee-form-heading {
+            margin-bottom: 16px;
+        }
+
+        .trainee-form-heading h2 {
+            font-size: 20px;
+        }
+
+        .trainee-form-card {
+            border-radius: 12px;
+        }
+
+        .trainee-form-card-header h3 {
+            font-size: 18px;
+        }
+
+        .trainee-form-body {
+            padding: 20px 15px;
+        }
+
+        .trainee-form-footer {
+            padding: 15px;
+        }
+
+        .trainee-btn {
+            width: 100%;
+        }
+    }
+</style>
+
+
+<div class="trainee-form-page">
+
+    <div class="trainee-form-wrapper">
+
+        <!-- PAGE HEADING -->
+        <div class="trainee-form-heading">
+
+            <h2>
+                <i class="fas fa-bullseye trainee-field-icon"></i>
+                Add Objective
+            </h2>
+
+            <p>
+                Create a new objective by selecting gender and entering the objective details.
+            </p>
+
         </div>
 
-        <div class="card-body">
 
-            <div class="mb-3">
-                <label for="nGenderID" class="form-label">
-                    Gender <span class="text-danger">*</span>
-                </label>
+        <!-- FORM CARD -->
+        <div class="trainee-form-card">
 
-                <select id="nGenderID" class="form-select">
-                    <option value="">-- Select Gender --</option>
-                    <option value="1">Male</option>
-                    <option value="2">Female</option>
-                </select>
+            <!-- HEADER -->
+            <div class="trainee-form-card-header">
 
-                <span id="genderError" class="text-danger"></span>
+                <h3>
+                    <i class="fas fa-plus-circle me-2"></i>
+                    Objective Details
+                </h3>
+
+                <p>
+                    Enter the required information below.
+                </p>
+
             </div>
 
 
-            <div class="mb-3">
-                <label for="sObjective" class="form-label">
-                    Objective <span class="text-danger">*</span>
-                </label>
+            <!-- BODY -->
+            <div class="trainee-form-body">
 
-                <textarea id="sObjective"
-                          class="form-control"
-                          rows="4"
-                          placeholder="Enter objective"></textarea>
+                <!-- Gender -->
+                <div class="trainee-form-group">
 
-                <span id="objectiveError" class="text-danger"></span>
+                    <label for="nGenderID" class="trainee-form-label">
+
+                        <i class="fas fa-venus-mars trainee-field-icon"></i>
+
+                        Gender
+
+                        <span class="required">*</span>
+
+                    </label>
+
+
+                    <select id="nGenderID"
+                            class="trainee-form-select">
+
+                        <option value="">
+                            -- Select Gender --
+                        </option>
+
+                        <option value="1">
+                            Male
+                        </option>
+
+                        <option value="2">
+                            Female
+                        </option>
+
+                    </select>
+
+
+                    <span id="genderError"
+                          class="trainee-error"></span>
+
+                </div>
+
+
+                <!-- Objective -->
+                <div class="trainee-form-group">
+
+                    <label for="sObjective" class="trainee-form-label">
+
+                        <i class="fas fa-align-left trainee-field-icon"></i>
+
+                        Objective
+
+                        <span class="required">*</span>
+
+                    </label>
+
+
+                    <textarea id="sObjective"
+                              class="trainee-form-textarea"
+                              rows="5"
+                              placeholder="Enter objective"></textarea>
+
+
+                    <span id="objectiveError"
+                          class="trainee-error"></span>
+
+                </div>
+
             </div>
 
 
-            <button type="button"
-                    id="btnAddObjective"
-                    class="btn btn-primary">
-                Add Objective
-            </button>
+            <!-- FOOTER -->
+            <div class="trainee-form-footer">
+
+                <button type="button"
+                        id="btnAddObjective"
+                        class="trainee-btn trainee-btn-primary">
+
+                    <i class="fas fa-save me-2"></i>
+
+                    Add Objective
+
+                </button>
+
+            </div>
 
         </div>
 
@@ -71,88 +395,96 @@
     <script>
 
         $("#btnAddObjective").click(function () {
-            debugger;
-        // Clear previous errors
-        $("#genderError").text("");
-        $("#objectiveError").text("");
 
-        var genderID = $("#nGenderID").val();
-        var objective = $("#sObjective").val().trim();
+            // Clear previous errors
+            $("#genderError").text("");
+            $("#objectiveError").text("");
 
-        var isValid = true;
+            var genderID = $("#nGenderID").val();
+            var objective = $("#sObjective").val().trim();
 
-
-        // Gender validation
-        if (genderID === "") {
-        $("#genderError").text("Please select gender.");
-        isValid = false;
-        }
+            var isValid = true;
 
 
-        // Objective validation
-        if (objective === "") {
-        $("#objectiveError").text("Please enter objective.");
-        isValid = false;
-        }
+            // Gender validation
+            if (genderID === "") {
+
+                $("#genderError").text("Please select gender.");
+
+                isValid = false;
+            }
 
 
-        if (!isValid) {
-        return;
-        }
+            // Objective validation
+            if (objective === "") {
+
+                $("#objectiveError").text("Please enter objective.");
+
+                isValid = false;
+            }
 
 
-        // Disable button
-        $("#btnAddObjective")
-        .prop("disabled", true)
-        .text("Saving...");
+            if (!isValid) {
+                return;
+            }
 
 
-        $.ajax({
+            // Disable button
+            $("#btnAddObjective")
+                .prop("disabled", true)
+                .html('<i class="fas fa-spinner fa-spin me-2"></i>Saving...');
 
-        url: '@Url.Action("AddObjective", "SuperAdmin")',
 
-        type: 'POST',
+            $.ajax({
 
-        data: {
-        nGenderID: parseInt(genderID),
-        sObjective: objective
-        },
+                url: '@Url.Action("AddObjective", "SuperAdmin")',
 
-        success: function (response) {
+                type: 'POST',
 
-        if (response.success) {
+                data: {
+                    nGenderID: parseInt(genderID),
+                    sObjective: objective
+                },
 
-        alert(response.message);
 
-        // Clear form
-        $("#nGenderID").val("");
-        $("#sObjective").val("");
+                success: function (response) {
 
-        }
-        else {
+                    if (response.success) {
 
-        alert(response.message);
+                        alert(response.message);
 
-        }
-        },
+                        // Clear form
+                        $("#nGenderID").val("");
+                        $("#sObjective").val("");
 
-        error: function (xhr) {
+                    }
+                    else {
 
-        console.log(xhr.responseText);
+                        alert(response.message);
 
-        alert("Something went wrong while saving objective.");
+                    }
 
-        },
+                },
 
-        complete: function () {
 
-        $("#btnAddObjective")
-        .prop("disabled", false)
-        .text("Add Objective");
+                error: function (xhr) {
 
-        }
+                    console.log(xhr.responseText);
 
-        });
+                    alert("Something went wrong while saving objective.");
+
+                },
+
+
+                complete: function () {
+
+                    $("#btnAddObjective")
+                        .prop("disabled", false)
+                        .html('<i class="fas fa-save me-2"></i>Add Objective');
+
+                }
+
+            });
 
         });
 
