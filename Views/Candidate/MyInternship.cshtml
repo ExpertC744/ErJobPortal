@@ -6,8 +6,19 @@
     ViewData["Title"] = "My Internship";
     ViewData["Panel"] = "Candidate";
     ViewData["UserName"] = "Candidate";
-}
 
+}
+<style>
+    .organization-name-link {
+        color: #2563eb;
+        font-weight: 600;
+        text-decoration: none;
+        cursor: pointer;
+    }
+
+        .organization-name-link:hover {
+            text-decoration: underline;
+        }</style>
 <div class="container-fluid">
 
 
@@ -76,7 +87,19 @@
 
                                 <!-- ORGANIZATION NAME -->
                                 <td>
-                                    @item.OrganizationName
+                                    @if (item.PostID > 0)
+                                    {
+                                        <a asp-controller="Candidate"
+                                           asp-action="ViewAppliedOrgPost"
+                                           asp-route-id="@item.PostID"
+                                           class="organization-name-link">
+                                            @item.OrganizationName
+                                        </a>
+                                    }
+                                    else
+                                    {
+                                        @item.OrganizationName
+                                    }
                                 </td>
 
                                 <!-- POSITION -->
