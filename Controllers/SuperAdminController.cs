@@ -554,6 +554,40 @@ namespace ErJobPortal.Controllers
         }
 
 
+        [HttpPost]
+        [Route("SuperAdmin/ToggleOrganizationSABit")]
+        public IActionResult ToggleOrganizationSABit(int id, bool status)
+        {
+            try
+            {
+                bool result = _repository.ToggleOrganizationSABit(id, status);
+
+                if (result)
+                {
+                    return Json(new
+                    {
+                        success = true,
+                        status = status
+                    });
+                }
+
+                return Json(new
+                {
+                    success = false,
+                    message = "Organization status could not be updated."
+                });
+            }
+            catch (Exception ex)
+            {
+                return Json(new
+                {
+                    success = false,
+                    message = ex.Message
+                });
+            }
+        }
+
+
         public IActionResult SAOrgProfileList(int? id, bool? status)
         {
             string connectionString =
@@ -587,14 +621,14 @@ namespace ErJobPortal.Controllers
                     OP.dDateOfBirth,
                     OP.nEstablishmentYear,
                     OP.dCreatedDate,
-                    OP.nBit
+                    OP.nSABit
 
                 FROM tblOrgProfile OP
 
                 INNER JOIN tblOrgRegistration ORG
                     ON OP.nOrgID = ORG.nID
 
-                WHERE ORG.nBit = 1
+                WHERE ORG.nSABit = 1
 
                 ORDER BY OP.nID DESC";
 
@@ -670,9 +704,9 @@ namespace ErJobPortal.Controllers
                                         ? Convert.ToInt32(reader["nEstablishmentYear"])
                                         : null,
 
-                                    nBit =
-                                        reader["nBit"] != DBNull.Value &&
-                                        Convert.ToBoolean(reader["nBit"])
+                                    nSABit =
+                                        reader["nSABit"] != DBNull.Value &&
+                                        Convert.ToBoolean(reader["nSABit"])
                                 });
                             }
                         }
@@ -719,14 +753,14 @@ namespace ErJobPortal.Controllers
                     OP.dDateOfBirth,
                     OP.nEstablishmentYear,
                     OP.dCreatedDate,
-                    OP.nBit
+                    OP.nSABit
 
                 FROM tblOrgProfile OP
 
                 INNER JOIN tblOrgRegistration ORG
                     ON OP.nOrgID = ORG.nID
 
-                WHERE ORG.nBit = 1
+                WHERE ORG.nSABit = 1
 
                 ORDER BY OP.nID DESC";
 
@@ -802,9 +836,9 @@ namespace ErJobPortal.Controllers
                                             ? Convert.ToInt32(reader["nEstablishmentYear"])
                                             : null,
 
-                                    nBit =
-                                        reader["nBit"] != DBNull.Value &&
-                                        Convert.ToBoolean(reader["nBit"])
+                                    nSABit =
+                                        reader["nSABit"] != DBNull.Value &&
+                                        Convert.ToBoolean(reader["nSABit"])
                                 });
                             }
                         }
@@ -1482,13 +1516,13 @@ namespace ErJobPortal.Controllers
                 {
                     string query = @"
                 UPDATE tblOrgProfile
-                SET nBit = @nBit
+                SET nSABit = @nSABit
                 WHERE nID = @nID
             ";
 
                     using (SqlCommand cmd = new SqlCommand(query, con))
                     {
-                        cmd.Parameters.Add("@nBit", SqlDbType.Bit).Value = status;
+                        cmd.Parameters.Add("@nSABit", SqlDbType.Bit).Value = status;
                         cmd.Parameters.Add("@nID", SqlDbType.Int).Value = id;
 
                         con.Open();
@@ -2542,14 +2576,93 @@ namespace ErJobPortal.Controllers
 
         [HttpGet]
         [Route("SuperAdmin/CandidateFeedback/{id:int}")]
+        //        public IActionResult CandidateFeedback()
+        //        {
+        //            List<SACandidateFeedbackM> feedbackList = new List<SACandidateFeedbackM>();
+
+        //            string connectionString =
+        //                _configuration.GetConnectionString("DefaultConnection");
+
+        //            using (SqlConnection con = new SqlConnection(connectionString))
+        //            {
+        //                con.Open();
+
+        //                string query = @"
+        //WITH LatestFeedback AS
+        //(
+        //    SELECT
+        //        CF.nID AS FeedbackID,
+        //        CF.nAdminID,
+        //        CF.nSABit,
+        //        ROW_NUMBER() OVER
+        //        (
+        //            PARTITION BY CF.nAdminID
+        //            ORDER BY CF.nID DESC
+        //        ) AS RowNum
+        //    FROM tblCandidateFeedback CF
+        //)
+
+        //SELECT
+        //    CR.nID,
+        //    CR.sFName,
+        //    CR.sLName,
+        //    LF.FeedbackID,
+        //    LF.nAdminID,
+        //    ISNULL(LF.nSABit, 0) AS nSABit
+
+        //FROM tblCandidateRegister CR
+
+        //INNER JOIN LatestFeedback LF
+        //    ON CR.nID = LF.nAdminID
+
+        //WHERE LF.RowNum = 1
+
+        //ORDER BY LF.FeedbackID DESC";
+
+        //                using (SqlCommand cmd = new SqlCommand(query, con))
+        //                {
+        //                    using (SqlDataReader dr = cmd.ExecuteReader())
+        //                    {
+        //                        while (dr.Read())
+        //                        {
+        //                            SACandidateFeedbackM model = new SACandidateFeedbackM();
+
+        //                            model.nID = Convert.ToInt32(dr["nID"]);
+        //                            model.sFName = dr["sFName"]?.ToString();
+        //                            model.sLName = dr["sLName"]?.ToString();
+
+        //                            if (dr["nAdminID"] != DBNull.Value)
+        //                            {
+        //                                model.nAdminID = Convert.ToInt32(dr["nAdminID"]);
+        //                            }
+
+        //                            model.nSABit = Convert.ToInt32(dr["nSABit"]);
+
+        //                            model.Status =
+        //                                model.nSABit == 1 ? "Enabled" : "Disabled";
+
+        //                            feedbackList.Add(model);
+        //                        }
+        //                    }
+        //                }
+        //            }
+
+        //            return View(feedbackList);
+        //        }
+
+
+        [HttpGet]
+        [Route("SuperAdmin/CandidateFeedback")]
         public IActionResult CandidateFeedback()
         {
-            List<SACandidateFeedbackM> feedbackList = new List<SACandidateFeedbackM>();
+            List<SACandidateFeedbackM> feedbackList =
+                new List<SACandidateFeedbackM>();
 
             string connectionString =
                 _configuration.GetConnectionString("DefaultConnection");
 
-            using (SqlConnection con = new SqlConnection(connectionString))
+            using (SqlConnection con =
+                   new SqlConnection(connectionString))
             {
                 con.Open();
 
@@ -2560,11 +2673,13 @@ WITH LatestFeedback AS
         CF.nID AS FeedbackID,
         CF.nAdminID,
         CF.nSABit,
+
         ROW_NUMBER() OVER
         (
             PARTITION BY CF.nAdminID
             ORDER BY CF.nID DESC
         ) AS RowNum
+
     FROM tblCandidateFeedback CF
 )
 
@@ -2572,8 +2687,10 @@ SELECT
     CR.nID,
     CR.sFName,
     CR.sLName,
+
     LF.FeedbackID,
     LF.nAdminID,
+
     ISNULL(LF.nSABit, 0) AS nSABit
 
 FROM tblCandidateRegister CR
@@ -2585,27 +2702,59 @@ WHERE LF.RowNum = 1
 
 ORDER BY LF.FeedbackID DESC";
 
-                using (SqlCommand cmd = new SqlCommand(query, con))
+
+                using (SqlCommand cmd =
+                       new SqlCommand(query, con))
                 {
-                    using (SqlDataReader dr = cmd.ExecuteReader())
+                    using (SqlDataReader dr =
+                           cmd.ExecuteReader())
                     {
                         while (dr.Read())
                         {
-                            SACandidateFeedbackM model = new SACandidateFeedbackM();
+                            SACandidateFeedbackM model =
+                                new SACandidateFeedbackM();
 
-                            model.nID = Convert.ToInt32(dr["nID"]);
-                            model.sFName = dr["sFName"]?.ToString();
-                            model.sLName = dr["sLName"]?.ToString();
 
+                            // Candidate ID
+                            model.nID =
+                                Convert.ToInt32(
+                                    dr["nID"]);
+
+
+                            // Candidate Name
+                            model.sFName =
+                                dr["sFName"]?.ToString();
+
+                            model.sLName =
+                                dr["sLName"]?.ToString();
+
+
+                            // Actual Feedback ID
+                            model.FeedbackID =
+                                Convert.ToInt32(
+                                    dr["FeedbackID"]);
+
+
+                            // Candidate ID stored in feedback
                             if (dr["nAdminID"] != DBNull.Value)
                             {
-                                model.nAdminID = Convert.ToInt32(dr["nAdminID"]);
+                                model.nAdminID =
+                                    Convert.ToInt32(
+                                        dr["nAdminID"]);
                             }
 
-                            model.nSABit = Convert.ToInt32(dr["nSABit"]);
+
+                            // Super Admin status
+                            model.nSABit =
+                                Convert.ToInt32(
+                                    dr["nSABit"]);
+
 
                             model.Status =
-                                model.nSABit == 1 ? "Enabled" : "Disabled";
+                                model.nSABit == 1
+                                ? "Enabled"
+                                : "Disabled";
+
 
                             feedbackList.Add(model);
                         }
@@ -2615,34 +2764,47 @@ ORDER BY LF.FeedbackID DESC";
 
             return View(feedbackList);
         }
-
         //Enable / Disable Method
         [HttpPost]
         [ValidateAntiForgeryToken]
+       
         public IActionResult ToggleCandidateFeedback(int id)
         {
             string connectionString =
-                _configuration.GetConnectionString("DefaultConnection");
+                _configuration.GetConnectionString(
+                    "DefaultConnection");
 
-            using (SqlConnection con = new SqlConnection(connectionString))
+            using (SqlConnection con =
+                   new SqlConnection(connectionString))
             {
                 con.Open();
 
                 string query = @"
-     UPDATE tblCandidateFeedback
-     SET
-         nSABit = CASE
-                     WHEN ISNULL(nSABit, 0) = 1 THEN 0
-                     ELSE 1
-                  END,
-         ModDate = GETDATE()
-     WHERE nAdminID = @id";
+            UPDATE tblCandidateFeedback
+            SET
+                nSABit =
+                    CASE
+                        WHEN ISNULL(nSABit, 0) = 1
+                            THEN 0
+                        ELSE 1
+                    END,
 
-                using (SqlCommand cmd = new SqlCommand(query, con))
+                ModDate = GETDATE()
+
+            WHERE nID = @FeedbackID";
+
+
+                using (SqlCommand cmd =
+                       new SqlCommand(query, con))
                 {
-                    cmd.Parameters.Add("@id", SqlDbType.Int).Value = id;
+                    cmd.Parameters.Add(
+                        "@FeedbackID",
+                        SqlDbType.Int).Value = id;
 
-                    int result = cmd.ExecuteNonQuery();
+
+                    int result =
+                        cmd.ExecuteNonQuery();
+
 
                     if (result == 0)
                     {
@@ -3320,14 +3482,14 @@ ORDER BY SAF.nID DESC, OFB.nID DESC;
                                 dr["sFacilities"]?.ToString() ?? "";
 
                             item.dRegisterDate =
-    dr["dRegisterDate"] == DBNull.Value
-        ? DateTime.MinValue
-        : Convert.ToDateTime(dr["dRegisterDate"]);
+                                dr["dRegisterDate"] == DBNull.Value
+                                    ? DateTime.MinValue
+                                    : Convert.ToDateTime(dr["dRegisterDate"]);
 
-                            item.dModDate =
-    dr["dModDate"] == DBNull.Value
-        ? DateTime.MinValue
-        : Convert.ToDateTime(dr["dModDate"]);
+                                                        item.dModDate =
+                                dr["dModDate"] == DBNull.Value
+                                ? DateTime.MinValue
+                                : Convert.ToDateTime(dr["dModDate"]);
 
                             item.nBit =
                                 dr["nBit"] != DBNull.Value &&
@@ -3351,6 +3513,29 @@ ORDER BY SAF.nID DESC, OFB.nID DESC;
             return View(posts);
         }
 
+        // khushi 03-10-26
+        [HttpPost]
+        [Route("SuperAdmin/ToggleSAAllOrganizationPostStatus")]
+        public void ToggleSAAllOrganizationPostStatus(int id)
+        {
+            using (SqlConnection con = new SqlConnection(
+                _configuration.GetConnectionString("DefaultConnection")))
+            {
+                using (SqlCommand cmd = new SqlCommand(@"
+      UPDATE tblPost
+      SET nBit = CASE
+                  WHEN ISNULL(nBit, 0) = 1 THEN 0
+                  ELSE 1
+                 END
+      WHERE nID = @nID", con))
+                {
+                    cmd.Parameters.Add("@nID", SqlDbType.Int).Value = id;
+
+                    con.Open();
+                    cmd.ExecuteNonQuery();
+                }
+            }
+        }
 
 
         public IActionResult ViewOrgPost(int id)

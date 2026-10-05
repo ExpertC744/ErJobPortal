@@ -272,3 +272,81 @@
 
 </div>
 
+    <script>
+
+    function togglePostStatus(button) {
+
+        var id = button.getAttribute("data-id");
+
+        if (!id) {
+            alert("Post ID not found.");
+            return;
+        }
+
+        // Current status
+        var currentStatus = button.classList.contains("enabled");
+
+        // Confirmation message
+        var message = currentStatus
+            ? "Are you sure you want to disable this post?"
+            : "Are you sure you want to enable this post?";
+
+        // Ask confirmation
+        if (!window.confirm(message)) {
+            return;
+        }
+
+        // Prevent double click
+        button.disabled = true;
+
+        fetch('/SuperAdmin/ToggleSAAllOrganizationPostStatus?id=' + encodeURIComponent(id), {
+            method: 'POST'
+        })
+        .then(response => {
+
+            if (!response.ok) {
+                throw new Error("Server returned HTTP " + response.status);
+            }
+
+            // Don't call response.json()
+            return response;
+
+        })
+        .then(() => {
+
+            // Toggle button after successful request
+            if (currentStatus) {
+
+                button.textContent = "Disabled";
+
+                button.classList.remove("enabled");
+                button.classList.add("disabled");
+
+            }
+            else {
+
+                button.textContent = "Enabled";
+
+                button.classList.remove("disabled");
+                button.classList.add("enabled");
+
+            }
+
+        })
+        .catch(error => {
+
+            console.error("Post status error:", error);
+
+            alert("Something went wrong while updating post status.");
+
+        })
+        .finally(() => {
+
+            button.disabled = false;
+
+        });
+
+    }
+
+</script>
+
