@@ -3351,6 +3351,29 @@ ORDER BY SAF.nID DESC, OFB.nID DESC;
             return View(posts);
         }
 
+        // khushi 03-10-26
+        [HttpPost]
+        [Route("SuperAdmin/ToggleSAAllOrganizationPostStatus")]
+        public void ToggleSAAllOrganizationPostStatus(int id)
+        {
+            using (SqlConnection con = new SqlConnection(
+                _configuration.GetConnectionString("DefaultConnection")))
+            {
+                using (SqlCommand cmd = new SqlCommand(@"
+      UPDATE tblPost
+      SET nBit = CASE
+                  WHEN ISNULL(nBit, 0) = 1 THEN 0
+                  ELSE 1
+                 END
+      WHERE nID = @nID", con))
+                {
+                    cmd.Parameters.Add("@nID", SqlDbType.Int).Value = id;
+
+                    con.Open();
+                    cmd.ExecuteNonQuery();
+                }
+            }
+        }
 
 
         public IActionResult ViewOrgPost(int id)
@@ -3671,6 +3694,7 @@ ORDER BY SAF.nID DESC, OFB.nID DESC;
             };
 
             return View(model);
+
         }
 
         [HttpGet]

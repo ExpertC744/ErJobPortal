@@ -801,3 +801,34 @@ table.master-data-table {
     .master-back-btn i {
         line-height: 1;
     }
+
+.master-status {
+    border: none;
+    outline: none;
+    padding: 7px 16px;
+    border-radius: 20px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    min-width: 82px;
+    text-align: center;
+    transition: all 0.2s ease;
+}
+
+    /* Enabled - Teal Green */
+    .master-status.enabled {
+        background: #198f7a;
+        color: #fff;
+        border: 1px solid #198f7a;
+    }
+
+    /* Disabled - Red */
+    .master-status.disabled {
+        background: #dc3545;
+        color: #fff;
+        border: 1px solid #dc3545;
+    }
+
+    .master-status:hover {
+        opacity: 0.9;
+    }

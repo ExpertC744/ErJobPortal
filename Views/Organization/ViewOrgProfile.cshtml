@@ -1,6 +1,160 @@
-﻿@{
+﻿@model ErJobPortal.Models.OrgProfile
+
+@{
     ViewData["Title"] = "View Organization Profile";
     Layout = null;
+
+    // =====================================================
+    // ORGANIZATION DATA
+    // =====================================================
+
+    string organizationName =
+        string.IsNullOrWhiteSpace(Model?.sOrganizationName)
+            ? "-"
+            : Model.sOrganizationName;
+
+    string contactName =
+        string.IsNullOrWhiteSpace(Model?.sOrganizationName)
+            ? "-"
+            : Model.sOrganizationName;
+
+    string designation =
+        string.IsNullOrWhiteSpace(Model?.sDesignation)
+            ? "-"
+            : Model.sDesignation;
+
+    string email =
+        string.IsNullOrWhiteSpace(Model?.sOrganizationEmail)
+            ? "-"
+            : Model.sOrganizationEmail;
+
+    string mobile =
+        string.IsNullOrWhiteSpace(Model?.sMobile)
+            ? "-"
+            : Model.sMobile;
+
+
+    // =====================================================
+    // PROFILE DATA
+    // =====================================================
+
+    string companyAddress =
+        string.IsNullOrWhiteSpace(Model?.sCompanyAddress)
+            ? "-"
+            : Model.sCompanyAddress;
+
+    string establishmentYear =
+        Model?.nEstablishmentYear > 0
+            ? Model.nEstablishmentYear.ToString()
+            : "-";
+
+    string gstNo =
+        string.IsNullOrWhiteSpace(Model?.sGSTNo)
+            ? "-"
+            : Model.sGSTNo;
+
+    string cinNo =
+        string.IsNullOrWhiteSpace(Model?.sCINNo)
+            ? "-"
+            : Model.sCINNo;
+
+    string employeeStrength =
+        string.IsNullOrWhiteSpace(Model?.nEmployeeStrength)
+            ? "-"
+            : Model.nEmployeeStrength;
+
+
+    // =====================================================
+    // DATE OF BIRTH
+    // =====================================================
+
+    string dateOfBirth =
+        Model?.dDateOfBirth.HasValue == true
+            ? Model.dDateOfBirth.Value.ToString("dd-MM-yyyy")
+            : "-";
+
+
+    // =====================================================
+    // CREATED DATE
+    // =====================================================
+
+    string createdDate =
+        Model?.dCreatedDate != DateTime.MinValue
+            ? Model.dCreatedDate.ToString("dd-MM-yyyy")
+            : "-";
+
+
+    // =====================================================
+    // MODIFIED DATE
+    // =====================================================
+
+    string modifiedDate =
+        Model?.dModifiedDate.HasValue == true
+            ? Model.dModifiedDate.Value.ToString("dd-MM-yyyy")
+            : "-";
+
+
+    // =====================================================
+    // ORGANIZATION ID
+    // =====================================================
+
+    string organizationId =
+        Model?.nOrgID > 0
+            ? Model.nOrgID.ToString()
+            : "-";
+
+
+    // =====================================================
+    // PROFILE ID
+    // =====================================================
+
+    string profileId =
+        Model?.nID > 0
+            ? Model.nID.ToString()
+            : "-";
+
+
+    // =====================================================
+    // STATUS
+    // =====================================================
+
+    string profileStatus =
+        Model?.nBit == true
+            ? "Active"
+            : "Inactive";
+
+
+    // =====================================================
+    // SUPER ADMIN STATUS
+    // =====================================================
+
+    string saStatus =
+        Model?.nSABit == true
+            ? "Approved"
+            : "Not Approved";
+
+
+    // =====================================================
+    // DYNAMIC LOGO
+    // =====================================================
+
+    string logoPath;
+
+    if (!string.IsNullOrWhiteSpace(Model?.sCompanyLogo))
+    {
+        logoPath =
+            Url.Content(
+                "~/uploads/organization/" +
+                Model.sCompanyLogo
+            );
+    }
+    else
+    {
+        logoPath =
+            Url.Content(
+                "~/images/it-networkz-logo.png"
+            );
+    }
 }
 
 <!DOCTYPE html>
@@ -13,6 +167,7 @@
     <link rel="stylesheet"
           href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
     <link href="~/css/vieworgprofile.css" rel="stylesheet" />
+
 </head>
 
 <body>
@@ -39,8 +194,92 @@
             <!-- ================= IDENTITY ================= -->
             <section class="organization-section">
 
+
+
+                <div class="organization-main">
+
+
+                    <!-- ORGANIZATION LOGO -->
+
+                    <div class="organization-logo">
+
+                        <img src="@logoPath"
+                             alt="@organizationName Logo" />
+
+                    </div>
+
+
+                    <!-- ORGANIZATION INFORMATION -->
+
+                    <div class="organization-info">
+
+
+                        <div class="organization-name">
+
+                            @organizationName
+
+
+                            <span class="verified-icon"
+                                  title="Verified Organization">
+
+                                <i class="fa-solid fa-check"></i>
+
+                            </span>
+
+
+                        </div>
+
+
+                        <div class="organization-meta">
+
+
+                            <span>
+
+                                <i class="fa-solid fa-building"></i>
+
+                                Organization
+
+                            </span>
+
+
+                            <span class="meta-dot">
+                                •
+                            </span>
+
+
+                            <span>
+
+                                <i class="fa-solid fa-location-dot"></i>
+
+                                @companyAddress
+
+                            </span>
+
+
+                            <span class="meta-dot">
+                                •
+                            </span>
+
+
+                            <span>
+
+                                <i class="fa-solid fa-globe"></i>
+
+                                1Trainee
+
+                            </span>
+
+
+                        </div>
+
+
+                    </div>
+
+
+
                 <div class="organization-logo">
                     <img src="~/images/it-networkz-logo.png" alt="IT-NetworkZ Infosystems Pvt Ltd Logo" />
+
                 </div>
 
                 <h1 class="organization-name">IT-NetworkZ Infosystems Pvt Ltd</h1>
@@ -65,67 +304,321 @@
                 <div class="information-grid">
 
                     <div class="information-card">
+
+
+
+                        <div class="information-top">
+
+
+                            <div class="information-icon">
+
+                                <i class="fa-solid fa-user"></i>
+
+                            </div>
+
+
+                            <div class="information-label">
+
+                                Contact Person Name
+
+                            </div>
+
+
+                        </div>
+
+
+                        <div class="information-value">
+
+                            @contactName
+
+                        </div>
+
+
+
                         <div class="information-icon"><i class="fa-solid fa-user"></i></div>
                         <div class="information-text">
                             <div class="information-label">Contact Person</div>
                             <div class="information-value">Harshada Girhe</div>
                         </div>
+
                     </div>
 
                     <div class="information-card">
+
+
+                        <div class="information-top">
+
+
+                            <div class="information-icon">
+
+                                <i class="fa-solid fa-briefcase"></i>
+
+                            </div>
+
+
+                            <div class="information-label">
+
+                                Designation
+
+                            </div>
+
+
+                        </div>
+
+
+                        <div class="information-value">
+
+                            @designation
+
+                        </div>
+
+
+
                         <div class="information-icon"><i class="fa-solid fa-briefcase"></i></div>
                         <div class="information-text">
                             <div class="information-label">Designation</div>
                             <div class="information-value">HRM</div>
                         </div>
+
                     </div>
 
                     <div class="information-card">
+
+
+
+                        <div class="information-top">
+
+
+                            <div class="information-icon">
+
+                                <i class="fa-solid fa-location-dot"></i>
+
+                            </div>
+
+
+                            <div class="information-label">
+
+                                Company Address
+
+                            </div>
+
+
+                        </div>
+
+
+                        <div class="information-value">
+
+                            @companyAddress
+
+                        </div>
+
+
                         <div class="information-icon"><i class="fa-solid fa-location-dot"></i></div>
                         <div class="information-text">
                             <div class="information-label">Company Address</div>
                             <div class="information-value">Laxmi Nagar, Nagpur</div>
                         </div>
+
                     </div>
 
                     <div class="information-card">
+
+
+
+                        <div class="information-top">
+
+
+                            <div class="information-icon">
+
+                                <i class="fa-solid fa-calendar-days"></i>
+
+                            </div>
+
+
+                            <div class="information-label">
+
+                                Establishment Year
+
+                            </div>
+
+
+                        </div>
+
+
+                        <div class="information-value">
+
+                            @establishmentYear
+
+                        </div>
+
+
+
                         <div class="information-icon"><i class="fa-solid fa-calendar-days"></i></div>
                         <div class="information-text">
                             <div class="information-label">Established</div>
                             <div class="information-value">2007</div>
                         </div>
+
                     </div>
 
                     <div class="information-card">
+
+
+
+                        <div class="information-top">
+
+
+                            <div class="information-icon">
+
+                                <i class="fa-solid fa-envelope"></i>
+
+                            </div>
+
+
+                            <div class="information-label">
+
+                                Verification Email
+
+                            </div>
+
+
+                        </div>
+
+
+                        <div class="information-value">
+
+                            @email
+
+                        </div>
+
+
+
                         <div class="information-icon"><i class="fa-solid fa-envelope"></i></div>
                         <div class="information-text">
                             <div class="information-label">Verification Email</div>
                             <div class="information-value">contact@it-networkz.com</div>
                         </div>
+
                     </div>
 
                     <div class="information-card">
+
+
+
+                        <div class="information-top">
+
+
+                            <div class="information-icon">
+
+                                <i class="fa-solid fa-file-invoice"></i>
+
+                            </div>
+
+
+                            <div class="information-label">
+
+                                GST No.
+
+                            </div>
+
+
+                        </div>
+
+
+                        <div class="information-value">
+
+                            @gstNo
+
+                        </div>
+
+
+
                         <div class="information-icon"><i class="fa-solid fa-users"></i></div>
                         <div class="information-text">
                             <div class="information-label">Employee Strength</div>
                             <div class="information-value">11-100</div>
                         </div>
+
                     </div>
 
                     <div class="information-card">
+
+
+
+                        <div class="information-top">
+
+
+                            <div class="information-icon">
+
+                                <i class="fa-solid fa-file-lines"></i>
+
+                            </div>
+
+
+                            <div class="information-label">
+
+                                CIN No.
+
+                            </div>
+
+
+                        </div>
+
+
+                        <div class="information-value">
+
+                            @cinNo
+
+                        </div>
+
+
+
                         <div class="information-icon"><i class="fa-solid fa-file-invoice"></i></div>
                         <div class="information-text">
                             <div class="information-label">GST No.</div>
                             <div class="information-value">27AADCI8640L1Z6</div>
                         </div>
+
                     </div>
 
                     <div class="information-card">
+
+
+
+                        <div class="information-top">
+
+
+                            <div class="information-icon">
+
+                                <i class="fa-solid fa-users"></i>
+
+                            </div>
+
+
+                            <div class="information-label">
+
+                                Current Employee Strength
+
+                            </div>
+
+
+                        </div>
+
+
+                        <div class="information-value">
+
+                            @employeeStrength
+
+                        </div>
+
+
+
                         <div class="information-icon"><i class="fa-solid fa-file-lines"></i></div>
                         <div class="information-text">
                             <div class="information-label">CIN No.</div>
                             <div class="information-value">U72200MH2015PTC266007</div>
                         </div>
+
                     </div>
 
                 </div>
@@ -141,10 +634,37 @@
     </main>
 
     <script>
+
+
+        function goHome() {
+
+            window.location.href = "/";
+
+        }
+
+
+        function printProfile() {
+
+            window.print();
+
+        }
+
+
+        function downloadProfile() {
+
+            window.print();
+
+        }
+
+
         function goHome() { window.location.href = "/"; }
         function printProfile() { window.print(); }
         function downloadProfile() { window.print(); } // choose "Save as PDF" in the print dialog
     </script>
 
 </body>
+
+
+
 </html>
+

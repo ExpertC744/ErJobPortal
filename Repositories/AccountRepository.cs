@@ -2070,5 +2070,794 @@ public OrganizationLogin? GetOrganizationLoginDetails(string email)
 
             return model;
         }
+
+        // shrirang 05/10/26
+        // shrirang 05/10/26
+        // shrirang 05/10/26
+        // =========================================================
+        // INSERT SUB TPO
+        // =========================================================
+
+        public bool InsertSubTPO(TPORegistration model)
+        {
+            using (SqlConnection cn = _db.GetConnection())
+            {
+                string query = @"
+            INSERT INTO tblTPORegistration
+            (
+                FullName,
+                CollegeMailID,
+                MobileNo,
+                PasswordHash,
+                CollegeName,
+                CollegeCode,
+                CollegeAddress,
+                OrganizationWebsiteURL,
+                Designation,
+                DepartmentName,
+                CollegeEmployeeID,
+                SupportingDocument1,
+                SupportingDocument2,
+                ProfilePhoto,
+                OTP,
+                OTPVerified,
+                Status,
+                IsApproved,
+                IsActive,
+                CreatedDate,
+                UpdatedDate,
+                subtopbit
+            )
+            VALUES
+            (
+                @FullName,
+                @CollegeMailID,
+                @MobileNo,
+                @PasswordHash,
+                @CollegeName,
+                @CollegeCode,
+                @CollegeAddress,
+                @OrganizationWebsiteURL,
+                @Designation,
+                @DepartmentName,
+                @CollegeEmployeeID,
+                @SupportingDocument1,
+                @SupportingDocument2,
+                @ProfilePhoto,
+                @OTP,
+                @OTPVerified,
+                @Status,
+                @IsApproved,
+                @IsActive,
+                GETDATE(),
+                GETDATE(),
+                1
+            )";
+
+                using (SqlCommand cmd =
+                       new SqlCommand(query, cn))
+                {
+                    cmd.Parameters.AddWithValue(
+                        "@FullName",
+                        model.FullName ?? "");
+
+                    cmd.Parameters.AddWithValue(
+                        "@CollegeMailID",
+                        model.CollegeMailID ?? "");
+
+                    cmd.Parameters.AddWithValue(
+                        "@MobileNo",
+                        model.MobileNo ?? "");
+
+                    // =====================================================
+                    // PASSWORD
+                    // =====================================================
+
+                    cmd.Parameters.AddWithValue(
+                        "@PasswordHash",
+                        model.Password ?? "");
+
+                    // =====================================================
+                    // COLLEGE
+                    // =====================================================
+
+                    cmd.Parameters.AddWithValue(
+                        "@CollegeName",
+                        model.CollegeName ?? "");
+
+                    cmd.Parameters.AddWithValue(
+                        "@CollegeCode",
+                        model.CollegeCode ?? "");
+
+                    cmd.Parameters.AddWithValue(
+                        "@CollegeAddress",
+                        model.CollegeAddress ?? "");
+
+                    cmd.Parameters.AddWithValue(
+                        "@OrganizationWebsiteURL",
+                        string.IsNullOrWhiteSpace(
+                            model.OrganizationWebsiteURL)
+                            ? (object)DBNull.Value
+                            : model.OrganizationWebsiteURL);
+
+                    // =====================================================
+                    // PROFESSIONAL
+                    // =====================================================
+
+                    cmd.Parameters.AddWithValue(
+                        "@Designation",
+                        model.Designation ?? "");
+
+                    cmd.Parameters.AddWithValue(
+                        "@DepartmentName",
+                        model.DepartmentName ?? "");
+
+                    cmd.Parameters.AddWithValue(
+                        "@CollegeEmployeeID",
+                        model.CollegeEmployeeID ?? "");
+
+                    // =====================================================
+                    // DOCUMENTS
+                    // =====================================================
+
+                    cmd.Parameters.AddWithValue(
+                        "@SupportingDocument1",
+                        string.IsNullOrWhiteSpace(
+                            model.SupportingDocument1)
+                            ? (object)DBNull.Value
+                            : model.SupportingDocument1);
+
+                    cmd.Parameters.AddWithValue(
+                        "@SupportingDocument2",
+                        string.IsNullOrWhiteSpace(
+                            model.SupportingDocument2)
+                            ? (object)DBNull.Value
+                            : model.SupportingDocument2);
+
+                    cmd.Parameters.AddWithValue(
+                        "@ProfilePhoto",
+                        string.IsNullOrWhiteSpace(
+                            model.ProfilePhoto)
+                            ? (object)DBNull.Value
+                            : model.ProfilePhoto);
+
+                    // =====================================================
+                    // OTP
+                    // =====================================================
+
+                    cmd.Parameters.AddWithValue(
+                        "@OTP",
+                        string.IsNullOrWhiteSpace(model.OTP)
+                            ? (object)DBNull.Value
+                            : model.OTP);
+
+                    cmd.Parameters.AddWithValue(
+                        "@OTPVerified",
+                        model.OTPVerified);
+
+                    // =====================================================
+                    // APPROVAL
+                    // =====================================================
+
+                    cmd.Parameters.AddWithValue(
+                        "@Status",
+                        string.IsNullOrWhiteSpace(model.Status)
+                            ? "Pending"
+                            : model.Status);
+
+                    cmd.Parameters.AddWithValue(
+                        "@IsApproved",
+                        model.IsApproved);
+
+                    cmd.Parameters.AddWithValue(
+                        "@IsActive",
+                        model.IsActive);
+
+                    // =====================================================
+                    // EXECUTE
+                    // =====================================================
+
+                    cn.Open();
+
+                    return cmd.ExecuteNonQuery() > 0;
+                }
+            }
+        }
+
+
+
+        //public List<TPORegistration> GetAllTPODetails()
+        //{
+        //    List<TPORegistration> list = new List<TPORegistration>();
+
+        //    using (SqlConnection cn = _db.GetConnection())
+        //    {
+        //        string query = @"
+        //    SELECT
+        //        TPOID,
+        //        FullName,
+        //        CollegeMailID,
+        //        MobileNo,
+        //        CollegeName,
+        //        CollegeCode,
+        //        CollegeAddress,
+        //        OrganizationWebsiteURL,
+        //        Designation,
+        //        DepartmentName,
+        //        CollegeEmployeeID,
+        //        SupportingDocument1,
+        //        SupportingDocument2,
+        //        ProfilePhoto,
+        //        OTP,
+        //        OTPVerified,
+        //        Status,
+        //        IsApproved,
+        //        IsActive,
+        //        CreatedDate,
+        //        UpdatedDate,
+
+        //        CASE
+        //            WHEN ISNULL(subtopbit, 0) = 1
+        //                THEN 'Sub TPO'
+        //            ELSE 'TPO'
+        //        END AS TPOType
+
+        //    FROM tblTPORegistration
+        //    ORDER BY TPOID ASC";
+
+        //        using (SqlCommand cmd = new SqlCommand(query, cn))
+        //        {
+        //            cn.Open();
+
+        //            using (SqlDataReader reader = cmd.ExecuteReader())
+        //            {
+        //                while (reader.Read())
+        //                {
+        //                    TPORegistration tpo = new TPORegistration
+        //                    {
+        //                        TPOID =
+        //                            Convert.ToInt32(reader["TPOID"]),
+
+        //                        FullName =
+        //                            reader["FullName"]?.ToString(),
+
+        //                        CollegeMailID =
+        //                            reader["CollegeMailID"]?.ToString(),
+
+        //                        MobileNo =
+        //                            reader["MobileNo"]?.ToString(),
+
+        //                        CollegeName =
+        //                            reader["CollegeName"]?.ToString(),
+
+        //                        CollegeCode =
+        //                            reader["CollegeCode"]?.ToString(),
+
+        //                        CollegeAddress =
+        //                            reader["CollegeAddress"]?.ToString(),
+
+        //                        OrganizationWebsiteURL =
+        //                            reader["OrganizationWebsiteURL"]?.ToString(),
+
+        //                        Designation =
+        //                            reader["Designation"]?.ToString(),
+
+        //                        DepartmentName =
+        //                            reader["DepartmentName"]?.ToString(),
+
+        //                        CollegeEmployeeID =
+        //                            reader["CollegeEmployeeID"]?.ToString(),
+
+        //                        SupportingDocument1 =
+        //                            reader["SupportingDocument1"]?.ToString(),
+
+        //                        SupportingDocument2 =
+        //                            reader["SupportingDocument2"]?.ToString(),
+
+        //                        ProfilePhoto =
+        //                            reader["ProfilePhoto"]?.ToString(),
+
+        //                        OTP =
+        //                            reader["OTP"]?.ToString(),
+
+        //                        OTPVerified =
+        //                            reader["OTPVerified"] != DBNull.Value &&
+        //                            Convert.ToBoolean(reader["OTPVerified"]),
+
+        //                        Status =
+        //                            reader["Status"]?.ToString(),
+
+        //                        IsApproved =
+        //                            reader["IsApproved"] != DBNull.Value &&
+        //                            Convert.ToBoolean(reader["IsApproved"]),
+
+        //                        IsActive =
+        //                            reader["IsActive"] != DBNull.Value &&
+        //                            Convert.ToBoolean(reader["IsActive"]),
+
+        //                        CreatedDate =
+        //                            reader["CreatedDate"] == DBNull.Value
+        //                                ? null
+        //                                : Convert.ToDateTime(reader["CreatedDate"]),
+
+        //                        UpdatedDate =
+        //                            reader["UpdatedDate"] == DBNull.Value
+        //                                ? null
+        //                                : Convert.ToDateTime(reader["UpdatedDate"])
+        //                    };
+
+        //                    // Store TPO Type using ViewBag later
+        //                    list.Add(tpo);
+        //                }
+        //            }
+        //        }
+        //    }
+
+        //    return list;
+        //}
+
+        // shriang 05/10/26
+        public List<TPORegistration> GetAllTPODetails()
+        {
+            List<TPORegistration> list = new List<TPORegistration>();
+
+            using (SqlConnection cn = _db.GetConnection())
+            {
+                string query = @"
+            SELECT
+                TPOID,
+                FullName,
+                CollegeMailID,
+                MobileNo,
+                CollegeName,
+                CollegeCode,
+                CollegeAddress,
+                OrganizationWebsiteURL,
+                Designation,
+                DepartmentName,
+                CollegeEmployeeID,
+                SupportingDocument1,
+                SupportingDocument2,
+                ProfilePhoto,
+                OTP,
+                OTPVerified,
+                Status,
+                IsApproved,
+                IsActive,
+                CreatedDate,
+                UpdatedDate,
+                subtopbit
+            FROM tblTPORegistration
+            ORDER BY TPOID ASC";
+
+                using (SqlCommand cmd = new SqlCommand(query, cn))
+                {
+                    cn.Open();
+
+                    using (SqlDataReader reader = cmd.ExecuteReader())
+                    {
+                        while (reader.Read())
+                        {
+                            TPORegistration tpo = new TPORegistration
+                            {
+                                TPOID = Convert.ToInt32(reader["TPOID"]),
+
+                                FullName = reader["FullName"]?.ToString(),
+
+                                CollegeMailID =
+                                    reader["CollegeMailID"]?.ToString(),
+
+                                MobileNo =
+                                    reader["MobileNo"]?.ToString(),
+
+                                CollegeName =
+                                    reader["CollegeName"]?.ToString(),
+
+                                CollegeCode =
+                                    reader["CollegeCode"]?.ToString(),
+
+                                CollegeAddress =
+                                    reader["CollegeAddress"]?.ToString(),
+
+                                OrganizationWebsiteURL =
+                                    reader["OrganizationWebsiteURL"]?.ToString(),
+
+                                Designation =
+                                    reader["Designation"]?.ToString(),
+
+                                DepartmentName =
+                                    reader["DepartmentName"]?.ToString(),
+
+                                CollegeEmployeeID =
+                                    reader["CollegeEmployeeID"]?.ToString(),
+
+                                SupportingDocument1 =
+                                    reader["SupportingDocument1"]?.ToString(),
+
+                                SupportingDocument2 =
+                                    reader["SupportingDocument2"]?.ToString(),
+
+                                ProfilePhoto =
+                                    reader["ProfilePhoto"]?.ToString(),
+
+                                OTP =
+                                    reader["OTP"]?.ToString(),
+
+                                OTPVerified =
+                                    reader["OTPVerified"] != DBNull.Value &&
+                                    Convert.ToBoolean(reader["OTPVerified"]),
+
+                                Status =
+                                    reader["Status"]?.ToString(),
+
+                                IsApproved =
+                                    reader["IsApproved"] != DBNull.Value &&
+                                    Convert.ToBoolean(reader["IsApproved"]),
+
+                                IsActive =
+                                    reader["IsActive"] != DBNull.Value &&
+                                    Convert.ToBoolean(reader["IsActive"]),
+
+                                CreatedDate =
+                                    reader["CreatedDate"] == DBNull.Value
+                                        ? null
+                                        : Convert.ToDateTime(reader["CreatedDate"]),
+
+                                UpdatedDate =
+                                    reader["UpdatedDate"] == DBNull.Value
+                                        ? null
+                                        : Convert.ToDateTime(reader["UpdatedDate"])
+                            };
+
+                            list.Add(tpo);
+                        }
+                    }
+                }
+            }
+
+            return list;
+        }
+
+        // shrirang 05/10/26
+        public TPORegistration? GetTPOById(int tpoId)
+        {
+            using (SqlConnection cn = _db.GetConnection())
+            {
+                string query = @"
+            SELECT
+                TPOID,
+                FullName,
+                CollegeMailID,
+                MobileNo,
+                CollegeName,
+                CollegeCode,
+                CollegeAddress,
+                OrganizationWebsiteURL,
+                Designation,
+                DepartmentName,
+                CollegeEmployeeID,
+                SupportingDocument1,
+                SupportingDocument2,
+                ProfilePhoto,
+                Status,
+                IsApproved,
+                IsActive,
+                CreatedDate,
+                UpdatedDate,
+                subtopbit
+            FROM tblTPORegistration
+            WHERE TPOID = @TPOID";
+
+                using (SqlCommand cmd = new SqlCommand(query, cn))
+                {
+                    cmd.Parameters.Add("@TPOID", SqlDbType.Int).Value = tpoId;
+
+                    cn.Open();
+
+                    using (SqlDataReader reader = cmd.ExecuteReader())
+                    {
+                        if (!reader.Read())
+                            return null;
+
+                        return new TPORegistration
+                        {
+                            TPOID = Convert.ToInt32(reader["TPOID"]),
+
+                            FullName = reader["FullName"] == DBNull.Value
+                                ? ""
+                                : reader["FullName"].ToString(),
+
+                            CollegeMailID = reader["CollegeMailID"] == DBNull.Value
+                                ? ""
+                                : reader["CollegeMailID"].ToString(),
+
+                            MobileNo = reader["MobileNo"] == DBNull.Value
+                                ? ""
+                                : reader["MobileNo"].ToString(),
+
+                            CollegeName = reader["CollegeName"] == DBNull.Value
+                                ? ""
+                                : reader["CollegeName"].ToString(),
+
+                            CollegeCode = reader["CollegeCode"] == DBNull.Value
+                                ? ""
+                                : reader["CollegeCode"].ToString(),
+
+                            CollegeAddress = reader["CollegeAddress"] == DBNull.Value
+                                ? ""
+                                : reader["CollegeAddress"].ToString(),
+
+                            OrganizationWebsiteURL =
+                                reader["OrganizationWebsiteURL"] == DBNull.Value
+                                ? ""
+                                : reader["OrganizationWebsiteURL"].ToString(),
+
+                            Designation = reader["Designation"] == DBNull.Value
+                                ? ""
+                                : reader["Designation"].ToString(),
+
+                            DepartmentName = reader["DepartmentName"] == DBNull.Value
+                                ? ""
+                                : reader["DepartmentName"].ToString(),
+
+                            CollegeEmployeeID =
+                                reader["CollegeEmployeeID"] == DBNull.Value
+                                ? ""
+                                : reader["CollegeEmployeeID"].ToString(),
+
+                            SupportingDocument1 =
+                                reader["SupportingDocument1"] == DBNull.Value
+                                ? null
+                                : reader["SupportingDocument1"].ToString(),
+
+                            SupportingDocument2 =
+                                reader["SupportingDocument2"] == DBNull.Value
+                                ? null
+                                : reader["SupportingDocument2"].ToString(),
+
+                            ProfilePhoto =
+                                reader["ProfilePhoto"] == DBNull.Value
+                                ? null
+                                : reader["ProfilePhoto"].ToString(),
+
+                            Status =
+                                reader["Status"] == DBNull.Value
+                                ? null
+                                : reader["Status"].ToString(),
+
+                            IsApproved =
+                                reader["IsApproved"] != DBNull.Value &&
+                                Convert.ToBoolean(reader["IsApproved"]),
+
+                            IsActive =
+                                reader["IsActive"] != DBNull.Value &&
+                                Convert.ToBoolean(reader["IsActive"]),
+
+                            CreatedDate =
+                                reader["CreatedDate"] == DBNull.Value
+                                ? null
+                                : Convert.ToDateTime(reader["CreatedDate"]),
+
+                            UpdatedDate =
+                                reader["UpdatedDate"] == DBNull.Value
+                                ? null
+                                : Convert.ToDateTime(reader["UpdatedDate"])
+                        };
+                    }
+                }
+            }
+        }
+
+        public bool UpdateTPOProfile(TPORegistration model)
+        {
+            using (SqlConnection cn = _db.GetConnection())
+            {
+                string query = @"
+            UPDATE tblTPORegistration
+            SET
+                FullName = @FullName,
+                CollegeMailID = @CollegeMailID,
+                MobileNo = @MobileNo,
+                CollegeName = @CollegeName,
+                CollegeCode = @CollegeCode,
+                CollegeAddress = @CollegeAddress,
+                OrganizationWebsiteURL = @OrganizationWebsiteURL,
+                Designation = @Designation,
+                DepartmentName = @DepartmentName,
+                CollegeEmployeeID = @CollegeEmployeeID,
+                SupportingDocument1 = 
+                    CASE
+                        WHEN @SupportingDocument1 IS NOT NULL
+                             AND @SupportingDocument1 <> ''
+                        THEN @SupportingDocument1
+                        ELSE SupportingDocument1
+                    END,
+                SupportingDocument2 =
+                    CASE
+                        WHEN @SupportingDocument2 IS NOT NULL
+                             AND @SupportingDocument2 <> ''
+                        THEN @SupportingDocument2
+                        ELSE SupportingDocument2
+                    END,
+                ProfilePhoto =
+                    CASE
+                        WHEN @ProfilePhoto IS NOT NULL
+                             AND @ProfilePhoto <> ''
+                        THEN @ProfilePhoto
+                        ELSE ProfilePhoto
+                    END,
+                UpdatedDate = GETDATE()
+            WHERE TPOID = @TPOID";
+
+                using (SqlCommand cmd = new SqlCommand(query, cn))
+                {
+                    cmd.Parameters.Add("@TPOID", SqlDbType.Int)
+                        .Value = model.TPOID;
+
+                    cmd.Parameters.Add("@FullName", SqlDbType.NVarChar, 150)
+                        .Value = model.FullName ?? "";
+
+                    cmd.Parameters.Add("@CollegeMailID", SqlDbType.NVarChar, 200)
+                        .Value = model.CollegeMailID ?? "";
+
+                    cmd.Parameters.Add("@MobileNo", SqlDbType.NVarChar, 15)
+                        .Value = model.MobileNo ?? "";
+
+                    cmd.Parameters.Add("@CollegeName", SqlDbType.NVarChar, 250)
+                        .Value = model.CollegeName ?? "";
+
+                    cmd.Parameters.Add("@CollegeCode", SqlDbType.NVarChar, 100)
+                        .Value = string.IsNullOrWhiteSpace(model.CollegeCode)
+                            ? DBNull.Value
+                            : model.CollegeCode;
+
+                    cmd.Parameters.Add("@CollegeAddress", SqlDbType.NVarChar, 500)
+                        .Value = model.CollegeAddress ?? "";
+
+                    cmd.Parameters.Add("@OrganizationWebsiteURL", SqlDbType.NVarChar, 500)
+                        .Value = string.IsNullOrWhiteSpace(model.OrganizationWebsiteURL)
+                            ? DBNull.Value
+                            : model.OrganizationWebsiteURL;
+
+                    cmd.Parameters.Add("@Designation", SqlDbType.NVarChar, 150)
+                        .Value = model.Designation ?? "";
+
+                    cmd.Parameters.Add("@DepartmentName", SqlDbType.NVarChar, 150)
+                        .Value = model.DepartmentName ?? "";
+
+                    cmd.Parameters.Add("@CollegeEmployeeID", SqlDbType.NVarChar, 100)
+                        .Value = model.CollegeEmployeeID ?? "";
+
+                    cmd.Parameters.Add("@SupportingDocument1", SqlDbType.NVarChar, 500)
+                        .Value = string.IsNullOrWhiteSpace(model.SupportingDocument1)
+                            ? DBNull.Value
+                            : model.SupportingDocument1;
+
+                    cmd.Parameters.Add("@SupportingDocument2", SqlDbType.NVarChar, 500)
+                        .Value = string.IsNullOrWhiteSpace(model.SupportingDocument2)
+                            ? DBNull.Value
+                            : model.SupportingDocument2;
+
+                    cmd.Parameters.Add("@ProfilePhoto", SqlDbType.NVarChar, 500)
+                        .Value = string.IsNullOrWhiteSpace(model.ProfilePhoto)
+                            ? DBNull.Value
+                            : model.ProfilePhoto;
+
+                    cn.Open();
+
+                    int rows = cmd.ExecuteNonQuery();
+
+                    return rows > 0;
+                }
+            }
+        }
+
+
+        //public bool UpdateTPOProfile(TPORegistration model)
+        //{
+        //    using (SqlConnection cn = _db.GetConnection())
+        //    {
+        //        string query = @"
+        //    UPDATE tblTPORegistration
+        //    SET
+        //        FullName = @FullName,
+        //        CollegeMailID = @CollegeMailID,
+        //        MobileNo = @MobileNo,
+        //        CollegeName = @CollegeName,
+        //        CollegeCode = @CollegeCode,
+        //        CollegeAddress = @CollegeAddress,
+        //        OrganizationWebsiteURL = @OrganizationWebsiteURL,
+        //        Designation = @Designation,
+        //        DepartmentName = @DepartmentName,
+        //        CollegeEmployeeID = @CollegeEmployeeID,
+
+        //        SupportingDocument1 =
+        //            CASE
+        //                WHEN @SupportingDocument1 IS NULL
+        //                     OR @SupportingDocument1 = ''
+        //                THEN SupportingDocument1
+        //                ELSE @SupportingDocument1
+        //            END,
+
+        //        SupportingDocument2 =
+        //            CASE
+        //                WHEN @SupportingDocument2 IS NULL
+        //                     OR @SupportingDocument2 = ''
+        //                THEN SupportingDocument2
+        //                ELSE @SupportingDocument2
+        //            END,
+
+        //        ProfilePhoto =
+        //            CASE
+        //                WHEN @ProfilePhoto IS NULL
+        //                     OR @ProfilePhoto = ''
+        //                THEN ProfilePhoto
+        //                ELSE @ProfilePhoto
+        //            END,
+
+        //        UpdatedDate = GETDATE()
+
+        //    WHERE TPOID = @TPOID";
+
+        //        using (SqlCommand cmd = new SqlCommand(query, cn))
+        //        {
+        //            cmd.Parameters.Add("@TPOID", SqlDbType.Int)
+        //                .Value = model.TPOID;
+
+        //            cmd.Parameters.Add("@FullName", SqlDbType.NVarChar, 150)
+        //                .Value = model.FullName?.Trim() ?? "";
+
+        //            cmd.Parameters.Add("@CollegeMailID", SqlDbType.NVarChar, 200)
+        //                .Value = model.CollegeMailID?.Trim() ?? "";
+
+        //            cmd.Parameters.Add("@MobileNo", SqlDbType.NVarChar, 20)
+        //                .Value = model.MobileNo?.Trim() ?? "";
+
+        //            cmd.Parameters.Add("@CollegeName", SqlDbType.NVarChar, 250)
+        //                .Value = model.CollegeName?.Trim() ?? "";
+
+        //            cmd.Parameters.Add("@CollegeCode", SqlDbType.NVarChar, 100)
+        //                .Value = string.IsNullOrWhiteSpace(model.CollegeCode)
+        //                    ? DBNull.Value
+        //                    : model.CollegeCode.Trim();
+
+        //            cmd.Parameters.Add("@CollegeAddress", SqlDbType.NVarChar, 500)
+        //                .Value = model.CollegeAddress?.Trim() ?? "";
+
+        //            cmd.Parameters.Add("@OrganizationWebsiteURL", SqlDbType.NVarChar, 500)
+        //                .Value = string.IsNullOrWhiteSpace(model.OrganizationWebsiteURL)
+        //                    ? DBNull.Value
+        //                    : model.OrganizationWebsiteURL.Trim();
+
+        //            cmd.Parameters.Add("@Designation", SqlDbType.NVarChar, 150)
+        //                .Value = model.Designation?.Trim() ?? "";
+
+        //            cmd.Parameters.Add("@DepartmentName", SqlDbType.NVarChar, 150)
+        //                .Value = model.DepartmentName?.Trim() ?? "";
+
+        //            cmd.Parameters.Add("@CollegeEmployeeID", SqlDbType.NVarChar, 100)
+        //                .Value = model.CollegeEmployeeID?.Trim() ?? "";
+
+        //            cmd.Parameters.Add("@SupportingDocument1", SqlDbType.NVarChar, 500)
+        //                .Value = string.IsNullOrWhiteSpace(model.SupportingDocument1)
+        //                    ? DBNull.Value
+        //                    : model.SupportingDocument1;
+
+        //            cmd.Parameters.Add("@SupportingDocument2", SqlDbType.NVarChar, 500)
+        //                .Value = string.IsNullOrWhiteSpace(model.SupportingDocument2)
+        //                    ? DBNull.Value
+        //                    : model.SupportingDocument2;
+
+        //            cmd.Parameters.Add("@ProfilePhoto", SqlDbType.NVarChar, 500)
+        //                .Value = string.IsNullOrWhiteSpace(model.ProfilePhoto)
+        //                    ? DBNull.Value
+        //                    : model.ProfilePhoto;
+
+        //            cn.Open();
+
+        //            return cmd.ExecuteNonQuery() > 0;
+        //        }
+        //    }
+        //}
     }
 }
