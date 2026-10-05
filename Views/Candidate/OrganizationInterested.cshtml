@@ -10,24 +10,29 @@
 
 <div class="container-fluid">
 
+  
+
+
+    <!-- MASTER TABLE CARD -->
     <div class="master-table-container">
 
-        <!-- PAGE HEADING -->
-        <div class="mb-4">
+        
 
-            <h1 class="mb-2">
-                Organization Interested
-            </h1>
-
-            <p class="mb-0 text-muted">
-                @ViewBag.CandidateCode
-            </p>
-
-        </div>
 
         <!-- TABLE -->
         <div class="table-responsive">
+              <!-- PAGE HEADING -->
+    <div class="mb-4">
 
+        <h1 class="mb-2">
+            Organization Interested
+        </h1>
+
+        <p class="mb-0 text-muted">
+            @ViewBag.CandidateCode
+        </p>
+
+    </div>
             <table id="candidateTable"
                    class="master-data-table">
 
@@ -63,6 +68,7 @@
 
                 </thead>
 
+
                 <tbody>
 
                     @if (Model != null && Model.Count > 0)
@@ -78,30 +84,21 @@
                                     @srNo
                                 </td>
 
+
                                 <!-- ORGANIZATION NAME -->
                                 <td>
                                     @item.OrganizationName
                                 </td>
 
+
                                 <!-- ORGANIZATION URL -->
                                 <td>
 
                                     @if (!string.IsNullOrWhiteSpace(
-                                                                item.OrganizationUrl))
+                                        item.OrganizationUrl))
                                     {
-                                        string organizationUrl =
-                                        item.OrganizationUrl;
-
-                                        if (!organizationUrl.StartsWith("http://") &&
-                                        !organizationUrl.StartsWith("https://"))
-                                        {
-                                            organizationUrl =
-                                            "https://" + organizationUrl;
-                                        }
-
-                                        <a href="@organizationUrl"
+                                        <a href="@item.OrganizationUrl"
                                            target="_blank"
-                                           rel="noopener noreferrer"
                                            class="master-link">
 
                                             Visit
@@ -113,29 +110,26 @@
                                         <span>-</span>
                                     }
 
-                        </td>
-
-                        <!-- CONTACT PERSON -->
-                        <td>
-                            @(!string.IsNullOrWhiteSpace(
-                                                        item.ContactPersonName)
-                                                        ? item.ContactPersonName
-                                                        : "-")
                                 </td>
+
+
+                                <!-- CONTACT PERSON -->
+                                <td>
+                                    @item.ContactPersonName
+                                </td>
+
 
                                 <!-- DESIGNATION -->
                                 <td>
-                                    @(!string.IsNullOrWhiteSpace(
-                                                                item.Designation)
-                                                                ? item.Designation
-                                                                : "-")
+                                    @item.Designation
                                 </td>
+
 
                                 <!-- APPLY STATUS -->
                                 <td>
 
                                     @if (!string.IsNullOrWhiteSpace(
-                                                                item.ApplyStatus))
+                                        item.ApplyStatus))
                                     {
                                         <span class="master-status">
                                             @item.ApplyStatus
@@ -153,25 +147,13 @@
                             srNo++;
                         }
                     }
-                    else
-                    {
-                        <tr>
-
-                            <td colspan="6"
-                                class="text-center">
-
-                                No organization has shown interest yet.
-
-                            </td>
-
-                        </tr>
-                    }
 
                 </tbody>
 
             </table>
 
         </div>
+
 
         <!-- PAGE INFO -->
         <div id="candidatePageInfo"

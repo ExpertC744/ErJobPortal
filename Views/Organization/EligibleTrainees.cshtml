@@ -138,38 +138,25 @@
 
                                 </td>
 
-                                @*shrirang 05/10/26*@
+
                                 <!-- =================================================
                                      VIEW RESUME
                                 ================================================== -->
-                                <!-- =================================================
-     VIEW THIS CANDIDATE'S RESUME
-================================================== -->
 
                                 <td>
 
-                                    @if (item.CandidateID > 0)
-                                    {
-                                        <a asp-controller="Resume"
-                                           asp-action="Resume"
-                                           asp-route-id="@item.CandidateID"
-                                           class="resume-view-btn"
-                                           title="View Resume"
-                                           target="_blank">
+                                    <a asp-controller="Candidate"
+                                       asp-action="Resume"
+                                       asp-route-id="@item.CandidateID"
+                                       class="resume-view-btn"
+                                       title="View Resume">
 
-                                            <i class="fas fa-eye"></i>
+                                        <i class="fas fa-eye"></i>
 
-                                        </a>
-                                    }
-                                    else
-                                    {
-                                        <span class="text-muted">
-                                            Resume Not Available
-                                        </span>
-                                    }
+                                    </a>
 
                                 </td>
-                                @*end*@
+
 
                                 <!-- =================================================
                                      EMAIL

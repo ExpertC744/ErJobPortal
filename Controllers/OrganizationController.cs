@@ -752,6 +752,19 @@ namespace ErJobPortal.Controllers
             return View(model);
         }
 
+
+        [HttpGet]
+        [Route("Organization/ViewProfile/{id}")]
+        public IActionResult ViewOrgProfile(string id)
+        {
+            if (!IsValidOrganizationCode(id))
+                return NotFound();
+
+            ViewBag.OrgCode = id;
+
+            return View();
+        }
+
         public IActionResult ViewOrgPost()
         {
             return View();
@@ -4325,135 +4338,6 @@ WHERE nID = @nID
 
         #endregion
 
-        #region "Selected Trainees"
-
-        [HttpGet]
-        [Route("Organization/SelectedTrainees")]
-        public IActionResult SelectedTrainees(string? orgCode)
-        {
-            // =====================================================
-            // GET ORGANIZATION ID FROM SESSION
-            // =====================================================
-
-            int? sessionOrgID = HttpContext.Session.GetInt32("OrgID");
-
-            if (sessionOrgID == null)
-            {
-                return RedirectToAction("OrganizationLogin", "Account");
-            }
-
-            int orgID = sessionOrgID.Value;
-
-            List<OrgFinalSelectionM> selectedTrainees =
-                new List<OrgFinalSelectionM>();
-
-            // =====================================================
-            // GET SELECTED TRAINEES
-            // =====================================================
-
-            using (SqlConnection con = new SqlConnection(_configuration.GetConnectionString("DefaultConnection")))
-            {
-                using (SqlCommand cmd = new SqlCommand(
-                    "SP_GetOrgFinalSelection", con))
-                {
-                    cmd.CommandType = CommandType.StoredProcedure;
-
-                    cmd.Parameters.Add("@OrgID", SqlDbType.Int)
-                        .Value = orgID;
-
-                    con.Open();
-
-                    using (SqlDataReader dr = cmd.ExecuteReader())
-                    {
-                        while (dr.Read())
-                        {
-                            OrgFinalSelectionM item =
-                                new OrgFinalSelectionM();
-
-                            item.SrNo =
-                                dr["SrNo"] == DBNull.Value
-                                    ? 0
-                                    : Convert.ToInt32(dr["SrNo"]);
-
-                            item.FinalSelectionID =
-                                dr["FinalSelectionID"] == DBNull.Value
-                                    ? 0
-                                    : Convert.ToInt32(dr["FinalSelectionID"]);
-
-                            item.OrganizationID =
-                                dr["OrganizationID"] == DBNull.Value
-                                    ? 0
-                                    : Convert.ToInt32(dr["OrganizationID"]);
-
-                            item.CandidateID =
-                                dr["CandidateID"] == DBNull.Value
-                                    ? 0
-                                    : Convert.ToInt32(dr["CandidateID"]);
-
-                            item.PostID =
-                                dr["PostID"] == DBNull.Value
-                                    ? 0
-                                    : Convert.ToInt32(dr["PostID"]);
-
-                            item.PostDate =
-                                dr["PostDate"] == DBNull.Value
-                                    ? null
-                                    : Convert.ToDateTime(dr["PostDate"]);
-
-                            item.PositionName =
-                                dr["PositionName"] == DBNull.Value
-                                    ? ""
-                                    : dr["PositionName"].ToString();
-
-                            item.TraineeName =
-                                dr["TraineeName"] == DBNull.Value
-                                    ? ""
-                                    : dr["TraineeName"].ToString();
-
-                            item.EmailID =
-                                dr["EmailID"] == DBNull.Value
-                                    ? ""
-                                    : dr["EmailID"].ToString();
-
-                            item.TraineeSkills =
-                                dr["TraineeSkills"] == DBNull.Value
-                                    ? ""
-                                    : dr["TraineeSkills"].ToString();
-
-                            item.ResumeCandidateID =
-                                dr["ResumeCandidateID"] == DBNull.Value
-                                    ? 0
-                                    : Convert.ToInt32(
-                                        dr["ResumeCandidateID"]);
-
-                            selectedTrainees.Add(item);
-                        }
-                    }
-                }
-            }
-
-            // =====================================================
-            // ORGANIZATION CODE
-            // =====================================================
-
-            ViewBag.OrgCode = string.IsNullOrWhiteSpace(orgCode)
-                ? orgID.ToString()
-                : orgCode;
-
-            ViewBag.OrganizationID = orgID;
-
-            // =====================================================
-            // TOTAL SELECTED TRAINEES
-            // =====================================================
-
-            ViewBag.TotalSelectedTrainees =
-                selectedTrainees.Count;
-
-            return View(selectedTrainees);
-        }
-
-        #endregion
-
         // khushi 01-10-26
         [HttpGet]
         public IActionResult RepostOrgPost(int id)
@@ -4917,8 +4801,8 @@ WHERE nID = @nID
 
         //khushi 01-10-26
         [HttpGet]
-        [Route("Organization/OrgPreviousPost/{id}")]
-        public IActionResult OrgPreviousPost(string? id)
+        [Route("Organization/OrgPreviousPost")]
+        public IActionResult OrgPreviousPost()
         {
             int? sessionOrgID = HttpContext.Session.GetInt32("OrgID");
 
@@ -4928,8 +4812,6 @@ WHERE nID = @nID
             }
 
             int orgID = sessionOrgID.Value;
-
-            string? orgCode = GetOrganizationCode();
 
             OrgPostM item = null;
 
@@ -5118,12 +5000,12 @@ WHERE nID = @nID
 
                 if (item == null)
                 {
-                    TempData["Error"] = "Post not found or this post has not expired yet.";
+                    TempData["Error"] =
+                        "Post not found or this post has not expired yet.";
 
                     return RedirectToAction(
-       "OrgPreviousPost",
-       "Organization",
-       new { id = GetOrganizationCode() });
+                        "PreviousPost",
+                        "Organization");
                 }
 
                 // =====================================================
@@ -5136,9 +5018,8 @@ WHERE nID = @nID
                         "You are not authorized to repost this post.";
 
                     return RedirectToAction(
-       "OrgPreviousPost",
-       "Organization",
-       new { id = GetOrganizationCode() });
+                        "PreviousPost",
+                        "Organization");
                 }
 
                 // =====================================================
@@ -5167,360 +5048,9 @@ WHERE nID = @nID
                 TempData["Error"] = ex.Message;
 
                 return RedirectToAction(
-       "OrgPreviousPost",
-       "Organization",
-       new { id = GetOrganizationCode() });
+                    "PreviousPost",
+                    "Organization");
             }
-        }
-
-
-        [HttpPost]
-        [Route("Organization/ToggleOrgPreviousPostStatus")]
-        public void ToggleOrgPreviousPostStatus(int id)
-        {
-            int? sessionOrgID = HttpContext.Session.GetInt32("OrgID");
-
-            if (!sessionOrgID.HasValue)
-            {
-                return;
-            }
-
-            int orgID = sessionOrgID.Value;
-
-            using (SqlConnection con = new SqlConnection(
-                _configuration.GetConnectionString("DefaultConnection")))
-            {
-                using (SqlCommand cmd = new SqlCommand(@"
-    UPDATE tblPost
-    SET nBit = CASE
-                WHEN ISNULL(nBit, 0) = 1 THEN 0
-                ELSE 1
-               END
-    WHERE nID = @nID
-      AND nOrgID = @nOrgID", con))
-                {
-                    cmd.Parameters.Add("@nID", SqlDbType.Int).Value = id;
-                    cmd.Parameters.Add("@nOrgID", SqlDbType.Int).Value = orgID;
-
-                    con.Open();
-                    cmd.ExecuteNonQuery();
-                }
-            }
-        }
-
-        //khushi 03-10-26
-        [HttpGet]
-        [Route("Organization/ViewOrgProfile/{id}")]
-        public IActionResult ViewOrgProfile(string id)
-        {
-            // =====================================================
-            // VALIDATE ORGANIZATION CODE
-            // =====================================================
-
-            if (string.IsNullOrWhiteSpace(id))
-                return NotFound();
-
-            if (!IsValidOrganizationCode(id))
-                return NotFound();
-
-
-            // =====================================================
-            // GET ORGANIZATION ID FROM ORGANIZATION CODE
-            // Example: OR07082601 -> 01
-            // =====================================================
-
-            if (id.Length < 2 ||
-                !int.TryParse(
-                    id.Substring(id.Length - 2),
-                    out int orgId) ||
-                orgId <= 0)
-            {
-                return NotFound();
-            }
-
-
-            // =====================================================
-            // CONNECTION STRING
-            // =====================================================
-
-            string? connectionString =
-                _configuration.GetConnectionString(
-                    "DefaultConnection");
-
-            if (string.IsNullOrWhiteSpace(connectionString))
-            {
-                return StatusCode(
-                    500,
-                    "Database connection string not found.");
-            }
-
-
-            // =====================================================
-            // ORGANIZATION PROFILE MODEL
-            // =====================================================
-
-            OrgProfile? model = null;
-
-
-            // =====================================================
-            // DATABASE
-            // =====================================================
-
-            using (SqlConnection cn =
-                   new SqlConnection(connectionString))
-            {
-                using (SqlCommand cmd =
-                       new SqlCommand(
-                           "SP_GetOrganizationProfile",
-                           cn))
-                {
-                    cmd.CommandType =
-                        CommandType.StoredProcedure;
-
-
-                    // =================================================
-                    // ORGANIZATION ID
-                    // =================================================
-
-                    cmd.Parameters.Add(
-                        "@nOrgID",
-                        SqlDbType.Int
-                    ).Value = orgId;
-
-
-                    // =================================================
-                    // OPEN CONNECTION
-                    // =================================================
-
-                    cn.Open();
-
-
-                    // =================================================
-                    // READ DATA
-                    // =================================================
-
-                    using (SqlDataReader dr =
-                           cmd.ExecuteReader())
-                    {
-                        if (dr.Read())
-                        {
-                            model = new OrgProfile
-                            {
-                                // =====================================
-                                // BASIC INFORMATION
-                                // =====================================
-
-                                nID =
-                                    dr["nID"] != DBNull.Value
-                                        ? Convert.ToInt32(
-                                            dr["nID"])
-                                        : 0,
-
-                                nOrgID =
-                                    dr["nOrgID"] != DBNull.Value
-                                        ? Convert.ToInt32(
-                                            dr["nOrgID"])
-                                        : orgId,
-
-
-                                // =====================================
-                                // ORGANIZATION NAME
-                                // DATABASE = sName
-                                // MODEL = sOrganizationName
-                                // =====================================
-
-                                sOrganizationName =
-                                    dr["sName"] != DBNull.Value
-                                        ? dr["sName"].ToString()!
-                                        : string.Empty,
-
-
-                                // =====================================
-                                // EMAIL
-                                // DATABASE = sEmail
-                                // MODEL = sOrganizationEmail
-                                // =====================================
-
-                                sOrganizationEmail =
-                                    dr["sEmail"] != DBNull.Value
-                                        ? dr["sEmail"].ToString()!
-                                        : string.Empty,
-
-
-                                // =====================================
-                                // MOBILE
-                                // =====================================
-
-                                sMobile =
-                                    dr["sMobile"] != DBNull.Value
-                                        ? dr["sMobile"].ToString()!
-                                        : string.Empty,
-
-
-                                // =====================================
-                                // DESIGNATION
-                                // =====================================
-
-                                sDesignation =
-                                    dr["sDesignation"] != DBNull.Value
-                                        ? dr["sDesignation"].ToString()!
-                                        : string.Empty,
-
-
-                                // =====================================
-                                // DATE OF BIRTH
-                                // =====================================
-
-                                dDateOfBirth =
-                                    dr["dDateOfBirth"] != DBNull.Value
-                                        ? Convert.ToDateTime(
-                                            dr["dDateOfBirth"])
-                                        : null,
-
-
-                                // =====================================
-                                // COMPANY LOGO
-                                // =====================================
-
-                                sCompanyLogo =
-                                    dr["sCompanyLogo"] != DBNull.Value
-                                        ? dr["sCompanyLogo"].ToString()!
-                                        : string.Empty,
-
-
-                                // =====================================
-                                // COMPANY ADDRESS
-                                // =====================================
-
-                                sCompanyAddress =
-                                    dr["sCompanyAddress"] != DBNull.Value
-                                        ? dr["sCompanyAddress"].ToString()!
-                                        : string.Empty,
-
-
-                                // =====================================
-                                // ESTABLISHMENT YEAR
-                                // =====================================
-
-                                nEstablishmentYear =
-                                    dr["nEstablishmentYear"] != DBNull.Value
-                                        ? Convert.ToInt32(
-                                            dr["nEstablishmentYear"])
-                                        : 0,
-
-
-                                // =====================================
-                                // GST NUMBER
-                                // =====================================
-
-                                sGSTNo =
-                                    dr["sGSTNo"] != DBNull.Value
-                                        ? dr["sGSTNo"].ToString()!
-                                        : string.Empty,
-
-
-                                // =====================================
-                                // CIN NUMBER
-                                // =====================================
-
-                                sCINNo =
-                                    dr["sCINNo"] != DBNull.Value
-                                        ? dr["sCINNo"].ToString()!
-                                        : string.Empty,
-
-
-                                // =====================================
-                                // EMPLOYEE STRENGTH
-                                // =====================================
-
-                                nEmployeeStrength =
-                                    dr["nEmployeeStrength"] != DBNull.Value
-                                        ? dr["nEmployeeStrength"].ToString()!
-                                        : string.Empty,
-
-
-                                // =====================================
-                                // CREATED DATE
-                                // =====================================
-
-                                dCreatedDate =
-                                    dr["dCreatedDate"] != DBNull.Value
-                                        ? Convert.ToDateTime(
-                                            dr["dCreatedDate"])
-                                        : DateTime.MinValue,
-
-
-                                // =====================================
-                                // MODIFIED DATE
-                                // =====================================
-
-                                dModifiedDate =
-                                    dr["dModifiedDate"] != DBNull.Value
-                                        ? Convert.ToDateTime(
-                                            dr["dModifiedDate"])
-                                        : null,
-
-
-                                // =====================================
-                                // BIT
-                                // =====================================
-
-                                nBit =
-                                    dr["nBit"] != DBNull.Value &&
-                                    Convert.ToBoolean(
-                                        dr["nBit"]),
-
-
-                                // =====================================
-                                // SA BIT
-                                // =====================================
-
-                                nSABit =
-                                    dr["nSABit"] != DBNull.Value
-                                        ? Convert.ToBoolean(
-                                            dr["nSABit"])
-                                        : null
-                            };
-                        }
-                    }
-                }
-            }
-
-
-            // =====================================================
-            // PROFILE NOT FOUND
-            // =====================================================
-
-            if (model == null)
-                return NotFound();
-
-
-            // =====================================================
-            // SEND ORGANIZATION CODE
-            // =====================================================
-
-            ViewBag.OrgCode = id;
-
-
-            // =====================================================
-            // OPTIONAL SESSION VALUES
-            // Same parameters as EditProfile
-            // =====================================================
-
-            ViewBag.OrgID = orgId;
-
-            ViewBag.OrgName =
-                model.sOrganizationName;
-
-            ViewBag.OrgEmail =
-                model.sOrganizationEmail;
-
-
-            // =====================================================
-            // RETURN VIEW
-            // =====================================================
-
-            return View(model);
         }
     }
 }

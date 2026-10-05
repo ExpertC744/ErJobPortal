@@ -195,12 +195,13 @@
                             <td>
                                 @Model.sDivyang
                             </td>
+
                             <td>
-                                <button type="button"
-                                        class="master-status @(Model.nBit ? "enabled" : "disabled")"
-                                        onclick="toggleOrgPreviousPostStatus(@Model.nID, this)">
+
+                                <span class="master-status">
                                     @(Model.nBit ? "Enabled" : "Disabled")
-                                </button>
+                                </span>
+
                             </td>
 
                         </tr>
@@ -223,32 +224,6 @@
 
     </div>
 
-    <script>
-        function toggleOrgPreviousPostStatus(id, button) {
-
-            fetch('/Organization/ToggleOrgPreviousPostStatus?id=' + id, {
-                method: 'POST'
-            })
-            .then(() => {
-
-                if (button.textContent.trim() === "Enabled") {
-
-                    button.textContent = "Disabled";
-
-                    button.classList.remove("enabled");
-                    button.classList.add("disabled");
-
-                } else {
-
-                    button.textContent = "Enabled";
-
-                    button.classList.remove("disabled");
-                    button.classList.add("enabled");
-
-                }
-            });
-        }
-    </script>
 </div>
 
 
