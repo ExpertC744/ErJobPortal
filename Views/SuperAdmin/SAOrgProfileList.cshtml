@@ -1,0 +1,473 @@
+﻿
+@model List<OrgProfileListM>
+
+@{
+    Layout = "~/Views/Shared/_DashboardLayout.cshtml";
+
+    ViewData["Title"] = "Organization Profile List";
+    ViewData["Panel"] = "SuperAdmin";
+    ViewData["UserName"] = "Super Admin";
+}
+
+
+
+<style>
+    .status {
+    color: white;
+    padding: 7px 12px;
+    border: none;
+    border-radius: 6px;
+    display: inline-block;
+    font-size: 12px;
+    cursor: pointer;
+    min-width: 75px;
+    transition: 0.2s ease;
+}
+
+.enabled {
+    background: #198754;
+}
+
+.disabled {
+    background: #dc3545;
+}
+
+.status:hover {
+    opacity: 0.85;
+    transform: translateY(-1px);
+}
+
+.status:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none;
+}
+</style>
+
+<div class="container-fluid">
+
+    <!-- MASTER TABLE CARD -->
+    <div class="master-table-container">
+
+        <!-- MASTER TABLE HEADER -->
+        <div class="master-table-title">
+
+            <div>
+
+                <h2>
+                    Organization Profile List
+                </h2>
+
+                <p>
+                    View and manage complete organization profile information
+                </p>
+
+            </div>
+
+            <a asp-controller="SuperAdmin"
+               asp-action="Dashboard"
+               class="btn btn-secondary">
+
+                Back to Dashboard
+
+            </a>
+
+        </div>
+
+
+        <!-- MASTER TABLE -->
+        <div class="table-responsive">
+
+            <table id="organizationTable"
+                   class="master-data-table">
+
+                <thead>
+
+                    <tr>
+
+                        <th>Sr. No</th>
+
+                        <th>Profile Creation Date</th>
+
+                        <th>Organization Name</th>
+
+                        <th>Action</th>
+
+                        <th>Organization Logo</th>
+
+                        <th>Organization Address</th>
+
+                        <th>Verification Email</th>
+
+                        <th>GST NO.</th>
+
+                        <th>CIN NO.</th>
+
+                        <th>Current Employee Strength</th>
+
+                        <th>DOB</th>
+
+                        <th>Establishment Year</th>
+
+                        <th>Status</th>
+
+                    </tr>
+
+                </thead>
+
+
+                <tbody>
+
+                    @if (Model != null && Model.Count > 0)
+                    {
+                        int srNo = 1;
+
+                        foreach (var item in Model)
+                        {
+                            <tr>
+
+                                <!-- SR NO -->
+                                <td class="master-id">
+                                    @srNo
+                                </td>
+
+
+                                <!-- PROFILE CREATION DATE -->
+                                <td>
+
+                                    @(item.ProfileCreationDate.HasValue
+                                        ? item.ProfileCreationDate.Value.ToString("dd-MM-yyyy")
+                                        : "N/A")
+
+                                </td>
+
+
+                                <!-- ORGANIZATION NAME -->
+                                <td>
+
+                                    <strong>
+                                        @item.OrganizationName
+                                    </strong>
+
+                                </td>
+
+
+                                <!-- ACTION -->
+                                <td>
+
+                                    <a href="@Url.Action(
+                                        "OrganizationProfileDetails",
+                                        "SuperAdmin",
+                                        new { id = item.nID })"
+                                       class="master-view-btn">
+
+                                        View
+
+                                    </a>
+
+                                </td>
+
+
+                                <!-- ORGANIZATION LOGO -->
+                                <td>
+
+                                    @if (!string.IsNullOrEmpty(item.OrganizationLogo))
+                                    {
+                                        <img src="@item.OrganizationLogo"
+                                             alt="Organization Logo"
+                                             class="candidate-profile-photo" />
+                                    }
+                                    else
+                                    {
+                                        <span class="text-muted">
+                                            No Logo
+                                        </span>
+                                    }
+
+                                </td>
+
+
+                                <!-- ORGANIZATION ADDRESS -->
+                                <td>
+
+                                    @if (!string.IsNullOrEmpty(item.OrganizationAddress))
+                                    {
+                                        @item.OrganizationAddress
+                                    }
+                                    else
+                                    {
+                                        <span class="text-muted">
+                                            N/A
+                                        </span>
+                                    }
+
+                                </td>
+
+
+                                <!-- VERIFICATION EMAIL -->
+                                <td>
+                                    @item.VerificationEmail
+                                </td>
+
+
+                                <!-- GST NO -->
+                                <td>
+
+                                    @if (!string.IsNullOrEmpty(item.GSTNo))
+                                    {
+                                        @item.GSTNo
+                                    }
+                                    else
+                                    {
+                                        <span class="text-muted">
+                                            N/A
+                                        </span>
+                                    }
+
+                                </td>
+
+
+                                <!-- CIN NO -->
+                                <td>
+
+                                    @if (!string.IsNullOrEmpty(item.CINNo))
+                                    {
+                                        @item.CINNo
+                                    }
+                                    else
+                                    {
+                                        <span class="text-muted">
+                                            N/A
+                                        </span>
+                                    }
+
+                                </td>
+
+
+                                <!-- CURRENT EMPLOYEE STRENGTH -->
+                                <td>
+                                    @item.CurrentEmployeeStrength
+                                </td>
+
+
+                                <!-- DOB -->
+                                <td>
+
+                                    @(item.DOB.HasValue
+                                        ? item.DOB.Value.ToString("dd-MM-yyyy")
+                                        : "N/A")
+
+                                </td>
+
+
+                                <!-- ESTABLISHMENT YEAR -->
+                                <td>
+
+                                    @(item.EstablishmentYear.HasValue
+                                        ? item.EstablishmentYear.ToString()
+                                        : "N/A")
+
+                                </td>
+
+                               
+                                
+                                <!-- STATUS -->
+                                <td>
+
+                                    <button type="button"
+                                            class="status @(item.nBit ? "enabled" : "disabled")"
+                                            data-id="@item.nID"
+                                            onclick="toggleOrganizationStatus(this)">
+
+                                       @(item.nBit ? "Enabled" : "Disabled")
+
+                                    </button>
+
+                                </td>
+
+                            </tr>
+
+                            srNo++;
+                        }
+                    }
+                    else
+                    {
+                        <tr>
+
+                            <td colspan="13"
+                                class="text-center">
+
+                                No organization profiles found.
+
+                            </td>
+
+                        </tr>
+                    }
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+
+        <!-- MASTER PAGE INFO -->
+        <div id="organizationPageInfo"
+             class="master-page-info text-center">
+        </div>
+
+    </div>
+
+</div>
+
+
+
+@* <script>
+
+    function toggleOrganizationStatus(button) {
+
+        var id = $(button).data("id");
+
+        var currentStatus = $(button).hasClass("enabled");
+
+        var newStatus = !currentStatus;
+
+        $.ajax({
+
+            url: '@Url.Action("SAOrgProfileList")',
+
+            type: 'GET',
+
+            data: {
+                id: id,
+                status: newStatus
+            },
+
+            success: function (response) {
+
+                console.log(response);
+
+                if (response.success) {
+
+                    if (newStatus) {
+
+                        $(button)
+                            .removeClass("disabled")
+                            .addClass("enabled")
+                            .text("Enabled");
+
+                    }
+                    else {
+
+                        $(button)
+                            .removeClass("enabled")
+                            .addClass("disabled")
+                            .text("Disabled");
+                    }
+
+                }
+                else {
+
+                    alert(response.message);
+                }
+            },
+
+            error: function (xhr) {
+
+                console.log("STATUS:", xhr.status);
+                console.log("RESPONSE:", xhr.responseText);
+
+                alert(
+                    "Error updating status.\n\n" +
+                    "HTTP Status: " + xhr.status
+                );
+            }
+
+        });
+
+    }
+
+</script> *@
+
+
+                    <script>
+
+    function toggleOrganizationStatus(button) {
+
+        var id = $(button).data("id");
+
+        // Current button state
+        var currentStatus = $(button).hasClass("enabled");
+
+        // New status
+        var newStatus = !currentStatus;
+
+        // Prevent double click
+        $(button).prop("disabled", true);
+
+        $.ajax({
+
+            url: '@Url.Action("ToggleOrganizationStatus", "SuperAdmin")',
+
+            type: 'POST',
+
+            data: {
+                id: id,
+                status: newStatus
+            },
+
+            success: function (response) {
+
+                console.log(response);
+
+                if (response.success) {
+
+                    if (response.status) {
+
+                        $(button)
+                            .removeClass("disabled")
+                            .addClass("enabled")
+                            .text("Enabled");
+
+                    }
+                    else {
+
+                        $(button)
+                            .removeClass("enabled")
+                            .addClass("disabled")
+                            .text("Disabled");
+
+                    }
+
+                }
+                else {
+
+                    alert(response.message || "Unable to update organization status.");
+
+                }
+
+            },
+
+            error: function (xhr) {
+
+                console.log("HTTP STATUS:", xhr.status);
+                console.log("RESPONSE:", xhr.responseText);
+
+                alert(
+                    "Error updating organization status.\n\n" +
+                    "HTTP Status: " + xhr.status
+                );
+
+            },
+
+            complete: function () {
+
+                $(button).prop("disabled", false);
+
+            }
+
+        });
+
+    }
+
+</script>

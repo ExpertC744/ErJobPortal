@@ -1,0 +1,392 @@
+﻿@{
+    Layout = "~/Views/Shared/_DashboardLayout.cshtml";
+
+    ViewData["Title"] = "TPO Feedback";
+    ViewData["Panel"] = "TPO";
+    ViewData["UserName"] = "TPO";
+}
+
+<link rel="stylesheet"
+      href="~/css/OrgCreateFeedback.css"
+      asp-append-version="true" />
+
+
+<div class="feedback-page">
+
+    <div class="feedback-container">
+
+        <h1 class="feedback-title">
+            Add Feedback
+        </h1>
+
+
+        <!-- =========================================
+             QUESTION 1
+             ========================================= -->
+
+        <div class="feedback-question-box">
+
+            <div class="question-text">
+
+                <span class="question-number">
+                    1.
+                </span>
+
+                Was the candidate's overall performance satisfactory?
+
+            </div>
+
+
+            <div class="radio-options">
+
+                <label class="radio-option">
+
+                    <input type="radio"
+                           name="question1"
+                           value="True" />
+
+                    <span>True</span>
+
+                </label>
+
+
+                <label class="radio-option">
+
+                    <input type="radio"
+                           name="question1"
+                           value="False" />
+
+                    <span>False</span>
+
+                </label>
+
+            </div>
+
+        </div>
+
+
+        <!-- =========================================
+             QUESTION 2 - STAR RATING
+             ========================================= -->
+
+        <div class="feedback-question-box">
+
+            <div class="question-text">
+
+                <span class="question-number">
+                    2.
+                </span>
+
+                How would you rate the candidate's overall performance?
+
+            </div>
+
+
+            <div class="star-options">
+
+                <input type="radio"
+                       name="question2"
+                       value="1"
+                       id="star1"
+                       class="star-input" />
+
+                <label for="star1"
+                       class="star"
+                       data-value="1">
+                    ☆
+                </label>
+
+
+                <input type="radio"
+                       name="question2"
+                       value="2"
+                       id="star2"
+                       class="star-input" />
+
+                <label for="star2"
+                       class="star"
+                       data-value="2">
+                    ☆
+                </label>
+
+
+                <input type="radio"
+                       name="question2"
+                       value="3"
+                       id="star3"
+                       class="star-input" />
+
+                <label for="star3"
+                       class="star"
+                       data-value="3">
+                    ☆
+                </label>
+
+
+                <input type="radio"
+                       name="question2"
+                       value="4"
+                       id="star4"
+                       class="star-input" />
+
+                <label for="star4"
+                       class="star"
+                       data-value="4">
+                    ☆
+                </label>
+
+
+                <input type="radio"
+                       name="question2"
+                       value="5"
+                       id="star5"
+                       class="star-input" />
+
+                <label for="star5"
+                       class="star"
+                       data-value="5">
+                    ☆
+                </label>
+
+            </div>
+
+        </div>
+
+
+        <!-- =========================================
+             QUESTION 3
+             ========================================= -->
+
+        <div class="feedback-question-box">
+
+            <div class="question-text">
+
+                <span class="question-number">
+                    3.
+                </span>
+
+                Did the candidate demonstrate good communication skills?
+
+            </div>
+
+
+            <div class="radio-options">
+
+                <label class="radio-option">
+
+                    <input type="radio"
+                           name="question3"
+                           value="Yes" />
+
+                    <span>Yes</span>
+
+                </label>
+
+
+                <label class="radio-option">
+
+                    <input type="radio"
+                           name="question3"
+                           value="No" />
+
+                    <span>No</span>
+
+                </label>
+
+            </div>
+
+        </div>
+
+
+        <!-- =========================================
+             QUESTION 4 - EMOJI
+             ========================================= -->
+
+        <div class="feedback-question-box">
+
+            <div class="question-text">
+
+                <span class="question-number">
+                    4.
+                </span>
+
+                How satisfied are you with the candidate?
+
+            </div>
+
+
+            <div class="emoji-options">
+
+                <label class="emoji-option">
+
+                    <input type="radio"
+                           name="question4"
+                           value="1" />
+
+                    <span class="emoji">
+                        😡
+                    </span>
+
+                </label>
+
+
+                <label class="emoji-option">
+
+                    <input type="radio"
+                           name="question4"
+                           value="2" />
+
+                    <span class="emoji">
+                        😟
+                    </span>
+
+                </label>
+
+
+                <label class="emoji-option">
+
+                    <input type="radio"
+                           name="question4"
+                           value="3" />
+
+                    <span class="emoji">
+                        😐
+                    </span>
+
+                </label>
+
+
+                <label class="emoji-option">
+
+                    <input type="radio"
+                           name="question4"
+                           value="4" />
+
+                    <span class="emoji">
+                        🙂
+                    </span>
+
+                </label>
+
+
+                <label class="emoji-option">
+
+                    <input type="radio"
+                           name="question4"
+                           value="5" />
+
+                    <span class="emoji">
+                        😍
+                    </span>
+
+                </label>
+
+            </div>
+
+        </div>
+
+
+        <!-- =========================================
+             QUESTION 5
+             ========================================= -->
+
+        <div class="feedback-question-box">
+
+            <div class="question-text">
+
+                <span class="question-number">
+                    5.
+                </span>
+
+                Please provide your overall feedback.
+
+            </div>
+
+
+            <textarea class="feedback-textarea"
+                      placeholder="Enter your feedback..."></textarea>
+
+        </div>
+
+
+        <!-- =========================================
+             STATIC SUBMIT BUTTON
+             ========================================= -->
+
+        <div class="submit-area">
+
+            <button type="button"
+                    class="submit-button">
+                Submit
+            </button>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<script>
+
+    document.addEventListener(
+        "DOMContentLoaded",
+        function () {
+
+            const stars =
+                document.querySelectorAll(".star");
+
+            const inputs =
+                document.querySelectorAll(".star-input");
+
+
+            function updateStars(selectedValue) {
+
+                stars.forEach(function (star) {
+
+                    const value =
+                        parseInt(
+                            star.getAttribute("data-value")
+                        );
+
+                    if (value <= selectedValue) {
+
+                        star.textContent = "★";
+
+                    }
+                    else {
+
+                        star.textContent = "☆";
+
+                    }
+
+                });
+
+            }
+
+
+            stars.forEach(function (star) {
+
+                star.addEventListener(
+                    "click",
+                    function () {
+
+                        const selectedValue =
+                            parseInt(
+                                this.getAttribute(
+                                    "data-value"
+                                )
+                            );
+
+                        updateStars(selectedValue);
+
+                    }
+                );
+
+            });
+
+        }
+    );
+
+</script>
+

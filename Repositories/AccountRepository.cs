@@ -1016,10 +1016,15 @@ GetOrganizationRegistrationDetails(int orgId)
                 sProfileImage,
                 nCollegeCode,
                 sCollegeName,
+                sPassword,
                 RegDate,
                 ModDate,
                 nBit,
-                nSABit
+                nSABit,
+                sOTP,
+                nBranch,
+                nPassoutYear,
+                nDepartment
             FROM tblCandidateRegister
             WHERE nBit = 1
             ORDER BY nID DESC";
@@ -1040,19 +1045,19 @@ GetOrganizationRegistrationDetails(int orgId)
 
                                 sFName = dr["sFName"] == DBNull.Value
                                     ? ""
-                                    : dr["sFName"].ToString()!,
+                                    : dr["sFName"].ToString(),
 
                                 sLName = dr["sLName"] == DBNull.Value
                                     ? ""
-                                    : dr["sLName"].ToString()!,
+                                    : dr["sLName"].ToString(),
 
                                 sMobile = dr["sMobile"] == DBNull.Value
                                     ? ""
-                                    : dr["sMobile"].ToString()!,
+                                    : dr["sMobile"].ToString(),
 
                                 sEmail = dr["sEmail"] == DBNull.Value
                                     ? ""
-                                    : dr["sEmail"].ToString()!,
+                                    : dr["sEmail"].ToString(),
 
                                 DOB = dr["DOB"] == DBNull.Value
                                     ? null
@@ -1064,7 +1069,7 @@ GetOrganizationRegistrationDetails(int orgId)
 
                                 sProfileImage = dr["sProfileImage"] == DBNull.Value
                                     ? ""
-                                    : dr["sProfileImage"].ToString()!,
+                                    : dr["sProfileImage"].ToString(),
 
                                 nCollegeCode = dr["nCollegeCode"] == DBNull.Value
                                     ? 0
@@ -1073,6 +1078,10 @@ GetOrganizationRegistrationDetails(int orgId)
                                 sCollegeName = dr["sCollegeName"] == DBNull.Value
                                     ? 0
                                     : Convert.ToInt32(dr["sCollegeName"]),
+
+                                sPassword = dr["sPassword"] == DBNull.Value
+                                    ? ""
+                                    : dr["sPassword"].ToString(),
 
                                 RegDate = dr["RegDate"] == DBNull.Value
                                     ? null
@@ -1086,7 +1095,23 @@ GetOrganizationRegistrationDetails(int orgId)
                                        Convert.ToBoolean(dr["nBit"]),
 
                                 nSABit = dr["nSABit"] != DBNull.Value &&
-                                         Convert.ToBoolean(dr["nSABit"])
+                                         Convert.ToBoolean(dr["nSABit"]),
+
+                                sOTP = dr["sOTP"] == DBNull.Value
+                                    ? ""
+                                    : dr["sOTP"].ToString(),
+
+                                nBranch = dr["nBranch"] == DBNull.Value
+                                    ? null
+                                    : Convert.ToInt32(dr["nBranch"]),
+
+                                nPassoutYear = dr["nPassoutYear"] == DBNull.Value
+                                    ? null
+                                    : Convert.ToInt32(dr["nPassoutYear"]),
+
+                                nDepartment = dr["nDepartment"] == DBNull.Value
+                                    ? null
+                                    : Convert.ToInt32(dr["nDepartment"])
                             };
 
                             list.Add(model);
@@ -1098,6 +1123,59 @@ GetOrganizationRegistrationDetails(int orgId)
             return list;
         }
 
+
+        public bool ToggleCandidateStatus(int id)
+        {
+            using (SqlConnection cn = _db.GetConnection())
+            {
+                string query = @"
+            UPDATE tblCandidateRegister
+            SET nBit = CASE 
+                            WHEN nBit = 1 THEN 0
+                            ELSE 1
+                       END,
+                ModDate = GETDATE()
+            WHERE nID = @nID";
+
+                using (SqlCommand cmd = new SqlCommand(query, cn))
+                {
+                    cmd.Parameters.AddWithValue("@nID", id);
+
+                    cn.Open();
+
+                    int rows = cmd.ExecuteNonQuery();
+
+                    return rows > 0;
+                }
+            }
+        }
+
+        public bool GetCandidateStatus(int id)
+        {
+            using (SqlConnection cn = _db.GetConnection())
+            {
+                string query = @"
+            SELECT nBit
+            FROM tblCandidateRegister
+            WHERE nID = @nID";
+
+                using (SqlCommand cmd = new SqlCommand(query, cn))
+                {
+                    cmd.Parameters.AddWithValue("@nID", id);
+
+                    cn.Open();
+
+                    object result = cmd.ExecuteScalar();
+
+                    if (result == null || result == DBNull.Value)
+                    {
+                        return false;
+                    }
+
+                    return Convert.ToBoolean(result);
+                }
+            }
+        }
         #endregion
 
         #region Super Admin Organization List
@@ -1785,6 +1863,212 @@ public OrganizationLogin? GetOrganizationLoginDetails(string email)
                     return result > 0;
                 }
             }
+        }
+
+
+        // shrirang 03/10/26
+        // =========================================================
+        // GET TPO DETAILS BY TPO ID
+        // =========================================================
+
+        // =========================================================
+        // GET TPO DETAILS BY TPO ID
+        // =========================================================
+
+        // shrirang 03/10/26
+        // =========================================================
+        // GET TPO DETAILS BY TPO ID
+        // =========================================================
+
+        public TPORegistration? GetTPODetails(int tpoId)
+        {
+            TPORegistration? model = null;
+
+            using (SqlConnection cn = _db.GetConnection())
+            {
+                string query = @"
+            SELECT
+                FullName,
+                CollegeMailID,
+                MobileNo,
+                CollegeName,
+                CollegeCode,
+                CollegeAddress,
+                OrganizationWebsiteURL,
+                Designation,
+                DepartmentName,
+                CollegeEmployeeID,
+                SupportingDocument1,
+                SupportingDocument2,
+                ProfilePhoto,
+                OTPVerified,
+                Status,
+                IsApproved,
+                IsActive,
+                ApprovedBy,
+                ApprovedDate,
+                RejectionReason,
+                CreatedDate,
+                UpdatedDate
+            FROM tblTPORegistration
+            WHERE TPOID = @TPOID";
+
+                using (SqlCommand cmd = new SqlCommand(query, cn))
+                {
+                    cmd.Parameters.Add(
+                        "@TPOID",
+                        SqlDbType.Int
+                    ).Value = tpoId;
+
+                    cn.Open();
+
+                    using (SqlDataReader reader = cmd.ExecuteReader())
+                    {
+                        if (reader.Read())
+                        {
+                            model = new TPORegistration
+                            {
+                                // ==============================
+                                // PERSONAL DETAILS
+                                // ==============================
+
+                                FullName =
+                                    reader["FullName"] == DBNull.Value
+                                        ? ""
+                                        : reader["FullName"].ToString(),
+
+                                CollegeMailID =
+                                    reader["CollegeMailID"] == DBNull.Value
+                                        ? ""
+                                        : reader["CollegeMailID"].ToString(),
+
+                                MobileNo =
+                                    reader["MobileNo"] == DBNull.Value
+                                        ? ""
+                                        : reader["MobileNo"].ToString(),
+
+                                // ==============================
+                                // COLLEGE DETAILS
+                                // ==============================
+
+                                CollegeName =
+                                    reader["CollegeName"] == DBNull.Value
+                                        ? ""
+                                        : reader["CollegeName"].ToString(),
+
+                                CollegeCode =
+                                    reader["CollegeCode"] == DBNull.Value
+                                        ? ""
+                                        : reader["CollegeCode"].ToString(),
+
+                                CollegeAddress =
+                                    reader["CollegeAddress"] == DBNull.Value
+                                        ? ""
+                                        : reader["CollegeAddress"].ToString(),
+
+                                OrganizationWebsiteURL =
+                                    reader["OrganizationWebsiteURL"] == DBNull.Value
+                                        ? ""
+                                        : reader["OrganizationWebsiteURL"].ToString(),
+
+                                // ==============================
+                                // PROFESSIONAL DETAILS
+                                // ==============================
+
+                                Designation =
+                                    reader["Designation"] == DBNull.Value
+                                        ? ""
+                                        : reader["Designation"].ToString(),
+
+                                DepartmentName =
+                                    reader["DepartmentName"] == DBNull.Value
+                                        ? ""
+                                        : reader["DepartmentName"].ToString(),
+
+                                CollegeEmployeeID =
+                                    reader["CollegeEmployeeID"] == DBNull.Value
+                                        ? ""
+                                        : reader["CollegeEmployeeID"].ToString(),
+
+                                // ==============================
+                                // DOCUMENTS
+                                // ==============================
+
+                                SupportingDocument1 =
+                                    reader["SupportingDocument1"] == DBNull.Value
+                                        ? null
+                                        : reader["SupportingDocument1"].ToString(),
+
+                                SupportingDocument2 =
+                                    reader["SupportingDocument2"] == DBNull.Value
+                                        ? null
+                                        : reader["SupportingDocument2"].ToString(),
+
+                                ProfilePhoto =
+                                    reader["ProfilePhoto"] == DBNull.Value
+                                        ? null
+                                        : reader["ProfilePhoto"].ToString(),
+
+                                // ==============================
+                                // STATUS
+                                // ==============================
+
+                                OTPVerified =
+                                    reader["OTPVerified"] != DBNull.Value &&
+                                    Convert.ToBoolean(reader["OTPVerified"]),
+
+                                Status =
+                                    reader["Status"] == DBNull.Value
+                                        ? null
+                                        : reader["Status"].ToString(),
+
+                                IsApproved =
+                                    reader["IsApproved"] != DBNull.Value &&
+                                    Convert.ToBoolean(reader["IsApproved"]),
+
+                                IsActive =
+                                    reader["IsActive"] != DBNull.Value &&
+                                    Convert.ToBoolean(reader["IsActive"]),
+
+                                // ==============================
+                                // APPROVAL DETAILS
+                                // ==============================
+
+                                ApprovedBy =
+                                    reader["ApprovedBy"] == DBNull.Value
+                                        ? null
+                                        : Convert.ToInt32(reader["ApprovedBy"]),
+
+                                ApprovedDate =
+                                    reader["ApprovedDate"] == DBNull.Value
+                                        ? null
+                                        : Convert.ToDateTime(reader["ApprovedDate"]),
+
+                                RejectionReason =
+                                    reader["RejectionReason"] == DBNull.Value
+                                        ? null
+                                        : reader["RejectionReason"].ToString(),
+
+                                // ==============================
+                                // DATE DETAILS
+                                // ==============================
+
+                                CreatedDate =
+                                    reader["CreatedDate"] == DBNull.Value
+                                        ? null
+                                        : Convert.ToDateTime(reader["CreatedDate"]),
+
+                                UpdatedDate =
+                                    reader["UpdatedDate"] == DBNull.Value
+                                        ? null
+                                        : Convert.ToDateTime(reader["UpdatedDate"])
+                            };
+                        }
+                    }
+                }
+            }
+
+            return model;
         }
     }
 }

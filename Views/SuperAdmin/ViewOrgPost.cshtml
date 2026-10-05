@@ -1,0 +1,1272 @@
+﻿@model ErJobPortal.Models.OrgPostDetailsVM
+
+@{
+    Layout = "~/Views/Shared/_DashboardLayout.cshtml";
+
+    ViewData["Title"] = "Organization Post Details";
+    ViewData["Panel"] = "SuperAdmin";
+    ViewData["UserName"] = "ItNetworkZ";
+
+    var post = Model.Post;
+}
+
+<style>
+
+    .post-details-page {
+        padding: 25px 20px 40px;
+    }
+
+    /* ===============================
+       HEADER
+    =============================== */
+
+    .post-page-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 22px;
+        gap: 15px;
+    }
+
+    .post-page-header h2 {
+        margin: 0;
+        font-size: 27px;
+        font-weight: 700;
+        color: #1f2937;
+    }
+
+    .post-page-header p {
+        margin: 6px 0 0;
+        color: #6b7280;
+        font-size: 14px;
+    }
+
+    .post-counter {
+        background: #1e7b67;
+        color: white;
+        padding: 9px 18px;
+        border-radius: 30px;
+        font-size: 13px;
+        font-weight: 600;
+        white-space: nowrap;
+    }
+
+    /* ===============================
+       MAIN CARD
+    =============================== */
+
+    .post-details-card {
+        background: #fff;
+        border-radius: 18px;
+        border: 1px solid #e5e7eb;
+        box-shadow: 0 8px 30px rgba(0,0,0,0.08);
+        overflow: hidden;
+    }
+
+    /* ===============================
+       POST HEADER
+    =============================== */
+
+    .post-header {
+        background: linear-gradient(
+            135deg,
+            #1e7b67,
+            #155e52
+        );
+
+        padding: 28px 35px;
+
+        color: white;
+
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+
+        gap: 20px;
+    }
+
+    .post-header-left {
+        display: flex;
+        align-items: center;
+        gap: 18px;
+    }
+
+    .post-icon {
+        width: 62px;
+        height: 62px;
+
+        background: rgba(255,255,255,0.16);
+
+        border: 1px solid rgba(255,255,255,0.25);
+
+        border-radius: 14px;
+
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        font-size: 27px;
+    }
+
+    .post-title h1 {
+        margin: 0 0 5px;
+        font-size: 25px;
+        font-weight: 700;
+    }
+
+    .post-title p {
+        margin: 0;
+        font-size: 13px;
+        opacity: 0.9;
+    }
+
+    .post-status {
+        padding: 8px 16px;
+        border-radius: 30px;
+
+        background: rgba(255,255,255,0.16);
+        border: 1px solid rgba(255,255,255,0.3);
+
+        font-size: 13px;
+        font-weight: 600;
+
+        white-space: nowrap;
+    }
+
+    /* ===============================
+       BODY
+    =============================== */
+
+    .post-body {
+        padding: 30px 35px;
+    }
+
+    .section-title {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+
+        margin-bottom: 22px;
+        padding-bottom: 11px;
+
+        border-bottom: 1px solid #e5e7eb;
+    }
+
+    .section-title .bar {
+        width: 7px;
+        height: 25px;
+
+        background: #1e7b67;
+
+        border-radius: 5px;
+    }
+
+    .section-title h4 {
+        margin: 0;
+
+        font-size: 18px;
+        font-weight: 700;
+
+        color: #1f2937;
+    }
+
+    /* ===============================
+       FIELDS
+    =============================== */
+
+    .post-field {
+        margin-bottom: 20px;
+    }
+
+    .post-label {
+        display: block;
+
+        margin-bottom: 7px;
+
+        font-size: 12px;
+        font-weight: 700;
+
+        color: #6b7280;
+
+        text-transform: uppercase;
+        letter-spacing: .4px;
+    }
+
+    .post-value {
+        min-height: 44px;
+
+        padding: 11px 14px;
+
+        background: #f8fafc;
+
+        border: 1px solid #e5e7eb;
+
+        border-radius: 9px;
+
+        color: #1f2937;
+
+        font-size: 14px;
+
+        display: flex;
+        align-items: center;
+
+        word-break: break-word;
+    }
+
+    .post-value.large {
+        min-height: 90px;
+        align-items: flex-start;
+        line-height: 1.6;
+    }
+
+    .post-value.skills {
+        min-height: 80px;
+        align-items: flex-start;
+        white-space: pre-wrap;
+        line-height: 1.6;
+    }
+
+    .empty-value {
+        color: #9ca3af;
+        font-style: italic;
+    }
+
+    /* ===============================
+       NAVIGATION
+    =============================== */
+
+    .post-navigation {
+        background: #f8fafc;
+
+        border-top: 1px solid #e5e7eb;
+
+        padding: 20px 35px;
+
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+
+        gap: 15px;
+    }
+
+    .navigation-buttons {
+        display: flex;
+        gap: 10px;
+    }
+
+    .nav-btn {
+        height: 42px;
+
+        min-width: 115px;
+
+        border-radius: 8px;
+
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+
+        gap: 7px;
+
+        font-size: 13px;
+        font-weight: 600;
+
+        text-decoration: none;
+
+        transition: all .2s ease;
+    }
+
+    .back-btn {
+        background: white;
+        color: #374151;
+        border: 1px solid #d1d5db;
+    }
+
+    .back-btn:hover {
+        background: #f3f4f6;
+        color: #111827;
+    }
+
+    .previous-btn {
+        background: #e5e7eb;
+        color: #374151;
+    }
+
+    .previous-btn:hover {
+        background: #d1d5db;
+        color: #111827;
+
+        transform: translateX(-2px);
+    }
+
+    .next-btn {
+        background: #1e7b67;
+        color: white;
+    }
+
+    .next-btn:hover {
+        background: #155e52;
+        color: white;
+
+        transform: translateX(2px);
+    }
+
+    .navigation-info {
+        color: #6b7280;
+
+        font-size: 13px;
+        font-weight: 600;
+    }
+
+    .disabled-btn {
+        opacity: .45;
+        pointer-events: none;
+    }
+
+    /* ===============================
+       RESPONSIVE
+    =============================== */
+
+    @@media(max-width: 768px) {
+
+        .post-details-page {
+            padding: 15px 10px 30px;
+        }
+
+        .post-page-header {
+            flex-direction: column;
+            align-items: flex-start;
+        }
+
+        .post-header {
+            flex-direction: column;
+            text-align: center;
+        }
+
+        .post-header-left {
+            flex-direction: column;
+        }
+
+        .post-title h1 {
+            font-size: 21px;
+        }
+
+        .post-body {
+            padding: 25px 20px;
+        }
+
+        .post-navigation {
+            flex-direction: column;
+        }
+
+        .navigation-buttons {
+            width: 100%;
+        }
+
+        .nav-btn {
+            flex: 1;
+        }
+    }
+
+</style>
+
+
+<div class="container-fluid post-details-page">
+
+
+    <!-- =====================================
+         PAGE HEADER
+    ====================================== -->
+
+    <div class="post-page-header">
+
+        <div>
+
+            <h2>
+                Organization Post Details
+            </h2>
+
+            <p>
+                Complete information about the internship post
+            </p>
+
+        </div>
+
+        <div class="post-counter">
+
+            Post
+            @Model.CurrentIndex
+            of
+            @Model.TotalRecords
+
+        </div>
+
+    </div>
+
+
+    <!-- =====================================
+         MAIN CARD
+    ====================================== -->
+
+    <div class="post-details-card">
+
+
+        <!-- =================================
+             POST HEADER
+        ================================== -->
+
+        <div class="post-header">
+
+            <div class="post-header-left">
+
+                <div class="post-icon">
+
+                    <i class="fa-solid fa-briefcase"></i>
+
+                </div>
+
+
+                <div class="post-title">
+
+                    <h1>
+                        @ShowValue(post.sPositionName)
+                    </h1>
+
+                    <p>
+                        Post ID: @post.nID
+                        &nbsp; | &nbsp;
+                        Organization ID: @post.nOrgID
+                    </p>
+
+                </div>
+
+            </div>
+
+
+            <div class="post-status">
+
+                @(post.nBit ? "Enabled" : "Disabled")
+
+            </div>
+
+        </div>
+
+
+        <!-- =================================
+             BODY
+        ================================== -->
+
+        <div class="post-body">
+
+
+            <!-- =================================
+                 BASIC POST INFORMATION
+            ================================== -->
+
+            <div class="section-title">
+
+                <span class="bar"></span>
+
+                <h4>
+                    Basic Post Information
+                </h4>
+
+            </div>
+
+
+            <div class="row">
+
+
+                <!-- Position -->
+
+                <div class="col-lg-4 col-md-6">
+
+                    <div class="post-field">
+
+                        <label class="post-label">
+                            Position
+                        </label>
+
+                        <div class="post-value">
+
+                            @ShowValue(post.sPositionName)
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <!-- Required Trainees -->
+
+                <div class="col-lg-4 col-md-6">
+
+                    <div class="post-field">
+
+                        <label class="post-label">
+                            Required Trainees
+                        </label>
+
+                        <div class="post-value">
+
+                            @post.nRequiredTrainees
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <!-- Gender -->
+
+                <div class="col-lg-4 col-md-6">
+
+                    <div class="post-field">
+
+                        <label class="post-label">
+                            Gender
+                        </label>
+
+                        <div class="post-value">
+
+                            @ShowValue(post.sGenderName)
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <!-- Qualification -->
+
+                <div class="col-lg-6 col-md-6">
+
+                    <div class="post-field">
+
+                        <label class="post-label">
+                            Minimum Qualification
+                        </label>
+
+                        <div class="post-value">
+
+                            @ShowValue(post.sMinimumQualificationName)
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <!-- Internship Type -->
+
+                <div class="col-lg-6 col-md-6">
+
+                    <div class="post-field">
+
+                        <label class="post-label">
+                            Internship Type
+                        </label>
+
+                        <div class="post-value">
+
+                            @ShowValue(post.sInternshipTypeName)
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+            </div>
+
+
+            <!-- =================================
+                 LOCATION & WORKING
+            ================================== -->
+
+            <div class="section-title mt-3">
+
+                <span class="bar"></span>
+
+                <h4>
+                    Location & Working Information
+                </h4>
+
+            </div>
+
+
+            <div class="row">
+
+
+                <!-- Country -->
+
+                <div class="col-lg-4 col-md-6">
+
+                    <div class="post-field">
+
+                        <label class="post-label">
+                            Country
+                        </label>
+
+                        <div class="post-value">
+
+                            @ShowValue(post.sCountryName)
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <!-- State -->
+
+                <div class="col-lg-4 col-md-6">
+
+                    <div class="post-field">
+
+                        <label class="post-label">
+                            State
+                        </label>
+
+                        <div class="post-value">
+
+                            @ShowValue(post.sStateName)
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <!-- City -->
+
+                <div class="col-lg-4 col-md-6">
+
+                    <div class="post-field">
+
+                        <label class="post-label">
+                            City
+                        </label>
+
+                        <div class="post-value">
+
+                            @ShowValue(post.nCityName)
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <!-- Working Hours -->
+
+                <div class="col-lg-4 col-md-6">
+
+                    <div class="post-field">
+
+                        <label class="post-label">
+                            Working Hours / Day
+                        </label>
+
+                        <div class="post-value">
+
+                            @ShowValue(post.sWorkingHours)
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <!-- Working Shift -->
+
+                <div class="col-lg-4 col-md-6">
+
+                    <div class="post-field">
+
+                        <label class="post-label">
+                            Working Shift
+                        </label>
+
+                        <div class="post-value">
+
+                            @ShowValue(post.sWorkingShift)
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <!-- Working Days -->
+
+                <div class="col-lg-4 col-md-6">
+
+                    <div class="post-field">
+
+                        <label class="post-label">
+                            Working Days
+                        </label>
+
+                        <div class="post-value">
+
+                            @ShowValue(post.sWorkingDays)
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+            </div>
+
+
+            <!-- =================================
+                 INTERNSHIP INFORMATION
+            ================================== -->
+
+            <div class="section-title mt-3">
+
+                <span class="bar"></span>
+
+                <h4>
+                    Internship Information
+                </h4>
+
+            </div>
+
+
+            <div class="row">
+
+
+                <!-- Fellowship -->
+
+                <div class="col-lg-6 col-md-6">
+
+                    <div class="post-field">
+
+                        <label class="post-label">
+                            Internship / Fellowship Type
+                        </label>
+
+                        <div class="post-value">
+
+                            @ShowValue(post.sInternshipFellowshipTypeName)
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <!-- Training -->
+
+                <div class="col-lg-6 col-md-6">
+
+                    <div class="post-field">
+
+                        <label class="post-label">
+                            Training Involved
+                        </label>
+
+                        <div class="post-value">
+
+                            @ShowValue(post.sTrainingInvolvedName)
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <!-- Duration -->
+
+                <div class="col-lg-4 col-md-6">
+
+                    <div class="post-field">
+
+                        <label class="post-label">
+                            Internship Duration
+                        </label>
+
+                        <div class="post-value">
+
+                            @ShowValue(post.sInternshipDurationName)
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <!-- Mode -->
+
+                <div class="col-lg-4 col-md-6">
+
+                    <div class="post-field">
+
+                        <label class="post-label">
+                            Internship Mode
+                        </label>
+
+                        <div class="post-value">
+
+                            @ShowValue(post.sInternshipModeName)
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <!-- Divyang -->
+
+                <div class="col-lg-4 col-md-6">
+
+                    <div class="post-field">
+
+                        <label class="post-label">
+                            Divyang Allowed
+                        </label>
+
+                        <div class="post-value">
+
+                            @ShowValue(post.sDivyang)
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+            </div>
+
+
+            <!-- =================================
+                 DATES & CHARGES
+            ================================== -->
+
+            <div class="section-title mt-3">
+
+                <span class="bar"></span>
+
+                <h4>
+                    Dates & Charges
+                </h4>
+
+            </div>
+
+
+            <div class="row">
+
+
+               <div class="col-lg-4 col-md-6">
+
+                            <div class="post-field">
+
+                                <label class="post-label">
+                                    Start Date
+                                </label>
+
+                                <div class="post-value">
+
+                                    @(post.dStartDate.HasValue
+                                        ? post.dStartDate.Value.ToString("dd-MM-yyyy")
+                                        : "N/A")
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
+
+                        <!-- Completion Date -->
+
+                        <div class="col-lg-4 col-md-6">
+
+                            <div class="post-field">
+
+                                <label class="post-label">
+                                    Completion Date
+                                </label>
+
+                                <div class="post-value">
+
+                                    @(post.dCompletionDate == DateTime.MinValue
+                                        ? "N/A"
+                                        : post.dCompletionDate.ToString("dd-MM-yyyy"))
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
+
+                <!-- Charges -->
+
+                <div class="col-lg-4 col-md-6">
+
+                    <div class="post-field">
+
+                        <label class="post-label">
+                            Total Charges
+                        </label>
+
+                        <div class="post-value">
+
+                            @if (post.sTotalCharges.HasValue)
+                            {
+                                @post.sTotalCharges.Value.ToString("0.##")
+                                @:&nbsp; @post.sCurrency
+                            }
+                            else
+                            {
+                                <span class="empty-value">
+                                    N/A
+                                </span>
+                            }
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+            </div>
+
+
+            <!-- =================================
+                 SKILLS & FACILITIES
+            ================================== -->
+
+            <div class="section-title mt-3">
+
+                <span class="bar"></span>
+
+                <h4>
+                    Skills & Facilities
+                </h4>
+
+            </div>
+
+
+            <div class="row">
+
+
+                <!-- Technical Skills -->
+
+                <div class="col-lg-4">
+
+                    <div class="post-field">
+
+                        <label class="post-label">
+                            Technical Skills
+                        </label>
+
+                        <div class="post-value skills">
+
+                            @ShowValue(post.sTechnicalSkills)
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <!-- Medical Skills -->
+
+                <div class="col-lg-4">
+
+                    <div class="post-field">
+
+                        <label class="post-label">
+                            Medical Skills
+                        </label>
+
+                        <div class="post-value skills">
+
+                            @ShowValue(post.sMedicalSkills)
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <!-- Non Technical -->
+
+                <div class="col-lg-4">
+
+                    <div class="post-field">
+
+                        <label class="post-label">
+                            Non-Technical Skills
+                        </label>
+
+                        <div class="post-value skills">
+
+                            @ShowValue(post.sNonTechnicalSkills)
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <!-- Facilities -->
+
+                <div class="col-lg-6">
+
+                    <div class="post-field">
+
+                        <label class="post-label">
+                            Facilities Available
+                        </label>
+
+                        <div class="post-value large">
+
+                            @ShowValue(post.sFacilities)
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <!-- Languages -->
+
+                <div class="col-lg-6">
+
+                    <div class="post-field">
+
+                        <label class="post-label">
+                            Languages Known
+                        </label>
+
+                        <div class="post-value large">
+
+                            @ShowValue(post.sLanguageKnown)
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+            </div>
+
+
+            <!-- =================================
+                 POST DATES
+            ================================== -->
+
+            <div class="section-title mt-3">
+
+                <span class="bar"></span>
+
+                <h4>
+                    Post Information
+                </h4>
+
+            </div>
+
+
+            <div class="row">
+
+
+               <div class="col-lg-4 col-md-6">
+
+                        <div class="post-field">
+
+                            <label class="post-label">
+                                Post Creation Date
+                            </label>
+
+                            <div class="post-value">
+
+                                @(post.dRegisterDate.HasValue
+                                    ? post.dRegisterDate.Value.ToString("dd-MM-yyyy")
+                                    : "N/A")
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- Last Modified Date -->
+
+                    <div class="col-lg-4 col-md-6">
+
+                        <div class="post-field">
+
+                            <label class="post-label">
+                                Last Modified Date
+                            </label>
+
+                            <div class="post-value">
+
+                                @(post.dModDate.HasValue
+                                    ? post.dModDate.Value.ToString("dd-MM-yyyy")
+                                    : "N/A")
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+
+                <div class="col-lg-4 col-md-6">
+
+                    <div class="post-field">
+
+                        <label class="post-label">
+                            Super Admin Status
+                        </label>
+
+                        <div class="post-value">
+
+                            @(post.nSABit ? "Enabled" : "Disabled")
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+            </div>
+
+
+        </div>
+
+
+        <!-- =====================================
+             NAVIGATION
+        ====================================== -->
+
+        <div class="post-navigation">
+
+
+            <!-- BACK -->
+
+            <a asp-controller="SuperAdmin"
+               asp-action="SAOrgPostList"
+               class="nav-btn back-btn">
+                <i class="fa-solid fa-arrow-left"></i>
+                Back to List
+            </a>
+
+
+            <!-- RECORD -->
+
+            <div class="navigation-info">
+
+                Post
+                @Model.CurrentIndex
+                /
+                @Model.TotalRecords
+
+            </div>
+
+
+            <!-- PREVIOUS / NEXT -->
+
+            <div class="navigation-buttons">
+
+
+                @if (Model.HasPrevious)
+                {
+                    <a asp-action="ViewOrgPost"
+                       asp-route-id="@Model.PreviousId"
+                       class="nav-btn previous-btn">
+
+                        <i class="fa-solid fa-chevron-left"></i>
+
+                        Previous
+
+                    </a>
+                }
+                else
+                {
+                    <span class="nav-btn previous-btn disabled-btn">
+
+                        <i class="fa-solid fa-chevron-left"></i>
+
+                        Previous
+
+                    </span>
+                }
+
+
+                @if (Model.HasNext)
+                {
+                    <a asp-action="ViewOrgPost"
+                       asp-route-id="@Model.NextId"
+                       class="nav-btn next-btn">
+
+                        Next
+
+                        <i class="fa-solid fa-chevron-right"></i>
+
+                    </a>
+                }
+                else
+                {
+                    <span class="nav-btn next-btn disabled-btn">
+
+                        Next
+
+                        <i class="fa-solid fa-chevron-right"></i>
+
+                    </span>
+                }
+
+            </div>
+
+
+        </div>
+
+
+    </div>
+
+</div>
+
+
+@functions
+{
+    public string ShowValue(string? value)
+    {
+        if (string.IsNullOrWhiteSpace(value))
+        {
+            return "N/A";
+        }
+
+        return value;
+    }
+}

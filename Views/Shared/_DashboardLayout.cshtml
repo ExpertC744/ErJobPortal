@@ -2790,7 +2790,7 @@
 else if (resumeProfile == 2)
 {
     <a asp-controller="Resume"
-       asp-action="ViewProfileTwo"
+       asp-action="ViewProfileFour"
        asp-route-id="@candidateId"
        class="profile-submenu-link"
        target="_blank">
@@ -3543,10 +3543,12 @@ else
 					</a>
 
 
+					@*Shrirang 03/10/26*@
+
 					<!-- ================= FEEDBACK ================= -->
 
 					<a asp-controller="TPO"
-					   asp-action="Feedback"
+					   asp-action="CreateFeedback"
 					   class="sidebar-link">
 
 						<span class="menu-icon">
@@ -3558,6 +3560,7 @@ else
 						</span>
 
 					</a>
+					@*End*@
 
 
 					<!-- ================= SETTINGS ================= -->
@@ -3691,14 +3694,14 @@ else
 							 class="sidebar-submenu collapse">
 
 							 <a asp-controller="SuperAdmin"
-       asp-action="TraineeReg"
-       asp-route-id="1">
-        <span>Trainee Registrations</span>
+							   asp-action="SATrainees"
+							   asp-route-id="1">
+								<span>Trainee Registrations</span>
 
-    </a>
+							</a>
 
 							<a asp-controller="SuperAdmin"
-							   asp-action="Profiles" asp-route-id="1">
+							   asp-action="SATraineeProfileList" asp-route-id="1">
 								Trainee Profiles
 							</a>
 
@@ -3746,8 +3749,8 @@ else
 							</a>
 
 							<a asp-controller="SuperAdmin"
-							   asp-action="Profiles" asp-route-id="1">
-								Org Profiles
+							   asp-action="SAOrgProfileList" asp-route-id="1">
+								Org Profile
 							</a>
 
 							<a asp-controller="SuperAdmin"
