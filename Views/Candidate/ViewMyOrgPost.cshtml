@@ -1,0 +1,558 @@
+﻿@model ErJobPortal.Models.OrgPostM
+
+@{
+    Layout = "~/Views/Shared/_DashboardLayout.cshtml";
+
+    ViewData["Title"] = "Internship Post Details";
+    ViewData["Panel"] = "Candidate";
+    ViewData["UserName"] = "Candidate";
+
+    var post = Model;
+}
+
+<link rel="stylesheet"
+      href="~/css/InternshipDetails.css"
+      asp-append-version="true" />
+
+<div class="container-fluid">
+
+    <div class="master-table-container">
+
+        <!-- =====================================================
+             HEADER
+        ====================================================== -->
+
+        <div class="mb-4">
+
+            <h1 class="mb-2">
+                Internship Post Details
+            </h1>
+
+            <p class="mb-0 text-muted">
+                Candidate Code:
+                @ViewBag.CandidateCode
+            </p>
+
+        </div>
+
+
+        <!-- =====================================================
+             ORGANIZATION
+        ====================================================== -->
+
+        <div class="card mb-4">
+
+            <div class="card-header">
+
+                <h4 class="mb-0">
+                    Organization Details
+                </h4>
+
+            </div>
+
+            <div class="card-body">
+
+                <div class="row">
+
+                    <div class="col-md-12 mb-3">
+
+                        <strong>
+                            Organization Name
+                        </strong>
+
+                        <div>
+                            @post?.sName
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- =====================================================
+             INTERNSHIP DETAILS
+        ====================================================== -->
+
+        <div class="card mb-4">
+
+            <div class="card-header">
+
+                <h4 class="mb-0">
+                    Internship Details
+                </h4>
+
+            </div>
+
+            <div class="card-body">
+
+                <div class="row">
+
+                    <!-- Position -->
+
+                    <div class="col-md-6 mb-3">
+
+                        <strong>
+                            Position
+                        </strong>
+
+                        <div>
+                            @post?.sPositionName
+                        </div>
+
+                    </div>
+
+
+                    <!-- Required Trainees -->
+
+                    <div class="col-md-6 mb-3">
+
+                        <strong>
+                            Required Trainees
+                        </strong>
+
+                        <div>
+                            @post?.nRequiredTrainees
+                        </div>
+
+                    </div>
+
+
+                    <!-- Gender -->
+
+                    <div class="col-md-6 mb-3">
+
+                        <strong>
+                            Gender
+                        </strong>
+
+                        <div>
+                            @post?.sGenderName
+                        </div>
+
+                    </div>
+
+
+                    <!-- Qualification -->
+
+                    <div class="col-md-6 mb-3">
+
+                        <strong>
+                            Minimum Qualification
+                        </strong>
+
+                        <div>
+                            @post?.sMinimumQualificationName
+                        </div>
+
+                    </div>
+
+
+                    <!-- Country -->
+
+                    <div class="col-md-4 mb-3">
+
+                        <strong>
+                            Country
+                        </strong>
+
+                        <div>
+                            @post?.sCountryName
+                        </div>
+
+                    </div>
+
+
+                    <!-- State -->
+
+                    <div class="col-md-4 mb-3">
+
+                        <strong>
+                            State
+                        </strong>
+
+                        <div>
+                            @post?.sStateName
+                        </div>
+
+                    </div>
+
+
+                    <!-- City -->
+
+                    <div class="col-md-4 mb-3">
+
+                        <strong>
+                            City
+                        </strong>
+
+                        <div>
+                            @post?.nCityName
+                        </div>
+
+                    </div>
+
+
+                    <!-- Working Hours -->
+
+                    <div class="col-md-4 mb-3">
+
+                        <strong>
+                            Working Hours
+                        </strong>
+
+                        <div>
+                            @post?.sWorkingHours
+                        </div>
+
+                    </div>
+
+
+                    <!-- Working Shift -->
+
+                    <div class="col-md-4 mb-3">
+
+                        <strong>
+                            Working Shift
+                        </strong>
+
+                        <div>
+                            @post?.sWorkingShift
+                        </div>
+
+                    </div>
+
+
+                    <!-- Internship Type -->
+
+                    <div class="col-md-4 mb-3">
+
+                        <strong>
+                            Internship Type
+                        </strong>
+
+                        <div>
+                            @post?.sInternshipTypeName
+                        </div>
+
+                    </div>
+
+
+                    <!-- Fellowship -->
+
+                    <div class="col-md-6 mb-3">
+
+                        <strong>
+                            Internship / Fellowship Type
+                        </strong>
+
+                        <div>
+                            @post?.sInternshipFellowshipTypeName
+                        </div>
+
+                    </div>
+
+
+                    <!-- Training -->
+
+                    <div class="col-md-6 mb-3">
+
+                        <strong>
+                            Training Involved
+                        </strong>
+
+                        <div>
+                            @post?.sTrainingInvolvedName
+                        </div>
+
+                    </div>
+
+
+                    <!-- Duration -->
+
+                    <div class="col-md-6 mb-3">
+
+                        <strong>
+                            Internship Duration
+                        </strong>
+
+                        <div>
+                            @post?.sInternshipDurationName
+                        </div>
+
+                    </div>
+
+
+                    <!-- Start Date -->
+
+                    <div class="col-md-3 mb-3">
+
+                        <strong>
+                            Start Date
+                        </strong>
+
+                        <div>
+                            @(post != null &&
+                                post.dStartDate != DateTime.MinValue
+                                ? Convert.ToDateTime(
+                                post.dStartDate)
+                                .ToString("dd-MM-yyyy")
+                                : "-")
+                        </div>
+
+                    </div>
+
+
+                    <!-- Completion Date -->
+
+                    <div class="col-md-3 mb-3">
+
+                        <strong>
+                            Completion Date
+                        </strong>
+
+                        <div>
+                            @(post != null &&
+                                post.dCompletionDate != DateTime.MinValue
+                                ? Convert.ToDateTime(
+                                post.dCompletionDate)
+                                .ToString("dd-MM-yyyy")
+                                : "-")
+                        </div>
+
+                    </div>
+
+
+                    <!-- Mode -->
+
+                    <div class="col-md-6 mb-3">
+
+                        <strong>
+                            Internship Mode
+                        </strong>
+
+                        <div>
+                            @post?.sInternshipModeName
+                        </div>
+
+                    </div>
+
+
+                    <!-- Language -->
+
+                    <div class="col-md-6 mb-3">
+
+                        <strong>
+                            Language Known
+                        </strong>
+
+                        <div>
+                            @post?.sLanguageKnown
+                        </div>
+
+                    </div>
+
+
+                    <!-- Working Days -->
+
+                    <div class="col-md-6 mb-3">
+
+                        <strong>
+                            Working Days
+                        </strong>
+
+                        <div>
+                            @post?.sWorkingDays
+                        </div>
+
+                    </div>
+
+
+                    <!-- Facilities -->
+
+                    <div class="col-md-6 mb-3">
+
+                        <strong>
+                            Facilities
+                        </strong>
+
+                        <div>
+                            @if (!string.IsNullOrWhiteSpace(
+                            post?.sFacilities))
+                            {
+                                @post.sFacilities
+                            }
+                            else
+                            {
+                                <span class="text-muted">
+                                    N/A
+                                </span>
+                            }
+                        </div>
+
+                    </div>
+
+
+                    <!-- Divyang -->
+
+                    <div class="col-md-6 mb-3">
+
+                        <strong>
+                            Divyang
+                        </strong>
+
+                        <div>
+                            @post?.sDivyang
+                        </div>
+
+                    </div>
+
+
+                    <!-- Total Charges -->
+
+                    <div class="col-md-6 mb-3">
+
+                        <strong>
+                            Total Charges
+                        </strong>
+
+                        <div>
+                            @post?.sTotalCharges
+                            @post?.sCurrency
+                        </div>
+
+                    </div>
+
+
+                    <!-- Medical Skills -->
+
+                    <div class="col-md-12 mb-3">
+
+                        <strong>
+                            Medical Skills
+                        </strong>
+
+                        <div>
+                            @post?.sMedicalSkills
+                        </div>
+
+                    </div>
+
+
+                    <!-- Technical Skills -->
+
+                    <div class="col-md-12 mb-3">
+
+                        <strong>
+                            Technical Skills
+                        </strong>
+
+                        <div>
+                            @post?.sTechnicalSkills
+                        </div>
+
+                    </div>
+
+
+                    <!-- Non Technical Skills -->
+
+                    <div class="col-md-12 mb-3">
+
+                        <strong>
+                            Non-Technical Skills
+                        </strong>
+
+                        <div>
+                            @post?.sNonTechnicalSkills
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- =====================================================
+             PREVIOUS / NEXT NAVIGATION
+        ====================================================== -->
+
+        <div class="d-flex justify-content-between align-items-center mt-4">
+
+            <div>
+
+                @if (ViewBag.HasPrevious == true)
+                {
+                    <a asp-controller="Candidate"
+                       asp-action="ViewMyOrgPost"
+                       asp-route-id="@ViewBag.PreviousPostID"
+                       class="btn btn-secondary">
+
+                        ← Previous
+
+                    </a>
+                }
+                else
+                {
+                    <button type="button"
+                            class="btn btn-secondary"
+                            disabled>
+
+                        ← Previous
+
+                    </button>
+                }
+
+            </div>
+
+
+            <div>
+
+                <a asp-controller="Candidate"
+                   asp-action="InternshipDetails"
+                   asp-route-id="@ViewBag.CandidateCode"
+                   class="btn btn-outline-secondary">
+
+                    Back to Internship Posts
+
+                </a>
+
+            </div>
+
+
+            <div>
+
+                @if (ViewBag.HasNext == true)
+                {
+                    <a asp-controller="Candidate"
+                       asp-action="ViewMyOrgPost"
+                       asp-route-id="@ViewBag.NextPostID"
+                       class="btn btn-primary">
+
+                        Next →
+
+                    </a>
+                }
+                else
+                {
+                    <button type="button"
+                            class="btn btn-primary"
+                            disabled>
+
+                        Next →
+
+                    </button>
+                }
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>

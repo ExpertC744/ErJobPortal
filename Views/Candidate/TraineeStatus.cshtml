@@ -10,7 +10,7 @@
 
 <div class="container-fluid">
 
-   
+
 
 
     <!-- =====================================================
@@ -20,7 +20,7 @@
     <div class="master-table-container">
 
 
-      
+
 
 
         <!-- =================================================
@@ -28,21 +28,21 @@
         ================================================== -->
 
         <div class="table-responsive">
-             <!-- =====================================================
-         PAGE HEADING
-    ====================================================== -->
+            <!-- =====================================================
+                 PAGE HEADING
+            ====================================================== -->
 
-    <div class="mb-4">
+            <div class="mb-4">
 
-        <h1 class="mb-2">
-            Trainee Selection
-        </h1>
+                <h1 class="mb-2">
+                    Trainee Selection
+                </h1>
 
-        <p class="mb-0 text-muted">
-            @ViewBag.CandidateCode
-        </p>
+                <p class="mb-0 text-muted">
+                    @ViewBag.CandidateCode
+                </p>
 
-    </div>
+            </div>
             <table id="candidateTable"
                    class="master-data-table">
 
@@ -86,32 +86,23 @@
                             <tr>
 
                                 <!-- SR NO -->
-
                                 <td class="master-id">
                                     @srNo
                                 </td>
 
-
                                 <!-- ORGANIZATION -->
-
                                 <td>
                                     @item.OrganizationName
                                 </td>
 
-
                                 <!-- POSITION -->
-
                                 <td>
                                     @item.Position
                                 </td>
 
-
                                 <!-- FINAL STATUS -->
-
                                 <td>
-
-                                    @if (!string.IsNullOrWhiteSpace(
-                                        item.FinalStatus))
+                                    @if (!string.IsNullOrWhiteSpace(item.FinalStatus))
                                     {
                                         <span class="master-status">
                                             @item.FinalStatus
@@ -119,38 +110,21 @@
                                     }
                                     else
                                     {
-                                        <span>
-                                            -
-                                        </span>
+                                        <span>-</span>
                                     }
-
                                 </td>
 
-
                                 <!-- REGISTRATION DATE -->
-
                                 <td>
-                                    @item.RegistrationDate?
-                                        .ToString("dd-MM-yyyy")
+                                    @(item.RegistrationDate.HasValue
+                                        ? item.RegistrationDate.Value.ToString("dd-MM-yyyy")
+                                        : "-")
                                 </td>
 
                             </tr>
 
                             srNo++;
                         }
-                    }
-                    else
-                    {
-                        <tr>
-
-                            <td colspan="5"
-                                class="text-center">
-
-                                No entries found
-
-                            </td>
-
-                        </tr>
                     }
 
                 </tbody>

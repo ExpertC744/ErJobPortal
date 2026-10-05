@@ -1,53 +1,82 @@
-﻿/* ============================================================
-   VIEW PROFILE TWENTY-TWO
-   3-COLUMN RESUME | BLUE CAP + ROUND PHOTO | A4 LANDSCAPE
-   ============================================================ */
+/* =========================================================
+   VIEWPROFILETWENTYTWO  -  RIGHT RAIL  -  LANDSCAPE RESUME (A4 29.7cm x 21cm)
+   File: ~/css/viewprofiletwentytwo.css
 
+   Style  : White header with square photo, content on the left and a tinted full-height rail on the right.
+   Sheet  : 1123px x 794px  (= 297mm x 210mm @ 96dpi)
+   Zoom   : Layout never reflows, sheet is only zoomed out
+   Themes : blue | teal | slate | brown | green
+========================================================= */
 
-/* ---------- THEMES (default = blue) ---------- */
+/* =========================================================
+   THEMES
+   --primary / --primary-dark : main colours
+   --soft / --soft-border     : tinted backgrounds + lines
+   --accent                   : light tint (for dark areas)
+   --ink                      : very dark shade of the theme
+   --card / --page / --heading: surfaces (templates may change)
+========================================================= */
 
-:root {
-    --accent: #0a74bb;
-    --track: #d6e6f2;
-    --ink: #1d1d1f;
-    --ink-soft: #55595f;
-    --page-bg: #e9edf0;
+.resume-sheet {
+    --primary: #1f4e68;
+    --primary-dark: #163a4f;
+    --soft: #eaf1f5;
+    --soft-border: #d3e0e8;
+    --accent: #7fc3e3;
+    --ink: #0e2431;
+    --text: #2b3440;
+    --muted: #6b7785;
+    --card: #ffffff;
+    --page: #ffffff;
+    --heading: var(--primary);
 }
 
-    :root[data-theme="teal"] {
-        --accent: #0f8b8d;
-        --track: #d2e8e8;
+    .resume-sheet[data-theme="blue"] {
+        --primary: #1f4e68;
+        --primary-dark: #163a4f;
+        --soft: #eaf1f5;
+        --soft-border: #d3e0e8;
+        --accent: #7fc3e3;
+        --ink: #0e2431;
     }
 
-    :root[data-theme="crimson"] {
-        --accent: #b5364a;
-        --track: #f0d8dc;
+    .resume-sheet[data-theme="teal"] {
+        --primary: #176b68;
+        --primary-dark: #0f4f4c;
+        --soft: #e7f3f2;
+        --soft-border: #cde4e2;
+        --accent: #72d1cc;
+        --ink: #0a2a29;
     }
 
-    :root[data-theme="slate"] {
-        --accent: #4a5a6a;
-        --track: #d9dfe5;
+    .resume-sheet[data-theme="slate"] {
+        --primary: #455a64;
+        --primary-dark: #33444c;
+        --soft: #eef1f3;
+        --soft-border: #dbe1e5;
+        --accent: #a9c2ce;
+        --ink: #1a2429;
     }
 
-    :root[data-theme="plum"] {
-        --accent: #7a4a8c;
-        --track: #e4d7ea;
+    .resume-sheet[data-theme="brown"] {
+        --primary: #765536;
+        --primary-dark: #583e26;
+        --soft: #f6efe8;
+        --soft-border: #e8dccf;
+        --accent: #e0b07f;
+        --ink: #2a1c10;
     }
 
-    :root[data-theme="gold"] {
-        --accent: #b8892e;
-        --track: #f0e6cf;
+    .resume-sheet[data-theme="green"] {
+        --primary: #3f6f55;
+        --primary-dark: #2d5340;
+        --soft: #ebf3ee;
+        --soft-border: #d4e4da;
+        --accent: #8fd0a9;
+        --ink: #13271c;
     }
 
-    :root[data-theme="emerald"] {
-        --accent: #2e8b57;
-        --track: #d5eadd;
-    }
-
-
-/* ---------- GLOBAL ---------- */
-
-* {
+*, *::before, *::after {
     box-sizing: border-box;
 }
 
@@ -57,634 +86,794 @@ html, body {
 }
 
 body {
-    background: var(--page-bg);
-    color: var(--ink);
-    font-family: "Poppins", "Segoe UI", Arial, sans-serif;
-    min-height: 100vh;
+    font-family: 'Inter', 'Segoe UI', Arial, sans-serif;
+    font-size: 11.5px;
+    line-height: 1.45;
+    color: #2b3440;
+    background: #e6eaf0;
+    -webkit-font-smoothing: antialiased;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
 }
-.hobby-tags {
+
+/* =========================================================
+   PAGE WRAPPER + SHEET (LANDSCAPE A4 1123 x 794)
+========================================================= */
+
+.resume-page-wrapper {
+    position: relative;
+    top: 65px;
+    width: 100%;
     display: flex;
-    flex-wrap: wrap;
-    gap: 1.4mm;
-    margin-top: 4mm;
-}
-
-.hobby-tag {
-    padding: 1mm 3mm;
-    background: var(--track);
-    border-left: .8mm solid var(--accent);
-    color: var(--ink);
-    font-size: 8.5px;
-    font-weight: 500;
-    line-height: 1.35;
-}
-
-/* ---------- TOOLBAR ---------- */
-
-.resume-toolbar {
-width: 297mm;height:210mm;
-    max-width: calc(100% - 40px);
-    margin: 20px auto 10px;
-    display: flex;
-    justify-content: flex-end;
-    align-items: center;
-    gap: 8px;
-}
-
-.toolbar-btn {
-    border: 0;
-    border-radius: 7px;
-    padding: 9px 15px;
-    font-family: inherit;
-    font-size: 11px;
-    font-weight: 600;
-    text-decoration: none;
-    display: inline-flex;
-    align-items: center;
-    gap: 7px;
-    cursor: pointer;
-    transition: transform .2s ease;
-}
-
-    .toolbar-btn:hover {
-        transform: translateY(-2px);
-    }
-
-.toolbar-edit {
-    background: #fff;
-    color: var(--ink);
-    border: 1px solid #cfd6dc;
-}
-
-.toolbar-print {
-    background: var(--ink);
-    color: #fff;
-}
-
-.toolbar-download {
-    background: var(--accent);
-    color: #fff;
-}
-
-.toolbar-btn:disabled {
-    opacity: .6;
-    cursor: not-allowed;
-}
-
-
-/* ---------- THEME SWITCHER ---------- */
-
-.theme-switcher {
-width: 297mm;height:210mm;
-    max-width: calc(100% - 40px);
-    margin: 0 auto 14px;
-    display: flex;
-    align-items: center;
-    justify-content: flex-end;
-    gap: 9px;
-}
-
-    .theme-switcher > span {
-        font-size: 11px;
-        font-weight: 600;
-        color: #66707a;
-        margin-right: 2px;
-    }
-
-.theme-swatch {
-    width: 22px;
-    height: 22px;
-    padding: 0;
-    border-radius: 50%;
-    cursor: pointer;
-    border: 2px solid #fff;
-    box-shadow: 0 0 0 1px #bfc7ce;
-    transition: transform .2s ease;
-}
-
-    .theme-swatch:hover {
-        transform: scale(1.12);
-    }
-
-    .theme-swatch:focus-visible {
-        outline: 2px solid var(--ink);
-        outline-offset: 2px;
-    }
-
-    .theme-swatch.active {
-        box-shadow: 0 0 0 2px var(--ink);
-    }
-
-
-/* ---------- SHEET ---------- */
-
-.resume-container {
-    padding: 5px 0 50px;
+    justify-content: center;
+    align-items: flex-start;
+    padding: 24px 12px 90px;
+    overflow-x: hidden;
 }
 
 .resume-sheet {
-    position: relative;
-width: 297mm;height:210mm;
-    min-height: 210mm;
-    margin: 0 auto;
-    background: #fff;
-    display: grid;
-    grid-template-columns: 30% 31% 39%;
-    box-shadow: 0 20px 55px rgba(20, 40, 60, .16);
-}
-
-.col {
-    position: relative;
-    min-width: 0;
+    width: 1123px;
+    min-width: 1123px;
+    height: 794px;
+    min-height: 794px;
+    background: var(--page);
+    color: var(--text);
+    box-shadow: 0 10px 40px rgba(20, 35, 55, 0.18);
     display: flex;
     flex-direction: column;
-}
-
-
-/* ============================================================
-   COLUMN 1  -  PHOTO / CONTACT / ABOUT / MISSION
-   ============================================================ */
-
-.col-left::after {
-    content: "";
-    position: absolute;
-    top: 62mm;
-    bottom: 10mm;
-    right: 0;
-    width: 1px;
-    background: var(--accent);
-}
-
-.blue-cap {
-    height: 44mm;
-    margin: 0 5mm 0 4mm;
-    background: var(--accent);
-}
-
-.photo-frame {
-    width: 54mm;
-    height: 54mm;
-    margin: -26mm auto 0;
-    border-radius: 50%;
-    border: 2.4mm solid #fff;
     overflow: hidden;
-    background: var(--track);
-    position: relative;
-    z-index: 1;
-    flex-shrink: 0;
+    transform-origin: top center;
 }
 
-.profile-photo,
-.profile-placeholder {
+/* =========================================================
+   HEADER (base)
+========================================================= */
+
+.resume-header {
+    position: relative;
+    flex: 0 0 auto;
+    display: flex;
+    align-items: center;
+    gap: 22px;
+    padding: 20px 34px 18px;
+    background: var(--primary);
+    color: #ffffff;
+}
+
+.photo-wrapper {
+    flex: 0 0 auto;
+    width: 92px;
+    height: 92px;
+    padding: 3px;
+    border-radius: 50%;
+    background: #ffffff;
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.25);
+    overflow: hidden;
+}
+
+.profile-photo {
+    display: block;
     width: 100%;
     height: 100%;
     object-fit: cover;
-    display: block;
+    border-radius: 50%;
 }
 
 .profile-placeholder {
+    width: 100%;
+    height: 100%;
     display: flex;
     align-items: center;
     justify-content: center;
-    color: #fff;
-    font-size: 52px;
-    background: var(--accent);
+    border-radius: 50%;
+    background: var(--soft);
+    color: var(--primary);
+    font-size: 36px;
 }
 
-.col-body {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    gap: 6mm;
-    padding: 7mm 7mm 10mm 8mm;
-}
-
-.plain-heading {
-    margin: 0 0 3mm;
-    font-size: 15px;
-    font-weight: 700;
-    line-height: 1.2;
-    letter-spacing: .2px;
-    color: var(--ink);
-}
-
-.body-text {
-    margin: 0;
-    font-size: 9.5px;
-    line-height: 1.7;
-    color: var(--ink);
-    text-align: left;
-}
-
-
-/* contact */
-
-.contact-list {
-    display: flex;
-    flex-direction: column;
-    gap: 2.6mm;
-}
-
-.contact-row {
-    display: flex;
-    align-items: center;
-    gap: 3mm;
-}
-
-.contact-icon {
-    width: 6.5mm;
-    height: 6.5mm;
-    flex-shrink: 0;
-    border-radius: 1.2mm;
-    background: var(--accent);
-    color: #fff;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 9px;
-}
-
-.contact-row span {
-    font-size: 9.5px;
-    line-height: 1.4;
-    word-break: break-word;
+.header-info {
+    flex: 1 1 auto;
     min-width: 0;
 }
 
-
-/* mission */
-
-.pref-list {
-    display: flex;
-    flex-direction: column;
-    gap: 2.6mm;
-}
-
-    .pref-list small {
-        display: block;
-        font-size: 7.5px;
-        letter-spacing: 1.2px;
-        text-transform: uppercase;
-        color: var(--ink-soft);
-        margin-bottom: .8mm;
-    }
-
-    .pref-list strong {
-        display: block;
-        font-size: 9.5px;
-        font-weight: 500;
-        line-height: 1.4;
-    }
-
-
-/* ============================================================
-   COLUMN 2  -  NAME / EDUCATION / SKILLS / LANGUAGES
-   ============================================================ */
-
-.col-mid {
-    padding: 14mm 7mm 10mm 8mm;
-    gap: 7mm;
-}
-
-    .col-mid::after {
-        content: "";
-        position: absolute;
-        top: 12mm;
-        bottom: 10mm;
-        right: 0;
-        width: 1px;
-        background: var(--accent);
-    }
-
-.profile-name {
+.candidate-name {
     margin: 0;
-    font-family: "Oswald", "Impact", "Arial Narrow", sans-serif;
+    font-family: 'Playfair Display', Georgia, serif;
+    font-size: 30px;
     font-weight: 700;
-    font-size: 36px;
-    line-height: 1.05;
-    letter-spacing: 1px;
-    text-transform: uppercase;
-    color: var(--ink);
+    line-height: 1.15;
+    letter-spacing: 0.3px;
+    color: #ffffff;
     word-break: break-word;
 }
 
-.profile-role {
-    margin-top: 2.5mm;
+.candidate-role {
+    margin-top: 4px;
     font-size: 13px;
-    font-weight: 300;
-    letter-spacing: 3px;
-    line-height: 1.3;
-    color: var(--ink);
+    font-weight: 500;
+    letter-spacing: 0.4px;
+    color: rgba(255, 255, 255, 0.85);
 }
 
-.profile-quote {
-    margin: 3mm 0 0;
-    font-size: 9px;
-    line-height: 1.6;
-    font-style: italic;
-    color: var(--ink-soft);
+.header-accent {
+    width: 56px;
+    height: 3px;
+    margin-top: 10px;
+    border-radius: 3px;
+    background: rgba(255, 255, 255, 0.75);
 }
 
-.bar-heading {
-    margin: 0 0 3.5mm;
-    padding: 1.3mm 3mm;
-    background: var(--accent);
-    color: #fff;
-    font-size: 13px;
-    font-weight: 600;
-    letter-spacing: .5px;
-    line-height: 1.3;
-}
-
-
-/* education */
-
-.edu-list {
+.header-contact {
+    flex: 0 0 auto;
     display: flex;
     flex-direction: column;
-    gap: 3.4mm;
-    padding: 0 1mm;
+    gap: 6px;
+    max-width: 300px;
 }
 
-.edu-title {
-    font-size: 11px;
-    font-weight: 600;
-    line-height: 1.3;
-}
-
-.edu-sub {
-    font-size: 9px;
-    font-weight: 600;
-    line-height: 1.35;
-    color: var(--ink-soft);
-}
-
-.edu-year {
-    font-size: 9.5px;
-    line-height: 1.4;
-}
-
-.edu-note {
-    font-size: 8.5px;
-    line-height: 1.4;
-    color: var(--ink-soft);
-}
-
-
-/* skills */
-
-.skill-group {
-    padding: 0 1mm;
-    margin-bottom: 3mm;
-}
-
-.skill-group-title {
-    font-size: 7.5px;
-    letter-spacing: 1.2px;
-    text-transform: uppercase;
-    color: var(--ink-soft);
-    margin-bottom: 1.2mm;
-}
-
-.skill-list {
-    list-style: none;
-    margin: 0;
-    padding: 0;
+.header-contact-item {
     display: flex;
-    flex-direction: column;
-    gap: 1.6mm;
+    align-items: center;
+    gap: 9px;
+    font-size: 11.5px;
+    color: #ffffff;
 }
 
-    .skill-list li {
-        position: relative;
-        padding-left: 4mm;
+    .header-contact-item i {
+        flex: 0 0 auto;
+        width: 22px;
+        height: 22px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 50%;
+        background: rgba(255, 255, 255, 0.18);
         font-size: 10px;
-        line-height: 1.35;
     }
 
-        .skill-list li::before {
-            content: "";
-            position: absolute;
-            left: 0;
-            top: .55em;
-            width: 1.6mm;
-            height: 1.6mm;
-            border-radius: 50%;
-            background: var(--accent);
-        }
-
-
-/* languages */
-
-.lang-row {
-    padding: 0 1mm;
-    margin-bottom: 2.6mm;
-}
-
-.lang-name {
-    font-size: 10px;
-    margin-bottom: 1mm;
-}
-
-.skill-bar {
-    height: 1.8mm;
-    background: var(--track);
-}
-
-    .skill-bar span {
-        display: block;
-        height: 100%;
-        background: var(--accent);
+    .header-contact-item span {
+        min-width: 0;
+        word-break: break-word;
+        overflow-wrap: anywhere;
     }
 
+/* =========================================================
+   BODY (base)
+========================================================= */
 
-/* ============================================================
-   COLUMN 3  -  EXPERIENCE / ACHIEVEMENTS / REFERENCES
-   ============================================================ */
-
-.col-right {
-    padding: 14mm 10mm 10mm 8mm;
-    gap: 7mm;
-}
-
-    .col-right .block-bottom {
-        margin-top: auto; /* pushes references to the bottom */
-    }
-
-.exp-list {
+.resume-body {
+    flex: 1 1 auto;
+    min-height: 0;
     display: flex;
-    flex-direction: column;
-    gap: 4.5mm;
-}
-
-.exp-item {
-    display: grid;
-    grid-template-columns: 17mm 1fr;
-    column-gap: 3mm;
     align-items: stretch;
 }
 
-.exp-date {
-    font-size: 8.5px;
-    font-weight: 700;
-    letter-spacing: .8px;
-    line-height: 1.4;
-    text-align: center;
-    padding-top: .6mm;
-    word-break: break-word;
+.left-column {
+    flex: 0 0 245px;
+    width: 245px;
+    min-height: 0;
+    padding: 16px 16px 16px 22px;
+    background: var(--soft);
+    border-right: 1px solid var(--soft-border);
+    overflow: hidden;
 }
 
-.exp-body {
-    border-left: .5mm solid var(--accent);
-    padding: 0 0 .5mm 3.5mm;
+.right-column {
+    flex: 1 1 auto;
     min-width: 0;
+    min-height: 0;
+    padding: 16px 26px 16px 24px;
+    background: transparent;
+    column-count: 2;
+    column-gap: 26px;
+    column-fill: balance;
+    overflow: hidden;
 }
 
-.exp-title {
-    font-size: 11px;
-    font-weight: 700;
-    line-height: 1.3;
+/* =========================================================
+   SECTIONS
+========================================================= */
+
+.resume-section {
+    margin-bottom: 13px;
+    break-inside: avoid;
+    page-break-inside: avoid;
 }
 
-.exp-org {
-    margin-top: .8mm;
-    font-size: 9.5px;
-    line-height: 1.4;
-    color: var(--ink-soft);
-    word-break: break-word;
-}
-
-.exp-status {
-    margin-top: 1.2mm;
-    font-size: 9px;
-    line-height: 1.4;
-}
-
-    .exp-status i {
-        color: var(--accent);
-        margin-right: 4px;
+    .resume-section:last-child {
+        margin-bottom: 0;
     }
 
+.right-column > .resume-section:has(.summary) {
+    column-span: all;
+    margin-bottom: 13px;
+}
 
-/* achievements */
+.section-heading {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    margin-bottom: 8px;
+}
 
-.achievement-list {
-    list-style: none;
-    margin: 0;
-    padding: 0;
+.section-icon {
+    flex: 0 0 auto;
+    width: 22px;
+    height: 22px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 5px;
+    background: var(--primary);
+    color: #ffffff;
+    font-size: 10.5px;
+}
+
+.section-title {
+    flex: 0 1 auto;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.2px;
+    color: var(--heading);
+}
+
+.section-title-line {
+    flex: 1 1 auto;
+    min-width: 10px;
+    height: 1px;
+    background: var(--soft-border);
+}
+
+/* CONTACT */
+.info-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    margin-bottom: 7px;
+}
+
+    .info-item:last-child {
+        margin-bottom: 0;
+    }
+
+.info-icon {
+    flex: 0 0 auto;
+    width: 22px;
+    height: 22px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    background: var(--card);
+    border: 1px solid var(--soft-border);
+    color: var(--heading);
+    font-size: 10px;
+}
+
+.info-content {
+    flex: 1 1 auto;
+    min-width: 0;
     display: flex;
     flex-direction: column;
-    gap: 2mm;
 }
 
-    .achievement-list li {
-        display: flex;
-        gap: 7px;
-        font-size: 9.5px;
-        line-height: 1.5;
+.info-label {
+    font-size: 9.5px;
+    font-weight: 600;
+    line-height: 1.25;
+    color: var(--muted);
+}
+
+.info-value {
+    font-size: 11px;
+    font-weight: 500;
+    line-height: 1.35;
+    color: var(--text);
+    word-break: break-word;
+    overflow-wrap: anywhere;
+}
+
+/* SKILLS */
+.skill-group {
+    margin-bottom: 8px;
+}
+
+    .skill-group:last-child {
+        margin-bottom: 0;
     }
 
-    .achievement-list i {
-        color: var(--accent);
-        margin-top: 2px;
-        font-size: 9.5px;
-    }
-
-
-/* references */
-
-.ref-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 5mm;
-}
-
-.ref-item {
-    min-width: 0;
-}
-
-.ref-name {
+.skill-group-title {
+    margin-bottom: 3px;
     font-size: 11px;
     font-weight: 700;
-    line-height: 1.3;
+    color: var(--text);
 }
 
-.ref-rel {
-    font-size: 9.5px;
-    line-height: 1.4;
-    color: var(--ink-soft);
-    margin-bottom: 1mm;
-}
-
-.ref-line {
-    font-size: 8.5px;
-    line-height: 1.45;
-    color: var(--ink-soft);
+.skill-list {
+    padding: 6px 8px;
+    background: var(--card);
+    border: 1px solid var(--soft-border);
+    border-left: 3px solid var(--heading);
+    border-radius: 4px;
+    font-size: 10.8px;
+    line-height: 1.5;
+    color: var(--text);
     word-break: break-word;
 }
 
-
-/* ---------- RESPONSIVE (sheet stays A4, scrolls sideways) ---------- */
-
-@media (max-width: 1000px) {
-    .resume-toolbar,
-    .theme-switcher {
-        width: 100%;
-        max-width: calc(100% - 20px);
-        justify-content: center;
-        flex-wrap: wrap;
-    }
-
-    .resume-container {
-        overflow-x: auto;
-        padding: 10px 0 40px;
-    }
-
-    .resume-sheet {
-        margin-left: 10px;
-        margin-right: 10px;
-    }
+/* LANGUAGES */
+.language-list {
+    display: flex;
+    flex-direction: column;
 }
 
-@media (max-width: 600px) {
-    .toolbar-btn {
-        padding: 8px 10px;
+.language-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 6px;
+    padding: 4px 0;
+    border-bottom: 1px dashed var(--soft-border);
+}
+
+    .language-row:last-child {
+        border-bottom: 0;
+    }
+
+.language-name {
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--text);
+}
+
+.language-level {
+    flex: 0 0 auto;
+    padding: 1px 8px;
+    border-radius: 20px;
+    background: var(--primary);
+    color: #ffffff;
+    font-size: 9.5px;
+    font-weight: 600;
+    line-height: 1.5;
+}
+
+/* INTERESTS / PREFERRED LOCATION */
+.interest-box {
+    padding: 6px 9px;
+    background: var(--card);
+    border: 1px solid var(--soft-border);
+    border-radius: 5px;
+    font-size: 10.8px;
+    line-height: 1.5;
+    color: var(--text);
+    word-break: break-word;
+}
+
+/* SOCIAL */
+.social-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 7px;
+    margin-bottom: 6px;
+    font-size: 10.5px;
+    color: var(--text);
+}
+
+    .social-item:last-child {
+        margin-bottom: 0;
+    }
+
+    .social-item i {
+        flex: 0 0 auto;
+        margin-top: 1px;
+        font-size: 13px;
+        color: var(--heading);
+    }
+
+    .social-item span {
+        min-width: 0;
+        word-break: break-all;
+        overflow-wrap: anywhere;
+    }
+
+/* PROFESSIONAL PROFILE */
+.summary {
+    padding: 8px 12px;
+    background: var(--soft);
+    border-left: 4px solid var(--heading);
+    border-radius: 0 5px 5px 0;
+    font-size: 11.3px;
+    line-height: 1.6;
+    color: var(--text);
+    text-align: justify;
+    word-break: break-word;
+    white-space: pre-line;
+}
+
+/* EXPERIENCE */
+.experience-item {
+    position: relative;
+    margin-left: 5px;
+    padding: 0 0 10px 16px;
+    border-left: 2px solid var(--soft-border);
+    break-inside: avoid;
+    page-break-inside: avoid;
+}
+
+    .experience-item:last-child {
+        padding-bottom: 0;
+    }
+
+    .experience-item::before {
+        content: "";
+        position: absolute;
+        left: -7px;
+        top: 3px;
+        width: 12px;
+        height: 12px;
+        border-radius: 50%;
+        background: var(--page);
+        border: 3px solid var(--heading);
+    }
+
+.experience-title {
+    font-size: 12px;
+    font-weight: 700;
+    line-height: 1.3;
+    color: var(--text);
+}
+
+.experience-company {
+    margin-top: 1px;
+    font-size: 11.3px;
+    font-weight: 600;
+    color: var(--heading);
+}
+
+.experience-meta {
+    margin-top: 2px;
+    font-size: 10.5px;
+    color: var(--muted);
+}
+
+/* EDUCATION */
+.education-list {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.education-item {
+    padding: 6px 10px;
+    background: var(--card);
+    border: 1px solid var(--soft-border);
+    border-left: 4px solid var(--heading);
+    border-radius: 4px;
+    break-inside: avoid;
+    page-break-inside: avoid;
+}
+
+.education-title {
+    font-size: 11.8px;
+    font-weight: 700;
+    line-height: 1.3;
+    color: var(--text);
+}
+
+.education-meta {
+    margin-top: 1px;
+    font-size: 10.5px;
+    color: var(--muted);
+}
+
+/* ACHIEVEMENTS */
+.achievement-list {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.achievement-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 7px;
+    font-size: 11.3px;
+    line-height: 1.45;
+    color: var(--text);
+}
+
+    .achievement-item i {
+        flex: 0 0 auto;
+        margin-top: 2px;
+        font-size: 11.5px;
+        color: var(--heading);
+    }
+
+    .achievement-item span {
+        min-width: 0;
+        word-break: break-word;
+    }
+
+/* REFERENCES */
+.reference-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 7px;
+}
+
+.reference-item {
+    padding: 7px 10px;
+    background: var(--soft);
+    border: 1px solid var(--soft-border);
+    border-radius: 5px;
+    break-inside: avoid;
+    page-break-inside: avoid;
+}
+
+.reference-name {
+    font-size: 11.8px;
+    font-weight: 700;
+    color: var(--text);
+}
+
+.reference-relation {
+    margin-bottom: 3px;
+    font-size: 10.5px;
+    font-weight: 600;
+    color: var(--heading);
+}
+
+.reference-detail {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-top: 2px;
+    font-size: 10.5px;
+    color: var(--muted);
+}
+
+    .reference-detail i {
+        width: 11px;
+        text-align: center;
         font-size: 10px;
+        color: var(--heading);
+    }
+
+/* CAREER PREFERENCE */
+.preference-item {
+    margin-bottom: 5px;
+    font-size: 11.3px;
+    line-height: 1.5;
+    color: var(--text);
+}
+
+    .preference-item:last-child {
+        margin-bottom: 0;
+    }
+
+    .preference-item strong {
+        margin-right: 4px;
+        font-weight: 700;
+        color: var(--heading);
+    }
+
+/* =========================================================
+   RIGHT RAIL  -  TEMPLATE SPECIFIC
+========================================================= */
+
+.resume-sheet {
+    display: grid;
+    grid-template-columns: 1fr 268px;
+    grid-template-rows: auto 1fr;
+    border-top: 8px solid var(--primary);
+}
+
+.resume-body { display: contents; }
+
+.resume-header {
+    grid-column: 1;
+    grid-row: 1;
+    padding: 22px 30px 16px;
+    background: #ffffff;
+    border-bottom: 3px solid var(--primary);
+}
+
+.photo-wrapper {
+    width: 98px;
+    height: 98px;
+    padding: 0;
+    border-radius: 16px;
+    box-shadow: none;
+    border: 2px solid var(--primary);
+}
+
+.profile-photo,
+.profile-placeholder { border-radius: 14px; }
+
+.candidate-name {
+    font-family: 'Inter', 'Segoe UI', Arial, sans-serif;
+    font-size: 27px;
+    font-weight: 800;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+}
+
+.candidate-role { font-weight: 600; letter-spacing: 1px; }
+.header-contact { max-width: 250px; }
+
+.left-column {
+    grid-column: 2;
+    grid-row: 1 / 3;
+    flex: none;
+    width: auto;
+    padding: 22px 22px 16px 22px;
+    background: var(--soft);
+    border-right: 0;
+    border-left: 1px solid var(--soft-border);
+}
+
+.right-column {
+    grid-column: 1;
+    grid-row: 2;
+    padding: 16px 30px 16px 30px;
+}
+
+.section-title { font-size: 11px; letter-spacing: 1.4px; text-transform: uppercase; }
+.section-icon { width: 22px; height: 22px; border-radius: 50%; background: transparent; border: 1.5px solid var(--primary); color: var(--primary); }
+.section-title-line { height: 2px; background: var(--primary); opacity: 0.25; }
+
+.candidate-name { color: var(--ink); }
+.candidate-role { color: var(--primary); }
+.header-accent { background: var(--primary); }
+.header-contact-item { color: var(--text); }
+.header-contact-item i { background: var(--primary); color: #ffffff; }
+
+/* =========================================================
+   RESPONSIVE  -  ZOOM OUT ONLY (sheet = 1123px wide)
+   zoom = (screen width - 28px) / 1123
+   Layout never reflows, the sheet is only made smaller.
+========================================================= */
+
+@media (max-width: 1150px) {
+    .resume-page-wrapper {
+        padding: 14px 12px 80px;
     }
 }
 
+@media (max-width: 1140px) {
+    .resume-sheet {
+        zoom: 0.99;
+    }
+}
 
-/* ---------- PRINT ---------- */
+@media (max-width: 1100px) {
+    .resume-sheet {
+        zoom: 0.95;
+    }
+}
+
+@media (max-width: 1040px) {
+    .resume-sheet {
+        zoom: 0.9;
+    }
+}
+
+@media (max-width: 980px) {
+    .resume-sheet {
+        zoom: 0.84;
+    }
+}
+
+@media (max-width: 920px) {
+    .resume-sheet {
+        zoom: 0.79;
+    }
+}
+
+@media (max-width: 860px) {
+    .resume-sheet {
+        zoom: 0.74;
+    }
+}
+
+@media (max-width: 800px) {
+    .resume-sheet {
+        zoom: 0.68;
+    }
+}
+
+@media (max-width: 740px) {
+    .resume-sheet {
+        zoom: 0.63;
+    }
+}
+
+@media (max-width: 680px) {
+    .resume-sheet {
+        zoom: 0.58;
+    }
+}
+
+@media (max-width: 620px) {
+    .resume-sheet {
+        zoom: 0.52;
+    }
+}
+
+@media (max-width: 560px) {
+    .resume-sheet {
+        zoom: 0.47;
+    }
+}
+
+@media (max-width: 500px) {
+    .resume-sheet {
+        zoom: 0.42;
+    }
+}
+
+@media (max-width: 450px) {
+    .resume-sheet {
+        zoom: 0.37;
+    }
+}
+
+@media (max-width: 400px) {
+    .resume-sheet {
+        zoom: 0.33;
+    }
+}
+
+@media (max-width: 360px) {
+    .resume-sheet {
+        zoom: 0.29;
+    }
+}
+
+@media (max-width: 320px) {
+    .resume-sheet {
+        zoom: 0.26;
+    }
+}
+
+/* =========================================================
+   PRINT  -  A4 LANDSCAPE
+========================================================= */
+
+@page {
+    size: 297mm 210mm;
+    margin: 0;
+}
 
 @media print {
     html, body {
-    width: 297mm;height:210mm;
-        margin: 0;
-        padding: 0;
-        background: #fff;
-        -webkit-print-color-adjust: exact;
-        print-color-adjust: exact;
+        background: #ffffff;
+        width: 297mm;
+        height: 210mm;
     }
 
-    .resume-toolbar,
-    .theme-switcher {
-        display: none !important;
-    }
-
-    .resume-container {
+    .resume-page-wrapper {
+        position: static;
+        top: 0;
         padding: 0;
-        margin: 0;
+        display: block;
+        overflow: visible;
     }
 
     .resume-sheet {
-    width: 297mm;height:210mm;
+        zoom: 1 !important;
+        width: 297mm;
+        min-width: 297mm;
+        height: 210mm;
         min-height: 210mm;
         margin: 0;
         box-shadow: none;
+        page-break-after: avoid;
     }
 
-    @page {
-        size: A4 landscape;
-        margin: 0;
+    .resume-top-toolbar,
+    .resume-theme-switcher,
+    .resume-navigation {
+        display: none !important;
     }
 }

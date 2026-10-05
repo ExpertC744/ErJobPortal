@@ -1,0 +1,228 @@
+﻿ 
+/* =========================================
+       1TRAINEE BILLING CONTROLLER
+       ========================================= */
+.billing-page {
+    padding-bottom: 40px;
+}
+
+
+/* Page Header */
+
+.billing-page-header {
+    margin-bottom: 24px;
+}
+
+    .billing-page-header h1 {
+        margin: 0 0 6px;
+        color: #0f172a;
+        font-size: 28px;
+        font-weight: 700;
+    }
+
+        .billing-page-header h1 i {
+            margin-right: 9px;
+            color: #0d9488;
+        }
+
+    .billing-page-header p {
+        margin: 0;
+        color: #64748b;
+        font-size: 14px;
+    }
+
+
+/* Company Card */
+
+.billing-company-card {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    padding: 18px 22px;
+    margin-bottom: 24px;
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 15px;
+    box-shadow: 0 5px 20px rgba(15, 23, 42, .05);
+}
+
+.company-icon {
+    width: 48px;
+    height: 48px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    border-radius: 12px;
+    background: #ccfbf1;
+    color: #0d9488;
+    font-size: 19px;
+}
+
+.company-label {
+    display: block;
+    margin-bottom: 3px;
+    color: #94a3b8;
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: .5px;
+}
+
+.billing-company-card h2 {
+    margin: 0;
+    color: #0f172a;
+    font-size: 19px;
+    font-weight: 700;
+}
+
+
+/* Options */
+
+.billing-options {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 18px;
+}
+
+
+/* Option Card */
+
+.billing-option-card {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    min-height: 125px;
+    padding: 22px;
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 16px;
+    text-decoration: none;
+    box-shadow: 0 5px 20px rgba(15, 23, 42, .05);
+    transition: all .2s ease;
+}
+
+    .billing-option-card:hover {
+        border-color: #99f6e4;
+        background: #fafffe;
+        text-decoration: none;
+        transform: translateY(-2px);
+        box-shadow: 0 9px 25px rgba(13, 148, 136, .10);
+    }
+
+
+/* Icon */
+
+.billing-option-icon {
+    width: 52px;
+    height: 52px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    border-radius: 14px;
+    background: #f0fdfa;
+    color: #0d9488;
+    font-size: 20px;
+    transition: all .2s ease;
+}
+
+.billing-option-card:hover .billing-option-icon {
+    background: #ccfbf1;
+    color: #0f766e;
+}
+
+
+/* Content */
+
+.billing-option-content {
+    min-width: 0;
+    flex: 1;
+}
+
+    .billing-option-content h3 {
+        margin: 0 0 6px;
+        color: #0f172a;
+        font-size: 16px;
+        font-weight: 700;
+    }
+
+    .billing-option-content p {
+        margin: 0;
+        color: #64748b;
+        font-size: 12px;
+        line-height: 1.5;
+    }
+
+
+/* Arrow */
+
+.billing-option-arrow {
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    border-radius: 8px;
+    background: #f8fafc;
+    color: #94a3b8;
+    font-size: 11px;
+    transition: all .2s ease;
+}
+
+.billing-option-card:hover .billing-option-arrow {
+    background: #ccfbf1;
+    color: #0d9488;
+}
+
+
+/* =========================================
+       RESPONSIVE
+       ========================================= */
+
+@media (max-width: 767px) {
+
+    .billing-page {
+        padding-left: 5px;
+        padding-right: 5px;
+    }
+
+    .billing-page-header h1 {
+        font-size: 24px;
+    }
+
+    .billing-options {
+        grid-template-columns: 1fr;
+        gap: 14px;
+    }
+
+    .billing-option-card {
+        min-height: 105px;
+        padding: 18px;
+    }
+}
+
+
+@media (max-width: 480px) {
+
+    .billing-company-card {
+        padding: 15px;
+    }
+
+    .company-icon {
+        width: 43px;
+        height: 43px;
+    }
+
+    .billing-option-icon {
+        width: 46px;
+        height: 46px;
+    }
+
+    .billing-option-content h3 {
+        font-size: 14px;
+    }
+}
+ 
