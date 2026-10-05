@@ -1,0 +1,483 @@
+﻿@model ErJobPortal.Models.TPOFeedbackViewModel
+
+@{
+    Layout = "~/Views/Shared/_DashboardLayout.cshtml";
+
+    ViewData["Title"] = "Create Feedback";
+    ViewData["Panel"] = "TPO";
+
+    ViewData["UserName"] =
+        Context.Session.GetString("TPOName") ?? "TPO";
+}
+
+<div class="container-fluid">
+
+    <div class="master-table-container">
+
+        <!-- =====================================================
+             PAGE HEADER
+        ====================================================== -->
+
+        <div class="mb-4">
+
+            <h2>
+                Create Feedback
+            </h2>
+
+        </div>
+
+
+        <!-- =====================================================
+             SUCCESS MESSAGE
+        ====================================================== -->
+
+        @if (TempData["Success"] != null)
+        {
+            <div class="alert alert-success">
+                @TempData["Success"]
+            </div>
+        }
+
+
+        <!-- =====================================================
+             ERROR MESSAGE
+        ====================================================== -->
+
+        @if (TempData["Error"] != null)
+        {
+            <div class="alert alert-danger">
+                @TempData["Error"]
+            </div>
+        }
+
+
+        <!-- =====================================================
+             VALIDATION SUMMARY
+        ====================================================== -->
+
+        <div asp-validation-summary="ModelOnly"
+             class="text-danger mb-3">
+        </div>
+
+
+        <!-- =====================================================
+             TPO FEEDBACK FORM
+        ====================================================== -->
+
+        <form asp-controller="TPO"
+              asp-action="CreateFeedback"
+              method="post">
+
+            @Html.AntiForgeryToken()
+
+
+            <!-- =================================================
+                 QUESTION 1
+            ================================================== -->
+
+            <div class="mb-4">
+
+                <label class="form-label fw-bold">
+
+                    @(string.IsNullOrWhiteSpace(Model.Que1)
+                        ? "Question 1"
+                        : Model.Que1)
+
+                </label>
+
+
+                <div>
+
+                    <div class="form-check">
+
+                        <input type="radio"
+                               class="form-check-input"
+                               asp-for="sQue1"
+                               value="True"
+                               id="q1Yes" />
+
+                        <label class="form-check-label"
+                               for="q1Yes">
+
+                            Yes
+
+                        </label>
+
+                    </div>
+
+
+                    <div class="form-check">
+
+                        <input type="radio"
+                               class="form-check-input"
+                               asp-for="sQue1"
+                               value="False"
+                               id="q1No" />
+
+                        <label class="form-check-label"
+                               for="q1No">
+
+                            No
+
+                        </label>
+
+                    </div>
+
+                </div>
+
+
+                <span asp-validation-for="sQue1"
+                      class="text-danger">
+                </span>
+
+            </div>
+
+
+            <!-- =================================================
+                 QUESTION 2
+            ================================================== -->
+
+            <div class="mb-4">
+
+                <label class="form-label fw-bold">
+
+                    @(string.IsNullOrWhiteSpace(Model.Que2)
+                        ? "Question 2"
+                        : Model.Que2)
+
+                </label>
+
+
+                <div>
+
+                    <div class="form-check">
+
+                        <input type="radio"
+                               class="form-check-input"
+                               asp-for="sQue2"
+                               value="1"
+                               id="q2_1" />
+
+                        <label class="form-check-label"
+                               for="q2_1">
+
+                            ⭐ 1
+
+                        </label>
+
+                    </div>
+
+
+                    <div class="form-check">
+
+                        <input type="radio"
+                               class="form-check-input"
+                               asp-for="sQue2"
+                               value="2"
+                               id="q2_2" />
+
+                        <label class="form-check-label"
+                               for="q2_2">
+
+                            ⭐⭐ 2
+
+                        </label>
+
+                    </div>
+
+
+                    <div class="form-check">
+
+                        <input type="radio"
+                               class="form-check-input"
+                               asp-for="sQue2"
+                               value="3"
+                               id="q2_3" />
+
+                        <label class="form-check-label"
+                               for="q2_3">
+
+                            ⭐⭐⭐ 3
+
+                        </label>
+
+                    </div>
+
+
+                    <div class="form-check">
+
+                        <input type="radio"
+                               class="form-check-input"
+                               asp-for="sQue2"
+                               value="4"
+                               id="q2_4" />
+
+                        <label class="form-check-label"
+                               for="q2_4">
+
+                            ⭐⭐⭐⭐ 4
+
+                        </label>
+
+                    </div>
+
+
+                    <div class="form-check">
+
+                        <input type="radio"
+                               class="form-check-input"
+                               asp-for="sQue2"
+                               value="5"
+                               id="q2_5" />
+
+                        <label class="form-check-label"
+                               for="q2_5">
+
+                            ⭐⭐⭐⭐⭐ 5
+
+                        </label>
+
+                    </div>
+
+                </div>
+
+
+                <span asp-validation-for="sQue2"
+                      class="text-danger">
+                </span>
+
+            </div>
+
+
+            <!-- =================================================
+                 QUESTION 3
+            ================================================== -->
+
+            <div class="mb-4">
+
+                <label class="form-label fw-bold">
+
+                    @(string.IsNullOrWhiteSpace(Model.Que3)
+                        ? "Question 3"
+                        : Model.Que3)
+
+                </label>
+
+
+                <div>
+
+                    <div class="form-check">
+
+                        <input type="radio"
+                               class="form-check-input"
+                               asp-for="sQue3"
+                               value="Yes"
+                               id="q3Yes" />
+
+                        <label class="form-check-label"
+                               for="q3Yes">
+
+                            Yes
+
+                        </label>
+
+                    </div>
+
+
+                    <div class="form-check">
+
+                        <input type="radio"
+                               class="form-check-input"
+                               asp-for="sQue3"
+                               value="No"
+                               id="q3No" />
+
+                        <label class="form-check-label"
+                               for="q3No">
+
+                            No
+
+                        </label>
+
+                    </div>
+
+                </div>
+
+
+                <span asp-validation-for="sQue3"
+                      class="text-danger">
+                </span>
+
+            </div>
+
+
+            <!-- =================================================
+                 QUESTION 4
+            ================================================== -->
+
+            <div class="mb-4">
+
+                <label class="form-label fw-bold">
+
+                    @(string.IsNullOrWhiteSpace(Model.Que4)
+                        ? "Question 4"
+                        : Model.Que4)
+
+                </label>
+
+
+                <div>
+
+                    <div class="form-check">
+
+                        <input type="radio"
+                               class="form-check-input"
+                               asp-for="sQue4"
+                               value="1"
+                               id="q4_1" />
+
+                        <label class="form-check-label"
+                               for="q4_1">
+
+                            😞 1
+
+                        </label>
+
+                    </div>
+
+
+                    <div class="form-check">
+
+                        <input type="radio"
+                               class="form-check-input"
+                               asp-for="sQue4"
+                               value="2"
+                               id="q4_2" />
+
+                        <label class="form-check-label"
+                               for="q4_2">
+
+                            🙁 2
+
+                        </label>
+
+                    </div>
+
+
+                    <div class="form-check">
+
+                        <input type="radio"
+                               class="form-check-input"
+                               asp-for="sQue4"
+                               value="3"
+                               id="q4_3" />
+
+                        <label class="form-check-label"
+                               for="q4_3">
+
+                            😐 3
+
+                        </label>
+
+                    </div>
+
+
+                    <div class="form-check">
+
+                        <input type="radio"
+                               class="form-check-input"
+                               asp-for="sQue4"
+                               value="4"
+                               id="q4_4" />
+
+                        <label class="form-check-label"
+                               for="q4_4">
+
+                            🙂 4
+
+                        </label>
+
+                    </div>
+
+
+                    <div class="form-check">
+
+                        <input type="radio"
+                               class="form-check-input"
+                               asp-for="sQue4"
+                               value="5"
+                               id="q4_5" />
+
+                        <label class="form-check-label"
+                               for="q4_5">
+
+                            😃 5
+
+                        </label>
+
+                    </div>
+
+                </div>
+
+
+                <span asp-validation-for="sQue4"
+                      class="text-danger">
+                </span>
+
+            </div>
+
+
+            <!-- =================================================
+                 QUESTION 5
+            ================================================== -->
+
+            <div class="mb-4">
+
+                <label class="form-label fw-bold">
+
+                    @(string.IsNullOrWhiteSpace(Model.Que5)
+                        ? "Additional Feedback"
+                        : Model.Que5)
+
+                </label>
+
+
+                <textarea asp-for="sQue5"
+                          class="form-control"
+                          rows="5"
+                          placeholder="Enter your feedback"></textarea>
+
+
+                <span asp-validation-for="sQue5"
+                      class="text-danger">
+                </span>
+
+            </div>
+
+
+            <!-- =================================================
+                 SUBMIT BUTTON
+            ================================================== -->
+
+            <div class="mt-4">
+
+                <button type="submit"
+                        class="btn btn-primary">
+
+                    Submit Feedback
+
+                </button>
+
+            </div>
+
+        </form>
+
+    </div>
+
+</div>
+
+
+@section Scripts
+{
+    <partial name="_ValidationScriptsPartial" />
+}

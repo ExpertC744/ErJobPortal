@@ -1,0 +1,428 @@
+﻿@model List<ErJobPortal.Models.TPORegistration>
+
+@{
+    Layout = "~/Views/Shared/_DashboardLayout.cshtml";
+
+    ViewData["Title"] = "TPO Details";
+    ViewData["Panel"] = "TPO";
+    ViewData["UserName"] =
+        Context.Session.GetString("TPOName") ?? "TPO";
+}
+
+<link rel="stylesheet"
+      href="~/css/InternshipDetails.css"
+      asp-append-version="true" />
+
+<div class="container-fluid">
+
+    <div class="master-table-container">
+
+        <!-- =====================================================
+             PAGE HEADER
+        ====================================================== -->
+
+        <div class="mb-4">
+
+            <h1 class="mb-2">
+                TPO Details
+            </h1>
+
+            <p class="mb-0 text-muted">
+                Registered TPO and Sub TPO Information
+            </p>
+
+        </div>
+
+
+        <!-- =====================================================
+             SUCCESS MESSAGE
+        ====================================================== -->
+
+        @if (TempData["Success"] != null)
+        {
+            <div class="alert alert-success">
+                @TempData["Success"]
+            </div>
+        }
+
+
+        <!-- =====================================================
+             ERROR MESSAGE
+        ====================================================== -->
+
+        @if (TempData["Error"] != null)
+        {
+            <div class="alert alert-danger">
+                @TempData["Error"]
+            </div>
+        }
+
+
+        <!-- =====================================================
+             TABLE
+        ====================================================== -->
+
+        <div class="tpo-table-scroll">
+
+            <table class="master-data-table">
+
+                <thead>
+
+                    <tr>
+
+                        <th>
+                            Sr. No
+                        </th>
+
+                        <th>
+                            TPO ID
+                        </th>
+
+                        <th>
+                            TPO Type
+                        </th>
+
+                        <th>
+                            Full Name
+                        </th>
+
+                        <th>
+                            College Email ID
+                        </th>
+
+                        <th>
+                            Mobile No
+                        </th>
+
+                        <th>
+                            College Name
+                        </th>
+
+                        <th>
+                            College Code
+                        </th>
+
+                        <th>
+                            College Address
+                        </th>
+
+                        <th>
+                            Website
+                        </th>
+
+                        <th>
+                            Designation
+                        </th>
+
+                        <th>
+                            Department
+                        </th>
+
+                        <th>
+                            Employee ID
+                        </th>
+
+                        <th>
+                            Status
+                        </th>
+
+                        <th>
+                            Approved
+                        </th>
+
+                        <th>
+                            Active
+                        </th>
+
+                        <th>
+                            Created Date
+                        </th>
+
+                        <th>
+                            Updated Date
+                        </th>
+
+                    </tr>
+
+                </thead>
+
+
+                <tbody>
+
+                    @{
+                        int srNo = 1;
+                    }
+
+
+                    @foreach (var item in Model)
+                    {
+                        <tr>
+
+                            <!-- SR NO -->
+
+                            <td class="master-id">
+                                @srNo
+                            </td>
+
+
+                            <!-- TPO ID -->
+
+                            <td>
+                                @item.TPOID
+                            </td>
+
+
+                            <!-- TPO TYPE -->
+
+                            <td>
+
+                                @if (item.TPOType == "Sub TPO")
+                                {
+                                    <span class="tpo-type-sub">
+                                        Sub TPO
+                                    </span>
+                                }
+                                else
+                                {
+                                    <span class="tpo-type-main">
+                                        TPO
+                                    </span>
+                                }
+
+                            </td>
+
+
+                            <!-- NAME -->
+
+                            <td>
+                                @item.FullName
+                            </td>
+
+
+                            <!-- EMAIL -->
+
+                            <td>
+                                @item.CollegeMailID
+                            </td>
+
+
+                            <!-- MOBILE -->
+
+                            <td>
+                                @item.MobileNo
+                            </td>
+
+
+                            <!-- COLLEGE -->
+
+                            <td>
+                                @item.CollegeName
+                            </td>
+
+
+                            <!-- COLLEGE CODE -->
+
+                            <td>
+
+                                @if (!string.IsNullOrWhiteSpace(
+                                    item.CollegeCode))
+                                {
+                                    @item.CollegeCode
+                                }
+                                else
+                                {
+                                    <span class="text-muted">
+                                        N/A
+                                    </span>
+                                }
+
+                            </td>
+
+
+                            <!-- ADDRESS -->
+
+                            <td>
+                                @item.CollegeAddress
+                            </td>
+
+
+                            <!-- WEBSITE -->
+
+                            <td>
+
+                                @if (!string.IsNullOrWhiteSpace(
+                                    item.OrganizationWebsiteURL))
+                                {
+                                    <a href="@item.OrganizationWebsiteURL"
+                                       target="_blank"
+                                       class="text-primary fw-semibold">
+
+                                        Visit Website
+
+                                    </a>
+                                }
+                                else
+                                {
+                                    <span class="text-muted">
+                                        N/A
+                                    </span>
+                                }
+
+                            </td>
+
+
+                            <!-- DESIGNATION -->
+
+                            <td>
+                                @item.Designation
+                            </td>
+
+
+                            <!-- DEPARTMENT -->
+
+                            <td>
+                                @item.DepartmentName
+                            </td>
+
+
+                            <!-- EMPLOYEE ID -->
+
+                            <td>
+                                @item.CollegeEmployeeID
+                            </td>
+
+
+                            <!-- STATUS -->
+
+                            <td>
+
+                                @if (!string.IsNullOrWhiteSpace(
+                                    item.Status))
+                                {
+                                    @item.Status
+                                }
+                                else
+                                {
+                                    <span class="text-muted">
+                                        Pending
+                                    </span>
+                                }
+
+                            </td>
+
+
+                            <!-- APPROVED -->
+
+                            <td>
+
+                                @if (item.IsApproved)
+                                {
+                                    <span class="master-action-btn">
+                                        Approved
+                                    </span>
+                                }
+                                else
+                                {
+                                    <span class="text-muted">
+                                        Not Approved
+                                    </span>
+                                }
+
+                            </td>
+
+
+                            <!-- ACTIVE -->
+
+                            <td>
+
+                                @if (item.IsActive)
+                                {
+                                    <span class="master-action-btn">
+                                        Active
+                                    </span>
+                                }
+                                else
+                                {
+                                    <span class="text-muted">
+                                        Inactive
+                                    </span>
+                                }
+
+                            </td>
+
+
+                            <!-- CREATED DATE -->
+
+                            <td>
+                                @(item.CreatedDate?.ToString(
+                                    "dd-MM-yyyy hh:mm tt")
+                                    ?? "N/A")
+                            </td>
+
+
+                            <!-- UPDATED DATE -->
+
+                            <td>
+                                @(item.UpdatedDate?.ToString(
+                                    "dd-MM-yyyy hh:mm tt")
+                                    ?? "N/A")
+                            </td>
+
+                        </tr>
+
+                        srNo++;
+                    }
+
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<style>
+
+    .tpo-table-scroll {
+        width: 100%;
+        overflow-x: auto;
+        overflow-y: hidden;
+        border: 1px solid #e5e5e5;
+        border-radius: 4px;
+    }
+
+    .tpo-table-scroll .master-data-table {
+        width: 100%;
+        min-width: 2200px;
+        margin-bottom: 0;
+    }
+
+    .tpo-table-scroll .master-data-table th,
+    .tpo-table-scroll .master-data-table td {
+        white-space: nowrap;
+    }
+
+    .tpo-type-main,
+    .tpo-type-sub {
+        display: inline-block;
+        padding: 5px 10px;
+        border-radius: 4px;
+        font-size: 13px;
+        font-weight: 600;
+    }
+
+    .tpo-type-main {
+        background: #e8f1ff;
+        color: #1557a6;
+    }
+
+    .tpo-type-sub {
+        background: #eaf8ed;
+        color: #18753c;
+    }
+
+</style>

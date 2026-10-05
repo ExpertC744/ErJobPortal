@@ -1456,5 +1456,170 @@ public IActionResult OrganizationResetPassword()
                 return View(model);
             }
         }
+
+        // shrirang 05/10/26
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public IActionResult TPOEditProfile(TPORegistration model)
+        {
+            // Get logged-in TPO from session
+            int? tpoId = HttpContext.Session.GetInt32("TPOID");
+
+            if (tpoId == null || tpoId <= 0)
+            {
+                return RedirectToAction("TPOLogin", "Account");
+            }
+
+            // IMPORTANT:
+            // Never take TPOID from the form.
+            // Use the logged-in user's session ID.
+            model.TPOID = tpoId.Value;
+
+            // Password is not being edited from Edit Profile
+            ModelState.Remove(nameof(TPORegistration.Password));
+            ModelState.Remove(nameof(TPORegistration.ConfirmPassword));
+
+            if (!ModelState.IsValid)
+            {
+                ViewData["Panel"] = "TPO";
+                ViewData["UserName"] =
+                    HttpContext.Session.GetString("TPOName") ?? "TPO";
+
+                ViewData["Title"] = "Edit TPO Profile";
+
+                return View("~/Views/TPO/EditProfile.cshtml", model);
+            }
+
+            try
+            {
+                // ==========================================
+                // UPLOAD FOLDER
+                // ==========================================
+
+                string uploadFolder = Path.Combine(
+                    Directory.GetCurrentDirectory(),
+                    "wwwroot",
+                    "Uploads",
+                    "TPO");
+
+                if (!Directory.Exists(uploadFolder))
+                {
+                    Directory.CreateDirectory(uploadFolder);
+                }
+
+                // ==========================================
+                // SUPPORTING DOCUMENT 1
+                // ==========================================
+
+                if (model.SupportingDocument1File != null &&
+                    model.SupportingDocument1File.Length > 0)
+                {
+                    string extension =
+                        Path.GetExtension(model.SupportingDocument1File.FileName);
+
+                    string fileName =
+                        "TPO_DOC1_" +
+                        Guid.NewGuid().ToString("N") +
+                        extension;
+
+                    string filePath =
+                        Path.Combine(uploadFolder, fileName);
+
+                    using (FileStream stream =
+                           new FileStream(filePath, FileMode.Create))
+                    {
+                        model.SupportingDocument1File.CopyTo(stream);
+                    }
+
+                    model.SupportingDocument1 = fileName;
+                }
+
+                // ==========================================
+                // SUPPORTING DOCUMENT 2
+                // ==========================================
+
+                if (model.SupportingDocument2File != null &&
+                    model.SupportingDocument2File.Length > 0)
+                {
+                    string extension =
+                        Path.GetExtension(model.SupportingDocument2File.FileName);
+
+                    string fileName =
+                        "TPO_DOC2_" +
+                        Guid.NewGuid().ToString("N") +
+                        extension;
+
+                    string filePath =
+                        Path.Combine(uploadFolder, fileName);
+
+                    using (FileStream stream =
+                           new FileStream(filePath, FileMode.Create))
+                    {
+                        model.SupportingDocument2File.CopyTo(stream);
+                    }
+
+                    model.SupportingDocument2 = fileName;
+                }
+
+                // ==========================================
+                // PROFILE PHOTO
+                // ==========================================
+
+                if (model.ProfilePhotoFile != null &&
+                    model.ProfilePhotoFile.Length > 0)
+                {
+                    string extension =
+                        Path.GetExtension(model.ProfilePhotoFile.FileName);
+
+                    string fileName =
+                        "TPO_PROFILE_" +
+                        Guid.NewGuid().ToString("N") +
+                        extension;
+
+                    string filePath =
+                        Path.Combine(uploadFolder, fileName);
+
+                    using (FileStream stream =
+                           new FileStream(filePath, FileMode.Create))
+                    {
+                        model.ProfilePhotoFile.CopyTo(stream);
+                    }
+
+                    model.ProfilePhoto = fileName;
+                }
+
+                // ==========================================
+                // UPDATE DATABASE
+                // ==========================================
+
+                bool updated =
+                    _accountRepository.UpdateTPOProfile(model);
+
+                if (!updated)
+                {
+                    TempData["Error"] =
+                        "TPO profile could not be updated.";
+
+                    return RedirectToAction("EditProfile", "TPO");
+                }
+
+                // Update session name
+                HttpContext.Session.SetString(
+                    "TPOName",
+                    model.FullName ?? "TPO");
+
+                TempData["Success"] =
+                    "TPO profile updated successfully.";
+
+                return RedirectToAction("ViewProfile", "TPO");
+            }
+            catch (Exception ex)
+            {
+                TempData["Error"] =
+                    "Error while updating TPO profile: " + ex.Message;
+
+                return RedirectToAction("EditProfile", "TPO");
+            }
+        }
     }
 }

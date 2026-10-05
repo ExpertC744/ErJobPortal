@@ -245,20 +245,19 @@
                         </td>
 
 
-                        <!-- Status -->
-                        <td>
+                            <!-- Status -->
+                            <td>
 
-                            <button type="button"
-                                    class="status @(item.nBit ? "enabled" : "disabled")"
-                                    data-id="@item.nID"
-                                    onclick="togglePostStatus(this)">
+                                <button type="button"
+                                        class="master-status @(item.nBit ? "enabled" : "disabled")"
+                                        data-id="@item.nID"
+                                        onclick="togglePostStatus(this)">
 
-                                @(item.nBit ? "Enabled" : "Disabled")
+                                    @(item.nBit ? "Enabled" : "Disabled")
 
-                            </button>
+                                </button>
 
-                        </td>
-
+                            </td>
                     </tr>
 
                     srNo++;
