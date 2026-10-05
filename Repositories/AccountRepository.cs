@@ -388,64 +388,151 @@ GetOrganizationRegistrationDetails(int orgId)
         {
             using (SqlConnection cn = _db.GetConnection())
             {
-                using (SqlCommand cmd = new SqlCommand("SP_OrganizationLogin", cn))
+                using (SqlCommand cmd =
+                       new SqlCommand("SP_OrganizationLogin", cn))
                 {
                     cmd.CommandType = CommandType.StoredProcedure;
-                    cmd.Parameters.AddWithValue("@sEmail", model.sEmail ?? "");
-                    cmd.Parameters.AddWithValue("@sPassword", model.sPassword ?? "");
+
+                    cmd.Parameters.AddWithValue(
+                        "@sEmail",
+                        model.sEmail ?? ""
+                    );
+
+                    cmd.Parameters.AddWithValue(
+                        "@sPassword",
+                        model.sPassword ?? ""
+                    );
+
                     cn.Open();
+
                     using (SqlDataReader dr = cmd.ExecuteReader())
                     {
                         if (dr.Read())
                         {
                             return new OrganizationUser
                             {
-                                nID = Convert.ToInt32(dr["nID"]),
-                                sOrgName = dr["sOrgName"].ToString(),
-                                sOrgUrl = dr["sOrgUrl"].ToString(),
-                                sName = dr["sName"].ToString(),
-                                sDesignation = dr["sDesignation"].ToString(),
-                                sMobile = dr["sMobile"].ToString(),
-                                sEmail = dr["sEmail"].ToString(),
-                                nCollegeCode = Convert.ToInt32(dr["nCollegeCode"]),
-                                nCollegeName = Convert.ToInt32(dr["nCollegeName"])
+                                nID = dr["nID"] == DBNull.Value
+                                    ? 0
+                                    : Convert.ToInt32(dr["nID"]),
+
+                                sOrgName = dr["sOrgName"] == DBNull.Value
+                                    ? ""
+                                    : dr["sOrgName"].ToString(),
+
+                                sOrgUrl = dr["sOrgUrl"] == DBNull.Value
+                                    ? ""
+                                    : dr["sOrgUrl"].ToString(),
+
+                                sName = dr["sName"] == DBNull.Value
+                                    ? ""
+                                    : dr["sName"].ToString(),
+
+                                sDesignation = dr["sDesignation"] == DBNull.Value
+                                    ? ""
+                                    : dr["sDesignation"].ToString(),
+
+                                sMobile = dr["sMobile"] == DBNull.Value
+                                    ? ""
+                                    : dr["sMobile"].ToString(),
+
+                                sEmail = dr["sEmail"] == DBNull.Value
+                                    ? ""
+                                    : dr["sEmail"].ToString(),
+
+                                nCollegeCode = dr["nCollegeCode"] == DBNull.Value
+                                    ? null
+                                    : Convert.ToInt32(dr["nCollegeCode"]),
+
+                                nCollegeName = dr["nCollegeName"] == DBNull.Value
+                                    ? null
+                                    : Convert.ToInt32(dr["nCollegeName"]),
+
+                                // IMPORTANT
+                                nSABit = dr["nSABit"] != DBNull.Value
+                                    && Convert.ToBoolean(dr["nSABit"])
                             };
                         }
                     }
                 }
             }
+
             return null;
         }
         #endregion
 
+      
         #region "Candidate Login"
+
         public CandidateUser? LoginCandidate(CandidateLogin model)
         {
             using (SqlConnection cn = _db.GetConnection())
             {
-                using (SqlCommand cmd = new SqlCommand("SP_CandidateLogin", cn))
+                using (SqlCommand cmd =
+                       new SqlCommand("SP_CandidateLogin", cn))
                 {
                     cmd.CommandType = CommandType.StoredProcedure;
 
-                    cmd.Parameters.AddWithValue("@sEmail", model.sEmail ?? "");
-                    cmd.Parameters.AddWithValue("@sPassword", model.sPassword ?? "");
+                    cmd.Parameters.AddWithValue(
+                        "@sEmail",
+                        model.sEmail ?? ""
+                    );
+
+                    cmd.Parameters.AddWithValue(
+                        "@sPassword",
+                        model.sPassword ?? ""
+                    );
+
                     cn.Open();
+
                     using (SqlDataReader dr = cmd.ExecuteReader())
                     {
                         if (dr.Read())
                         {
                             return new CandidateUser
                             {
-                                nID = Convert.ToInt32(dr["nID"]),
-                                sFName = dr["sFName"].ToString(),
-                                sLName = dr["sLName"].ToString(),
-                                sMobile = dr["sMobile"].ToString(),
-                                sEmail = dr["sEmail"].ToString(),
-                                DOB = dr["DOB"] == DBNull.Value ? null : Convert.ToDateTime(dr["DOB"]),
-                                nGender = Convert.ToInt32(dr["nGender"]),
-                                sProfileImage = dr["sProfileImage"].ToString(),
-                                nCollegeCode = Convert.ToInt32(dr["nCollegeCode"]),
-                                sCollegeName = Convert.ToInt32(dr["sCollegeName"])
+                                nID = dr["nID"] == DBNull.Value
+                                    ? 0
+                                    : Convert.ToInt32(dr["nID"]),
+
+                                sFName = dr["sFName"] == DBNull.Value
+                                    ? ""
+                                    : dr["sFName"].ToString(),
+
+                                sLName = dr["sLName"] == DBNull.Value
+                                    ? ""
+                                    : dr["sLName"].ToString(),
+
+                                sMobile = dr["sMobile"] == DBNull.Value
+                                    ? ""
+                                    : dr["sMobile"].ToString(),
+
+                                sEmail = dr["sEmail"] == DBNull.Value
+                                    ? ""
+                                    : dr["sEmail"].ToString(),
+
+                                DOB = dr["DOB"] == DBNull.Value
+                                    ? null
+                                    : Convert.ToDateTime(dr["DOB"]),
+
+                                nGender = dr["nGender"] == DBNull.Value
+                                    ? 0
+                                    : Convert.ToInt32(dr["nGender"]),
+
+                                sProfileImage = dr["sProfileImage"] == DBNull.Value
+                                    ? ""
+                                    : dr["sProfileImage"].ToString(),
+
+                                nCollegeCode = dr["nCollegeCode"] == DBNull.Value
+                                    ? 0
+                                    : Convert.ToInt32(dr["nCollegeCode"]),
+
+                                sCollegeName = dr["sCollegeName"] == DBNull.Value
+                                    ? 0
+                                    : Convert.ToInt32(dr["sCollegeName"]),
+
+                                // Super Admin Enable / Disable status
+                                nSABit = dr["nSABit"] != DBNull.Value
+                                    && Convert.ToBoolean(dr["nSABit"])
                             };
                         }
                     }
@@ -454,7 +541,9 @@ GetOrganizationRegistrationDetails(int orgId)
 
             return null;
         }
+
         #endregion
+       
 
         #region "SA Login"
 
@@ -1124,6 +1213,9 @@ GetOrganizationRegistrationDetails(int orgId)
         }
 
 
+
+        //Super Admin Candidate List Status
+
         public bool ToggleCandidateStatus(int id)
         {
             using (SqlConnection cn = _db.GetConnection())
@@ -1204,7 +1296,6 @@ GetOrganizationRegistrationDetails(int orgId)
                 nBit,
                 nSABit
             FROM tblOrgRegistration
-            WHERE nBit = 1
             ORDER BY nID DESC";
 
                 using (SqlCommand cmd =
@@ -1283,8 +1374,34 @@ GetOrganizationRegistrationDetails(int orgId)
 
             return list;
         }
-
         #endregion
+
+        // Super Admin Organization List status
+        public bool ToggleOrganizationSABit(int id, bool status)
+        {
+            using (SqlConnection cn = _db.GetConnection())
+            {
+                string query = @"
+            UPDATE tblOrgRegistration
+            SET 
+                nSABit = @nSABit,
+                ModDate = GETDATE()
+            WHERE nID = @nID";
+
+                using (SqlCommand cmd =
+                       new SqlCommand(query, cn))
+                {
+                    cmd.Parameters.AddWithValue("@nID", id);
+                    cmd.Parameters.AddWithValue("@nSABit", status ? 1 : 0);
+
+                    cn.Open();
+
+                    return cmd.ExecuteNonQuery() > 0;
+                }
+            }
+        }
+
+       
 
         // shrirang 15/09/26
 

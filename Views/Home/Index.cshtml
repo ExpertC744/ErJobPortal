@@ -5,6 +5,11 @@
 	ViewData["BodyClass"] = "home-page";
 }
 
+
+@{
+    var feedbacks = ViewBag.Feedbacks as List<HomeFeedbackCardM>
+                     ?? new List<HomeFeedbackCardM>();
+}
 <link rel="stylesheet" href="~/css/home-modern.css" asp-append-version="true">
 
 <!-- START PRELOADER -->
@@ -817,6 +822,296 @@
      END TRAINEE SECTION
 ========================================================= -->
 <!-- END TEAM -->
+
+<!-- =========================================================
+     Start CANDIDATE FEEDBACK SECTION
+========================================================= -->
+
+<section class="team_area feedback_area">
+
+    <div class="container">
+
+        <!-- SECTION TITLE -->
+        <div class="section-title text-center">
+
+            <span class="team-subtitle">
+                CANDIDATE FEEDBACK
+            </span>
+
+            <h2>
+                What Our Trainees Say
+            </h2>
+
+            <p>
+                Hear from our trainees about their learning experience,
+                career journey and experience with us.
+            </p>
+
+        </div>
+
+
+        <!-- =================================================
+             SLIDER
+        ================================================== -->
+
+        <div class="trainee-slider-wrapper feedback-slider-wrapper">
+
+            <div class="trainee-slider-track feedback-slider-track">
+
+                @if (feedbacks.Any())
+                {
+
+                    <!-- =====================================
+                         FIRST SET OF FEEDBACK CARDS
+                    ====================================== -->
+
+                    foreach (var feedback in feedbacks)
+                    {
+
+                        <div class="trainee-slide feedback-slide">
+
+                            <div class="our-team feedback-card">
+
+                                <!-- QUOTE ICON -->
+
+                                <div class="feedback-quote-icon">
+
+                                    <i class="fa-solid fa-quote-left"></i>
+
+                                </div>
+
+
+                                <!-- RATING -->
+
+                                <div class="feedback-rating">
+
+                                    @for (int i = 1; i <= 5; i++)
+                                    {
+                                        if (i <= feedback.Rating)
+                                        {
+                                            <i class="fa-solid fa-star"></i>
+                                        }
+                                        else
+                                        {
+                                            <i class="fa-regular fa-star"></i>
+                                        }
+                                    }
+
+                                </div>
+
+
+                                <!-- FEEDBACK -->
+
+                                <div class="feedback-content">
+
+                                    <p>
+                                        "@feedback.Feedback"
+                                    </p>
+
+                                </div>
+
+
+                                <!-- PROFILE -->
+
+                                <div class="feedback-profile">
+
+                                    @if (!string.IsNullOrWhiteSpace(feedback.ProfileImage))
+                                    {
+                                        <img src="~/uploads/candidates/@feedback.ProfileImage"
+                                             alt="@feedback.TraineeName"
+                                             class="trainee-profile-image" />
+                                    }
+                                    else
+                                    {
+                                        <img src="~/assets/img/team/default-profile.png"
+                                             alt="Profile"
+                                             class="trainee-profile-image" />
+                                    }
+
+                                </div>
+
+
+                                <!-- NAME + DESIGNATION -->
+
+                                <div class="team-prof feedback-team-prof">
+
+                                    <h3>
+                                        @feedback.TraineeName
+                                    </h3>
+
+                                    <span>
+                                        @(string.IsNullOrWhiteSpace(feedback.Designation)
+                                            ? "Trainee"
+                                            : feedback.Designation)
+                                    </span>
+
+                                </div>
+
+
+                                <!-- LOCATION -->
+
+                                <div class="sth_det2">
+
+                                    <span class="ti-location-pin"></span>
+
+                                    <u>
+                                        @(string.IsNullOrWhiteSpace(feedback.Location)
+                                            ? "Location not available"
+                                            : feedback.Location)
+                                    </u>
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                    }
+
+
+                    <!-- =====================================
+                         SECOND SET
+                         Required for infinite animation
+                    ====================================== -->
+
+                    foreach (var feedback in feedbacks)
+                    {
+
+                        <div class="trainee-slide feedback-slide">
+
+                            <div class="our-team feedback-card">
+
+                                <!-- QUOTE ICON -->
+
+                                <div class="feedback-quote-icon">
+
+                                    <i class="fa-solid fa-quote-left"></i>
+
+                                </div>
+
+
+                                <!-- RATING -->
+
+                                <div class="feedback-rating">
+
+                                    @for (int i = 1; i <= 5; i++)
+                                    {
+                                        if (i <= feedback.Rating)
+                                        {
+                                            <i class="fa-solid fa-star"></i>
+                                        }
+                                        else
+                                        {
+                                            <i class="fa-regular fa-star"></i>
+                                        }
+                                    }
+
+                                </div>
+
+
+                                <!-- FEEDBACK -->
+
+                                <div class="feedback-content">
+
+                                    <p>
+                                        "@feedback.Feedback"
+                                    </p>
+
+                                </div>
+
+
+                                <!-- PROFILE -->
+
+                                <div class="feedback-profile">
+
+                                    @if (!string.IsNullOrWhiteSpace(feedback.ProfileImage))
+                                    {
+                                        <img src="~/uploads/candidates/@feedback.ProfileImage"
+                                             alt="@feedback.TraineeName"
+                                             class="trainee-profile-image" />
+                                    }
+                                    else
+                                    {
+                                        <img src="~/assets/img/team/default-profile.png"
+                                             alt="Profile"
+                                             class="trainee-profile-image" />
+                                    }
+
+                                </div>
+
+
+                                <!-- NAME + DESIGNATION -->
+
+                                <div class="team-prof feedback-team-prof">
+
+                                    <h3>
+                                        @feedback.TraineeName
+                                    </h3>
+
+                                    <span>
+                                        @(string.IsNullOrWhiteSpace(feedback.Designation)
+                                            ? "Trainee"
+                                            : feedback.Designation)
+                                    </span>
+
+                                </div>
+
+
+                                <!-- LOCATION -->
+
+                                <div class="sth_det2">
+
+                                    <span class="ti-location-pin"></span>
+
+                                    <u>
+                                        @(string.IsNullOrWhiteSpace(feedback.Location)
+                                            ? "Location not available"
+                                            : feedback.Location)
+                                    </u>
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                    }
+
+                }
+                else
+                {
+
+                    <!-- NO FEEDBACK -->
+
+                    <div class="no-trainee">
+
+                        <div class="no-trainee-icon">
+                            <i class="ti-comment-alt"></i>
+                        </div>
+
+                        <h4>
+                            No Feedback Available
+                        </h4>
+
+                        <p>
+                            Candidate feedback will appear here once available.
+                        </p>
+
+                    </div>
+
+                }
+
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
+
+<!-- =========================================================
+     END CANDIDATE FEEDBACK SECTION
+========================================================= -->
 
 
 

@@ -357,6 +357,7 @@ namespace ErJobPortal.Controllers
         }
 
         [HttpPost]
+        [HttpPost]
         public IActionResult OrganizationLogin(OrganizationLogin model)
         {
             if (!ModelState.IsValid)
@@ -364,18 +365,46 @@ namespace ErJobPortal.Controllers
                 return View(model);
             }
 
-            OrganizationUser? user = _accountRepository.LoginOrganization(model);
+            OrganizationUser? user =
+                _accountRepository.LoginOrganization(model);
 
             if (user != null)
             {
+                // Super Admin disabled organization
+                if (!user.nSABit)
+                {
+                    TempData["Error"] =
+                        "Your organization has been disabled by the Super Admin. Please contact the administrator.";
+
+                    return View(model);
+                }
+
+                // Normal login
                 HttpContext.Session.SetInt32("OrgID", user.nID);
-                HttpContext.Session.SetString("OrgName", user.sOrgName ?? "");
-                HttpContext.Session.SetString("OrgEmail", user.sEmail ?? "");
-                HttpContext.Session.SetString("OrgCode", user.orgCode ?? "");
-                return RedirectToAction("Dashboard", "Organization");
+
+                HttpContext.Session.SetString(
+                    "OrgName",
+                    user.sOrgName ?? ""
+                );
+
+                HttpContext.Session.SetString(
+                    "OrgEmail",
+                    user.sEmail ?? ""
+                );
+
+                HttpContext.Session.SetString(
+                    "OrgCode",
+                    user.orgCode ?? ""
+                );
+
+                return RedirectToAction(
+                    "Dashboard",
+                    "Organization"
+                );
             }
 
             TempData["Error"] = "Invalid Email or Password";
+
             return View(model);
         }
 
@@ -389,6 +418,7 @@ namespace ErJobPortal.Controllers
 
 
         [HttpPost]
+        [HttpPost]
         public IActionResult CandidateLogin(CandidateLogin model)
         {
             if (!ModelState.IsValid)
@@ -401,22 +431,46 @@ namespace ErJobPortal.Controllers
 
             if (user != null)
             {
+                // =====================================================
+                // SUPER ADMIN DISABLED CANDIDATE
+                // =====================================================
+
+                if (!user.nSABit)
+                {
+                    TempData["Error"] =
+                        "Your account has been disabled by the Super Admin. Please contact the administrator.";
+
+                    return View(model);
+                }
+
+                // =====================================================
+                // CANDIDATE ENABLED
+                // =====================================================
+
                 HttpContext.Session.SetInt32(
                     "CandidateID",
-                    user.nID);
+                    user.nID
+                );
 
                 HttpContext.Session.SetString(
                     "CandidateName",
-                    (user.sFName + " " + user.sLName).Trim());
+                    (user.sFName + " " + user.sLName).Trim()
+                );
 
                 HttpContext.Session.SetString(
                     "CandidateEmail",
-                    user.sEmail ?? "");
+                    user.sEmail ?? ""
+                );
 
                 return RedirectToAction(
                     "Dashboard",
-                    "Candidate");
+                    "Candidate"
+                );
             }
+
+            // =====================================================
+            // INVALID LOGIN
+            // =====================================================
 
             TempData["Error"] =
                 "Invalid Email or Password";

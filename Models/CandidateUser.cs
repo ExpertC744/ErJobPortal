@@ -21,5 +21,8 @@
         public int nCollegeCode { get; set; }
 
         public int sCollegeName { get; set; }
+
+        // Super Admin Status
+        public bool nSABit { get; set; }
     }
 }
