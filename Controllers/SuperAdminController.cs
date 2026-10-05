@@ -3351,7 +3351,6 @@ ORDER BY SAF.nID DESC, OFB.nID DESC;
             return View(posts);
         }
 
-<<<<<<< HEAD
         // khushi 03-10-26
         [HttpPost]
         [Route("SuperAdmin/ToggleSAAllOrganizationPostStatus")]
@@ -3374,7 +3373,7 @@ ORDER BY SAF.nID DESC, OFB.nID DESC;
                     cmd.ExecuteNonQuery();
                 }
             }
-=======
+        }
 
 
         public IActionResult ViewOrgPost(int id)
@@ -3695,7 +3694,7 @@ ORDER BY SAF.nID DESC, OFB.nID DESC;
             };
 
             return View(model);
->>>>>>> 5bcac352732744a33cf890cb001ee67765c1c57d
+
         }
 
         [HttpGet]
