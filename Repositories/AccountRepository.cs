@@ -1864,5 +1864,211 @@ public OrganizationLogin? GetOrganizationLoginDetails(string email)
                 }
             }
         }
+
+
+        // shrirang 03/10/26
+        // =========================================================
+        // GET TPO DETAILS BY TPO ID
+        // =========================================================
+
+        // =========================================================
+        // GET TPO DETAILS BY TPO ID
+        // =========================================================
+
+        // shrirang 03/10/26
+        // =========================================================
+        // GET TPO DETAILS BY TPO ID
+        // =========================================================
+
+        public TPORegistration? GetTPODetails(int tpoId)
+        {
+            TPORegistration? model = null;
+
+            using (SqlConnection cn = _db.GetConnection())
+            {
+                string query = @"
+            SELECT
+                FullName,
+                CollegeMailID,
+                MobileNo,
+                CollegeName,
+                CollegeCode,
+                CollegeAddress,
+                OrganizationWebsiteURL,
+                Designation,
+                DepartmentName,
+                CollegeEmployeeID,
+                SupportingDocument1,
+                SupportingDocument2,
+                ProfilePhoto,
+                OTPVerified,
+                Status,
+                IsApproved,
+                IsActive,
+                ApprovedBy,
+                ApprovedDate,
+                RejectionReason,
+                CreatedDate,
+                UpdatedDate
+            FROM tblTPORegistration
+            WHERE TPOID = @TPOID";
+
+                using (SqlCommand cmd = new SqlCommand(query, cn))
+                {
+                    cmd.Parameters.Add(
+                        "@TPOID",
+                        SqlDbType.Int
+                    ).Value = tpoId;
+
+                    cn.Open();
+
+                    using (SqlDataReader reader = cmd.ExecuteReader())
+                    {
+                        if (reader.Read())
+                        {
+                            model = new TPORegistration
+                            {
+                                // ==============================
+                                // PERSONAL DETAILS
+                                // ==============================
+
+                                FullName =
+                                    reader["FullName"] == DBNull.Value
+                                        ? ""
+                                        : reader["FullName"].ToString(),
+
+                                CollegeMailID =
+                                    reader["CollegeMailID"] == DBNull.Value
+                                        ? ""
+                                        : reader["CollegeMailID"].ToString(),
+
+                                MobileNo =
+                                    reader["MobileNo"] == DBNull.Value
+                                        ? ""
+                                        : reader["MobileNo"].ToString(),
+
+                                // ==============================
+                                // COLLEGE DETAILS
+                                // ==============================
+
+                                CollegeName =
+                                    reader["CollegeName"] == DBNull.Value
+                                        ? ""
+                                        : reader["CollegeName"].ToString(),
+
+                                CollegeCode =
+                                    reader["CollegeCode"] == DBNull.Value
+                                        ? ""
+                                        : reader["CollegeCode"].ToString(),
+
+                                CollegeAddress =
+                                    reader["CollegeAddress"] == DBNull.Value
+                                        ? ""
+                                        : reader["CollegeAddress"].ToString(),
+
+                                OrganizationWebsiteURL =
+                                    reader["OrganizationWebsiteURL"] == DBNull.Value
+                                        ? ""
+                                        : reader["OrganizationWebsiteURL"].ToString(),
+
+                                // ==============================
+                                // PROFESSIONAL DETAILS
+                                // ==============================
+
+                                Designation =
+                                    reader["Designation"] == DBNull.Value
+                                        ? ""
+                                        : reader["Designation"].ToString(),
+
+                                DepartmentName =
+                                    reader["DepartmentName"] == DBNull.Value
+                                        ? ""
+                                        : reader["DepartmentName"].ToString(),
+
+                                CollegeEmployeeID =
+                                    reader["CollegeEmployeeID"] == DBNull.Value
+                                        ? ""
+                                        : reader["CollegeEmployeeID"].ToString(),
+
+                                // ==============================
+                                // DOCUMENTS
+                                // ==============================
+
+                                SupportingDocument1 =
+                                    reader["SupportingDocument1"] == DBNull.Value
+                                        ? null
+                                        : reader["SupportingDocument1"].ToString(),
+
+                                SupportingDocument2 =
+                                    reader["SupportingDocument2"] == DBNull.Value
+                                        ? null
+                                        : reader["SupportingDocument2"].ToString(),
+
+                                ProfilePhoto =
+                                    reader["ProfilePhoto"] == DBNull.Value
+                                        ? null
+                                        : reader["ProfilePhoto"].ToString(),
+
+                                // ==============================
+                                // STATUS
+                                // ==============================
+
+                                OTPVerified =
+                                    reader["OTPVerified"] != DBNull.Value &&
+                                    Convert.ToBoolean(reader["OTPVerified"]),
+
+                                Status =
+                                    reader["Status"] == DBNull.Value
+                                        ? null
+                                        : reader["Status"].ToString(),
+
+                                IsApproved =
+                                    reader["IsApproved"] != DBNull.Value &&
+                                    Convert.ToBoolean(reader["IsApproved"]),
+
+                                IsActive =
+                                    reader["IsActive"] != DBNull.Value &&
+                                    Convert.ToBoolean(reader["IsActive"]),
+
+                                // ==============================
+                                // APPROVAL DETAILS
+                                // ==============================
+
+                                ApprovedBy =
+                                    reader["ApprovedBy"] == DBNull.Value
+                                        ? null
+                                        : Convert.ToInt32(reader["ApprovedBy"]),
+
+                                ApprovedDate =
+                                    reader["ApprovedDate"] == DBNull.Value
+                                        ? null
+                                        : Convert.ToDateTime(reader["ApprovedDate"]),
+
+                                RejectionReason =
+                                    reader["RejectionReason"] == DBNull.Value
+                                        ? null
+                                        : reader["RejectionReason"].ToString(),
+
+                                // ==============================
+                                // DATE DETAILS
+                                // ==============================
+
+                                CreatedDate =
+                                    reader["CreatedDate"] == DBNull.Value
+                                        ? null
+                                        : Convert.ToDateTime(reader["CreatedDate"]),
+
+                                UpdatedDate =
+                                    reader["UpdatedDate"] == DBNull.Value
+                                        ? null
+                                        : Convert.ToDateTime(reader["UpdatedDate"])
+                            };
+                        }
+                    }
+                }
+            }
+
+            return model;
+        }
     }
 }
