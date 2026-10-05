@@ -1,0 +1,144 @@
+﻿@model List<ErJobPortal.Models.OrganizationTraineeListViewModel>
+
+@{
+    Layout = "~/Views/Shared/_DashboardLayout.cshtml";
+
+    ViewData["Title"] = "Trainees Details";
+    ViewData["Panel"] = "Organization";
+    ViewData["UserName"] = "Organization";
+}
+
+<div class="container-fluid">
+
+    <!-- =====================================================
+         PAGE HEADING
+    ====================================================== -->
+
+    <div class="d-flex justify-content-between align-items-center mb-4">
+
+        <div>
+
+            <h1 class="mb-2">
+                Trainees Details
+            </h1>
+
+            <p class="mb-0 text-muted">
+                @ViewBag.OrgCode
+            </p>
+
+        </div>
+
+        <!-- BACK BUTTON -->
+
+        <a href="@Url.Action(
+                               "Dashboard",
+                               "Organization",
+                               new { id = ViewBag.OrgCode })"
+           class="btn btn-primary"
+           style="
+                width:65px;
+                height:55px;
+                display:flex;
+                align-items:center;
+                justify-content:center;
+                font-size:24px;">
+
+            <i class="fas fa-arrow-left"></i>
+
+        </a>
+
+    </div>
+
+
+    <!-- =====================================================
+         MASTER TABLE
+    ====================================================== -->
+
+    <div class="master-table-container">
+
+        <div class="table-responsive">
+
+            <table id="organizationTraineesTable"
+                   class="master-data-table">
+
+                <thead>
+
+                    <tr>
+
+                        <th>Candidate ID</th>
+                        <th>Name</th>
+                        <th>Email</th>
+                        <th>Mobile</th>
+                        <th>Apply Date</th>
+                        <th>Start Date</th>
+                        <th>Status</th>
+                        <th>Final Status</th>
+                        <th>Comment</th>
+
+                    </tr>
+
+                </thead>
+
+                <tbody>
+
+                    @if (Model != null && Model.Any())
+                    {
+                        foreach (var item in Model)
+                        {
+                            <tr>
+                                <td>@item.CandidateID</td>
+
+                                <td>@item.CandidateName</td>
+
+                                <td>@item.Email</td>
+
+                                <td>@item.Mobile</td>
+
+                                <td>
+                                    @(item.ApplyDate?.ToString("dd-MM-yyyy") ?? "-")
+                                </td>
+
+                                <td>
+                                    @(item.StartDate?.ToString("dd-MM-yyyy") ?? "-")
+                                </td>
+
+                                <td>
+                                    @item.Status
+                                </td>
+
+                                <td>
+                                    @item.FinalStatus
+                                </td>
+
+                                <td>
+                                    @item.Comment
+                                </td>
+                            </tr>
+                        }
+                    }
+                    else
+                    {
+                        <tr>
+                            <td colspan="9" class="text-center">
+                                No eligible trainees found.
+                            </td>
+                        </tr>
+                    }
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+        <!-- =====================================================
+             PAGE INFO
+        ====================================================== -->
+
+        <div id="organizationTraineesPageInfo"
+             class="master-page-info text-center d-none">
+        </div>
+
+    </div>
+
+</div>
