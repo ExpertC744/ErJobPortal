@@ -1,12 +1,12 @@
-﻿@model ErJobPortal.Models.OrgProfile
+@model ErJobPortal.Models.OrgProfile
 
 @{
     ViewData["Title"] = "View Organization Profile";
     Layout = null;
 
-    // =====================================================
+    // ====
     // ORGANIZATION DATA
-    // =====================================================
+    // ====
 
     string organizationName =
         string.IsNullOrWhiteSpace(Model?.sOrganizationName)
@@ -34,9 +34,9 @@
             : Model.sMobile;
 
 
-    // =====================================================
+    // ====
     // PROFILE DATA
-    // =====================================================
+    // ====
 
     string companyAddress =
         string.IsNullOrWhiteSpace(Model?.sCompanyAddress)
@@ -64,9 +64,9 @@
             : Model.nEmployeeStrength;
 
 
-    // =====================================================
+    // ====
     // DATE OF BIRTH
-    // =====================================================
+    // ====
 
     string dateOfBirth =
         Model?.dDateOfBirth.HasValue == true
@@ -74,9 +74,9 @@
             : "-";
 
 
-    // =====================================================
+    // ====
     // CREATED DATE
-    // =====================================================
+    // ====
 
     string createdDate =
         Model?.dCreatedDate != DateTime.MinValue
@@ -84,9 +84,9 @@
             : "-";
 
 
-    // =====================================================
+    // ====
     // MODIFIED DATE
-    // =====================================================
+    // ====
 
     string modifiedDate =
         Model?.dModifiedDate.HasValue == true
@@ -94,9 +94,9 @@
             : "-";
 
 
-    // =====================================================
+    // ====
     // ORGANIZATION ID
-    // =====================================================
+    // ====
 
     string organizationId =
         Model?.nOrgID > 0
@@ -104,9 +104,9 @@
             : "-";
 
 
-    // =====================================================
+    // ====
     // PROFILE ID
-    // =====================================================
+    // ====
 
     string profileId =
         Model?.nID > 0
@@ -114,9 +114,9 @@
             : "-";
 
 
-    // =====================================================
+    // ====
     // STATUS
-    // =====================================================
+    // ====
 
     string profileStatus =
         Model?.nBit == true
@@ -124,9 +124,9 @@
             : "Inactive";
 
 
-    // =====================================================
+    // ====
     // SUPER ADMIN STATUS
-    // =====================================================
+    // ====
 
     string saStatus =
         Model?.nSABit == true
@@ -134,9 +134,9 @@
             : "Not Approved";
 
 
-    // =====================================================
+    // ====
     // DYNAMIC LOGO
-    // =====================================================
+    // ====
 
     string logoPath;
 
@@ -175,7 +175,7 @@
     <main class="profile-page">
         <article class="profile-card" id="organizationProfile">
 
-            <!-- ================= COVER ================= -->
+            <!-- === COVER === -->
             <header class="profile-cover">
                 <div class="profile-actions">
                     <button type="button" class="profile-action-btn" title="Home" aria-label="Home" onclick="goHome();">
@@ -191,7 +191,7 @@
 
             </header>
 
-            <!-- ================= IDENTITY ================= -->
+            <!-- === IDENTITY === -->
             <section class="organization-section">
 
 
@@ -298,7 +298,7 @@
 
             </section>
 
-            <!-- ================= DETAILS ================= -->
+            <!-- === DETAILS === -->
             <section class="profile-body">
 
                 <div class="information-grid">
@@ -344,6 +344,7 @@
                     </div>
 
                     <div class="information-card">
+
 
 
                         <div class="information-top">
@@ -411,6 +412,7 @@
                             @companyAddress
 
                         </div>
+
 
 
                         <div class="information-icon"><i class="fa-solid fa-location-dot"></i></div>
@@ -625,7 +627,7 @@
 
             </section>
 
-            <!-- ================= FOOTER ================= -->
+            <!-- === FOOTER === -->
             <footer class="profile-footer">
                 Powered by <strong>1Trainee</strong>
             </footer>
@@ -660,11 +662,12 @@
         function goHome() { window.location.href = "/"; }
         function printProfile() { window.print(); }
         function downloadProfile() { window.print(); } // choose "Save as PDF" in the print dialog
+
     </script>
 
 </body>
 
 
-
 </html>
+
 

@@ -1026,7 +1026,7 @@ GetOrganizationRegistrationDetails(int orgId)
                 nPassoutYear,
                 nDepartment
             FROM tblCandidateRegister
-            WHERE nBit = 1
+            WHERE nSABit = 1
             ORDER BY nID DESC";
 
                 using (SqlCommand cmd = new SqlCommand(query, cn))
@@ -1130,8 +1130,8 @@ GetOrganizationRegistrationDetails(int orgId)
             {
                 string query = @"
             UPDATE tblCandidateRegister
-            SET nBit = CASE 
-                            WHEN nBit = 1 THEN 0
+            SET nSABit = CASE 
+                            WHEN nSABit = 1 THEN 0
                             ELSE 1
                        END,
                 ModDate = GETDATE()
@@ -1155,7 +1155,7 @@ GetOrganizationRegistrationDetails(int orgId)
             using (SqlConnection cn = _db.GetConnection())
             {
                 string query = @"
-            SELECT nBit
+            SELECT nSABit
             FROM tblCandidateRegister
             WHERE nID = @nID";
 
