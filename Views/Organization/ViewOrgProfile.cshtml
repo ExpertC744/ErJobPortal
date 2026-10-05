@@ -4,9 +4,9 @@
     ViewData["Title"] = "View Organization Profile";
     Layout = null;
 
-    // =====================================================
+    // ====
     // ORGANIZATION DATA
-    // =====================================================
+    // ====
 
     string organizationName =
         string.IsNullOrWhiteSpace(Model?.sOrganizationName)
@@ -34,9 +34,9 @@
             : Model.sMobile;
 
 
-    // =====================================================
+    // ====
     // PROFILE DATA
-    // =====================================================
+    // ====
 
     string companyAddress =
         string.IsNullOrWhiteSpace(Model?.sCompanyAddress)
@@ -64,9 +64,9 @@
             : Model.nEmployeeStrength;
 
 
-    // =====================================================
+    // ====
     // DATE OF BIRTH
-    // =====================================================
+    // ====
 
     string dateOfBirth =
         Model?.dDateOfBirth.HasValue == true
@@ -74,9 +74,9 @@
             : "-";
 
 
-    // =====================================================
+    // ====
     // CREATED DATE
-    // =====================================================
+    // ====
 
     string createdDate =
         Model?.dCreatedDate != DateTime.MinValue
@@ -84,9 +84,9 @@
             : "-";
 
 
-    // =====================================================
+    // ====
     // MODIFIED DATE
-    // =====================================================
+    // ====
 
     string modifiedDate =
         Model?.dModifiedDate.HasValue == true
@@ -94,9 +94,9 @@
             : "-";
 
 
-    // =====================================================
+    // ====
     // ORGANIZATION ID
-    // =====================================================
+    // ====
 
     string organizationId =
         Model?.nOrgID > 0
@@ -104,9 +104,9 @@
             : "-";
 
 
-    // =====================================================
+    // ====
     // PROFILE ID
-    // =====================================================
+    // ====
 
     string profileId =
         Model?.nID > 0
@@ -114,9 +114,9 @@
             : "-";
 
 
-    // =====================================================
+    // ====
     // STATUS
-    // =====================================================
+    // ====
 
     string profileStatus =
         Model?.nBit == true
@@ -124,9 +124,9 @@
             : "Inactive";
 
 
-    // =====================================================
+    // ====
     // SUPER ADMIN STATUS
-    // =====================================================
+    // ====
 
     string saStatus =
         Model?.nSABit == true
@@ -134,9 +134,9 @@
             : "Not Approved";
 
 
-    // =====================================================
+    // ====
     // DYNAMIC LOGO
-    // =====================================================
+    // ====
 
     string logoPath;
 
@@ -175,7 +175,7 @@
     <main class="profile-page">
         <article class="profile-card" id="organizationProfile">
 
-            <!-- ================= COVER ================= -->
+            <!-- === COVER === -->
             <header class="profile-cover">
                 <div class="profile-actions">
                     <button type="button" class="profile-action-btn" title="Home" aria-label="Home" onclick="goHome();">
@@ -191,10 +191,10 @@
 
             </header>
 
-            <!-- ================= IDENTITY ================= -->
+            <!-- === IDENTITY === -->
             <section class="organization-section">
 
-<<<<<<< HEAD
+
 
                 <div class="organization-main">
 
@@ -276,10 +276,10 @@
                     </div>
 
 
-=======
+
                 <div class="organization-logo">
                     <img src="~/images/it-networkz-logo.png" alt="IT-NetworkZ Infosystems Pvt Ltd Logo" />
->>>>>>> 5bcac352732744a33cf890cb001ee67765c1c57d
+
                 </div>
 
                 <h1 class="organization-name">IT-NetworkZ Infosystems Pvt Ltd</h1>
@@ -298,13 +298,13 @@
 
             </section>
 
-            <!-- ================= DETAILS ================= -->
+            <!-- === DETAILS === -->
             <section class="profile-body">
 
                 <div class="information-grid">
 
                     <div class="information-card">
-<<<<<<< HEAD
+
 
 
                         <div class="information-top">
@@ -334,17 +334,17 @@
                         </div>
 
 
-=======
+
                         <div class="information-icon"><i class="fa-solid fa-user"></i></div>
                         <div class="information-text">
                             <div class="information-label">Contact Person</div>
                             <div class="information-value">Harshada Girhe</div>
                         </div>
->>>>>>> 5bcac352732744a33cf890cb001ee67765c1c57d
+
                     </div>
 
                     <div class="information-card">
-<<<<<<< HEAD
+
 
 
                         <div class="information-top">
@@ -374,17 +374,17 @@
                         </div>
 
 
-=======
+
                         <div class="information-icon"><i class="fa-solid fa-briefcase"></i></div>
                         <div class="information-text">
                             <div class="information-label">Designation</div>
                             <div class="information-value">HRM</div>
                         </div>
->>>>>>> 5bcac352732744a33cf890cb001ee67765c1c57d
+
                     </div>
 
                     <div class="information-card">
-<<<<<<< HEAD
+
 
 
                         <div class="information-top">
@@ -414,17 +414,17 @@
                         </div>
 
 
-=======
+
                         <div class="information-icon"><i class="fa-solid fa-location-dot"></i></div>
                         <div class="information-text">
                             <div class="information-label">Company Address</div>
                             <div class="information-value">Laxmi Nagar, Nagpur</div>
                         </div>
->>>>>>> 5bcac352732744a33cf890cb001ee67765c1c57d
+
                     </div>
 
                     <div class="information-card">
-<<<<<<< HEAD
+
 
 
                         <div class="information-top">
@@ -454,17 +454,17 @@
                         </div>
 
 
-=======
+
                         <div class="information-icon"><i class="fa-solid fa-calendar-days"></i></div>
                         <div class="information-text">
                             <div class="information-label">Established</div>
                             <div class="information-value">2007</div>
                         </div>
->>>>>>> 5bcac352732744a33cf890cb001ee67765c1c57d
+
                     </div>
 
                     <div class="information-card">
-<<<<<<< HEAD
+
 
 
                         <div class="information-top">
@@ -494,17 +494,17 @@
                         </div>
 
 
-=======
+
                         <div class="information-icon"><i class="fa-solid fa-envelope"></i></div>
                         <div class="information-text">
                             <div class="information-label">Verification Email</div>
                             <div class="information-value">contact@it-networkz.com</div>
                         </div>
->>>>>>> 5bcac352732744a33cf890cb001ee67765c1c57d
+
                     </div>
 
                     <div class="information-card">
-<<<<<<< HEAD
+
 
 
                         <div class="information-top">
@@ -534,17 +534,17 @@
                         </div>
 
 
-=======
+
                         <div class="information-icon"><i class="fa-solid fa-users"></i></div>
                         <div class="information-text">
                             <div class="information-label">Employee Strength</div>
                             <div class="information-value">11-100</div>
                         </div>
->>>>>>> 5bcac352732744a33cf890cb001ee67765c1c57d
+
                     </div>
 
                     <div class="information-card">
-<<<<<<< HEAD
+
 
 
                         <div class="information-top">
@@ -574,17 +574,17 @@
                         </div>
 
 
-=======
+
                         <div class="information-icon"><i class="fa-solid fa-file-invoice"></i></div>
                         <div class="information-text">
                             <div class="information-label">GST No.</div>
                             <div class="information-value">27AADCI8640L1Z6</div>
                         </div>
->>>>>>> 5bcac352732744a33cf890cb001ee67765c1c57d
+
                     </div>
 
                     <div class="information-card">
-<<<<<<< HEAD
+
 
 
                         <div class="information-top">
@@ -614,20 +614,20 @@
                         </div>
 
 
-=======
+
                         <div class="information-icon"><i class="fa-solid fa-file-lines"></i></div>
                         <div class="information-text">
                             <div class="information-label">CIN No.</div>
                             <div class="information-value">U72200MH2015PTC266007</div>
                         </div>
->>>>>>> 5bcac352732744a33cf890cb001ee67765c1c57d
+
                     </div>
 
                 </div>
 
             </section>
 
-            <!-- ================= FOOTER ================= -->
+            <!-- === FOOTER === -->
             <footer class="profile-footer">
                 Powered by <strong>1Trainee</strong>
             </footer>
@@ -636,7 +636,7 @@
     </main>
 
     <script>
-<<<<<<< HEAD
+
 
         function goHome() {
 
@@ -658,17 +658,16 @@
 
         }
 
-=======
+
         function goHome() { window.location.href = "/"; }
         function printProfile() { window.print(); }
         function downloadProfile() { window.print(); } // choose "Save as PDF" in the print dialog
->>>>>>> 5bcac352732744a33cf890cb001ee67765c1c57d
+
     </script>
 
 </body>
-<<<<<<< HEAD
+
 
 </html>
-=======
-</html>
->>>>>>> 5bcac352732744a33cf890cb001ee67765c1c57d
+
+
