@@ -1,6 +1,160 @@
-﻿@{
+﻿@model ErJobPortal.Models.OrgProfile
+
+@{
     ViewData["Title"] = "View Organization Profile";
     Layout = null;
+
+    // =====================================================
+    // ORGANIZATION DATA
+    // =====================================================
+
+    string organizationName =
+        string.IsNullOrWhiteSpace(Model?.sOrganizationName)
+            ? "-"
+            : Model.sOrganizationName;
+
+    string contactName =
+        string.IsNullOrWhiteSpace(Model?.sOrganizationName)
+            ? "-"
+            : Model.sOrganizationName;
+
+    string designation =
+        string.IsNullOrWhiteSpace(Model?.sDesignation)
+            ? "-"
+            : Model.sDesignation;
+
+    string email =
+        string.IsNullOrWhiteSpace(Model?.sOrganizationEmail)
+            ? "-"
+            : Model.sOrganizationEmail;
+
+    string mobile =
+        string.IsNullOrWhiteSpace(Model?.sMobile)
+            ? "-"
+            : Model.sMobile;
+
+
+    // =====================================================
+    // PROFILE DATA
+    // =====================================================
+
+    string companyAddress =
+        string.IsNullOrWhiteSpace(Model?.sCompanyAddress)
+            ? "-"
+            : Model.sCompanyAddress;
+
+    string establishmentYear =
+        Model?.nEstablishmentYear > 0
+            ? Model.nEstablishmentYear.ToString()
+            : "-";
+
+    string gstNo =
+        string.IsNullOrWhiteSpace(Model?.sGSTNo)
+            ? "-"
+            : Model.sGSTNo;
+
+    string cinNo =
+        string.IsNullOrWhiteSpace(Model?.sCINNo)
+            ? "-"
+            : Model.sCINNo;
+
+    string employeeStrength =
+        string.IsNullOrWhiteSpace(Model?.nEmployeeStrength)
+            ? "-"
+            : Model.nEmployeeStrength;
+
+
+    // =====================================================
+    // DATE OF BIRTH
+    // =====================================================
+
+    string dateOfBirth =
+        Model?.dDateOfBirth.HasValue == true
+            ? Model.dDateOfBirth.Value.ToString("dd-MM-yyyy")
+            : "-";
+
+
+    // =====================================================
+    // CREATED DATE
+    // =====================================================
+
+    string createdDate =
+        Model?.dCreatedDate != DateTime.MinValue
+            ? Model.dCreatedDate.ToString("dd-MM-yyyy")
+            : "-";
+
+
+    // =====================================================
+    // MODIFIED DATE
+    // =====================================================
+
+    string modifiedDate =
+        Model?.dModifiedDate.HasValue == true
+            ? Model.dModifiedDate.Value.ToString("dd-MM-yyyy")
+            : "-";
+
+
+    // =====================================================
+    // ORGANIZATION ID
+    // =====================================================
+
+    string organizationId =
+        Model?.nOrgID > 0
+            ? Model.nOrgID.ToString()
+            : "-";
+
+
+    // =====================================================
+    // PROFILE ID
+    // =====================================================
+
+    string profileId =
+        Model?.nID > 0
+            ? Model.nID.ToString()
+            : "-";
+
+
+    // =====================================================
+    // STATUS
+    // =====================================================
+
+    string profileStatus =
+        Model?.nBit == true
+            ? "Active"
+            : "Inactive";
+
+
+    // =====================================================
+    // SUPER ADMIN STATUS
+    // =====================================================
+
+    string saStatus =
+        Model?.nSABit == true
+            ? "Approved"
+            : "Not Approved";
+
+
+    // =====================================================
+    // DYNAMIC LOGO
+    // =====================================================
+
+    string logoPath;
+
+    if (!string.IsNullOrWhiteSpace(Model?.sCompanyLogo))
+    {
+        logoPath =
+            Url.Content(
+                "~/uploads/organization/" +
+                Model.sCompanyLogo
+            );
+    }
+    else
+    {
+        logoPath =
+            Url.Content(
+                "~/images/it-networkz-logo.png"
+            );
+    }
 }
 
 <!DOCTYPE html>
@@ -19,6 +173,7 @@
           href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
 
     <link href="~/css/vieworgprofile.css" rel="stylesheet" />
+
 </head>
 
 
@@ -151,8 +306,8 @@
 
                     <div class="organization-logo">
 
-                        <img src="~/images/it-networkz-logo.png"
-                             alt="IT-NetworkZ Infosystems Pvt Ltd Logo" />
+                        <img src="@logoPath"
+                             alt="@organizationName Logo" />
 
                     </div>
 
@@ -164,7 +319,7 @@
 
                         <div class="organization-name">
 
-                            IT-NetworkZ Infosystems Pvt Ltd
+                            @organizationName
 
 
                             <span class="verified-icon"
@@ -173,6 +328,7 @@
                                 <i class="fa-solid fa-check"></i>
 
                             </span>
+
 
                         </div>
 
@@ -198,7 +354,7 @@
 
                                 <i class="fa-solid fa-location-dot"></i>
 
-                                Nagpur, India
+                                @companyAddress
 
                             </span>
 
@@ -276,6 +432,7 @@
 
                         <div class="information-top">
 
+
                             <div class="information-icon">
 
                                 <i class="fa-solid fa-user"></i>
@@ -289,12 +446,13 @@
 
                             </div>
 
+
                         </div>
 
 
                         <div class="information-value">
 
-                            Harshada Girhe
+                            @contactName
 
                         </div>
 
@@ -310,6 +468,7 @@
 
                         <div class="information-top">
 
+
                             <div class="information-icon">
 
                                 <i class="fa-solid fa-briefcase"></i>
@@ -323,12 +482,13 @@
 
                             </div>
 
+
                         </div>
 
 
                         <div class="information-value">
 
-                            HRM
+                            @designation
 
                         </div>
 
@@ -344,6 +504,7 @@
 
                         <div class="information-top">
 
+
                             <div class="information-icon">
 
                                 <i class="fa-solid fa-location-dot"></i>
@@ -357,12 +518,13 @@
 
                             </div>
 
+
                         </div>
 
 
                         <div class="information-value">
 
-                            Laxmi Nagar, Nagpur
+                            @companyAddress
 
                         </div>
 
@@ -378,6 +540,7 @@
 
                         <div class="information-top">
 
+
                             <div class="information-icon">
 
                                 <i class="fa-solid fa-calendar-days"></i>
@@ -391,12 +554,13 @@
 
                             </div>
 
+
                         </div>
 
 
                         <div class="information-value">
 
-                            2007
+                            @establishmentYear
 
                         </div>
 
@@ -412,6 +576,7 @@
 
                         <div class="information-top">
 
+
                             <div class="information-icon">
 
                                 <i class="fa-solid fa-envelope"></i>
@@ -425,12 +590,13 @@
 
                             </div>
 
+
                         </div>
 
 
                         <div class="information-value">
 
-                            contact@it-networkz.com
+                            @email
 
                         </div>
 
@@ -446,6 +612,7 @@
 
                         <div class="information-top">
 
+
                             <div class="information-icon">
 
                                 <i class="fa-solid fa-file-invoice"></i>
@@ -459,12 +626,13 @@
 
                             </div>
 
+
                         </div>
 
 
                         <div class="information-value">
 
-                            27AADCI8640L1Z6
+                            @gstNo
 
                         </div>
 
@@ -480,6 +648,7 @@
 
                         <div class="information-top">
 
+
                             <div class="information-icon">
 
                                 <i class="fa-solid fa-file-lines"></i>
@@ -493,12 +662,13 @@
 
                             </div>
 
+
                         </div>
 
 
                         <div class="information-value">
 
-                            U72200MH2015PTC266007
+                            @cinNo
 
                         </div>
 
@@ -514,6 +684,7 @@
 
                         <div class="information-top">
 
+
                             <div class="information-icon">
 
                                 <i class="fa-solid fa-users"></i>
@@ -527,12 +698,13 @@
 
                             </div>
 
+
                         </div>
 
 
                         <div class="information-value">
 
-                            11-100
+                            @employeeStrength
 
                         </div>
 
@@ -587,7 +759,7 @@
 
         }
 
-            
+
         function printProfile() {
 
             window.print();
