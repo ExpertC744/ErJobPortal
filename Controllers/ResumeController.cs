@@ -223,6 +223,17 @@ namespace ErJobPortal.Controllers
                 57 => "ViewProfileFiftySeven",
                 58 => "ViewProfileFiftyEight",
                 59 => "ViewProfileFiftyNine",
+                91 => "ViewProfileNinetyOne",
+                92 => "ViewProfileNinetyTwo",
+                93 => "ViewProfileNinetyThree",
+                94 => "ViewProfileNinetyFour",
+                95 => "ViewProfileNinetyFive",
+                96 => "ViewProfileNinetySix",
+                97 => "ViewProfileNinetySeven",
+                98 => "ViewProfileNinetyEight",
+                99 => "ViewProfileNinetyNine",
+                100 => "ViewProfileOneHundred",
+
                 _ => "Resume"
             };
 
