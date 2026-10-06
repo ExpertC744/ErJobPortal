@@ -583,20 +583,19 @@ namespace ErJobPortal.Controllers
         // ==========================================
         // CANDIDATE LIST
         // ==========================================
-        ////[HttpGet]
-        ////[Route("Organization/TraineeList/{id}")]
-        ////public IActionResult TraineeList(string id)
-        ////{
-        ////    if (!IsValidOrganizationCode(id))
-        ////        return NotFound();
+        [HttpGet]
+        [Route("Organization/TraineeList/{id}")]
+        public IActionResult TraineeList(string id)
+        {
+            if (!IsValidOrganizationCode(id))
+                return NotFound();
 
-        ////    ViewBag.OrgCode = id;
+            ViewBag.OrgCode = id;
 
-        ////    List<SATraineeListM> trainees =
-        ////        _repository.GetSATraineeList();
+            List<SATraineeListM> trainees = _repository.GetSATraineeList();
 
-        ////    return View(trainees);
-        ////}
+            return View(trainees);
+        }
 
         // ==========================================
         // ORGANIZATION LIST
@@ -3364,8 +3363,7 @@ WHERE nID = @nID
         [ValidateAntiForgeryToken]
         public IActionResult EditPost(OrgPostM model)
         {
-            int? sessionOrgID =
-                HttpContext.Session.GetInt32("OrgID");
+            int? sessionOrgID = HttpContext.Session.GetInt32("OrgID");
 
             if (sessionOrgID == null)
             {
@@ -3472,8 +3470,10 @@ WHERE nID = @nID
                             : DBNull.Value);
 
                     cmd.Parameters.AddWithValue(
-                        "@sCurrency",
-                        model.sCurrency ?? (object)DBNull.Value);
+     "@sCurrency",
+     string.IsNullOrWhiteSpace(model.sCurrency)
+         ? "NA"
+         : model.sCurrency);
 
                     // =====================================================
                     // DURATION
@@ -3601,10 +3601,9 @@ WHERE nID = @nID
                     }
                 }
 
-                TempData["Success"] =
-                    "Post updated successfully.";
+                TempData["Success"] = "Post updated successfully.";
 
-                return RedirectToAction("PostDetails");
+                return RedirectToAction("PostDetails", new { id = orgID } );
             }
             catch (Exception ex)
             {

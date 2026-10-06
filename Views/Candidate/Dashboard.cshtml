@@ -3,6 +3,8 @@
     ViewData["Title"] = "Candidate Dashboard";
     ViewData["Panel"] = "Candidate";
     ViewData["UserName"] = "Candidate";
+
+    var candidateCode = ViewBag.CandidateCode as string;
 }
 
 <style>
@@ -2032,7 +2034,7 @@
             <!-- Extra Post -->
             <div class="mt-3">
 
-                <a href="#"
+                <a href="@Url.Action("ExtraPost", "Candidate", new { id = candidateCode })"
                    class="btn btn-success px-4 py-2">
                     <i class="fas fa-plus me-2"></i>
                     Extra Post

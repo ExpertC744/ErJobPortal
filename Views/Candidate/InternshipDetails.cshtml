@@ -7,6 +7,12 @@
     ViewData["Title"] = "Internship Post";
     ViewData["Panel"] = "Candidate";
     ViewData["UserName"] = "Candidate";
+
+
+    var candidateCode = ViewBag.candidateCode as string;
+
+    // Get id passed from controller
+    var internshipId = ViewBag.InternshipId as string;
 }
 
 <div class="container-fluid">
@@ -31,7 +37,7 @@
                 </h1>
 
                 <p class="mb-0 text-muted">
-                    HN236383503368076
+                    @internshipId
                 </p>
 
             </div>
@@ -182,16 +188,17 @@
              EXTRA POST BUTTON
         ================================================== -->
 
-        <div class="mt-4">
+        <form asp-controller="Candidate"
+              asp-action="ExtraPost"
+              asp-route-id="@internshipId"
+              method="get">
 
-            <button type="button"
+            <button type="submit"
                     class="submit-button">
-
                 Extra Post
-
             </button>
 
-        </div>
+        </form>
 
     </div>
 

@@ -1,4 +1,6 @@
-﻿@{
+﻿@model List<ErJobPortal.Models.SAFinalSelectionViewModel>
+
+@{
     Layout = "~/Views/Shared/_DashboardLayout.cshtml";
 
     ViewData["Title"] = "Selected Trainees";
@@ -8,17 +10,17 @@
 
 <div class="container-fluid selected-trainees-page">
 
-   
-
     <!-- Selected Trainees Table -->
     <div class="master-table-container">
- 
+
         <div class="table-responsive">
-             <!-- Page Header -->
-    <div class="mb-4">
-        <h1 class="mb-2">Selected Trainees</h1>
-        <p class="mb-0 text-muted">ItNetworkZ</p>
-    </div>
+
+            <!-- Page Header -->
+            <div class="mb-4">
+                <h1 class="mb-2">Selected Trainees</h1>
+                <p class="mb-0 text-muted">ItNetworkZ</p>
+            </div>
+
             <table id="selectedTraineesTable"
                    class="master-data-table">
 
@@ -36,40 +38,79 @@
 
                 <tbody>
 
-                    <tr>
+                    @if (Model != null && Model.Any())
+                    {
+                        int srNo = 1;
 
-                        <td class="master-id">1</td>
+                        foreach (var item in Model)
+                        {
+                            <tr>
 
-                        <td>25-09-2026</td>
+                                <td class="master-id">
+                                    @srNo
+                                </td>
 
-                        <td>.NET Trainee</td>
+                                <td>
+                                    @(item.PostDate.HasValue
+                                                                ? item.PostDate.Value.ToString("dd-MM-yyyy")
+                                                                : "-")
+                                </td>
 
-                        <td>Khushi Fale</td>
+                                <td>
+                                    @(string.IsNullOrWhiteSpace(item.PositionName)
+                                                                ? "-"
+                                                                : item.PositionName)
+                                </td>
 
-                        <td>khushi@example.com</td>
+                                <td>
+                                    @(string.IsNullOrWhiteSpace(item.CandidateName)
+                                                                ? "-"
+                                                                : item.CandidateName)
+                                </td>
 
-                        <td>
-                            HTML, CSS, JavaScript, .NET
-                        </td>
+                                <td>
+                                    @(string.IsNullOrWhiteSpace(item.EmailID)
+                                                                ? "-"
+                                                                : item.EmailID)
+                                </td>
 
-                        <td class="resume-column">
+                                <td>
+                                    @(string.IsNullOrWhiteSpace(item.Skills)
+                                                                ? "-"
+                                                                : item.Skills)
+                                </td>
 
-                         @*shrirang 05/10/26*@
-          <a asp-controller="Resume"
-   asp-action="Resume"
-   asp-route-id="1"
-   class="resume-view-btn"
-   title="View Resume"
-   target="_blank">
+                                <td class="resume-column">
 
-    <i class="fas fa-eye"></i>
+                                    @*shrirang 05/10/26*@
+                                    <a asp-controller="Resume"
+                                       asp-action="Resume"
+                                       asp-route-id="1"
+                                       class="resume-view-btn"
+                                       title="View Resume"
+                                       target="_blank">
 
-</a>
-       @*end*@
+                                        <i class="fas fa-eye"></i>
 
-                        </td>
+                                    </a>
+                                    @*end*@
 
-                    </tr>
+                                </td>
+
+                            </tr>
+
+                            srNo++;
+                        }
+                    }
+                    else
+                    {
+                        <tr>
+                            <td colspan="7"
+                                class="text-center">
+                                No selected trainees found.
+                            </td>
+                        </tr>
+                    }
 
                 </tbody>
 

@@ -3859,10 +3859,71 @@ ORDER BY SAF.nID DESC, OFB.nID DESC;
 
         }
 
+        //khushi 6-10-26
         [HttpGet]
         public IActionResult SAFinalSelection()
         {
-            return View();
+            List<SAFinalSelectionViewModel> model =
+                new List<SAFinalSelectionViewModel>();
+
+            string connectionString =
+                _configuration.GetConnectionString("DefaultConnection");
+
+            using (SqlConnection con = new SqlConnection(connectionString))
+            {
+                using (SqlCommand cmd = new SqlCommand(
+                    "SP_GetSAFinalSelection", con))
+                {
+                    cmd.CommandType = CommandType.StoredProcedure;
+
+                    con.Open();
+
+                    using (SqlDataReader reader = cmd.ExecuteReader())
+                    {
+                        while (reader.Read())
+                        {
+                            model.Add(new SAFinalSelectionViewModel
+                            {
+                                nID = Convert.ToInt32(
+                                    reader["FinalSelectionID"]),
+
+                                OrgID = Convert.ToInt32(
+                                    reader["OrganizationID"]),
+
+                                CandidateID = Convert.ToInt32(
+                                    reader["CandidateID"]),
+
+                                PostID = Convert.ToInt32(
+                                    reader["PostID"]),
+
+                                PostDate =
+                                    reader["PostDate"] == DBNull.Value
+                                        ? null
+                                        : Convert.ToDateTime(
+                                            reader["PostDate"]),
+
+                                PositionName =
+                                    reader["PositionName"]?.ToString()
+                                    ?? "",
+
+                                CandidateName =
+                                    reader["CandidateName"]?.ToString()
+                                    ?? "",
+
+                                EmailID =
+                                    reader["EmailID"]?.ToString()
+                                    ?? "",
+
+                                Skills =
+                                    reader["Skills"]?.ToString()
+                                    ?? ""
+                            });
+                        }
+                    }
+                }
+            }
+
+            return View(model);
         }
 
         //khushi 01-10-26
