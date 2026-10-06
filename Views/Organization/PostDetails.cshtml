@@ -5,6 +5,8 @@
     ViewData["Title"] = "All Post Details";
     ViewData["Panel"] = "Organization";
     ViewData["UserName"] = "Organization";
+
+    string orgCode = ViewBag.OrgCode?.ToString() ?? "";
 }
 
 @* 
@@ -154,9 +156,9 @@
         </h2>
 
 
-        @*   <div class="page-subtitle">
-            At73803469839
-        </div> *@
+        <div class="page-subtitle">
+            @orgCode
+        </div>
 
 
 
@@ -340,7 +342,6 @@
                                 @item.sWorkingHours
                             </td>
 
-
                             <!-- Working Days -->
                             <td>
 
@@ -350,74 +351,53 @@
 
                             </td>
 
-
                             <!-- Internship Type -->
                             <td>
                                 @item.sInternshipTypeName
                             </td>
-
 
                             <!-- Internship Fellowship Type -->
                             <td>
                                 @item.sInternshipFellowshipTypeName
                             </td>
 
-
                             <!-- Training Involved -->
                             <td>
                                 @item.sTrainingInvolvedName
                             </td>
-
 
                             <!-- Internship Duration -->
                             <td>
                                 @item.sInternshipDurationName
                             </td>
 
-
                             <!-- Facilities -->
                             <td>
-
                                 @if (!string.IsNullOrWhiteSpace(item.sFacilities))
                                 {
-                                    <i class="fa-solid fa-wifi wifi"
-                                       title="@item.sFacilities">
-                                    </i>
+                                    <i class="fa-solid fa-wifi wifi" title="@item.sFacilities"></i>
                                 }
                                 else
                                 {
                                     <span>-</span>
                                 }
-
-                        </td>
-
-
-                        <!-- Internship Mode -->
-                        <td>
-                            @item.sInternshipModeName
-                        </td>
-
-
-                        <!-- Divyang -->
-                        <td>
-
-                            @(string.IsNullOrWhiteSpace(item.sDivyang)
-                                                        ? "No"
-                                                        : item.sDivyang)
-
                             </td>
 
+                            <!-- Internship Mode -->
+                            <td>
+                                @item.sInternshipModeName
+                            </td>
+
+                            <!-- Divyang -->
+                            <td>
+
+                                @(string.IsNullOrWhiteSpace(item.sDivyang) ? "No" : item.sDivyang)
+                            </td>
 
                             <!-- Status -->
                             <td>
-
-                                <button type="button"
-                                        class="status @(item.nBit ? "enabled" : "disabled")"
-                                        data-id="@item.nID"
-                                        onclick="togglePostStatus(this)">
-
+                                <button type="button" class="status @(item.nBit ? "enabled" : "disabled")" data-id="@item.nID" onclick="togglePostStatus(this)">
                                     @(item.nBit ? "Enabled" : "Disabled")
-
                                 </button>
 
                             </td>
@@ -435,77 +415,77 @@
 
     </div>
 
-    </div>
-    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+</div>
+<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
 
-    <script src="https://cdn.datatables.net/1.13.8/js/jquery.dataTables.min.js"></script>
+<script src="https://cdn.datatables.net/1.13.8/js/jquery.dataTables.min.js"></script>
 
 
-    <script>
+<script>
 
-        $(document).ready(function () {
+    $(document).ready(function () {
 
-        $('#postTable').DataTable({
+    $('#postTable').DataTable({
 
-        pageLength: 25,
+    pageLength: 25,
 
-        searching: true,
+    searching: true,
 
-        ordering: true,
+    ordering: true,
 
-        paging: true,
+    paging: true,
 
-        info: true,
+    info: true,
 
-        autoWidth: false,
+    autoWidth: false,
 
-        scrollX: true
+    scrollX: true
 
-        });
+    });
 
-        });
+    });
 
-    </script>
+</script>
 
-    <script>
+<script>
 
-        function togglePostStatus(button) {
+    function togglePostStatus(button) {
 
-        const postId = button.dataset.id;
+    const postId = button.dataset.id;
 
-        button.disabled = true;
+    button.disabled = true;
 
-        fetch('@Url.Action("TogglePostStatus", "Organization")', {
-        method: 'POST',
-        headers: {
-        'Content-Type': 'application/x-www-form-urlencoded'
-        },
-        body: 'id=' + encodeURIComponent(postId)
-        })
-        .then(response => response.json())
-        .then(result => {
+    fetch('@Url.Action("TogglePostStatus", "Organization")', {
+    method: 'POST',
+    headers: {
+    'Content-Type': 'application/x-www-form-urlencoded'
+    },
+    body: 'id=' + encodeURIComponent(postId)
+    })
+    .then(response => response.json())
+    .then(result => {
 
-        if (result.success) {
+    if (result.success) {
 
-        if (result.enabled) {
+    if (result.enabled) {
 
-        button.textContent = "Enabled";
+    button.textContent = "Enabled";
 
-        button.classList.remove("disabled");
-        button.classList.add("enabled");
+    button.classList.remove("disabled");
+    button.classList.add("enabled");
 
-        } else {
+    } else {
 
-        button.textContent = "Disabled";
+    button.textContent = "Disabled";
 
-        button.classList.remove("enabled");
-        button.classList.add("disabled");
-        }
-        }
+    button.classList.remove("enabled");
+    button.classList.add("disabled");
+    }
+    }
 
-        button.disabled = false;
-        });
+    button.disabled = false;
+    });
 
-        }
+    }
 
-    </script>
+</script>
