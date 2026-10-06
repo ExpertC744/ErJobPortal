@@ -19,7 +19,7 @@ namespace ErJobPortal.Controllers
             _configuration = configuration;
             _repository = repository;
         }
-               
+
         // =========================================================
         // GET LOGGED-IN ORGANIZATION CODE
         // =========================================================
@@ -583,20 +583,20 @@ namespace ErJobPortal.Controllers
         // ==========================================
         // CANDIDATE LIST
         // ==========================================
-        [HttpGet]
-        [Route("Organization/TraineeList/{id}")]
-        public IActionResult TraineeList(string id)
-        {
-            if (!IsValidOrganizationCode(id))
-                return NotFound();
+        ////[HttpGet]
+        ////[Route("Organization/TraineeList/{id}")]
+        ////public IActionResult TraineeList(string id)
+        ////{
+        ////    if (!IsValidOrganizationCode(id))
+        ////        return NotFound();
 
-            ViewBag.OrgCode = id;
+        ////    ViewBag.OrgCode = id;
 
-            List<SATraineeListM> trainees =
-                _repository.GetSATraineeList();
+        ////    List<SATraineeListM> trainees =
+        ////        _repository.GetSATraineeList();
 
-            return View(trainees);
-        }
+        ////    return View(trainees);
+        ////}
 
         // ==========================================
         // ORGANIZATION LIST
@@ -4917,8 +4917,8 @@ WHERE nID = @nID
 
         //khushi 01-10-26
         [HttpGet]
-        [Route("Organization/OrgPreviousPost")]
-        public IActionResult OrgPreviousPost()
+        [Route("Organization/OrgPreviousPost/{id}")]
+        public IActionResult OrgPreviousPost(string? id)
         {
             int? sessionOrgID = HttpContext.Session.GetInt32("OrgID");
 
@@ -4928,6 +4928,8 @@ WHERE nID = @nID
             }
 
             int orgID = sessionOrgID.Value;
+
+            string? orgCode = GetOrganizationCode();
 
             OrgPostM item = null;
 
@@ -5116,12 +5118,12 @@ WHERE nID = @nID
 
                 if (item == null)
                 {
-                    TempData["Error"] =
-                        "Post not found or this post has not expired yet.";
+                    TempData["Error"] = "Post not found or this post has not expired yet.";
 
                     return RedirectToAction(
-                        "PreviousPost",
-                        "Organization");
+       "OrgPreviousPost",
+       "Organization",
+       new { id = GetOrganizationCode() });
                 }
 
                 // =====================================================
@@ -5134,8 +5136,9 @@ WHERE nID = @nID
                         "You are not authorized to repost this post.";
 
                     return RedirectToAction(
-                        "PreviousPost",
-                        "Organization");
+       "OrgPreviousPost",
+       "Organization",
+       new { id = GetOrganizationCode() });
                 }
 
                 // =====================================================
@@ -5164,8 +5167,9 @@ WHERE nID = @nID
                 TempData["Error"] = ex.Message;
 
                 return RedirectToAction(
-                    "PreviousPost",
-                    "Organization");
+       "OrgPreviousPost",
+       "Organization",
+       new { id = GetOrganizationCode() });
             }
         }
 
@@ -5518,5 +5522,202 @@ WHERE nID = @nID
 
             return View(model);
         }
+
+        #region "Org dashboard Table inner data table matching on count"
+        // =========================================================
+        // TRAINEE LIST
+        // =========================================================
+
+        // =========================================================
+        // APPLIED TRAINEES FOR ORGANIZATION POST
+        // =========================================================
+
+        ////[HttpGet]
+        ////[Route("Organization/OrgPositionTR/{id?}", Name = "OrganizationTraineeList")]
+        ////[ResponseCache(NoStore = true, Location = ResponseCacheLocation.None)]
+        ////public IActionResult OrgPositionTR(int id)
+        [HttpGet]
+        [Route("Organization/OrgPositionTR/{id:int}")]
+        public IActionResult OrgPositionTR(int id)
+        {
+            // =====================================================
+            // GET ORGANIZATION ID FROM SESSION
+            // =====================================================
+
+            int? orgId = HttpContext.Session.GetInt32("OrgID");
+
+            if (orgId == null || orgId <= 0)
+            {
+                return RedirectToAction(
+                    "OrganizationLogin",
+                    "Account");
+            }
+
+            // =====================================================
+            // POST ID
+            // =====================================================
+
+            int postId = id;
+
+            if (postId <= 0)
+            {
+                return NotFound("Invalid Post ID.");
+            }
+
+            // =====================================================
+            // GET ORGANIZATION DETAILS
+            // =====================================================
+
+            var organization =
+                _repository.GetOrganizationRegistrationDetails(
+                    orgId.Value);
+
+            if (organization == null)
+            {
+                return NotFound(
+                    "Organization registration not found.");
+            }
+
+            if (organization.Value.RegDate == null)
+            {
+                return BadRequest(
+                    "Organization Registration Date is missing.");
+            }
+
+            // =====================================================
+            // ORGANIZATION CODE
+            // =====================================================
+
+            string organizationCode =
+                "OR" +
+                organization.Value.RegDate.Value
+                    .ToString("ddMMyy") +
+                organization.Value.OrganizationID
+                    .ToString("D2");
+
+            // =====================================================
+            // GET TRAINEES
+            // =====================================================
+
+            List<OrganizationTraineeListViewModel> trainees =
+                new List<OrganizationTraineeListViewModel>();
+
+            string connectionString =
+                _configuration.GetConnectionString(
+                    "DefaultConnection");
+
+            using (SqlConnection con =
+                   new SqlConnection(connectionString))
+            {
+                using (SqlCommand cmd =
+                       new SqlCommand(
+                           "SP_OrgELigiblePositionCanId",
+                           con))
+                {
+                    cmd.CommandType =
+                        CommandType.StoredProcedure;
+
+                    cmd.Parameters.Add(
+                        "@OrganizationID",
+                        SqlDbType.Int).Value =
+                            orgId.Value;
+
+                    cmd.Parameters.Add(
+                        "@Postid",
+                        SqlDbType.Int).Value =
+                            postId;
+
+                    con.Open();
+
+                    using (SqlDataReader dr =
+                           cmd.ExecuteReader())
+                    {
+                        while (dr.Read())
+                        {
+                            OrganizationTraineeListViewModel trainee =
+                                new OrganizationTraineeListViewModel();
+
+                            trainee.CandidateID =
+                                dr["CandidateID"] != DBNull.Value
+                                ? Convert.ToInt32(dr["CandidateID"])
+                                : 0;
+
+                            string firstName =
+                                dr["sFName"] != DBNull.Value
+                                ? dr["sFName"].ToString()
+                                : "";
+
+                            string lastName =
+                                dr["sLName"] != DBNull.Value
+                                ? dr["sLName"].ToString()
+                                : "";
+
+                            trainee.CandidateName =
+                                (firstName + " " + lastName).Trim();
+
+                            trainee.Email =
+                                dr["sEmail"] != DBNull.Value
+                                ? dr["sEmail"].ToString()
+                                : "";
+
+                            trainee.Mobile =
+                                dr["sMobile"] != DBNull.Value
+                                ? dr["sMobile"].ToString()
+                                : "";
+
+                            trainee.ApplyDate =
+                                dr["CApplyDate"] != DBNull.Value
+                                ? Convert.ToDateTime(dr["CApplyDate"])
+                                : null;
+
+                            trainee.PostID =
+                                dr["PostId"] != DBNull.Value
+                                ? Convert.ToInt32(dr["PostId"])
+                                : 0;
+
+                            trainee.StartDate =
+                                dr["dStartDate"] != DBNull.Value
+                                ? Convert.ToDateTime(dr["dStartDate"])
+                                : null;
+
+                            trainee.Status =
+                                dr["Status"] != DBNull.Value
+                                ? dr["Status"].ToString()
+                                : "-";
+
+                            trainee.FinalStatus =
+                                dr["FinalStatus"] != DBNull.Value
+                                ? dr["FinalStatus"].ToString()
+                                : "-";
+
+                            trainee.Comment =
+                                dr["Comment"] != DBNull.Value
+                                ? dr["Comment"].ToString()
+                                : "";
+
+                            trainees.Add(trainee);
+                        }
+                    }
+                }
+            }
+
+            // =====================================================
+            // VIEW BAG
+            // =====================================================
+
+            ViewBag.OrgID = orgId.Value;
+            ViewBag.OrgCode = organizationCode;
+            ViewBag.OrgName =
+                HttpContext.Session.GetString("OrgName");
+
+            ViewBag.OrgEmail =
+                HttpContext.Session.GetString("OrgEmail");
+
+            ViewBag.PostID = postId;
+
+            //return View("TraineeList", trainees);
+            return View(trainees);
+        }
+        #endregion
     }
 }

@@ -1217,12 +1217,43 @@
                                         </a>
 
                                     </td>
-
                                     <!-- Applied Trainees -->
                                     <td class="text-center">
 
-                                        <a asp-controller="Organization"
-                                           asp-action="AppliedTraineeList"
+                                        <a href="@Url.Action("OrgPositionTR", "Organization", new { id = item.nID })"
+                                           class="resume-view-btn"
+                                           title="View Applied Trainees">
+
+                                            <i class="fas fa-users"></i>
+                                            <span>@item.MatchingTraineeCount</span>
+
+                                        </a>
+                               @*          <a href="@Url.RouteUrl(
+            "OrganizationTraineeList",
+            new { id = item.nID })"
+   class="resume-view">
+    @item.MatchingTraineeCount
+</a> *@
+                                        @* <a href="@Url.RouteUrl(
+                                                           "OrganizationTraineeList",
+                                                           new { id = item.nID })"
+                                   class="resume-view-btn"
+                                   title="View Applied Trainees">
+
+                                            <i class="fas fa-users"></i>
+
+                                            <span>
+                                                @item.MatchingTraineeCount
+                                            </span>
+
+                                        </a> *@
+
+                                    </td>
+                                    <!-- Applied Trainees -->
+                                   @*  <td class="text-center">
+
+                                       @*  <a asp-controller="Organization"
+                                           asp-action="OrgPositionTR"
                                            asp-route-id="@item.nID"
                                            class="resume-view-btn"
                                            title="View Applied Trainees">
@@ -1235,7 +1266,16 @@
 
                                         </a>
 
-                                    </td>
+                                        <a href="@Url.Action(
+                                                           "OrgPositionTR",
+                                                           "Organization",
+                                                           new { id = item.nID })"
+                                   class="applied-trainee-link">
+
+                                            @item.AppliedTraineeCount
+
+                                        </a>
+                                    </td> *@
 
                                 </tr>
 

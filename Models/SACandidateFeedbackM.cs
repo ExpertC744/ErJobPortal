@@ -4,6 +4,8 @@
     {
         public int nID { get; set; }
 
+        // Actual Feedback ID
+        public int FeedbackID { get; set; }
         public string? sFName { get; set; }
 
         public string? sLName { get; set; }

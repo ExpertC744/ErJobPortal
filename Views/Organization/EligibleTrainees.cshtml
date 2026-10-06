@@ -140,10 +140,13 @@
 
                                 </td>
 
-
+                                @*shrirang 05/10/26*@
                                 <!-- =================================================
                                      VIEW RESUME radhika05-0=10
                                 ================================================== -->
+                                <!-- =================================================
+     VIEW THIS CANDIDATE'S RESUME
+================================================== -->
 
                                 <td>
 
@@ -152,13 +155,28 @@
                                        asp-route-id="@item.CandidateID"
                                        class="resume-view-btn"
                                        title="View Resume">
+                                    @if (item.CandidateID > 0)
+                                    {
+                                        <a asp-controller="Resume"
+                                           asp-action="Resume"
+                                           asp-route-id="@item.CandidateID"
+                                           class="resume-view-btn"
+                                           title="View Resume"
+                                           target="_blank">
 
-                                        <i class="fas fa-eye"></i>
+                                            <i class="fas fa-eye"></i>
 
-                                    </a>
+                                        </a>
+                                    }
+                                    else
+                                    {
+                                        <span class="text-muted">
+                                            Resume Not Available
+                                        </span>
+                                    }
 
                                 </td>
-
+                                @*end*@
 
                                 <!-- =================================================
                                      EMAIL
