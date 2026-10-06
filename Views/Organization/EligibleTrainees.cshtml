@@ -10,6 +10,8 @@
     int postID = ViewBag.PostID ?? 0;
     string orgCode = ViewBag.OrgCode?.ToString() ?? "";
 }
+@* Radhika05-10 *@
+<link rel="stylesheet" href="~/css/EligibleTrainees.css" asp-append-version="true" />
 
 <div class="container-fluid eligible-trainees-page">
 
@@ -140,12 +142,12 @@
 
 
                                 <!-- =================================================
-                                     VIEW RESUME
+                                     VIEW RESUME radhika05-0=10
                                 ================================================== -->
 
                                 <td>
 
-                                    <a asp-controller="Candidate"
+                                    <a asp-controller="Resume"
                                        asp-action="Resume"
                                        asp-route-id="@item.CandidateID"
                                        class="resume-view-btn"
