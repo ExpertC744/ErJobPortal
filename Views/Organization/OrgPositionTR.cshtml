@@ -55,16 +55,10 @@
     ====================================================== -->
 
     <div class="master-table-container">
-
         <div class="table-responsive">
-
-            <table id="organizationTraineesTable"
-                   class="master-data-table">
-
+            <table id="organizationTraineesTable" class="master-data-table">
                 <thead>
-
                     <tr>
-
                         <th>Candidate ID</th>
                         <th>Name</th>
                         <th>Email</th>
@@ -74,42 +68,30 @@
                         <th>Status</th>
                         <th>Final Status</th>
                         <th>Comment</th>
-
                     </tr>
-
                 </thead>
-
                 <tbody>
-
                     @if (Model != null && Model.Any())
                     {
                         foreach (var item in Model)
                         {
                             <tr>
                                 <td>@item.CandidateID</td>
-
                                 <td>@item.CandidateName</td>
-
                                 <td>@item.Email</td>
-
                                 <td>@item.Mobile</td>
-
                                 <td>
                                     @(item.ApplyDate?.ToString("dd-MM-yyyy") ?? "-")
                                 </td>
-
                                 <td>
                                     @(item.StartDate?.ToString("dd-MM-yyyy") ?? "-")
                                 </td>
-
                                 <td>
                                     @item.Status
                                 </td>
-
                                 <td>
                                     @item.FinalStatus
                                 </td>
-
                                 <td>
                                     @item.Comment
                                 </td>
@@ -124,21 +106,13 @@
                             </td>
                         </tr>
                     }
-
                 </tbody>
-
             </table>
-
         </div>
-
         <!-- =====================================================
              PAGE INFO
         ====================================================== -->
-
-        <div id="organizationTraineesPageInfo"
-             class="master-page-info text-center d-none">
+        <div id="organizationTraineesPageInfo" class="master-page-info text-center d-none">
         </div>
-
     </div>
-
 </div>
