@@ -3793,3 +3793,242 @@ body.site-modern {
         font-size: 12px;
     }
 }
+
+
+
+
+_________________________ Cadidate FeedBack css ___________________________________
+
+
+
+
+/* =========================================================
+   CANDIDATE FEEDBACK
+   Same design language as Trainee Section
+========================================================= */
+.feedback_area {
+    padding-top: 80px;
+    padding-bottom: 90px;
+}
+
+
+/* =========================================================
+   FEEDBACK SLIDE
+========================================================= */
+
+.feedback-slide {
+    width: 390px;
+}
+
+
+/* =========================================================
+   FEEDBACK CARD
+========================================================= */
+
+.feedback-card {
+    min-height: 410px;
+    padding: 35px 28px 28px;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    background: #ffffff;
+    border-radius: 10px;
+    transition: all 0.35s ease;
+}
+
+    .feedback-card:hover {
+        transform: translateY(-8px);
+    }
+
+
+/* =========================================================
+   QUOTE ICON
+========================================================= */
+
+.feedback-quote-icon {
+    width: 48px;
+    height: 48px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 15px;
+    border-radius: 50%;
+    background: rgba(30, 123, 103, 0.10);
+    color: #1e7b67;
+    font-size: 19px;
+}
+
+
+/* =========================================================
+   RATING
+========================================================= */
+
+.feedback-rating {
+    display: flex;
+    justify-content: center;
+    gap: 4px;
+    margin-bottom: 18px;
+}
+
+    .feedback-rating i {
+        color: #f5b301;
+        font-size: 14px;
+    }
+
+
+/* =========================================================
+   FEEDBACK TEXT
+========================================================= */
+
+.feedback-content {
+    width: 100%;
+    min-height: 105px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 18px;
+}
+
+    .feedback-content p {
+        margin: 0;
+        text-align: center;
+        color: #666666;
+        font-size: 14px;
+        line-height: 1.8;
+    }
+
+
+/* =========================================================
+   PROFILE
+========================================================= */
+
+.feedback-profile {
+    width: 72px;
+    height: 72px;
+    margin-bottom: 14px;
+    overflow: hidden;
+    border-radius: 50%;
+    border: 3px solid rgba(30, 123, 103, 0.15);
+    background: #f2f7f5;
+}
+
+    .feedback-profile .trainee-profile-image {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        border-radius: 50%;
+    }
+
+
+/* =========================================================
+   NAME
+========================================================= */
+
+.feedback-team-prof {
+    text-align: center;
+    margin-bottom: 8px;
+}
+
+    .feedback-team-prof h3 {
+        margin-bottom: 4px;
+    }
+
+    .feedback-team-prof span {
+        display: block;
+    }
+
+
+/* =========================================================
+   LOCATION
+========================================================= */
+
+.feedback-card .sth_det2 {
+    margin-top: 3px;
+    text-align: center;
+}
+
+
+/* =========================================================
+   INFINITE RIGHT TO LEFT SLIDER
+========================================================= */
+
+.feedback-slider-wrapper {
+    overflow: hidden;
+    width: 100%;
+}
+
+.feedback-slider-track {
+    display: flex;
+    width: max-content;
+    animation: feedbackSlideRTL 35s linear infinite;
+}
+
+.feedback-slider-wrapper:hover .feedback-slider-track {
+    animation-play-state: paused;
+}
+
+
+/* =========================================================
+   RIGHT → LEFT
+========================================================= */
+
+@keyframes feedbackSlideRTL {
+
+    from {
+        transform: translateX(0);
+    }
+
+    to {
+        transform: translateX(-50%);
+    }
+}
+
+
+/* =========================================================
+   NO FEEDBACK
+========================================================= */
+
+.feedback_area .no-trainee {
+    min-width: 100%;
+    text-align: center;
+}
+
+
+/* =========================================================
+   RESPONSIVE
+========================================================= */
+
+@media (max-width: 991px) {
+
+    .feedback_area {
+        padding-top: 60px;
+        padding-bottom: 70px;
+    }
+
+    .feedback-slide {
+        width: 350px;
+    }
+}
+
+
+@media (max-width: 575px) {
+
+    .feedback_area {
+        padding-top: 50px;
+        padding-bottom: 60px;
+    }
+
+    .feedback-slide {
+        width: 300px;
+    }
+
+    .feedback-card {
+        min-height: 390px;
+        padding: 28px 20px 24px;
+    }
+
+    .feedback-content p {
+        font-size: 13px;
+    }
+}

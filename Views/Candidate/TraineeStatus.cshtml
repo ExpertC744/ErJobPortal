@@ -10,17 +10,11 @@
 
 <div class="container-fluid">
 
-
-
-
     <!-- =====================================================
          MASTER TABLE CARD
     ====================================================== -->
 
     <div class="master-table-container">
-
-
-
 
 
         <!-- =================================================
@@ -112,15 +106,24 @@
                                     {
                                         <span>-</span>
                                     }
-                                </td>
+
+                        </td>
+
+                                
+
 
                                 <!-- REGISTRATION DATE -->
-                                <td>
-                                    @(item.RegistrationDate.HasValue
-                                        ? item.RegistrationDate.Value.ToString("dd-MM-yyyy")
-                                        : "-")
-                                </td>
 
+
+                        <td>
+                            @(item.RegistrationDate.HasValue
+                                                        ? item.RegistrationDate.Value.ToString("dd-MM-yyyy")
+                                                        : "-")
+
+                                
+
+                                </td>
+                                
                             </tr>
 
                             srNo++;

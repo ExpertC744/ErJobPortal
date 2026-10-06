@@ -591,6 +591,109 @@
             font-size: 9px;
         }
     }
+
+    /* =========================================================
+           VIEW BUTTON
+        ========================================================= */
+
+    .sa-view-btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        padding: 6px 10px;
+        border-radius: 7px;
+        background: #e8f5f1;
+        color: #1e7b67;
+        text-decoration: none;
+        font-size: 10px;
+        font-weight: 700;
+        transition: all .2s ease;
+    }
+
+        .sa-view-btn:hover {
+            background: #1e7b67;
+            color: #ffffff;
+            text-decoration: none;
+        }
+
+        .sa-view-btn i {
+            font-size: 9px;
+        }
+
+        /* =========================================================
+   APPLY STATUS BUTTONS
+========================================================= */
+
+.apply-status-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    min-width: 105px;
+    height: 38px;
+
+    padding: 8px 16px;
+
+    border-radius: 6px;
+
+    font-size: 13px;
+    font-weight: 600;
+
+    text-decoration: none;
+
+    transition: all 0.2s ease;
+}
+
+/* =========================================================
+   APPLY NOW
+========================================================= */
+
+.apply-now-btn {
+    background: #0d9488;
+    color: #ffffff;
+
+    border: 1px solid #0d9488;
+
+    cursor: pointer;
+}
+
+.apply-now-btn:hover {
+    background: #0f766e;
+    border-color: #0f766e;
+
+    color: #ffffff;
+
+    transform: translateY(-1px);
+
+    box-shadow: 0 4px 10px rgba(13, 148, 136, 0.20);
+}
+
+.apply-now-btn:active {
+    background: #115e59;
+    border-color: #115e59;
+
+    transform: translateY(0);
+}
+
+/* =========================================================
+   APPLIED
+========================================================= */
+
+.applied-btn {
+    background: #16a34a;
+    color: #ffffff;
+
+    border: 1px solid #16a34a;
+
+    cursor: default;
+}
+
+.applied-btn:hover {
+    background: #15803d;
+    border-color: #15803d;
+
+    color: #ffffff;
+}
 </style>
 @if (TempData["ApplyMessage"] != null)
 {
@@ -657,12 +760,17 @@
 
                 </div>
 
-                <a asp-controller="Candidate"
-                   asp-action="OrgList"
-                   class="stat-link">
-                    View Details
-                    <i class="fas fa-arrow-right"></i>
-                </a>
+                @* radhika02-10 *@
+                <div class="stat-bottom">
+                    <a asp-controller="Candidate"
+                       asp-action="OrgList"
+                       class="sa-view-btn">
+
+                        View Details
+                        <i class="fas fa-arrow-right"></i>
+
+                    </a>
+                </div>
 
             </div>
         </div>
@@ -714,6 +822,7 @@
         </div>
 
 
+        @* radhika02-09 *@
         <div class="col-xl-3 col-md-6 mb-4">
             <div class="stat-card">
 
@@ -721,27 +830,38 @@
                     <i class="fas fa-paper-plane"></i>
                 </div>
 
+                @{
+                    var traineeAppliedPosts = ViewBag.TraineeAppliedPosts;
+                    int applicationsSentCount = traineeAppliedPosts == null
+                    ? 0
+                    : ((System.Collections.ICollection)traineeAppliedPosts).Count;
+                }
+
                 <div class="stat-title">
                     Applications Sent
                 </div>
 
                 <div class="stat-number">
-                    25
+                    @applicationsSentCount
                 </div>
 
                 <div class="stat-bottom">
+
                     <a asp-controller="Candidate"
                        asp-action="TraineeApplied"
-                       class="stat-link">
-                        View Details
-                        <i class="fas fa-arrow-right"></i>
-                    </a>
+                       asp-route-id="@ViewBag.CandidateCode"
+                       class="sa-view-btn">
 
+                        View Details
+
+
+                        <i class="fas fa-arrow-right"></i>
+
+                    </a>
                 </div>
 
             </div>
         </div>
-
     </div>
 
 
@@ -1849,7 +1969,7 @@
 
                     <div>
                         <h2>
-                            <i class="fas fa-briefcase me-2"></i>
+                           
                             Internship Post
                         </h2>
 
@@ -1945,28 +2065,45 @@
                                 </td>
 
                                 <!-- Apply Status -->
-                                <td>
+                             <!-- Apply Status -->
+<td>
 
-                                    @if (post.IsApplied)
-                                    {
-                                        <span class="master-action-btn">
-                                            Applied
-                                        </span>
-                                    }
-                                    else
-                                    {
-                                        <form asp-controller="Candidate" asp-action="ApplyToPost" method="post" style="display:inline;">
-                                            @Html.AntiForgeryToken()
-                                            <input type="hidden" name="postId" value="@post.nID" />
-                                            <input type="hidden" name="orgId" value="@post.nOrgID" />
-                                            <button type="submit" class="master-action-btn" style="border:none; cursor:pointer;">
-                                                Apply Now
-                                            </button>
+    @if (post.IsApplied)
+    {
+        <span class="apply-status-btn applied-btn">
+            <i class="fas fa-check-circle me-1"></i>
+            Applied
+        </span>
+    }
+    else
+    {
+        <form asp-controller="Candidate"
+              asp-action="ApplyToPost"
+              method="post"
+              class="apply-form">
 
-                                        </form>
-                                    }
+            @Html.AntiForgeryToken()
 
-                                </td>
+            <input type="hidden"
+                   name="postId"
+                   value="@post.nID" />
+
+            <input type="hidden"
+                   name="orgId"
+                   value="@post.nOrgID" />
+
+            <button type="submit"
+                    class="apply-status-btn apply-now-btn">
+
+                <i class="fas fa-paper-plane me-1"></i>
+                Apply Now
+
+            </button>
+
+        </form>
+    }
+
+</td>
 
                             </tr>
 

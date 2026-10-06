@@ -11,20 +11,13 @@
       href="~/css/CandidateRegister.css"
       asp-append-version="true" />
 
-
 <div class="candidate-register-page">
 
     <div class="candidate-register-card">
 
-
-        <!-- =====================================================
-             HEADER
-        ====================================================== -->
-
         <div class="register-icon">
             <i class="fa-solid fa-user-plus"></i>
         </div>
-
 
         <div class="register-heading">
 
@@ -37,447 +30,454 @@
         </div>
 
 
-        <!-- =====================================================
-             PERSONAL DETAILS
-        ====================================================== -->
+        @if (TempData["Success"] != null)
+        {
+            <div class="alert alert-success mt-3">
+                @TempData["Success"]
+            </div>
+        }
 
-        <div class="section-title mt-3 mb-3">
+        @if (TempData["Error"] != null)
+        {
+            <div class="alert alert-danger mt-3">
+                @TempData["Error"]
+            </div>
+        }
 
-            <i class="fa-solid fa-user"></i>
 
-            Personal Details
+        <form asp-controller="TPO"
+              asp-action="AddSubTPO"
+              method="post"
+              enctype="multipart/form-data">
 
-        </div>
+            @Html.AntiForgeryToken()
 
 
-        <!-- FULL NAME + MOBILE -->
+            <!-- =====================================================
+                 PERSONAL DETAILS
+            ====================================================== -->
 
-        <div class="register-form-row">
+            <div class="section-title mt-3 mb-3">
 
-            <div class="register-form-group">
+                <i class="fa-solid fa-user"></i>
 
-                <label class="register-label">
-                    Full Name
-                </label>
-
-                <input type="text"
-                       class="register-input"
-                       placeholder="Enter full name" />
+                Personal Details
 
             </div>
 
 
-            <div class="register-form-group">
+            <div class="register-form-row">
 
-                <label class="register-label">
-                    Mobile Number
-                </label>
+                <div class="register-form-group">
 
-                <input type="tel"
-                       class="register-input"
-                       placeholder="Enter mobile number"
-                       maxlength="10" />
-
-            </div>
-
-        </div>
-
-
-        <!-- COLLEGE EMAIL + EMPLOYEE ID -->
-
-        <div class="register-form-row">
-
-            <div class="register-form-group">
-
-                <label class="register-label">
-                    College Mail ID
-                </label>
-
-                <input type="email"
-                       class="register-input"
-                       placeholder="Enter official college email" />
-
-            </div>
-
-
-            <div class="register-form-group">
-
-                <label class="register-label">
-                    College Employee ID
-                </label>
-
-                <input type="text"
-                       class="register-input"
-                       placeholder="Enter employee ID" />
-
-            </div>
-
-        </div>
-
-
-        <!-- =====================================================
-             COLLEGE / ORGANIZATION DETAILS
-        ====================================================== -->
-
-        <div class="section-title mt-4 mb-3">
-
-            <i class="fa-solid fa-building-columns"></i>
-
-            College / Organization Details
-
-        </div>
-
-
-        <!-- COLLEGE NAME + CODE -->
-
-        <div class="register-form-row">
-
-            <div class="register-form-group">
-
-                <label class="register-label">
-                    College Name
-                </label>
-
-                <input type="text"
-                       class="register-input"
-                       placeholder="Enter college name" />
-
-            </div>
-
-
-            <div class="register-form-group">
-
-                <label class="register-label">
-                    College Code
-                </label>
-
-                <input type="text"
-                       class="register-input"
-                       placeholder="Enter college code" />
-
-            </div>
-
-        </div>
-
-
-        <!-- COLLEGE ADDRESS -->
-
-        <div class="register-form-row">
-
-            <div class="register-form-group"
-                 style="width:100%;">
-
-                <label class="register-label">
-                    College Address
-                </label>
-
-                <textarea class="register-input"
-                          rows="3"
-                          placeholder="Enter complete college address"></textarea>
-
-            </div>
-
-        </div>
-
-
-        <!-- WEBSITE -->
-
-        <div class="register-form-row">
-
-            <div class="register-form-group"
-                 style="width:100%;">
-
-                <label class="register-label">
-                    College / Organization Website URL
-                </label>
-
-                <input type="url"
-                       class="register-input"
-                       placeholder="https://www.examplecollege.ac.in" />
-
-            </div>
-
-        </div>
-
-
-        <!-- =====================================================
-             PROFESSIONAL DETAILS
-        ====================================================== -->
-
-        <div class="section-title mt-4 mb-3">
-
-            <i class="fa-solid fa-briefcase"></i>
-
-            Professional Details
-
-        </div>
-
-
-        <!-- DESIGNATION + DEPARTMENT -->
-
-        <div class="register-form-row">
-
-            <div class="register-form-group">
-
-                <label class="register-label">
-                    Designation
-                </label>
-
-                <input type="text"
-                       class="register-input"
-                       placeholder="e.g. Assistant Training & Placement Officer" />
-
-            </div>
-
-
-            <div class="register-form-group">
-
-                <label class="register-label">
-                    Department Name
-                </label>
-
-                <input type="text"
-                       class="register-input"
-                       placeholder="e.g. Training & Placement" />
-
-            </div>
-
-        </div>
-
-
-        <!-- =====================================================
-             VERIFICATION DOCUMENTS
-        ====================================================== -->
-
-        <div class="section-title mt-4 mb-3">
-
-            <i class="fa-solid fa-file-shield"></i>
-
-            Verification Documents
-
-        </div>
-
-
-        <!-- DOCUMENT 1 + DOCUMENT 2 -->
-
-        <div class="register-form-row">
-
-            <div class="register-form-group">
-
-                <label class="register-label">
-
-                    Supporting Document 1
-
-                    <small>
-                        (ID Card / Appointment Letter)
-                    </small>
-
-                </label>
-
-
-                <input type="file"
-                       accept=".pdf,.jpg,.jpeg,.png"
-                       class="register-input register-file" />
-
-            </div>
-
-
-            <div class="register-form-group">
-
-                <label class="register-label">
-
-                    Supporting Document 2
-
-                    <small>
-                        (Authorization / Other Proof)
-                    </small>
-
-                </label>
-
-
-                <input type="file"
-                       accept=".pdf,.jpg,.jpeg,.png"
-                       class="register-input register-file" />
-
-            </div>
-
-        </div>
-
-
-        <!-- PROFILE PHOTO -->
-
-        <div class="register-form-row">
-
-            <div class="register-form-group">
-
-                <label class="register-label">
-                    Profile Photo
-                </label>
-
-
-                <input type="file"
-                       accept=".jpg,.jpeg,.png"
-                       class="register-input register-file" />
-
-            </div>
-
-        </div>
-
-
-        <!-- =====================================================
-             OTP VERIFICATION
-        ====================================================== -->
-
-        <div class="section-title mt-4 mb-3">
-
-            <i class="fa-solid fa-shield-halved"></i>
-
-            Email / Mobile Verification
-
-        </div>
-
-
-        <div class="otp-section">
-
-            <label class="otp-label">
-                OTP Verification
-            </label>
-
-
-            <div class="otp-content">
-
-
-                <!-- OTP OPTIONS -->
-
-                <div class="otp-options">
-
-                    <label class="radio-option">
-
-                        <input type="radio"
-                               name="OTPType"
-                               value="Mobile"
-                               checked />
-
-                        <span>
-                            Mobile No.
-                        </span>
-
+                    <label class="register-label">
+                        Full Name
                     </label>
-
-
-                    <label class="radio-option">
-
-                        <input type="radio"
-                               name="OTPType"
-                               value="Email" />
-
-                        <span>
-                            College Email
-                        </span>
-
-                    </label>
-
-
-                    <!-- STATIC BUTTON -->
-
-                    <button type="button"
-                            class="send-otp-btn">
-
-                        Send OTP
-
-                    </button>
-
-                </div>
-
-
-                <!-- OTP INPUT -->
-
-                <div class="otp-input-container">
 
                     <input type="text"
-                           class="otp-input"
-                           placeholder="Enter OTP"
-                           maxlength="6"
-                           autocomplete="off" />
+                           name="FullName"
+                           class="register-input"
+                           placeholder="Enter full name"
+                           required />
+
+                </div>
+
+
+                <div class="register-form-group">
+
+                    <label class="register-label">
+                        Mobile Number
+                    </label>
+
+                    <input type="tel"
+                           name="MobileNo"
+                           class="register-input"
+                           placeholder="Enter mobile number"
+                           maxlength="10"
+                           required />
 
                 </div>
 
             </div>
 
-        </div>
+
+            <div class="register-form-row">
+
+                <div class="register-form-group">
+
+                    <label class="register-label">
+                        College Mail ID
+                    </label>
+
+                    <input type="email"
+                           name="CollegeMailID"
+                           class="register-input"
+                           placeholder="Enter official college email"
+                           required />
+
+                </div>
 
 
-        <!-- =====================================================
-             LOGIN DETAILS
-        ====================================================== -->
+                <div class="register-form-group">
 
-        <div class="section-title mt-4 mb-3">
+                    <label class="register-label">
+                        College Employee ID
+                    </label>
 
-            <i class="fa-solid fa-lock"></i>
+                    <input type="text"
+                           name="CollegeEmployeeID"
+                           class="register-input"
+                           placeholder="Enter employee ID"
+                           required />
 
-            Login Details
+                </div>
 
-        </div>
+            </div>
 
 
-        <!-- PASSWORD + CONFIRM PASSWORD -->
+            <!-- =====================================================
+                 COLLEGE DETAILS
+            ====================================================== -->
 
-        <div class="register-form-row">
+            <div class="section-title mt-4 mb-3">
 
-            <div class="register-form-group">
+                <i class="fa-solid fa-building-columns"></i>
 
-                <label class="register-label">
-                    Password
-                </label>
-
-                <input type="password"
-                       class="register-input"
-                       placeholder="Create password" />
+                College / Organization Details
 
             </div>
 
 
-            <div class="register-form-group">
+            <div class="register-form-row">
 
-                <label class="register-label">
-                    Confirm Password
-                </label>
+                <div class="register-form-group">
 
-                <input type="password"
-                       class="register-input"
-                       placeholder="Confirm password" />
+                    <label class="register-label">
+                        College Name
+                    </label>
+
+                    <input type="text"
+                           name="CollegeName"
+                           class="register-input"
+                           placeholder="Enter college name"
+                           required />
+
+                </div>
+
+
+                <div class="register-form-group">
+
+                    <label class="register-label">
+                        College Code
+                    </label>
+
+                    <input type="text"
+                           name="CollegeCode"
+                           class="register-input"
+                           placeholder="Enter college code"
+                           required />
+
+                </div>
 
             </div>
 
-        </div>
+
+            <div class="register-form-row">
+
+                <div class="register-form-group"
+                     style="width:100%;">
+
+                    <label class="register-label">
+                        College Address
+                    </label>
+
+                    <textarea name="CollegeAddress"
+                              class="register-input"
+                              rows="3"
+                              placeholder="Enter complete college address"
+                              required></textarea>
+
+                </div>
+
+            </div>
 
 
-        <!-- =====================================================
-             INFORMATION
-        ====================================================== -->
+            <div class="register-form-row">
 
-        @*      <div class="alert alert-info mt-3">
+                <div class="register-form-group"
+                     style="width:100%;">
 
-            <i class="fa-solid fa-circle-info me-2"></i>
+                    <label class="register-label">
+                        College / Organization Website URL
+                    </label>
 
-            The Sub TPO account will remain pending until it is
-            verified and approved by the Super Admin.
+                    <input type="url"
+                           name="OrganizationWebsiteURL"
+                           class="register-input"
+                           placeholder="https://www.examplecollege.ac.in" />
 
-        </div> *@
+                </div>
+
+            </div>
 
 
-        <!-- =====================================================
-             STATIC ADD BUTTON
-        ====================================================== -->
+            <!-- =====================================================
+                 PROFESSIONAL DETAILS
+            ====================================================== -->
 
-        <button type="button"
-                class="register-main-btn">
+            <div class="section-title mt-4 mb-3">
 
-            <i class="fa-solid fa-user-plus"></i>
+                <i class="fa-solid fa-briefcase"></i>
 
-            Add Sub TPO
+                Professional Details
 
-        </button>
+            </div>
+
+
+            <div class="register-form-row">
+
+                <div class="register-form-group">
+
+                    <label class="register-label">
+                        Designation
+                    </label>
+
+                    <input type="text"
+                           name="Designation"
+                           class="register-input"
+                           placeholder="e.g. Assistant Training & Placement Officer"
+                           required />
+
+                </div>
+
+
+                <div class="register-form-group">
+
+                    <label class="register-label">
+                        Department Name
+                    </label>
+
+                    <input type="text"
+                           name="DepartmentName"
+                           class="register-input"
+                           placeholder="e.g. Training & Placement"
+                           required />
+
+                </div>
+
+            </div>
+
+
+            <!-- =====================================================
+                 DOCUMENTS
+            ====================================================== -->
+
+            <div class="section-title mt-4 mb-3">
+
+                <i class="fa-solid fa-file-shield"></i>
+
+                Verification Documents
+
+            </div>
+
+
+            <div class="register-form-row">
+
+                <div class="register-form-group">
+
+                    <label class="register-label">
+                        Supporting Document 1
+                        <small>
+                            (ID Card / Appointment Letter)
+                        </small>
+                    </label>
+
+                    <input type="file"
+                           name="SupportingDocument1"
+                           accept=".pdf,.jpg,.jpeg,.png"
+                           class="register-input register-file"
+                           required />
+
+                </div>
+
+
+                <div class="register-form-group">
+
+                    <label class="register-label">
+                        Supporting Document 2
+                        <small>
+                            (Authorization / Other Proof)
+                        </small>
+                    </label>
+
+                    <input type="file"
+                           name="SupportingDocument2"
+                           accept=".pdf,.jpg,.jpeg,.png"
+                           class="register-input register-file"
+                           required />
+
+                </div>
+
+            </div>
+
+
+            <div class="register-form-row">
+
+                <div class="register-form-group">
+
+                    <label class="register-label">
+                        Profile Photo
+                    </label>
+
+                    <input type="file"
+                           name="ProfilePhoto"
+                           accept=".jpg,.jpeg,.png"
+                           class="register-input register-file"
+                           required />
+
+                </div>
+
+            </div>
+
+
+            <!-- =====================================================
+                 OTP
+            ====================================================== -->
+
+            <div class="section-title mt-4 mb-3">
+
+                <i class="fa-solid fa-shield-halved"></i>
+
+                Email / Mobile Verification
+
+            </div>
+
+
+            <div class="otp-section">
+
+                <label class="otp-label">
+                    OTP Verification
+                </label>
+
+                <div class="otp-content">
+
+                    <div class="otp-options">
+
+                        <label class="radio-option">
+
+                            <input type="radio"
+                                   name="OTPType"
+                                   value="Mobile"
+                                   checked />
+
+                            <span>
+                                Mobile No.
+                            </span>
+
+                        </label>
+
+
+                        <label class="radio-option">
+
+                            <input type="radio"
+                                   name="OTPType"
+                                   value="Email" />
+
+                            <span>
+                                College Email
+                            </span>
+
+                        </label>
+
+
+                        <button type="button"
+                                class="send-otp-btn">
+
+                            Send OTP
+
+                        </button>
+
+                    </div>
+
+
+                    <div class="otp-input-container">
+
+                        <input type="text"
+                               name="OTP"
+                               class="otp-input"
+                               placeholder="Enter OTP"
+                               maxlength="6"
+                               autocomplete="off"
+                               required />
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <!-- =====================================================
+                 LOGIN
+            ====================================================== -->
+
+            <div class="section-title mt-4 mb-3">
+
+                <i class="fa-solid fa-lock"></i>
+
+                Login Details
+
+            </div>
+
+
+            <div class="register-form-row">
+
+                <div class="register-form-group">
+
+                    <label class="register-label">
+                        Password
+                    </label>
+
+                    <input type="password"
+                           name="Password"
+                           class="register-input"
+                           placeholder="Create password"
+                           required />
+
+                </div>
+
+
+                <div class="register-form-group">
+
+                    <label class="register-label">
+                        Confirm Password
+                    </label>
+
+                    <input type="password"
+                           name="ConfirmPassword"
+                           class="register-input"
+                           placeholder="Confirm password"
+                           required />
+
+                </div>
+
+            </div>
+
+
+            <!-- =====================================================
+                 SUBMIT
+            ====================================================== -->
+
+            <button type="submit"
+                    class="register-main-btn">
+
+                <i class="fa-solid fa-user-plus"></i>
+
+                Add Sub TPO
+
+            </button>
+
+        </form>
 
 
         <!-- =====================================================
@@ -494,7 +494,6 @@
             </a>
 
         </div>
-
 
     </div>
 
