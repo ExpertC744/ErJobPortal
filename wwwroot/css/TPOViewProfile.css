@@ -1,0 +1,888 @@
+﻿:root {
+    --primary: #0d9488;
+    --primary-dark: #0f766e;
+    --primary-deep: #115e59;
+    --primary-light: #14b8a6;
+    --primary-soft: #ccfbf1;
+    --page-bg: #f3f7f6;
+    --white: #ffffff;
+    --text: #0f172a;
+    --text-soft: #475569;
+    --muted: #64748b;
+    --border: #e2e8f0;
+    --success: #15803d;
+    --success-bg: #f0fdf4;
+    --danger: #b91c1c;
+    --danger-bg: #fef2f2;
+    --shadow: 0 12px 32px rgba(15, 23, 42, 0.09);
+}
+
+
+/* =========================================================
+   RESET
+========================================================= */
+
+* {
+    box-sizing: border-box;
+}
+
+
+html {
+    width: 100%;
+    min-height: 100%;
+    margin: 0;
+    padding: 0;
+    scroll-behavior: smooth;
+}
+
+
+body {
+    width: 100%;
+    min-height: 100vh;
+    margin: 0;
+    padding: 0;
+    font-family: "Segoe UI", Inter, Arial, sans-serif;
+    color: var(--text);
+    background: var(--page-bg);
+    /*
+       IMPORTANT:
+       Allow browser mouse wheel and touchpad scrolling.
+    */
+    overflow-x: hidden;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+}
+
+
+/* =========================================================
+   PAGE SCROLL CONTAINER
+========================================================= */
+
+.tpo-profile-page {
+    width: 100%;
+    min-height: 100vh;
+    padding: 24px 18px 35px;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    /*
+       DO NOT use overflow:hidden here.
+    */
+    overflow: visible;
+}
+
+
+/* =========================================================
+   PROFILE CARD
+========================================================= */
+
+.tpo-profile-card {
+    width: 100%;
+    max-width: 1040px;
+    margin: 0 auto;
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 18px;
+    box-shadow: var(--shadow);
+    overflow: hidden;
+}
+
+
+/* =========================================================
+   COVER
+========================================================= */
+
+.tpo-profile-cover {
+    position: relative;
+    height: 125px;
+    min-height: 125px;
+    background: linear-gradient( 135deg, #115e59 0%, #0f766e 50%, #0d9488 100% );
+    overflow: hidden;
+}
+
+
+    .tpo-profile-cover::before {
+        content: "";
+        position: absolute;
+        width: 230px;
+        height: 230px;
+        right: -80px;
+        top: -150px;
+        border-radius: 50%;
+        background: rgba(255, 255, 255, 0.08);
+    }
+
+
+    .tpo-profile-cover::after {
+        content: "";
+        position: absolute;
+        width: 160px;
+        height: 160px;
+        left: 48%;
+        bottom: -125px;
+        border-radius: 50%;
+        background: rgba(255, 255, 255, 0.06);
+    }
+
+
+/* =========================================================
+   COVER CONTENT
+========================================================= */
+
+.tpo-cover-content {
+    position: relative;
+    z-index: 2;
+    width: 100%;
+    height: 125px;
+    padding: 20px 24px;
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 15px;
+}
+
+
+/* =========================================================
+   BRAND
+========================================================= */
+
+.tpo-cover-brand {
+    display: flex;
+    align-items: center;
+    gap: 11px;
+}
+
+
+.tpo-brand-icon {
+    width: 43px;
+    height: 43px;
+    flex: 0 0 43px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 11px;
+    color: var(--primary-dark);
+    background: #ffffff;
+    box-shadow: 0 5px 14px rgba(0, 0, 0, 0.14);
+}
+
+
+    .tpo-brand-icon i {
+        font-size: 18px;
+    }
+
+
+.tpo-brand-details {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+
+.tpo-brand-title {
+    color: #ffffff;
+    font-size: 21px;
+    line-height: 1.2;
+    font-weight: 800;
+}
+
+
+.tpo-brand-subtitle {
+    color: rgba(255, 255, 255, 0.78);
+    font-size: 10px;
+    line-height: 1.3;
+}
+
+
+/* =========================================================
+   ACTION BUTTONS
+========================================================= */
+
+.tpo-profile-actions {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+}
+
+
+.tpo-action-btn {
+    width: 36px;
+    height: 36px;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #ffffff;
+    background: rgba(255, 255, 255, 0.13);
+    border: 1px solid rgba(255, 255, 255, 0.28);
+    border-radius: 9px;
+    cursor: pointer;
+    transition: all 0.18s ease;
+}
+
+
+    .tpo-action-btn:hover {
+        background: rgba(255, 255, 255, 0.23);
+        transform: translateY(-1px);
+    }
+
+
+    .tpo-action-btn i {
+        font-size: 13px;
+    }
+
+
+/* =========================================================
+   IDENTITY
+========================================================= */
+
+.tpo-identity-section {
+    padding: 0 25px 20px;
+    text-align: center;
+    background: #ffffff;
+    border-bottom: 1px solid var(--border);
+}
+
+
+/* =========================================================
+   PHOTO
+========================================================= */
+
+.tpo-profile-photo {
+    width: 82px;
+    height: 82px;
+    margin: -41px auto 10px;
+    position: relative;
+    z-index: 5;
+    padding: 4px;
+    border-radius: 50%;
+    background: #ffffff;
+    box-shadow: 0 7px 18px rgba(15, 23, 42, 0.13);
+}
+
+
+.tpo-photo-placeholder {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    color: var(--primary-dark);
+    background: #ecfdf5;
+    border: 1px solid #ccfbf1;
+}
+
+
+    .tpo-photo-placeholder i {
+        font-size: 29px;
+    }
+
+
+/* =========================================================
+   NAME
+========================================================= */
+
+.tpo-profile-name {
+    margin: 0;
+    color: var(--text);
+    font-size: 25px;
+    line-height: 1.2;
+    font-weight: 800;
+    letter-spacing: -0.4px;
+    overflow-wrap: anywhere;
+}
+
+
+/* =========================================================
+   META
+========================================================= */
+
+.tpo-profile-meta {
+    margin-top: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 6px;
+}
+
+
+.tpo-verified-badge,
+.tpo-meta-item {
+    min-height: 25px;
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 4px 9px;
+    border-radius: 50px;
+    font-size: 10px;
+    font-weight: 650;
+}
+
+
+.tpo-verified-badge {
+    color: var(--primary-deep);
+    background: var(--primary-soft);
+    border: 1px solid #a7f3d0;
+}
+
+
+.tpo-meta-item {
+    color: var(--text-soft);
+    background: #f8fafc;
+    border: 1px solid var(--border);
+}
+
+
+/* =========================================================
+   BODY
+========================================================= */
+
+.tpo-profile-body {
+    padding: 22px 25px 26px;
+    background: #ffffff;
+}
+
+
+/* =========================================================
+   SECTION HEADING
+========================================================= */
+
+.tpo-section-heading {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 11px;
+}
+
+
+.tpo-section-spacing {
+    margin-top: 23px;
+}
+
+
+.tpo-section-icon {
+    width: 34px;
+    height: 34px;
+    flex: 0 0 34px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--primary-dark);
+    background: #f0fdfa;
+    border: 1px solid #ccfbf1;
+    border-radius: 9px;
+}
+
+
+    .tpo-section-icon i {
+        font-size: 13px;
+    }
+
+
+.tpo-section-heading h2 {
+    margin: 0;
+    color: var(--text);
+    font-size: 15px;
+    line-height: 1.2;
+    font-weight: 750;
+}
+
+
+.tpo-section-heading p {
+    margin: 2px 0 0;
+    color: var(--muted);
+    font-size: 10px;
+    line-height: 1.35;
+}
+
+
+/* =========================================================
+   INFORMATION GRID
+========================================================= */
+
+.tpo-information-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 9px;
+}
+
+
+/* =========================================================
+   INFORMATION CARD
+========================================================= */
+
+.tpo-information-card {
+    min-width: 0;
+    min-height: 67px;
+    padding: 11px 12px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: #ffffff;
+    border: 1px solid var(--border);
+    border-radius: 11px;
+    transition: border-color 0.18s ease, box-shadow 0.18s ease, transform 0.18s ease;
+}
+
+
+    .tpo-information-card:hover {
+        border-color: #99f6e4;
+        box-shadow: 0 5px 15px rgba(15, 118, 110, 0.07);
+        transform: translateY(-1px);
+    }
+
+
+/* =========================================================
+   INFORMATION ICON
+========================================================= */
+
+.tpo-information-icon {
+    width: 33px;
+    height: 33px;
+    flex: 0 0 33px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--primary-dark);
+    background: #f0fdfa;
+    border: 1px solid #ccfbf1;
+    border-radius: 8px;
+}
+
+
+    .tpo-information-icon i {
+        font-size: 12px;
+    }
+
+
+/* =========================================================
+   INFORMATION TEXT
+========================================================= */
+
+.tpo-information-text {
+    min-width: 0;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+
+.tpo-information-label {
+    display: block;
+    color: var(--muted);
+    font-size: 9px;
+    line-height: 1.2;
+    font-weight: 700;
+    letter-spacing: 0.45px;
+    text-transform: uppercase;
+}
+
+
+.tpo-information-value {
+    display: block;
+    color: var(--text);
+    font-size: 12px;
+    line-height: 1.35;
+    font-weight: 600;
+    overflow-wrap: anywhere;
+    word-break: break-word;
+}
+
+
+/* =========================================================
+   WIDE CARD
+========================================================= */
+
+.tpo-card-wide {
+    grid-column: 1 / -1;
+}
+
+
+.tpo-address {
+    line-height: 1.45;
+}
+
+
+/* =========================================================
+   WEBSITE
+========================================================= */
+
+.tpo-website-link {
+    color: var(--primary-dark);
+    text-decoration: none;
+    overflow-wrap: anywhere;
+    word-break: break-word;
+}
+
+
+    .tpo-website-link:hover {
+        color: var(--primary);
+        text-decoration: underline;
+    }
+
+
+/* =========================================================
+   DOCUMENT CARD
+========================================================= */
+
+.tpo-document-card {
+    min-width: 0;
+    min-height: 82px;
+    padding: 12px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: #ffffff;
+    border: 1px solid var(--border);
+    border-radius: 11px;
+    transition: border-color 0.18s ease, box-shadow 0.18s ease, transform 0.18s ease;
+}
+
+
+    .tpo-document-card:hover {
+        border-color: #99f6e4;
+        box-shadow: 0 5px 15px rgba(15, 118, 110, 0.07);
+        transform: translateY(-1px);
+    }
+
+
+.tpo-document-icon {
+    width: 36px;
+    height: 36px;
+    flex: 0 0 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--primary-dark);
+    background: var(--primary-soft);
+    border: 1px solid #ccfbf1;
+    border-radius: 9px;
+}
+
+
+    .tpo-document-icon i {
+        font-size: 14px;
+    }
+
+
+.tpo-document-content {
+    min-width: 0;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+
+.tpo-document-description {
+    color: var(--text-soft);
+    font-size: 10px;
+    line-height: 1.3;
+    overflow-wrap: anywhere;
+}
+
+
+/* =========================================================
+   STATUS
+========================================================= */
+
+.tpo-status {
+    width: fit-content;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    margin-top: 3px;
+    padding: 3px 7px;
+    border-radius: 30px;
+    font-size: 9px;
+    line-height: 1.2;
+    font-weight: 700;
+}
+
+
+    .tpo-status.uploaded {
+        color: var(--success);
+        background: var(--success-bg);
+        border: 1px solid #bbf7d0;
+    }
+
+
+    .tpo-status.not-uploaded {
+        color: var(--danger);
+        background: var(--danger-bg);
+        border: 1px solid #fecaca;
+    }
+
+
+/* =========================================================
+   FOOTER
+========================================================= */
+
+.tpo-profile-footer {
+    min-height: 45px;
+    padding: 11px 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    color: var(--muted);
+    font-size: 10px;
+    background: #f8fafc;
+    border-top: 1px solid var(--border);
+}
+
+
+    .tpo-profile-footer strong {
+        color: var(--primary-dark);
+    }
+
+
+/* =========================================================
+   SCROLLBAR
+========================================================= */
+
+html::-webkit-scrollbar,
+body::-webkit-scrollbar {
+    width: 8px;
+}
+
+
+html::-webkit-scrollbar-track,
+body::-webkit-scrollbar-track {
+    background: #edf3f2;
+}
+
+
+html::-webkit-scrollbar-thumb,
+body::-webkit-scrollbar-thumb {
+    background: #94a3b8;
+    border-radius: 20px;
+    border: 2px solid #edf3f2;
+}
+
+
+    html::-webkit-scrollbar-thumb:hover,
+    body::-webkit-scrollbar-thumb:hover {
+        background: var(--primary);
+    }
+
+
+/* =========================================================
+   TABLET
+========================================================= */
+
+@media (max-width: 760px) {
+
+    .tpo-profile-page {
+        padding: 15px 12px 25px;
+    }
+
+
+    .tpo-profile-body {
+        padding: 20px;
+    }
+
+
+    .tpo-identity-section {
+        padding-left: 20px;
+        padding-right: 20px;
+    }
+}
+
+
+/* =========================================================
+   MOBILE
+========================================================= */
+
+@media (max-width: 600px) {
+
+    .tpo-profile-page {
+        padding: 0;
+    }
+
+
+    .tpo-profile-card {
+        min-height: 100vh;
+        border-radius: 0;
+        border-left: 0;
+        border-right: 0;
+        box-shadow: none;
+    }
+
+
+    .tpo-profile-cover {
+        height: 110px;
+        min-height: 110px;
+    }
+
+
+    .tpo-cover-content {
+        height: 110px;
+        padding: 16px 14px;
+    }
+
+
+    .tpo-brand-icon {
+        width: 38px;
+        height: 38px;
+        flex-basis: 38px;
+    }
+
+
+    .tpo-brand-title {
+        font-size: 18px;
+    }
+
+
+    .tpo-brand-subtitle {
+        display: none;
+    }
+
+
+    .tpo-profile-actions {
+        gap: 5px;
+    }
+
+
+    .tpo-action-btn {
+        width: 33px;
+        height: 33px;
+    }
+
+
+    .tpo-profile-photo {
+        width: 76px;
+        height: 76px;
+        margin-top: -38px;
+    }
+
+
+    .tpo-profile-name {
+        font-size: 21px;
+    }
+
+
+    .tpo-identity-section {
+        padding: 0 14px 18px;
+    }
+
+
+    .tpo-profile-body {
+        padding: 19px 14px 23px;
+    }
+
+
+    .tpo-information-grid {
+        grid-template-columns: 1fr;
+        gap: 8px;
+    }
+
+
+    .tpo-card-wide {
+        grid-column: auto;
+    }
+
+
+    .tpo-section-spacing {
+        margin-top: 21px;
+    }
+
+
+    .tpo-information-card {
+        min-height: 63px;
+    }
+}
+
+
+/* =========================================================
+   VERY SMALL MOBILE
+========================================================= */
+
+@media (max-width: 390px) {
+
+    .tpo-cover-content {
+        padding-left: 10px;
+        padding-right: 10px;
+    }
+
+
+    .tpo-profile-actions {
+        gap: 3px;
+    }
+
+
+    .tpo-action-btn {
+        width: 31px;
+        height: 31px;
+    }
+
+
+    .tpo-profile-name {
+        font-size: 20px;
+    }
+}
+
+
+/* =========================================================
+   PRINT
+========================================================= */
+
+@media print {
+
+    @page {
+        size: A4 portrait;
+        margin: 8mm;
+    }
+
+
+    html,
+    body {
+        width: 100%;
+        min-height: auto;
+        overflow: visible !important;
+        background: #ffffff !important;
+    }
+
+
+    .tpo-profile-page {
+        min-height: auto;
+        padding: 0;
+        display: block;
+    }
+
+
+    .tpo-profile-card {
+        max-width: none;
+        border-radius: 0;
+        box-shadow: none;
+        border: 1px solid #d1d5db;
+    }
+
+
+    .tpo-profile-actions {
+        display: none !important;
+    }
+
+
+    .tpo-information-card,
+    .tpo-document-card {
+        break-inside: avoid;
+        page-break-inside: avoid;
+        box-shadow: none;
+    }
+
+
+    .tpo-profile-cover {
+        print-color-adjust: exact;
+        -webkit-print-color-adjust: exact;
+    }
+
+
+        .tpo-profile-cover::before,
+        .tpo-profile-cover::after {
+            display: none;
+        }
+}

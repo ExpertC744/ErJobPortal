@@ -4917,8 +4917,8 @@ WHERE nID = @nID
 
         //khushi 01-10-26
         [HttpGet]
-        [Route("Organization/OrgPreviousPost")]
-        public IActionResult OrgPreviousPost()
+        [Route("Organization/OrgPreviousPost/{id}")]
+        public IActionResult OrgPreviousPost(string? id)
         {
             int? sessionOrgID = HttpContext.Session.GetInt32("OrgID");
 
@@ -4928,6 +4928,8 @@ WHERE nID = @nID
             }
 
             int orgID = sessionOrgID.Value;
+
+            string? orgCode = GetOrganizationCode();
 
             OrgPostM item = null;
 
@@ -5116,12 +5118,12 @@ WHERE nID = @nID
 
                 if (item == null)
                 {
-                    TempData["Error"] =
-                        "Post not found or this post has not expired yet.";
+                    TempData["Error"] = "Post not found or this post has not expired yet.";
 
                     return RedirectToAction(
-                        "PreviousPost",
-                        "Organization");
+       "OrgPreviousPost",
+       "Organization",
+       new { id = GetOrganizationCode() });
                 }
 
                 // =====================================================
@@ -5134,8 +5136,9 @@ WHERE nID = @nID
                         "You are not authorized to repost this post.";
 
                     return RedirectToAction(
-                        "PreviousPost",
-                        "Organization");
+       "OrgPreviousPost",
+       "Organization",
+       new { id = GetOrganizationCode() });
                 }
 
                 // =====================================================
@@ -5164,8 +5167,9 @@ WHERE nID = @nID
                 TempData["Error"] = ex.Message;
 
                 return RedirectToAction(
-                    "PreviousPost",
-                    "Organization");
+       "OrgPreviousPost",
+       "Organization",
+       new { id = GetOrganizationCode() });
             }
         }
 

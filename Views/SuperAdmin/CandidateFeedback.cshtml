@@ -1,183 +1,272 @@
-﻿@model IEnumerable<ErJobPortal.Models.SACandidateFeedbackM>
+﻿```cshtml
+@model IEnumerable<ErJobPortal.Models.SACandidateFeedbackM>
 
-    @* Radhika30-09 *@
-<link rel="stylesheet" href="~/css/SACandidateFeedback.css" asp-append-version="true" />
+<link rel="stylesheet"
+      href="~/css/SACandidateFeedback.css"
+      asp-append-version="true" />
+
 @{
     Layout = "~/Views/Shared/_DashboardLayout.cshtml";
 
     ViewData["Title"] = "Trainee Feedback";
-
     ViewData["Panel"] = "SuperAdmin";
-
     ViewData["UserName"] = "Super Admin";
 }
 
-
-
 <div class="feedback-page container-fluid trainee-selection-page">
 
-    <!-- TITLE -->
-
-   
-
-
-    <!-- MASTER TABLE -->
-
     <div class="master-table-container">
-       <div class="feedback-title-row">
 
-    <!-- LEFT SIDE -->
-    <div>
+        <!-- ========================================================= -->
+        <!-- PAGE HEADER -->
+        <!-- ========================================================= -->
 
-        <h1 class="feedback-title">
-            Trainee Feedback Details
-        </h1>
+        <div class="feedback-title-row">
 
-        <div class="feedback-subtitle">
-            ItNetworkZ
+            <div>
+                <h1 class="feedback-title">
+                    Trainee Feedback Details
+                </h1>
+
+                <div class="feedback-subtitle">
+                    ItNetworkZ
+                </div>
+            </div>
+
+            <!-- BACK BUTTON -->
+            <a href="javascript:history.back();"
+               class="back-button"
+               title="Back">
+
+                <i class="fas fa-arrow-left"></i>
+
+            </a>
+
         </div>
 
-    </div>
+
+        <!-- ========================================================= -->
+        <!-- SUCCESS / ERROR MESSAGE -->
+        <!-- ========================================================= -->
+
+        @if (TempData["Success"] != null)
+        {
+            <div class="alert alert-success alert-dismissible fade show"
+                 role="alert">
+
+                @TempData["Success"]
+
+                <button type="button"
+                        class="btn-close"
+                        data-bs-dismiss="alert">
+                </button>
+
+            </div>
+        }
+
+        @if (TempData["Error"] != null)
+        {
+            <div class="alert alert-danger alert-dismissible fade show"
+                 role="alert">
+
+                @TempData["Error"]
+
+                <button type="button"
+                        class="btn-close"
+                        data-bs-dismiss="alert">
+                </button>
+
+            </div>
+        }
 
 
-    <!-- RIGHT SIDE -->
-    <a href="javascript:history.back();"
-       class="back-button"
-       title="Back">
+        <!-- ========================================================= -->
+        <!-- FEEDBACK TABLE -->
+        <!-- ========================================================= -->
 
-        <i class="fas fa-arrow-left"></i>
+        <div class="table-responsive">
 
-    </a>
+            <table id="feedbackTable"
+                   class="master-data-table"
+                   data-mobile-scroll="true">
 
-</div>
-        <table id="feedbackTable"
-               class="master-data-table"
-               data-mobile-scroll="true">
+                <thead>
 
-            <thead>
-
-                <tr>
-
-                    <th>
-                        Sr. No
-                    </th>
-
-                    <th>
-                        Trainee ID
-                    </th>
-
-                    <th>
-                        Trainee Name
-                    </th>
-
-                    <th>
-                        Status
-                    </th>
-
-                    <th>
-                        Action
-                    </th>
-
-                </tr>
-
-            </thead>
-
-
-            <tbody>
-
-                @{
-                    int srNo = 1;
-                }
-
-                @if (Model != null && Model.Any())
-                {
-                    foreach (var item in Model)
-                    {
-                        <tr>
-
-                            <!-- SR NO -->
-
-                            <td>
-                                @srNo
-                            </td>
-
-
-                            <!-- TRAINEE ID -->
-
-                            <td>
-                                @item.nID
-                            </td>
-
-
-                            <!-- TRAINEE NAME -->
-
-                            <td>
-                                @item.sFName @item.sLName
-                            </td>
-
-
-                            <!-- STATUS -->
-
-                            <td>
-
-                                <form asp-controller="SuperAdmin" asp-action="ToggleCandidateFeedback" method="post" style="display:inline;">
-                                    @Html.AntiForgeryToken()
-
-                                    <input type="hidden" name="id" value="@item.nID" />
-
-                                    @if (item.nSABit == 1)
-                                    {
-                                        <button style="background: #198754;border: none;
-    color: #ffffff;
-    padding: 6px 12px;
-    border-radius: 6px;
-    font-size: 12px;
-    cursor: pointer;
-    min-width: 75px;" type="submit"bclass="status-button status-enabled"bonclick="return confirm('Are you sure you want to disable this feedback?');">
-                                            Enabled
-                                        </button>
-                                    }
-                                    else
-                                    {
-                                        <button type="submit" class="status-button status-disabled" onclick="return confirm('Are you sure you want to enable this feedback?');">
-                                            Disabled
-                                        </button>
-                                    }
-                                </form>
-                            </td>
-
-                            <!-- ACTION -->
-
-                            <td>
-                                <a asp-controller="SuperAdmin" asp-action="DetailsCandidateFeedback" asp-route-id="@item.nID" class="master-action-btn" title="View">
-                                    <i class="fas fa-eye"></i>
-                                </a>
-                            </td>
-                        </tr>
-
-                        srNo++;
-                    }
-                }
-                else
-                {
                     <tr>
 
-                        <td colspan="5"
-                            class="text-center">
+                        <th>
+                            Sr. No
+                        </th>
 
-                            No trainee feedback found.
+                        <th>
+                            Trainee ID
+                        </th>
 
-                        </td>
+                        <th>
+                            Trainee Name
+                        </th>
+
+                        <th>
+                            Status
+                        </th>
+
+                        <th>
+                            Action
+                        </th>
 
                     </tr>
-                }
 
-            </tbody>
-
-        </table>
+                </thead>
 
 
-        <!-- MASTER PAGE INFO -->
+                <tbody>
+
+                    @{
+                        int srNo = 1;
+                    }
+
+                    @if (Model != null && Model.Any())
+                    {
+                        foreach (var item in Model)
+                        {
+                            <tr>
+
+                                <!-- ================================================= -->
+                                <!-- SR NO -->
+                                <!-- ================================================= -->
+
+                                <td>
+                                    @srNo
+                                </td>
+
+
+                                <!-- ================================================= -->
+                                <!-- TRAINEE ID -->
+                                <!-- ================================================= -->
+
+                                <td>
+                                    @item.nAdminID
+                                </td>
+
+
+                                <!-- ================================================= -->
+                                <!-- TRAINEE NAME -->
+                                <!-- ================================================= -->
+
+                                <td>
+                                    @item.sFName @item.sLName
+                                </td>
+
+
+                                <!-- ================================================= -->
+                                <!-- STATUS -->
+                                <!-- ================================================= -->
+
+                                <td>
+
+                                    <form asp-controller="SuperAdmin"
+                                          asp-action="ToggleCandidateFeedback"
+                                          method="post"
+                                          class="feedback-toggle-form"
+                                          style="display:inline;">
+
+                                        @Html.AntiForgeryToken()
+
+                                        <!--
+                                            IMPORTANT:
+                                            Send FeedbackID, NOT CandidateID.
+                                        -->
+
+                                        <input type="hidden"
+                                               name="id"
+                                               value="@item.FeedbackID" />
+
+
+                                        @if (item.nSABit == 1)
+                                        {
+                                            <!-- ===================================== -->
+                                            <!-- ENABLED -->
+                                            <!-- ===================================== -->
+
+                                            <button type="submit"
+                                                    class="status-button status-enabled"
+                                                    onclick="return confirm('Are you sure you want to disable this feedback?');">
+
+                                                Enabled
+
+                                            </button>
+                                        }
+                                        else
+                                        {
+                                            <!-- ===================================== -->
+                                            <!-- DISABLED -->
+                                            <!-- ===================================== -->
+
+                                            <button type="submit"
+                                                    class="status-button status-disabled"
+                                                    onclick="return confirm('Are you sure you want to enable this feedback?');">
+
+                                                Disabled
+
+                                            </button>
+                                        }
+
+                                    </form>
+
+                                </td>
+
+
+                                <!-- ================================================= -->
+                                <!-- ACTION -->
+                                <!-- ================================================= -->
+
+                                <td>
+
+                                    <a asp-controller="SuperAdmin"
+                                       asp-action="DetailsCandidateFeedback"
+                                       asp-route-id="@item.FeedbackID"
+                                       class="master-action-btn"
+                                       title="View Feedback">
+
+                                        <i class="fas fa-eye"></i>
+
+                                    </a>
+
+                                </td>
+
+                            </tr>
+
+                            srNo++;
+                        }
+                    }
+                    else
+                    {
+                        <!-- ========================================================= -->
+                        <!-- NO DATA -->
+                        <!-- ========================================================= -->
+
+                        <tr>
+
+                            <td colspan="5"
+                                class="text-center">
+
+                                No trainee feedback found.
+
+                            </td>
+
+                        </tr>
+                    }
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+
+        <!-- ========================================================= -->
+        <!-- PAGINATION INFO -->
+        <!-- ========================================================= -->
 
         <div id="feedbackPageInfo"
              class="master-page-info text-center d-none">
@@ -185,64 +274,37 @@
 
     </div>
 
-    <script>
-        document.querySelectorAll(".feedback-toggle-form").forEach(function (form) {
+</div>
 
-            form.addEventListener("submit", function (e) {
 
-                e.preventDefault();
+<!-- ============================================================= -->
+<!-- OPTIONAL AUTO HIDE ALERT -->
+<!-- ============================================================= -->
 
-                const button = form.querySelector(".status-button");
-                const formData = new FormData(form);
+<script>
 
-                fetch(form.action, {
-                    method: "POST",
-                    body: formData
-                })
-                .then(response => {
+    document.addEventListener("DOMContentLoaded", function () {
 
-                    if (!response.ok) {
-                        throw new Error("Update failed");
-                    }
+        setTimeout(function () {
 
-                    if (button.classList.contains("status-enabled")) {
+            const alerts = document.querySelectorAll(".alert");
 
-                        button.innerText = "Disabled";
+            alerts.forEach(function (alert) {
 
-                        button.classList.remove("status-enabled");
-                        button.classList.add("status-disabled");
+                if (typeof bootstrap !== "undefined") {
 
-                        button.setAttribute(
-                            "onclick",
-                            "return confirm('Are you sure you want to enable this feedback?');"
-                        );
+                    const bsAlert =
+                        bootstrap.Alert.getOrCreateInstance(alert);
 
-                    }
-                    else {
+                    bsAlert.close();
 
-                        button.innerText = "Enabled";
-
-                        button.classList.remove("status-disabled");
-                        button.classList.add("status-enabled");
-
-                        button.setAttribute(
-                            "onclick",
-                            "return confirm('Are you sure you want to disable this feedback?');"
-                        );
-                    }
-                })
-                .catch(error => {
-
-                    console.error(error);
-                    alert("Unable to update feedback status.");
-
-                });
+                }
 
             });
 
-        });
-    </script>
+        }, 4000);
 
-</div>
+    });
 
- 
+</script>
+```
