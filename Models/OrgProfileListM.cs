@@ -29,6 +29,6 @@
         public int? EstablishmentYear { get; set; }
 
         // Organization Profile Status
-        public bool nBit { get; set; }
+        public bool nSABit { get; set; }
     }
 }

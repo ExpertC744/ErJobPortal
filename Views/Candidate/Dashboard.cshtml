@@ -3,6 +3,8 @@
     ViewData["Title"] = "Candidate Dashboard";
     ViewData["Panel"] = "Candidate";
     ViewData["UserName"] = "Candidate";
+
+    var candidateCode = ViewBag.CandidateCode as string;
 }
 
 <style>
@@ -619,6 +621,81 @@
         .sa-view-btn i {
             font-size: 9px;
         }
+
+        /* =========================================================
+   APPLY STATUS BUTTONS
+========================================================= */
+
+.apply-status-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    min-width: 105px;
+    height: 38px;
+
+    padding: 8px 16px;
+
+    border-radius: 6px;
+
+    font-size: 13px;
+    font-weight: 600;
+
+    text-decoration: none;
+
+    transition: all 0.2s ease;
+}
+
+/* =========================================================
+   APPLY NOW
+========================================================= */
+
+.apply-now-btn {
+    background: #0d9488;
+    color: #ffffff;
+
+    border: 1px solid #0d9488;
+
+    cursor: pointer;
+}
+
+.apply-now-btn:hover {
+    background: #0f766e;
+    border-color: #0f766e;
+
+    color: #ffffff;
+
+    transform: translateY(-1px);
+
+    box-shadow: 0 4px 10px rgba(13, 148, 136, 0.20);
+}
+
+.apply-now-btn:active {
+    background: #115e59;
+    border-color: #115e59;
+
+    transform: translateY(0);
+}
+
+/* =========================================================
+   APPLIED
+========================================================= */
+
+.applied-btn {
+    background: #16a34a;
+    color: #ffffff;
+
+    border: 1px solid #16a34a;
+
+    cursor: default;
+}
+
+.applied-btn:hover {
+    background: #15803d;
+    border-color: #15803d;
+
+    color: #ffffff;
+}
 </style>
 @if (TempData["ApplyMessage"] != null)
 {
@@ -1894,7 +1971,7 @@
 
                     <div>
                         <h2>
-                            <i class="fas fa-briefcase me-2"></i>
+                           
                             Internship Post
                         </h2>
 
@@ -1990,28 +2067,45 @@
                                 </td>
 
                                 <!-- Apply Status -->
-                                <td>
+                             <!-- Apply Status -->
+<td>
 
-                                    @if (post.IsApplied)
-                                    {
-                                        <span class="master-action-btn">
-                                            Applied
-                                        </span>
-                                    }
-                                    else
-                                    {
-                                        <form asp-controller="Candidate" asp-action="ApplyToPost" method="post" style="display:inline;">
-                                            @Html.AntiForgeryToken()
-                                            <input type="hidden" name="postId" value="@post.nID" />
-                                            <input type="hidden" name="orgId" value="@post.nOrgID" />
-                                            <button type="submit" class="master-action-btn" style="border:none; cursor:pointer;">
-                                                Apply Now
-                                            </button>
+    @if (post.IsApplied)
+    {
+        <span class="apply-status-btn applied-btn">
+            <i class="fas fa-check-circle me-1"></i>
+            Applied
+        </span>
+    }
+    else
+    {
+        <form asp-controller="Candidate"
+              asp-action="ApplyToPost"
+              method="post"
+              class="apply-form">
 
-                                        </form>
-                                    }
+            @Html.AntiForgeryToken()
 
-                                </td>
+            <input type="hidden"
+                   name="postId"
+                   value="@post.nID" />
+
+            <input type="hidden"
+                   name="orgId"
+                   value="@post.nOrgID" />
+
+            <button type="submit"
+                    class="apply-status-btn apply-now-btn">
+
+                <i class="fas fa-paper-plane me-1"></i>
+                Apply Now
+
+            </button>
+
+        </form>
+    }
+
+</td>
 
                             </tr>
 
@@ -2032,7 +2126,7 @@
             <!-- Extra Post -->
             <div class="mt-3">
 
-                <a href="#"
+                <a href="@Url.Action("ExtraPost", "Candidate", new { id = candidateCode })"
                    class="btn btn-success px-4 py-2">
                     <i class="fas fa-plus me-2"></i>
                     Extra Post

@@ -163,12 +163,36 @@ namespace ErJobPortal.Models
         // BROAD GROUP
         // =====================================================
 
+        //[Range(
+        //    1,
+        //    int.MaxValue,
+        //    ErrorMessage = "Please select a broad group."
+        //)]
+        //public int nBroadGroup { get; set; }
+
+
+        // =====================================================
+        // CURRENT YEAR
+        // =====================================================
+
         [Range(
             1,
-            int.MaxValue,
-            ErrorMessage = "Please select a broad group."
+            5,
+            ErrorMessage = "Please select a valid current year."
         )]
-        public int nBroadGroup { get; set; }
+        public int? nCurrentYear { get; set; }
+
+
+        // =====================================================
+        // ADMISSION YEAR
+        // =====================================================
+
+        [Range(
+            1900,
+            2100,
+            ErrorMessage = "Please enter a valid admission year."
+        )]
+        public int? nAdmissionYear { get; set; }
 
 
         // =====================================================
@@ -216,12 +240,12 @@ namespace ErJobPortal.Models
         // CONFIRM PASSWORD
         // =====================================================
 
-        [Required(ErrorMessage = "Confirm password is required.")]
-        [Compare(
-            "sPassword",
-            ErrorMessage = "Password and confirm password do not match."
-        )]
-        public string? sConfirmPassword { get; set; }
+        //[Required(ErrorMessage = "Confirm password is required.")]
+        //[Compare(
+        //    "sPassword",
+        //    ErrorMessage = "Password and confirm password do not match."
+        //)]
+        //public string? sConfirmPassword { get; set; }
 
 
         // =====================================================

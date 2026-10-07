@@ -12,32 +12,155 @@ namespace ErJobPortal.Repositories
     public class AccountRepository
     {
         private readonly DbConnection _db; public AccountRepository(DbConnection db) { _db = db; }
-
+        // shrirang 06/10/26
         // Candidate Register 
         #region "Candidate Register"
         public int Register(CandidateRegister model)
         {
             using (SqlConnection cn = _db.GetConnection())
             {
-                using (SqlCommand cmd = new SqlCommand("SP_RegisterCandidate", cn))
-                {
-                    cmd.CommandType = CommandType.StoredProcedure;
+                string query = @"
+            INSERT INTO tblCandidateRegister
+            (
+                sFName,
+                sLName,
+                sMobile,
+                sEmail,
+                DOB,
+                nGender,
+                sProfileImage,
+                nCollegeCode,
+                sCollegeName,
+                sPassword,
+                RegDate,
+                ModDate,
+                nBit,
+                nSABit,
+                sOTP,
+                nBranch,
+                nPassoutYear,
+                nDepartment,
+                nCurrentYear,
+                nAdmissionYear
+            )
+            VALUES
+            (
+                @sFName,
+                @sLName,
+                @sMobile,
+                @sEmail,
+                @DOB,
+                @nGender,
+                @sProfileImage,
+                @nCollegeCode,
+                @sCollegeName,
+                @sPassword,
+                GETDATE(),
+                GETDATE(),
+                1,
+                1,
+                @sOTP,
+                @nBranch,
+                @nPassoutYear,
+                @nDepartment,
+                @nCurrentYear,
+                @nAdmissionYear
+            )";
 
-                    cmd.Parameters.AddWithValue("@sFName", model.sFName);
-                    cmd.Parameters.AddWithValue("@sLName", model.sLName);
-                    cmd.Parameters.AddWithValue("@sMobile", model.sMobile);
-                    cmd.Parameters.AddWithValue("@sEmail", model.sEmail);
-                    cmd.Parameters.AddWithValue("@DOB", model.DOB);
-                    cmd.Parameters.AddWithValue("@nGender", model.nGender);
-                    cmd.Parameters.AddWithValue("@sProfileImage", model.sProfileImage ?? "");
-                    cmd.Parameters.AddWithValue("@nCollegeCode", model.nCollegeCode);
-                    cmd.Parameters.AddWithValue("@sCollegeName", model.sCollegeName);
-                    cmd.Parameters.AddWithValue("@sPassword", model.sPassword);
-                    cmd.Parameters.AddWithValue("@sOTP", model.sOTP ?? "");
-                    cmd.Parameters.AddWithValue("@nDepartment", model.nDepartment);
-                    cmd.Parameters.AddWithValue("@nBranch", model.nBranch);
-                    cmd.Parameters.AddWithValue("@nPassoutYear", model.nPassoutYear);
+                using (SqlCommand cmd = new SqlCommand(query, cn))
+                {
+                    cmd.CommandType = CommandType.Text;
+
+                    cmd.Parameters.AddWithValue(
+                        "@sFName",
+                        model.sFName ?? ""
+                    );
+
+                    cmd.Parameters.AddWithValue(
+                        "@sLName",
+                        model.sLName ?? ""
+                    );
+
+                    cmd.Parameters.AddWithValue(
+                        "@sMobile",
+                        model.sMobile ?? ""
+                    );
+
+                    cmd.Parameters.AddWithValue(
+                        "@sEmail",
+                        model.sEmail ?? ""
+                    );
+
+                    cmd.Parameters.AddWithValue(
+                        "@DOB",
+                        model.DOB.HasValue
+                            ? model.DOB.Value
+                            : DBNull.Value
+                    );
+
+                    cmd.Parameters.AddWithValue(
+                        "@nGender",
+                        model.nGender
+                    );
+
+                    cmd.Parameters.AddWithValue(
+                        "@sProfileImage",
+                        model.sProfileImage ?? ""
+                    );
+
+                    cmd.Parameters.AddWithValue(
+                        "@nCollegeCode",
+                        model.nCollegeCode
+                    );
+
+                    cmd.Parameters.AddWithValue(
+                        "@sCollegeName",
+                        model.sCollegeName
+                    );
+
+                    cmd.Parameters.AddWithValue(
+                        "@sPassword",
+                        model.sPassword ?? ""
+                    );
+
+                    cmd.Parameters.AddWithValue(
+                        "@sOTP",
+                        model.sOTP ?? ""
+                    );
+
+                    cmd.Parameters.AddWithValue(
+                        "@nBranch",
+                        model.nBranch
+                    );
+
+                    cmd.Parameters.AddWithValue(
+                        "@nPassoutYear",
+                        model.nPassoutYear.HasValue
+                            ? model.nPassoutYear.Value
+                            : DBNull.Value
+                    );
+
+                    cmd.Parameters.AddWithValue(
+                        "@nDepartment",
+                        model.nDepartment
+                    );
+
+                    cmd.Parameters.AddWithValue(
+                        "@nCurrentYear",
+                        model.nCurrentYear.HasValue
+                            ? model.nCurrentYear.Value
+                            : DBNull.Value
+                    );
+
+                    cmd.Parameters.AddWithValue(
+                        "@nAdmissionYear",
+                        model.nAdmissionYear.HasValue
+                            ? model.nAdmissionYear.Value
+                            : DBNull.Value
+                    );
+
                     cn.Open();
+
                     return cmd.ExecuteNonQuery();
                 }
             }
@@ -388,64 +511,151 @@ GetOrganizationRegistrationDetails(int orgId)
         {
             using (SqlConnection cn = _db.GetConnection())
             {
-                using (SqlCommand cmd = new SqlCommand("SP_OrganizationLogin", cn))
+                using (SqlCommand cmd =
+                       new SqlCommand("SP_OrganizationLogin", cn))
                 {
                     cmd.CommandType = CommandType.StoredProcedure;
-                    cmd.Parameters.AddWithValue("@sEmail", model.sEmail ?? "");
-                    cmd.Parameters.AddWithValue("@sPassword", model.sPassword ?? "");
+
+                    cmd.Parameters.AddWithValue(
+                        "@sEmail",
+                        model.sEmail ?? ""
+                    );
+
+                    cmd.Parameters.AddWithValue(
+                        "@sPassword",
+                        model.sPassword ?? ""
+                    );
+
                     cn.Open();
+
                     using (SqlDataReader dr = cmd.ExecuteReader())
                     {
                         if (dr.Read())
                         {
                             return new OrganizationUser
                             {
-                                nID = Convert.ToInt32(dr["nID"]),
-                                sOrgName = dr["sOrgName"].ToString(),
-                                sOrgUrl = dr["sOrgUrl"].ToString(),
-                                sName = dr["sName"].ToString(),
-                                sDesignation = dr["sDesignation"].ToString(),
-                                sMobile = dr["sMobile"].ToString(),
-                                sEmail = dr["sEmail"].ToString(),
-                                nCollegeCode = Convert.ToInt32(dr["nCollegeCode"]),
-                                nCollegeName = Convert.ToInt32(dr["nCollegeName"])
+                                nID = dr["nID"] == DBNull.Value
+                                    ? 0
+                                    : Convert.ToInt32(dr["nID"]),
+
+                                sOrgName = dr["sOrgName"] == DBNull.Value
+                                    ? ""
+                                    : dr["sOrgName"].ToString(),
+
+                                sOrgUrl = dr["sOrgUrl"] == DBNull.Value
+                                    ? ""
+                                    : dr["sOrgUrl"].ToString(),
+
+                                sName = dr["sName"] == DBNull.Value
+                                    ? ""
+                                    : dr["sName"].ToString(),
+
+                                sDesignation = dr["sDesignation"] == DBNull.Value
+                                    ? ""
+                                    : dr["sDesignation"].ToString(),
+
+                                sMobile = dr["sMobile"] == DBNull.Value
+                                    ? ""
+                                    : dr["sMobile"].ToString(),
+
+                                sEmail = dr["sEmail"] == DBNull.Value
+                                    ? ""
+                                    : dr["sEmail"].ToString(),
+
+                                nCollegeCode = dr["nCollegeCode"] == DBNull.Value
+                                    ? null
+                                    : Convert.ToInt32(dr["nCollegeCode"]),
+
+                                nCollegeName = dr["nCollegeName"] == DBNull.Value
+                                    ? null
+                                    : Convert.ToInt32(dr["nCollegeName"]),
+
+                                // IMPORTANT
+                                nSABit = dr["nSABit"] != DBNull.Value
+                                    && Convert.ToBoolean(dr["nSABit"])
                             };
                         }
                     }
                 }
             }
+
             return null;
         }
         #endregion
 
+      
         #region "Candidate Login"
+
         public CandidateUser? LoginCandidate(CandidateLogin model)
         {
             using (SqlConnection cn = _db.GetConnection())
             {
-                using (SqlCommand cmd = new SqlCommand("SP_CandidateLogin", cn))
+                using (SqlCommand cmd =
+                       new SqlCommand("SP_CandidateLogin", cn))
                 {
                     cmd.CommandType = CommandType.StoredProcedure;
 
-                    cmd.Parameters.AddWithValue("@sEmail", model.sEmail ?? "");
-                    cmd.Parameters.AddWithValue("@sPassword", model.sPassword ?? "");
+                    cmd.Parameters.AddWithValue(
+                        "@sEmail",
+                        model.sEmail ?? ""
+                    );
+
+                    cmd.Parameters.AddWithValue(
+                        "@sPassword",
+                        model.sPassword ?? ""
+                    );
+
                     cn.Open();
+
                     using (SqlDataReader dr = cmd.ExecuteReader())
                     {
                         if (dr.Read())
                         {
                             return new CandidateUser
                             {
-                                nID = Convert.ToInt32(dr["nID"]),
-                                sFName = dr["sFName"].ToString(),
-                                sLName = dr["sLName"].ToString(),
-                                sMobile = dr["sMobile"].ToString(),
-                                sEmail = dr["sEmail"].ToString(),
-                                DOB = dr["DOB"] == DBNull.Value ? null : Convert.ToDateTime(dr["DOB"]),
-                                nGender = Convert.ToInt32(dr["nGender"]),
-                                sProfileImage = dr["sProfileImage"].ToString(),
-                                nCollegeCode = Convert.ToInt32(dr["nCollegeCode"]),
-                                sCollegeName = Convert.ToInt32(dr["sCollegeName"])
+                                nID = dr["nID"] == DBNull.Value
+                                    ? 0
+                                    : Convert.ToInt32(dr["nID"]),
+
+                                sFName = dr["sFName"] == DBNull.Value
+                                    ? ""
+                                    : dr["sFName"].ToString(),
+
+                                sLName = dr["sLName"] == DBNull.Value
+                                    ? ""
+                                    : dr["sLName"].ToString(),
+
+                                sMobile = dr["sMobile"] == DBNull.Value
+                                    ? ""
+                                    : dr["sMobile"].ToString(),
+
+                                sEmail = dr["sEmail"] == DBNull.Value
+                                    ? ""
+                                    : dr["sEmail"].ToString(),
+
+                                DOB = dr["DOB"] == DBNull.Value
+                                    ? null
+                                    : Convert.ToDateTime(dr["DOB"]),
+
+                                nGender = dr["nGender"] == DBNull.Value
+                                    ? 0
+                                    : Convert.ToInt32(dr["nGender"]),
+
+                                sProfileImage = dr["sProfileImage"] == DBNull.Value
+                                    ? ""
+                                    : dr["sProfileImage"].ToString(),
+
+                                nCollegeCode = dr["nCollegeCode"] == DBNull.Value
+                                    ? 0
+                                    : Convert.ToInt32(dr["nCollegeCode"]),
+
+                                sCollegeName = dr["sCollegeName"] == DBNull.Value
+                                    ? 0
+                                    : Convert.ToInt32(dr["sCollegeName"]),
+
+                                // Super Admin Enable / Disable status
+                                nSABit = dr["nSABit"] != DBNull.Value
+                                    && Convert.ToBoolean(dr["nSABit"])
                             };
                         }
                     }
@@ -454,7 +664,9 @@ GetOrganizationRegistrationDetails(int orgId)
 
             return null;
         }
+
         #endregion
+       
 
         #region "SA Login"
 
@@ -1124,6 +1336,9 @@ GetOrganizationRegistrationDetails(int orgId)
         }
 
 
+
+        //Super Admin Candidate List Status
+
         public bool ToggleCandidateStatus(int id)
         {
             using (SqlConnection cn = _db.GetConnection())
@@ -1204,7 +1419,6 @@ GetOrganizationRegistrationDetails(int orgId)
                 nBit,
                 nSABit
             FROM tblOrgRegistration
-            WHERE nBit = 1
             ORDER BY nID DESC";
 
                 using (SqlCommand cmd =
@@ -1283,8 +1497,34 @@ GetOrganizationRegistrationDetails(int orgId)
 
             return list;
         }
-
         #endregion
+
+        // Super Admin Organization List status
+        public bool ToggleOrganizationSABit(int id, bool status)
+        {
+            using (SqlConnection cn = _db.GetConnection())
+            {
+                string query = @"
+            UPDATE tblOrgRegistration
+            SET 
+                nSABit = @nSABit,
+                ModDate = GETDATE()
+            WHERE nID = @nID";
+
+                using (SqlCommand cmd =
+                       new SqlCommand(query, cn))
+                {
+                    cmd.Parameters.AddWithValue("@nID", id);
+                    cmd.Parameters.AddWithValue("@nSABit", status ? 1 : 0);
+
+                    cn.Open();
+
+                    return cmd.ExecuteNonQuery() > 0;
+                }
+            }
+        }
+
+       
 
         // shrirang 15/09/26
 
@@ -2859,5 +3099,181 @@ public OrganizationLogin? GetOrganizationLoginDetails(string email)
         //        }
         //    }
         //}
+
+        // shrirang 06/10/26
+
+        // =========================================================
+        // TPO TRAINEE INFO
+        // GET TRAINEES BY COLLEGE
+        // =========================================================
+
+        public List<TPOTraineeInfoM> GetTPOTraineesByCollege(
+            string collegeName)
+        {
+            List<TPOTraineeInfoM> trainees =
+                new List<TPOTraineeInfoM>();
+
+            using (SqlConnection cn = _db.GetConnection())
+            {
+                string query = @"
+            SELECT
+                c.nID,
+                c.sFName,
+                c.sLName,
+                c.sMobile,
+                c.sEmail,
+                c.DOB,
+                c.nGender,
+                c.sProfileImage,
+                c.nCollegeCode,
+                c.sCollegeName,
+                c.nDepartment,
+                c.nBranch,
+                c.nCurrentYear,
+                c.nAdmissionYear,
+                c.nPassoutYear,
+                c.RegDate,
+                c.nSABit,
+
+                col.sCollegeName AS CollegeDisplayName
+
+            FROM tblCandidateRegister c
+
+            INNER JOIN tblCollege col
+                ON col.nID = c.sCollegeName
+
+            WHERE
+                LTRIM(RTRIM(col.sCollegeName))
+                =
+                LTRIM(RTRIM(@CollegeName))
+
+            ORDER BY c.nID DESC";
+
+                using (SqlCommand cmd =
+                       new SqlCommand(query, cn))
+                {
+                    cmd.CommandType = CommandType.Text;
+
+                    cmd.Parameters.Add(
+                        "@CollegeName",
+                        SqlDbType.NVarChar,
+                        250
+                    ).Value =
+                        collegeName?.Trim() ?? "";
+
+                    cn.Open();
+
+                    using (SqlDataReader dr =
+                           cmd.ExecuteReader())
+                    {
+                        while (dr.Read())
+                        {
+                            TPOTraineeInfoM trainee =
+                                new TPOTraineeInfoM();
+
+                            trainee.nID =
+                                dr["nID"] == DBNull.Value
+                                    ? 0
+                                    : Convert.ToInt32(
+                                        dr["nID"]);
+
+                            trainee.sFName =
+                                dr["sFName"] == DBNull.Value
+                                    ? ""
+                                    : dr["sFName"].ToString();
+
+                            trainee.sLName =
+                                dr["sLName"] == DBNull.Value
+                                    ? ""
+                                    : dr["sLName"].ToString();
+
+                            trainee.sMobile =
+                                dr["sMobile"] == DBNull.Value
+                                    ? ""
+                                    : dr["sMobile"].ToString();
+
+                            trainee.sEmail =
+                                dr["sEmail"] == DBNull.Value
+                                    ? ""
+                                    : dr["sEmail"].ToString();
+
+                            trainee.DOB =
+                                dr["DOB"] == DBNull.Value
+                                    ? null
+                                    : Convert.ToDateTime(
+                                        dr["DOB"]);
+
+                            trainee.nGender =
+                                dr["nGender"] == DBNull.Value
+                                    ? 0
+                                    : Convert.ToInt32(
+                                        dr["nGender"]);
+
+                            trainee.sProfileImage =
+                                dr["sProfileImage"] == DBNull.Value
+                                    ? ""
+                                    : dr["sProfileImage"].ToString();
+
+                            trainee.nCollegeCode =
+                                dr["nCollegeCode"] == DBNull.Value
+                                    ? 0
+                                    : Convert.ToInt32(
+                                        dr["nCollegeCode"]);
+
+                            trainee.nCollegeName =
+                                dr["sCollegeName"] == DBNull.Value
+                                    ? 0
+                                    : Convert.ToInt32(
+                                        dr["sCollegeName"]);
+
+                            trainee.nDepartment =
+                                dr["nDepartment"] == DBNull.Value
+                                    ? null
+                                    : Convert.ToInt32(
+                                        dr["nDepartment"]);
+
+                            trainee.nBranch =
+                                dr["nBranch"] == DBNull.Value
+                                    ? null
+                                    : Convert.ToInt32(
+                                        dr["nBranch"]);
+
+                            trainee.nCurrentYear =
+                                dr["nCurrentYear"] == DBNull.Value
+                                    ? null
+                                    : Convert.ToInt32(
+                                        dr["nCurrentYear"]);
+
+                            trainee.nAdmissionYear =
+                                dr["nAdmissionYear"] == DBNull.Value
+                                    ? null
+                                    : Convert.ToInt32(
+                                        dr["nAdmissionYear"]);
+
+                            trainee.nPassoutYear =
+                                dr["nPassoutYear"] == DBNull.Value
+                                    ? null
+                                    : Convert.ToInt32(
+                                        dr["nPassoutYear"]);
+
+                            trainee.RegDate =
+                                dr["RegDate"] == DBNull.Value
+                                    ? null
+                                    : Convert.ToDateTime(
+                                        dr["RegDate"]);
+
+                            trainee.nSABit =
+                                dr["nSABit"] != DBNull.Value &&
+                                Convert.ToBoolean(
+                                    dr["nSABit"]);
+
+                            trainees.Add(trainee);
+                        }
+                    }
+                }
+            }
+
+            return trainees;
+        }
     }
 }

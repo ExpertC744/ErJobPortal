@@ -299,11 +299,11 @@
 
                             <td>
                                 <button type="button"
-                                        class="status @(item.nBit ? "enabled" : "disabled")"
+                                        class="status @(item.nSABit ? "enabled" : "disabled")"
                                         data-id="@item.nID"
                                         onclick="togglePostStatus(this)">
 
-                                    @(item.nBit ? "Enabled" : "Disabled")
+                                    @(item.nSABit ? "Enabled" : "Disabled")
 
                                 </button>
                             </td>
@@ -334,6 +334,20 @@
             return;
         }
 
+        // Current button status
+        const currentStatus = button.classList.contains("enabled");
+
+        // Confirmation message
+        const message = currentStatus
+            ? "Are you sure you want to disable this post?"
+            : "Are you sure you want to enable this post?";
+
+        // Confirm before updating
+        if (!confirm(message)) {
+            return;
+        }
+
+        // Prevent double click
         button.disabled = true;
 
         fetch('@Url.Action("TogglePostStatus", "SuperAdmin")', {
@@ -382,7 +396,10 @@
             }
             else {
 
-                alert(result.message || "Unable to update post status.");
+                alert(
+                    result.message ||
+                    "Unable to update post status."
+                );
 
             }
 
@@ -392,7 +409,9 @@
 
             console.error(error);
 
-            alert("Something went wrong while updating post status.");
+            alert(
+                "Something went wrong while updating post status."
+            );
 
         })
 
