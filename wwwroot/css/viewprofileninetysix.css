@@ -1,7 +1,7 @@
 /* =========================================================
    VIEWPROFILENINETYSIX  -  MIDNIGHT PANELS  -  PORTRAIT A4 (794px x 1123px)
    File: ~/css/viewprofileninetysix.css
-   Layout: master layout (unchanged) - only the DESIGN section differs
+   Layout: master layout (with footer inside the sheet) - only the DESIGN section differs
 ========================================================= */
 
 *, *::before, *::after { box-sizing: border-box; }
@@ -46,7 +46,7 @@ html, body {
 
 /* ---------- Columns are the autofit targets: bounded + clipped ---------- */
 .left-column, .right-column { min-height: 0; min-width: 0; overflow: hidden; }
-.resume-body { display: flex; flex: 1; min-height: 0; }
+.resume-body { display: flex; flex: 1 1 auto; min-height: 0; }
 
 /* ---------- Photo ---------- */
 .profile-photo, .profile-placeholder { display: block; width: 100%; height: 100%; }
@@ -61,10 +61,10 @@ html, body {
 .header-contact { display: none; }
 .header-contact-item { display: flex; align-items: center; gap: .5em; }
 .header-contact-item i { flex: none; }
-.candidate-name { margin: 0; line-height: 1.15; word-break: break-word; }
-.candidate-role { word-break: break-word; }
+.candidate-name { margin: 0; line-height: 1.15; word-break: break-word; overflow-wrap: anywhere; }
+.candidate-role { word-break: break-word; overflow-wrap: anywhere; }
 
-/* ---------- Sections (empty data = section not rendered; these guard the rest) ---------- */
+/* ---------- Sections ---------- */
 .resume-section { break-inside: avoid; page-break-inside: avoid; margin-bottom: 1.5em; }
 .resume-section:last-child { margin-bottom: 0; }
 .resume-section:empty { display: none; }
@@ -106,9 +106,14 @@ html, body {
 .experience-company { font-size: 1.08em; font-weight: 500; color: var(--c); margin-top: .1em; word-break: break-word; }
 .experience-meta { font-size: .98em; color: var(--muted); margin-top: .15em; }
 
+/* Education: items sit directly inside .education-section (2-column grid saves height) */
+.education-section { display: grid; grid-template-columns: minmax(0,1fr) minmax(0,1fr); gap: .7em 1.4em; align-items: start; }
+.education-section .section-heading { grid-column: 1 / -1; margin-bottom: .2em; }
 .education-list { display: grid; grid-template-columns: 1fr 1fr; gap: .7em 1.4em; }
 .education-item { margin: 0; min-width: 0; }
-.education-title { font-size: 1.08em; font-weight: 600; color: var(--c-dark); word-break: break-word; }
+.education-title { font-size: 1.08em; font-weight: 600; color: var(--c-dark); word-break: break-word; margin-bottom: .15em; }
+.education-row { font-size: 1em; line-height: 1.45; color: var(--text); word-break: break-word; }
+.education-row strong { font-weight: 600; color: var(--muted); margin-right: .3em; }
 .education-meta { font-size: 1em; color: var(--muted); margin-top: .15em; }
 
 .achievement-item { display: flex; align-items: flex-start; gap: .7em; font-size: 1.05em; line-height: 1.45; margin-bottom: .4em; }
@@ -128,23 +133,59 @@ html, body {
 .preference-item strong { font-weight: 600; margin-right: .4em; }
 
 /* =========================================================
+   FOOTER (lives INSIDE the sheet, so it must be compact)
+   Fixed compact size, never shrinks, and ignores the layout's
+   "max-width:700px" stacking (the sheet is zoomed, not reflowed).
+========================================================= */
+.resume-footer {
+    flex: none;
+    position: relative;
+    z-index: 5;
+    width: 100%;
+    margin: 0;
+    padding: 2.5mm var(--foot-x, 12mm) 3mm;
+    border-top: 1px solid var(--c-line);
+    background: transparent;
+    font-size: 10px;
+}
+.resume-footer-row { display: flex; flex-direction: row; align-items: flex-end; justify-content: space-between; gap: 6mm; width: 100%; }
+.resume-signature-section { flex: 1 1 0; min-width: 0; }
+.resume-signature-box { width: 40mm; text-align: center; }
+.resume-signature-image { display: block; width: 36mm; height: 11mm; object-fit: contain; margin: 0 auto 1px; }
+.resume-signature-line { width: 40mm; margin: 0 auto 2px; border-top: 1px solid #777; }
+.resume-signature-label { font-size: 8px; font-weight: 600; text-align: center; }
+.resume-footer-info { flex: 1.4 1 0; min-width: 0; display: flex; flex-direction: column; align-items: center; justify-content: flex-end; gap: 2px; font-size: 9px; text-align: center; }
+.resume-footer-location, .resume-footer-date { line-height: 1.3; }
+.resume-footer-label { font-weight: 700; margin-right: 3px; }
+.resume-powered-by { flex: 1 1 0; min-width: 0; text-align: right; font-size: 8px; color: var(--muted); white-space: nowrap; }
+.resume-powered-by strong { font-weight: 700; color: var(--ink); }
+
+@media (max-width: 700px) {
+    .resume-footer { padding: 2.5mm var(--foot-x, 12mm) 3mm; }
+    .resume-footer-row { flex-direction: row; align-items: flex-end; gap: 6mm; }
+    .resume-signature-section { flex: 1 1 0; }
+    .resume-footer-info { flex: 1.4 1 0; }
+    .resume-powered-by { flex: 1 1 0; text-align: right; white-space: nowrap; }
+}
+
+/* =========================================================
    DESIGN
    ViewProfileNinetySix - Midnight Panels
    ========================================================= */
 /* Dark theme-coloured page with translucent panels */
 .resume-sheet { --ink: #f3f6f8; --text: #cfd9df; --muted: #97a9b5; display: flex; flex-direction: column; background: linear-gradient(165deg, var(--c-dark) 0, #0b1319 100%); }
-.resume-header { position: static; flex: none; display: flex; align-items: center; gap: 8mm; padding: 12mm 12mm 6mm; }
-.photo-wrapper { flex: none; width: 36mm; height: 36mm; padding: 1mm; border-radius: 50%; border: 1mm solid var(--c-line); overflow: hidden; }
+.resume-header { position: static; flex: none; display: flex; align-items: center; gap: 8mm; padding: 9mm 12mm 4mm; }
+.photo-wrapper { flex: none; width: 32mm; height: 32mm; padding: 1mm; border-radius: 50%; border: 1mm solid var(--c-line); overflow: hidden; }
 .profile-photo, .profile-placeholder { border-radius: 50%; }
 .header-info { flex: 1 1 auto; min-width: 0; }
-.candidate-name { font-size: 3em; font-weight: 700; letter-spacing: .02em; color: #fff; }
-.candidate-role { margin-top: .5em; font-size: 1.25em; letter-spacing: .2em; text-transform: uppercase; color: var(--c-line); }
+.candidate-name { font-size: 2.8em; font-weight: 700; letter-spacing: .02em; color: #fff; }
+.candidate-role { margin-top: .5em; font-size: 1.2em; letter-spacing: .2em; text-transform: uppercase; color: var(--c-line); }
 .header-accent { width: 18mm; height: 3px; background: var(--c-line); }
 
-.left-column { flex: 0 0 66mm; width: 66mm; padding: 2mm 3mm 8mm 12mm; }
-.right-column { flex: 1 1 auto; padding: 2mm 12mm 8mm 3mm; }
+.left-column { flex: 0 0 66mm; width: 66mm; padding: 2mm 3mm 3mm 12mm; }
+.right-column { flex: 1 1 auto; padding: 2mm 12mm 3mm 3mm; }
 
-.resume-section { margin-bottom: 1em; padding: 1.1em 1.3em; background: rgba(255,255,255,.06); border: 1px solid rgba(255,255,255,.12); border-radius: 3mm; }
+.resume-section { margin-bottom: .9em; padding: 1em 1.2em; background: rgba(255,255,255,.06); border: 1px solid rgba(255,255,255,.12); border-radius: 3mm; }
 .resume-section:last-child { margin-bottom: 0; }
 .section-icon { display: flex; align-items: center; justify-content: center; width: 1.9em; height: 1.9em; border-radius: 50%; background: var(--c-line); color: var(--c-dark); font-size: 1em; }
 .section-title { font-size: 1.15em; color: var(--c-line); }
@@ -152,6 +193,10 @@ html, body {
 .experience-company, .reference-relation { color: var(--c-line); }
 .info-icon, .social-item i, .achievement-item i { color: var(--c-line); }
 .experience-item { padding-left: .9em; border-left: 2px solid rgba(255,255,255,.2); }
+
+.resume-footer { --foot-x: 12mm; border-top-color: rgba(255,255,255,.2); }
+.resume-signature-line { border-top-color: #97a9b5; }
+.resume-signature-image { background: #fff; border-radius: 2px; padding: 1px; }
 
 /* =========================================================
    RESPONSIVE — the sheet stays exactly A4; on smaller screens
