@@ -133,16 +133,15 @@
 
                                 <!-- ACTION -->
                                 <td>
-
-                                    <button type="button"
-                                            class="master-view-btn"
-                                            data-id="@item.CandidateID">
-
-                                        View
-
-                                    </button>
-
-                                </td>
+    <a asp-controller="SuperAdmin"
+       asp-action="ViewTraineeResume"
+       asp-route-id="@item.CandidateID"
+       class="master-view-btn"
+       target="_blank"
+       rel="noopener noreferrer">
+        View
+    </a>
+</td>
 
 
                                 <!-- PHOTO -->

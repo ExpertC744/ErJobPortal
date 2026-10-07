@@ -3859,10 +3859,71 @@ ORDER BY SAF.nID DESC, OFB.nID DESC;
 
         }
 
+        //khushi 6-10-26
         [HttpGet]
         public IActionResult SAFinalSelection()
         {
-            return View();
+            List<SAFinalSelectionViewModel> model =
+                new List<SAFinalSelectionViewModel>();
+
+            string connectionString =
+                _configuration.GetConnectionString("DefaultConnection");
+
+            using (SqlConnection con = new SqlConnection(connectionString))
+            {
+                using (SqlCommand cmd = new SqlCommand(
+                    "SP_GetSAFinalSelection", con))
+                {
+                    cmd.CommandType = CommandType.StoredProcedure;
+
+                    con.Open();
+
+                    using (SqlDataReader reader = cmd.ExecuteReader())
+                    {
+                        while (reader.Read())
+                        {
+                            model.Add(new SAFinalSelectionViewModel
+                            {
+                                nID = Convert.ToInt32(
+                                    reader["FinalSelectionID"]),
+
+                                OrgID = Convert.ToInt32(
+                                    reader["OrganizationID"]),
+
+                                CandidateID = Convert.ToInt32(
+                                    reader["CandidateID"]),
+
+                                PostID = Convert.ToInt32(
+                                    reader["PostID"]),
+
+                                PostDate =
+                                    reader["PostDate"] == DBNull.Value
+                                        ? null
+                                        : Convert.ToDateTime(
+                                            reader["PostDate"]),
+
+                                PositionName =
+                                    reader["PositionName"]?.ToString()
+                                    ?? "",
+
+                                CandidateName =
+                                    reader["CandidateName"]?.ToString()
+                                    ?? "",
+
+                                EmailID =
+                                    reader["EmailID"]?.ToString()
+                                    ?? "",
+
+                                Skills =
+                                    reader["Skills"]?.ToString()
+                                    ?? ""
+                            });
+                        }
+                    }
+                }
+            }
+
+            return View(model);
         }
 
         //khushi 01-10-26
@@ -4188,5 +4249,46 @@ ORDER BY SAF.nID DESC, OFB.nID DESC;
             return View(trainees);
         }
         #endregion
+
+        // sanidhya 06/10/26
+        // =========================================================
+        // SUPER ADMIN - VIEW TRAINEE SELECTED RESUME
+        // =========================================================
+
+        // ============================================================
+        // VIEW TRAINEE RESUME
+        // Opens the SAME resume template selected by the candidate
+        // ============================================================
+
+        // ============================================================
+        // VIEW TRAINEE RESUME
+        // Opens EXACTLY the same resume selected by the candidate
+        // ============================================================
+
+        [HttpGet]
+        [Route("SuperAdmin/ViewTraineeResume/{id:int}")]
+        public IActionResult ViewTraineeResume(int id)
+        {
+            if (id <= 0)
+            {
+                return BadRequest("Invalid Candidate ID.");
+            }
+
+            // IMPORTANT:
+            // Use the same Resume action already used by the
+            // Candidate section.
+            //
+            // Resume(int id) internally:
+            // 1. Gets candidate profile
+            // 2. Gets Resume_Profile
+            // 3. Finds selected template
+            // 4. Opens that exact ViewProfileXX page
+
+            return RedirectToAction(
+                "Resume",
+                "Resume",
+                new { id = id }
+            );
+        }
     }
 }

@@ -104,11 +104,11 @@
 
                                 </td>
 
-                                <!-- Applied Trainees -->
-                                <td class="text-center">
+                                @* AppliedTrainee.cshtml *@ 
+                                        <td class="text-center">
 
                                     <a asp-controller="Organization"
-                                       asp-action="AppliedTraineeList"
+                                       asp-action="OrgPositionTR"
                                        asp-route-id="@item.nID"
                                        class="resume-view-btn"
                                        title="View Applied Trainees">
@@ -128,19 +128,6 @@
 
                             srNo++;
                         }
-                    }
-                    else
-                    {
-                        <tr>
-
-                            <td colspan="5"
-                                class="text-center">
-
-                                No applied trainees found.
-
-                            </td>
-
-                        </tr>
                     }
 
                 </tbody>
@@ -207,7 +194,7 @@
 
                 lengthMenu: "_MENU_ entries per page",
 
-                emptyTable: "No entries found",
+                emptyTable: "No applied trainees found.",
 
                 zeroRecords: "No matching records found",
 

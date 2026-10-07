@@ -1,0 +1,276 @@
+﻿@* Extra Post *@
+
+<link rel="stylesheet"
+      href="~/css/InternshipDetails.css"
+      asp-append-version="true" />
+
+@{
+    Layout = "~/Views/Shared/_DashboardLayout.cshtml";
+
+    ViewData["Title"] = "Extra Post";
+    ViewData["Panel"] = "Candidate";
+    ViewData["UserName"] = "Candidate";
+
+    var extraPosts =
+        ViewBag.InternshipPosts
+        as List<ErJobPortal.Models.OrgPostM>
+        ?? new List<ErJobPortal.Models.OrgPostM>();
+
+    int srNo = 1;
+
+    var candidateCode =
+        ViewBag.candidateCode as string;
+
+    var internshipId =
+        ViewBag.InternshipId as string;
+}
+
+<div class="container-fluid">
+
+    <div class="master-table-container">
+
+        <!-- =====================================================
+             PAGE HEADING
+        ====================================================== -->
+
+        <div class="mb-4">
+
+            <h1 class="mb-2">
+                Extra Post
+            </h1>
+
+            <p class="mb-0 text-muted">
+                @internshipId
+            </p>
+
+        </div>
+
+
+        <!-- =====================================================
+             TABLE
+        ====================================================== -->
+
+        <div class="table-responsive">
+
+            <table class="master-data-table">
+
+                <thead>
+
+                    <tr>
+
+                        <th>
+                            Sr. No
+                        </th>
+
+                        <th>
+                            Organization Name
+                        </th>
+
+                        <th>
+                            Position
+                        </th>
+
+                        <th>
+                            Location
+                        </th>
+
+                        <th>
+                            Internship / Fellowship Type
+                        </th>
+
+                        <th>
+                            Facilities
+                        </th>
+
+                        <th>
+                            Apply Status
+                        </th>
+
+                    </tr>
+
+                </thead>
+
+
+                <tbody>
+
+                    @if (extraPosts.Any())
+                    {
+                        foreach (var post in extraPosts)
+                        {
+                            <tr>
+
+                                <!-- Sr No -->
+                                <td class="master-id">
+                                    @srNo
+                                </td>
+
+
+                                <!-- Organization -->
+                                <td>
+                                    <a href="#"
+                                       class="text-primary fw-semibold text-decoration-underline">
+
+                                        @(string.IsNullOrWhiteSpace(post.sName)
+                                                                        ? "N/A"
+                                                                        : post.sName)
+
+                                    </a>
+                                </td>
+
+
+                                <!-- Position -->
+                                <td>
+
+                                    @(string.IsNullOrWhiteSpace(post.sPositionName)
+                                                                ? "N/A"
+                                                                : post.sPositionName)
+
+                                </td>
+
+
+                                <!-- Location -->
+                                <td>
+
+                                    @if (!string.IsNullOrWhiteSpace(post.sCountryName))
+                                    {
+                                        @post.sCountryName
+                                        <br />
+                                    }
+
+                                    @if (!string.IsNullOrWhiteSpace(post.sStateName))
+                                    {
+                                        @post.sStateName
+                                        <br />
+                                    }
+
+                                    @if (!string.IsNullOrWhiteSpace(post.nCityName))
+                                    {
+                                        @post.nCityName
+                                    }
+
+                                    @if (string.IsNullOrWhiteSpace(post.sCountryName)
+                                                                && string.IsNullOrWhiteSpace(post.sStateName)
+                                                                && string.IsNullOrWhiteSpace(post.nCityName))
+                                    {
+                                        <span class="text-muted">
+                                            N/A
+                                        </span>
+                                    }
+
+                        </td>
+
+
+                        <!-- Internship / Fellowship Type -->
+                        <td>
+
+                            @(string.IsNullOrWhiteSpace(
+                                                        post.sInternshipFellowshipTypeName)
+
+                                                        ? "N/A"
+                                                        : post.sInternshipFellowshipTypeName)
+
+                                </td>
+
+
+                                <!-- Facilities -->
+                                <td>
+
+                                    @if (!string.IsNullOrWhiteSpace(post.sFacilities))
+                                    {
+                                        @post.sFacilities
+                                    }
+                                    else
+                                    {
+                                        <span class="text-muted">
+                                            N/A
+                                        </span>
+                                    }
+
+                                </td>
+
+
+                                <!-- Apply Status -->
+                                <td>
+
+                                    @if (post.IsApplied)
+                                    {
+                                        <span class="master-action-btn">
+                                            Applied
+                                        </span>
+                                    }
+                                    else
+                                    {
+                                        <form asp-controller="Candidate"
+                                              asp-action="ApplyToPost"
+                                              method="post"
+                                              style="display:inline;">
+
+                                            @Html.AntiForgeryToken()
+
+                                            <input type="hidden"
+                                                   name="postId"
+                                                   value="@post.nID" />
+
+                                            <input type="hidden"
+                                                   name="orgId"
+                                                   value="@post.nOrgID" />
+
+                                            <button type="submit"
+                                                    class="master-action-btn"
+                                                    style="border:none; cursor:pointer;">
+
+                                                Apply Now
+
+                                            </button>
+
+                                        </form>
+                                    }
+
+                                </td>
+
+                            </tr>
+
+                            srNo++;
+                        }
+                    }
+                    else
+                    {
+                        <tr>
+
+                            <td colspan="7"
+                                class="text-center text-muted py-4">
+
+                                No extra posts found matching your profile.
+
+                            </td>
+
+                        </tr>
+                    }
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+
+        <!-- =====================================================
+             BACK BUTTON
+        ====================================================== -->
+
+        <div class="mt-4">
+
+            <button type="button"
+                    class="submit-button"
+                    onclick="window.history.back();">
+
+                Back
+
+            </button>
+
+        </div>
+
+    </div>
+
+</div>
+
