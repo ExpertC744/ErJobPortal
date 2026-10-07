@@ -1156,11 +1156,15 @@
 
         </div>
 
-        @* khushi 29-09 *@
+        @*  khushi 06/10/26 *@
         <!-- MASTER TABLE CARD -->
         <div class="master-table-container">
 
+<<<<<<< HEAD
+            <!-- MASTER TABLE -->
+=======
   <!-- MASTER TABLE -->
+>>>>>>> 2d1479547e61f6fd803d4b81260d21e72c902880
             <div class="table-responsive">
 
                 <table id="organizationJobsTable"
@@ -1178,7 +1182,8 @@
 
                     <tbody>
 
-                        @if (appliedTraineePosts.Any())
+                        @if (appliedTraineePosts != null &&
+                                                appliedTraineePosts.Any())
                         {
                             int srNo = 1;
 
@@ -1217,26 +1222,14 @@
                                         </a>
 
                                     </td>
+
                                     <!-- Applied Trainees -->
                                     <td class="text-center">
 
-                                        <a href="@Url.Action("OrgPositionTR", "Organization", new { id = item.nID })"
-                                           class="resume-view-btn"
-                                           title="View Applied Trainees">
-
-                                            <i class="fas fa-users"></i>
-                                            <span>@item.MatchingTraineeCount</span>
-
-                                        </a>
-                               @*          <a href="@Url.RouteUrl(
-            "OrganizationTraineeList",
-            new { id = item.nID })"
-   class="resume-view">
-    @item.MatchingTraineeCount
-</a> *@
-                                        @* <a href="@Url.RouteUrl(
-                                                           "OrganizationTraineeList",
-                                                           new { id = item.nID })"
+                                        <a href="@Url.Action(
+                                                                                                                   "OrgPositionTR",
+                                                                                                                   "Organization",
+                                                                                                                   new { id = item.nID })"
                                    class="resume-view-btn"
                                    title="View Applied Trainees">
 
@@ -1246,58 +1239,21 @@
                                                 @item.MatchingTraineeCount
                                             </span>
 
-                                        </a> *@
+                                        </a>
 
                                     </td>
-                                    <!-- Applied Trainees -->
-                                   @*  <td class="text-center">
-
-                                       @*  <a asp-controller="Organization"
-                                           asp-action="OrgPositionTR"
-                                           asp-route-id="@item.nID"
-                                           class="resume-view-btn"
-                                           title="View Applied Trainees">
-
-                                            <i class="fas fa-users"></i>
-
-                                            <span>
-                                                @item.MatchingTraineeCount
-                                            </span>
-
-                                        </a>
-
-                                        <a href="@Url.Action(
-                                                           "OrgPositionTR",
-                                                           "Organization",
-                                                           new { id = item.nID })"
-                                   class="applied-trainee-link">
-
-                                            @item.AppliedTraineeCount
-
-                                        </a>
-                                    </td> *@
 
                                 </tr>
 
-                                srNo++;
+                                                srNo++;
                             }
                         }
-                        else
-                        {
-                            <tr>
-                                <td colspan="5" class="text-center">
-                                    No applied trainees found.
-                                </td>
-                            </tr>
-                        }
-
 
                     </tbody>
 
                 </table>
 
             </div>
-
 
             <!-- MASTER PAGE INFO -->
             <div id="organizationJobsPageInfo"
