@@ -4249,5 +4249,46 @@ ORDER BY SAF.nID DESC, OFB.nID DESC;
             return View(trainees);
         }
         #endregion
+
+        // sanidhya 06/10/26
+        // =========================================================
+        // SUPER ADMIN - VIEW TRAINEE SELECTED RESUME
+        // =========================================================
+
+        // ============================================================
+        // VIEW TRAINEE RESUME
+        // Opens the SAME resume template selected by the candidate
+        // ============================================================
+
+        // ============================================================
+        // VIEW TRAINEE RESUME
+        // Opens EXACTLY the same resume selected by the candidate
+        // ============================================================
+
+        [HttpGet]
+        [Route("SuperAdmin/ViewTraineeResume/{id:int}")]
+        public IActionResult ViewTraineeResume(int id)
+        {
+            if (id <= 0)
+            {
+                return BadRequest("Invalid Candidate ID.");
+            }
+
+            // IMPORTANT:
+            // Use the same Resume action already used by the
+            // Candidate section.
+            //
+            // Resume(int id) internally:
+            // 1. Gets candidate profile
+            // 2. Gets Resume_Profile
+            // 3. Finds selected template
+            // 4. Opens that exact ViewProfileXX page
+
+            return RedirectToAction(
+                "Resume",
+                "Resume",
+                new { id = id }
+            );
+        }
     }
 }

@@ -583,19 +583,24 @@ namespace ErJobPortal.Controllers
         // ==========================================
         // CANDIDATE LIST
         // ==========================================
-        [HttpGet]
-        [Route("Organization/TraineeList/{id}")]
-        public IActionResult TraineeList(string id)
-        {
-            if (!IsValidOrganizationCode(id))
-                return NotFound();
+        ////[HttpGet]
+        ////[Route("Organization/TraineeList/{id}")]
+        ////public IActionResult TraineeList(string id)
+        ////{
+        ////    if (!IsValidOrganizationCode(id))
+        ////        return NotFound();
 
-            ViewBag.OrgCode = id;
+        ////    ViewBag.OrgCode = id;
 
+<<<<<<< HEAD
             List<SATraineeListM> trainees = _repository.GetSATraineeList();
+=======
+        ////    List<SATraineeListM> trainees =
+        ////        _repository.GetSATraineeList();
+>>>>>>> Shrirang
 
-            return View(trainees);
-        }
+        ////    return View(trainees);
+        ////}
 
         // ==========================================
         // ORGANIZATION LIST

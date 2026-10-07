@@ -1161,10 +1161,14 @@
         <div class="master-table-container">
 
 <<<<<<< HEAD
+<<<<<<< HEAD
             <!-- MASTER TABLE -->
 =======
   <!-- MASTER TABLE -->
 >>>>>>> 2d1479547e61f6fd803d4b81260d21e72c902880
+=======
+  <!-- MASTER TABLE -->
+>>>>>>> Shrirang
             <div class="table-responsive">
 
                 <table id="organizationJobsTable"
@@ -1222,14 +1226,34 @@
                                         </a>
 
                                     </td>
-
                                     <!-- Applied Trainees -->
                                     <td class="text-center">
 
+<<<<<<< HEAD
                                         <a href="@Url.Action(
                                                                                                                    "OrgPositionTR",
                                                                                                                    "Organization",
                                                                                                                    new { id = item.nID })"
+                                   class="resume-view-btn"
+                                   title="View Applied Trainees">
+=======
+                                        <a href="@Url.Action("OrgPositionTR", "Organization", new { id = item.nID })"
+                                           class="resume-view-btn"
+                                           title="View Applied Trainees">
+
+                                            <i class="fas fa-users"></i>
+                                            <span>@item.MatchingTraineeCount</span>
+
+                                        </a>
+                               @*          <a href="@Url.RouteUrl(
+            "OrganizationTraineeList",
+            new { id = item.nID })"
+   class="resume-view">
+    @item.MatchingTraineeCount
+</a> *@
+                                        @* <a href="@Url.RouteUrl(
+                                                           "OrganizationTraineeList",
+                                                           new { id = item.nID })"
                                    class="resume-view-btn"
                                    title="View Applied Trainees">
 
@@ -1239,9 +1263,37 @@
                                                 @item.MatchingTraineeCount
                                             </span>
 
-                                        </a>
+                                        </a> *@
 
                                     </td>
+                                    <!-- Applied Trainees -->
+                                   @*  <td class="text-center">
+
+                                       @*  <a asp-controller="Organization"
+                                           asp-action="OrgPositionTR"
+                                           asp-route-id="@item.nID"
+                                           class="resume-view-btn"
+                                           title="View Applied Trainees">
+>>>>>>> Shrirang
+
+                                            <i class="fas fa-users"></i>
+
+                                            <span>
+                                                @item.MatchingTraineeCount
+                                            </span>
+
+                                        </a>
+
+                                        <a href="@Url.Action(
+                                                           "OrgPositionTR",
+                                                           "Organization",
+                                                           new { id = item.nID })"
+                                   class="applied-trainee-link">
+
+                                            @item.AppliedTraineeCount
+
+                                        </a>
+                                    </td> *@
 
                                 </tr>
 

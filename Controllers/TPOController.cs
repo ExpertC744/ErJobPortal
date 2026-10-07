@@ -1378,5 +1378,91 @@ namespace ErJobPortal.Controllers
                     "TPO");
             }
         }
+
+        // shrirang 06/10/26
+
+        // =====================================================
+        // TPO TRAINEE INFORMATION
+        // =====================================================
+
+        [HttpGet]
+        public IActionResult TraineesInfo()
+        {
+            // =================================================
+            // CHECK TPO LOGIN
+            // =================================================
+
+            int? tpoId =
+                HttpContext.Session.GetInt32("TPOID");
+
+            if (tpoId == null || tpoId <= 0)
+            {
+                return RedirectToAction(
+                    "TPOLogin",
+                    "Account");
+            }
+
+
+            // =================================================
+            // GET LOGGED-IN TPO COLLEGE
+            // =================================================
+
+            string collegeName =
+                HttpContext.Session.GetString(
+                    "TPOCollegeName")
+                ?? "";
+
+
+            // =================================================
+            // COLLEGE NOT FOUND
+            // =================================================
+
+            if (string.IsNullOrWhiteSpace(collegeName))
+            {
+                TempData["Error"] =
+                    "College information is not available for this TPO.";
+
+                return RedirectToAction(
+                    "Dashboard",
+                    "TPO");
+            }
+
+
+            // =================================================
+            // GET ONLY THIS COLLEGE'S TRAINEES
+            // =================================================
+
+            List<TPOTraineeInfoM> trainees =
+                _accountRepository.GetTPOTraineesByCollege(
+                    collegeName);
+
+
+            // =================================================
+            // PAGE INFORMATION
+            // =================================================
+
+            ViewData["Panel"] = "TPO";
+
+            ViewData["UserName"] =
+                HttpContext.Session.GetString(
+                    "TPOName")
+                ?? "TPO";
+
+            ViewData["Title"] =
+                "Trainee Information";
+
+            ViewBag.CollegeName =
+                collegeName;
+
+            ViewBag.TraineeCount =
+                trainees.Count;
+
+
+            // =================================================
+            // SEND DATA TO VIEW
+            // =================================================
+
+            return View(trainees);
+        }
     }
 }
