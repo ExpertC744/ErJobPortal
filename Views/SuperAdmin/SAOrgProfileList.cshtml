@@ -275,11 +275,11 @@
                                 <td>
 
                                     <button type="button"
-                                            class="status @(item.nBit ? "enabled" : "disabled")"
+                                            class="status @(item.nSABit ? "enabled" : "disabled")"
                                             data-id="@item.nID"
                                             onclick="toggleOrganizationStatus(this)">
 
-                                       @(item.nBit ? "Enabled" : "Disabled")
+                                       @(item.nSABit ? "Enabled" : "Disabled")
 
                                     </button>
 
@@ -321,76 +321,7 @@
 </div>
 
 
-
-@* <script>
-
-    function toggleOrganizationStatus(button) {
-
-        var id = $(button).data("id");
-
-        var currentStatus = $(button).hasClass("enabled");
-
-        var newStatus = !currentStatus;
-
-        $.ajax({
-
-            url: '@Url.Action("SAOrgProfileList")',
-
-            type: 'GET',
-
-            data: {
-                id: id,
-                status: newStatus
-            },
-
-            success: function (response) {
-
-                console.log(response);
-
-                if (response.success) {
-
-                    if (newStatus) {
-
-                        $(button)
-                            .removeClass("disabled")
-                            .addClass("enabled")
-                            .text("Enabled");
-
-                    }
-                    else {
-
-                        $(button)
-                            .removeClass("enabled")
-                            .addClass("disabled")
-                            .text("Disabled");
-                    }
-
-                }
-                else {
-
-                    alert(response.message);
-                }
-            },
-
-            error: function (xhr) {
-
-                console.log("STATUS:", xhr.status);
-                console.log("RESPONSE:", xhr.responseText);
-
-                alert(
-                    "Error updating status.\n\n" +
-                    "HTTP Status: " + xhr.status
-                );
-            }
-
-        });
-
-    }
-
-</script> *@
-
-
-                    <script>
+@*                     <script>
 
     function toggleOrganizationStatus(button) {
 
@@ -443,6 +374,108 @@
                 else {
 
                     alert(response.message || "Unable to update organization status.");
+
+                }
+
+            },
+
+            error: function (xhr) {
+
+                console.log("HTTP STATUS:", xhr.status);
+                console.log("RESPONSE:", xhr.responseText);
+
+                alert(
+                    "Error updating organization status.\n\n" +
+                    "HTTP Status: " + xhr.status
+                );
+
+            },
+
+            complete: function () {
+
+                $(button).prop("disabled", false);
+
+            }
+
+        });
+
+    }
+
+</script> *@
+
+
+
+            <script>
+
+    function toggleOrganizationStatus(button) {
+
+        var id = $(button).data("id");
+
+        // Prevent invalid ID
+        if (!id) {
+            return;
+        }
+
+        // Current button state
+        var currentStatus = $(button).hasClass("enabled");
+
+        // Confirmation message
+        var message = currentStatus
+            ? "Are you sure you want to disable this organization?"
+            : "Are you sure you want to enable this organization?";
+
+        // Show confirmation before AJAX call
+        if (!confirm(message)) {
+            return;
+        }
+
+        // New status
+        var newStatus = !currentStatus;
+
+        // Prevent double click
+        $(button).prop("disabled", true);
+
+        $.ajax({
+
+            url: '@Url.Action("ToggleOrganizationStatus", "SuperAdmin")',
+
+            type: 'POST',
+
+            data: {
+                id: id,
+                status: newStatus
+            },
+
+            success: function (response) {
+
+                console.log(response);
+
+                if (response.success) {
+
+                    if (response.status) {
+
+                        $(button)
+                            .removeClass("disabled")
+                            .addClass("enabled")
+                            .text("Enabled");
+
+                    }
+                    else {
+
+                        $(button)
+                            .removeClass("enabled")
+                            .addClass("disabled")
+                            .text("Disabled");
+
+                    }
+
+                }
+                else {
+
+                    alert(
+                        response.message ||
+                        "Unable to update organization status."
+                    );
 
                 }
 

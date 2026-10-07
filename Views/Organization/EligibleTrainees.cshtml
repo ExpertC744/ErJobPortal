@@ -10,6 +10,8 @@
     int postID = ViewBag.PostID ?? 0;
     string orgCode = ViewBag.OrgCode?.ToString() ?? "";
 }
+@* Radhika05-10 *@
+<link rel="stylesheet" href="~/css/EligibleTrainees.css" asp-append-version="true" />
 
 <div class="container-fluid eligible-trainees-page">
 
@@ -140,7 +142,7 @@
 
                                 @*shrirang 05/10/26*@
                                 <!-- =================================================
-                                     VIEW RESUME
+                                     VIEW RESUME radhika05-0=10
                                 ================================================== -->
                                 <!-- =================================================
      VIEW THIS CANDIDATE'S RESUME
@@ -148,6 +150,11 @@
 
                                 <td>
 
+                                    <a asp-controller="Resume"
+                                       asp-action="Resume"
+                                       asp-route-id="@item.CandidateID"
+                                       class="resume-view-btn"
+                                       title="View Resume" />
                                     @if (item.CandidateID > 0)
                                     {
                                         <a asp-controller="Resume"
