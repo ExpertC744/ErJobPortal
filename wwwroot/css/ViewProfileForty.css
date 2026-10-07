@@ -716,60 +716,6 @@ body {
 }
 
 /* =========================================================
-   FIT FIX  -  left column was clipped (Preferred Location)
-   - slimmer footer (overrides the master layout inline style)
-   - tighter left column spacing
-========================================================= */
-
-.resume-footer {
-    margin-top: 8px;
-    padding: 8px 25px 8px;
-}
-
-.resume-signature-image {
-    height: 42px;
-    margin-bottom: 2px;
-}
-
-.left-column {
-    padding: 18px 14px 10px 20px;
-}
-
-    .left-column .resume-section {
-        margin-bottom: 9px;
-    }
-
-    .left-column .section-heading {
-        margin-bottom: 6px;
-    }
-
-    .left-column .info-item {
-        margin-bottom: 5px;
-    }
-
-    .left-column .skill-group {
-        margin-bottom: 6px;
-    }
-
-    .left-column .skill-list,
-    .left-column .interest-box {
-        padding: 4px 8px;
-        line-height: 1.4;
-    }
-
-    .left-column .language-row {
-        padding: 2px 0;
-    }
-
-    .left-column .language-level {
-        line-height: 1.35;
-    }
-
-    .left-column .social-item {
-        margin-bottom: 4px;
-    }
-
-/* =========================================================
    RESPONSIVE  -  ZOOM OUT ONLY (sheet = 1123px wide)
    zoom = (screen width - 28px) / 1123
    Layout never reflows, the sheet is only made smaller.

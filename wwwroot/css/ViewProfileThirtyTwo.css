@@ -1,8 +1,8 @@
 /* =========================================================
-   VIEWPROFILETHIRTYTWO  -  FOLDER TABS  -  LANDSCAPE RESUME (A4 29.7cm x 21cm)
+   VIEWPROFILETHIRTYTWO  -  NEWSPAPER THREE  -  LANDSCAPE RESUME (A4 29.7cm x 21cm)
    File: ~/css/viewprofilethirtytwo.css
 
-   Style  : Tinted header with a ringed photo and pill contacts, section headings as folder tabs on a baseline, three stacked content columns.
+   Style  : Three narrow content columns with hairline rules between them, slim sidebar and a double-ruled header.
    Sheet  : 1123px x 794px  (= 297mm x 210mm @ 96dpi)
    Zoom   : Layout never reflows, sheet is only zoomed out
    Themes : blue | teal | slate | brown | green
@@ -658,283 +658,47 @@ body {
     }
 
 /* =========================================================
-   FOLDER TABS  -  TEMPLATE SPECIFIC
+   NEWSPAPER THREE  -  TEMPLATE SPECIFIC
 ========================================================= */
-
-/* ---------- header: tinted, ringed photo, pill contacts ---------- */
 
 .resume-header {
     gap: 24px;
-    padding: 18px 34px 16px;
-    background: var(--soft);
-    border-bottom: 4px solid var(--primary);
-}
-
-.photo-wrapper {
-    width: 98px;
-    height: 98px;
-    padding: 3px;
+    padding: 18px 34px 14px;
     background: #ffffff;
-    box-shadow: 0 0 0 3px var(--primary);
+    border-bottom: 4px double var(--primary);
 }
 
-.candidate-name {
-    font-size: 34px;
-    letter-spacing: 0;
-    color: var(--ink);
-}
+.photo-wrapper { width: 90px; height: 90px; padding: 0; border-radius: 8px; box-shadow: none; border: 2px solid var(--primary); }
+.profile-photo,
+.profile-placeholder { border-radius: 6px; }
 
-.candidate-role {
-    font-size: 12px;
-    font-weight: 700;
-    letter-spacing: 2.4px;
-    text-transform: uppercase;
-    color: var(--primary);
-}
-
-.header-accent {
-    width: 64px;
-    height: 4px;
-    background: var(--primary);
-}
-
-.header-contact {
-    gap: 6px;
-}
-
-.header-contact-item {
-    padding: 3px 14px 3px 4px;
-    background: #ffffff;
-    border: 1px solid var(--soft-border);
-    border-radius: 30px;
-    color: var(--text);
-}
-
-    .header-contact-item i {
-        background: var(--primary);
-        color: #ffffff;
-    }
-
-/* ---------- sidebar: white, slim ---------- */
+.candidate-name { font-size: 32px; letter-spacing: 0; }
+.candidate-role { font-weight: 600; letter-spacing: 1px; }
+.header-accent { display: none; }
 
 .left-column {
-    flex: 0 0 214px;
-    width: 214px;
-    padding: 16px 16px 14px 20px;
-    background: #ffffff;
-    border-right: 1px solid var(--soft-border);
+    flex: 0 0 208px;
+    width: 208px;
+    padding: 16px 14px 14px 20px;
 }
 
 .right-column {
-    padding: 16px 26px 14px 24px;
-}
-
-/* ---------- section headings: folder tabs on a baseline ---------- */
-
-.section-heading {
-    align-items: flex-end;
-    gap: 0;
-    margin-bottom: 8px;
-}
-
-.section-icon {
-    display: none;
-}
-
-.section-title {
-    padding: 3px 12px 2px;
-    border-radius: 6px 6px 0 0;
-    background: var(--primary);
-    font-size: 10.5px;
-    line-height: 1.5;
-    letter-spacing: 1.2px;
-    text-transform: uppercase;
-    color: #ffffff;
-}
-
-.section-title-line {
-    flex: 1 1 auto;
-    min-width: 8px;
-    height: 2px;
-    background: var(--primary);
-}
-
-.summary {
-    font-size: 11.3px;
-}
-
-/* =========================================================
-   CONTENT FIX  -  no empty space, education rows, compact footer
-========================================================= */
-
-/* Preferred Location is already shown in Career Preference */
-.left-column .resume-section:has(.fa-location-arrow) {
-    display: none;
-}
-
-/* ---------- content area: three stacks, no holes ----------
-   Profile                 (full width)
-   COLUMN 1: Experience / Certifications
-   COLUMN 2: Education (spans 2 rows)
-   COLUMN 3: References (spans 2 rows)
-   Career Preference       (full width, last row) */
-
-.right-column {
-    display: grid;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-    grid-auto-flow: row dense;
-    align-content: start;
-    align-items: start;
-    column-count: auto;
+    column-count: 3;
     column-gap: 22px;
-    row-gap: 12px;
+    column-rule: 1px solid var(--soft-border);
+    padding: 16px 24px 14px 22px;
 }
 
-.resume-sheet .right-column > .resume-section {
-    min-width: 0;
-    margin-bottom: 0;
-    grid-column: 1; /* default: column 1 */
-}
+.section-icon { display: none; }
+.section-title { font-size: 11px; letter-spacing: 1.2px; text-transform: uppercase; }
+.section-heading { margin-bottom: 6px; }
+.summary { font-size: 11.2px; }
 
-    .resume-sheet .right-column > .resume-section:has(.summary) {
-        grid-column: 1 / -1;
-        grid-row: 1;
-    }
-
-.resume-sheet .right-column > .education-section {
-    grid-column: 2;
-    grid-row: 2 / span 2;
-    padding-left: 16px;
-    border-left: 1px solid var(--soft-border);
-}
-
-.resume-sheet .right-column > .resume-section:has(.fa-user-group) {
-    grid-column: 3;
-    grid-row: 2 / span 2;
-    padding-left: 16px;
-    border-left: 1px solid var(--soft-border);
-}
-
-.resume-sheet .right-column > .resume-section:has(.fa-bullseye) {
-    grid-column: 1 / -1;
-    grid-row: 4;
-    display: flex;
-    flex-wrap: wrap;
-    align-items: baseline;
-    column-gap: 32px;
-    padding-top: 8px;
-    border-top: 1px solid var(--soft-border);
-}
-
-    .resume-sheet .right-column > .resume-section:has(.fa-bullseye) .section-heading {
-        flex: 0 0 100%;
-    }
-
-    .resume-sheet .right-column > .resume-section:has(.fa-bullseye) .preference-item {
-        margin-bottom: 0;
-    }
-
-/* Education card rows (Year / Stream / Division ...) */
-.education-section .education-item {
-    margin-bottom: 6px;
-}
-
-    .education-section .education-item:last-child {
-        margin-bottom: 0;
-    }
-
-.education-section .education-row {
-    font-size: 10.5px;
-    line-height: 1.4;
-    color: var(--text);
-}
-
-    .education-section .education-row strong {
-        margin-right: 4px;
-        color: var(--heading);
-    }
-
-/* =========================================================
-   FOOTER  -  signature / location / date / powered by
-   Compact bar under the content. Flex directions are forced so
-   the layout's phone rule (max-width: 700px) can never reflow it.
-========================================================= */
-
-.resume-sheet .resume-footer {
-    flex: 0 0 auto;
-    width: auto;
-    margin: 0;
-    padding: 8px 30px 10px;
-    background: var(--page);
-    border-top: 1px solid var(--soft-border);
-}
-
-.resume-sheet .resume-footer-row {
-    display: flex;
-    flex-direction: row;
-    align-items: flex-end;
-    justify-content: space-between;
-    flex-wrap: nowrap;
-    gap: 20px;
-    width: 100%;
-}
-
-.resume-sheet .resume-signature-section {
-    flex: 0 0 auto;
-    min-width: 0;
-}
-
-.resume-sheet .resume-signature-box {
-    width: 170px;
-    margin: 0;
-}
-
-.resume-sheet .resume-signature-image {
-    width: 120px;
-    height: 36px;
-    margin: 0 auto 3px;
-}
-
-.resume-sheet .resume-signature-line {
-    width: 150px;
-    margin: 0 auto 3px;
-    border-top-color: var(--muted);
-}
-
-.resume-sheet .resume-signature-label {
-    font-size: 10px;
-    color: var(--muted);
-}
-
-.resume-sheet .resume-footer-info {
-    flex: 1 1 auto;
-    min-width: 0;
-    flex-direction: row;
-    align-items: flex-end;
-    justify-content: space-between;
-    gap: 16px;
-    font-size: 10.5px;
-    color: var(--text);
-}
-
-.resume-sheet .resume-footer-label {
-    margin-right: 4px;
-    color: var(--heading);
-}
-
-.resume-sheet .resume-powered-by {
-    flex: 0 0 auto;
-    min-width: 0;
-    margin: 0;
-    font-size: 9.5px;
-    text-align: right;
-    white-space: nowrap;
-    color: var(--muted);
-}
-
-    .resume-sheet .resume-powered-by strong {
-        color: var(--heading);
-    }
+.candidate-name { color: var(--ink); }
+.candidate-role { color: var(--primary); }
+.header-accent { background: var(--primary); }
+.header-contact-item { color: var(--text); }
+.header-contact-item i { background: var(--primary); color: #ffffff; }
 
 /* =========================================================
    RESPONSIVE  -  ZOOM OUT ONLY (sheet = 1123px wide)

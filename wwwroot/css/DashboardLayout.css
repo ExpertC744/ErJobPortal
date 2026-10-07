@@ -1734,7 +1734,7 @@ button {
         height: 35px;
         display: flex;
         align-items: center;
-        justify-content: center;
+        justify-content: flex-start;
         color: #1e7b67;
         font-size: 17px;
         transition: color .2s ease;

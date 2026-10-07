@@ -2,6 +2,8 @@
 
 @model ResumeViewModel
 
+
+
 @{
     /*
     ============================================================
@@ -29,9 +31,6 @@
 
     var candidateName =
         Model.CandidateName?.Trim();
-
-    // Current date for resume footer
-    var currentDate = DateTime.Now.ToString("dd-MM-yyyy");
 
     var candidateRole =
         GetLookupName(
@@ -69,295 +68,145 @@
     var resumeCss =
         actionName?.ToLowerInvariant() switch
         {
-         "viewprofile4" =>
-    "~/css/viewprofilefour.css",
+            "viewprofilefour" =>
+        "~/css/viewprofilefour.css",
 
-"viewprofile5" =>
-    "~/css/viewprofilefive.css",
+            "viewprofilefive" =>
+            "~/css/viewprofilefive.css",
 
-"viewprofile6" =>
-    "~/css/ViewProfileSix.css",
+            "viewprofilesix" =>
+            "~/css/ViewProfileSix.css",
 
-"viewprofile7" =>
-    "~/css/viewprofileseven.css",
+            "viewprofileseven" =>
+            "~/css/viewprofileseven.css",
 
-"viewprofile8" =>
-    "~/css/viewprofileeight.css",
+            "viewprofileeight" =>
+            "~/css/viewprofileeight.css",
 
-"viewprofile9" =>
-    "~/css/viewprofilenine.css",
+            "viewprofilenine" =>
+            "~/css/viewprofilenine.css",
 
-"viewprofile10" =>
-    "~/css/viewprofileten.css",
+            "viewprofileten" =>
+            "~/css/viewprofileten.css",
 
-"viewprofile11" =>
-    "~/css/viewprofileeleven.css",
+            "viewprofileeleven" =>
+            "~/css/viewprofileeleven.css",
 
-"viewprofile12" =>
-    "~/css/viewprofiletwelve.css",
+            "viewprofiletwelve" =>
+            "~/css/viewprofiletwelve.css",
 
-"viewprofile13" =>
-    "~/css/viewprofilethirteen.css",
+            "viewprofilethirteen" =>
+            "~/css/viewprofilethirteen.css",
 
-"viewprofile14" =>
-    "~/css/viewprofilefourteen.css",
+            "viewprofilefourteen" =>
+            "~/css/viewprofilefourteen.css",
 
-"viewprofile15" =>
-    "~/css/viewprofilefifteen.css",
+            "viewprofilefifteen" =>
+            "~/css/viewprofilefifteen.css",
 
-"viewprofile16" =>
-    "~/css/viewprofilesixteen.css",
+            "viewprofilesixteen" =>
+            "~/css/viewprofilesixteen.css",
 
-"viewprofile17" =>
-    "~/css/viewprofileseventeen.css",
+            "viewprofileseventeen" =>
+            "~/css/viewprofileseventeen.css",
 
-"viewprofile18" =>
-    "~/css/viewprofileeighteen.css",
+            "viewprofileeighteen" =>
+            "~/css/viewprofileeighteen.css",
 
-"viewprofile19" =>
-    "~/css/viewprofilenineteen.css",
+            "viewprofilenineteen" =>
+            "~/css/viewprofilenineteen.css",
 
-"viewprofile20" =>
-    "~/css/viewprofiletwenty.css",
+            "viewprofiletwenty" =>
+            "~/css/viewprofiletwenty.css",
 
-"viewprofile21" =>
-    "~/css/viewprofiletwentyone.css",
+            "viewprofiletwentyone" =>
+                "~/css/viewprofiletwentyone.css",
 
-"viewprofile22" =>
-    "~/css/viewprofiletwentytwo.css",
+            "viewprofiletwentytwo" =>
+                "~/css/viewprofiletwentytwo.css",
 
-"viewprofile23" =>
-    "~/css/viewprofiletwentythree.css",
+            "viewprofiletwentythree" =>
+                "~/css/viewprofiletwentythree.css",
 
-"viewprofile24" =>
-    "~/css/viewprofiletwentyfour.css",
+            "viewprofiletwentyfour" =>
+                "~/css/viewprofiletwentyfour.css",
 
-"viewprofile25" =>
-    "~/css/viewprofiletwentyfive.css",
+            "viewprofiletwentyfive" =>
+                "~/css/viewprofiletwentyfive.css",
 
-"viewprofile26" =>
-    "~/css/viewprofilesix.css",
+            "viewprofiletwentysix" =>
+                "~/css/viewprofiletwentysix.css",
 
-"viewprofile27" =>
-    "~/css/viewprofileseven.css",
+            "viewprofiletwentyseven" =>
+                "~/css/viewprofiletwentyseven.css",
 
-"viewprofile28" =>
-    "~/css/viewprofileeight.css",
+            "viewprofiletwentyeight" =>
+                "~/css/viewprofiletwentyeight.css",
 
-"viewprofile29" =>
-    "~/css/viewprofilenine.css",
+            "viewprofiletwentynine" =>
+                "~/css/viewprofiletwentynine.css",
 
-"viewprofile30" =>
-    "~/css/viewprofilethirty.css",
+            "viewprofilethirty" =>
+                "~/css/viewprofilethirty.css",
 
-"viewprofile31" =>
-    "~/css/viewprofilethirtyone.css",
+            "viewprofilethirtyone" =>
+                "~/css/viewprofilethirtyone.css",
 
-"viewprofile32" =>
-    "~/css/viewprofilethirtytwo.css",
+            "viewprofilethirtytwo" =>
+                "~/css/viewprofilethirtytwo.css",
 
-"viewprofile33" =>
-    "~/css/viewprofilethirtythree.css",
+            "viewprofilethirtythree" =>
+                "~/css/viewprofilethirtythree.css",
 
-"viewprofile34" =>
-    "~/css/viewprofilethirtyfour.css",
+            "viewprofilethirtyfour" =>
+                "~/css/viewprofilethirtyfour.css",
 
-"viewprofile35" =>
-    "~/css/viewprofilethirtyfive.css",
+            "viewprofilethirtyfive" =>
+                "~/css/viewprofilethirtyfive.css",
 
-"viewprofile36" =>
-    "~/css/viewprofilethirtysix.css",
+            "viewprofilethirtysix" =>
+                "~/css/viewprofilethirtysix.css",
 
-"viewprofile37" =>
-    "~/css/viewprofilethirtyseven.css",
+            "viewprofilethirtyseven" =>
+                "~/css/viewprofilethirtyseven.css",
 
-"viewprofile38" =>
-    "~/css/viewprofilethirtyeight.css",
+            "viewprofilethirtyeight" =>
+                "~/css/viewprofilethirtyeight.css",
 
-"viewprofile39" =>
-    "~/css/viewprofilethirtynine.css",
+            "viewprofilethirtynine" =>
+                "~/css/viewprofilethirtynine.css",
 
-"viewprofile40" =>
-    "~/css/viewprofileforty.css",
+            "viewprofileforty" =>
+                "~/css/viewprofileforty.css",
 
-"viewprofile41" =>
-    "~/css/viewprofilefortyone.css",
-
-"viewprofile42" =>
-    "~/css/viewprofilefortytwo.css",
-
-"viewprofile43" =>
-    "~/css/viewprofilefortythree.css",
-
-"viewprofile44" =>
-    "~/css/viewprofilefortyfour.css",
-
-"viewprofile45" =>
-    "~/css/viewprofilefortyfive.css",
-
-"viewprofile46" =>
-    "~/css/viewprofilefortysix.css",
-
-"viewprofile47" =>
-    "~/css/viewprofilefortyseven.css",
-
-"viewprofile48" =>
-    "~/css/viewprofilefortyeight.css",
-
-"viewprofile49" =>
-    "~/css/viewprofilefortynine.css",
-
-"viewprofile50" =>
-    "~/css/viewprofilefifty.css",
-
-"viewprofile51" =>
-    "~/css/viewprofilefiftyone.css",
-
-"viewprofile52" =>
-    "~/css/viewprofilefiftytwo.css",
-
-"viewprofile53" =>
-    "~/css/viewprofilefiftythree.css",
-
-"viewprofile54" =>
-    "~/css/viewprofilefiftyfour.css",
-
-"viewprofile55" =>
-    "~/css/viewprofilefiftyfive.css",
-
-"viewprofile56" =>
-    "~/css/viewprofilefiftysix.css",
-
-"viewprofile57" =>
-    "~/css/viewprofilefiftyseven.css",
-
-"viewprofile58" =>
-    "~/css/viewprofilefiftyeight.css",
-
-"viewprofile59" =>
-    "~/css/viewprofilefiftynine.css",
-
-"viewprofile60" =>
-    "~/css/viewprofilesixty.css",
-
-"viewprofile61" =>
-    "~/css/viewprofilesixtyone.css",
-
-"viewprofile62" =>
-    "~/css/viewprofilesixtytwo.css",
-
-"viewprofile63" =>
-    "~/css/viewprofilesixtythree.css",
-
-"viewprofile64" =>
-    "~/css/viewprofilesixtyfour.css",
-
-"viewprofile65" =>
-    "~/css/viewprofilesixtyfive.css",
-
-"viewprofile66" =>
-    "~/css/viewprofilesixtysix.css",
-
-"viewprofile67" =>
-    "~/css/viewprofilesixtyseven.css",
-
-"viewprofile68" =>
-    "~/css/viewprofilesixtyeight.css",
-
-"viewprofile69" =>
-    "~/css/viewprofilesixtynine.css",
-
-"viewprofile70" =>
-    "~/css/viewprofileseventy.css",
-
-"viewprofile71" =>
-    "~/css/viewprofileseventyone.css",
-
-"viewprofile72" =>
-    "~/css/viewprofileseventytwo.css",
-
-"viewprofile73" =>
-    "~/css/viewprofileseventythree.css",
-
-"viewprofile74" =>
-    "~/css/viewprofileseventyfour.css",
-
-"viewprofile75" =>
-    "~/css/viewprofileseventyfive.css",
-
-"viewprofile76" =>
-    "~/css/viewprofileseventysix.css",
-
-"viewprofile77" =>
-    "~/css/viewprofileseventyseven.css",
-
-"viewprofile78" =>
-    "~/css/viewprofileseventyeight.css",
-
-"viewprofile79" =>
-    "~/css/viewprofileseventynine.css",
-
-"viewprofile80" =>
-    "~/css/viewprofileeighty.css",
-
-"viewprofile81" =>
-    "~/css/viewprofileeightyone.css",
-
-"viewprofile82" =>
-    "~/css/viewprofileeightytwo.css",
-
-"viewprofile83" =>
-    "~/css/viewprofileeightythree.css",
-
-"viewprofile84" =>
-    "~/css/viewprofileeightyfour.css",
-
-"viewprofile85" =>
-    "~/css/viewprofileeightyfive.css",
-
-"viewprofile86" =>
-    "~/css/viewprofileeightysix.css",
-
-"viewprofile87" =>
-    "~/css/viewprofileeightyseven.css",
-
-"viewprofile88" =>
-    "~/css/viewprofileeightyeight.css",
-
-"viewprofile89" =>
-    "~/css/viewprofileeightynine.css",
-
-"viewprofile90" =>
-    "~/css/viewprofileninety.css",
-
-"viewprofile91" =>
+                "viewprofileninetyone" =>
     "~/css/viewprofileninetyone.css",
 
-"viewprofile92" =>
+"viewprofileninetytwo" =>
     "~/css/viewprofileninetytwo.css",
 
-"viewprofile93" =>
+"viewprofileninetythree" =>
     "~/css/viewprofileninetythree.css",
 
-"viewprofile94" =>
+"viewprofileninetyfour" =>
     "~/css/viewprofileninetyfour.css",
 
-"viewprofile95" =>
+"viewprofileninetyfive" =>
     "~/css/viewprofileninetyfive.css",
 
-"viewprofile96" =>
+"viewprofileninetysix" =>
     "~/css/viewprofileninetysix.css",
 
-"viewprofile97" =>
+"viewprofileninetyseven" =>
     "~/css/viewprofileninetyseven.css",
 
-"viewprofile98" =>
-    "~/css/viewprofileninetyEight.css",
+"viewprofileninetyeight" =>
+    "~/css/viewprofileninetyeight.css",
 
-"viewprofile99" =>
+"viewprofileninetynine" =>
     "~/css/viewprofileninetynine.css",
 
-"viewprofile100" =>
+"viewprofilehundred" =>
     "~/css/viewprofilehundred.css",
             _ =>
             ""
@@ -805,138 +654,6 @@
             }
         }
     </style>
-    <style>
-        /* =========================================================
-           RESUME FOOTER
-        ========================================================= */
-
-        .resume-footer {
-            width: 100%;
-            margin-top: 25px;
-            padding: 18px 25px 12px 25px;
-            border-top: 1px solid #d9e0e5;
-            box-sizing: border-box;
-        }
-
-        .resume-footer-row {
-            display: flex;
-            align-items: flex-end;
-            justify-content: space-between;
-            gap: 25px;
-            width: 100%;
-        }
-
-        .resume-signature-section {
-            flex: 1;
-            min-width: 160px;
-        }
-
-        .resume-signature-box {
-            width: 160px;
-            text-align: center;
-        }
-
-        .resume-signature-image {
-            display: block;
-            width: 150px;
-            height: 55px;
-            object-fit: contain;
-            margin: 0 auto 3px auto;
-        }
-
-        .resume-signature-line {
-            width: 160px;
-            border-top: 1px solid #777;
-            margin: 0 auto 5px auto;
-        }
-
-        .resume-signature-label {
-            font-size: 10px;
-            font-weight: 600;
-            text-align: center;
-        }
-
-        .resume-footer-info {
-            flex: 1.4;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: flex-end;
-            gap: 6px;
-            font-size: 11px;
-            text-align: center;
-        }
-
-        .resume-footer-location,
-        .resume-footer-date {
-            line-height: 1.4;
-        }
-
-        .resume-footer-label {
-            font-weight: 700;
-            margin-right: 4px;
-        }
-
-        .resume-powered-by {
-            flex: 1;
-            min-width: 160px;
-            text-align: right;
-            font-size: 10px;
-            color: #777;
-            white-space: nowrap;
-        }
-
-        .resume-powered-by strong {
-            font-weight: 700;
-            color: #333;
-        }
-
-        @@media print {
-            .resume-footer {
-                page-break-inside: avoid !important;
-                break-inside: avoid !important;
-            }
-
-            .resume-footer-row,
-            .resume-signature-section,
-            .resume-footer-info,
-            .resume-powered-by {
-                page-break-inside: avoid !important;
-                break-inside: avoid !important;
-            }
-        }
-
-        @@media (max-width: 700px) {
-            .resume-footer {
-                padding: 15px;
-            }
-
-            .resume-footer-row {
-                flex-direction: column;
-                align-items: stretch;
-                gap: 15px;
-            }
-
-            .resume-signature-section {
-                flex: 0 0 auto;
-            }
-
-            .resume-signature-box {
-                margin: 0 auto;
-            }
-
-            .resume-footer-info {
-                align-items: center;
-            }
-
-            .resume-powered-by {
-                flex: 0 0 auto;
-                text-align: center;
-                white-space: normal;
-            }
-        }
-    </style>
-
     <!-- =====================================================
          TITLE
     ====================================================== -->
@@ -993,103 +710,53 @@
     @{
         var resumeActions = new[]
         {
-     "ViewProfile4",
-"ViewProfile5",
-"ViewProfile6",
-"ViewProfile7",
-"ViewProfile8",
-"ViewProfile9",
-"ViewProfile10",
-"ViewProfile11",
-"ViewProfile12",
-"ViewProfile13",
-"ViewProfile14",
-"ViewProfile15",
-"ViewProfile16",
-"ViewProfile17",
-"ViewProfile18",
-"ViewProfile19",
-"ViewProfile20",
-"ViewProfile21",
-"ViewProfile22",
-"ViewProfile23",
-"ViewProfile24",
-"ViewProfile25",
-"ViewProfile26",
-"ViewProfile27",
-"ViewProfile28",
-"ViewProfile29",
-"ViewProfile30",
-"ViewProfile31",
-"ViewProfile32",
-"ViewProfile33",
-"ViewProfile34",
-"ViewProfile35",
-"ViewProfile36",
-"ViewProfile37",
-"ViewProfile38",
-"ViewProfile39",
-"ViewProfile40",
-"ViewProfile41",
-"ViewProfile42",
-"ViewProfile43",
-"ViewProfile44",
-"ViewProfile45",
-"ViewProfile46",
-"ViewProfile47",
-"ViewProfile48",
-"ViewProfile49",
-"ViewProfile50",
-"ViewProfile51",
-"ViewProfile52",
-"ViewProfile53",
-"ViewProfile54",
-"ViewProfile55",
-"ViewProfile56",
-"ViewProfile57",
-"ViewProfile58",
-"ViewProfile59",
-"ViewProfile60",
-"ViewProfile61",
-"ViewProfile62",
-"ViewProfile63",
-"ViewProfile64",
-"ViewProfile65",
-"ViewProfile66",
-"ViewProfile67",
-"ViewProfile68",
-"ViewProfile69",
-"ViewProfile70",
-"ViewProfile71",
-"ViewProfile72",
-"ViewProfile73",
-"ViewProfile74",
-"ViewProfile75",
-"ViewProfile76",
-"ViewProfile77",
-"ViewProfile78",
-"ViewProfile79",
-"ViewProfile80",
-"ViewProfile81",
-"ViewProfile82",
-"ViewProfile83",
-"ViewProfile84",
-"ViewProfile85",
-"ViewProfile86",
-"ViewProfile87",
-"ViewProfile88",
-"ViewProfile89",
-"ViewProfile90",
-"ViewProfile91",
-"ViewProfile92",
-"ViewProfile93",
-"ViewProfile94",
-"ViewProfile95",
-"ViewProfile96",
-"ViewProfile97",
-"ViewProfile98",
-"ViewProfile99",
-"ViewProfile100",
+        "ViewProfileFour",
+        "ViewProfileFive",
+        "ViewProfileSix",
+        "ViewProfileSeven",
+        "ViewProfileEight",
+        "ViewProfileNine",
+        "ViewProfileTen",
+        "ViewProfileEleven",
+        "ViewProfileTwelve",
+        "ViewProfileThirteen",
+        "ViewProfileFourteen",
+        "ViewProfileFifteen",
+        "ViewProfileSixteen",
+        "ViewProfileSeventeen",
+        "ViewProfileEighteen",
+        "ViewProfileNineteen",
+        "ViewProfileTwenty",
+        "ViewProfileTwentyOne",
+        "ViewProfileTwentyTwo",
+        "ViewProfileTwentyThree",
+        "ViewProfileTwentyFour",
+        "ViewProfileTwentyFive",
+        "ViewProfileTwentySix",
+        "ViewProfileTwentySeven",
+        "ViewProfileTwentyEight",
+        "ViewProfileTwentyNine",
+        "ViewProfileThirty",
+        "ViewProfileThirtyOne",
+        "ViewProfileThirtyTwo",
+        "ViewProfileThirtyThree",
+        "ViewProfileThirtyFour",
+        "ViewProfileThirtyFive",
+        "ViewProfileThirtySix",
+        "ViewProfileThirtySeven",
+        "ViewProfileThirtyEight",
+        "ViewProfileThirtyNine",
+        "ViewProfileForty",
+        "ViewProfileNinetyOne",
+"ViewProfileNinetyTwo",
+"ViewProfileNinetyThree",
+"ViewProfileNinetyFour",
+"ViewProfileNinetyFive",
+"ViewProfileNinetySix",
+"ViewProfileNinetySeven",
+"ViewProfileNinetyEight",
+"ViewProfileNinetyNine",
+"ViewProfileHundred",
 
         };
 
@@ -1975,326 +1642,230 @@
                         </section>
                     }
 
-<!-- =========================================================
-     EDUCATION  (order: PhD > PG > Graduation > HSC > SSC)
-========================================================= -->
-
-@{
-    // SSC
-    var sscYear = p.SSC_YEAR;
-    var sscDivision = p.SSC_DIVISION;
-
-    // HSC / DIPLOMA
-    var hscDiplomaYear = p.HSC_DIPLOMA_YEAR;
-    var hscDiplomaDivision = p.HSC_DIPLOMA_DIVISION;
-
-    // GRADUATION
-    var graduationYear = p.Graduation_Year;
-    var graduationDivision = p.Graduation_Division;
-    var graduationStream = p.Graduation_Stream;
-    var otherGraduationStream = p.Other_Stream;
-
-    // POST GRADUATION
-    var pgYear = p.PG_Year;
-    var pgDivision = p.PG_Division;
-    var pgStream = p.PG_Stream;
-    var otherPGSpecialization = p.Other_Specialization;
-
-    // PhD
-    var phdYear = p.PhD_Year;
-    var phdStatus = p.PhD_Status;
-    var phdTopic = p.PhD_Topic;
-    var previousPhdTopicYear = p.Previous_PhD_Topic_Year;
-}
-
-@if (
-    sscYear.HasValue ||
-    sscDivision.HasValue ||
-    hscDiplomaYear.HasValue ||
-    hscDiplomaDivision.HasValue ||
-    graduationYear.HasValue ||
-    graduationDivision.HasValue ||
-    graduationStream.HasValue ||
-    !string.IsNullOrWhiteSpace(otherGraduationStream) ||
-    pgYear.HasValue ||
-    pgDivision.HasValue ||
-    pgStream.HasValue ||
-    !string.IsNullOrWhiteSpace(otherPGSpecialization) ||
-    phdYear.HasValue ||
-    phdStatus.HasValue ||
-    !string.IsNullOrWhiteSpace(phdTopic) ||
-    !string.IsNullOrWhiteSpace(previousPhdTopicYear)
-)
-{
-    <div class="resume-section education-section">
-
-        <div class="section-heading">
-
-            <div class="section-icon">
-                <i class="fa fa-graduation-cap"></i>
-            </div>
-
-            <div class="section-title">
-                Education
-            </div>
-
-            <div class="section-title-line"></div>
-
-        </div>
-
-        <!-- =====================================================
-             PhD
-        ====================================================== -->
-
-        @if (
-            phdYear.HasValue ||
-            phdStatus.HasValue ||
-            !string.IsNullOrWhiteSpace(phdTopic) ||
-            !string.IsNullOrWhiteSpace(previousPhdTopicYear)
-        )
-        {
-            <div class="education-item">
-
-                <div class="education-title">
-                    PhD
-                </div>
-
-                @if (phdYear.HasValue)
-                {
-                    <div class="education-row">
-                        <strong>Year:</strong>
-                        <span>@phdYear</span>
-                    </div>
-                }
-
-                @if (phdStatus.HasValue)
-                {
-                    <div class="education-row">
-                        <strong>Status:</strong>
-                        <span>
-                            @GetLookupName(
-                                Model.InternshipStatuses,
-                                phdStatus
-                            )
-                        </span>
-                    </div>
-                }
-
-                @if (!string.IsNullOrWhiteSpace(phdTopic))
-                {
-                    <div class="education-row">
-                        <strong>Topic:</strong>
-                        <span>@phdTopic</span>
-                    </div>
-                }
-
-                @if (!string.IsNullOrWhiteSpace(previousPhdTopicYear))
-                {
-                    <div class="education-row">
-                        <strong>Previous PhD:</strong>
-                        <span>@previousPhdTopicYear</span>
-                    </div>
-                }
-
-            </div>
-        }
 
 
-        <!-- =====================================================
-             POST GRADUATION
-        ====================================================== -->
+                    <!-- =================================================
+                         EDUCATION
+                    ================================================== -->
+                    @if (
+                                        HasNum(p.PG_Year) ||
+                                        HasNum(p.Graduation_Year) ||
+                                        HasNum(p.HSC_DIPLOMA_YEAR) ||
+                                        HasNum(p.SSC_YEAR)
+                                        )
+                    {
+                        <section class="resume-section">
 
-        @if (
-            pgYear.HasValue ||
-            pgDivision.HasValue ||
-            pgStream.HasValue ||
-            !string.IsNullOrWhiteSpace(otherPGSpecialization)
-        )
-        {
-            <div class="education-item">
+                            <div class="section-heading">
 
-                <div class="education-title">
-                    Post Graduation
-                </div>
+                                <div class="section-icon">
+                                    <i class="fa fa-graduation-cap"></i>
+                                </div>
 
-                @if (pgYear.HasValue)
-                {
-                    <div class="education-row">
-                        <strong>Year:</strong>
-                        <span>@pgYear</span>
-                    </div>
-                }
+                                <div class="section-title">
+                                    Education
+                                </div>
 
-                @if (pgStream.HasValue)
-                {
-                    <div class="education-row">
-                        <strong>Stream:</strong>
-                        <span>
-                            @GetLookupName(Model.Streams, pgStream)
-                        </span>
-                    </div>
-                }
+                                <div class="section-title-line"></div>
 
-                @if (pgDivision.HasValue)
-                {
-                    <div class="education-row">
-                        <strong>Division:</strong>
-                        <span>
-                            @GetLookupName(Model.Divisions, pgDivision)
-                        </span>
-                    </div>
-                }
-
-                @if (!string.IsNullOrWhiteSpace(otherPGSpecialization))
-                {
-                    <div class="education-row">
-                        <strong>Specialization:</strong>
-                        <span>@otherPGSpecialization</span>
-                    </div>
-                }
-
-            </div>
-        }
+                            </div>
 
 
-        <!-- =====================================================
-             GRADUATION
-        ====================================================== -->
-
-        @if (
-            graduationYear.HasValue ||
-            graduationDivision.HasValue ||
-            graduationStream.HasValue ||
-            !string.IsNullOrWhiteSpace(otherGraduationStream)
-        )
-        {
-            <div class="education-item">
-
-                <div class="education-title">
-                    Graduation
-                </div>
-
-                @if (graduationYear.HasValue)
-                {
-                    <div class="education-row">
-                        <strong>Year:</strong>
-                        <span>@graduationYear</span>
-                    </div>
-                }
-
-                @if (graduationStream.HasValue)
-                {
-                    <div class="education-row">
-                        <strong>Stream:</strong>
-                        <span>
-                            @GetLookupName(Model.Streams, graduationStream)
-                        </span>
-                    </div>
-                }
-
-                @if (graduationDivision.HasValue)
-                {
-                    <div class="education-row">
-                        <strong>Division:</strong>
-                        <span>
-                            @GetLookupName(Model.Divisions, graduationDivision)
-                        </span>
-                    </div>
-                }
-
-                @if (!string.IsNullOrWhiteSpace(otherGraduationStream))
-                {
-                    <div class="education-row">
-                        <strong>Other Stream:</strong>
-                        <span>@otherGraduationStream</span>
-                    </div>
-                }
-
-            </div>
-        }
+                            <div class="education-list">
 
 
-        <!-- =====================================================
-             HSC / DIPLOMA
-        ====================================================== -->
+                                <!-- =================================================
+                                     PG
+                                ================================================== -->
+                                @if (HasNum(p.PG_Year))
+                                {
+                                    var pgStream =
+                                    GetLookupName(
+                                    Model.Streams,
+                                    p.PG_Stream
+                                    );
 
-        @if (
-            hscDiplomaYear.HasValue ||
-            hscDiplomaDivision.HasValue
-        )
-        {
-            <div class="education-item">
-
-                <div class="education-title">
-                    HSC / Diploma
-                </div>
-
-                @if (hscDiplomaYear.HasValue)
-                {
-                    <div class="education-row">
-                        <strong>Year:</strong>
-                        <span>@hscDiplomaYear</span>
-                    </div>
-                }
-
-                @if (hscDiplomaDivision.HasValue)
-                {
-                    <div class="education-row">
-                        <strong>Division:</strong>
-                        <span>
-                            @GetLookupName(
-                                Model.Divisions,
-                                hscDiplomaDivision
-                            )
-                        </span>
-                    </div>
-                }
-
-            </div>
-        }
+                                    var pgDivision =
+                                    GetLookupName(
+                                    Model.Divisions,
+                                    p.PG_Division
+                                    );
 
 
-        <!-- =====================================================
-             SSC
-        ====================================================== -->
+                                    <div class="education-item">
 
-        @if (
-            sscYear.HasValue ||
-            sscDivision.HasValue
-        )
-        {
-            <div class="education-item">
+                                        <div class="education-title">
 
-                <div class="education-title">
-                    SSC
-                </div>
+                                            @if (Has(pgStream))
+                                            {
+                                                @pgStream
+                                            }
+                                            else
+                                            {
+                                                <span>
+                                                    Post Graduation
+                                                </span>
+                                            }
 
-                @if (sscYear.HasValue)
-                {
-                    <div class="education-row">
-                        <strong>Year:</strong>
-                        <span>@sscYear</span>
-                    </div>
-                }
+                                        </div>
 
-                @if (sscDivision.HasValue)
-                {
-                    <div class="education-row">
-                        <strong>Division:</strong>
-                        <span>
-                            @GetLookupName(
-                                Model.Divisions,
-                                sscDivision
-                            )
-                        </span>
-                    </div>
-                }
 
-            </div>
-        }
+                                        <div class="education-meta">
 
-    </div>
-}
+                                            Post Graduation
+                                            &nbsp;•&nbsp;
+                                            @p.PG_Year
+
+                                            @if (Has(pgDivision))
+                                            {
+                                                <span>
+                                                    &nbsp;•&nbsp;
+                                                    @pgDivision
+                                                </span>
+                                            }
+
+                                        </div>
+
+                                    </div>
+                                }
+
+
+
+                                <!-- =================================================
+                                     GRADUATION
+                                ================================================== -->
+                                @if (HasNum(p.Graduation_Year))
+                                {
+                                    var graduationStream =
+                                    GetLookupName(
+                                    Model.Streams,
+                                    p.Graduation_Stream
+                                    );
+
+                                    var graduationDivision =
+                                    GetLookupName(
+                                    Model.Divisions,
+                                    p.Graduation_Division
+                                    );
+
+
+                                    <div class="education-item">
+
+                                        <div class="education-title">
+
+                                            @if (Has(graduationStream))
+                                            {
+                                                @graduationStream
+                                            }
+                                            else
+                                            {
+                                                <span>
+                                                    Graduation
+                                                </span>
+                                            }
+
+                                        </div>
+
+
+                                        <div class="education-meta">
+
+                                            Graduation
+                                            &nbsp;•&nbsp;
+                                            @p.Graduation_Year
+
+                                            @if (Has(graduationDivision))
+                                            {
+                                                <span>
+                                                    &nbsp;•&nbsp;
+                                                    @graduationDivision
+                                                </span>
+                                            }
+
+                                        </div>
+
+                                    </div>
+                                }
+
+
+
+                                <!-- =================================================
+                                     HSC / DIPLOMA
+                                ================================================== -->
+                                @if (HasNum(p.HSC_DIPLOMA_YEAR))
+                                {
+                                    var hscDivision =
+                                    GetLookupName(
+                                    Model.Divisions,
+                                    p.HSC_DIPLOMA_DIVISION
+                                    );
+
+
+                                    <div class="education-item">
+
+                                        <div class="education-title">
+                                            HSC / Diploma
+                                        </div>
+
+
+                                        <div class="education-meta">
+
+                                            @p.HSC_DIPLOMA_YEAR
+
+                                            @if (Has(hscDivision))
+                                            {
+                                                <span>
+                                                    &nbsp;•&nbsp;
+                                                    @hscDivision
+                                                </span>
+                                            }
+
+                                        </div>
+
+                                    </div>
+                                }
+
+
+
+                                <!-- =================================================
+                                     SSC
+                                ================================================== -->
+                                @if (HasNum(p.SSC_YEAR))
+                                {
+                                    var sscDivision =
+                                    GetLookupName(
+                                    Model.Divisions,
+                                    p.SSC_DIVISION
+                                    );
+
+
+                                    <div class="education-item">
+
+                                        <div class="education-title">
+                                            SSC / 10th
+                                        </div>
+
+
+                                        <div class="education-meta">
+
+                                            @p.SSC_YEAR
+
+                                            @if (Has(sscDivision))
+                                            {
+                                                <span>
+                                                    &nbsp;•&nbsp;
+                                                    @sscDivision
+                                                </span>
+                                            }
+
+                                        </div>
+
+                                    </div>
+                                }
+
+                            </div>
+
+                        </section>
+                    }
 
 
 
@@ -2595,83 +2166,6 @@
 
             </div>
 
-
-            <!-- =====================================================
-                 CANDIDATE SIGNATURE / LOCATION / DATE / POWERED BY
-            ====================================================== -->
-
-            <footer class="resume-footer">
-
-                <div class="resume-footer-row">
-
-                    <!-- CANDIDATE SIGNATURE -->
-                    <div class="resume-signature-section">
-
-                        <div class="resume-signature-box">
-
-                            @if (Has(p.sSignature))
-                            {
-                                <img src="@p.sSignature"
-                                     class="resume-signature-image"
-                                     alt="Candidate Signature" />
-                            }
-
-                            <div class="resume-signature-line"></div>
-
-                            <div class="resume-signature-label">
-                                Candidate Signature
-                            </div>
-
-                        </div>
-
-                    </div>
-
-
-                    <!-- LOCATION + DATE -->
-                    <div class="resume-footer-info">
-
-                        <div class="resume-footer-location">
-
-                            <span class="resume-footer-label">
-                                Location:
-                            </span>
-
-                            <span id="resumeFooterAddress">
-                                @if (HasValue(p.Pincode))
-                                {
-                                    @p.Pincode
-                                }
-                                else
-                                {
-                                    @:N/A
-                                }
-                            </span>
-
-                        </div>
-
-                        <div class="resume-footer-date">
-
-                            <span class="resume-footer-label">
-                                Date:
-                            </span>
-
-                            <span>@currentDate</span>
-
-                        </div>
-
-                    </div>
-
-
-                    <!-- POWERED BY -->
-                    <div class="resume-powered-by">
-                        Powered By <strong>one.trainee.com</strong>
-                    </div>
-
-                </div>
-
-            </footer>
-
-
         </div>
 
     </div>
@@ -2826,7 +2320,7 @@
 
                     const addressElements =
                         document.querySelectorAll(
-                            "#resumeAddress, #resumeAddressLeft, #resumeFooterAddress"
+                            "#resumeAddress, #resumeAddressLeft"
                         );
 
 

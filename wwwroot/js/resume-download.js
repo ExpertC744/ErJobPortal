@@ -1,15 +1,30 @@
 ﻿/* ================================================================
    1TRAINEE - COMMON RESUME PRINT + PDF DOWNLOAD
    ---------------------------------------------------------------
-   AUTO ORIENTATION (LANDSCAPE + PORTRAIT)
+   MOBILE / TABLET SAFE PDF VERSION
 
+   IMPORTANT:
+   ---------------------------------------------------------------
    The visible resume is NEVER resized or modified.
+
    PDF generation uses a separate hidden A4 rendering copy.
 
-   Landscape sheet -> A4 landscape PDF (297mm x 210mm)
-   Portrait sheet  -> A4 portrait PDF  (210mm x 297mm)
+   Therefore:
 
-   Mobile / tablet zoom rules never affect the PDF.
+   Desktop  -> A4 layout
+   Tablet   -> A4 layout
+   Mobile   -> A4 layout
+
+   Responsive mobile CSS will NOT break the PDF.
+
+   PDF:
+       A4 Landscape
+       297mm × 210mm
+       No margin
+       No extra corner spacing
+       No mobile reflow
+       No tablet reflow
+       Exact desktop/A4 resume structure
 ================================================================ */
 
 (function () {
@@ -22,39 +37,51 @@
     ============================================================ */
 
     const CONFIG = {
+
         selector: "#resumeSheet",
+
+        orientation: "landscape",
+
         format: "a4",
+
         scale: 2.5,
+
         quality: 0.95,
-        filename: "Resume"
+
+        filename: "Resume",
+
+        /*
+         * Fixed desktop rendering width.
+         *
+         * 297mm at 96 DPI ≈ 1122.52px
+         *
+         * We use 1200px as the CSS rendering viewport.
+         * This prevents mobile/tablet media queries from
+         * changing the resume layout.
+         */
+        renderWidth: 1200,
+
+        renderHeight: 848
+
     };
-
-
-    /*
-     * Fixed render sizes (CSS px).
-     * Landscape: 1200 x 848   (A4 ratio 297:210)
-     * Portrait : 794  x 1123  (A4 at 96 DPI, same as the sheet CSS)
-     */
-    const RENDER = {
-        landscape: { width: 1200, height: 848 },
-        portrait: { width: 794, height: 1123 }
-    };
-
-
-    /*
-     * Window width given to html2canvas. Large enough so
-     * mobile @media (max-width) rules never apply.
-     */
-    const RENDER_WINDOW_WIDTH = 1200;
 
 
     /* ============================================================
-       A4 SIZE (mm)
+       A4 SIZE
     ============================================================ */
 
     const A4 = {
-        landscape: { width: 297, height: 210 },
-        portrait: { width: 210, height: 297 }
+
+        landscape: {
+            width: 297,
+            height: 210
+        },
+
+        portrait: {
+            width: 210,
+            height: 297
+        }
+
     };
 
 
@@ -63,25 +90,11 @@
     ============================================================ */
 
     function getSheet() {
-        return document.querySelector(CONFIG.selector);
-    }
 
+        return document.querySelector(
+            CONFIG.selector
+        );
 
-    /* ============================================================
-       DETECT ORIENTATION
-       ------------------------------------------------------------
-       Uses the sheet's CSS width/height (not affected by zoom
-       or transforms), so it works on mobile too.
-    ============================================================ */
-
-    function getOrientation(sheet) {
-
-        const cs = window.getComputedStyle(sheet);
-
-        const w = parseFloat(cs.width) || sheet.offsetWidth;
-        const h = parseFloat(cs.height) || sheet.offsetHeight;
-
-        return h > w ? "portrait" : "landscape";
     }
 
 
@@ -97,18 +110,37 @@
             document.body.dataset.candidateName ||
             CONFIG.filename;
 
+
         name = String(name).trim();
 
+
         if (!name) {
+
             name = CONFIG.filename;
+
         }
 
+
         name = name
-            .replace(/[<>:"/\\|?*\x00-\x1F]/g, "")
-            .replace(/\s+/g, " ")
-            .replace(/\.pdf$/i, "");
+
+            .replace(
+                /[<>:"/\\|?*\x00-\x1F]/g,
+                ""
+            )
+
+            .replace(
+                /\s+/g,
+                " "
+            )
+
+            .replace(
+                /\.pdf$/i,
+                ""
+            );
+
 
         return name + "_Resume.pdf";
+
     }
 
 
@@ -118,15 +150,27 @@
 
     async function waitForFonts() {
 
-        if (document.fonts && document.fonts.ready) {
+        if (
+            document.fonts &&
+            document.fonts.ready
+        ) {
 
             try {
+
                 await document.fonts.ready;
+
             }
             catch (error) {
-                console.warn("Font loading skipped.", error);
+
+                console.warn(
+                    "Font loading skipped.",
+                    error
+                );
+
             }
+
         }
+
     }
 
 
@@ -134,21 +178,35 @@
        WAIT FOR IMAGES
     ============================================================ */
 
-    async function waitForImages(container) {
+    async function waitForImages(
+        container
+    ) {
 
-        const images = container.querySelectorAll("img");
+        const images =
+            container.querySelectorAll("img");
+
 
         if (!images.length) {
+
             return;
+
         }
+
 
         const pending = [];
 
+
         images.forEach(function (img) {
 
-            if (img.complete && img.naturalWidth > 0) {
+            if (
+                img.complete &&
+                img.naturalWidth > 0
+            ) {
+
                 return;
+
             }
+
 
             pending.push(
 
@@ -156,35 +214,75 @@
 
                     let finished = false;
 
+
                     function finish() {
 
                         if (finished) {
+
                             return;
+
                         }
+
 
                         finished = true;
 
-                        img.removeEventListener("load", finish);
-                        img.removeEventListener("error", finish);
+
+                        img.removeEventListener(
+                            "load",
+                            finish
+                        );
+
+
+                        img.removeEventListener(
+                            "error",
+                            finish
+                        );
+
 
                         resolve();
+
                     }
 
-                    img.addEventListener("load", finish, { once: true });
-                    img.addEventListener("error", finish, { once: true });
+
+                    img.addEventListener(
+                        "load",
+                        finish,
+                        { once: true }
+                    );
+
+
+                    img.addEventListener(
+                        "error",
+                        finish,
+                        { once: true }
+                    );
+
                 })
+
             );
+
         });
+
 
         if (pending.length) {
 
             await Promise.race([
+
                 Promise.all(pending),
+
                 new Promise(function (resolve) {
-                    setTimeout(resolve, 5000);
+
+                    setTimeout(
+                        resolve,
+                        5000
+                    );
+
                 })
+
             ]);
+
         }
+
     }
 
 
@@ -197,11 +295,17 @@
         return new Promise(function (resolve) {
 
             requestAnimationFrame(function () {
+
                 requestAnimationFrame(function () {
+
                     resolve();
+
                 });
+
             });
+
         });
+
     }
 
 
@@ -209,143 +313,322 @@
        BUTTON LOADING
     ============================================================ */
 
-    function setLoading(button, loading) {
+    function setLoading(
+        button,
+        loading
+    ) {
 
         if (!button) {
+
             return;
+
         }
+
 
         if (loading) {
 
             if (!button.dataset.oldHtml) {
-                button.dataset.oldHtml = button.innerHTML;
+
+                button.dataset.oldHtml =
+                    button.innerHTML;
+
             }
+
 
             button.disabled = true;
 
+
             button.innerHTML =
                 '<i class="fa-solid fa-spinner fa-spin"></i>';
+
         }
         else {
 
             button.disabled = false;
 
+
             if (button.dataset.oldHtml) {
-                button.innerHTML = button.dataset.oldHtml;
+
+                button.innerHTML =
+                    button.dataset.oldHtml;
+
                 delete button.dataset.oldHtml;
+
             }
+
         }
+
     }
 
 
     /* ============================================================
        CREATE PDF RENDER CONTAINER
        ------------------------------------------------------------
-       Hidden copy of the resume at a fixed size that matches the
-       detected orientation. The visible resume is not touched.
+       This is the most important part.
+
+       The actual resume on the screen is NOT changed.
+
+       A separate hidden rendering area is created with:
+
+           width  = 1200px
+           height = 848px
+
+       This gives html2canvas a desktop-like rendering
+       environment even when the user is on a mobile device.
     ============================================================ */
 
-    function createPDFRenderContainer(sheet) {
+    function createPDFRenderContainer(
+        sheet
+    ) {
 
-        const orientation = getOrientation(sheet);
-
-        const renderWidth = RENDER[orientation].width;
-        const renderHeight = RENDER[orientation].height;
-
-
-        const container = document.createElement("div");
-
-        container.id = "resumePdfRenderContainer";
-
-        container.setAttribute("data-resume-pdf-render", "true");
+        const container =
+            document.createElement("div");
 
 
-        /* Completely independent from page layout */
-
-        container.style.position = "fixed";
-        container.style.left = "-100000px";
-        container.style.top = "0";
-        container.style.overflow = "hidden";
-        container.style.background = "#ffffff";
-        container.style.zIndex = "-1";
-        container.style.pointerEvents = "none";
+        container.id =
+            "resumePdfRenderContainer";
 
 
-        /* Deep copy of the resume */
+        container.setAttribute(
+            "data-resume-pdf-render",
+            "true"
+        );
 
-        const clone = sheet.cloneNode(true);
+
+        /*
+         * Completely independent from page layout.
+         */
+
+        container.style.position =
+            "fixed";
+
+        container.style.left =
+            "-100000px";
+
+        container.style.top =
+            "0";
+
+        container.style.width =
+            CONFIG.renderWidth + "px";
+
+        container.style.height =
+            CONFIG.renderHeight + "px";
+
+        container.style.minWidth =
+            CONFIG.renderWidth + "px";
+
+        container.style.maxWidth =
+            CONFIG.renderWidth + "px";
+
+        container.style.overflow =
+            "hidden";
+
+        container.style.background =
+            "#ffffff";
+
+        container.style.zIndex =
+            "-1";
+
+        container.style.pointerEvents =
+            "none";
+
+
+        /*
+         * Create a deep copy of the resume.
+         */
+
+        const clone =
+            sheet.cloneNode(true);
+
 
         clone.removeAttribute("id");
 
-        clone.setAttribute("data-pdf-resume", "true");
+
+        clone.setAttribute(
+            "data-pdf-resume",
+            "true"
+        );
 
 
-        /* Force exact render size on container + clone */
+        /*
+         * Force desktop/A4 resume dimensions.
+         */
 
-        ["width", "minWidth", "maxWidth"].forEach(function (key) {
-            container.style[key] = renderWidth + "px";
-            clone.style[key] = renderWidth + "px";
-        });
+        const size =
+            String(
+                CONFIG.orientation
+            ).toLowerCase() ===
+                "portrait"
 
-        ["height", "minHeight", "maxHeight"].forEach(function (key) {
-            container.style[key] = renderHeight + "px";
-            clone.style[key] = renderHeight + "px";
-        });
+                ? A4.portrait
 
-
-        /* IMPORTANT: ignore the mobile zoom rules */
-
-        clone.style.zoom = "1";
-
-        clone.style.margin = "0";
-        clone.style.padding = clone.style.padding || "0";
-        clone.style.position = "relative";
-        clone.style.left = "0";
-        clone.style.top = "0";
-        clone.style.transform = "none";
-        clone.style.transformOrigin = "top left";
-        clone.style.boxSizing = "border-box";
-        clone.style.overflow = "hidden";
-        clone.style.boxShadow = "none";
+                : A4.landscape;
 
 
-        /* Preserve theme */
+        /*
+         * A4 ratio.
+         */
 
-        if (sheet.hasAttribute("data-theme")) {
+        const aspectRatio =
+            size.width /
+            size.height;
+
+
+        const renderWidth =
+            CONFIG.renderWidth;
+
+
+        const renderHeight =
+            Math.round(
+                renderWidth /
+                aspectRatio
+            );
+
+
+        container.style.height =
+            renderHeight + "px";
+
+
+        container.style.minHeight =
+            renderHeight + "px";
+
+
+        container.style.maxHeight =
+            renderHeight + "px";
+
+
+        /*
+         * Force the cloned resume itself.
+         */
+
+        clone.style.width =
+            renderWidth + "px";
+
+        clone.style.minWidth =
+            renderWidth + "px";
+
+        clone.style.maxWidth =
+            renderWidth + "px";
+
+
+        clone.style.height =
+            renderHeight + "px";
+
+        clone.style.minHeight =
+            renderHeight + "px";
+
+        clone.style.maxHeight =
+            renderHeight + "px";
+
+
+        clone.style.margin =
+            "0";
+
+        clone.style.padding =
+            clone.style.padding || "0";
+
+
+        clone.style.position =
+            "relative";
+
+
+        clone.style.left =
+            "0";
+
+        clone.style.top =
+            "0";
+
+
+        clone.style.transform =
+            "none";
+
+
+        clone.style.transformOrigin =
+            "top left";
+
+
+        clone.style.boxSizing =
+            "border-box";
+
+
+        clone.style.overflow =
+            "hidden";
+
+
+        clone.style.boxShadow =
+            "none";
+
+
+        /*
+         * Make sure theme is preserved.
+         */
+
+        if (
+            sheet.hasAttribute(
+                "data-theme"
+            )
+        ) {
+
             clone.setAttribute(
                 "data-theme",
-                sheet.getAttribute("data-theme")
+                sheet.getAttribute(
+                    "data-theme"
+                )
             );
+
         }
 
 
-        /* Hide toolbar / navigation if present inside resume */
+        /*
+         * Prevent PDF toolbar/navigation
+         * elements from appearing if any
+         * somehow exist inside the resume.
+         */
 
         clone
-            .querySelectorAll("[data-resume-action]")
+            .querySelectorAll(
+                "[data-resume-action]"
+            )
             .forEach(function (element) {
-                element.style.display = "none";
+
+                element.style.display =
+                    "none";
+
             });
 
+
         clone
-            .querySelectorAll(".resume-navigation, .resume-top-toolbar")
+            .querySelectorAll(
+                ".resume-navigation, .resume-top-toolbar"
+            )
             .forEach(function (element) {
-                element.style.display = "none";
+
+                element.style.display =
+                    "none";
+
             });
 
 
         container.appendChild(clone);
 
-        document.body.appendChild(container);
+
+        document.body.appendChild(
+            container
+        );
 
 
         return {
+
             container: container,
+
             clone: clone,
+
             width: renderWidth,
-            height: renderHeight,
-            orientation: orientation
+
+            height: renderHeight
+
         };
+
     }
 
 
@@ -353,69 +636,142 @@
        REMOVE PDF RENDER CONTAINER
     ============================================================ */
 
-    function removePDFRenderContainer(render) {
+    function removePDFRenderContainer(
+        render
+    ) {
 
-        if (!render || !render.container) {
+        if (
+            !render ||
+            !render.container
+        ) {
+
             return;
+
         }
 
-        if (render.container.parentNode) {
-            render.container.parentNode.removeChild(render.container);
+
+        if (
+            render.container.parentNode
+        ) {
+
+            render.container.parentNode.removeChild(
+                render.container
+            );
+
         }
+
     }
 
 
     /* ============================================================
        COPY CSS VARIABLES
+       ------------------------------------------------------------
+       Theme variables are copied from the real resume to the
+       PDF clone so the selected theme remains identical.
     ============================================================ */
 
-    function copyThemeVariables(source, target) {
+    function copyThemeVariables(
+        source,
+        target
+    ) {
 
         try {
 
-            const computed = window.getComputedStyle(source);
+            const computed =
+                window.getComputedStyle(
+                    source
+                );
+
 
             const variables = [
+
                 "--resume-primary",
+
                 "--resume-secondary",
+
                 "--resume-accent",
+
                 "--resume-text",
+
                 "--resume-muted",
+
                 "--resume-bg",
-                "--resume-border",
-                "--fit"
+
+                "--resume-border"
+
             ];
+
 
             variables.forEach(function (variable) {
 
-                const value = computed.getPropertyValue(variable);
+                const value =
+                    computed.getPropertyValue(
+                        variable
+                    );
+
 
                 if (value) {
-                    target.style.setProperty(variable, value);
+
+                    target.style.setProperty(
+                        variable,
+                        value
+                    );
+
                 }
+
             });
+
         }
         catch (error) {
-            console.warn("Theme variables could not be copied.", error);
+
+            console.warn(
+                "Theme variables could not be copied.",
+                error
+            );
+
         }
+
     }
 
 
     /* ============================================================
-       COPY IMPORTANT STATE
-       (--fit is copied too, so the autofit result is identical)
+       COPY IMPORTANT INLINE STATE
     ============================================================ */
 
-    function copyResumeState(source, target) {
+    function copyResumeState(
+        source,
+        target
+    ) {
 
-        if (source.hasAttribute("data-theme")) {
+        /*
+         * Copy theme.
+         */
+
+        if (
+            source.hasAttribute(
+                "data-theme"
+            )
+        ) {
+
             target.setAttribute(
                 "data-theme",
-                source.getAttribute("data-theme")
+                source.getAttribute(
+                    "data-theme"
+                )
             );
+
         }
 
-        copyThemeVariables(source, target);
+
+        /*
+         * Copy CSS custom properties.
+         */
+
+        copyThemeVariables(
+            source,
+            target
+        );
+
     }
 
 
@@ -425,162 +781,429 @@
 
     async function downloadResumePDF() {
 
-        const sheet = getSheet();
+        const sheet =
+            getSheet();
+
 
         if (!sheet) {
-            alert('Resume container with id="resumeSheet" was not found.');
+
+            alert(
+                'Resume container with id="resumeSheet" was not found.'
+            );
+
             return;
+
         }
 
-        if (typeof html2canvas !== "function") {
-            alert("html2canvas is not loaded.");
+
+        if (
+            typeof html2canvas !==
+            "function"
+        ) {
+
+            alert(
+                "html2canvas is not loaded."
+            );
+
             return;
+
         }
 
-        if (!window.jspdf || !window.jspdf.jsPDF) {
-            alert("jsPDF is not loaded.");
+
+        if (
+            !window.jspdf ||
+            !window.jspdf.jsPDF
+        ) {
+
+            alert(
+                "jsPDF is not loaded."
+            );
+
             return;
+
         }
 
-        const button = document.querySelector(
-            '[data-resume-action="download"]'
-        );
+
+        const button =
+            document.querySelector(
+                '[data-resume-action="download"]'
+            );
+
 
         let render = null;
 
+
         try {
 
-            setLoading(button, true);
+            setLoading(
+                button,
+                true
+            );
 
 
-            /* Wait for the normal page */
+            /* ====================================================
+               WAIT FOR NORMAL PAGE
+            ==================================================== */
 
             await waitForFonts();
-            await waitForImages(sheet);
+
+            await waitForImages(
+                sheet
+            );
 
 
-            /* Dynamic data */
+            /* ====================================================
+               DYNAMIC DATA
+            ==================================================== */
 
             if (
                 window.resumeReadyPromise &&
-                typeof window.resumeReadyPromise.then === "function"
+                typeof window.resumeReadyPromise.then ===
+                "function"
             ) {
 
                 try {
+
                     await window.resumeReadyPromise;
+
                 }
                 catch (error) {
-                    console.warn("Dynamic resume data failed.", error);
+
+                    console.warn(
+                        "Dynamic resume data failed.",
+                        error
+                    );
+
                 }
+
             }
 
+
             await waitForPaint();
 
 
-            /* Create hidden copy */
+            /* ====================================================
+               CREATE DESKTOP PDF COPY
+            ==================================================== */
 
-            render = createPDFRenderContainer(sheet);
+            render =
+                createPDFRenderContainer(
+                    sheet
+                );
 
-            copyResumeState(sheet, render.clone);
 
-            await waitForImages(render.clone);
+            /*
+             * Copy current theme.
+             */
+
+            copyResumeState(
+                sheet,
+                render.clone
+            );
+
+
+            /*
+             * Wait for cloned images.
+             */
+
+            await waitForImages(
+                render.clone
+            );
+
+
+            /*
+             * Wait for cloned fonts/layout.
+             */
+
             await waitForFonts();
+
             await waitForPaint();
+
+
+            /*
+             * Force browser layout calculation.
+             */
 
             void render.clone.offsetWidth;
 
+
             await waitForPaint();
 
 
-            /* Final size */
+            /* ====================================================
+               GET FINAL PDF RENDER SIZE
+            ==================================================== */
 
-            const rect = render.clone.getBoundingClientRect();
+            const rect =
+                render.clone.getBoundingClientRect();
 
-            const width = Math.round(rect.width);
-            const height = Math.round(rect.height);
 
-            if (width <= 0 || height <= 0) {
-                throw new Error("PDF render has an invalid size.");
+            const width =
+                Math.round(
+                    rect.width
+                );
+
+
+            const height =
+                Math.round(
+                    rect.height
+                );
+
+
+            if (
+                width <= 0 ||
+                height <= 0
+            ) {
+
+                throw new Error(
+                    "PDF render has an invalid size."
+                );
+
             }
 
 
-            /* html2canvas */
+            /* ====================================================
+               HTML2CANVAS
+               ----------------------------------------------------
+               IMPORTANT:
 
-            const canvas = await html2canvas(render.clone, {
+               windowWidth is intentionally LARGE.
 
-                scale: CONFIG.scale,
-                useCORS: true,
-                allowTaint: false,
-                backgroundColor: "#ffffff",
-                logging: false,
+               This prevents mobile media queries such as:
 
-                width: width,
-                height: height,
+                   @media(max-width:768px)
 
-                x: 0,
-                y: 0,
-                scrollX: 0,
-                scrollY: 0,
+               from changing the resume layout.
+            ==================================================== */
 
-                /* Wide window: mobile media queries never apply */
-                windowWidth: RENDER_WINDOW_WIDTH,
-                windowHeight: Math.max(render.height, 1),
+            const canvas =
+                await html2canvas(
 
-                ignoreElements: function (element) {
-                    return element.hasAttribute("data-resume-ignore");
-                }
-            });
+                    render.clone,
 
-            if (!canvas || canvas.width <= 0 || canvas.height <= 0) {
-                throw new Error("Resume canvas could not be generated.");
+                    {
+
+                        scale:
+                            CONFIG.scale,
+
+
+                        useCORS:
+                            true,
+
+
+                        allowTaint:
+                            false,
+
+
+                        backgroundColor:
+                            "#ffffff",
+
+
+                        logging:
+                            false,
+
+
+                        width:
+                            width,
+
+
+                        height:
+                            height,
+
+
+                        x:
+                            0,
+
+
+                        y:
+                            0,
+
+
+                        scrollX:
+                            0,
+
+
+                        scrollY:
+                            0,
+
+
+                        /*
+                         * VERY IMPORTANT
+                         *
+                         * Do NOT use:
+                         *
+                         * document.documentElement.clientWidth
+                         *
+                         * because on mobile it can be
+                         * 390px / 430px etc.
+                         *
+                         * Use desktop rendering width.
+                         */
+
+                        windowWidth:
+                            CONFIG.renderWidth,
+
+
+                        windowHeight:
+                            CONFIG.renderHeight,
+
+
+                        ignoreElements:
+                            function (element) {
+
+                                return element.hasAttribute(
+                                    "data-resume-ignore"
+                                );
+
+                            }
+
+                    }
+
+                );
+
+
+            /* ====================================================
+               CHECK CANVAS
+            ==================================================== */
+
+            if (
+                !canvas ||
+                canvas.width <= 0 ||
+                canvas.height <= 0
+            ) {
+
+                throw new Error(
+                    "Resume canvas could not be generated."
+                );
+
             }
 
 
-            /* PDF - orientation matches the sheet */
+            /* ====================================================
+               PDF SIZE
+            ==================================================== */
 
-            const orientation = render.orientation;
-            const size = A4[orientation];
+            const size =
+                String(
+                    CONFIG.orientation
+                ).toLowerCase() ===
+                    "portrait"
 
-            const jsPDF = window.jspdf.jsPDF;
+                    ? A4.portrait
 
-            const pdf = new jsPDF({
-                orientation: orientation,
-                unit: "mm",
-                format: CONFIG.format,
-                compress: true,
-                putOnlyUsedFonts: true
-            });
-
-            const image = canvas.toDataURL("image/jpeg", CONFIG.quality);
+                    : A4.landscape;
 
 
-            /* Full A4 page, no margin */
+            /* ====================================================
+               CREATE PDF
+            ==================================================== */
+
+            const jsPDF =
+                window.jspdf.jsPDF;
+
+
+            const pdf =
+                new jsPDF({
+
+                    orientation:
+                        CONFIG.orientation,
+
+                    unit:
+                        "mm",
+
+                    format:
+                        "a4",
+
+                    compress:
+                        true,
+
+                    putOnlyUsedFonts:
+                        true
+
+                });
+
+
+            /* ====================================================
+               CANVAS → IMAGE
+            ==================================================== */
+
+            const image =
+                canvas.toDataURL(
+                    "image/jpeg",
+                    CONFIG.quality
+                );
+
+
+            /* ====================================================
+               FULL A4 PAGE
+               ----------------------------------------------------
+               No margin
+               No padding
+               No extra corner space
+            ==================================================== */
 
             pdf.addImage(
+
                 image,
+
                 "JPEG",
+
                 0,
+
                 0,
+
                 size.width,
+
                 size.height,
+
                 undefined,
+
                 "FAST"
+
             );
 
-            pdf.save(getFileName());
+
+            /* ====================================================
+               SAVE
+            ==================================================== */
+
+            pdf.save(
+                getFileName()
+            );
+
         }
         catch (error) {
 
-            console.error("Resume PDF error:", error);
+            console.error(
+                "Resume PDF error:",
+                error
+            );
 
-            alert("Unable to generate PDF.");
+
+            alert(
+                "Unable to generate PDF."
+            );
+
         }
         finally {
 
-            removePDFRenderContainer(render);
+            /*
+             * Always remove temporary desktop
+             * rendering copy.
+             */
 
-            setLoading(button, false);
+            removePDFRenderContainer(
+                render
+            );
+
+
+            setLoading(
+                button,
+                false
+            );
+
         }
+
     }
 
 
@@ -590,55 +1213,100 @@
 
     function printResume() {
 
-        const sheet = getSheet();
+        const sheet =
+            getSheet();
+
 
         if (!sheet) {
-            alert('Resume container with id="resumeSheet" was not found.');
+
+            alert(
+                'Resume container with id="resumeSheet" was not found.'
+            );
+
             return;
+
         }
 
+
         window.print();
+
     }
 
 
     /* ============================================================
-       EVENTS
+       MASTER LAYOUT EVENTS
     ============================================================ */
 
     function initializeEvents() {
 
-        document.addEventListener("click", function (event) {
+        document.addEventListener(
+            "click",
+            function (event) {
 
-            const actionButton = event.target.closest("[data-resume-action]");
+                const actionButton =
+                    event.target.closest(
+                        "[data-resume-action]"
+                    );
 
-            if (!actionButton) {
-                return;
-            }
 
-            const action = actionButton.dataset.resumeAction;
+                if (!actionButton) {
 
-            if (action === "download") {
-
-                event.preventDefault();
-
-                if (actionButton.disabled) {
                     return;
+
                 }
 
-                downloadResumePDF();
 
-                return;
+                const action =
+                    actionButton.dataset.resumeAction;
+
+
+                /* =================================================
+                   DOWNLOAD
+                ================================================= */
+
+                if (
+                    action === "download"
+                ) {
+
+                    event.preventDefault();
+
+
+                    if (
+                        actionButton.disabled
+                    ) {
+
+                        return;
+
+                    }
+
+
+                    downloadResumePDF();
+
+                    return;
+
+                }
+
+
+                /* =================================================
+                   PRINT
+                ================================================= */
+
+                if (
+                    action === "print"
+                ) {
+
+                    event.preventDefault();
+
+
+                    printResume();
+
+                    return;
+
+                }
+
             }
+        );
 
-            if (action === "print") {
-
-                event.preventDefault();
-
-                printResume();
-
-                return;
-            }
-        });
     }
 
 
@@ -646,9 +1314,12 @@
        PUBLIC FUNCTIONS
     ============================================================ */
 
-    window.downloadResumePDF = downloadResumePDF;
+    window.downloadResumePDF =
+        downloadResumePDF;
 
-    window.printResume = printResume;
+
+    window.printResume =
+        printResume;
 
 
     /* ============================================================
@@ -656,14 +1327,26 @@
     ============================================================ */
 
     function initialize() {
-        initializeEvents();
+        initializeEvents()
     }
 
-    if (document.readyState === "loading") {
-        document.addEventListener("DOMContentLoaded", initialize);
+
+    if (
+        document.readyState ===
+        "loading"
+    ) {
+
+        document.addEventListener(
+            "DOMContentLoaded",
+            initialize
+        );
+
     }
     else {
+
         initialize();
+
     }
+
 
 })();

@@ -164,107 +164,65 @@ namespace ErJobPortal.Controllers
 
             string actionName = resumeProfile switch
             {
-                1 => "ViewProfile1",
-                2 => "ViewProfile2",
-                3 => "ViewProfile3",
-                4 => "ViewProfile4",
-                5 => "ViewProfile5",
-                6 => "ViewProfile6",
-                7 => "ViewProfile7",
-                8 => "ViewProfile8",
-                9 => "ViewProfile9",
-                10 => "ViewProfile10",
-                11 => "ViewProfile11",
-                12 => "ViewProfile12",
-                13 => "ViewProfile13",
-                14 => "ViewProfile14",
-                15 => "ViewProfile15",
-                16 => "ViewProfile16",
-                17 => "ViewProfile17",
-                18 => "ViewProfile18",
-                19 => "ViewProfile19",
-                20 => "ViewProfile20",
-                21 => "ViewProfile21",
-                22 => "ViewProfile22",
-                23 => "ViewProfile23",
-                24 => "ViewProfile24",
-                25 => "ViewProfile25",
-                26 => "ViewProfile26",
-                27 => "ViewProfile27",
-                28 => "ViewProfile28",
-                29 => "ViewProfile29",
-                30 => "ViewProfile30",
-                31 => "ViewProfile31",
-                32 => "ViewProfile32",
-                33 => "ViewProfile33",
-                34 => "ViewProfile34",
-                35 => "ViewProfile35",
-                36 => "ViewProfile36",
-                37 => "ViewProfile37",
-                38 => "ViewProfile38",
-                39 => "ViewProfile39",
-                40 => "ViewProfile40",
-                41 => "ViewProfile41",
-                42 => "ViewProfile42",
-                43 => "ViewProfile43",
-                44 => "ViewProfile44",
-                45 => "ViewProfile45",
-                46 => "ViewProfile46",
-                47 => "ViewProfile47",
-                48 => "ViewProfile48",
-                49 => "ViewProfile49",
-                50 => "ViewProfile50",
-                51 => "ViewProfile51",
-                52 => "ViewProfile52",
-                53 => "ViewProfile53",
-                54 => "ViewProfile54",
-                55 => "ViewProfile55",
-                56 => "ViewProfile56",
-                57 => "ViewProfile57",
-                58 => "ViewProfile58",
-                59 => "ViewProfile59",
-                60 => "ViewProfile60",
-                61 => "ViewProfile61",
-                62 => "ViewProfile62",
-                63 => "ViewProfile63",
-                64 => "ViewProfile64",
-                65 => "ViewProfile65",
-                66 => "ViewProfile66",
-                67 => "ViewProfile67",
-                68 => "ViewProfile68",
-                69 => "ViewProfile69",
-                70 => "ViewProfile70",
-                71 => "ViewProfile71",
-                72 => "ViewProfile72",
-                73 => "ViewProfile73",
-                74 => "ViewProfile74",
-                75 => "ViewProfile75",
-                76 => "ViewProfile76",
-                77 => "ViewProfile77",
-                78 => "ViewProfile78",
-                79 => "ViewProfile79",
-                80 => "ViewProfile80",
-                81 => "ViewProfile81",
-                82 => "ViewProfile82",
-                83 => "ViewProfile83",
-                84 => "ViewProfile84",
-                85 => "ViewProfile85",
-                86 => "ViewProfile86",
-                87 => "ViewProfile87",
-                88 => "ViewProfile88",
-                89 => "ViewProfile89",
-                90 => "ViewProfile90",
-                91 => "ViewProfile91",
-                92 => "ViewProfile92",
-                93 => "ViewProfile93",
-                94 => "ViewProfile94",
-                95 => "ViewProfile95",
-                96 => "ViewProfile96",
-                97 => "ViewProfile97",
-                98 => "ViewProfile98",
-                99 => "ViewProfile99",
-                100 => "ViewProfile100",
-
+                1 => "ViewProfileOne",
+                2 => "ViewProfileTwo",
+                3 => "ViewProfileThree",
+                4 => "ViewProfileFour",
+                5 => "ViewProfileFive",
+                6 => "ViewProfileSix",
+                7 => "ViewProfileSeven",
+                8 => "ViewProfileEight",
+                9 => "ViewProfileNine",
+                10 => "ViewProfileTen",
+                11 => "ViewProfileEleven",
+                12 => "ViewProfileTwelve",
+                13 => "ViewProfileThirteen",
+                14 => "ViewProfileFourteen",
+                15 => "ViewProfileFifteen",
+                16 => "ViewProfileSixteen",
+                17 => "ViewProfileSeventeen",
+                18 => "ViewProfileEighteen",
+                19 => "ViewProfileNineteen",
+                20 => "ViewProfileTwenty",
+                21 => "ViewProfileTwentyOne",
+                22 => "ViewProfileTwentyTwo",
+                23 => "ViewProfileTwentyThree",
+                24 => "ViewProfileTwentyFour",
+                25 => "ViewProfileTwentyFive",
+                26 => "ViewProfileTwentySix",
+                27 => "ViewProfileTwentySeven",
+                28 => "ViewProfileTwentyEight",
+                29 => "ViewProfileTwentyNine",
+                30 => "ViewProfileThirty",
+                31 => "ViewProfileThirtyOne",
+                32 => "ViewProfileThirtyTwo",
+                33 => "ViewProfileThirtyThree",
+                34 => "ViewProfileThirtyFour",
+                35 => "ViewProfileThirtyFive",
+                36 => "ViewProfileThirtySix",
+                37 => "ViewProfileThirtySeven",
+                38 => "ViewProfileThirtyEight",
+                39 => "ViewProfileThirtyNine",
+                40 => "ViewProfileForty",
+                41 => "ViewProfileFortyOne",
+                42 => "ViewProfileFortyTwo",
+                43 => "ViewProfileFortyThree",
+                44 => "ViewProfileFortyFour",
+                45 => "ViewProfileFortyFive",
+                46 => "ViewProfileFortySix",
+                47 => "ViewProfileFortySeven",
+                48 => "ViewProfileFortyEight",
+                49 => "ViewProfileFortyNine",
+                50 => "ViewProfileFifty",
+                51 => "ViewProfileFiftyOne",
+                52 => "ViewProfileFiftyTwo",
+                53 => "ViewProfileFiftyThree",
+                54 => "ViewProfileFiftyFour",
+                55 => "ViewProfileFiftyFive",
+                56 => "ViewProfileFiftySix",
+                57 => "ViewProfileFiftySeven",
+                58 => "ViewProfileFiftyEight",
+                59 => "ViewProfileFiftyNine",
                 _ => "Resume"
             };
 
@@ -283,802 +241,544 @@ namespace ErJobPortal.Controllers
         // ============================================================
         // RESUME TEMPLATE 1
         // ============================================================
-        public IActionResult ViewProfile1(int id)
+        public IActionResult ViewProfileOne(int id)
         {
-            return RenderProfile(id, "ViewProfile1");
+            return RenderProfile(id, "ViewProfileOne");
         }
+
 
         // ============================================================
         // RESUME TEMPLATE 2
         // ============================================================
-        public IActionResult ViewProfile2(int id)
+        public IActionResult ViewProfileTwo(int id)
         {
-            return RenderProfile(id, "ViewProfile2");
+            return RenderProfile(id, "ViewProfileTwo");
         }
+
 
         // ============================================================
         // RESUME TEMPLATE 3
         // ============================================================
-        public IActionResult ViewProfile3(int id)
+        public IActionResult ViewProfileThree(int id)
         {
-            return RenderProfile(id, "ViewProfile3");
+            return RenderProfile(id, "ViewProfileThree");
         }
+
 
         // ============================================================
         // RESUME TEMPLATE 4
         // ============================================================
-        public IActionResult ViewProfile4(int id)
+        public IActionResult ViewProfileFour(int id)
         {
-            return RenderProfile(id, "ViewProfile4");
+            return RenderProfile(id, "ViewProfileFour");
         }
+
 
         // ============================================================
         // RESUME TEMPLATE 5
         // ============================================================
-        public IActionResult ViewProfile5(int id)
+        public IActionResult ViewProfileFive(int id)
         {
-            return RenderProfile(id, "ViewProfile5");
+            return RenderProfile(id, "ViewProfileFive");
         }
+
 
         // ============================================================
         // RESUME TEMPLATE 6
         // ============================================================
-        public IActionResult ViewProfile6(int id)
+        public IActionResult ViewProfileSix(int id)
         {
-            return RenderProfile(id, "ViewProfile6");
+            return RenderProfile(id, "ViewProfileSix");
         }
+
 
         // ============================================================
         // RESUME TEMPLATE 7
         // ============================================================
-        public IActionResult ViewProfile7(int id)
+        public IActionResult ViewProfileSeven(int id)
         {
-            return RenderProfile(id, "ViewProfile7");
+            return RenderProfile(id, "ViewProfileSeven");
         }
+
 
         // ============================================================
         // RESUME TEMPLATE 8
         // ============================================================
-        public IActionResult ViewProfile8(int id)
+        public IActionResult ViewProfileEight(int id)
         {
-            return RenderProfile(id, "ViewProfile8");
+            return RenderProfile(id, "ViewProfileEight");
         }
+
 
         // ============================================================
         // RESUME TEMPLATE 9
         // ============================================================
-        public IActionResult ViewProfile9(int id)
+        public IActionResult ViewProfileNine(int id)
         {
-            return RenderProfile(id, "ViewProfile9");
+            return RenderProfile(id, "ViewProfileNine");
         }
+
 
         // ============================================================
         // RESUME TEMPLATE 10
         // ============================================================
-        public IActionResult ViewProfile10(int id)
+        public IActionResult ViewProfileTen(int id)
         {
-            return RenderProfile(id, "ViewProfile10");
+            return RenderProfile(id, "ViewProfileTen");
         }
+
 
         // ============================================================
         // RESUME TEMPLATE 11
         // ============================================================
-        public IActionResult ViewProfile11(int id)
+        public IActionResult ViewProfileEleven(int id)
         {
-            return RenderProfile(id, "ViewProfile11");
+            return RenderProfile(id, "ViewProfileEleven");
         }
+
 
         // ============================================================
         // RESUME TEMPLATE 12
         // ============================================================
-        public IActionResult ViewProfile12(int id)
+        public IActionResult ViewProfileTwelve(int id)
         {
-            return RenderProfile(id, "ViewProfile12");
+            return RenderProfile(id, "ViewProfileTwelve");
         }
+
 
         // ============================================================
         // RESUME TEMPLATE 13
         // ============================================================
-        public IActionResult ViewProfile13(int id)
+        public IActionResult ViewProfileThirteen(int id)
         {
-            return RenderProfile(id, "ViewProfile13");
+            return RenderProfile(id, "ViewProfileThirteen");
         }
+
 
         // ============================================================
         // RESUME TEMPLATE 14
         // ============================================================
-        public IActionResult ViewProfile14(int id)
+        public IActionResult ViewProfileFourteen(int id)
         {
-            return RenderProfile(id, "ViewProfile14");
+            return RenderProfile(id, "ViewProfileFourteen");
         }
+
 
         // ============================================================
         // RESUME TEMPLATE 15
         // ============================================================
-        public IActionResult ViewProfile15(int id)
+        public IActionResult ViewProfileFifteen(int id)
         {
-            return RenderProfile(id, "ViewProfile15");
+            return RenderProfile(id, "ViewProfileFifteen");
         }
+
 
         // ============================================================
         // RESUME TEMPLATE 16
         // ============================================================
-        public IActionResult ViewProfile16(int id)
+        public IActionResult ViewProfileSixteen(int id)
         {
-            return RenderProfile(id, "ViewProfile16");
+            return RenderProfile(id, "ViewProfileSixteen");
         }
+
 
         // ============================================================
         // RESUME TEMPLATE 17
         // ============================================================
-        public IActionResult ViewProfile17(int id)
+        public IActionResult ViewProfileSeventeen(int id)
         {
-            return RenderProfile(id, "ViewProfile17");
+            return RenderProfile(id, "ViewProfileSeventeen");
         }
+
 
         // ============================================================
         // RESUME TEMPLATE 18
         // ============================================================
-        public IActionResult ViewProfile18(int id)
+        public IActionResult ViewProfileEighteen(int id)
         {
-            return RenderProfile(id, "ViewProfile18");
+            return RenderProfile(id, "ViewProfileEighteen");
         }
+
 
         // ============================================================
         // RESUME TEMPLATE 19
         // ============================================================
-        public IActionResult ViewProfile19(int id)
+        public IActionResult ViewProfileNineteen(int id)
         {
-            return RenderProfile(id, "ViewProfile19");
+            return RenderProfile(id, "ViewProfileNineteen");
         }
+
 
         // ============================================================
         // RESUME TEMPLATE 20
         // ============================================================
-        public IActionResult ViewProfile20(int id)
+        public IActionResult ViewProfileTwenty(int id)
         {
-            return RenderProfile(id, "ViewProfile20");
+            return RenderProfile(id, "ViewProfileTwenty");
         }
+
 
         // ============================================================
         // RESUME TEMPLATE 21
         // ============================================================
-        public IActionResult ViewProfile21(int id)
+        public IActionResult ViewProfileTwentyOne(int id)
         {
-            return RenderProfile(id, "ViewProfile21");
+            return RenderProfile(id, "ViewProfileTwentyOne");
         }
+
 
         // ============================================================
         // RESUME TEMPLATE 22
         // ============================================================
-        public IActionResult ViewProfile22(int id)
+        public IActionResult ViewProfileTwentyTwo(int id)
         {
-            return RenderProfile(id, "ViewProfile22");
+            return RenderProfile(id, "ViewProfileTwentyTwo");
         }
+
 
         // ============================================================
         // RESUME TEMPLATE 23
         // ============================================================
-        public IActionResult ViewProfile23(int id)
+        public IActionResult ViewProfileTwentyThree(int id)
         {
-            return RenderProfile(id, "ViewProfile23");
+            return RenderProfile(id, "ViewProfileTwentyThree");
         }
+
 
         // ============================================================
         // RESUME TEMPLATE 24
         // ============================================================
-        public IActionResult ViewProfile24(int id)
+        public IActionResult ViewProfileTwentyFour(int id)
         {
-            return RenderProfile(id, "ViewProfile24");
+            return RenderProfile(id, "ViewProfileTwentyFour");
         }
+
 
         // ============================================================
         // RESUME TEMPLATE 25
         // ============================================================
-        public IActionResult ViewProfile25(int id)
+        public IActionResult ViewProfileTwentyFive(int id)
         {
-            return RenderProfile(id, "ViewProfile25");
+            return RenderProfile(id, "ViewProfileTwentyFive");
         }
+
 
         // ============================================================
         // RESUME TEMPLATE 26
         // ============================================================
-        public IActionResult ViewProfile26(int id)
+        public IActionResult ViewProfileTwentySix(int id)
         {
-            return RenderProfile(id, "ViewProfile26");
+            return RenderProfile(id, "ViewProfileTwentySix");
         }
+
 
         // ============================================================
         // RESUME TEMPLATE 27
         // ============================================================
-        public IActionResult ViewProfile27(int id)
+        public IActionResult ViewProfileTwentySeven(int id)
         {
-            return RenderProfile(id, "ViewProfile27");
+            return RenderProfile(id, "ViewProfileTwentySeven");
         }
+
 
         // ============================================================
         // RESUME TEMPLATE 28
         // ============================================================
-        public IActionResult ViewProfile28(int id)
+        public IActionResult ViewProfileTwentyEight(int id)
         {
-            return RenderProfile(id, "ViewProfile28");
+            return RenderProfile(id, "ViewProfileTwentyEight");
         }
+
 
         // ============================================================
         // RESUME TEMPLATE 29
         // ============================================================
-        public IActionResult ViewProfile29(int id)
+        public IActionResult ViewProfileTwentyNine(int id)
         {
-            return RenderProfile(id, "ViewProfile29");
+            return RenderProfile(id, "ViewProfileTwentyNine");
         }
+
 
         // ============================================================
         // RESUME TEMPLATE 30
         // ============================================================
-        public IActionResult ViewProfile30(int id)
+        public IActionResult ViewProfileThirty(int id)
         {
-            return RenderProfile(id, "ViewProfile30");
+            return RenderProfile(id, "ViewProfileThirty");
         }
+
 
         // ============================================================
         // RESUME TEMPLATE 31
         // ============================================================
-        public IActionResult ViewProfile31(int id)
+        public IActionResult ViewProfileThirtyOne(int id)
         {
-            return RenderProfile(id, "ViewProfile31");
+            return RenderProfile(id, "ViewProfileThirtyOne");
         }
+
 
         // ============================================================
         // RESUME TEMPLATE 32
         // ============================================================
-        public IActionResult ViewProfile32(int id)
+        public IActionResult ViewProfileThirtyTwo(int id)
         {
-            return RenderProfile(id, "ViewProfile32");
+            return RenderProfile(id, "ViewProfileThirtyTwo");
         }
+
 
         // ============================================================
         // RESUME TEMPLATE 33
         // ============================================================
-        public IActionResult ViewProfile33(int id)
+        public IActionResult ViewProfileThirtyThree(int id)
         {
-            return RenderProfile(id, "ViewProfile33");
+            return RenderProfile(id, "ViewProfileThirtyThree");
         }
+
 
         // ============================================================
         // RESUME TEMPLATE 34
         // ============================================================
-        public IActionResult ViewProfile34(int id)
+        public IActionResult ViewProfileThirtyFour(int id)
         {
-            return RenderProfile(id, "ViewProfile34");
+            return RenderProfile(id, "ViewProfileThirtyFour");
         }
+
 
         // ============================================================
         // RESUME TEMPLATE 35
         // ============================================================
-        public IActionResult ViewProfile35(int id)
+        public IActionResult ViewProfileThirtyFive(int id)
         {
-            return RenderProfile(id, "ViewProfile35");
+            return RenderProfile(id, "ViewProfileThirtyFive");
         }
+
 
         // ============================================================
         // RESUME TEMPLATE 36
         // ============================================================
-        public IActionResult ViewProfile36(int id)
+        public IActionResult ViewProfileThirtySix(int id)
         {
-            return RenderProfile(id, "ViewProfile36");
+            return RenderProfile(id, "ViewProfileThirtySix");
         }
+
 
         // ============================================================
         // RESUME TEMPLATE 37
         // ============================================================
-        public IActionResult ViewProfile37(int id)
+        public IActionResult ViewProfileThirtySeven(int id)
         {
-            return RenderProfile(id, "ViewProfile37");
+            return RenderProfile(id, "ViewProfileThirtySeven");
         }
+
 
         // ============================================================
         // RESUME TEMPLATE 38
         // ============================================================
-        public IActionResult ViewProfile38(int id)
+        public IActionResult ViewProfileThirtyEight(int id)
         {
-            return RenderProfile(id, "ViewProfile38");
+            return RenderProfile(id, "ViewProfileThirtyEight");
         }
+
 
         // ============================================================
         // RESUME TEMPLATE 39
         // ============================================================
-        public IActionResult ViewProfile39(int id)
+        public IActionResult ViewProfileThirtyNine(int id)
         {
-            return RenderProfile(id, "ViewProfile39");
+            return RenderProfile(id, "ViewProfileThirtyNine");
         }
+
 
         // ============================================================
         // RESUME TEMPLATE 40
         // ============================================================
-        public IActionResult ViewProfile40(int id)
+        public IActionResult ViewProfileForty(int id)
         {
-            return RenderProfile(id, "ViewProfile40");
+            return RenderProfile(id, "ViewProfileForty");
         }
-
         // ============================================================
         // RESUME TEMPLATE 41
         // ============================================================
-        public IActionResult ViewProfile41(int id)
+        public IActionResult ViewProfileFortyOne(int id)
         {
-            return RenderProfile(id, "ViewProfile41");
+            return RenderProfile(id, "ViewProfileFortyOne");
         }
+
 
         // ============================================================
         // RESUME TEMPLATE 42
         // ============================================================
-        public IActionResult ViewProfile42(int id)
+        public IActionResult ViewProfileFortyTwo(int id)
         {
-            return RenderProfile(id, "ViewProfile42");
+            return RenderProfile(id, "ViewProfileFortyTwo");
         }
+
 
         // ============================================================
         // RESUME TEMPLATE 43
         // ============================================================
-        public IActionResult ViewProfile43(int id)
+        public IActionResult ViewProfileFortyThree(int id)
         {
-            return RenderProfile(id, "ViewProfile43");
+            return RenderProfile(id, "ViewProfileFortyThree");
         }
+
 
         // ============================================================
         // RESUME TEMPLATE 44
         // ============================================================
-        public IActionResult ViewProfile44(int id)
+        public IActionResult ViewProfileFortyFour(int id)
         {
-            return RenderProfile(id, "ViewProfile44");
+            return RenderProfile(id, "ViewProfileFortyFour");
         }
+
 
         // ============================================================
         // RESUME TEMPLATE 45
         // ============================================================
-        public IActionResult ViewProfile45(int id)
+        public IActionResult ViewProfileFortyFive(int id)
         {
-            return RenderProfile(id, "ViewProfile45");
+            return RenderProfile(id, "ViewProfileFortyFive");
         }
+
 
         // ============================================================
         // RESUME TEMPLATE 46
         // ============================================================
-        public IActionResult ViewProfile46(int id)
+        public IActionResult ViewProfileFortySix(int id)
         {
-            return RenderProfile(id, "ViewProfile46");
+            return RenderProfile(id, "ViewProfileFortySix");
         }
+
 
         // ============================================================
         // RESUME TEMPLATE 47
         // ============================================================
-        public IActionResult ViewProfile47(int id)
+        public IActionResult ViewProfileFortySeven(int id)
         {
-            return RenderProfile(id, "ViewProfile47");
+            return RenderProfile(id, "ViewProfileFortySeven");
         }
+
 
         // ============================================================
         // RESUME TEMPLATE 48
         // ============================================================
-        public IActionResult ViewProfile48(int id)
+        public IActionResult ViewProfileFortyEight(int id)
         {
-            return RenderProfile(id, "ViewProfile48");
+            return RenderProfile(id, "ViewProfileFortyEight");
         }
+
 
         // ============================================================
         // RESUME TEMPLATE 49
         // ============================================================
-        public IActionResult ViewProfile49(int id)
+        public IActionResult ViewProfileFortyNine(int id)
         {
-            return RenderProfile(id, "ViewProfile49");
+            return RenderProfile(id, "ViewProfileFortyNine");
         }
+
 
         // ============================================================
         // RESUME TEMPLATE 50
         // ============================================================
-        public IActionResult ViewProfile50(int id)
+        public IActionResult ViewProfileFifty(int id)
         {
-            return RenderProfile(id, "ViewProfile50");
+            return RenderProfile(id, "ViewProfileFifty");
         }
+
 
         // ============================================================
         // RESUME TEMPLATE 51
         // ============================================================
-        public IActionResult ViewProfile51(int id)
+        public IActionResult ViewProfileFiftyOne(int id)
         {
-            return RenderProfile(id, "ViewProfile51");
+            return RenderProfile(id, "ViewProfileFiftyOne");
         }
+
 
         // ============================================================
         // RESUME TEMPLATE 52
         // ============================================================
-        public IActionResult ViewProfile52(int id)
+        public IActionResult ViewProfileFiftyTwo(int id)
         {
-            return RenderProfile(id, "ViewProfile52");
+            return RenderProfile(id, "ViewProfileFiftyTwo");
         }
+
 
         // ============================================================
         // RESUME TEMPLATE 53
         // ============================================================
-        public IActionResult ViewProfile53(int id)
+        public IActionResult ViewProfileFiftyThree(int id)
         {
-            return RenderProfile(id, "ViewProfile53");
+            return RenderProfile(id, "ViewProfileFiftyThree");
         }
+
 
         // ============================================================
         // RESUME TEMPLATE 54
         // ============================================================
-        public IActionResult ViewProfile54(int id)
+        public IActionResult ViewProfileFiftyFour(int id)
         {
-            return RenderProfile(id, "ViewProfile54");
+            return RenderProfile(id, "ViewProfileFiftyFour");
         }
+
 
         // ============================================================
         // RESUME TEMPLATE 55
         // ============================================================
-        public IActionResult ViewProfile55(int id)
+        public IActionResult ViewProfileFiftyFive(int id)
         {
-            return RenderProfile(id, "ViewProfile55");
+            return RenderProfile(id, "ViewProfileFiftyFive");
         }
+
 
         // ============================================================
         // RESUME TEMPLATE 56
         // ============================================================
-        public IActionResult ViewProfile56(int id)
+        public IActionResult ViewProfileFiftySix(int id)
         {
-            return RenderProfile(id, "ViewProfile56");
+            return RenderProfile(id, "ViewProfileFiftySix");
         }
+
 
         // ============================================================
         // RESUME TEMPLATE 57
         // ============================================================
-        public IActionResult ViewProfile57(int id)
+        public IActionResult ViewProfileFiftySeven(int id)
         {
-            return RenderProfile(id, "ViewProfile57");
+            return RenderProfile(id, "ViewProfileFiftySeven");
         }
+
 
         // ============================================================
         // RESUME TEMPLATE 58
         // ============================================================
-        public IActionResult ViewProfile58(int id)
+        public IActionResult ViewProfileFiftyEight(int id)
         {
-            return RenderProfile(id, "ViewProfile58");
+            return RenderProfile(id, "ViewProfileFiftyEight");
         }
+
 
         // ============================================================
         // RESUME TEMPLATE 59
         // ============================================================
-        public IActionResult ViewProfile59(int id)
+        public IActionResult ViewProfileFiftyNine(int id)
         {
-            return RenderProfile(id, "ViewProfile59");
+            return RenderProfile(id, "ViewProfileFiftyNine");
         }
 
         // ============================================================
-        // RESUME TEMPLATE 60
-        // ============================================================
-        public IActionResult ViewProfile60(int id)
-        {
-            return RenderProfile(id, "ViewProfile60");
-        }
-
-        // ============================================================
-        // RESUME TEMPLATE 61
-        // ============================================================
-        public IActionResult ViewProfile61(int id)
-        {
-            return RenderProfile(id, "ViewProfile61");
-        }
-
-        // ============================================================
-        // RESUME TEMPLATE 62
-        // ============================================================
-        public IActionResult ViewProfile62(int id)
-        {
-            return RenderProfile(id, "ViewProfile62");
-        }
-
-        // ============================================================
-        // RESUME TEMPLATE 63
-        // ============================================================
-        public IActionResult ViewProfile63(int id)
-        {
-            return RenderProfile(id, "ViewProfile63");
-        }
-
-        // ============================================================
-        // RESUME TEMPLATE 64
-        // ============================================================
-        public IActionResult ViewProfile64(int id)
-        {
-            return RenderProfile(id, "ViewProfile64");
-        }
-
-        // ============================================================
-        // RESUME TEMPLATE 65
-        // ============================================================
-        public IActionResult ViewProfile65(int id)
-        {
-            return RenderProfile(id, "ViewProfile65");
-        }
-
-        // ============================================================
-        // RESUME TEMPLATE 66
-        // ============================================================
-        public IActionResult ViewProfile66(int id)
-        {
-            return RenderProfile(id, "ViewProfile66");
-        }
-
-        // ============================================================
-        // RESUME TEMPLATE 67
-        // ============================================================
-        public IActionResult ViewProfile67(int id)
-        {
-            return RenderProfile(id, "ViewProfile67");
-        }
-
-        // ============================================================
-        // RESUME TEMPLATE 68
-        // ============================================================
-        public IActionResult ViewProfile68(int id)
-        {
-            return RenderProfile(id, "ViewProfile68");
-        }
-
-        // ============================================================
-        // RESUME TEMPLATE 69
-        // ============================================================
-        public IActionResult ViewProfile69(int id)
-        {
-            return RenderProfile(id, "ViewProfile69");
-        }
-
-        // ============================================================
-        // RESUME TEMPLATE 70
-        // ============================================================
-        public IActionResult ViewProfile70(int id)
-        {
-            return RenderProfile(id, "ViewProfile70");
-        }
-
-        // ============================================================
-        // RESUME TEMPLATE 71
-        // ============================================================
-        public IActionResult ViewProfile71(int id)
-        {
-            return RenderProfile(id, "ViewProfile71");
-        }
-
-        // ============================================================
-        // RESUME TEMPLATE 72
-        // ============================================================
-        public IActionResult ViewProfile72(int id)
-        {
-            return RenderProfile(id, "ViewProfile72");
-        }
-
-        // ============================================================
-        // RESUME TEMPLATE 73
-        // ============================================================
-        public IActionResult ViewProfile73(int id)
-        {
-            return RenderProfile(id, "ViewProfile73");
-        }
-
-        // ============================================================
-        // RESUME TEMPLATE 74
-        // ============================================================
-        public IActionResult ViewProfile74(int id)
-        {
-            return RenderProfile(id, "ViewProfile74");
-        }
-
-        // ============================================================
-        // RESUME TEMPLATE 75
-        // ============================================================
-        public IActionResult ViewProfile75(int id)
-        {
-            return RenderProfile(id, "ViewProfile75");
-        }
-
-        // ============================================================
-        // RESUME TEMPLATE 76
-        // ============================================================
-        public IActionResult ViewProfile76(int id)
-        {
-            return RenderProfile(id, "ViewProfile76");
-        }
-
-        // ============================================================
-        // RESUME TEMPLATE 77
-        // ============================================================
-        public IActionResult ViewProfile77(int id)
-        {
-            return RenderProfile(id, "ViewProfile77");
-        }
-
-        // ============================================================
-        // RESUME TEMPLATE 78
-        // ============================================================
-        public IActionResult ViewProfile78(int id)
-        {
-            return RenderProfile(id, "ViewProfile78");
-        }
-
-        // ============================================================
-        // RESUME TEMPLATE 79
-        // ============================================================
-        public IActionResult ViewProfile79(int id)
-        {
-            return RenderProfile(id, "ViewProfile79");
-        }
-
-        // ============================================================
-        // RESUME TEMPLATE 80
-        // ============================================================
-        public IActionResult ViewProfile80(int id)
-        {
-            return RenderProfile(id, "ViewProfile80");
-        }
-
-        // ============================================================
-        // RESUME TEMPLATE 81
-        // ============================================================
-        public IActionResult ViewProfile81(int id)
-        {
-            return RenderProfile(id, "ViewProfile81");
-        }
-
-        // ============================================================
-        // RESUME TEMPLATE 82
-        // ============================================================
-        public IActionResult ViewProfile82(int id)
-        {
-            return RenderProfile(id, "ViewProfile82");
-        }
-
-        // ============================================================
-        // RESUME TEMPLATE 83
-        // ============================================================
-        public IActionResult ViewProfile83(int id)
-        {
-            return RenderProfile(id, "ViewProfile83");
-        }
-
-        // ============================================================
-        // RESUME TEMPLATE 84
-        // ============================================================
-        public IActionResult ViewProfile84(int id)
-        {
-            return RenderProfile(id, "ViewProfile84");
-        }
-
-        // ============================================================
-        // RESUME TEMPLATE 85
-        // ============================================================
-        public IActionResult ViewProfile85(int id)
-        {
-            return RenderProfile(id, "ViewProfile85");
-        }
-
-        // ============================================================
-        // RESUME TEMPLATE 86
-        // ============================================================
-        public IActionResult ViewProfile86(int id)
-        {
-            return RenderProfile(id, "ViewProfile86");
-        }
-
-        // ============================================================
-        // RESUME TEMPLATE 87
-        // ============================================================
-        public IActionResult ViewProfile87(int id)
-        {
-            return RenderProfile(id, "ViewProfile87");
-        }
-
-        // ============================================================
-        // RESUME TEMPLATE 88
-        // ============================================================
-        public IActionResult ViewProfile88(int id)
-        {
-            return RenderProfile(id, "ViewProfile88");
-        }
-
-        // ============================================================
-        // RESUME TEMPLATE 89
-        // ============================================================
-        public IActionResult ViewProfile89(int id)
-        {
-            return RenderProfile(id, "ViewProfile89");
-        }
-
-        // ============================================================
-        // RESUME TEMPLATE 90
-        // ============================================================
-        public IActionResult ViewProfile90(int id)
-        {
-            return RenderProfile(id, "ViewProfile90");
-        }
-
-        // ============================================================
-        // RESUME TEMPLATE 91
-        // ============================================================
-        public IActionResult ViewProfile91(int id)
-        {
-            return RenderProfile(id, "ViewProfile91");
-        }
-
-        // ============================================================
-        // RESUME TEMPLATE 92
-        // ============================================================
-        public IActionResult ViewProfile92(int id)
-        {
-            return RenderProfile(id, "ViewProfile92");
-        }
-
-        // ============================================================
-        // RESUME TEMPLATE 93
-        // ============================================================
-        public IActionResult ViewProfile93(int id)
-        {
-            return RenderProfile(id, "ViewProfile93");
-        }
-
-        // ============================================================
-        // RESUME TEMPLATE 94
-        // ============================================================
-        public IActionResult ViewProfile94(int id)
-        {
-            return RenderProfile(id, "ViewProfile94");
-        }
-
-        // ============================================================
-        // RESUME TEMPLATE 95
-        // ============================================================
-        public IActionResult ViewProfile95(int id)
-        {
-            return RenderProfile(id, "ViewProfile95");
-        }
-
-        // ============================================================
-        // RESUME TEMPLATE 96
-        // ============================================================
-        public IActionResult ViewProfile96(int id)
-        {
-            return RenderProfile(id, "ViewProfile96");
-        }
-
-        // ============================================================
-        // RESUME TEMPLATE 97
-        // ============================================================
-        public IActionResult ViewProfile97(int id)
-        {
-            return RenderProfile(id, "ViewProfile97");
-        }
-
-        // ============================================================
-        // RESUME TEMPLATE 98
-        // ============================================================
-        public IActionResult ViewProfile98(int id)
-        {
-            return RenderProfile(id, "ViewProfile98");
-        }
-
-        // ============================================================
-        // RESUME TEMPLATE 99
-        // ============================================================
-        public IActionResult ViewProfile99(int id)
-        {
-            return RenderProfile(id, "ViewProfile99");
-        }
-
-        // ============================================================
-        // RESUME TEMPLATE 100
-        // ============================================================
-        public IActionResult ViewProfile100(int id)
-        {
-            return RenderProfile(id, "ViewProfile100");
-        }
+        // RESUME TEMPLATES 91 - 100 (PORTRAIT)
+        // ============================================================
+        public IActionResult ViewProfileNinetyOne(int id) => RenderProfile(id, "ViewProfileNinetyOne");
+        public IActionResult ViewProfileNinetyTwo(int id) => RenderProfile(id, "ViewProfileNinetyTwo");
+        public IActionResult ViewProfileNinetyThree(int id) => RenderProfile(id, "ViewProfileNinetyThree");
+        public IActionResult ViewProfileNinetyFour(int id) => RenderProfile(id, "ViewProfileNinetyFour");
+        public IActionResult ViewProfileNinetyFive(int id) => RenderProfile(id, "ViewProfileNinetyFive");
+        public IActionResult ViewProfileNinetySix(int id) => RenderProfile(id, "ViewProfileNinetySix");
+        public IActionResult ViewProfileNinetySeven(int id) => RenderProfile(id, "ViewProfileNinetySeven");
+        public IActionResult ViewProfileNinetyEight(int id) => RenderProfile(id, "ViewProfileNinetyEight");
+        public IActionResult ViewProfileNinetyNine(int id) => RenderProfile(id, "ViewProfileNinetyNine");
+        public IActionResult ViewProfileHundred(int id) => RenderProfile(id, "ViewProfileHundred");
 
     }
 }
