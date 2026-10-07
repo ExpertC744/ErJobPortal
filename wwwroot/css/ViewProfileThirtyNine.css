@@ -1,8 +1,8 @@
 /* =========================================================
-   VIEWPROFILETHIRTYNINE  -  TOP INFO STRIP  -  LANDSCAPE RESUME (A4 29.7cm x 21cm)
+   VIEWPROFILETHIRTYNINE  -  SPLIT BANNER  -  LANDSCAPE RESUME (A4 29.7cm x 21cm)
    File: ~/css/viewprofilethirtynine.css
 
-   Style  : Skills, languages, interests and links across a tinted strip right under the header, main content below.
+   Style  : Slanted two-tone banner (name on white, contact and photo on colour), tinted info strip beneath, accent-bar headings in a two-stack content area.
    Sheet  : 1123px x 794px  (= 297mm x 210mm @ 96dpi)
    Zoom   : Layout never reflows, sheet is only zoomed out
    Themes : blue | teal | slate | brown | green
@@ -658,46 +658,322 @@ body {
     }
 
 /* =========================================================
-   TOP INFO STRIP  -  TEMPLATE SPECIFIC
+   SPLIT BANNER  -  TEMPLATE SPECIFIC
 ========================================================= */
+
+/* ---------- header: slanted two-tone banner ---------- */
 
 .resume-header {
     gap: 24px;
-    padding: 16px 34px;
-    background: var(--primary-dark);
+    padding: 18px 34px;
+    background: linear-gradient(105deg, #ffffff 0, #ffffff 62%, var(--primary) 62.2%, var(--primary) 100%);
+    border-bottom: 5px solid var(--accent);
 }
 
-.header-info { order: 1; }
-.header-contact { order: 2; }
-.photo-wrapper { order: 3; width: 84px; height: 84px; box-shadow: 0 0 0 3px var(--accent); }
+.header-info {
+    order: 1;
+}
 
-.candidate-name { font-size: 30px; }
-.candidate-role { color: var(--accent); }
-.header-accent { background: var(--accent); }
+.header-contact {
+    order: 2;
+}
 
-.resume-body { flex-direction: column; }
+.photo-wrapper {
+    order: 3;
+    width: 88px;
+    height: 88px;
+    box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.45);
+}
+
+.candidate-name {
+    font-size: 32px;
+    color: var(--ink);
+}
+
+.candidate-role {
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 2.4px;
+    text-transform: uppercase;
+    color: var(--primary);
+}
+
+.header-accent {
+    width: 48px;
+    height: 4px;
+    background: var(--accent);
+}
+
+.header-contact-item {
+    color: #ffffff;
+}
+
+    .header-contact-item i {
+        background: rgba(255, 255, 255, 0.22);
+        color: #ffffff;
+    }
+
+/* ---------- info strip: tinted, circled icons ---------- */
+
+.resume-body {
+    flex-direction: column;
+}
 
 .left-column {
     order: 1;
     flex: 0 0 auto;
     width: auto;
     padding: 12px 30px 6px;
-    column-count: 4;
-    column-gap: 22px;
+    column-count: 3;
+    column-gap: 28px;
     column-fill: balance;
     background: var(--soft);
     border-right: 0;
-    border-bottom: 3px solid var(--primary);
+    border-bottom: 1px solid var(--soft-border);
 }
 
-.left-column .resume-section { margin-bottom: 8px; }
+    .left-column .resume-section {
+        margin-bottom: 8px;
+    }
 
-/* contact + preferred location already shown in header / career preference */
-.left-column .resume-section:has(.fa-address-card),
-.left-column .resume-section:has(.fa-location-arrow) { display: none; }
+        /* contact + preferred location already shown in header / career preference */
+        .left-column .resume-section:has(.fa-address-card),
+        .left-column .resume-section:has(.fa-location-arrow) {
+            display: none;
+        }
 
-.right-column { order: 2; padding: 14px 30px 14px; column-gap: 30px; }
-.section-heading { margin-bottom: 6px; }
+    .left-column .section-icon {
+        border-radius: 50%;
+        background: #ffffff;
+        border: 1.5px solid var(--primary);
+        color: var(--primary);
+    }
+
+    .left-column .section-title {
+        font-size: 11px;
+        letter-spacing: 1.2px;
+        text-transform: uppercase;
+    }
+
+    .left-column .section-title-line {
+        height: 0;
+        background: none;
+        border-top: 1px dotted var(--primary);
+    }
+
+    /* languages two per row, keeps the strip short */
+    .left-column .language-list {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        column-gap: 18px;
+    }
+
+/* ---------- content: accent-bar headings ---------- */
+
+.right-column {
+    order: 2;
+    padding: 14px 30px 14px;
+}
+
+.section-heading {
+    margin-bottom: 6px;
+}
+
+.right-column .section-heading {
+    padding-left: 10px;
+    border-left: 4px solid var(--primary);
+}
+
+.right-column .section-icon {
+    display: none;
+}
+
+.right-column .section-title {
+    font-size: 12px;
+    letter-spacing: 1.2px;
+    text-transform: uppercase;
+    color: var(--ink);
+}
+
+.experience-item::before {
+    border-radius: 3px;
+}
+
+/* =========================================================
+   CONTENT FIX  -  no empty space, education rows, compact footer
+========================================================= */
+
+/* Preferred Location is already shown in Career Preference */
+.left-column .resume-section:has(.fa-location-arrow) {
+    display: none;
+}
+
+/* ---------- content area: compact rows, no holes, nothing cut ----------
+   Row 1: Profile                                  (full width)
+   Row 2: Experience | Certifications | References (fill left to right)
+   Row 3: Education                                (full width, cards side by side)
+   Row 4: Career Preference                        (full width, inline)
+   Missing sections simply drop out; rows close up. */
+
+.right-column {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    grid-auto-flow: row dense;
+    align-content: start;
+    align-items: start;
+    column-count: auto;
+    column-gap: 30px;
+    row-gap: 12px;
+}
+
+.resume-sheet .right-column > .resume-section {
+    min-width: 0;
+    margin-bottom: 0;
+}
+
+    .resume-sheet .right-column > .resume-section:has(.summary) {
+        grid-column: 1 / -1;
+        grid-row: 1;
+    }
+
+/* Education: one row, cards side by side */
+.resume-sheet .right-column > .education-section {
+    grid-column: 1 / -1;
+    grid-row: 3;
+    display: grid;
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+    column-gap: 8px;
+    row-gap: 6px;
+}
+
+    .resume-sheet .right-column > .education-section > .section-heading {
+        grid-column: 1 / -1;
+        margin-bottom: 0;
+    }
+
+    .resume-sheet .right-column > .education-section > .education-item {
+        margin-bottom: 0;
+    }
+
+/* Career Preference: full width, items inline */
+.resume-sheet .right-column > .resume-section:has(.fa-bullseye) {
+    grid-column: 1 / -1;
+    grid-row: 4;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    column-gap: 32px;
+}
+
+    .resume-sheet .right-column > .resume-section:has(.fa-bullseye) .section-heading {
+        flex: 0 0 100%;
+    }
+
+    .resume-sheet .right-column > .resume-section:has(.fa-bullseye) .preference-item {
+        margin-bottom: 0;
+    }
+
+/* Education card rows (Year / Stream / Division ...) */
+.education-section .education-item {
+    margin-bottom: 6px;
+}
+
+    .education-section .education-item:last-child {
+        margin-bottom: 0;
+    }
+
+.education-section .education-row {
+    font-size: 10.5px;
+    line-height: 1.4;
+    color: var(--text);
+}
+
+    .education-section .education-row strong {
+        margin-right: 4px;
+        color: var(--heading);
+    }
+
+/* =========================================================
+   FOOTER  -  signature / location / date / powered by
+   Compact bar under the content. Flex directions are forced so
+   the layout's phone rule (max-width: 700px) can never reflow it.
+========================================================= */
+
+.resume-sheet .resume-footer {
+    flex: 0 0 auto;
+    width: auto;
+    margin: 0;
+    padding: 8px 30px 10px;
+    background: var(--page);
+    border-top: 1px solid var(--soft-border);
+}
+
+.resume-sheet .resume-footer-row {
+    display: flex;
+    flex-direction: row;
+    align-items: flex-end;
+    justify-content: space-between;
+    flex-wrap: nowrap;
+    gap: 20px;
+    width: 100%;
+}
+
+.resume-sheet .resume-signature-section {
+    flex: 0 0 auto;
+    min-width: 0;
+}
+
+.resume-sheet .resume-signature-box {
+    width: 170px;
+    margin: 0;
+}
+
+.resume-sheet .resume-signature-image {
+    width: 120px;
+    height: 36px;
+    margin: 0 auto 3px;
+}
+
+.resume-sheet .resume-signature-line {
+    width: 150px;
+    margin: 0 auto 3px;
+    border-top-color: var(--muted);
+}
+
+.resume-sheet .resume-signature-label {
+    font-size: 10px;
+    color: var(--muted);
+}
+
+.resume-sheet .resume-footer-info {
+    flex: 1 1 auto;
+    min-width: 0;
+    flex-direction: row;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 16px;
+    font-size: 10.5px;
+    color: var(--text);
+}
+
+.resume-sheet .resume-footer-label {
+    margin-right: 4px;
+    color: var(--heading);
+}
+
+.resume-sheet .resume-powered-by {
+    flex: 0 0 auto;
+    min-width: 0;
+    margin: 0;
+    font-size: 9.5px;
+    text-align: right;
+    white-space: nowrap;
+    color: var(--muted);
+}
+
+    .resume-sheet .resume-powered-by strong {
+        color: var(--heading);
+    }
 
 /* =========================================================
    RESPONSIVE  -  ZOOM OUT ONLY (sheet = 1123px wide)
