@@ -3,26 +3,29 @@
 @{
     Layout = "~/Views/Shared/_DashboardLayout.cshtml";
 
-    ViewData["Title"] = "Applied Internship Details";
+    ViewData["Title"] = "Internship Post Details";
     ViewData["Panel"] = "Candidate";
     ViewData["UserName"] = "Candidate";
 
     var post = Model?.Post;
-    var org = Model?.Organization;
 }
+
+<link rel="stylesheet"
+      href="~/css/InternshipDetails.css"
+      asp-append-version="true" />
 
 <div class="container-fluid">
 
     <div class="master-table-container">
 
-        <!-- ==========================================
-             PAGE HEADER
-        =========================================== -->
+        <!-- =====================================================
+             HEADER
+        ====================================================== -->
 
         <div class="mb-4">
 
             <h1 class="mb-2">
-                Applied Internship Details
+                Internship Post Details
             </h1>
 
             <p class="mb-0 text-muted">
@@ -33,181 +36,32 @@
         </div>
 
 
-        <!-- ==========================================
-             ORGANIZATION DETAILS
-        =========================================== -->
+        <!-- =====================================================
+             ORGANIZATION
+        ====================================================== -->
 
         <div class="card mb-4">
 
             <div class="card-header">
+
                 <h4 class="mb-0">
                     Organization Details
                 </h4>
+
             </div>
 
             <div class="card-body">
 
                 <div class="row">
 
-                    <!-- LOGO -->
+                    <div class="col-md-12 mb-3">
 
-                    <div class="col-md-3 text-center mb-3">
+                        <strong>
+                            Organization Name
+                        </strong>
 
-                        @if (!string.IsNullOrWhiteSpace(
-                        org?.sCompanyLogo))
-                        {
-                            <img src="~/uploads/organization/@org.sCompanyLogo"
-                                 alt="Organization Logo"
-                                 class="img-fluid"
-                                 style="
-                                     max-height:150px;
-                                     max-width:200px;
-                                     object-fit:contain;
-                                     " />
-                        }
-                        else
-                        {
-                            <div class="text-muted">
-                                No Logo Available
-                            </div>
-                        }
-
-                    </div>
-
-
-                    <!-- ORGANIZATION INFORMATION -->
-
-                    <div class="col-md-9">
-
-                        <div class="row">
-
-                            <div class="col-md-6 mb-3">
-
-                                <strong>
-                                    Organization Name
-                                </strong>
-
-                                <div>
-                                    @org?.sOrganizationName
-                                </div>
-
-                            </div>
-
-
-                            <div class="col-md-6 mb-3">
-
-                                <strong>
-                                    Email
-                                </strong>
-
-                                <div>
-                                    @org?.sOrganizationEmail
-                                </div>
-
-                            </div>
-
-
-                            <div class="col-md-6 mb-3">
-
-                                <strong>
-                                    Mobile
-                                </strong>
-
-                                <div>
-                                    @org?.sMobile
-                                </div>
-
-                            </div>
-
-
-                            <div class="col-md-6 mb-3">
-
-                                <strong>
-                                    Designation
-                                </strong>
-
-                                <div>
-                                    @org?.sDesignation
-                                </div>
-
-                            </div>
-
-
-                            <div class="col-md-12 mb-3">
-
-                                <strong>
-                                    Organization Address
-                                </strong>
-
-                                <div>
-                                    @org?.sCompanyAddress
-                                </div>
-
-                            </div>
-
-
-                            <div class="col-md-4 mb-3">
-
-                                <strong>
-                                    Establishment Year
-                                </strong>
-
-                                <div>
-                                    @(org?.nEstablishmentYear > 0
-                                        ? org.nEstablishmentYear.ToString()
-                                        : "-")
-                                </div>
-
-                            </div>
-
-
-                            <div class="col-md-4 mb-3">
-
-                                <strong>
-                                    Employee Strength
-                                </strong>
-
-                                <div>
-                                    @(string.IsNullOrWhiteSpace(
-                                        org?.nEmployeeStrength)
-                                        ? "-"
-                                        : org.nEmployeeStrength)
-                                </div>
-
-                            </div>
-
-
-                            <div class="col-md-4 mb-3">
-
-                                <strong>
-                                    GST No.
-                                </strong>
-
-                                <div>
-                                    @(string.IsNullOrWhiteSpace(
-                                        org?.sGSTNo)
-                                        ? "-"
-                                        : org.sGSTNo)
-                                </div>
-
-                            </div>
-
-
-                            <div class="col-md-6 mb-3">
-
-                                <strong>
-                                    CIN No.
-                                </strong>
-
-                                <div>
-                                    @(string.IsNullOrWhiteSpace(
-                                        org?.sCINNo)
-                                        ? "-"
-                                        : org.sCINNo)
-                                </div>
-
-                            </div>
-
+                        <div>
+                            @post?.sName
                         </div>
 
                     </div>
@@ -219,9 +73,9 @@
         </div>
 
 
-        <!-- ==========================================
+        <!-- =====================================================
              INTERNSHIP DETAILS
-        =========================================== -->
+        ====================================================== -->
 
         <div class="card mb-4">
 
@@ -237,6 +91,8 @@
 
                 <div class="row">
 
+                    <!-- Position -->
+
                     <div class="col-md-6 mb-3">
 
                         <strong>
@@ -249,6 +105,8 @@
 
                     </div>
 
+
+                    <!-- Required Trainees -->
 
                     <div class="col-md-6 mb-3">
 
@@ -263,6 +121,8 @@
                     </div>
 
 
+                    <!-- Gender -->
+
                     <div class="col-md-6 mb-3">
 
                         <strong>
@@ -275,6 +135,8 @@
 
                     </div>
 
+
+                    <!-- Qualification -->
 
                     <div class="col-md-6 mb-3">
 
@@ -289,6 +151,8 @@
                     </div>
 
 
+                    <!-- Country -->
+
                     <div class="col-md-4 mb-3">
 
                         <strong>
@@ -301,6 +165,8 @@
 
                     </div>
 
+
+                    <!-- State -->
 
                     <div class="col-md-4 mb-3">
 
@@ -315,6 +181,8 @@
                     </div>
 
 
+                    <!-- City -->
+
                     <div class="col-md-4 mb-3">
 
                         <strong>
@@ -327,6 +195,8 @@
 
                     </div>
 
+
+                    <!-- Working Hours -->
 
                     <div class="col-md-4 mb-3">
 
@@ -341,6 +211,8 @@
                     </div>
 
 
+                    <!-- Working Shift -->
+
                     <div class="col-md-4 mb-3">
 
                         <strong>
@@ -353,6 +225,8 @@
 
                     </div>
 
+
+                    <!-- Internship Type -->
 
                     <div class="col-md-4 mb-3">
 
@@ -367,6 +241,8 @@
                     </div>
 
 
+                    <!-- Fellowship -->
+
                     <div class="col-md-6 mb-3">
 
                         <strong>
@@ -379,6 +255,8 @@
 
                     </div>
 
+
+                    <!-- Training -->
 
                     <div class="col-md-6 mb-3">
 
@@ -393,6 +271,8 @@
                     </div>
 
 
+                    <!-- Duration -->
+
                     <div class="col-md-6 mb-3">
 
                         <strong>
@@ -406,6 +286,8 @@
                     </div>
 
 
+                    <!-- Start Date -->
+
                     <div class="col-md-3 mb-3">
 
                         <strong>
@@ -413,14 +295,20 @@
                         </strong>
 
                         <div>
-                            @(post == null
-                                ? "-"
-                                : Convert.ToDateTime(post.dStartDate)
-                                .ToString("dd-MM-yyyy"))
+
+                            @(post != null &&
+                              post.dStartDate != DateTime.MinValue
+                                ? Convert.ToDateTime(
+                                    post.dStartDate
+                                  ).ToString("dd-MM-yyyy")
+                                : "-")
+
                         </div>
 
                     </div>
 
+
+                    <!-- Completion Date -->
 
                     <div class="col-md-3 mb-3">
 
@@ -429,14 +317,20 @@
                         </strong>
 
                         <div>
-                            @(post == null
-                                ? "-"
-                                : Convert.ToDateTime(post.dCompletionDate)
-                                .ToString("dd-MM-yyyy"))
+
+                            @(post != null &&
+                              post.dCompletionDate != DateTime.MinValue
+                                ? Convert.ToDateTime(
+                                    post.dCompletionDate
+                                  ).ToString("dd-MM-yyyy")
+                                : "-")
+
                         </div>
 
                     </div>
 
+
+                    <!-- Mode -->
 
                     <div class="col-md-6 mb-3">
 
@@ -451,6 +345,8 @@
                     </div>
 
 
+                    <!-- Language -->
+
                     <div class="col-md-6 mb-3">
 
                         <strong>
@@ -463,6 +359,8 @@
 
                     </div>
 
+
+                    <!-- Working Days -->
 
                     <div class="col-md-6 mb-3">
 
@@ -477,6 +375,8 @@
                     </div>
 
 
+                    <!-- Facilities -->
+
                     <div class="col-md-6 mb-3">
 
                         <strong>
@@ -484,24 +384,95 @@
                         </strong>
 
                         <div>
-                            @post?.sFacilities
+
+                            @if (!string.IsNullOrWhiteSpace(
+                                post?.sFacilities))
+                            {
+                                @post.sFacilities
+                            }
+                            else
+                            {
+                                <span class="text-muted">
+                                    N/A
+                                </span>
+                            }
+
                         </div>
 
                     </div>
 
 
-                    <div class="col-md-12 mb-3">
+                    <!-- Divyang -->
+
+                    <div class="col-md-6 mb-3">
 
                         <strong>
-                            Application Status
+                            Divyang
                         </strong>
 
                         <div>
+                            @post?.sDivyang
+                        </div>
 
-                            <span class="master-status">
-                                Applied
-                            </span>
+                    </div>
 
+
+                    <!-- Total Charges -->
+
+                    <div class="col-md-6 mb-3">
+
+                        <strong>
+                            Total Charges
+                        </strong>
+
+                        <div>
+                            @post?.sTotalCharges
+                            @post?.sCurrency
+                        </div>
+
+                    </div>
+
+
+                    <!-- Medical Skills -->
+
+                    <div class="col-md-12 mb-3">
+
+                        <strong>
+                            Medical Skills
+                        </strong>
+
+                        <div>
+                            @post?.sMedicalSkills
+                        </div>
+
+                    </div>
+
+
+                    <!-- Technical Skills -->
+
+                    <div class="col-md-12 mb-3">
+
+                        <strong>
+                            Technical Skills
+                        </strong>
+
+                        <div>
+                            @post?.sTechnicalSkills
+                        </div>
+
+                    </div>
+
+
+                    <!-- Non Technical Skills -->
+
+                    <div class="col-md-12 mb-3">
+
+                        <strong>
+                            Non-Technical Skills
+                        </strong>
+
+                        <div>
+                            @post?.sNonTechnicalSkills
                         </div>
 
                     </div>
@@ -513,20 +484,84 @@
         </div>
 
 
-        <!-- ==========================================
-             BACK BUTTON
-        =========================================== -->
+        <!-- =====================================================
+             PREVIOUS / NEXT NAVIGATION
+        ====================================================== -->
 
-        <div class="mt-3">
+        <div class="d-flex justify-content-between align-items-center mt-4">
 
-            <a asp-controller="Candidate"
-               asp-action="MyInternship"
-               asp-route-id="@ViewBag.CandidateCode"
-               class="btn btn-secondary">
+            <!-- PREVIOUS -->
 
-                Back to My Internship
+            <div>
 
-            </a>
+                @if (ViewBag.HasPrevious == true)
+                {
+                    <a asp-controller="Candidate"
+                       asp-action="ViewMyOrgPost"
+                       asp-route-id="@ViewBag.PreviousPostID"
+                       class="btn btn-secondary">
+
+                        ← Previous
+
+                    </a>
+                }
+                else
+                {
+                    <button type="button"
+                            class="btn btn-secondary"
+                            disabled>
+
+                        ← Previous
+
+                    </button>
+                }
+
+            </div>
+
+
+            <!-- BACK -->
+
+            <div>
+
+                <a asp-controller="Candidate"
+                   asp-action="MyInternship"
+                   asp-route-id="@ViewBag.CandidateCode"
+                   class="btn btn-outline-secondary">
+
+                    Back to My Internship
+
+                </a>
+
+            </div>
+
+
+            <!-- NEXT -->
+
+            <div>
+
+                @if (ViewBag.HasNext == true)
+                {
+                    <a asp-controller="Candidate"
+                       asp-action="ViewMyOrgPost"
+                       asp-route-id="@ViewBag.NextPostID"
+                       class="btn btn-primary">
+
+                        Next →
+
+                    </a>
+                }
+                else
+                {
+                    <button type="button"
+                            class="btn btn-primary"
+                            disabled>
+
+                        Next →
+
+                    </button>
+                }
+
+            </div>
 
         </div>
 

@@ -94,11 +94,13 @@
 
                             <!-- Organization -->
                             <td>
-                                <a href="#"
-                                   class="text-primary fw-semibold text-decoration-underline">
-                                    @post.sName
-                                </a>
-                            </td>
+    <a asp-controller="Candidate"
+       asp-action="ViewMyOrgPost"
+       asp-route-id="@post.nID"
+       class="text-primary fw-semibold text-decoration-underline">
+        @post.sName
+    </a>
+</td>
 
                             <!-- Position -->
                             <td>

@@ -1,0 +1,276 @@
+﻿@model List<ErJobPortal.Models.TPOTraineeInfoM>
+
+@{
+    Layout = "~/Views/Shared/_DashboardLayout.cshtml";
+
+    ViewData["Title"] = "Trainee Information";
+    ViewData["Panel"] = "TPO";
+    ViewData["UserName"] = Context.Session.GetString("TPOName") ?? "TPO";
+
+    string collegeName =
+        ViewBag.CollegeName?.ToString() ?? "";
+
+    int traineeCount =
+        ViewBag.TraineeCount != null
+            ? Convert.ToInt32(ViewBag.TraineeCount)
+            : 0;
+}
+
+<div class="container-fluid">
+
+    <!-- =====================================================
+         PAGE HEADER
+    ====================================================== -->
+
+    <div class="d-flex justify-content-between align-items-center mb-3">
+
+        <div>
+
+            <h2 class="mb-1">
+                Trainee Information
+            </h2>
+
+            <div class="text-muted">
+                College:
+                <strong>
+                    @collegeName
+                </strong>
+            </div>
+
+        </div>
+
+        <div>
+
+            <span class="badge bg-primary"
+                  style="font-size:15px; padding:10px 15px;">
+                Total Trainees:
+                @traineeCount
+            </span>
+
+        </div>
+
+    </div>
+
+
+    <!-- =====================================================
+         SEARCH
+    ====================================================== -->
+
+    <div class="card mb-3">
+
+        <div class="card-body">
+
+            <input type="text"
+                   id="traineeSearch"
+                   class="form-control"
+                   placeholder="Search by name, email or mobile..." />
+
+        </div>
+
+    </div>
+
+
+    <!-- =====================================================
+         TABLE
+    ====================================================== -->
+
+    <div class="card">
+
+        <div class="card-body">
+
+            <div class="table-responsive">
+
+                <table class="table table-bordered table-hover"
+                       id="traineeTable">
+
+                    <thead>
+
+                        <tr>
+
+                            <th>
+                                Sr. No.
+                            </th>
+
+                            <th>
+                                Name
+                            </th>
+
+                            <th>
+                                Mobile
+                            </th>
+
+                            <th>
+                                Email
+                            </th>
+
+                            <th>
+                                DOB
+                            </th>
+
+                            <th>
+                                College Code
+                            </th>
+
+                            <th>
+                                Current Year
+                            </th>
+
+                            <th>
+                                Admission Year
+                            </th>
+
+                            <th>
+                                Passout Year
+                            </th>
+
+                            <th>
+                                Registration Date
+                            </th>
+
+                        </tr>
+
+                    </thead>
+
+                    <tbody>
+
+                        @if (Model != null &&
+                             Model.Count > 0)
+                        {
+                            int srNo = 1;
+
+                            foreach (var trainee in Model)
+                            {
+                                <tr>
+
+                                    <td>
+                                        @srNo
+                                    </td>
+
+                                    <td>
+                                        @trainee.FullName
+                                    </td>
+
+                                    <td>
+                                        @trainee.sMobile
+                                    </td>
+
+                                    <td>
+                                        @trainee.sEmail
+                                    </td>
+
+                                    <td>
+                                        @(trainee.DOB.HasValue
+                                            ? trainee.DOB.Value.ToString("dd-MM-yyyy")
+                                            : "-")
+                                    </td>
+
+                                    <td>
+                                        @trainee.nCollegeCode
+                                    </td>
+
+                                    <td>
+                                        @(trainee.nCurrentYear.HasValue
+                                            ? trainee.nCurrentYear.ToString()
+                                            : "-")
+                                    </td>
+
+                                    <td>
+                                        @(trainee.nAdmissionYear.HasValue
+                                            ? trainee.nAdmissionYear.ToString()
+                                            : "-")
+                                    </td>
+
+                                    <td>
+                                        @(trainee.nPassoutYear.HasValue
+                                            ? trainee.nPassoutYear.ToString()
+                                            : "-")
+                                    </td>
+
+                                    <td>
+                                        @(trainee.RegDate.HasValue
+                                            ? trainee.RegDate.Value.ToString("dd-MM-yyyy")
+                                            : "-")
+                                    </td>
+
+                                </tr>
+
+                                srNo++;
+                            }
+                        }
+                        else
+                        {
+                            <tr>
+
+                                <td colspan="10"
+                                    class="text-center">
+
+                                    No trainees found
+                                    for this college.
+
+                                </td>
+
+                            </tr>
+                        }
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<!-- =====================================================
+     SEARCH SCRIPT
+====================================================== -->
+
+<script>
+
+    document.addEventListener("DOMContentLoaded", function () {
+
+        const searchBox =
+            document.getElementById("traineeSearch");
+
+        const table =
+            document.getElementById("traineeTable");
+
+        if (!searchBox || !table) {
+            return;
+        }
+
+        searchBox.addEventListener("keyup", function () {
+
+            const searchValue =
+                this.value.toLowerCase().trim();
+
+            const rows =
+                table.querySelectorAll("tbody tr");
+
+            rows.forEach(function (row) {
+
+                const rowText =
+                    row.textContent.toLowerCase();
+
+                if (rowText.includes(searchValue)) {
+
+                    row.style.display = "";
+
+                }
+                else {
+
+                    row.style.display = "none";
+
+                }
+
+            });
+
+        });
+
+    });
+
+</script>

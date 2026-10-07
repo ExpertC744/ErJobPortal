@@ -2447,132 +2447,195 @@ namespace ErJobPortal.Controllers
         // =========================================================
 
         [HttpGet]
-        [Route("Candidate/MyInternship/{id?}")]
-        public IActionResult MyInternship(string? id)
+        public IActionResult MyInternship()
         {
-            // =========================================================
-            // GET LOGGED-IN CANDIDATE ID
-            // =========================================================
+            // =====================================================
+            // CHECK CANDIDATE SESSION
+            // =====================================================
 
-            int? candidateId =
+            int? candidateID =
                 HttpContext.Session.GetInt32("CandidateID");
 
-            if (candidateId == null || candidateId <= 0)
+            if (candidateID == null)
             {
                 return RedirectToAction(
                     "CandidateLogin",
-                    "Account");
+                    "Account"
+                );
             }
 
-            // =========================================================
+            // =====================================================
             // GET CANDIDATE CODE
-            // =========================================================
+            // =====================================================
 
-            string? candidateCode = GetCandidateCode();
+            string candidateCode =
+                HttpContext.Session.GetString("CandidateCode")
+                ?? "";
 
-            if (string.IsNullOrEmpty(candidateCode))
+            // =====================================================
+            // LIST
+            // =====================================================
+
+            List<OrgPostM> internships =
+                new List<OrgPostM>();
+
+            string connectionString =
+                _configuration.GetConnectionString("DefaultConnection");
+
+            using (SqlConnection con =
+                   new SqlConnection(connectionString))
             {
-                return NotFound(
-                    "Candidate code could not be generated.");
-            }
-
-            // =========================================================
-            // IF URL DOES NOT HAVE CANDIDATE CODE
-            // =========================================================
-
-            if (string.IsNullOrEmpty(id))
-            {
-                return RedirectToAction(
-                    "MyInternship",
-                    "Candidate",
-                    new
-                    {
-                        id = candidateCode
-                    });
-            }
-
-            // =========================================================
-            // VALIDATE CANDIDATE CODE
-            // =========================================================
-
-            if (!string.Equals(
-                id,
-                candidateCode,
-                StringComparison.OrdinalIgnoreCase))
-            {
-                return NotFound();
-            }
-
-            // =========================================================
-            // GET APPLIED INTERNSHIPS
-            // =========================================================
-
-            List<OrgPostM> appliedPosts =
-                TraineeApplyToPostList(candidateId.Value);
-
-            // =========================================================
-            // CONVERT TO VIEW MODEL
-            // =========================================================
-
-            List<MyInternshipViewModel> myInternships =
-                appliedPosts.Select(post => new MyInternshipViewModel
+                using (SqlCommand cmd =
+                       new SqlCommand(
+                           "SP_CandidateAppliedToPost",
+                           con))
                 {
-                    // IMPORTANT
-                    // These two values are required for redirect
-                    PostID = post.nID,
-                    OrgID = post.nOrgID,
+                    cmd.CommandType =
+                        CommandType.StoredProcedure;
 
-                    OrganizationName =
-                        post.sName ?? "",
+                    cmd.Parameters.Add(
+                        "@CandidateID",
+                        SqlDbType.Int
+                    ).Value = candidateID.Value;
 
-                    Position =
-                        post.sPositionName ?? "",
+                    con.Open();
 
-                    Location =
-                        string.Join(
-                            ", ",
-                            new[]
-                            {
-                  post.nCityName,
-                  post.sStateName,
-                  post.sCountryName
-                            }
-                            .Where(x =>
-                                !string.IsNullOrWhiteSpace(x))
-                        ),
+                    using (SqlDataReader dr =
+                           cmd.ExecuteReader())
+                    {
+                        while (dr.Read())
+                        {
+                            OrgPostM item =
+                                new OrgPostM();
 
-                    InternshipFellowshipType =
-                        post.sInternshipFellowshipTypeName ?? "",
+                            // =================================================
+                            // POST ID
+                            // =================================================
 
-                    Facilities =
-                        post.sFacilities ?? "",
+                            item.nID =
+                                dr["PostID"] == DBNull.Value
+                                    ? 0
+                                    : Convert.ToInt32(
+                                        dr["PostID"]);
 
-                    ApplyStatus =
-                        post.IsApplied
-                            ? "Applied"
-                            : ""
-                })
-                .ToList();
+                            // =================================================
+                            // ORGANIZATION ID
+                            // =================================================
 
-            // =========================================================
-            // VIEW DATA
-            // =========================================================
+                            item.nOrgID =
+                                dr["OrgID"] == DBNull.Value
+                                    ? 0
+                                    : Convert.ToInt32(
+                                        dr["OrgID"]);
 
-            ViewBag.CandidateCode =
-                candidateCode;
+                            // =================================================
+                            // ORGANIZATION NAME
+                            // =================================================
 
-            ViewBag.CandidateID =
-                candidateId.Value;
+                            item.sName =
+                                dr["OrganizationName"] == DBNull.Value
+                                    ? ""
+                                    : dr["OrganizationName"].ToString();
 
-            ViewBag.CandidateName =
-                HttpContext.Session.GetString(
-                    "CandidateName");
+                            // =================================================
+                            // POSITION
+                            // =================================================
 
-            ViewBag.CandidateEmail =
-                HttpContext.Session.GetString(
-                    "CandidateEmail");
+                            item.sPositionName =
+                                dr["Position"] == DBNull.Value
+                                    ? ""
+                                    : dr["Position"].ToString();
 
-            return View(myInternships);
+                            // =================================================
+                            // COUNTRY
+                            // =================================================
+
+                            item.sCountryName =
+                                dr["Country"] == DBNull.Value
+                                    ? ""
+                                    : dr["Country"].ToString();
+
+                            // =================================================
+                            // STATE
+                            // =================================================
+
+                            item.sStateName =
+                                dr["State"] == DBNull.Value
+                                    ? ""
+                                    : dr["State"].ToString();
+
+                            // =================================================
+                            // CITY
+                            // =================================================
+
+                            item.nCityName =
+                                dr["City"] == DBNull.Value
+                                    ? ""
+                                    : dr["City"].ToString();
+
+                            // =================================================
+                            // INTERNSHIP / FELLOWSHIP
+                            // =================================================
+
+                            item.sInternshipFellowshipTypeName =
+                                dr["InternshipFellowshipType"]
+                                    == DBNull.Value
+                                        ? ""
+                                        : dr[
+                                            "InternshipFellowshipType"
+                                          ].ToString();
+
+                            // =================================================
+                            // FACILITIES
+                            // =================================================
+
+                            item.sFacilities =
+                                dr["Facilities"] == DBNull.Value
+                                    ? ""
+                                    : dr["Facilities"].ToString();
+
+                            // =================================================
+                            // APPLIED
+                            // =================================================
+
+                            item.IsApplied = true;
+
+                            internships.Add(item);
+                        }
+                    }
+                }
+            }
+
+            // =====================================================
+            // SEND DATA TO VIEW
+            // =====================================================
+
+            ViewBag.CandidateCode = candidateCode;
+
+            return View(internships);
+        }
+
+
+        // =====================================================
+        // CHECK WHETHER COLUMN EXISTS
+        // =====================================================
+
+        private bool HasColumn(
+            SqlDataReader reader,
+            string columnName)
+        {
+            for (int i = 0; i < reader.FieldCount; i++)
+            {
+                if (string.Equals(
+                    reader.GetName(i),
+                    columnName,
+                    StringComparison.OrdinalIgnoreCase))
+                {
+                    return true;
+                }
+            }
+
+            return false;
         }
 
         // =========================================================
