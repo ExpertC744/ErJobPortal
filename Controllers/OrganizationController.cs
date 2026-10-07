@@ -592,12 +592,12 @@ namespace ErJobPortal.Controllers
 
         ////    ViewBag.OrgCode = id;
 
-<<<<<<< HEAD
-            List<SATraineeListM> trainees = _repository.GetSATraineeList();
-=======
+
+            //List<SATraineeListM> trainees = _repository.GetSATraineeList();
+
         ////    List<SATraineeListM> trainees =
         ////        _repository.GetSATraineeList();
->>>>>>> Shrirang
+
 
         ////    return View(trainees);
         ////}
