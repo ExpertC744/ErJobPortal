@@ -766,5 +766,19 @@ namespace ErJobPortal.Controllers
             return RenderProfile(id, "ViewProfileFiftyNine");
         }
 
+        // ============================================================
+        // RESUME TEMPLATES 91 - 100 (PORTRAIT)
+        // ============================================================
+        public IActionResult ViewProfileNinetyOne(int id) => RenderProfile(id, "ViewProfileNinetyOne");
+        public IActionResult ViewProfileNinetyTwo(int id) => RenderProfile(id, "ViewProfileNinetyTwo");
+        public IActionResult ViewProfileNinetyThree(int id) => RenderProfile(id, "ViewProfileNinetyThree");
+        public IActionResult ViewProfileNinetyFour(int id) => RenderProfile(id, "ViewProfileNinetyFour");
+        public IActionResult ViewProfileNinetyFive(int id) => RenderProfile(id, "ViewProfileNinetyFive");
+        public IActionResult ViewProfileNinetySix(int id) => RenderProfile(id, "ViewProfileNinetySix");
+        public IActionResult ViewProfileNinetySeven(int id) => RenderProfile(id, "ViewProfileNinetySeven");
+        public IActionResult ViewProfileNinetyEight(int id) => RenderProfile(id, "ViewProfileNinetyEight");
+        public IActionResult ViewProfileNinetyNine(int id) => RenderProfile(id, "ViewProfileNinetyNine");
+        public IActionResult ViewProfileHundred(int id) => RenderProfile(id, "ViewProfileHundred");
+
     }
 }
