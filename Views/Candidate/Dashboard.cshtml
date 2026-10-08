@@ -598,25 +598,30 @@
            VIEW BUTTON
         ========================================================= */
 
-    .sa-view-btn {
-        display: inline-flex;
-        align-items: center;
-        gap: 5px;
-        padding: 6px 10px;
-        border-radius: 7px;
-        background: #e8f5f1;
-        color: #1e7b67;
-        text-decoration: none;
-        font-size: 10px;
-        font-weight: 700;
-        transition: all .2s ease;
-    }
+ .post-job-btn {
+    flex-shrink: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    min-height: 44px;
+    padding: 12px 19px;
+    background: #1e7b67;
+    color: #ffffff;
+    border-radius: 10px;
+    text-decoration: none;
+    font-size: 15px;
+    font-weight: 600;
+    box-shadow: 0 7px 20px rgba(30,123,103,.18);
+    transition: all .25s ease;
+    white-space: nowrap;
+}
 
-        .sa-view-btn:hover {
-            background: #1e7b67;
-            color: #ffffff;
-            text-decoration: none;
-        }
+    .post-job-btn:hover {
+        background: #176553;
+        color: #ffffff;
+        transform: translateY(-2px);
+    }
 
         .sa-view-btn i {
             font-size: 9px;
@@ -777,7 +782,7 @@
             </div>
         </div>
 
-
+        @* radhika07 *@
         <div class="col-xl-3 col-md-6 mb-4">
             <div class="stat-card">
 
@@ -797,10 +802,25 @@
                     <span>+2</span> new opportunities
                 </div>
 
+                 <div class="stat-bottom">
+
+                    <a asp-controller="Candidate"
+                       asp-action="TotalOpening"
+                      
+                       class="sa-view-btn">
+
+                        View Details
+
+
+                        <i class="fas fa-arrow-right"></i>
+
+                    </a>
+                </div>
+
             </div>
         </div>
 
-
+         @* radhika07 *@
         <div class="col-xl-3 col-md-6 mb-4">
             <div class="stat-card">
 
@@ -818,6 +838,21 @@
 
                 <div class="stat-bottom">
                     <span>+1</span> from last week
+                </div>
+
+                 <div class="stat-bottom">
+
+                    <a asp-controller="Candidate"
+                       asp-action="TopSearch"
+                    
+                       class="sa-view-btn">
+
+                        View Details
+
+
+                        <i class="fas fa-arrow-right"></i>
+
+                    </a>
                 </div>
 
             </div>
@@ -2127,7 +2162,7 @@
             <div class="mt-3">
 
                 <a href="@Url.Action("ExtraPost", "Candidate", new { id = candidateCode })"
-                   class="btn btn-success px-4 py-2">
+                   class="post-job-btn">
                     <i class="fas fa-plus me-2"></i>
                     Extra Post
                 </a>

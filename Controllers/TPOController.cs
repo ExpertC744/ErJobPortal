@@ -472,54 +472,54 @@ namespace ErJobPortal.Controllers
         }
 
 
-  
-
-       //=============================================================
-       //TPO CREATE FEEDBACK - GET
-       //=============================================================
-
-       [HttpGet]
-       public IActionResult CreateFeedback()
-       {
-           // ---------------------------------------------------------
-           // CHECK TPO LOGIN
-           // ---------------------------------------------------------
-
-           int? tpoId =
-               HttpContext.Session.GetInt32("TPOID");
-
-           if (tpoId == null || tpoId <= 0)
-           {
-               return RedirectToAction(
-                   "TPOLogin",
-                   "Account");
-           }
 
 
-           // ---------------------------------------------------------
-           // CREATE MODEL
-           // ---------------------------------------------------------
+        //=============================================================
+        //TPO CREATE FEEDBACK - GET
+        //=============================================================
 
-           TPOFeedbackViewModel? model = null;
+        [HttpGet]
+        public IActionResult CreateFeedback()
+        {
+            // ---------------------------------------------------------
+            // CHECK TPO LOGIN
+            // ---------------------------------------------------------
+
+            int? tpoId =
+                HttpContext.Session.GetInt32("TPOID");
+
+            if (tpoId == null || tpoId <= 0)
+            {
+                return RedirectToAction(
+                    "TPOLogin",
+                    "Account");
+            }
 
 
-           // ---------------------------------------------------------
-           // CONNECTION STRING
-           // ---------------------------------------------------------
+            // ---------------------------------------------------------
+            // CREATE MODEL
+            // ---------------------------------------------------------
 
-           string? connectionString =
-               _configuration.GetConnectionString(
-                   "DefaultConnection");
+            TPOFeedbackViewModel? model = null;
 
 
-           // ---------------------------------------------------------
-           // GET ACTIVE FEEDBACK QUESTIONS
-           // ---------------------------------------------------------
+            // ---------------------------------------------------------
+            // CONNECTION STRING
+            // ---------------------------------------------------------
 
-           using (SqlConnection con =
-                  new SqlConnection(connectionString))
-           {
-               string query = @"
+            string? connectionString =
+                _configuration.GetConnectionString(
+                    "DefaultConnection");
+
+
+            // ---------------------------------------------------------
+            // GET ACTIVE FEEDBACK QUESTIONS
+            // ---------------------------------------------------------
+
+            using (SqlConnection con =
+                   new SqlConnection(connectionString))
+            {
+                string query = @"
            SELECT
                nID,
                Que1,
@@ -534,104 +534,104 @@ namespace ErJobPortal.Controllers
              AND ISNULL(nBit, 1) = 1";
 
 
-               using (SqlCommand cmd =
-                      new SqlCommand(query, con))
-               {
-                   con.Open();
+                using (SqlCommand cmd =
+                       new SqlCommand(query, con))
+                {
+                    con.Open();
 
-                   using (SqlDataReader reader =
-                          cmd.ExecuteReader())
-                   {
-                       if (reader.Read())
-                       {
-                           model = new TPOFeedbackViewModel
-                           {
-                               nID =
-                                   reader["nID"] == DBNull.Value
-                                   ? 0
-                                   : Convert.ToInt32(
-                                       reader["nID"]),
+                    using (SqlDataReader reader =
+                           cmd.ExecuteReader())
+                    {
+                        if (reader.Read())
+                        {
+                            model = new TPOFeedbackViewModel
+                            {
+                                nID =
+                                    reader["nID"] == DBNull.Value
+                                    ? 0
+                                    : Convert.ToInt32(
+                                        reader["nID"]),
 
-                               Que1 =
-                                   reader["Que1"] == DBNull.Value
-                                   ? ""
-                                   : reader["Que1"].ToString(),
+                                Que1 =
+                                    reader["Que1"] == DBNull.Value
+                                    ? ""
+                                    : reader["Que1"].ToString(),
 
-                               Que2 =
-                                   reader["Que2"] == DBNull.Value
-                                   ? ""
-                                   : reader["Que2"].ToString(),
+                                Que2 =
+                                    reader["Que2"] == DBNull.Value
+                                    ? ""
+                                    : reader["Que2"].ToString(),
 
-                               Que3 =
-                                   reader["Que3"] == DBNull.Value
-                                   ? ""
-                                   : reader["Que3"].ToString(),
+                                Que3 =
+                                    reader["Que3"] == DBNull.Value
+                                    ? ""
+                                    : reader["Que3"].ToString(),
 
-                               Que4 =
-                                   reader["Que4"] == DBNull.Value
-                                   ? ""
-                                   : reader["Que4"].ToString(),
+                                Que4 =
+                                    reader["Que4"] == DBNull.Value
+                                    ? ""
+                                    : reader["Que4"].ToString(),
 
-                               Que5 =
-                                   reader["Que5"] == DBNull.Value
-                                   ? ""
-                                   : reader["Que5"].ToString(),
+                                Que5 =
+                                    reader["Que5"] == DBNull.Value
+                                    ? ""
+                                    : reader["Que5"].ToString(),
 
-                               // TPO answers initially empty
-                               sQue1 = "",
-                               sQue2 = "",
-                               sQue3 = "",
-                               sQue4 = "",
-                               sQue5 = "",
+                                // TPO answers initially empty
+                                sQue1 = "",
+                                sQue2 = "",
+                                sQue3 = "",
+                                sQue4 = "",
+                                sQue5 = "",
 
-                               TPOID = tpoId.Value,
+                                TPOID = tpoId.Value,
 
-                               nBit =
-                                   reader["nBit"] == DBNull.Value
-                                   ? 1
-                                   : Convert.ToInt32(
-                                       reader["nBit"]),
+                                nBit =
+                                    reader["nBit"] == DBNull.Value
+                                    ? 1
+                                    : Convert.ToInt32(
+                                        reader["nBit"]),
 
-                               nSABit =
-                                   reader["nSABit"] == DBNull.Value
-                                   ? 0
-                                   : Convert.ToInt32(
-                                       reader["nSABit"]),
+                                nSABit =
+                                    reader["nSABit"] == DBNull.Value
+                                    ? 0
+                                    : Convert.ToInt32(
+                                        reader["nSABit"]),
 
-                               nTPO = 1
-                           };
-                       }
-                   }
-               }
-           }
-
-
-           // ---------------------------------------------------------
-           // NO QUESTION FOUND
-           // ---------------------------------------------------------
-
-           if (model == null)
-           {
-               return NotFound(
-                   "TPO feedback questions were not found.");
-           }
+                                nTPO = 1
+                            };
+                        }
+                    }
+                }
+            }
 
 
-           // ---------------------------------------------------------
-           // VIEW DATA
-           // ---------------------------------------------------------
+            // ---------------------------------------------------------
+            // NO QUESTION FOUND
+            // ---------------------------------------------------------
 
-           ViewData["Panel"] = "TPO";
-
-           ViewData["UserName"] =
-               HttpContext.Session.GetString("TPOName")
-               ?? "TPO";
-
-           ViewData["Title"] = "Create Feedback";
+            if (model == null)
+            {
+                return NotFound(
+                    "TPO feedback questions were not found.");
+            }
 
 
-           return View(model);
-       }
+            // ---------------------------------------------------------
+            // VIEW DATA
+            // ---------------------------------------------------------
+
+            ViewData["Panel"] = "TPO";
+
+            ViewData["UserName"] =
+                HttpContext.Session.GetString("TPOName")
+                ?? "TPO";
+
+            ViewData["Title"] = "Create Feedback";
+
+
+            return View(model);
+        }
 
         // =============================================================
         // TPO CREATE FEEDBACK - POST
@@ -1094,6 +1094,24 @@ namespace ErJobPortal.Controllers
             ViewData["Title"] = "View TPO Profile";
 
             return View(model);
+        }
+
+        [HttpGet]
+        [Route("TPO/CreateNotification")]
+        public IActionResult CreateNotification()
+        {
+
+
+            return View();
+        }
+
+        [HttpGet]
+        [Route("TPO/SendNotification")]
+        public IActionResult SendNotification()
+        {
+
+
+            return View();
         }
 
 
