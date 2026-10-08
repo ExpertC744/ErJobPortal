@@ -1,0 +1,61 @@
+*[33m-[m[33m.[m   [33m3f05033[m[33m ([m[1;35mrefs/stash[m[33m)[m On master: Checking out ErKhushi
+[31m|[m[32m\[m [33m\[m  
+[31m|[m [32m|[m * [33m0e9bb7a[m untracked files on master: c4edf6d Merge pull request #79 from ExpertC744/karan
+[31m|[m * [33m4dd9809[m index on master: c4edf6d Merge pull request #79 from ExpertC744/karan
+[31m|[m[31m/[m  
+[31m|[m * [33m3ef735e[m[33m ([m[1;31morigin/master[m[33m, [m[1;31morigin/HEAD[m[33m)[m Merge pull request #82 from ExpertC744/Shrirang
+[31m|[m[31m/[m[35m|[m 
+[31m|[m *   [33m5b58e47[m[33m ([m[1;31morigin/Shrirang[m[33m)[m Merge branch 'master' into Shrirang
+[31m|[m [36m|[m[31m\[m  
+[31m|[m [36m|[m[31m/[m  
+[31m|[m[31m/[m[36m|[m   
+[31m|[m * [33m9849e5c[m tpo task changes and resume images shrirang
+[31m|[m [1;31m|[m *   [33m69dcc6f[m[33m ([m[1;31morigin/saumya[m[33m)[m Merge pull request #81 from ExpertC744/master
+[31m|[m [1;31m|[m [1;32m|[m[31m\[m  
+[31m|[m [1;31m|[m[31m_[m[1;32m|[m[31m/[m  
+[31m|[m[31m/[m[1;31m|[m [1;32m|[m   
+[31m|[m [1;31m|[m [1;32m|[m *   [33m86288d2[m[33m ([m[1;31morigin/karan[m[33m)[m Merge pull request #80 from ExpertC744/master
+[31m|[m [1;31m|[m [1;32m|[m [1;34m|[m[31m\[m  
+[31m|[m [1;31m|[m[31m_[m[1;32m|[m[31m_[m[1;34m|[m[31m/[m  
+[31m|[m[31m/[m[1;31m|[m [1;32m|[m [1;34m|[m   
+* [1;31m|[m [1;32m|[m [1;34m|[m   [33mc4edf6d[m[33m ([m[1;32mmaster[m[33m)[m Merge pull request #79 from ExpertC744/karan
+[1;36m|[m[1;34m\[m [1;31m\[m [1;32m\[m [1;34m\[m  
+[1;36m|[m [1;34m|[m [1;31m|[m[1;34m_[m[1;32m|[m[1;34m/[m  
+[1;36m|[m [1;34m|[m[1;34m/[m[1;31m|[m [1;32m|[m   
+[1;36m|[m * [1;31m|[m [1;32m|[m   [33m1818f91[m Anam,Radika,Karan updated changes in resumes
+[1;36m|[m [32m|[m[33m\[m [1;31m\[m [1;32m\[m  
+[1;36m|[m [32m|[m * [1;31m|[m [1;32m|[m [33m3b5893b[m Revert "Anam,Radhika,Karan"
+[1;36m|[m [32m|[m * [1;31m|[m [1;32m|[m [33m4bea4b9[m Reapply "Anam,Radhika,Karan"
+[1;36m|[m [32m|[m * [1;31m|[m [1;32m|[m [33m92fec83[m Revert "Anam,Radhika,Karan"
+[1;36m|[m [32m|[m[1;36m/[m [1;31m/[m [1;32m/[m  
+[1;36m|[m[1;36m/[m[32m|[m [1;31m|[m [1;32m|[m   
+* [32m|[m [1;31m|[m [1;32m|[m [33m6d9f8b0[m Anam,Radhika,Karan
+* [32m|[m [1;31m|[m [1;32m|[m [33m1410d76[m .
+* [32m|[m [1;31m|[m [1;32m|[m [33m4340fa1[m ..
+* [32m|[m [1;31m|[m [1;32m|[m   [33m04406c8[m .
+[34m|[m[35m\[m [32m\[m [1;31m\[m [1;32m\[m  
+[34m|[m * [32m\[m [1;31m\[m [1;32m\[m   [33m414c722[m Merge Shrirang branch into master
+[34m|[m [36m|[m[1;31m\[m [32m\[m [1;31m\[m [1;32m\[m  
+[34m|[m [36m|[m [1;31m|[m [32m|[m[1;31m/[m [1;32m/[m  
+[34m|[m [36m|[m [1;31m|[m[1;31m/[m[32m|[m [1;32m|[m   
+[34m|[m [36m|[m * [32m|[m [1;32m|[m [33m7e41a6f[m tpo shrirang changes
+[34m|[m [36m|[m * [32m|[m [1;32m|[m [33m3c83e56[m tpo model shrirang
+* [36m|[m [1;31m|[m [32m|[m [1;32m|[m [33m6c74a6e[m .
+[36m|[m[36m/[m [1;31m/[m [32m/[m [1;32m/[m  
+* [1;31m|[m [32m|[m [1;32m|[m   [33m54e7e7e[m Merge changes into master
+[1;32m|[m[1;33m\[m [1;31m\[m [32m\[m [1;32m\[m  
+[1;32m|[m * [1;31m\[m [32m\[m [1;32m\[m   [33ma9efba8[m Merge master changes into Er.Hemant
+[1;32m|[m [1;34m|[m[1;35m\[m [1;31m\[m [32m\[m [1;32m\[m  
+[1;32m|[m * [1;35m|[m [1;31m|[m [32m|[m [1;32m|[m [33m825d16a[m .
+[1;32m|[m * [1;35m|[m [1;31m|[m [32m|[m [1;32m|[m [33mb498c89[m .
+* [1;35m|[m [1;35m|[m [1;31m|[m [32m|[m [1;32m|[m   [33mf60caef[m Merge pull request #77 from ExpertC744/Shrirang
+[1;35m|[m[1;31m\[m [1;35m\[m [1;35m\[m [1;31m\[m [32m\[m [1;32m\[m  
+[1;35m|[m [1;31m|[m[1;35m_[m[1;35m|[m[1;35m/[m [1;31m/[m [32m/[m [1;32m/[m  
+[1;35m|[m[1;35m/[m[1;31m|[m [1;35m|[m [1;31m/[m [32m/[m [1;32m/[m   
+[1;35m|[m [1;31m|[m [1;35m|[m[1;31m/[m [32m/[m [1;32m/[m    
+[1;35m|[m [1;31m|[m[1;31m/[m[1;35m|[m [32m|[m [1;32m|[m     
+[1;35m|[m * [1;35m|[m [32m|[m [1;32m|[m [33ma1e8281[m shrirang changes
+[1;35m|[m * [1;35m|[m [32m|[m [1;32m|[m   [33m060d545[m Merge pull request #67 from ExpertC744/master
+[1;35m|[m [32m|[m[33m\[m [1;35m\[m [32m\[m [1;32m\[m  
+[1;35m|[m [32m|[m [33m|[m [1;35m|[m * [1;32m|[m [33ma6dc6da[m Reapply "Anam,Radhika,Karan"
+[1;35m|[m [32m|[m [33m|[m [1;35m|[m * [1;32m|[m [33m7eff37b[m Revert "Anam,Radhika,Karan"
