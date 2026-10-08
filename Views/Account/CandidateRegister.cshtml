@@ -27,6 +27,7 @@
                class="switch-btn">
                 Organization
             </a>
+
             <a asp-controller="Account"
                asp-action="TPORegister"
                class="switch-btn">
@@ -58,6 +59,7 @@
         <!-- =====================================================
              SUCCESS / ERROR MESSAGE
         ====================================================== -->
+
         @if (TempData["Success"] != null)
         {
             <div class="alert alert-success register-alert">
@@ -86,10 +88,41 @@
 
 
             <!-- =================================================
-                 FIRST NAME + LAST NAME
+                 PREFIX + FIRST NAME + LAST NAME
             ================================================== -->
 
             <div class="register-form-row">
+
+                <!-- Prefix -->
+
+                <div class="register-form-group">
+
+                    <label asp-for="sPrefix"
+                           class="register-label">
+                        Prefix
+                    </label>
+
+                    <select asp-for="sPrefix"
+                            class="register-select">
+
+                        <option value="">
+                            -- Select Prefix --
+                        </option>
+
+                        <option value="1">Mr.</option>
+                        <option value="2">Ms.</option>
+                        <option value="3">Mrs.</option>
+                        <option value="4">Dr.</option>
+                        <option value="5">Prof.</option>
+
+                    </select>
+
+                    <span asp-validation-for="sPrefix"
+                          class="text-danger register-validation">
+                    </span>
+
+                </div>
+
 
                 <!-- First Name -->
 
@@ -203,7 +236,7 @@
 
 
             <!-- =================================================
-                 MOBILE + EMAIL
+                 MOBILE + ALTERNATE MOBILE + EMAIL
             ================================================== -->
 
             <div class="register-form-row">
@@ -222,9 +255,34 @@
                            class="register-input"
                            placeholder="Enter mobile number"
                            maxlength="10"
+                           inputmode="numeric"
                            autocomplete="tel" />
 
                     <span asp-validation-for="sMobile"
+                          class="text-danger register-validation">
+                    </span>
+
+                </div>
+
+
+                <!-- Alternate Mobile -->
+
+                <div class="register-form-group">
+
+                    <label asp-for="sAlternateMobile"
+                           class="register-label">
+                        Alternate Mobile Number
+                    </label>
+
+                    <input asp-for="sAlternateMobile"
+                           type="tel"
+                           class="register-input"
+                           placeholder="Enter alternate mobile number"
+                           maxlength="10"
+                           inputmode="numeric"
+                           autocomplete="tel" />
+
+                    <span asp-validation-for="sAlternateMobile"
                           class="text-danger register-validation">
                     </span>
 
@@ -465,80 +523,82 @@
                 </div>
 
             </div>
+
+
             <!-- =================================================
-     CURRENT YEAR + ADMISSION YEAR
-================================================== -->
+                 CURRENT YEAR + ADMISSION YEAR
+            ================================================== -->
 
-<div class="register-form-row">
+            <div class="register-form-row">
 
-    <!-- Current Year -->
+                <!-- Current Year -->
 
-    <div class="register-form-group">
+                <div class="register-form-group">
 
-        <label asp-for="nCurrentYear"
-               class="register-label">
-            Current Year
-        </label>
+                    <label asp-for="nCurrentYear"
+                           class="register-label">
+                        Current Year
+                    </label>
 
-        <select asp-for="nCurrentYear"
-                class="register-select">
+                    <select asp-for="nCurrentYear"
+                            class="register-select">
 
-            <option value="">
-                -- Select Current Year --
-            </option>
+                        <option value="">
+                            -- Select Current Year --
+                        </option>
 
-            <option value="1">1st</option>
-            <option value="2">2nd</option>
-            <option value="3">3rd</option>
-            <option value="4">4th</option>
-            <option value="5">5th</option>
+                        <option value="1">1st</option>
+                        <option value="2">2nd</option>
+                        <option value="3">3rd</option>
+                        <option value="4">4th</option>
+                        <option value="5">5th</option>
 
-        </select>
+                    </select>
 
-        <span asp-validation-for="nCurrentYear"
-              class="text-danger register-validation">
-        </span>
+                    <span asp-validation-for="nCurrentYear"
+                          class="text-danger register-validation">
+                    </span>
 
-    </div>
+                </div>
 
 
-    <!-- Admission Year -->
+                <!-- Admission Year -->
 
-    <div class="register-form-group">
+                <div class="register-form-group">
 
-        <label asp-for="nAdmissionYear"
-               class="register-label">
-            Admission Year
-        </label>
+                    <label asp-for="nAdmissionYear"
+                           class="register-label">
+                        Admission Year
+                    </label>
 
-        <select asp-for="nAdmissionYear"
-                class="register-select">
+                    <select asp-for="nAdmissionYear"
+                            class="register-select">
 
-            <option value="">
-                -- Select Admission Year --
-            </option>
+                        <option value="">
+                            -- Select Admission Year --
+                        </option>
 
-            <option value="2020">2020</option>
-            <option value="2021">2021</option>
-            <option value="2022">2022</option>
-            <option value="2023">2023</option>
-            <option value="2024">2024</option>
-            <option value="2025">2025</option>
-            <option value="2026">2026</option>
-            <option value="2027">2027</option>
-            <option value="2028">2028</option>
-            <option value="2029">2029</option>
-            <option value="2030">2030</option>
+                        <option value="2020">2020</option>
+                        <option value="2021">2021</option>
+                        <option value="2022">2022</option>
+                        <option value="2023">2023</option>
+                        <option value="2024">2024</option>
+                        <option value="2025">2025</option>
+                        <option value="2026">2026</option>
+                        <option value="2027">2027</option>
+                        <option value="2028">2028</option>
+                        <option value="2029">2029</option>
+                        <option value="2030">2030</option>
 
-        </select>
+                    </select>
 
-        <span asp-validation-for="nAdmissionYear"
-              class="text-danger register-validation">
-        </span>
+                    <span asp-validation-for="nAdmissionYear"
+                          class="text-danger register-validation">
+                    </span>
 
-    </div>
+                </div>
 
-</div>
+            </div>
 
 
             <!-- =================================================
@@ -700,6 +760,20 @@
                 .on('blur', function () {
 
                     this.value = this.value.trim();
+
+                });
+
+
+            // =====================================================
+            // MOBILE NUMBER - DIGITS ONLY
+            // =====================================================
+
+            $('input[name="sMobile"], input[name="sAlternateMobile"]')
+                .on('input', function () {
+
+                    this.value = this.value
+                        .replace(/\D/g, '')
+                        .substring(0, 10);
 
                 });
 
@@ -1041,7 +1115,6 @@
                 });
 
             });
-
 
         });
 

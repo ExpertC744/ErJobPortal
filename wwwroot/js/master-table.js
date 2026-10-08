@@ -49,11 +49,11 @@
         var masterTable =
             tableElement.DataTable({
 
-                pageLength: 10,
+                pageLength: 5,
 
                 lengthMenu: [
-                    [10, 25, 50, 100],
-                    [10, 25, 50, 100]
+                    [5, 10, 25, 50, 100],
+                    [5, 10, 25, 50, 100]
                 ],
 
                 order: [

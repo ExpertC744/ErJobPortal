@@ -1,51 +1,149 @@
-﻿@model List<ErJobPortal.Models.TPOTraineeInfoM>
+﻿@using ErJobPortal.Models
+
+@model List<TPOTraineeInfoM>
 
 @{
     Layout = "~/Views/Shared/_DashboardLayout.cshtml";
 
     ViewData["Title"] = "Trainee Information";
     ViewData["Panel"] = "TPO";
-    ViewData["UserName"] = Context.Session.GetString("TPOName") ?? "TPO";
+
+    ViewData["UserName"] =
+        Context.Session.GetString("TPOName") ?? "TPO";
+
+
+    // =========================================================
+    // COLLEGE
+    // =========================================================
 
     string collegeName =
         ViewBag.CollegeName?.ToString() ?? "";
+
+    int collegeId =
+        ViewBag.CollegeId != null
+            ? Convert.ToInt32(ViewBag.CollegeId)
+            : 0;
+
+
+    // =========================================================
+    // DEPARTMENT
+    // =========================================================
+
+    string departmentName =
+        ViewBag.DepartmentName?.ToString() ?? "";
+
+    int? departmentId =
+        ViewBag.DepartmentId != null
+            ? Convert.ToInt32(ViewBag.DepartmentId)
+            : null;
+
+
+    // =========================================================
+    // TRAINEE COUNT
+    // =========================================================
 
     int traineeCount =
         ViewBag.TraineeCount != null
             ? Convert.ToInt32(ViewBag.TraineeCount)
             : 0;
+
+
+    // =========================================================
+    // FILTER VALUES
+    // =========================================================
+
+    string searchText =
+        ViewBag.SearchText?.ToString() ?? "";
+
+    int? selectedBranch =
+        ViewBag.BranchId != null
+            ? Convert.ToInt32(ViewBag.BranchId)
+            : null;
+
+    int? selectedCurrentYear =
+        ViewBag.CurrentYear != null
+            ? Convert.ToInt32(ViewBag.CurrentYear)
+            : null;
+
+    int? selectedAdmissionYear =
+        ViewBag.AdmissionYear != null
+            ? Convert.ToInt32(ViewBag.AdmissionYear)
+            : null;
+
+    int? selectedPassoutYear =
+        ViewBag.PassoutYear != null
+            ? Convert.ToInt32(ViewBag.PassoutYear)
+            : null;
+
+    int? selectedGender =
+        ViewBag.Gender != null
+            ? Convert.ToInt32(ViewBag.Gender)
+            : null;
+
+
+    // =========================================================
+    // BRANCH LIST
+    // =========================================================
+
+    List<BranchM> branches =
+        ViewBag.Branches as List<BranchM>
+        ?? new List<BranchM>();
+
 }
 
-<div class="container-fluid">
+<div class="container-fluid py-4">
 
     <!-- =====================================================
-         PAGE HEADER
-    ====================================================== -->
+     PAGE HEADER
+====================================================== -->
 
-    <div class="d-flex justify-content-between align-items-center mb-3">
+    <div class="d-flex justify-content-between align-items-center mb-4">
 
         <div>
 
-            <h2 class="mb-1">
+            <h3 class="mb-1">
+                <i class="bi bi-people-fill me-2"></i>
                 Trainee Information
-            </h2>
+            </h3>
 
             <div class="text-muted">
-                College:
-                <strong>
-                    @collegeName
-                </strong>
+
+                @if (!string.IsNullOrWhiteSpace(collegeName))
+                {
+                    <span>
+                        College ID:
+                        <strong>@collegeName</strong>
+                    </span>
+                }
+
+                @if (departmentId.HasValue)
+                {
+                    <span class="ms-3">
+                        Department:
+                        <strong>
+                            @departmentName
+                        </strong>
+                    </span>
+                }
+
             </div>
 
         </div>
 
-        <div>
 
-            <span class="badge bg-primary"
-                  style="font-size:15px; padding:10px 15px;">
-                Total Trainees:
+        <!-- =================================================
+         TRAINEE COUNT
+    ================================================== -->
+
+        <div class="text-end">
+
+            <div class="small text-muted">
+                Total Trainees
+            </div>
+
+            <h3 class="mb-0">
                 @traineeCount
-            </span>
+            </h3>
 
         </div>
 
@@ -53,170 +151,720 @@
 
 
     <!-- =====================================================
-         SEARCH
-    ====================================================== -->
+     FILTER CARD
+====================================================== -->
 
-    <div class="card mb-3">
+    <div class="card shadow-sm border-0 mb-4">
 
-        <div class="card-body">
+        <div class="card-header bg-white">
 
-            <input type="text"
-                   id="traineeSearch"
-                   class="form-control"
-                   placeholder="Search by name, email or mobile..." />
+            <div class="d-flex align-items-center">
+
+                <i class="bi bi-funnel-fill me-2"></i>
+
+                <strong>
+                    Filter Trainees
+                </strong>
+
+            </div>
 
         </div>
 
-    </div>
-
-
-    <!-- =====================================================
-         TABLE
-    ====================================================== -->
-
-    <div class="card">
 
         <div class="card-body">
 
-            <div class="table-responsive">
+            <form asp-controller="TPO"
+                  asp-action="TraineesInfo"
+                  method="get">
 
-                <table class="table table-bordered table-hover"
-                       id="traineeTable">
+                <!-- =================================================
+                 ROW 1
+            ================================================== -->
 
-                    <thead>
+                <div class="row g-3">
 
-                        <tr>
 
-                            <th>
-                                Sr. No.
-                            </th>
+                    <!-- SEARCH -->
 
-                            <th>
-                                Name
-                            </th>
+                    <div class="col-lg-4 col-md-6">
 
-                            <th>
-                                Mobile
-                            </th>
+                        <label class="form-label">
+                            Search
+                        </label>
 
-                            <th>
-                                Email
-                            </th>
+                        <input type="text"
+                               name="searchText"
+                               value="@searchText"
+                               class="form-control"
+                               placeholder="Search by name, mobile, email, DOB..." />
 
-                            <th>
-                                DOB
-                            </th>
+                    </div>
 
-                            <th>
-                                College Code
-                            </th>
 
-                            <th>
-                                Current Year
-                            </th>
+                    <!-- BRANCH -->
 
-                            <th>
-                                Admission Year
-                            </th>
+                    <div class="col-lg-2 col-md-6">
 
-                            <th>
-                                Passout Year
-                            </th>
+                        <label class="form-label">
+                            Branch
+                        </label>
 
-                            <th>
-                                Registration Date
-                            </th>
+                        <select name="branchId"
+                                class="form-select">
 
-                        </tr>
+                            <option value="">
+                                All Branches
+                            </option>
 
-                    </thead>
-
-                    <tbody>
-
-                        @if (Model != null &&
-                             Model.Count > 0)
-                        {
-                            int srNo = 1;
-
-                            foreach (var trainee in Model)
+                            @foreach (BranchM branch in branches)
                             {
+                                if (selectedBranch.HasValue &&
+                                    selectedBranch.Value == branch.nID)
+                                {
+                                    <option value="@branch.nID"
+                                            selected>
+                                        @branch.sBranch
+                                    </option>
+                                }
+                                else
+                                {
+                                    <option value="@branch.nID">
+                                        @branch.sBranch
+                                    </option>
+                                }
+                            }
+
+                        </select>
+
+                    </div>
+
+
+                    <!-- CURRENT YEAR -->
+
+                    <div class="col-lg-2 col-md-6">
+
+                        <label class="form-label">
+                            Current Year
+                        </label>
+
+                        <select name="currentYear"
+                                class="form-select">
+
+                            <option value="">
+                                All Years
+                            </option>
+
+                            @for (int year = 1; year <= 5; year++)
+                            {
+                                if (selectedCurrentYear.HasValue &&
+                                    selectedCurrentYear.Value == year)
+                                {
+                                    <option value="@year"
+                                            selected>
+                                        Year @year
+                                    </option>
+                                }
+                                else
+                                {
+                                    <option value="@year">
+                                        Year @year
+                                    </option>
+                                }
+                            }
+
+                        </select>
+
+                    </div>
+
+
+                    <!-- GENDER -->
+
+                    <div class="col-lg-2 col-md-6">
+
+                        <label class="form-label">
+                            Gender
+                        </label>
+
+                        <select name="gender"
+                                class="form-select">
+
+                            <option value="">
+                                All Gender
+                            </option>
+
+
+                            @if (selectedGender == 1)
+                            {
+                                <option value="1"
+                                        selected>
+                                    Male
+                                </option>
+                            }
+                            else
+                            {
+                                <option value="1">
+                                    Male
+                                </option>
+                            }
+
+
+                            @if (selectedGender == 2)
+                            {
+                                <option value="2"
+                                        selected>
+                                    Female
+                                </option>
+                            }
+                            else
+                            {
+                                <option value="2">
+                                    Female
+                                </option>
+                            }
+
+
+                            @if (selectedGender == 3)
+                            {
+                                <option value="3"
+                                        selected>
+                                    Other
+                                </option>
+                            }
+                            else
+                            {
+                                <option value="3">
+                                    Other
+                                </option>
+                            }
+
+                        </select>
+
+                    </div>
+
+
+                    <!-- FILTER BUTTON -->
+
+                    <div class="col-lg-2 col-md-6 d-flex align-items-end">
+
+                        <button type="submit"
+                                class="btn btn-primary w-100">
+
+                            <i class="bi bi-funnel me-1"></i>
+
+                            Filter
+
+                        </button>
+
+                    </div>
+
+                </div>
+
+
+                <!-- =================================================
+                 ROW 2
+            ================================================== -->
+
+                <div class="row g-3 mt-1">
+
+
+                    <!-- ADMISSION YEAR -->
+
+                    <div class="col-lg-3 col-md-6">
+
+                        <label class="form-label">
+                            Admission Year
+                        </label>
+
+                        <input type="number"
+                               name="admissionYear"
+                               value="@selectedAdmissionYear"
+                               class="form-control"
+                               placeholder="e.g. 2025"
+                               min="1900"
+                               max="2100" />
+
+                    </div>
+
+
+                    <!-- PASSOUT YEAR -->
+
+                    <div class="col-lg-3 col-md-6">
+
+                        <label class="form-label">
+                            Passout Year
+                        </label>
+
+                        <input type="number"
+                               name="passoutYear"
+                               value="@selectedPassoutYear"
+                               class="form-control"
+                               placeholder="e.g. 2027"
+                               min="1900"
+                               max="2100" />
+
+                    </div>
+
+
+                    <!-- DEPARTMENT -->
+
+                    <div class="col-lg-3 col-md-6">
+
+                        <label class="form-label">
+                            Department
+                        </label>
+
+                        <input type="text"
+                               class="form-control"
+                               value="@departmentName"
+                               readonly />
+
+                    </div>
+
+
+                    <!-- CLEAR -->
+
+                    <div class="col-lg-3 col-md-6 d-flex align-items-end">
+
+                        <a asp-controller="TPO"
+                           asp-action="TraineesInfo"
+                           class="btn btn-outline-secondary w-100">
+
+                            <i class="bi bi-arrow-counterclockwise me-1"></i>
+
+                            Clear Filters
+
+                        </a>
+
+                    </div>
+
+                </div>
+
+            </form>
+
+        </div>
+
+    </div>
+
+
+    <!-- =====================================================
+     TRAINEE TABLE
+====================================================== -->
+
+    <div class="card shadow-sm border-0">
+
+        <div class="card-header bg-white">
+
+            <div class="d-flex justify-content-between align-items-center">
+
+                <strong>
+                    Trainee List
+                </strong>
+
+                <span class="badge bg-primary">
+                    @traineeCount
+                </span>
+
+            </div>
+
+        </div>
+
+
+        <div class="card-body p-0">
+
+            @if (Model != null &&
+                 Model.Any())
+            {
+
+                <div class="table-responsive">
+
+                    <table class="table table-hover table-bordered align-middle mb-0">
+
+                        <thead class="table-light">
+
+                            <tr>
+
+                                <th class="text-center">
+                                    Sr. No.
+                                </th>
+
+                                <th>
+                                    Name
+                                </th>
+
+                                <th>
+                                    Gender
+                                </th>
+
+                                <th>
+                                    Mobile
+                                </th>
+
+                                <th>
+                                    Email
+                                </th>
+
+                                <th class="text-center">
+                                    Profile
+                                </th>
+
+                                <th>
+                                    DOB
+                                </th>
+
+                                <th>
+                                    Branch
+                                </th>
+
+                                <th>
+                                    Current Year
+                                </th>
+
+                                <th>
+                                    Admission Year
+                                </th>
+
+                                <th>
+                                    Passout Year
+                                </th>
+
+                                <th>
+                                    Registration Date
+                                </th>
+
+                                <th class="text-center">
+                                    Resume
+                                </th>
+
+                            </tr>
+
+                        </thead>
+
+
+                        <tbody>
+
+                            @{
+                                int srNo = 1;
+                            }
+
+                            @foreach (TPOTraineeInfoM trainee in Model)
+                            {
+
                                 <tr>
 
-                                    <td>
+
+                                    <!-- =================================
+                                     SR NO
+                                ================================== -->
+
+                                    <td class="text-center">
                                         @srNo
                                     </td>
 
-                                    <td>
-                                        @trainee.FullName
-                                    </td>
+
+                                    <!-- =================================
+                                     NAME
+                                ================================== -->
 
                                     <td>
-                                        @trainee.sMobile
+
+                                        <strong>
+
+                                            @if (!string.IsNullOrWhiteSpace(
+                                                trainee.PrefixName))
+                                            {
+                                                @trainee.PrefixName
+                                                <text> </text>
+                                            }
+
+                                            @trainee.FullName
+
+                                        </strong>
+
                                     </td>
 
-                                    <td>
-                                        @trainee.sEmail
-                                    </td>
+
+                                    <!-- =================================
+                                     GENDER
+                                ================================== -->
 
                                     <td>
-                                        @(trainee.DOB.HasValue
-                                            ? trainee.DOB.Value.ToString("dd-MM-yyyy")
-                                            : "-")
+                                        @(string.IsNullOrWhiteSpace(
+                                            trainee.GenderName)
+                                            ? "-"
+                                            : trainee.GenderName)
                                     </td>
 
-                                    <td>
-                                        @trainee.nCollegeCode
-                                    </td>
+
+                                    <!-- =================================
+                                     MOBILE
+                                ================================== -->
 
                                     <td>
-                                        @(trainee.nCurrentYear.HasValue
-                                            ? trainee.nCurrentYear.ToString()
-                                            : "-")
+
+                                        @if (!string.IsNullOrWhiteSpace(
+                                            trainee.sMobile))
+                                        {
+                                            @trainee.sMobile
+                                        }
+                                        else
+                                        {
+                                            <span class="text-muted">
+                                                -
+                                            </span>
+                                        }
+
                                     </td>
 
-                                    <td>
-                                        @(trainee.nAdmissionYear.HasValue
-                                            ? trainee.nAdmissionYear.ToString()
-                                            : "-")
-                                    </td>
+
+                                    <!-- =================================
+                                     EMAIL
+                                ================================== -->
 
                                     <td>
-                                        @(trainee.nPassoutYear.HasValue
-                                            ? trainee.nPassoutYear.ToString()
-                                            : "-")
+
+                                        @if (!string.IsNullOrWhiteSpace(
+                                            trainee.sEmail))
+                                        {
+                                            @trainee.sEmail
+                                        }
+                                        else
+                                        {
+                                            <span class="text-muted">
+                                                -
+                                            </span>
+                                        }
+
                                     </td>
 
+
+                                    <!-- =================================
+                                     PROFILE IMAGE
+                                ================================== -->
+
+                                    <td class="text-center">
+
+                                        @if (!string.IsNullOrWhiteSpace(
+                                            trainee.sProfileImage))
+                                        {
+
+                                            string imagePath =
+                                                trainee.sProfileImage
+                                                    .StartsWith("/")
+                                                    ? trainee.sProfileImage
+                                                    : Url.Content(
+                                                        "~/Uploads/Profile/" +
+                                                        trainee.sProfileImage);
+
+                                            <img src="@imagePath"
+                                                 alt="Profile"
+                                                 width="45"
+                                                 height="45"
+                                                 style="object-fit:cover;border-radius:50%;"
+                                                 onerror="this.style.display='none';" />
+
+                                        }
+                                        else
+                                        {
+
+                                            <div class="rounded-circle bg-light d-inline-flex align-items-center justify-content-center"
+                                                 style="width:45px;height:45px;">
+
+                                                <i class="bi bi-person text-muted"></i>
+
+                                            </div>
+
+                                        }
+
+                                    </td>
+
+
+                                    <!-- =================================
+                                     DOB
+                                ================================== -->
+
                                     <td>
-                                        @(trainee.RegDate.HasValue
-                                            ? trainee.RegDate.Value.ToString("dd-MM-yyyy")
-                                            : "-")
+
+                                        @if (trainee.DOB.HasValue)
+                                        {
+                                            @trainee.DOB.Value.ToString("dd-MM-yyyy")
+                                        }
+                                        else
+                                        {
+                                            <span class="text-muted">
+                                                -
+                                            </span>
+                                        }
+
+                                    </td>
+
+
+                                    <!-- =================================
+                                     BRANCH
+                                ================================== -->
+
+                                    <td>
+
+                                        @if (!string.IsNullOrWhiteSpace(
+                                            trainee.BranchName) &&
+                                            trainee.BranchName != "-")
+                                        {
+                                            @trainee.BranchName
+                                        }
+                                        else
+                                        {
+                                            <span class="text-muted">
+                                                -
+                                            </span>
+                                        }
+
+                                    </td>
+
+
+                                    <!-- =================================
+                                     CURRENT YEAR
+                                ================================== -->
+
+                                    <td>
+
+                                        @if (trainee.nCurrentYear.HasValue)
+                                        {
+                                            @trainee.nCurrentYear
+                                        }
+                                        else
+                                        {
+                                            <span class="text-muted">
+                                                -
+                                            </span>
+                                        }
+
+                                    </td>
+
+
+                                    <!-- =================================
+                                     ADMISSION YEAR
+                                ================================== -->
+
+                                    <td>
+
+                                        @if (trainee.nAdmissionYear.HasValue)
+                                        {
+                                            @trainee.nAdmissionYear
+                                        }
+                                        else
+                                        {
+                                            <span class="text-muted">
+                                                -
+                                            </span>
+                                        }
+
+                                    </td>
+
+
+                                    <!-- =================================
+                                     PASSOUT YEAR
+                                ================================== -->
+
+                                    <td>
+
+                                        @if (trainee.nPassoutYear.HasValue)
+                                        {
+                                            @trainee.nPassoutYear
+                                        }
+                                        else
+                                        {
+                                            <span class="text-muted">
+                                                -
+                                            </span>
+                                        }
+
+                                    </td>
+
+
+                                    <!-- =================================
+                                     REGISTRATION DATE
+                                ================================== -->
+
+                                    <td>
+
+                                        @if (trainee.RegDate.HasValue)
+                                        {
+                                            @trainee.RegDate.Value.ToString(
+                                                "dd-MM-yyyy")
+                                        }
+                                        else
+                                        {
+                                            <span class="text-muted">
+                                                -
+                                            </span>
+                                        }
+
+                                    </td>
+
+
+                                    <!-- =================================
+                                     RESUME
+                                ================================== -->
+
+                                    <td class="text-center">
+
+                                        <a href="@Url.Action(
+                                                                                            "Resume",
+                                                                                            "Resume",
+                                                                                            new { id = trainee.nID })"
+                                           target="_blank"
+                                           rel="noopener noreferrer"
+                                           class="btn btn-sm btn-primary"
+                                           title="View Selected Resume">
+
+                                            <i class="bi bi-eye"></i>
+
+                                        </a>
+
                                     </td>
 
                                 </tr>
 
                                 srNo++;
                             }
-                        }
-                        else
-                        {
-                            <tr>
 
-                                <td colspan="10"
-                                    class="text-center">
+                        </tbody>
 
-                                    No trainees found
-                                    for this college.
+                    </table>
 
-                                </td>
+                </div>
 
-                            </tr>
-                        }
+            }
+            else
+            {
 
-                    </tbody>
+                <!-- =================================================
+                 NO DATA
+            ================================================== -->
 
-                </table>
+                <div class="text-center py-5">
 
-            </div>
+                    <div class="mb-3">
+
+                        <i class="bi bi-people"
+                           style="font-size:50px;color:#adb5bd;">
+                        </i>
+
+                    </div>
+
+                    <h5>
+                        No trainees found
+                    </h5>
+
+                    <p class="text-muted mb-0">
+
+                        No trainee records match the selected
+                        filters.
+
+                    </p>
+
+                </div>
+
+            }
 
         </div>
 
@@ -224,53 +872,51 @@
 
 </div>
 
+@section Scripts
+{
+    <script>
 
-<!-- =====================================================
-     SEARCH SCRIPT
-====================================================== -->
+        $(document).ready(function () {
 
-<script>
+            // =====================================================
+            // REMOVE LEADING SPACES FROM SEARCH
+            // =====================================================
 
-    document.addEventListener("DOMContentLoaded", function () {
+            $('input[name="searchText"]').on(
+                'input',
+                function () {
 
-        const searchBox =
-            document.getElementById("traineeSearch");
-
-        const table =
-            document.getElementById("traineeTable");
-
-        if (!searchBox || !table) {
-            return;
-        }
-
-        searchBox.addEventListener("keyup", function () {
-
-            const searchValue =
-                this.value.toLowerCase().trim();
-
-            const rows =
-                table.querySelectorAll("tbody tr");
-
-            rows.forEach(function (row) {
-
-                const rowText =
-                    row.textContent.toLowerCase();
-
-                if (rowText.includes(searchValue)) {
-
-                    row.style.display = "";
+                    this.value =
+                        this.value.replace(/^\s+/, '');
 
                 }
-                else {
+            );
 
-                    row.style.display = "none";
+
+            // =====================================================
+            // PREVENT EMPTY SEARCH SUBMISSION
+            // =====================================================
+
+            $('form').on(
+                'submit',
+                function () {
+
+                    const search =
+                        $('input[name="searchText"]');
+
+                    if (search.length > 0) {
+
+                        search.val(
+                            search.val().trim()
+                        );
+
+                    }
 
                 }
-
-            });
+            );
 
         });
 
-    });
+    </script>
 
-</script>
+}

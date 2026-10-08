@@ -1336,7 +1336,7 @@
                         @*shrirang 02/10/26*@
             <!-- ======================= RESUME PROFILE ======================= -->
             @{
-    var resumeCount = 12;
+    var resumeCount = 100;
     var pageSize = 8;
     var resumeExts = new[] { "jpeg", "jpg", "png", "webp" };
 
@@ -1356,13 +1356,13 @@
             var path = System.IO.Path.Combine(
                 Env.WebRootPath,
                 "Resume",
-                $"r{n}.{ext}");
+                            $"r{n}.{ext}");
 
             if (System.IO.File.Exists(path))
-                return $"r{n}.{ext}";
+                            return $"r{n}.{ext}";
         }
 
-        return $"r{n}.jpeg";
+                    return $"r{n}.jpeg";
     }
 }
 

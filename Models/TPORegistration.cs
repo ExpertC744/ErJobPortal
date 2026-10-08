@@ -153,5 +153,8 @@ namespace ErJobPortal.Models
         // =========================================================
 
         public string? TPOType { get; set; }
+
+
+        public int? nDepartment { get; set; }
     }
 }

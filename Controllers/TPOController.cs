@@ -472,54 +472,54 @@ namespace ErJobPortal.Controllers
         }
 
 
+  
+
+       //=============================================================
+       //TPO CREATE FEEDBACK - GET
+       //=============================================================
+
+       [HttpGet]
+       public IActionResult CreateFeedback()
+       {
+           // ---------------------------------------------------------
+           // CHECK TPO LOGIN
+           // ---------------------------------------------------------
+
+           int? tpoId =
+               HttpContext.Session.GetInt32("TPOID");
+
+           if (tpoId == null || tpoId <= 0)
+           {
+               return RedirectToAction(
+                   "TPOLogin",
+                   "Account");
+           }
 
 
-        //=============================================================
-        //TPO CREATE FEEDBACK - GET
-        //=============================================================
+           // ---------------------------------------------------------
+           // CREATE MODEL
+           // ---------------------------------------------------------
 
-        [HttpGet]
-        public IActionResult CreateFeedback()
-        {
-            // ---------------------------------------------------------
-            // CHECK TPO LOGIN
-            // ---------------------------------------------------------
-
-            int? tpoId =
-                HttpContext.Session.GetInt32("TPOID");
-
-            if (tpoId == null || tpoId <= 0)
-            {
-                return RedirectToAction(
-                    "TPOLogin",
-                    "Account");
-            }
+           TPOFeedbackViewModel? model = null;
 
 
-            // ---------------------------------------------------------
-            // CREATE MODEL
-            // ---------------------------------------------------------
+           // ---------------------------------------------------------
+           // CONNECTION STRING
+           // ---------------------------------------------------------
 
-            TPOFeedbackViewModel? model = null;
-
-
-            // ---------------------------------------------------------
-            // CONNECTION STRING
-            // ---------------------------------------------------------
-
-            string? connectionString =
-                _configuration.GetConnectionString(
-                    "DefaultConnection");
+           string? connectionString =
+               _configuration.GetConnectionString(
+                   "DefaultConnection");
 
 
-            // ---------------------------------------------------------
-            // GET ACTIVE FEEDBACK QUESTIONS
-            // ---------------------------------------------------------
+           // ---------------------------------------------------------
+           // GET ACTIVE FEEDBACK QUESTIONS
+           // ---------------------------------------------------------
 
-            using (SqlConnection con =
-                   new SqlConnection(connectionString))
-            {
-                string query = @"
+           using (SqlConnection con =
+                  new SqlConnection(connectionString))
+           {
+               string query = @"
            SELECT
                nID,
                Que1,
@@ -534,104 +534,104 @@ namespace ErJobPortal.Controllers
              AND ISNULL(nBit, 1) = 1";
 
 
-                using (SqlCommand cmd =
-                       new SqlCommand(query, con))
-                {
-                    con.Open();
+               using (SqlCommand cmd =
+                      new SqlCommand(query, con))
+               {
+                   con.Open();
 
-                    using (SqlDataReader reader =
-                           cmd.ExecuteReader())
-                    {
-                        if (reader.Read())
-                        {
-                            model = new TPOFeedbackViewModel
-                            {
-                                nID =
-                                    reader["nID"] == DBNull.Value
-                                    ? 0
-                                    : Convert.ToInt32(
-                                        reader["nID"]),
+                   using (SqlDataReader reader =
+                          cmd.ExecuteReader())
+                   {
+                       if (reader.Read())
+                       {
+                           model = new TPOFeedbackViewModel
+                           {
+                               nID =
+                                   reader["nID"] == DBNull.Value
+                                   ? 0
+                                   : Convert.ToInt32(
+                                       reader["nID"]),
 
-                                Que1 =
-                                    reader["Que1"] == DBNull.Value
-                                    ? ""
-                                    : reader["Que1"].ToString(),
+                               Que1 =
+                                   reader["Que1"] == DBNull.Value
+                                   ? ""
+                                   : reader["Que1"].ToString(),
 
-                                Que2 =
-                                    reader["Que2"] == DBNull.Value
-                                    ? ""
-                                    : reader["Que2"].ToString(),
+                               Que2 =
+                                   reader["Que2"] == DBNull.Value
+                                   ? ""
+                                   : reader["Que2"].ToString(),
 
-                                Que3 =
-                                    reader["Que3"] == DBNull.Value
-                                    ? ""
-                                    : reader["Que3"].ToString(),
+                               Que3 =
+                                   reader["Que3"] == DBNull.Value
+                                   ? ""
+                                   : reader["Que3"].ToString(),
 
-                                Que4 =
-                                    reader["Que4"] == DBNull.Value
-                                    ? ""
-                                    : reader["Que4"].ToString(),
+                               Que4 =
+                                   reader["Que4"] == DBNull.Value
+                                   ? ""
+                                   : reader["Que4"].ToString(),
 
-                                Que5 =
-                                    reader["Que5"] == DBNull.Value
-                                    ? ""
-                                    : reader["Que5"].ToString(),
+                               Que5 =
+                                   reader["Que5"] == DBNull.Value
+                                   ? ""
+                                   : reader["Que5"].ToString(),
 
-                                // TPO answers initially empty
-                                sQue1 = "",
-                                sQue2 = "",
-                                sQue3 = "",
-                                sQue4 = "",
-                                sQue5 = "",
+                               // TPO answers initially empty
+                               sQue1 = "",
+                               sQue2 = "",
+                               sQue3 = "",
+                               sQue4 = "",
+                               sQue5 = "",
 
-                                TPOID = tpoId.Value,
+                               TPOID = tpoId.Value,
 
-                                nBit =
-                                    reader["nBit"] == DBNull.Value
-                                    ? 1
-                                    : Convert.ToInt32(
-                                        reader["nBit"]),
+                               nBit =
+                                   reader["nBit"] == DBNull.Value
+                                   ? 1
+                                   : Convert.ToInt32(
+                                       reader["nBit"]),
 
-                                nSABit =
-                                    reader["nSABit"] == DBNull.Value
-                                    ? 0
-                                    : Convert.ToInt32(
-                                        reader["nSABit"]),
+                               nSABit =
+                                   reader["nSABit"] == DBNull.Value
+                                   ? 0
+                                   : Convert.ToInt32(
+                                       reader["nSABit"]),
 
-                                nTPO = 1
-                            };
-                        }
-                    }
-                }
-            }
-
-
-            // ---------------------------------------------------------
-            // NO QUESTION FOUND
-            // ---------------------------------------------------------
-
-            if (model == null)
-            {
-                return NotFound(
-                    "TPO feedback questions were not found.");
-            }
+                               nTPO = 1
+                           };
+                       }
+                   }
+               }
+           }
 
 
-            // ---------------------------------------------------------
-            // VIEW DATA
-            // ---------------------------------------------------------
+           // ---------------------------------------------------------
+           // NO QUESTION FOUND
+           // ---------------------------------------------------------
 
-            ViewData["Panel"] = "TPO";
-
-            ViewData["UserName"] =
-                HttpContext.Session.GetString("TPOName")
-                ?? "TPO";
-
-            ViewData["Title"] = "Create Feedback";
+           if (model == null)
+           {
+               return NotFound(
+                   "TPO feedback questions were not found.");
+           }
 
 
-            return View(model);
-        }
+           // ---------------------------------------------------------
+           // VIEW DATA
+           // ---------------------------------------------------------
+
+           ViewData["Panel"] = "TPO";
+
+           ViewData["UserName"] =
+               HttpContext.Session.GetString("TPOName")
+               ?? "TPO";
+
+           ViewData["Title"] = "Create Feedback";
+
+
+           return View(model);
+       }
 
         // =============================================================
         // TPO CREATE FEEDBACK - POST
@@ -1096,24 +1096,6 @@ namespace ErJobPortal.Controllers
             return View(model);
         }
 
-        [HttpGet]
-        [Route("TPO/CreateNotification")]
-        public IActionResult CreateNotification()
-        {
-
-
-            return View();
-        }
-
-        [HttpGet]
-        [Route("TPO/SendNotification")]
-        public IActionResult SendNotification()
-        {
-
-
-            return View();
-        }
-
 
         [HttpPost]
         [ValidateAntiForgeryToken]
@@ -1398,22 +1380,33 @@ namespace ErJobPortal.Controllers
         }
 
         // shrirang 06/10/26
-
+        // shrirang 07/10/26
         // =====================================================
         // TPO TRAINEE INFORMATION
         // =====================================================
 
+        // ============================================================
+        // TPO - TRAINEE INFORMATION
+        // ============================================================
+
         [HttpGet]
-        public IActionResult TraineesInfo()
+        [Route("TPO/TraineesInfo")]
+        public IActionResult TraineesInfo(
+            string? searchText,
+            int? branchId,
+            int? currentYear,
+            int? admissionYear,
+            int? passoutYear,
+            int? gender)
         {
-            // =================================================
-            // CHECK TPO LOGIN
-            // =================================================
+            // ========================================================
+            // CHECK TPO SESSION
+            // ========================================================
 
             int? tpoId =
                 HttpContext.Session.GetInt32("TPOID");
 
-            if (tpoId == null || tpoId <= 0)
+            if (tpoId == null)
             {
                 return RedirectToAction(
                     "TPOLogin",
@@ -1421,66 +1414,179 @@ namespace ErJobPortal.Controllers
             }
 
 
-            // =================================================
-            // GET LOGGED-IN TPO COLLEGE
-            // =================================================
+            // ========================================================
+            // GET LOGGED-IN TPO DETAILS
+            // ========================================================
 
-            string collegeName =
-                HttpContext.Session.GetString(
-                    "TPOCollegeName")
-                ?? "";
+            TPORegistration? tpo =
+                _accountRepository.GetTPODetails(
+                    tpoId.Value);
 
-
-            // =================================================
-            // COLLEGE NOT FOUND
-            // =================================================
-
-            if (string.IsNullOrWhiteSpace(collegeName))
+            if (tpo == null)
             {
                 TempData["Error"] =
-                    "College information is not available for this TPO.";
+                    "TPO details could not be found.";
 
                 return RedirectToAction(
-                    "Dashboard",
-                    "TPO");
+                    "TPOLogin",
+                    "Account");
             }
 
 
-            // =================================================
-            // GET ONLY THIS COLLEGE'S TRAINEES
-            // =================================================
+            // ========================================================
+            // COLLEGE ID
+            // ========================================================
+
+            int collegeId = 0;
+
+            if (tpo.CollegeName != null)
+            {
+                collegeId =
+                    Convert.ToInt32(tpo.CollegeName);
+            }
+
+
+            // ========================================================
+            // TPO DEPARTMENT
+            //
+            // IMPORTANT:
+            // We are NOT finding department ID from DepartmentName.
+            //
+            // Your TPO table already contains:
+            //
+            // nDepartment = 1
+            //
+            // Therefore directly use tpo.nDepartment.
+            // ========================================================
+
+            int? departmentId =
+                tpo.nDepartment;
+
+
+            // ========================================================
+            // GET BRANCHES FOR TPO DEPARTMENT
+            // ========================================================
+
+            List<BranchM> branches =
+                new List<BranchM>();
+
+            if (departmentId.HasValue &&
+                departmentId.Value > 0)
+            {
+                branches =
+                    _accountRepository.GetBranches(
+                        departmentId.Value);
+            }
+
+
+            // ========================================================
+            // VALIDATE SELECTED BRANCH
+            //
+            // A TPO should only be able to filter branches that
+            // belong to his/her department.
+            // ========================================================
+
+            if (branchId.HasValue)
+            {
+                bool branchBelongsToDepartment =
+                    branches.Any(
+                        x => x.nID == branchId.Value);
+
+                if (!branchBelongsToDepartment)
+                {
+                    branchId = null;
+                }
+            }
+
+
+            // ========================================================
+            // CREATE TRAINEE FILTER
+            // ========================================================
+
+            TPOTraineeFilterM filter =
+                new TPOTraineeFilterM
+                {
+                    CollegeId = collegeId,
+
+                    SearchText =
+                        string.IsNullOrWhiteSpace(searchText)
+                            ? null
+                            : searchText.Trim(),
+
+                    BranchId = branchId,
+
+                    CurrentYear = currentYear,
+
+                    AdmissionYear = admissionYear,
+
+                    PassoutYear = passoutYear,
+
+                    Gender = gender
+                };
+
+
+            // ========================================================
+            // GET TRAINEES
+            // ========================================================
 
             List<TPOTraineeInfoM> trainees =
                 _accountRepository.GetTPOTraineesByCollege(
-                    collegeName);
+                    filter);
 
 
-            // =================================================
-            // PAGE INFORMATION
-            // =================================================
+            // ========================================================
+            // VIEWBAG VALUES
+            // ========================================================
 
-            ViewData["Panel"] = "TPO";
-
-            ViewData["UserName"] =
-                HttpContext.Session.GetString(
-                    "TPOName")
-                ?? "TPO";
-
-            ViewData["Title"] =
-                "Trainee Information";
+            ViewBag.CollegeId =
+                collegeId;
 
             ViewBag.CollegeName =
-                collegeName;
+                tpo.CollegeName;
+
+            ViewBag.DepartmentId =
+                departmentId;
+
+            ViewBag.DepartmentName =
+                tpo.DepartmentName;
+
+            ViewBag.Branches =
+                branches;
 
             ViewBag.TraineeCount =
                 trainees.Count;
 
 
-            // =================================================
-            // SEND DATA TO VIEW
-            // =================================================
+            // ========================================================
+            // PRESERVE FILTER VALUES
+            // ========================================================
 
-            return View(trainees);
+            ViewBag.SearchText =
+                searchText;
+
+            ViewBag.BranchId =
+                branchId;
+
+            ViewBag.CurrentYear =
+                currentYear;
+
+            ViewBag.AdmissionYear =
+                admissionYear;
+
+            ViewBag.PassoutYear =
+                passoutYear;
+
+            ViewBag.Gender =
+                gender;
+
+
+            // ========================================================
+            // RETURN VIEW
+            // ========================================================
+
+            return View(
+                "TraineesInfo",
+                trainees);
         }
     }
 }

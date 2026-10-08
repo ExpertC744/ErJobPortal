@@ -57,9 +57,14 @@
                                 </td>
 
                                 <td>
-                                    @(string.IsNullOrWhiteSpace(item.PositionName)
+                                    <a asp-controller="Account" asp-action="ViewOrgPost"
+                                       asp-route-id="@item.nID" 
+                                       title="@item.PositionName">
+                                        @item.PositionName
+                                    </a>
+                                  @*   @(string.IsNullOrWhiteSpace(item.PositionName)
                                                                 ? "-"
-                                                                : item.PositionName)
+                                                                : item.PositionName) *@
                                 </td>
 
                                 <td>
