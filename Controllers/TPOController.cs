@@ -1380,22 +1380,33 @@ namespace ErJobPortal.Controllers
         }
 
         // shrirang 06/10/26
-
+        // shrirang 07/10/26
         // =====================================================
         // TPO TRAINEE INFORMATION
         // =====================================================
 
+        // ============================================================
+        // TPO - TRAINEE INFORMATION
+        // ============================================================
+
         [HttpGet]
-        public IActionResult TraineesInfo()
+        [Route("TPO/TraineesInfo")]
+        public IActionResult TraineesInfo(
+            string? searchText,
+            int? branchId,
+            int? currentYear,
+            int? admissionYear,
+            int? passoutYear,
+            int? gender)
         {
-            // =================================================
-            // CHECK TPO LOGIN
-            // =================================================
+            // ========================================================
+            // CHECK TPO SESSION
+            // ========================================================
 
             int? tpoId =
                 HttpContext.Session.GetInt32("TPOID");
 
-            if (tpoId == null || tpoId <= 0)
+            if (tpoId == null)
             {
                 return RedirectToAction(
                     "TPOLogin",
@@ -1403,66 +1414,179 @@ namespace ErJobPortal.Controllers
             }
 
 
-            // =================================================
-            // GET LOGGED-IN TPO COLLEGE
-            // =================================================
+            // ========================================================
+            // GET LOGGED-IN TPO DETAILS
+            // ========================================================
 
-            string collegeName =
-                HttpContext.Session.GetString(
-                    "TPOCollegeName")
-                ?? "";
+            TPORegistration? tpo =
+                _accountRepository.GetTPODetails(
+                    tpoId.Value);
 
-
-            // =================================================
-            // COLLEGE NOT FOUND
-            // =================================================
-
-            if (string.IsNullOrWhiteSpace(collegeName))
+            if (tpo == null)
             {
                 TempData["Error"] =
-                    "College information is not available for this TPO.";
+                    "TPO details could not be found.";
 
                 return RedirectToAction(
-                    "Dashboard",
-                    "TPO");
+                    "TPOLogin",
+                    "Account");
             }
 
 
-            // =================================================
-            // GET ONLY THIS COLLEGE'S TRAINEES
-            // =================================================
+            // ========================================================
+            // COLLEGE ID
+            // ========================================================
+
+            int collegeId = 0;
+
+            if (tpo.CollegeName != null)
+            {
+                collegeId =
+                    Convert.ToInt32(tpo.CollegeName);
+            }
+
+
+            // ========================================================
+            // TPO DEPARTMENT
+            //
+            // IMPORTANT:
+            // We are NOT finding department ID from DepartmentName.
+            //
+            // Your TPO table already contains:
+            //
+            // nDepartment = 1
+            //
+            // Therefore directly use tpo.nDepartment.
+            // ========================================================
+
+            int? departmentId =
+                tpo.nDepartment;
+
+
+            // ========================================================
+            // GET BRANCHES FOR TPO DEPARTMENT
+            // ========================================================
+
+            List<BranchM> branches =
+                new List<BranchM>();
+
+            if (departmentId.HasValue &&
+                departmentId.Value > 0)
+            {
+                branches =
+                    _accountRepository.GetBranches(
+                        departmentId.Value);
+            }
+
+
+            // ========================================================
+            // VALIDATE SELECTED BRANCH
+            //
+            // A TPO should only be able to filter branches that
+            // belong to his/her department.
+            // ========================================================
+
+            if (branchId.HasValue)
+            {
+                bool branchBelongsToDepartment =
+                    branches.Any(
+                        x => x.nID == branchId.Value);
+
+                if (!branchBelongsToDepartment)
+                {
+                    branchId = null;
+                }
+            }
+
+
+            // ========================================================
+            // CREATE TRAINEE FILTER
+            // ========================================================
+
+            TPOTraineeFilterM filter =
+                new TPOTraineeFilterM
+                {
+                    CollegeId = collegeId,
+
+                    SearchText =
+                        string.IsNullOrWhiteSpace(searchText)
+                            ? null
+                            : searchText.Trim(),
+
+                    BranchId = branchId,
+
+                    CurrentYear = currentYear,
+
+                    AdmissionYear = admissionYear,
+
+                    PassoutYear = passoutYear,
+
+                    Gender = gender
+                };
+
+
+            // ========================================================
+            // GET TRAINEES
+            // ========================================================
 
             List<TPOTraineeInfoM> trainees =
                 _accountRepository.GetTPOTraineesByCollege(
-                    collegeName);
+                    filter);
 
 
-            // =================================================
-            // PAGE INFORMATION
-            // =================================================
+            // ========================================================
+            // VIEWBAG VALUES
+            // ========================================================
 
-            ViewData["Panel"] = "TPO";
-
-            ViewData["UserName"] =
-                HttpContext.Session.GetString(
-                    "TPOName")
-                ?? "TPO";
-
-            ViewData["Title"] =
-                "Trainee Information";
+            ViewBag.CollegeId =
+                collegeId;
 
             ViewBag.CollegeName =
-                collegeName;
+                tpo.CollegeName;
+
+            ViewBag.DepartmentId =
+                departmentId;
+
+            ViewBag.DepartmentName =
+                tpo.DepartmentName;
+
+            ViewBag.Branches =
+                branches;
 
             ViewBag.TraineeCount =
                 trainees.Count;
 
 
-            // =================================================
-            // SEND DATA TO VIEW
-            // =================================================
+            // ========================================================
+            // PRESERVE FILTER VALUES
+            // ========================================================
 
-            return View(trainees);
+            ViewBag.SearchText =
+                searchText;
+
+            ViewBag.BranchId =
+                branchId;
+
+            ViewBag.CurrentYear =
+                currentYear;
+
+            ViewBag.AdmissionYear =
+                admissionYear;
+
+            ViewBag.PassoutYear =
+                passoutYear;
+
+            ViewBag.Gender =
+                gender;
+
+
+            // ========================================================
+            // RETURN VIEW
+            // ========================================================
+
+            return View(
+                "TraineesInfo",
+                trainees);
         }
     }
 }
