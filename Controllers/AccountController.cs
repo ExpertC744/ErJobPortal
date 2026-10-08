@@ -1632,16 +1632,17 @@ public IActionResult OrganizationResetPassword()
         #region "Post"
         [HttpGet]
         [Route("Account/ViewOrgPost/{id}")]
-        public IActionResult ViewOrgPost(int id)
+        public IActionResult ViewOrgPost(int id, int nOrgID)
         {
-            int? sessionOrgID = HttpContext.Session.GetInt32("OrgID");
+            int orgID = nOrgID;
+            //int? sessionOrgID = HttpContext.Session.GetInt32("OrgID");
 
-            if (sessionOrgID == null)
-            {
-                return RedirectToAction("OrganizationLogin", "Account");
-            }
+            //if (sessionOrgID == null)
+            //{
+            //    return RedirectToAction("OrganizationLogin", "Account");
+            //}
 
-            int orgID = sessionOrgID.Value;
+            //int orgID = sessionOrgID.Value;
 
             OrgPostM? model = null;
 
