@@ -32,16 +32,11 @@ namespace ErJobPortal.Controllers
             if (orgId == null || orgId <= 0)
                 return null;
 
-            var organization =
-                _repository.GetOrganizationRegistrationDetails(orgId.Value);
-
-            if (organization == null ||
-                organization.Value.RegDate == null)
+            var organization = _repository.GetOrganizationRegistrationDetails(orgId.Value);
+            if (organization == null || organization.Value.RegDate == null)
                 return null;
 
-            return "OR" +
-                   organization.Value.RegDate.Value.ToString("ddMMyy") +
-                   organization.Value.OrganizationID.ToString("D2");
+            return "OR" + organization.Value.RegDate.Value.ToString("ddMMyy") + organization.Value.OrganizationID.ToString("D2");
         }
 
         // =========================================================
@@ -54,12 +49,7 @@ namespace ErJobPortal.Controllers
                 return false;
 
             string? organizationCode = GetOrganizationCode();
-
-            return !string.IsNullOrWhiteSpace(organizationCode) &&
-                   string.Equals(
-                       id,
-                       organizationCode,
-                       StringComparison.OrdinalIgnoreCase);
+            return !string.IsNullOrWhiteSpace(organizationCode) && string.Equals(id, organizationCode, StringComparison.OrdinalIgnoreCase);
         }
 
         // =========================================================
@@ -583,24 +573,19 @@ namespace ErJobPortal.Controllers
         // ==========================================
         // CANDIDATE LIST
         // ==========================================
-        ////[HttpGet]
-        ////[Route("Organization/TraineeList/{id}")]
-        ////public IActionResult TraineeList(string id)
-        ////{
-        ////    if (!IsValidOrganizationCode(id))
-        ////        return NotFound();
+        [HttpGet]
+        [Route("Organization/TraineeList/{id}")]
+        public IActionResult TraineeList(string id)
+        {
+            if (!IsValidOrganizationCode(id))
+                return NotFound();
 
-        ////    ViewBag.OrgCode = id;
+            ViewBag.OrgCode = id;
 
+            List<SATraineeListM> trainees = _repository.GetSATraineeList();
 
-            //List<SATraineeListM> trainees = _repository.GetSATraineeList();
-
-        ////    List<SATraineeListM> trainees =
-        ////        _repository.GetSATraineeList();
-
-
-        ////    return View(trainees);
-        ////}
+            return View(trainees);
+        }
 
         // ==========================================
         // ORGANIZATION LIST

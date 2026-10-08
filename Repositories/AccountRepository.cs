@@ -286,7 +286,15 @@ namespace ErJobPortal.Repositories
 
                     cn.Open();
 
-                    return cmd.ExecuteNonQuery();
+                    using (SqlDataReader reader = cmd.ExecuteReader())
+                    {
+                        if (reader.Read())
+                        {
+                            return Convert.ToInt32(reader["OrganizationID"]);
+                        }
+                    }
+
+                    return 0;
                 }
             }
         }
