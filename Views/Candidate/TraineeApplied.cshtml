@@ -92,15 +92,10 @@
                             <!-- ORGANIZATION -->
 
                             <td>
-    <a asp-controller="Candidate"
-       asp-action="ViewAppliedOrgPost"
-       asp-route-id="@post.nID"
-       class="organization-link">
-
-        @post.sName
-
-    </a>
-</td>
+                                <a asp-controller="Account" asp-action="ViewOrgPost" asp-route-id="@post.nID" asp-route-nOrgID="@post.nOrgID" class="organization-link">
+                                    @post.sName
+                                </a>
+                            </td>
 
 
                             <!-- POSITION -->
@@ -187,9 +182,9 @@
 <style>
 
     /*
-           Only responsive behavior.
-           Master 1Trainee CSS remains untouched.
-        */
+               Only responsive behavior.
+               Master 1Trainee CSS remains untouched.
+            */
 
     .trainee-applied-responsive {
         width: 100%;
