@@ -4363,5 +4363,13 @@ ORDER BY SAF.nID DESC, OFB.nID DESC;
                 }
             );
         }
+
+
+        //radhika07
+        [HttpGet]
+        public IActionResult SuperAdminTopSkills()
+        {
+            return View();
+        }
     }
 }
