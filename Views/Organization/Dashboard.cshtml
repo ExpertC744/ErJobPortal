@@ -204,34 +204,6 @@
             font-size: 9px;
         }
     }
-
-     /* =========================================================
-        VIEW BUTTON
-     ========================================================= */
-
- .sa-view-btn {
-     display: inline-flex;
-     align-items: center;
-     gap: 5px;
-     padding: 6px 10px;
-     border-radius: 7px;
-     background: #e8f5f1;
-     color: #1e7b67;
-     text-decoration: none;
-     font-size: 10px;
-     font-weight: 700;
-     transition: all .2s ease;
- }
-
-     .sa-view-btn:hover {
-         background: #1e7b67;
-         color: #ffffff;
-         text-decoration: none;
-     }
-
-     .sa-view-btn i {
-         font-size: 9px;
-     }
 </style>
 <!-- =========================================================
      DASHBOARD
@@ -265,7 +237,7 @@
 
     <div class="row g-4 mb-4">
 
-        <!-- POSTED JOBS radhika07-->
+        <!-- POSTED JOBS -->
 
         <div class="col-xl-3 col-lg-6 col-md-6">
 
@@ -295,7 +267,7 @@
                 <a asp-controller="Organization"
                    asp-action="TraineeList"
                    asp-route-id="@ViewBag.OrgCode"
-                   class="sa-view-btn">
+                   class="stat-link">
                     View Details
                     <i class="fas fa-arrow-right"></i>
                 </a>
@@ -305,7 +277,7 @@
         </div>
 
 
-        <!-- APPLICATIONS radhika07-->
+        <!-- APPLICATIONS -->
 
         <div class="col-xl-3 col-lg-6 col-md-6">
 
@@ -337,7 +309,7 @@
                 <a asp-controller="Organization"
                    asp-action="OrgList"
                    asp-route-id="@ViewBag.OrgCode"
-                   class="sa-view-btn">
+                   class="stat-link">
                     View Details
                     <i class="fas fa-arrow-right"></i>
                 </a>
@@ -346,7 +318,7 @@
         </div>
 
 
-        <!-- SHORTLISTED radhika07-->
+        <!-- SHORTLISTED -->
 
         <div class="col-xl-3 col-lg-6 col-md-6">
 
@@ -375,7 +347,7 @@
 
                 <a asp-controller="Organization"
                    asp-action="OrgTopSearch"
-                   class="sa-view-btn">
+                   class="stat-link">
                     View Candidates
                     <i class="fas fa-arrow-right"></i>
                 </a>
@@ -385,7 +357,7 @@
         </div>
 
 
-        <!-- INTERVIEWS radhika07-->
+        <!-- INTERVIEWS -->
 
         <div class="col-xl-3 col-lg-6 col-md-6">
 
@@ -415,7 +387,7 @@
                 <a asp-controller="Organization"
                    asp-action="AppliedTrainees"
                    asp-route-id="@ViewBag.OrgCode"
-                   class="sa-view-btn">
+                   class="stat-link">
                     View Interviews
                     <i class="fas fa-arrow-right"></i>
                 </a>

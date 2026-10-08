@@ -1,0 +1,329 @@
+﻿@model List<SATraineeProfileListM>
+
+@{
+    Layout = "~/Views/Shared/_DashboardLayout.cshtml";
+
+    ViewData["Title"] = "Trainee Profile List";
+    ViewData["Panel"] = "SuperAdmin";
+    ViewData["UserName"] = "Super Admin";
+}
+
+<div class="container-fluid">
+
+    <!-- MASTER TABLE CARD -->
+    <div class="master-table-container">
+
+        <!-- MASTER TABLE HEADER -->
+        <div class="master-table-title">
+
+            <div>
+
+                <h2>
+                    Trainee Profile List
+                </h2>
+
+                <p>
+                    View and manage complete trainee profile information
+                </p>
+
+            </div>
+
+            <a asp-controller="SuperAdmin"
+               asp-action="Dashboard"
+               class="btn btn-secondary">
+
+                Back to Dashboard
+
+            </a>
+
+        </div>
+
+
+        <!-- MASTER TABLE -->
+        <div class="table-responsive">
+
+            <table id="candidateProfileTable"
+                   class="master-data-table">
+
+                <thead>
+
+                    <tr>
+
+                        <th>Sr. No</th>
+
+                        <th>Profile Created Date</th>
+
+                        <th>Trainee Name</th>
+
+                        <th>Action</th>
+
+                        <th>Photo</th>
+
+                        <th>Location</th>
+
+                        <th>Pin Code</th>
+
+                        <th>SSC Year</th>
+
+                        <th>SSC Division</th>
+
+                        <th>HSC / Diploma Year</th>
+
+                        <th>HSC / Diploma Division</th>
+
+                        <th>Graduation Year</th>
+
+                        <th>Graduation Division</th>
+
+                        <th>Graduation Stream</th>
+
+                        <th>PG Year</th>
+
+                        <th>PG Division</th>
+
+                        <th>PG Stream</th>
+
+                        <th>PhD Year</th>
+
+                        <th>PhD Status</th>
+
+                        <th>PhD Topic</th>
+
+                        <th>Preferred Location</th>
+
+                        <th>Internship Type</th>
+
+                        <th>Uploaded Resume</th>
+
+                        <th>Resume Status</th>
+
+                    </tr>
+
+                </thead>
+
+
+                <tbody>
+
+                    @if (Model != null && Model.Count > 0)
+                    {
+                        int srNo = 1;
+
+                        foreach (var item in Model)
+                        {
+                            <tr>
+
+                                <!-- SR NO -->
+                                <td class="master-id">
+                                    @srNo
+                                </td>
+
+                                <!-- PROFILE CREATED DATE -->
+                                <td>
+                                    @item.ProfileCreatedDate
+                                </td>
+
+
+                                <!-- TRAINEE NAME -->
+                                <td>
+                                    <strong>
+                                        @item.TraineeName
+                                    </strong>
+                                </td>
+
+
+                                <!-- ACTION -->
+                                <td>
+    <a asp-controller="SuperAdmin"
+       asp-action="ViewTraineeResume"
+       asp-route-id="@item.CandidateID"
+       class="master-view-btn"
+       target="_blank"
+       rel="noopener noreferrer">
+        View
+    </a>
+</td>
+
+
+                                <!-- PHOTO -->
+                                <td>
+
+                                    @if (!string.IsNullOrEmpty(item.Photo))
+                                    {
+                                        <img src="@item.Photo"
+                                             alt="Candidate Photo"
+                                             class="candidate-profile-photo" />
+                                    }
+                                    else
+                                    {
+                                        <span class="text-muted">
+                                            No Photo
+                                        </span>
+                                    }
+
+                                </td>
+
+
+                                <!-- LOCATION -->
+                                <td>
+                                    @item.Location
+                                </td>
+
+
+                                <!-- PINCODE -->
+                                <td>
+                                    @item.Pincode
+                                </td>
+
+
+                                <!-- SSC -->
+                                <td>
+                                    @item.SSC_YEAR
+                                </td>
+
+                                <td>
+                                    @item.SSC_DIVISION
+                                </td>
+
+
+                                <!-- HSC / DIPLOMA -->
+                                <td>
+                                    @item.HSC_DIPLOMA_YEAR
+                                </td>
+
+                                <td>
+                                    @item.HSC_DIPLOMA_DIVISION
+                                </td>
+
+
+                                <!-- GRADUATION -->
+                                <td>
+                                    @item.Graduation_Year
+                                </td>
+
+                                <td>
+                                    @item.Graduation_Division
+                                </td>
+
+                                <td>
+                                    @item.Graduation_Stream
+                                </td>
+
+
+                                <!-- PG -->
+                                <td>
+                                    @item.PG_Year
+                                </td>
+
+                                <td>
+                                    @item.PG_Division
+                                </td>
+
+                                <td>
+                                    @item.PG_Stream
+                                </td>
+
+
+                                <!-- PHD -->
+                                <td>
+                                    @item.PhD_Year
+                                </td>
+
+                                <td>
+                                    @item.PhD_Status
+                                </td>
+
+                                <td>
+                                    @item.PhD_Topic
+                                </td>
+
+
+                                <!-- PREFERRED LOCATION -->
+                                <td>
+                                    @item.PreferredLocation
+                                </td>
+
+
+                                <!-- INTERNSHIP TYPE -->
+                                <td>
+                                    @item.Internship_FellowshipType
+                                </td>
+
+
+                                <!-- RESUME -->
+                                <td>
+
+                                    @if (!string.IsNullOrEmpty(item.Resume))
+                                    {
+                                        <a href="@item.Resume"
+                                           target="_blank"
+                                           class="btn btn-sm btn-primary">
+
+                                            View Resume
+
+                                        </a>
+                                    }
+                                    else
+                                    {
+                                        <span class="text-muted">
+                                            Not Uploaded
+                                        </span>
+                                    }
+
+                                </td>
+
+
+                                <!-- RESUME STATUS -->
+                                <td>
+
+                                    @if (item.ResumeUploaded)
+                                    {
+                                        <span class="badge bg-success">
+                                            Uploaded
+                                        </span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge bg-secondary">
+                                            Not Uploaded
+                                        </span>
+                                    }
+
+                                </td>
+
+                            </tr>
+
+                            srNo++;
+                        }
+                    }
+                    else
+                    {
+                        <tr>
+
+                            <td colspan="24"
+                                class="text-center">
+
+                                No trainee profiles found.
+
+                            </td>
+
+                        </tr>
+                    }
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+
+        <!-- MASTER PAGE INFO -->
+        <div id="candidateProfilePageInfo"
+             class="master-page-info text-center">
+        </div>
+
+    </div>
+
+</div>
+
+
+}

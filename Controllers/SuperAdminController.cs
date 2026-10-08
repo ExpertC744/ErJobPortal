@@ -4290,13 +4290,5 @@ ORDER BY SAF.nID DESC, OFB.nID DESC;
                 new { id = id }
             );
         }
-
-
-        //radhika07
-        [HttpGet]
-        public IActionResult SuperAdminTopSkills()
-        {
-            return View();
-        }
     }
 }

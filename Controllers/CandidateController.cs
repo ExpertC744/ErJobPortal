@@ -5770,19 +5770,5 @@ ORDER BY
 
             return View();
         }
-
-        //radhika07-10
-
-        [HttpGet]
-        public IActionResult TotalOpening()
-        {
-            return View();
-        }
-
-        [HttpGet]
-        public IActionResult TopSearch()
-        {
-            return View();
-        }
     }
 }
