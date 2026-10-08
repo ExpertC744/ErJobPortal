@@ -20,10 +20,8 @@
     ====================================================== -->
 
     <div class="eligible-page-header">
-
         <div>
             <h1>Eligible Trainees</h1>
-
             <p>
                 @orgCode
             </p>
@@ -35,11 +33,8 @@
            asp-route-id="@orgCode"
            class="master-back-btn"
            title="Back to Dashboard">
-
             <i class="fas fa-arrow-left"></i>
-
         </a>
-
     </div>
 
 
@@ -54,92 +49,56 @@
         ================================================== -->
 
         <div class="master-table-title">
-
             <div>
-
                 <h2>
                     <i class="fas fa-table me-2"></i>
                     Eligible Trainees
                 </h2>
-
             </div>
-
         </div>
-
 
         <!-- =================================================
              TABLE
         ================================================== -->
 
         <div class="table-responsive">
-
-            <table id="eligibleTraineesTable"
-                   class="master-data-table">
-
+            <table id="eligibleTraineesTable" class="master-data-table">
                 <thead>
-
                     <tr>
-
                         <th>Sr. No</th>
-
                         <th>Name</th>
-
                         <th>View Resume</th>
-
                         <th>Email</th>
-
                         <th>Gender</th>
-
                         <th>DOB</th>
-
                         <th>Skills</th>
-
                         <th>Apply Status</th>
-
                         <th>Status</th>
-
                         <th>Final Result</th>
-
                         <th>Comment</th>
-
                         <th>Update Status</th>
-
                     </tr>
-
                 </thead>
-
-
                 <tbody>
-
                     @if (Model != null && Model.Count > 0)
                     {
                         int srNo = 1;
-
                         foreach (var item in Model)
                         {
                             <tr>
-
                                 <!-- =================================================
                                      SR NO
                                 ================================================== -->
-
                                 <td class="master-id">
-
                                     @srNo
-
                                 </td>
-
 
                                 <!-- =================================================
                                      NAME
                                 ================================================== -->
-
                                 <td>
-
                                     @item.Name
-
                                 </td>
-
                                 @*shrirang 05/10/26*@
                                 <!-- =================================================
                                      VIEW RESUME radhika05-0=10
@@ -149,6 +108,8 @@
 ================================================== -->
 
                                 <td>
+
+
 
                                     <a asp-controller="Resume"
                                        asp-action="Resume"
@@ -163,9 +124,7 @@
                                            class="resume-view-btn"
                                            title="View Resume"
                                            target="_blank">
-
                                             <i class="fas fa-eye"></i>
-
                                         </a>
                                     }
                                     else
@@ -181,37 +140,22 @@
                                 <!-- =================================================
                                      EMAIL
                                 ================================================== -->
-
                                 <td>
-
                                     @item.EmailID
-
                                 </td>
-
 
                                 <!-- =================================================
                                      GENDER
                                 ================================================== -->
-
                                 <td>
-
                                     @item.Gender
-
                                 </td>
-
-
                                 <!-- =================================================
                                      DOB
                                 ================================================== -->
-
                                 <td>
-
-                                    @(item.DateOfBirth.HasValue
-                                                                ? item.DateOfBirth.Value.ToString("dd-MM-yyyy")
-                                                                : "")
-
+                                    @(item.DateOfBirth.HasValue ? item.DateOfBirth.Value.ToString("dd-MM-yyyy") : "")
                                 </td>
-
 
                                 <!-- =================================================
                                      SKILLS
@@ -250,9 +194,7 @@
 
                                     @if (item.CApply.HasValue)
                                     {
-                                        @(item.CApply.Value == 1
-                                                                    ? "Applied"
-                                                                    : "Yet To Apply")
+                                        @(item.CApply.Value == 1 ? "Applied" : "Yet To Apply")
                                     }
                                     else
                                     {
@@ -273,9 +215,7 @@
 
                                 <td>
 
-                                    <form asp-controller="Organization"
-                                          asp-action="UpdateCandidateStatus"
-                                          method="post">
+                                    <form asp-controller="Organization" asp-action="UpdateCandidateStatus" asp-route-id="@orgCode" method="post">
 
                                         @Html.AntiForgeryToken()
 
@@ -356,8 +296,7 @@
                                             data-candidate="@item.CandidateID"
                                             data-post="@item.PostID">
 
-                                        @if (string.IsNullOrEmpty(item.FinalStatus)
-                                                                        || item.FinalStatus == "0")
+                                        @if (string.IsNullOrEmpty(item.FinalStatus) || item.FinalStatus == "0")
                                         {
                                             <option value="0" selected>
                                                 Select a Final Result
@@ -426,8 +365,7 @@
 
                                 <td>
 
-                                    <select class="form-select comment-select"
-                                            data-current-comment="@item.Comment">
+                                    <select class="form-select comment-select" data-current-comment="@item.Comment">
 
                                         <option value="0">
                                             Select a Comment
@@ -453,20 +391,14 @@
 
                                 <td>
 
-                                    <form asp-controller="Organization"
-                                          asp-action="UpdateCandidateFinalStatus"
-                                          method="post"
-                                          class="final-status-form">
+                                    <form asp-controller="Organization" asp-action="UpdateCandidateFinalStatus" asp-route-id="@orgCode" method="post" class="final-status-form">
 
                                         @Html.AntiForgeryToken()
 
 
                                         <!-- Candidate ID -->
 
-                                        <input type="hidden"
-                                               name="candidateId"
-                                               value="@item.CandidateID" />
-
+                                        <input type="hidden" name="candidateId" value="@item.CandidateID" />
 
                                         <!-- Post ID -->
 

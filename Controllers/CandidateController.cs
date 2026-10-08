@@ -2042,7 +2042,8 @@ namespace ErJobPortal.Controllers
         }
 
         [HttpGet]
-        public IActionResult InternshipDetails(string id)
+        [Route("Candidate/InternshipDetails/{id?}")]
+        public IActionResult InternshipDetails(string? id)
         {
             // id = CD080900080701
 
@@ -2063,9 +2064,17 @@ namespace ErJobPortal.Controllers
             {
                 return NotFound("Candidate registration not found.");
             }
-            List<OrgPostM> internshipPosts = GetMatchingJobsForCandidate(candidateId.Value);
+
+            List<OrgPostM> internshipPosts =
+                GetMatchingJobsForCandidate(candidateId.Value);
+
             ViewBag.InternshipPosts = internshipPosts;
-            // Your code to get internship details using id
+
+            // =========================================================
+            // PASS ID TO VIEW
+            // =========================================================
+
+            ViewBag.InternshipId = id;
 
             return View();
         }
@@ -5548,6 +5557,222 @@ ORDER BY
             return posts;
         }
 
+        [HttpGet]
+        [Route("Candidate/ExtraPost/{id?}")]
+        public IActionResult ExtraPost(string? id)
+        {
+            // =====================================================
+            // GET CANDIDATE ID FROM SESSION
+            // =====================================================
 
+            int? candidateId =
+                HttpContext.Session.GetInt32("CandidateID");
+
+            if (candidateId == null || candidateId <= 0)
+            {
+                return RedirectToAction(
+                    "CandidateLogin",
+                    "Account");
+            }
+
+            // =====================================================
+            // GET MATCHING EXTRA POSTS
+            // =====================================================
+
+            var extraPosts =
+                new List<OrgPostM>();
+
+            using (SqlConnection con =
+                new SqlConnection(
+                    _configuration.GetConnectionString("DefaultConnection")))
+            {
+                using (SqlCommand cmd =
+                    new SqlCommand(
+                        "GetMatchingJobsForCandidateExtraPost",
+                        con))
+                {
+                    cmd.CommandType =
+                        CommandType.StoredProcedure;
+
+                    cmd.Parameters.AddWithValue(
+                        "@CandidateID",
+                        candidateId.Value);
+
+                    con.Open();
+
+                    using (SqlDataReader reader =
+                        cmd.ExecuteReader())
+                    {
+                        while (reader.Read())
+                        {
+                            var post = new OrgPostM();
+
+                            // =================================================
+                            // BASIC POST INFORMATION
+                            // =================================================
+
+                            post.nID =
+                                reader["PostID"] == DBNull.Value
+                                    ? 0
+                                    : Convert.ToInt32(reader["PostID"]);
+
+                            post.nOrgID =
+                                reader["OrgID"] == DBNull.Value
+                                    ? 0
+                                    : Convert.ToInt32(reader["OrgID"]);
+
+                            post.sName =
+                                reader["OrganizationName"] == DBNull.Value
+                                    ? ""
+                                    : reader["OrganizationName"].ToString();
+
+                            post.sPositionName =
+                                reader["PositionName"] == DBNull.Value
+                                    ? ""
+                                    : reader["PositionName"].ToString();
+
+                            // =================================================
+                            // LOCATION
+                            // =================================================
+
+                            post.sCountryName =
+                                reader["Country"] == DBNull.Value
+                                    ? ""
+                                    : reader["Country"].ToString();
+
+                            post.sStateName =
+                                reader["State"] == DBNull.Value
+                                    ? ""
+                                    : reader["State"].ToString();
+
+                            post.nCityName =
+                                reader["City"] == DBNull.Value
+                                    ? ""
+                                    : reader["City"].ToString();
+
+                            // =================================================
+                            // INTERNSHIP / FELLOWSHIP
+                            // =================================================
+
+                            post.sInternshipFellowshipTypeName =
+                                reader["InternshipFellowshipType"] == DBNull.Value
+                                    ? ""
+                                    : reader["InternshipFellowshipType"].ToString();
+
+                            // =================================================
+                            // FACILITIES
+                            // =================================================
+
+                            post.sFacilities =
+                                reader["sFacilities"] == DBNull.Value
+                                    ? ""
+                                    : reader["sFacilities"].ToString();
+
+                            // =================================================
+                            // APPLICATION STATUS
+                            // =================================================
+
+                            post.IsApplied =
+                                reader["CApply"] != DBNull.Value &&
+                                Convert.ToInt32(reader["CApply"]) == 1;
+
+                            // =================================================
+                            // OTHER DETAILS
+                            // =================================================
+
+                            if (reader["dStartDate"] != DBNull.Value)
+                            {
+                                post.dStartDate =
+                                    Convert.ToDateTime(
+                                        reader["dStartDate"]);
+                            }
+
+                            if (reader["dCompletionDate"] != DBNull.Value)
+                            {
+                                post.dCompletionDate =
+                                    Convert.ToDateTime(
+                                        reader["dCompletionDate"]);
+                            }
+
+                            post.nRequiredTrainees =
+                                reader["nRequiredTrainees"] == DBNull.Value
+                                    ? 0
+                                    : Convert.ToInt32(
+                                        reader["nRequiredTrainees"]);
+
+                            post.sWorkingHours =
+                                reader["sWorkingHours"] == DBNull.Value
+                                    ? ""
+                                    : reader["sWorkingHours"].ToString();
+
+                            post.sWorkingShift =
+                                reader["sWorkingShift"] == DBNull.Value
+                                    ? ""
+                                    : reader["sWorkingShift"].ToString();
+
+                            post.sCurrency =
+                                reader["sCurrency"] == DBNull.Value
+                                    ? ""
+                                    : reader["sCurrency"].ToString();
+
+                            post.sTotalCharges =
+     reader["sTotalCharges"] == DBNull.Value
+         ? (decimal?)null
+         : Convert.ToDecimal(reader["sTotalCharges"]);
+
+                            post.sMedicalSkills =
+                                reader["JobMedicalSkills"] == DBNull.Value
+                                    ? ""
+                                    : reader["JobMedicalSkills"].ToString();
+
+                            post.sTechnicalSkills =
+                                reader["JobTechnicalSkills"] == DBNull.Value
+                                    ? ""
+                                    : reader["JobTechnicalSkills"].ToString();
+
+                            post.sNonTechnicalSkills =
+                                reader["JobNonTechnicalSkills"] == DBNull.Value
+                                    ? ""
+                                    : reader["JobNonTechnicalSkills"].ToString();
+
+                            post.sDivyang =
+                                reader["sDivyang"] == DBNull.Value
+                                    ? ""
+                                    : reader["sDivyang"].ToString();
+
+                            post.sLanguageKnown =
+                                reader["sLanguageKnown"] == DBNull.Value
+                                    ? ""
+                                    : reader["sLanguageKnown"].ToString();
+
+                            post.sWorkingDays =
+                                reader["sWorkingDays"] == DBNull.Value
+                                    ? ""
+                                    : reader["sWorkingDays"].ToString();
+
+                            extraPosts.Add(post);
+                        }
+                    }
+                }
+            }
+
+            // =====================================================
+            // SEND DATA TO VIEW
+            // =====================================================
+
+            ViewBag.InternshipPosts = extraPosts;
+
+            ViewBag.candidateCode = id;
+
+
+
+            // =========================================================
+            // PASS ID TO VIEW
+            // =========================================================
+
+            ViewBag.InternshipId = id;
+
+            return View();
+        }
     }
 }

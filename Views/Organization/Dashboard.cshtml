@@ -1156,11 +1156,17 @@
 
         </div>
 
-        @* khushi 29-09 *@
+        @*  khushi 06/10/26 *@
         <!-- MASTER TABLE CARD -->
         <div class="master-table-container">
 
+
+            <!-- MASTER TABLE -->
+
   <!-- MASTER TABLE -->
+
+  <!-- MASTER TABLE -->
+
             <div class="table-responsive">
 
                 <table id="organizationJobsTable"
@@ -1178,7 +1184,8 @@
 
                     <tbody>
 
-                        @if (appliedTraineePosts.Any())
+                        @if (appliedTraineePosts != null &&
+                                                appliedTraineePosts.Any())
                         {
                             int srNo = 1;
 
@@ -1220,6 +1227,13 @@
                                     <!-- Applied Trainees -->
                                     <td class="text-center">
 
+
+                                        <a href="@Url.Action(
+                                                                                                                   "OrgPositionTR",
+                                                                                                                   "Organization",
+                                                                                                                   new { id = item.nID })"
+                                   class="resume-view-btn"
+                                   title="View Applied Trainees">
                                         <a href="@Url.Action("OrgPositionTR", "Organization", new { id = item.nID })"
                                            class="resume-view-btn"
                                            title="View Applied Trainees">
@@ -1257,6 +1271,7 @@
                                            asp-route-id="@item.nID"
                                            class="resume-view-btn"
                                            title="View Applied Trainees">
+>>>>>>> Shrirang
 
                                             <i class="fas fa-users"></i>
 
@@ -1279,25 +1294,15 @@
 
                                 </tr>
 
-                                srNo++;
+                                                srNo++;
                             }
                         }
-                        else
-                        {
-                            <tr>
-                                <td colspan="5" class="text-center">
-                                    No applied trainees found.
-                                </td>
-                            </tr>
-                        }
-
 
                     </tbody>
 
                 </table>
 
             </div>
-
 
             <!-- MASTER PAGE INFO -->
             <div id="organizationJobsPageInfo"
