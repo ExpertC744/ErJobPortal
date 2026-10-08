@@ -96,8 +96,7 @@ namespace ErJobPortal.Controllers
             // =========================================================
 
             string candidateCode = "CD" +
-                candidate.Value.DOB.Value.ToString("ddMMyy") +
-                candidate.Value.RegDate.Value.ToString("MMdd") +
+                candidate.Value.DOB.Value.ToString("ddMMyy") + 
                 candidate.Value.CandidateID.ToString("D2");
 
             // =========================================================
@@ -184,9 +183,6 @@ namespace ErJobPortal.Controllers
             // =========================================================
 
             SAChartsViewModel chartModel = new SAChartsViewModel();
-
-
-
             using (SqlConnection con = new SqlConnection(connectionString))
             {
                 using (SqlCommand cmd =
@@ -228,7 +224,7 @@ namespace ErJobPortal.Controllers
                                         Year = Convert.ToInt32(reader["Year"]),
                                         Month = Convert.ToInt32(reader["Month"]),
                                         TotalCount = Convert.ToInt32(reader["TotalCount"])
-                                    });
+                               });
                             }
                         }
                     }
