@@ -4213,20 +4213,93 @@ ORDER BY SAF.nID DESC, OFB.nID DESC;
                 return BadRequest("Invalid Candidate ID.");
             }
 
-            // IMPORTANT:
-            // Use the same Resume action already used by the
-            // Candidate section.
-            //
-            // Resume(int id) internally:
-            // 1. Gets candidate profile
-            // 2. Gets Resume_Profile
-            // 3. Finds selected template
-            // 4. Opens that exact ViewProfileXX page
+            string connectionString =
+                _configuration.GetConnectionString("DefaultConnection")
+                ?? throw new InvalidOperationException(
+                    "DefaultConnection is not configured."
+                );
+
+            var candidateIds = new List<int>();
+
+            using (SqlConnection con = new SqlConnection(connectionString))
+            {
+                string query = @"
+    SELECT CP.CandidateID
+    FROM tblCandidateProfile CP
+    INNER JOIN tblCandidateRegister CR
+        ON CP.CandidateID = CR.nID
+    WHERE CP.nBit = 1
+      AND CP.nSABit = 1
+    ORDER BY CP.nID DESC;
+";
+
+                using (SqlCommand cmd = new SqlCommand(query, con))
+                {
+                    con.Open();
+
+                    using (SqlDataReader reader = cmd.ExecuteReader())
+                    {
+                        while (reader.Read())
+                        {
+                            if (reader["CandidateID"] != DBNull.Value)
+                            {
+                                candidateIds.Add(
+                                    Convert.ToInt32(reader["CandidateID"])
+                                );
+                            }
+                        }
+                    }
+                }
+            }
+
+            // ============================================================
+            // FIND CURRENT CANDIDATE
+            // ============================================================
+
+            int currentIndex = candidateIds.IndexOf(id);
+
+            if (currentIndex == -1)
+            {
+                return NotFound("Candidate profile not found.");
+            }
+
+            // ============================================================
+            // PREVIOUS CANDIDATE
+            // ============================================================
+
+            int? previousCandidateId = null;
+
+            if (currentIndex > 0)
+            {
+                previousCandidateId =
+                    candidateIds[currentIndex - 1];
+            }
+
+            // ============================================================
+            // NEXT CANDIDATE
+            // ============================================================
+
+            int? nextCandidateId = null;
+
+            if (currentIndex < candidateIds.Count - 1)
+            {
+                nextCandidateId =
+                    candidateIds[currentIndex + 1];
+            }
+
+            // ============================================================
+            // OPEN RESUME CONTROLLER
+            // ============================================================
 
             return RedirectToAction(
                 "Resume",
                 "Resume",
-                new { id = id }
+                new
+                {
+                    id = id,
+                    previousCandidateId = previousCandidateId,
+                    nextCandidateId = nextCandidateId
+                }
             );
         }
     }

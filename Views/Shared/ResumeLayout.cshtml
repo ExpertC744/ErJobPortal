@@ -2,7 +2,230 @@
 
 @model ResumeViewModel
 
+<style>
+    /* ============================================================
+           CANDIDATE RESUME NAVIGATION
+           Previous Candidate  <-  Resume  ->  Next Candidate
+           ============================================================ */
 
+    .resume-candidate-viewer {
+        position: relative;
+        width: 100%;
+        min-height: 100vh;
+        box-sizing: border-box;
+    }
+
+    .candidate-resume-nav {
+        position: fixed;
+        top: 50%;
+        transform: translateY(-50%);
+        z-index: 99998;
+        min-width: 58px;
+        min-height: 58px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        padding: 10px 14px;
+        background: #ffffff;
+        color: #1f4e68;
+        border: 1px solid #dce3e8;
+        border-radius: 14px;
+        text-decoration: none;
+        box-shadow: 0 8px 24px rgba(15, 23, 42, 0.16);
+        transition: all 0.25s ease;
+        cursor: pointer;
+        font-size: 14px;
+        font-weight: 600;
+        user-select: none;
+    }
+
+    /* LEFT SIDE */
+    .candidate-prev {
+        left: 20px;
+    }
+
+    /* RIGHT SIDE */
+    .candidate-next {
+        right: 20px;
+    }
+
+    /* ICON */
+    .candidate-nav-icon {
+        width: 30px;
+        height: 30px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 50%;
+        background: #f1f5f8;
+        transition: all 0.25s ease;
+    }
+
+        .candidate-nav-icon i {
+            font-size: 13px;
+        }
+
+    /* TEXT */
+    .candidate-nav-text {
+        white-space: nowrap;
+        line-height: 1;
+    }
+
+    /* HOVER */
+    .candidate-resume-nav:hover {
+        background: #1f4e68;
+        color: #ffffff;
+        border-color: #1f4e68;
+        transform: translateY(-50%) scale(1.04);
+        box-shadow: 0 12px 30px rgba(15, 23, 42, 0.24);
+    }
+
+        .candidate-resume-nav:hover .candidate-nav-icon {
+            background: rgba(255, 255, 255, 0.18);
+            color: #ffffff;
+        }
+
+    /* ACTIVE */
+    .candidate-resume-nav:active {
+        transform: translateY(-50%) scale(0.97);
+    }
+
+    /* DISABLED */
+    .candidate-resume-nav.disabled {
+        opacity: 0.40;
+        cursor: not-allowed;
+        pointer-events: none;
+    }
+
+        .candidate-resume-nav.disabled .candidate-nav-icon {
+            background: #f3f4f6;
+        }
+
+
+    /* ============================================================
+           KEEP RESUME CENTERED
+           ============================================================ */
+
+    .resume-candidate-viewer .resume-page-wrapper {
+        width: 100%;
+    }
+
+
+    /* ============================================================
+           TABLET
+           ============================================================ */
+
+    @@media (max-width: 1100px) {
+
+        .candidate-resume-nav {
+            min-width: 50px;
+            min-height: 50px;
+            padding: 8px 10px;
+            border-radius: 12px;
+        }
+
+        .candidate-prev {
+            left: 10px;
+        }
+
+        .candidate-next {
+            right: 10px;
+        }
+
+        .candidate-nav-text {
+            display: none;
+        }
+
+        .candidate-nav-icon {
+            width: 32px;
+            height: 32px;
+        }
+    }
+
+
+    /* ============================================================
+           MOBILE
+           ============================================================ */
+
+    @@media (max-width: 700px) {
+
+        .candidate-resume-nav {
+            top: auto;
+            bottom: 18px;
+            transform: none;
+            min-width: 46px;
+            min-height: 46px;
+            padding: 6px;
+            border-radius: 12px;
+        }
+
+        .candidate-prev {
+            left: 14px;
+        }
+
+        .candidate-next {
+            right: 14px;
+        }
+
+        .candidate-resume-nav:hover {
+            transform: scale(1.04);
+        }
+
+        .candidate-resume-nav:active {
+            transform: scale(0.97);
+        }
+
+        .candidate-nav-icon {
+            width: 30px;
+            height: 30px;
+        }
+    }
+
+
+    /* ============================================================
+           VERY SMALL MOBILE
+           ============================================================ */
+
+    @@media (max-width: 420px) {
+
+        .candidate-resume-nav {
+            bottom: 12px;
+            min-width: 42px;
+            min-height: 42px;
+            border-radius: 10px;
+        }
+
+        .candidate-prev {
+            left: 8px;
+        }
+
+        .candidate-next {
+            right: 8px;
+        }
+
+        .candidate-nav-icon {
+            width: 28px;
+            height: 28px;
+        }
+
+            .candidate-nav-icon i {
+                font-size: 12px;
+            }
+    }
+
+
+    /* ============================================================
+           PRINT
+           ============================================================ */
+
+    @@media print {
+
+        .candidate-resume-nav {
+            display: none !important;
+        }
+    }
+</style>
 
 @{
     /*
@@ -1032,6 +1255,84 @@
         </div>
 
     </div>
+
+
+
+    @* Sanidhya *@
+
+
+    <!-- =========================================================
+     CANDIDATE NAVIGATION + RESUME
+========================================================= -->
+
+    <div class="resume-candidate-viewer">
+
+        @{
+            var previousCandidateText =
+                Context.Request.Query["previousCandidateId"].ToString();
+
+            var nextCandidateText =
+                Context.Request.Query["nextCandidateId"].ToString();
+
+            int previousCandidateId;
+            int nextCandidateId;
+
+            bool hasPreviousCandidate =
+                int.TryParse(
+                    previousCandidateText,
+                    out previousCandidateId
+                );
+
+            bool hasNextCandidate =
+                int.TryParse(
+                    nextCandidateText,
+                    out nextCandidateId
+                );
+        }
+
+
+        <!-- =====================================================
+         PREVIOUS CANDIDATE
+    ====================================================== -->
+        @if (hasPreviousCandidate)
+        {
+            <a href="@Url.Action(
+                                    "ViewTraineeResume",
+                                    "SuperAdmin",
+                                    new { id = previousCandidateId }
+                                )"
+               class="candidate-resume-nav candidate-prev"
+               title="Previous Candidate"
+               aria-label="Previous Candidate">
+
+                <span class="candidate-nav-icon">
+                    <i class="fa-solid fa-chevron-left"></i>
+                </span>
+
+                <span class="candidate-nav-text">
+                    Previous
+                </span>
+
+            </a>
+        }
+        else
+        {
+            <span class="candidate-resume-nav candidate-prev disabled"
+                  title="No Previous Candidate"
+                  aria-disabled="true">
+
+                <span class="candidate-nav-icon">
+                    <i class="fa-solid fa-chevron-left"></i>
+                </span>
+
+                <span class="candidate-nav-text">
+                    Previous
+                </span>
+
+            </span>
+        }
+
+
 
     <div class="resume-page-wrapper">
 
@@ -2494,6 +2795,54 @@
     </div>
 
 
+
+      @* Sanidhya 07.10 *@
+
+
+        <!-- =====================================================
+         NEXT CANDIDATE
+    ====================================================== -->
+        @if (hasNextCandidate)
+        {
+            <a href="@Url.Action(
+                                    "ViewTraineeResume",
+                                    "SuperAdmin",
+                                    new { id = nextCandidateId }
+                                )"
+               class="candidate-resume-nav candidate-next"
+               title="Next Candidate"
+               aria-label="Next Candidate">
+
+                <span class="candidate-nav-text">
+                    Next
+                </span>
+
+                <span class="candidate-nav-icon">
+                    <i class="fa-solid fa-chevron-right"></i>
+                </span>
+
+            </a>
+        }
+        else
+        {
+            <span class="candidate-resume-nav candidate-next disabled"
+                  title="No Next Candidate"
+                  aria-disabled="true">
+
+                <span class="candidate-nav-text">
+                    Next
+                </span>
+
+                <span class="candidate-nav-icon">
+                    <i class="fa-solid fa-chevron-right"></i>
+                </span>
+
+            </span>
+        }
+
+    </div>
+
+    @* End *@
 
     <!-- =========================================================
          THEME SWITCHER

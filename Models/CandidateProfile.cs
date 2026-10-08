@@ -223,5 +223,9 @@
         public string? MedicalSkills { get; set; }
 
         public string? TechnicalSkills { get; set; }
+
+        public string? sPrefix { get; set; }
+
+        public string? sAlternateMobile { get; set; }
     }
 }

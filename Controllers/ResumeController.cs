@@ -123,44 +123,29 @@ namespace ErJobPortal.Controllers
         // MAIN RESUME
         // ============================================================
         [HttpGet]
-        public IActionResult Resume(int id)
+        public IActionResult Resume(
+     int id,
+     int? previousCandidateId,
+     int? nextCandidateId)
         {
             if (id <= 0)
             {
                 return BadRequest("Invalid Candidate ID.");
             }
 
-            // ============================================================
-            // GET CANDIDATE PROFILE
-            // ============================================================
-
             var profile = _repository.GetProfile(id);
 
             if (profile == null)
             {
-                return NotFound(
-                    $"Candidate profile not found for CandidateID: {id}"
-                );
+                return NotFound("Candidate profile not found.");
             }
 
-            // ============================================================
-            // GET SELECTED RESUME PROFILE
-            // ============================================================
-
             int resumeProfile = profile.Resume_Profile ?? 1;
-
-            // ============================================================
-            // VALIDATE TEMPLATE NUMBER
-            // ============================================================
 
             if (resumeProfile < 1 || resumeProfile > 59)
             {
                 resumeProfile = 1;
             }
-
-            // ============================================================
-            // OPEN SELECTED TEMPLATE
-            // ============================================================
 
             string actionName = resumeProfile switch
             {
@@ -223,17 +208,19 @@ namespace ErJobPortal.Controllers
                 57 => "ViewProfileFiftySeven",
                 58 => "ViewProfileFiftyEight",
                 59 => "ViewProfileFiftyNine",
-                _ => "Resume"
-            };
 
-            // ============================================================
-            // REDIRECT TO SELECTED TEMPLATE
-            // ============================================================
+                _ => "ViewProfileOne"
+            };
 
             return RedirectToAction(
                 actionName,
                 "Resume",
-                new { id = id }
+                new
+                {
+                    id = id,
+                    previousCandidateId = previousCandidateId,
+                    nextCandidateId = nextCandidateId
+                }
             );
         }
 
