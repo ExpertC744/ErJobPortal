@@ -100,9 +100,9 @@
 
                             <!-- Organization -->
                             <td>
-    <a asp-controller="Candidate"
-       asp-action="ViewMyOrgPost"
-       asp-route-id="@post.nID"
+                                <a asp-controller="Account"
+                                   asp-action="ViewOrgPost"
+                                   asp-route-id="@post.nID" asp-route-nOrgID="@post.nOrgID"
        class="text-primary fw-semibold text-decoration-underline">
         @post.sName
     </a>
@@ -137,42 +137,45 @@
                                 }
                             </td>
 
-                            <!-- Apply Status -->
-                            <td>
+                           <!-- Apply Status -->
+<td>
 
-                                @if (post.IsApplied)
-                                {
-                                    <span class="master-action-btn">
-                                        Applied
-                                    </span>
-                                }
-                                else
-                                {
-                                    <form asp-controller="Candidate"
-                                          asp-action="ApplyToPost"
-                                          method="post"
-                                          style="display:inline;">
+    @if (post.IsApplied)
+    {
+        <span class="apply-status-btn applied-btn">
+            <i class="fas fa-check-circle me-1"></i>
+            Applied
+        </span>
+    }
+    else
+    {
+        <form asp-controller="Candidate"
+              asp-action="ApplyToPost"
+              method="post"
+              class="apply-form">
 
-                                        @Html.AntiForgeryToken()
+            @Html.AntiForgeryToken()
 
-                                        <input type="hidden"
-                                               name="postId"
-                                               value="@post.nID" />
+            <input type="hidden"
+                   name="postId"
+                   value="@post.nID" />
 
-                                        <input type="hidden"
-                                               name="orgId"
-                                               value="@post.nOrgID" />
+            <input type="hidden"
+                   name="orgId"
+                   value="@post.nOrgID" />
 
-                                        <button type="submit"
-                                                class="master-action-btn"
-                                                style="border:none; cursor:pointer;">
-                                            Apply Now
-                                        </button>
+            <button type="submit"
+                    class="apply-status-btn apply-now-btn">
 
-                                    </form>
-                                }
+                <i class="fas fa-paper-plane me-1"></i>
+                Apply Now
 
-                            </td>
+            </button>
+
+        </form>
+    }
+
+</td>
 
                         </tr>
 
@@ -196,7 +199,8 @@
               method="get">
 
             <button type="submit"
-                    class="submit-button">
+                    class="post-job-btn">
+                    <i class="fas fa-plus me-2"></i>
                 Extra Post
             </button>
 

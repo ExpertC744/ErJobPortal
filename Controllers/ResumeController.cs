@@ -196,6 +196,7 @@ namespace ErJobPortal.Controllers
                 //45 => "ViewProfileFortyFive",
                 //46 => "ViewProfileFortySix",
                 //47 => "ViewProfileFortySeven",
+                //48 => "ViewProfileFortyEight",
                 //49 => "ViewProfileFortyNine",
                 //50 => "ViewProfileFifty",
                 //51 => "ViewProfileFiftyOne",
@@ -309,8 +310,10 @@ namespace ErJobPortal.Controllers
                 100 => "ViewProfile100",
 
                
+            //    _ => "Resume"
+            //};
 
-                _ => "ViewProfileOne"
+            _ => "ViewProfileOne"
             };
 
             return RedirectToAction(
