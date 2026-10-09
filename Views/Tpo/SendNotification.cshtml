@@ -965,7 +965,6 @@
 
 <!-- =========================================================
      SEND CONFIRMATION MODAL
-========================================================= -->
 
 <div class="modal fade"
      id="sendNotificationModal"
@@ -988,6 +987,53 @@
                 <button type="button"
                         class="btn-close"
                         data-bs-dismiss="modal">
+                <small class="validation-message" id="viaError"></small>
+            </div>
+
+            <!-- Preview Message -->
+            <div class="form-group">
+                <span class="field-label">Preview Message</span>
+
+                <div class="preview-box">
+
+                    <div class="preview-top">
+                        <h3 id="previewTitle">Select a notification to preview</h3>
+
+                        <button type="button" class="preview-edit" id="editPreview">
+                            <i class="fas fa-pen"></i> Edit
+                        </button>
+                    </div>
+
+                    <div class="preview-body" id="previewBody" contenteditable="false">
+                        <p>Dear Students,</p>
+                        <p id="previewText">Your notification message will appear here.</p>
+                        <p>Regards,<br />TPO Team</p>
+                    </div>
+
+                </div>
+
+                <textarea id="MessageContent" name="MessageContent" hidden></textarea>
+            </div>
+
+            <!-- Info bar -->
+            <div class="info-bar">
+                <i class="fas fa-circle-info"></i>
+                <span id="infoText">Select an audience to see how many will receive this notification.</span>
+            </div>
+
+            <!-- Hidden fields filled by the Schedule popup -->
+            <input type="hidden" id="ScheduleDate" name="ScheduleDate" />
+            <input type="hidden" id="ScheduleTime" name="ScheduleTime" />
+
+            <!-- Buttons -->
+            <div class="form-actions">
+
+                <button type="submit" name="SendMode" value="Now" class="btn-save" id="btnSendNow">
+                    <i class="fas fa-paper-plane"></i> Send Now
+                </button>
+
+                <button type="button" class="btn-reset" id="btnSchedule">
+                    <i class="fas fa-calendar-days"></i> Schedule Later
                 </button>
 
             </div>
@@ -1038,6 +1084,43 @@
 
         </div>
 
+        </form>
+    </div>
+
+
+    <!-- Schedule popup -->
+    <div class="schedule-modal" id="scheduleModal" aria-hidden="true">
+        <div class="schedule-dialog" role="dialog" aria-labelledby="scheduleTitle">
+
+            <h3 id="scheduleTitle">Schedule Notification</h3>
+            <p>Choose when this notification should be sent.</p>
+
+            <div class="form-group">
+                <label for="PopupDate">Date <span>*</span></label>
+                <div class="input-box">
+                    <i class="fas fa-calendar-days"></i>
+                    <input type="date" id="PopupDate" />
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="PopupTime">Time <span>*</span></label>
+                <div class="input-box">
+                    <i class="fas fa-clock"></i>
+                    <input type="time" id="PopupTime" />
+                </div>
+            </div>
+
+            <small class="validation-message" id="scheduleError"></small>
+
+            <div class="form-actions">
+                <button type="button" class="btn-reset" id="cancelSchedule">Cancel</button>
+                <button type="button" class="btn-save" id="confirmSchedule">
+                    <i class="fas fa-calendar-check"></i> Schedule
+                </button>
+            </div>
+
+        </div>
     </div>
 
 </div>
@@ -1708,4 +1791,176 @@
 
     });
 
+</script>
+    document.addEventListener("DOMContentLoaded", function () {
+
+        const form         = document.getElementById("sendNotificationForm");
+        const notif        = document.getElementById("NotificationId");
+        const audience     = document.getElementById("Audience");
+        const previewTitle = document.getElementById("previewTitle");
+        const previewText  = document.getElementById("previewText");
+        const previewBody  = document.getElementById("previewBody");
+        const messageField = document.getElementById("MessageContent");
+        const editBtn      = document.getElementById("editPreview");
+        const infoText     = document.getElementById("infoText");
+        const btnNow       = document.getElementById("btnSendNow");
+        const btnSchedule  = document.getElementById("btnSchedule");
+
+        const modal        = document.getElementById("scheduleModal");
+        const popupDate    = document.getElementById("PopupDate");
+        const popupTime    = document.getElementById("PopupTime");
+        const scheduleErr  = document.getElementById("scheduleError");
+
+        /* ---------- Preview ---------- */
+        function updatePreview() {
+            const opt = notif.options[notif.selectedIndex];
+
+            if (opt && opt.value) {
+                previewTitle.textContent = opt.dataset.title || opt.text;
+                previewText.textContent  = opt.dataset.content || "";
+            } else {
+                previewTitle.textContent = "Select a notification to preview";
+                previewText.textContent  = "Your notification message will appear here.";
+            }
+            messageField.value = previewBody.innerHTML;
+        }
+
+        notif.addEventListener("change", function () {
+            updatePreview();
+            this.classList.remove("error");
+            document.getElementById("notificationError").textContent = "";
+        });
+
+        /* ---------- Edit preview ---------- */
+        editBtn.addEventListener("click", function () {
+            const editing = previewBody.getAttribute("contenteditable") === "true";
+
+            previewBody.setAttribute("contenteditable", editing ? "false" : "true");
+            previewBody.classList.toggle("editing", !editing);
+
+            this.innerHTML = editing
+                ? '<i class="fas fa-pen"></i> Edit'
+                : '<i class="fas fa-check"></i> Done';
+
+            if (!editing) previewBody.focus();
+            messageField.value = previewBody.innerHTML;
+        });
+
+        previewBody.addEventListener("input", function () {
+            messageField.value = previewBody.innerHTML;
+        });
+
+        /* ---------- Audience count ---------- */
+        function updateAudience() {
+            const opt = audience.options[audience.selectedIndex];
+
+            if (opt && opt.value) {
+                infoText.textContent =
+                    "This notification will be sent to " + opt.dataset.count + " " +
+                    opt.text.toLowerCase() + ".";
+            } else {
+                infoText.textContent =
+                    "Select an audience to see how many will receive this notification.";
+            }
+        }
+
+        audience.addEventListener("change", function () {
+            updateAudience();
+            this.classList.remove("error");
+            document.getElementById("audienceError").textContent = "";
+        });
+
+        /* ---------- Send Via ---------- */
+        document.querySelectorAll(".via-check").forEach(function (c) {
+            c.addEventListener("change", function () {
+                document.getElementById("viaError").textContent = "";
+            });
+        });
+
+        /* ---------- Validation ---------- */
+        function validate() {
+            let valid = true;
+
+            if (!notif.value) {
+                notif.classList.add("error");
+                document.getElementById("notificationError").textContent = "Please select a notification.";
+                valid = false;
+            }
+
+            if (!audience.value) {
+                audience.classList.add("error");
+                document.getElementById("audienceError").textContent = "Please select an audience.";
+                valid = false;
+            }
+
+            if (!document.querySelector(".via-check:checked")) {
+                document.getElementById("viaError").textContent = "Select at least one delivery method.";
+                valid = false;
+            }
+
+            return valid;
+        }
+
+        /* ---------- Send Now ---------- */
+        btnNow.addEventListener("click", function (e) {
+            document.getElementById("ScheduleDate").value = "";
+            document.getElementById("ScheduleTime").value = "";
+            if (!validate()) e.preventDefault();
+        });
+
+        /* ---------- Schedule Later popup ---------- */
+        function closeModal() {
+            modal.classList.remove("open");
+            modal.setAttribute("aria-hidden", "true");
+        }
+
+        btnSchedule.addEventListener("click", function () {
+            if (!validate()) return;
+
+            // no past dates
+            popupDate.min = new Date().toISOString().split("T")[0];
+            scheduleErr.textContent = "";
+            modal.classList.add("open");
+            modal.setAttribute("aria-hidden", "false");
+        });
+
+        document.getElementById("cancelSchedule").addEventListener("click", closeModal);
+
+        modal.addEventListener("click", function (e) {
+            if (e.target === modal) closeModal();
+        });
+
+        document.addEventListener("keydown", function (e) {
+            if (e.key === "Escape") closeModal();
+        });
+
+        document.getElementById("confirmSchedule").addEventListener("click", function () {
+            if (!popupDate.value || !popupTime.value) {
+                popupDate.classList.toggle("error", !popupDate.value);
+                popupTime.classList.toggle("error", !popupTime.value);
+                scheduleErr.textContent = "Please choose a date and time.";
+                return;
+            }
+
+            document.getElementById("ScheduleDate").value = popupDate.value;
+            document.getElementById("ScheduleTime").value = popupTime.value;
+
+            // submit with SendMode = Schedule
+            const mode = document.createElement("input");
+            mode.type  = "hidden";
+            mode.name  = "SendMode";
+            mode.value = "Schedule";
+            form.appendChild(mode);
+
+            messageField.value = previewBody.innerHTML;
+            form.submit();
+        });
+
+        form.addEventListener("submit", function () {
+            messageField.value = previewBody.innerHTML;
+        });
+
+        updatePreview();
+        updateAudience();
+    });
 </script>
