@@ -1,3 +1,13 @@
+﻿@using Microsoft.AspNetCore.Http
+
+@{
+    Layout = "~/Views/Shared/_DashboardLayout.cshtml";
+
+    ViewData["Title"] = "Create Notification";
+    ViewData["Panel"] = "TPO";
+
+    ViewData["UserName"] =
+        Context.Session.GetString("TPOName") ?? "TPO";
 ﻿@{
     ViewData["Title"] = "Create Notification";
 }
@@ -267,6 +277,106 @@
             </div>
 
 
+<div class="form-group full-width">
+
+    <label for="AttachFile1">
+        Attach File 1
+    </label>
+
+    <div class="upload-box">
+
+        <input type="file"
+               id="AttachFile1"
+               name="AttachFile1"
+               accept=".pdf,.doc,.docx,.jpg,.jpeg,.png" />
+
+        <label for="AttachFile1"
+               class="upload-label">
+
+            <div class="upload-icon">
+                <i class="fas fa-cloud-arrow-up"></i>
+            </div>
+
+            <div class="upload-text">
+
+                <strong>Choose a file</strong>
+
+                <span>
+                    PDF, DOC, DOCX, JPG or PNG
+                </span>
+
+            </div>
+
+            <div class="browse-button">
+                Browse
+            </div>
+
+        </label>
+
+        <div class="file-name"
+             id="fileName1">
+
+            <i class="fas fa-paperclip"></i>
+
+            <span>No file selected</span>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+
+<div class="form-group full-width">
+
+    <label for="AttachFile2">
+        Attach File 2
+    </label>
+
+    <div class="upload-box">
+
+        <input type="file"
+               id="AttachFile2"
+               name="AttachFile2"
+               accept=".pdf,.doc,.docx,.jpg,.jpeg,.png" />
+
+        <label for="AttachFile2"
+               class="upload-label">
+
+            <div class="upload-icon">
+                <i class="fas fa-cloud-arrow-up"></i>
+            </div>
+
+            <div class="upload-text">
+
+                <strong>Choose a file</strong>
+
+                <span>
+                    PDF, DOC, DOCX, JPG or PNG
+                </span>
+
+            </div>
+
+            <div class="browse-button">
+                Browse
+            </div>
+
+        </label>
+
+        <div class="file-name"
+             id="fileName2">
+
+            <i class="fas fa-paperclip"></i>
+
+            <span>No file selected</span>
+
+        </div>
+
+    </div>
+
+</div>
+
             <!-- Attach File -->
             <div class="form-group full-width">
 
@@ -361,6 +471,17 @@
         const form =
             document.getElementById("notificationForm");
 
+        const fileInput1 =
+    document.getElementById("AttachFile1");
+
+const fileName1 =
+    document.getElementById("fileName1");
+
+const fileInput2 =
+    document.getElementById("AttachFile2");
+
+const fileName2 =
+    document.getElementById("fileName2");
         const fileInput =
             document.getElementById("AttachFile");
 
@@ -430,6 +551,45 @@
 
 
         /* =========================================
+   FILE 1 NAME
+   ========================================= */
+
+fileInput1.addEventListener("change", function () {
+
+    if (this.files.length > 0) {
+
+        fileName1.querySelector("span").textContent =
+            this.files[0].name;
+
+    } else {
+
+        fileName1.querySelector("span").textContent =
+            "No file selected";
+
+    }
+
+});
+
+
+/* =========================================
+   FILE 2 NAME
+   ========================================= */
+
+fileInput2.addEventListener("change", function () {
+
+    if (this.files.length > 0) {
+
+        fileName2.querySelector("span").textContent =
+            this.files[0].name;
+
+    } else {
+
+        fileName2.querySelector("span").textContent =
+            "No file selected";
+
+    }
+
+});
            FILE NAME
            ========================================= */
 
@@ -576,6 +736,11 @@
 
                 content.value = "";
 
+               fileName1.querySelector("span").textContent =
+    "No file selected";
+
+fileName2.querySelector("span").textContent =
+    "No file selected";
                 fileName.querySelector("span").textContent =
                     "No file selected";
 
