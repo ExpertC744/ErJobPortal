@@ -5,6 +5,8 @@ using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Configuration;
 using System.Data;
 using System.Reflection;
+using System;
+using System.Collections.Generic;
 
 namespace ErJobPortal.Controllers
 {
@@ -5773,6 +5775,201 @@ ORDER BY
             ViewBag.InternshipId = id;
 
             return View();
+        }
+
+        // shrirang 08/10/26
+        // candidate notification section 
+        // ============================================================
+        // CANDIDATE NOTIFICATIONS
+        // ============================================================
+
+        [HttpGet]
+        [Route("Candidate/Notifications")]
+        public IActionResult Notifications()
+        {
+            int? candidateId =
+                HttpContext.Session.GetInt32("CandidateID");
+
+            if (candidateId == null)
+            {
+                return RedirectToAction(
+                    "CandidateLogin",
+                    "Account");
+            }
+
+            try
+            {
+                List<CandidateNotificationM> notifications =
+                    _repository.GetCandidateNotifications(
+                        candidateId.Value);
+
+                ViewBag.UnreadNotificationCount =
+                    _repository.GetCandidateUnreadNotificationCount(
+                        candidateId.Value);
+
+                return View(notifications);
+            }
+            catch (Exception)
+            {
+                TempData["Error"] =
+                    "Unable to load notifications. Please try again.";
+
+                return View(
+                    new List<CandidateNotificationM>());
+            }
+        }
+
+        // ============================================================
+        // CANDIDATE NOTIFICATION DETAIL
+        // ============================================================
+
+        [HttpGet]
+        [Route("Candidate/Notification/{id:int}")]
+        public IActionResult Notification(int id)
+        {
+            int? candidateId =
+                HttpContext.Session.GetInt32("CandidateID");
+
+            if (candidateId == null)
+            {
+                return RedirectToAction(
+                    "CandidateLogin",
+                    "Account");
+            }
+
+            if (id <= 0)
+            {
+                return RedirectToAction(
+                    "Notifications");
+            }
+
+            try
+            {
+                CandidateNotificationM? notification =
+                    _repository.GetCandidateNotification(
+                        candidateId.Value,
+                        id);
+
+                if (notification == null)
+                {
+                    TempData["Error"] =
+                        "Notification not found.";
+
+                    return RedirectToAction(
+                        "Notifications");
+                }
+
+                // ----------------------------------------------------
+                // Mark notification as read
+                // ----------------------------------------------------
+
+                if (!notification.IsRead)
+                {
+                    _repository.MarkCandidateNotificationAsRead(
+                        candidateId.Value,
+                        id);
+
+                    // Update model also so the current page
+                    // immediately shows it as read.
+                    notification.IsRead = true;
+                    notification.ReadDate = DateTime.Now;
+                }
+
+                // ----------------------------------------------------
+                // Get remaining unread count
+                // ----------------------------------------------------
+
+                ViewBag.UnreadNotificationCount =
+                    _repository.GetCandidateUnreadNotificationCount(
+                        candidateId.Value);
+
+                return View(notification);
+            }
+            catch (Exception)
+            {
+                TempData["Error"] =
+                    "Unable to open notification. Please try again.";
+
+                return RedirectToAction(
+                    "Notifications");
+            }
+        }
+
+        // ============================================================
+        // MARK CANDIDATE NOTIFICATION AS READ
+        // ============================================================
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        [Route("Candidate/Notification/MarkAsRead")]
+        public IActionResult MarkNotificationAsRead(
+            int notificationId)
+        {
+            int? candidateId =
+                HttpContext.Session.GetInt32("CandidateID");
+
+            if (candidateId == null)
+            {
+                return Unauthorized();
+            }
+
+            if (notificationId <= 0)
+            {
+                return BadRequest();
+            }
+
+            try
+            {
+                _repository.MarkCandidateNotificationAsRead(
+                    candidateId.Value,
+                    notificationId);
+
+                return Ok(new
+                {
+                    success = true
+                });
+            }
+            catch (Exception)
+            {
+                return StatusCode(
+                    500,
+                    new
+                    {
+                        success = false
+                    });
+            }
+        }
+
+
+        [HttpGet]
+        [Route("Candidate/Notification/UnreadCount")]
+        public IActionResult GetUnreadNotificationCount()
+        {
+            int? candidateId = HttpContext.Session.GetInt32("CandidateID");
+
+            if (candidateId == null)
+            {
+                return Unauthorized();
+            }
+
+            try
+            {
+                int count = _repository.GetCandidateUnreadNotificationCount(candidateId.Value);
+
+                return Json(new
+                {
+                    success = true,
+                    count = count
+                });
+            }
+            catch (Exception)
+            {
+                return StatusCode(500, new
+                {
+                    success = false,
+                    count = 0
+                });
+            }
         }
     }
 }

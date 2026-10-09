@@ -41,6 +41,46 @@
     } *@
 	<style>
 
+		/* shrirang 08/10/26 */
+		/* =========================================================
+   CANDIDATE NOTIFICATION BELL
+========================================================= */
+
+.candidate-notification-btn {
+    position: relative;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.candidate-notification-count {
+    position: absolute;
+    top: -5px;
+    right: -7px;
+
+    min-width: 18px;
+    height: 18px;
+
+    padding: 0 5px;
+
+    background: #dc3545;
+    color: #ffffff;
+
+    border-radius: 50px;
+
+    font-size: 10px;
+    font-weight: 700;
+
+    line-height: 18px;
+    text-align: center;
+
+    border: 2px solid #ffffff;
+
+    z-index: 10;
+}
+		/* end  */
+
 		.feedback-edit-container {
 			width: 100%;
 			display: flex;
@@ -4087,23 +4127,51 @@
 
 					</a>
 
-
+				@*shrirang 08/10/26*@
 					<!-- ================= NOTIFICATION / EVENT ================= -->
 
-					<a asp-controller="TPO"
-					   asp-action="AddNotificationEvent"
-					   class="sidebar-link">
+							<a href="javascript:void(0);"
+							   class="sidebar-link"
+							   onclick="toggleSubMenu('notificationSubmenu')">
 
-						<span class="menu-icon">
-							<i class="fas fa-bell"></i>
-						</span>
+								<span class="menu-icon">
+									<i class="fas fa-bell"></i>
+								</span>
 
-						<span class="menu-text">
-							Add Notification/Event
-						</span>
+								<span class="menu-text">
+									Notification / Event
+								</span>
 
-					</a>
+							</a>
 
+							<div class="profile-submenu"
+								 id="notificationSubmenu">
+
+								<a asp-controller="TPO"
+								   asp-action="ViewNotificationEvent"
+								   class="profile-submenu-link">
+
+									View Notification/Event
+
+								</a>
+
+								<a asp-controller="TPO"
+								   asp-action="CreateNotification"
+								   class="profile-submenu-link">
+
+									Add Notification/Event
+
+								</a>
+								<a asp-controller="TPO"
+								   asp-action="SendNotification"
+								   class="profile-submenu-link">
+
+									Send Notification/Event
+
+								</a>
+
+							</div>
+							@*end*@
 
 					@*Shrirang 03/10/26*@
 
@@ -4601,17 +4669,33 @@
 
 					</div>
 
-
+					@*shrirang 08/10/26*@
 					<!-- Notification -->
-					<button class="header-icon-btn">
+					@if (ViewData["Panel"]?.ToString() == "Candidate")
+{
+    <a href="/Candidate/Notifications"
+       class="header-icon-btn candidate-notification-btn"
+       title="Notifications">
 
-						<i class="far fa-bell"></i>
+        <i class="far fa-bell"></i>
 
-						<span class="notification-dot"></span>
+        <span id="candidateNotificationCount"
+              class="candidate-notification-count"
+              style="display:none;">
+            0
+        </span>
 
-					</button>
+    </a>
+}
+else
+{
+    <button class="header-icon-btn">
+        <i class="far fa-bell"></i>
+        <span class="notification-dot"></span>
+    </button>
+}
 
-
+					@*end*@
 					<!-- User -->
 					<div class="header-user-dropdown">
 
@@ -5211,6 +5295,90 @@ SUPER ADMIN
 	</script>
 	@* Page Specific JavaScript *@
 	@await RenderSectionAsync("Scripts", required: false)
+	@*shrirang 08/10/26 add notification *@
+	<script>
+    function toggleSubMenu(menuId) {
+
+        const menu = document.getElementById(menuId);
+
+        if (menu.style.display === "block") {
+            menu.style.display = "none";
+        } else {
+            menu.style.display = "block";
+        }
+    }
+</script>
+@*end*@
+
+@*shriang 08/10/26*@
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+
+        const panel = "@(ViewData["Panel"]?.ToString() ?? "")";
+
+        if (panel !== "Candidate") {
+            return;
+        }
+
+        loadCandidateNotificationCount();
+
+        // Refresh notification count every 30 seconds
+        setInterval(function () {
+            loadCandidateNotificationCount();
+        }, 30000);
+    });
+
+
+    function loadCandidateNotificationCount() {
+
+        fetch('/Candidate/Notification/UnreadCount', {
+            method: 'GET',
+            headers: {
+                'Accept': 'application/json'
+            }
+        })
+        .then(response => {
+
+            if (!response.ok) {
+                throw new Error("Unable to get notification count.");
+            }
+
+            return response.json();
+        })
+        .then(data => {
+
+            const badge =
+                document.getElementById('candidateNotificationCount');
+
+            if (!badge) {
+                return;
+            }
+
+            if (data.success && data.count > 0) {
+
+                badge.innerText =
+                    data.count > 99 ? "99+" : data.count;
+
+                badge.style.display = "inline-block";
+
+            }
+            else {
+
+                badge.innerText = "0";
+                badge.style.display = "none";
+            }
+        })
+        .catch(error => {
+
+            console.log(
+                "Candidate notification count error:",
+                error
+            );
+
+        });
+    }
+</script>
+@*end*@
 
 </body>
 
