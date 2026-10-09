@@ -8,6 +8,39 @@
     ViewData["UserName"] = "Super Admin";
 }
 
+<style>
+    /* Trainee Profile Photo - Fixed Table Size */
+    .master-data-table .candidate-profile-photo {
+        width: 55px;
+        height: 55px;
+        /*  max-width: 55px;
+        max-height: 55px; */
+        object-fit: contain;
+        display: block;
+        margin: 0 auto;
+        border-radius: 8px;
+        border: 1px solid #e2e8f0;
+        background-color: #f8fafc;
+    }
+
+    /* Keep photo column aligned */
+    .master-data-table td:has(.candidate-profile-photo) {
+        text-align: center;
+        vertical-align: middle;
+        min-width: 85px;
+    }
+
+    /* Responsive photo on smaller screens */
+    @@media (max-width: 768px) {
+        .master-data-table .candidate-profile-photo {
+            width: 45px;
+            height: 45px;
+            max-width: 45px;
+            max-height: 45px;
+        }
+    }
+</style>
+
 <div class="container-fluid">
 
     <!-- MASTER TABLE CARD -->
@@ -28,12 +61,12 @@
 
             </div>
 
+            <!-- Back -->
             <a asp-controller="SuperAdmin"
                asp-action="Dashboard"
-               class="btn btn-secondary">
-
-                Back to Dashboard
-
+               class="master-back-btn"
+               title="Back to Dashboard">
+                <i class="fas fa-arrow-left"></i>
             </a>
 
         </div>
@@ -110,7 +143,7 @@
 
                         foreach (var item in Model)
                         {
-                            @* <tr> *@
+                            <tr>
 
                                 <!-- SR NO -->
                                 <td class="master-id">
@@ -131,18 +164,18 @@
                                 </td>
 
 
-                                <!-- ACTION -->
-                                <td>
-
-                                <a asp-controller="SuperAdmin"
-                                   asp-action="ViewTraineeResume"
-                                   asp-route-id="@item.CandidateID"
-                                   class="master-view-btn"
-                                   target="_blank"
-                                   rel="noopener noreferrer">
-                                    View
-                                </a>
-                            </td>
+                        <!-- ACTION -->
+                        <td>
+                            <a asp-controller="SuperAdmin"
+                               asp-action="ViewTraineeResume"
+                               asp-route-id="@item.CandidateID"
+                               class=""
+                               title="View"
+                               target="_blank"
+                               rel="noopener noreferrer">
+                                <i class="fas fa-eye"></i>
+                            </a>
+                        </td>
                                @*  <a asp-controller="SuperAdmin"
                                    asp-action="ViewTraineeResume"
                                    asp-route-id="@item.CandidateID"
@@ -260,27 +293,28 @@
                                 </td>
 
 
-                                <!-- RESUME -->
-                                <td>
+                        <!-- RESUME -->
+                        <td>
 
-                                    @if (!string.IsNullOrEmpty(item.Resume))
-                                    {
-                                        <a href="@item.Resume"
-                                           target="_blank"
-                                           class="btn btn-sm btn-primary">
+                            @if (!string.IsNullOrEmpty(item.Resume))
+                            {
+                                <a href="@item.Resume"
+                                   target="_blank"
+                                   title="View Resume"
+                                   class="">
 
-                                            View Resume
+                                    <i class="fas fa-eye"></i>
 
-                                        </a>
-                                    }
-                                    else
-                                    {
-                                        <span class="text-muted">
-                                            Not Uploaded
-                                        </span>
-                                    }
+                                </a>
+                            }
+                            else
+                            {
+                                <span class="text-muted">
+                                    Not Uploaded
+                                </span>
+                            }
 
-                                </td>
+                        </td>
 
 
                                 <!-- RESUME STATUS -->
@@ -301,7 +335,7 @@
 
                                 </td>
 
-                            
+                            </tr>
                                 
                             srNo++;
 
