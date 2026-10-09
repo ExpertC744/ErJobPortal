@@ -1490,17 +1490,19 @@ namespace ErJobPortal.Controllers
             // GET BRANCHES FOR TPO DEPARTMENT
             // ========================================================
 
+            //List<BranchM> branches =
+            //    new List<BranchM>();
+
+            //if (departmentId.HasValue &&
+            //    departmentId.Value > 0)
+            //{
+            //    branches =
+            //        _accountRepository.GetBranches(
+            //            departmentId.Value);
+            //}
+            //Sanidhya 08/10/26
             List<BranchM> branches =
-                new List<BranchM>();
-
-            if (departmentId.HasValue &&
-                departmentId.Value > 0)
-            {
-                branches =
-                    _accountRepository.GetBranches(
-                        departmentId.Value);
-            }
-
+                    _accountRepository.GetBranches();
 
             // ========================================================
             // VALIDATE SELECTED BRANCH
@@ -1509,17 +1511,17 @@ namespace ErJobPortal.Controllers
             // belong to his/her department.
             // ========================================================
 
-            if (branchId.HasValue)
-            {
-                bool branchBelongsToDepartment =
-                    branches.Any(
-                        x => x.nID == branchId.Value);
+            //if (branchId.HasValue)
+            //{
+            //    bool branchBelongsToDepartment =
+            //        branches.Any(
+            //            x => x.nID == branchId.Value);
 
-                if (!branchBelongsToDepartment)
-                {
-                    branchId = null;
-                }
-            }
+            //    if (!branchBelongsToDepartment)
+            //    {
+            //        branchId = null;
+            //    }
+            //}
 
 
             // ========================================================

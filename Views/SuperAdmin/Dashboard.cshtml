@@ -711,7 +711,7 @@
                    asp-route-id="1"
                    class="sa-view-btn">
 
-                    View Details
+                    View
 
                     <i class="fas fa-arrow-right"></i>
 
@@ -746,28 +746,28 @@
                 Trainee Profiles
             </div>
 
-            <div class="sa-card-number">
-                500
-            </div>
+             <div class="sa-card-number">
+     @ViewBag.TraineeProfileCount
+ </div>
 
             <div class="sa-card-footer">
 
                 <span class="sa-card-info">
                     Total profiles
                 </span>
-                 <a asp-controller="SuperAdmin"
-                   asp-action="SATraineeProfileList"
-                   asp-route-id="1"
-                   class="sa-view-btn">
 
-                    View Details
+                <a asp-controller="SuperAdmin"
+   asp-action="SATraineeProfileList"
+   asp-route-id="1"
+   class="sa-view-btn">
 
-                    <i class="fas fa-arrow-right"></i>
+    View
 
-                </a>
+    <i class="fas fa-arrow-right"></i>
+
+</a>
+
             </div>
-
-            
 
         </div>
 
@@ -811,7 +811,7 @@
                    asp-route-id="1"
                    class="sa-view-btn">
 
-                    View Details
+                    View
 
                     <i class="fas fa-arrow-right"></i>
 
@@ -846,26 +846,27 @@
                 Organization Profile
             </div>
 
-            <div class="sa-card-number">
-                250
-            </div>
+              <div class="sa-card-number">
+     @ViewBag.OrganizationProfileCount
+ </div>
 
             <div class="sa-card-footer">
 
-                <span class="sa-card-info">
-                    Total profiles
-                </span>
+                 <span class="sa-card-info">
+     Organization Profile
+ </span>
 
-                 <a asp-controller="SuperAdmin"
-                   asp-action="SAOrgProfileList"
-                   asp-route-id="1"
-                   class="sa-view-btn">
+ <a asp-controller="SuperAdmin"
+   asp-action="SAOrgProfileList"
+   asp-route-id="1"
+   class="sa-view-btn">
 
-                    View Details
+    View
 
-                    <i class="fas fa-arrow-right"></i>
+    <i class="fas fa-arrow-right"></i>
 
-                </a>
+</a>
+
 
             </div>
 
@@ -911,7 +912,7 @@
                    asp-route-id="1"
                    class="sa-view-btn">
 
-                    View Details
+                    View
 
                     <i class="fas fa-arrow-right"></i>
 
@@ -1050,6 +1051,9 @@
 
             <div class="sa-card-footer">
 
+                <span class="sa-card-info">
+                    User feedback
+                </span>
                 
                  <a asp-controller="SuperAdmin"
        asp-action="CandidateFeedback"
