@@ -40,15 +40,15 @@ namespace ErJobPortal.Controllers
             return Json(departments);
         }
 
+        //sanidhya 08/10/26
 
         // ==========================================
         // GET BRANCHES BY DEPARTMENT
         // ==========================================
 
-        [HttpGet]
-        public IActionResult GetCandidateBranches(int departmentId)
+        public IActionResult GetCandidateBranches()
         {
-            var branches = _accountRepository.GetBranches(departmentId);
+            var branches = _accountRepository.GetBranches();
             return Json(branches);
         }
 
@@ -260,15 +260,22 @@ namespace ErJobPortal.Controllers
 
             return Json(departments);
         }
-
+        //sanidhya 08/10/26
         [HttpGet]
-        public IActionResult GetBranches(int departmentId)
+        public IActionResult GetBranches()
         {
             var branches =
-                _accountRepository.GetBranches(departmentId);
+                _accountRepository.GetBranches();
 
             return Json(branches);
         }
+        //public IActionResult GetBranches(int departmentId)
+        //{
+        //    var branches =
+        //        _accountRepository.GetBranches(departmentId);
+
+        //    return Json(branches);
+        //}
 
         #region "College"
 
@@ -1629,7 +1636,7 @@ public IActionResult OrganizationResetPassword()
 
 
 
-        #region "Post"
+        #region "View Post Master"
         [HttpGet]
         [Route("Account/ViewOrgPost/{id}")]
         public IActionResult ViewOrgPost(int id, int nOrgID)
@@ -1985,11 +1992,7 @@ public IActionResult OrganizationResetPassword()
 
         }
 
-        private string GetSkillNames(
-string? skillIds,
-string tableName,
-string idColumn,
-string nameColumn)
+        private string GetSkillNames(string? skillIds, string tableName, string idColumn, string nameColumn)
         {
             if (string.IsNullOrWhiteSpace(skillIds))
                 return "";
@@ -2040,6 +2043,13 @@ string nameColumn)
 
             return string.Join(", ", skillNames);
         }
+
+        #endregion
+
+        #region "View Profile"
+
+
+
         #endregion
     }
 }

@@ -495,21 +495,24 @@ GetOrganizationRegistrationDetails(int orgId)
             return departments;
         }
 
-
-        public List<BranchM> GetBranches(int departmentId)
+        //sanidhya 08/10/26
+        public List<BranchM> GetBranches()
         {
             List<BranchM> branches = new List<BranchM>();
 
             using (SqlConnection cn = _db.GetConnection())
             {
-                using (SqlCommand cmd = new SqlCommand(
-                    "SP_GetBranch", cn))
-                {
-                    cmd.CommandType = CommandType.StoredProcedure;
+                string query = @"
+     SELECT
+         nID,
+         nDepartmentID,
+         sBranch
+     FROM tblBranch
+     ORDER BY sBranch ASC";
 
-                    cmd.Parameters.Add(
-                        "@nDepartmentID",
-                        SqlDbType.Int).Value = departmentId;
+                using (SqlCommand cmd = new SqlCommand(query, cn))
+                {
+                    cmd.CommandType = CommandType.Text;
 
                     cn.Open();
 
@@ -522,8 +525,9 @@ GetOrganizationRegistrationDetails(int orgId)
                                 nID = Convert.ToInt32(dr["nID"]),
 
                                 nDepartmentID =
-                                    Convert.ToInt32(
-                                        dr["nDepartmentID"]),
+                                    dr["nDepartmentID"] != DBNull.Value
+                                        ? Convert.ToInt32(dr["nDepartmentID"])
+                                        : 0,
 
                                 sBranch =
                                     dr["sBranch"] != DBNull.Value
@@ -537,6 +541,58 @@ GetOrganizationRegistrationDetails(int orgId)
 
             return branches;
         }
+        //end
+
+        
+// Get branches by Department ID
+public List<BranchM> GetBranches(int departmentId)
+        {
+            List<BranchM> branches = new List<BranchM>();
+
+            using (SqlConnection cn = _db.GetConnection())
+            {
+                string query = @"
+            SELECT
+                nID,
+                nDepartmentID,
+                sBranch
+            FROM tblBranch
+            WHERE nDepartmentID = @DepartmentID
+            ORDER BY sBranch ASC";
+
+                using (SqlCommand cmd = new SqlCommand(query, cn))
+                {
+                    cmd.CommandType = CommandType.Text;
+
+                    cmd.Parameters.Add("@DepartmentID", SqlDbType.Int).Value = departmentId;
+
+                    cn.Open();
+
+                    using (SqlDataReader dr = cmd.ExecuteReader())
+                    {
+                        while (dr.Read())
+                        {
+                            branches.Add(new BranchM
+                            {
+                                nID = Convert.ToInt32(dr["nID"]),
+
+                                nDepartmentID = dr["nDepartmentID"] != DBNull.Value
+                                    ? Convert.ToInt32(dr["nDepartmentID"])
+                                    : 0,
+
+                                sBranch = dr["sBranch"] != DBNull.Value
+                                    ? dr["sBranch"].ToString()
+                                    : ""
+                            });
+                        }
+                    }
+                }
+            }
+
+            return branches;
+        }
+
+
         public List<CollegeM> GetColleges()
         {
             List<CollegeM> colleges = new List<CollegeM>();
@@ -1517,8 +1573,7 @@ GetOrganizationRegistrationDetails(int orgId)
 
         public List<OrganizationUser> GetAllOrganizationList()
         {
-            List<OrganizationUser> list =
-                new List<OrganizationUser>();
+            List<OrganizationUser> list = new List<OrganizationUser>();
 
             using (SqlConnection cn = _db.GetConnection())
             {
@@ -3239,10 +3294,15 @@ public OrganizationLogin? GetOrganizationLoginDetails(string email)
         // shrirang 07/10/26
         // GET TPO TRAINEES BY COLLEGE
         // =====================================================
+        // =====================================================
+        // shrirang 08/10/26
+        // GET TPO TRAINEES BY COLLEGE
+        // USED FOR TPO TRAINEES + SEND NOTIFICATION
+        // =====================================================
         #region "Get TPO Trainees By College"
 
         public List<TPOTraineeInfoM> GetTPOTraineesByCollege(
-     TPOTraineeFilterM filter)
+            TPOTraineeFilterM filter)
         {
             List<TPOTraineeInfoM> trainees =
                 new List<TPOTraineeInfoM>();
@@ -3294,6 +3354,12 @@ WHERE
 
     AND
     (
+        @DepartmentId IS NULL
+        OR C.nDepartment = @DepartmentId
+    )
+
+    AND
+    (
         @BranchId IS NULL
         OR C.nBranch = @BranchId
     )
@@ -3328,10 +3394,19 @@ ORDER BY C.nID DESC;
                 using (SqlCommand cmd =
                        new SqlCommand(query, cn))
                 {
+                    // =================================================
+                    // COLLEGE
+                    // =================================================
+
                     cmd.Parameters.Add(
                         "@CollegeID",
                         SqlDbType.Int).Value =
                             filter.CollegeId;
+
+
+                    // =================================================
+                    // SEARCH
+                    // =================================================
 
                     cmd.Parameters.Add(
                         "@SearchText",
@@ -3342,12 +3417,34 @@ ORDER BY C.nID DESC;
                             ? ""
                             : filter.SearchText.Trim();
 
+
+                    // =================================================
+                    // DEPARTMENT
+                    // =================================================
+
+                    cmd.Parameters.Add(
+                        "@DepartmentId",
+                        SqlDbType.Int).Value =
+                            filter.DepartmentId.HasValue
+                            ? filter.DepartmentId.Value
+                            : DBNull.Value;
+
+
+                    // =================================================
+                    // BRANCH
+                    // =================================================
+
                     cmd.Parameters.Add(
                         "@BranchId",
                         SqlDbType.Int).Value =
                             filter.BranchId.HasValue
                             ? filter.BranchId.Value
                             : DBNull.Value;
+
+
+                    // =================================================
+                    // CURRENT YEAR
+                    // =================================================
 
                     cmd.Parameters.Add(
                         "@CurrentYear",
@@ -3356,12 +3453,22 @@ ORDER BY C.nID DESC;
                             ? filter.CurrentYear.Value
                             : DBNull.Value;
 
+
+                    // =================================================
+                    // ADMISSION YEAR
+                    // =================================================
+
                     cmd.Parameters.Add(
                         "@AdmissionYear",
                         SqlDbType.Int).Value =
                             filter.AdmissionYear.HasValue
                             ? filter.AdmissionYear.Value
                             : DBNull.Value;
+
+
+                    // =================================================
+                    // PASSOUT YEAR
+                    // =================================================
 
                     cmd.Parameters.Add(
                         "@PassoutYear",
@@ -3370,6 +3477,11 @@ ORDER BY C.nID DESC;
                             ? filter.PassoutYear.Value
                             : DBNull.Value;
 
+
+                    // =================================================
+                    // GENDER
+                    // =================================================
+
                     cmd.Parameters.Add(
                         "@Gender",
                         SqlDbType.Int).Value =
@@ -3377,7 +3489,13 @@ ORDER BY C.nID DESC;
                             ? filter.Gender.Value
                             : DBNull.Value;
 
+
                     cn.Open();
+
+
+                    // =================================================
+                    // READ STUDENTS
+                    // =================================================
 
                     using (SqlDataReader reader =
                            cmd.ExecuteReader())
@@ -3496,7 +3614,10 @@ ORDER BY C.nID DESC;
                                 };
 
 
-                            // Gender name
+                            // =================================================
+                            // GENDER NAME
+                            // =================================================
+
                             trainee.GenderName =
                                 trainee.nGender switch
                                 {
@@ -3507,27 +3628,27 @@ ORDER BY C.nID DESC;
                                 };
 
 
-                            // Branch name
+                            // =================================================
+                            // BRANCH NAME
+                            // =================================================
+
                             trainee.BranchName = "-";
 
-                            if (trainee.nDepartment.HasValue &&
-                                trainee.nBranch.HasValue)
+
+                            if (trainee.nBranch.HasValue)
                             {
-                                List<BranchM> branchList =
-                                    GetBranches(
-                                        trainee.nDepartment.Value);
+                                List<BranchM> branchList = GetBranches();
 
                                 BranchM? branch =
                                     branchList.FirstOrDefault(
-                                        x => x.nID ==
-                                             trainee.nBranch.Value);
+                                        x => x.nID == trainee.nBranch.Value);
 
                                 if (branch != null)
                                 {
-                                    trainee.BranchName =
-                                        branch.sBranch;
+                                    trainee.BranchName = branch.sBranch;
                                 }
                             }
+
 
                             trainees.Add(trainee);
                         }
@@ -3593,5 +3714,1870 @@ ORDER BY C.nID DESC;
 
             return department.nID;
         }
+
+        // shrirang 08/10/26
+        // notification tpo
+        public List<TPONotificationListM> GetTPONotificationList(
+    int tpoId,
+    TPONotificationFilterM filter)
+        {
+            List<TPONotificationListM> list =
+                new List<TPONotificationListM>();
+
+            using (SqlConnection cn = _db.GetConnection())
+            {
+                string query = @"
+SELECT
+    NotificationID,
+    Title,
+    Type,
+    Audience,
+    NotificationDate,
+    NotificationTime,
+    Content,
+    SendEmailNotification,
+
+    Attachment1OriginalName,
+    Attachment1Path,
+
+    Attachment2OriginalName,
+    Attachment2Path,
+
+    CreatedBy,
+    CreatedByName,
+
+    IsActive,
+    IsDeleted,
+    CreatedDate
+
+FROM tblTPONotification
+
+WHERE CreatedBy = @CreatedBy
+AND IsDeleted = 0
+";
+
+                if (!string.IsNullOrWhiteSpace(filter.Type))
+                {
+                    query += @"
+AND Type = @Type
+";
+                }
+
+                if (!string.IsNullOrWhiteSpace(filter.Audience))
+                {
+                    query += @"
+AND Audience = @Audience
+";
+                }
+
+                if (filter.FromDate.HasValue)
+                {
+                    query += @"
+AND NotificationDate >= @FromDate
+";
+                }
+
+                if (filter.ToDate.HasValue)
+                {
+                    query += @"
+AND NotificationDate <= @ToDate
+";
+                }
+
+                query += @"
+ORDER BY CreatedDate DESC,
+         NotificationID DESC";
+
+
+                using (SqlCommand cmd =
+                       new SqlCommand(query, cn))
+                {
+                    cmd.Parameters.AddWithValue(
+                        "@CreatedBy",
+                        tpoId);
+
+
+                    if (!string.IsNullOrWhiteSpace(filter.Type))
+                    {
+                        cmd.Parameters.AddWithValue(
+                            "@Type",
+                            filter.Type);
+                    }
+
+
+                    if (!string.IsNullOrWhiteSpace(filter.Audience))
+                    {
+                        cmd.Parameters.AddWithValue(
+                            "@Audience",
+                            filter.Audience);
+                    }
+
+
+                    if (filter.FromDate.HasValue)
+                    {
+                        cmd.Parameters.AddWithValue(
+                            "@FromDate",
+                            filter.FromDate.Value.Date);
+                    }
+
+
+                    if (filter.ToDate.HasValue)
+                    {
+                        cmd.Parameters.AddWithValue(
+                            "@ToDate",
+                            filter.ToDate.Value.Date);
+                    }
+
+
+                    cn.Open();
+
+
+                    using (SqlDataReader reader =
+                           cmd.ExecuteReader())
+                    {
+                        while (reader.Read())
+                        {
+                            TPONotificationListM item =
+                                new TPONotificationListM();
+
+
+                            // ============================
+                            // Basic Information
+                            // ============================
+
+                            item.NotificationID =
+                                Convert.ToInt32(
+                                    reader["NotificationID"]);
+
+
+                            item.Title =
+                                reader["Title"]?.ToString()
+                                ?? string.Empty;
+
+
+                            item.Type =
+                                reader["Type"]?.ToString()
+                                ?? string.Empty;
+
+
+                            item.Audience =
+                                reader["Audience"]?.ToString()
+                                ?? string.Empty;
+
+
+                            // ============================
+                            // Date
+                            // ============================
+
+                            if (reader["NotificationDate"]
+                                != DBNull.Value)
+                            {
+                                item.NotificationDate =
+                                    Convert.ToDateTime(
+                                        reader["NotificationDate"]);
+                            }
+
+
+                            // ============================
+                            // Time
+                            // ============================
+
+                            if (reader["NotificationTime"]
+                                != DBNull.Value)
+                            {
+                                item.NotificationTime =
+                                    (TimeSpan)
+                                    reader["NotificationTime"];
+                            }
+
+
+                            // ============================
+                            // Content
+                            // ============================
+
+                            item.Content =
+                                reader["Content"]?.ToString()
+                                ?? string.Empty;
+
+
+                            // ============================
+                            // Email
+                            // ============================
+
+                            item.SendEmailNotification =
+                                reader["SendEmailNotification"]
+                                != DBNull.Value
+                                &&
+                                Convert.ToBoolean(
+                                    reader[
+                                        "SendEmailNotification"]);
+
+
+                            // ============================
+                            // Attachment 1
+                            // ============================
+
+                            item.Attachment1OriginalName =
+                                reader[
+                                    "Attachment1OriginalName"]
+                                != DBNull.Value
+                                ?
+                                reader[
+                                    "Attachment1OriginalName"]
+                                    .ToString()
+                                :
+                                null;
+
+
+                            item.Attachment1Path =
+                                reader[
+                                    "Attachment1Path"]
+                                != DBNull.Value
+                                ?
+                                reader[
+                                    "Attachment1Path"]
+                                    .ToString()
+                                :
+                                null;
+
+
+                            // ============================
+                            // Attachment 2
+                            // ============================
+
+                            item.Attachment2OriginalName =
+                                reader[
+                                    "Attachment2OriginalName"]
+                                != DBNull.Value
+                                ?
+                                reader[
+                                    "Attachment2OriginalName"]
+                                    .ToString()
+                                :
+                                null;
+
+
+                            item.Attachment2Path =
+                                reader[
+                                    "Attachment2Path"]
+                                != DBNull.Value
+                                ?
+                                reader[
+                                    "Attachment2Path"]
+                                    .ToString()
+                                :
+                                null;
+
+
+                            // ============================
+                            // Created By
+                            // ============================
+
+                            if (reader["CreatedBy"]
+                                != DBNull.Value)
+                            {
+                                item.CreatedBy =
+                                    Convert.ToInt32(
+                                        reader["CreatedBy"]);
+                            }
+
+
+                            item.CreatedByName =
+                                reader["CreatedByName"]
+                                != DBNull.Value
+                                ?
+                                reader["CreatedByName"]
+                                    .ToString()
+                                :
+                                null;
+
+
+                            // ============================
+                            // Status
+                            // ============================
+
+                            item.IsActive =
+                                reader["IsActive"]
+                                != DBNull.Value
+                                &&
+                                Convert.ToBoolean(
+                                    reader["IsActive"]);
+
+
+                            item.IsDeleted =
+                                reader["IsDeleted"]
+                                != DBNull.Value
+                                &&
+                                Convert.ToBoolean(
+                                    reader["IsDeleted"]);
+
+
+                            // ============================
+                            // Created Date
+                            // ============================
+
+                            item.CreatedDate =
+                                Convert.ToDateTime(
+                                    reader["CreatedDate"]);
+
+
+                            // ============================
+                            // Display Date / Time
+                            // ============================
+
+                            DateTime? notificationDateTime =
+                                null;
+
+
+                            if (item.NotificationDate.HasValue)
+                            {
+                                notificationDateTime =
+                                    item.NotificationDate.Value.Date;
+
+
+                                if (item.NotificationTime.HasValue)
+                                {
+                                    notificationDateTime =
+                                        notificationDateTime.Value
+                                        .Add(
+                                            item.NotificationTime
+                                            .Value);
+                                }
+                            }
+
+
+                            if (notificationDateTime.HasValue)
+                            {
+                                item.DisplayDateTime =
+                                    notificationDateTime.Value
+                                    .ToString(
+                                        "dd/MM/yyyy hh:mm tt");
+
+
+                                if (notificationDateTime.Value
+                                    < DateTime.Now)
+                                {
+                                    item.Status =
+                                        "Completed";
+                                }
+                                else
+                                {
+                                    item.Status =
+                                        "Active";
+                                }
+                            }
+                            else
+                            {
+                                item.Status =
+                                    item.IsActive
+                                    ?
+                                    "Active"
+                                    :
+                                    "Inactive";
+                            }
+
+
+                            list.Add(item);
+                        }
+                    }
+                }
+            }
+
+            return list;
+        }
+
+        // =====================================================
+        // shrirang 08/10/26
+        // TPO SEND NOTIFICATION
+        // GET TPO NOTIFICATIONS
+        // =====================================================
+        #region "Get TPO Notifications For Send"
+
+        public List<TPONotificationListM> GetTPONotificationsForSend(
+            int tpoId)
+        {
+            List<TPONotificationListM> list =
+                new List<TPONotificationListM>();
+
+            using (SqlConnection cn = _db.GetConnection())
+            {
+                string query = @"
+SELECT
+    N.NotificationID,
+    N.Title,
+    N.Type,
+    N.Audience,
+    N.NotificationDate,
+    N.NotificationTime,
+    N.Content,
+    N.SendEmailNotification,
+
+    N.Attachment1OriginalName,
+    N.Attachment1Path,
+
+    N.Attachment2OriginalName,
+    N.Attachment2Path,
+
+    N.CreatedBy,
+    N.CreatedByName,
+
+    N.IsActive,
+    N.IsDeleted,
+    N.CreatedDate,
+
+    -- =====================================================
+    -- NOTIFICATION TRACKING
+    -- =====================================================
+
+    ISNULL(T.TotalSent, 0) AS TotalSent,
+
+    ISNULL(T.TotalRead, 0) AS TotalRead,
+
+    ISNULL(T.TotalUnread, 0) AS TotalUnread
+
+FROM tblTPONotification N
+
+-- =========================================================
+-- CALCULATE STUDENT NOTIFICATION TRACKING
+-- =========================================================
+
+OUTER APPLY
+(
+    SELECT
+        COUNT(1) AS TotalSent,
+
+        SUM(
+    CASE
+        WHEN ISNULL(R.IsRead, 0) = 1
+        THEN 1
+        ELSE 0
+    END
+) AS TotalRead,
+
+SUM(
+    CASE
+        WHEN ISNULL(R.IsRead, 0) = 0
+        THEN 1
+        ELSE 0
+    END
+) AS TotalUnread
+
+    FROM tblTPONotificationRecipient R
+
+    WHERE
+        R.NotificationID = N.NotificationID
+        AND R.IsActive = 1
+
+) T
+
+WHERE
+    N.CreatedBy = @CreatedBy
+
+    AND N.IsDeleted = 0
+
+ORDER BY
+    N.CreatedDate DESC,
+    N.NotificationID DESC;
+";
+
+                using (SqlCommand cmd =
+                       new SqlCommand(query, cn))
+                {
+                    cmd.Parameters.Add(
+                        "@CreatedBy",
+                        SqlDbType.Int).Value = tpoId;
+
+                    cn.Open();
+
+                    using (SqlDataReader reader =
+                           cmd.ExecuteReader())
+                    {
+                        while (reader.Read())
+                        {
+                            TPONotificationListM item =
+                                new TPONotificationListM();
+
+
+                            // =================================================
+                            // BASIC INFORMATION
+                            // =================================================
+
+                            item.NotificationID =
+                                Convert.ToInt32(
+                                    reader["NotificationID"]);
+
+                            item.Title =
+                                reader["Title"]?.ToString()
+                                ?? string.Empty;
+
+                            item.Type =
+                                reader["Type"]?.ToString()
+                                ?? string.Empty;
+
+                            item.Audience =
+                                reader["Audience"]?.ToString()
+                                ?? string.Empty;
+
+
+                            // =================================================
+                            // DATE
+                            // =================================================
+
+                            if (reader["NotificationDate"]
+                                != DBNull.Value)
+                            {
+                                item.NotificationDate =
+                                    Convert.ToDateTime(
+                                        reader["NotificationDate"]);
+                            }
+
+
+                            // =================================================
+                            // TIME
+                            // =================================================
+
+                            if (reader["NotificationTime"]
+                                != DBNull.Value)
+                            {
+                                item.NotificationTime =
+                                    (TimeSpan)
+                                    reader["NotificationTime"];
+                            }
+
+
+                            // =================================================
+                            // CONTENT
+                            // =================================================
+
+                            item.Content =
+                                reader["Content"]?.ToString()
+                                ?? string.Empty;
+
+
+                            // =================================================
+                            // EMAIL
+                            // =================================================
+
+                            item.SendEmailNotification =
+                                reader["SendEmailNotification"]
+                                != DBNull.Value
+                                &&
+                                Convert.ToBoolean(
+                                    reader[
+                                        "SendEmailNotification"]);
+
+
+                            // =================================================
+                            // ATTACHMENT 1
+                            // =================================================
+
+                            item.Attachment1OriginalName =
+                                reader[
+                                    "Attachment1OriginalName"]
+                                != DBNull.Value
+                                ?
+                                reader[
+                                    "Attachment1OriginalName"]
+                                    .ToString()
+                                :
+                                null;
+
+                            item.Attachment1Path =
+                                reader[
+                                    "Attachment1Path"]
+                                != DBNull.Value
+                                ?
+                                reader[
+                                    "Attachment1Path"]
+                                    .ToString()
+                                :
+                                null;
+
+
+                            // =================================================
+                            // ATTACHMENT 2
+                            // =================================================
+
+                            item.Attachment2OriginalName =
+                                reader[
+                                    "Attachment2OriginalName"]
+                                != DBNull.Value
+                                ?
+                                reader[
+                                    "Attachment2OriginalName"]
+                                    .ToString()
+                                :
+                                null;
+
+                            item.Attachment2Path =
+                                reader[
+                                    "Attachment2Path"]
+                                != DBNull.Value
+                                ?
+                                reader[
+                                    "Attachment2Path"]
+                                    .ToString()
+                                :
+                                null;
+
+
+                            // =================================================
+                            // CREATED BY
+                            // =================================================
+
+                            if (reader["CreatedBy"]
+                                != DBNull.Value)
+                            {
+                                item.CreatedBy =
+                                    Convert.ToInt32(
+                                        reader["CreatedBy"]);
+                            }
+
+                            item.CreatedByName =
+                                reader["CreatedByName"]
+                                != DBNull.Value
+                                ?
+                                reader["CreatedByName"]
+                                    .ToString()
+                                :
+                                null;
+
+
+                            // =================================================
+                            // ACTIVE / DELETED
+                            // =================================================
+
+                            item.IsActive =
+                                reader["IsActive"]
+                                != DBNull.Value
+                                &&
+                                Convert.ToBoolean(
+                                    reader["IsActive"]);
+
+                            item.IsDeleted =
+                                reader["IsDeleted"]
+                                != DBNull.Value
+                                &&
+                                Convert.ToBoolean(
+                                    reader["IsDeleted"]);
+
+
+                            // =================================================
+                            // CREATED DATE
+                            // =================================================
+
+                            item.CreatedDate =
+                                Convert.ToDateTime(
+                                    reader["CreatedDate"]);
+
+                            // =================================================
+                            // NOTIFICATION TRACKING
+                            // =================================================
+
+                            item.TotalSent =
+                                reader["TotalSent"] != DBNull.Value
+                                ? Convert.ToInt32(reader["TotalSent"])
+                                : 0;
+
+                            item.TotalRead =
+                                reader["TotalRead"] != DBNull.Value
+                                ? Convert.ToInt32(reader["TotalRead"])
+                                : 0;
+
+                            item.TotalUnread =
+                                reader["TotalUnread"] != DBNull.Value
+                                ? Convert.ToInt32(reader["TotalUnread"])
+                                : 0;
+
+
+                            // =================================================
+                            // DISPLAY DATE / TIME
+                            // =================================================
+
+                            DateTime? notificationDateTime =
+                                null;
+
+                            if (item.NotificationDate.HasValue)
+                            {
+                                notificationDateTime =
+                                    item.NotificationDate.Value.Date;
+
+                                if (item.NotificationTime.HasValue)
+                                {
+                                    notificationDateTime =
+                                        notificationDateTime.Value.Add(
+                                            item.NotificationTime.Value);
+                                }
+                            }
+
+
+                            if (notificationDateTime.HasValue)
+                            {
+                                item.DisplayDateTime =
+                                    notificationDateTime.Value.ToString(
+                                        "dd/MM/yyyy hh:mm tt");
+
+
+                                if (notificationDateTime.Value
+                                    < DateTime.Now)
+                                {
+                                    item.Status =
+                                        "Completed";
+                                }
+                                else
+                                {
+                                    item.Status =
+                                        "Active";
+                                }
+                            }
+                            else
+                            {
+                                item.Status =
+                                    item.IsActive
+                                    ? "Active"
+                                    : "Inactive";
+                            }
+
+
+                            list.Add(item);
+                        }
+                    }
+                }
+            }
+
+            return list;
+        }
+
+        #endregion
+
+
+        #region "Send TPO Notification To Selected Candidates"
+
+        public int SendTPONotificationToCandidates(
+            int tpoId,
+            int notificationId,
+            int collegeId,
+            List<int> candidateIds)
+        {
+            if (candidateIds == null || candidateIds.Count == 0)
+            {
+                return 0;
+            }
+
+            // Remove duplicate Candidate IDs
+            candidateIds =
+                candidateIds
+                .Where(x => x > 0)
+                .Distinct()
+                .ToList();
+
+            if (candidateIds.Count == 0)
+            {
+                return 0;
+            }
+
+            using (SqlConnection cn = _db.GetConnection())
+            {
+                cn.Open();
+
+                using (SqlTransaction transaction =
+                       cn.BeginTransaction())
+                {
+                    try
+                    {
+                        // =====================================================
+                        // STEP 1
+                        // VERIFY NOTIFICATION BELONGS TO THIS TPO
+                        // =====================================================
+
+                        string notificationQuery = @"
+SELECT COUNT(1)
+FROM tblTPONotification
+WHERE
+    NotificationID = @NotificationID
+    AND CreatedBy = @TPOID
+    AND ISNULL(IsDeleted, 0) = 0;
+";
+
+                        using (SqlCommand notificationCmd =
+                               new SqlCommand(
+                                   notificationQuery,
+                                   cn,
+                                   transaction))
+                        {
+                            notificationCmd.Parameters.Add(
+                                "@NotificationID",
+                                SqlDbType.Int).Value =
+                                    notificationId;
+
+                            notificationCmd.Parameters.Add(
+                                "@TPOID",
+                                SqlDbType.Int).Value =
+                                    tpoId;
+
+                            int notificationExists =
+                                Convert.ToInt32(
+                                    notificationCmd.ExecuteScalar());
+
+                            if (notificationExists == 0)
+                            {
+                                throw new InvalidOperationException(
+                                    "The selected notification does not belong to the logged-in TPO."
+                                );
+                            }
+                        }
+
+
+                        // =====================================================
+                        // STEP 2
+                        // CREATE PARAMETER LIST
+                        // =====================================================
+
+                        List<string> candidateParameters =
+                            new List<string>();
+
+                        for (int i = 0;
+                             i < candidateIds.Count;
+                             i++)
+                        {
+                            string parameterName =
+                                "@CandidateID" + i;
+
+                            candidateParameters.Add(
+                                parameterName);
+                        }
+
+
+                        // =====================================================
+                        // STEP 3
+                        // INSERT ONLY VALID CANDIDATES
+                        //
+                        // SECURITY:
+                        // Candidate must belong to the TPO's college.
+                        // =====================================================
+
+                        string insertQuery = $@"
+INSERT INTO tblTPONotificationRecipient
+(
+    NotificationID,
+    CandidateID,
+    IsRead,
+    SentDate,
+    IsActive
+)
+SELECT
+    @NotificationID,
+    C.nID,
+    0,
+    GETDATE(),
+    1
+
+FROM tblCandidateRegister C
+
+WHERE
+    C.nID IN
+    (
+        {string.Join(",", candidateParameters)}
+    )
+
+    AND TRY_CONVERT(INT, C.sCollegeName) = @CollegeID
+
+    AND ISNULL(C.nBit, 0) = 1
+
+    AND NOT EXISTS
+    (
+        SELECT 1
+        FROM tblTPONotificationRecipient R
+        WHERE
+            R.NotificationID =
+                @NotificationID
+
+            AND R.CandidateID =
+                C.nID
+    );
+";
+
+
+                        using (SqlCommand insertCmd =
+                               new SqlCommand(
+                                   insertQuery,
+                                   cn,
+                                   transaction))
+                        {
+                            // =================================================
+                            // NOTIFICATION
+                            // =================================================
+
+                            insertCmd.Parameters.Add(
+                                "@NotificationID",
+                                SqlDbType.Int).Value =
+                                    notificationId;
+
+
+                            // =================================================
+                            // COLLEGE
+                            // =================================================
+
+                            insertCmd.Parameters.Add(
+                                "@CollegeID",
+                                SqlDbType.Int).Value =
+                                    collegeId;
+
+
+                            // =================================================
+                            // CANDIDATES
+                            // =================================================
+
+                            for (int i = 0;
+                                 i < candidateIds.Count;
+                                 i++)
+                            {
+                                insertCmd.Parameters.Add(
+                                    candidateParameters[i],
+                                    SqlDbType.Int).Value =
+                                        candidateIds[i];
+                            }
+
+
+                            // =================================================
+                            // EXECUTE
+                            // =================================================
+
+                            int insertedCount =
+                                insertCmd.ExecuteNonQuery();
+
+
+                            // =================================================
+                            // COMMIT
+                            // =================================================
+
+                            transaction.Commit();
+
+
+                            return insertedCount;
+                        }
+                    }
+                    catch
+                    {
+                        // =================================================
+                        // ROLLBACK
+                        // =================================================
+
+                        try
+                        {
+                            transaction.Rollback();
+                        }
+                        catch
+                        {
+                            // Ignore rollback error
+                        }
+
+                        throw;
+                    }
+                }
+            }
+        }
+
+        #endregion
+
+
+        // shrirang 08/10/26
+        // candidate notification section
+        public int GetCandidateUnreadNotificationCount(int candidateId)
+        {
+            using (SqlConnection cn = _db.GetConnection())
+            {
+                cn.Open();
+
+                string query = @"
+SELECT COUNT(1)
+FROM tblTPONotificationRecipient R
+INNER JOIN tblTPONotification N
+    ON N.NotificationID = R.NotificationID
+WHERE
+    R.CandidateID = @CandidateID
+    AND R.IsActive = 1
+    AND R.IsRead = 0
+    AND N.IsActive = 1
+    AND N.IsDeleted = 0;
+";
+
+                using (SqlCommand cmd = new SqlCommand(query, cn))
+                {
+                    cmd.Parameters.Add("@CandidateID", SqlDbType.Int)
+                                  .Value = candidateId;
+
+                    return Convert.ToInt32(cmd.ExecuteScalar());
+                }
+            }
+        }
+        public List<CandidateNotificationM> GetCandidateNotifications(
+    int candidateId)
+        {
+            List<CandidateNotificationM> notifications =
+                new List<CandidateNotificationM>();
+
+            using (SqlConnection cn = _db.GetConnection())
+            {
+                cn.Open();
+
+                string query = @"
+SELECT
+    R.RecipientID,
+    R.NotificationID,
+
+    N.Title,
+    N.Type,
+    N.Audience,
+    N.NotificationDate,
+    N.NotificationTime,
+    N.Content,
+
+    R.IsRead,
+    R.ReadDate,
+    R.SentDate,
+
+    N.CreatedDate,
+
+    N.Attachment1OriginalName,
+    N.Attachment1Path,
+
+    N.Attachment2OriginalName,
+    N.Attachment2Path
+
+FROM tblTPONotificationRecipient R
+
+INNER JOIN tblTPONotification N
+    ON N.NotificationID = R.NotificationID
+
+WHERE
+    R.CandidateID = @CandidateID
+    AND R.IsActive = 1
+    AND N.IsActive = 1
+    AND N.IsDeleted = 0
+
+ORDER BY
+    R.SentDate DESC,
+    R.RecipientID DESC;
+";
+
+                using (SqlCommand cmd = new SqlCommand(query, cn))
+                {
+                    cmd.Parameters.Add("@CandidateID", SqlDbType.Int)
+                                  .Value = candidateId;
+
+                    using (SqlDataReader dr = cmd.ExecuteReader())
+                    {
+                        while (dr.Read())
+                        {
+                            CandidateNotificationM item =
+                                new CandidateNotificationM();
+
+                            item.RecipientID =
+                                Convert.ToInt32(dr["RecipientID"]);
+
+                            item.NotificationID =
+                                Convert.ToInt32(dr["NotificationID"]);
+
+                            item.Title =
+                                dr["Title"] == DBNull.Value
+                                    ? string.Empty
+                                    : Convert.ToString(dr["Title"])!;
+
+                            item.Type =
+                                dr["Type"] == DBNull.Value
+                                    ? string.Empty
+                                    : Convert.ToString(dr["Type"])!;
+
+                            item.Audience =
+                                dr["Audience"] == DBNull.Value
+                                    ? string.Empty
+                                    : Convert.ToString(dr["Audience"])!;
+
+                            item.NotificationDate =
+                                dr["NotificationDate"] == DBNull.Value
+                                    ? null
+                                    : Convert.ToDateTime(
+                                        dr["NotificationDate"]);
+
+                            item.NotificationTime =
+                                dr["NotificationTime"] == DBNull.Value
+                                    ? null
+                                    : (TimeSpan?)dr["NotificationTime"];
+
+                            item.Content =
+                                dr["Content"] == DBNull.Value
+                                    ? string.Empty
+                                    : Convert.ToString(dr["Content"])!;
+
+                            item.IsRead =
+                                dr["IsRead"] != DBNull.Value &&
+                                Convert.ToBoolean(dr["IsRead"]);
+
+                            item.ReadDate =
+                                dr["ReadDate"] == DBNull.Value
+                                    ? null
+                                    : Convert.ToDateTime(dr["ReadDate"]);
+
+                            item.SentDate =
+                                dr["SentDate"] == DBNull.Value
+                                    ? DateTime.MinValue
+                                    : Convert.ToDateTime(dr["SentDate"]);
+
+                            item.CreatedDate =
+                                dr["CreatedDate"] == DBNull.Value
+                                    ? DateTime.MinValue
+                                    : Convert.ToDateTime(dr["CreatedDate"]);
+
+                            item.Attachment1OriginalName =
+                                dr["Attachment1OriginalName"] == DBNull.Value
+                                    ? null
+                                    : Convert.ToString(
+                                        dr["Attachment1OriginalName"]);
+
+                            item.Attachment1Path =
+                                dr["Attachment1Path"] == DBNull.Value
+                                    ? null
+                                    : Convert.ToString(
+                                        dr["Attachment1Path"]);
+
+                            item.Attachment2OriginalName =
+                                dr["Attachment2OriginalName"] == DBNull.Value
+                                    ? null
+                                    : Convert.ToString(
+                                        dr["Attachment2OriginalName"]);
+
+                            item.Attachment2Path =
+                                dr["Attachment2Path"] == DBNull.Value
+                                    ? null
+                                    : Convert.ToString(
+                                        dr["Attachment2Path"]);
+
+                            notifications.Add(item);
+                        }
+                    }
+                }
+            }
+
+            return notifications;
+        }
+
+        public CandidateNotificationM? GetCandidateNotification(
+    int candidateId,
+    int notificationId)
+        {
+            using (SqlConnection cn = _db.GetConnection())
+            {
+                cn.Open();
+
+                string query = @"
+SELECT
+    R.RecipientID,
+    R.NotificationID,
+
+    N.Title,
+    N.Type,
+    N.Audience,
+    N.NotificationDate,
+    N.NotificationTime,
+    N.Content,
+
+    R.IsRead,
+    R.ReadDate,
+    R.SentDate,
+
+    N.CreatedDate,
+
+    N.Attachment1OriginalName,
+    N.Attachment1Path,
+
+    N.Attachment2OriginalName,
+    N.Attachment2Path
+
+FROM tblTPONotificationRecipient R
+
+INNER JOIN tblTPONotification N
+    ON N.NotificationID = R.NotificationID
+
+WHERE
+    R.CandidateID = @CandidateID
+    AND R.NotificationID = @NotificationID
+    AND R.IsActive = 1
+    AND N.IsActive = 1
+    AND N.IsDeleted = 0;
+";
+
+                using (SqlCommand cmd = new SqlCommand(query, cn))
+                {
+                    cmd.Parameters.Add("@CandidateID", SqlDbType.Int)
+                                  .Value = candidateId;
+
+                    cmd.Parameters.Add("@NotificationID", SqlDbType.Int)
+                                  .Value = notificationId;
+
+                    using (SqlDataReader dr = cmd.ExecuteReader())
+                    {
+                        if (!dr.Read())
+                        {
+                            return null;
+                        }
+
+                        CandidateNotificationM item =
+                            new CandidateNotificationM();
+
+                        item.RecipientID =
+                            Convert.ToInt32(dr["RecipientID"]);
+
+                        item.NotificationID =
+                            Convert.ToInt32(dr["NotificationID"]);
+
+                        item.Title =
+                            dr["Title"] == DBNull.Value
+                                ? string.Empty
+                                : Convert.ToString(dr["Title"])!;
+
+                        item.Type =
+                            dr["Type"] == DBNull.Value
+                                ? string.Empty
+                                : Convert.ToString(dr["Type"])!;
+
+                        item.Audience =
+                            dr["Audience"] == DBNull.Value
+                                ? string.Empty
+                                : Convert.ToString(dr["Audience"])!;
+
+                        item.NotificationDate =
+                            dr["NotificationDate"] == DBNull.Value
+                                ? null
+                                : Convert.ToDateTime(
+                                    dr["NotificationDate"]);
+
+                        item.NotificationTime =
+                            dr["NotificationTime"] == DBNull.Value
+                                ? null
+                                : (TimeSpan?)dr["NotificationTime"];
+
+                        item.Content =
+                            dr["Content"] == DBNull.Value
+                                ? string.Empty
+                                : Convert.ToString(dr["Content"])!;
+
+                        item.IsRead =
+                            dr["IsRead"] != DBNull.Value &&
+                            Convert.ToBoolean(dr["IsRead"]);
+
+                        item.ReadDate =
+                            dr["ReadDate"] == DBNull.Value
+                                ? null
+                                : Convert.ToDateTime(dr["ReadDate"]);
+
+                        item.SentDate =
+                            dr["SentDate"] == DBNull.Value
+                                ? DateTime.MinValue
+                                : Convert.ToDateTime(dr["SentDate"]);
+
+                        item.CreatedDate =
+                            dr["CreatedDate"] == DBNull.Value
+                                ? DateTime.MinValue
+                                : Convert.ToDateTime(dr["CreatedDate"]);
+
+                        item.Attachment1OriginalName =
+                            dr["Attachment1OriginalName"] == DBNull.Value
+                                ? null
+                                : Convert.ToString(
+                                    dr["Attachment1OriginalName"]);
+
+                        item.Attachment1Path =
+                            dr["Attachment1Path"] == DBNull.Value
+                                ? null
+                                : Convert.ToString(
+                                    dr["Attachment1Path"]);
+
+                        item.Attachment2OriginalName =
+                            dr["Attachment2OriginalName"] == DBNull.Value
+                                ? null
+                                : Convert.ToString(
+                                    dr["Attachment2OriginalName"]);
+
+                        item.Attachment2Path =
+                            dr["Attachment2Path"] == DBNull.Value
+                                ? null
+                                : Convert.ToString(
+                                    dr["Attachment2Path"]);
+
+                        return item;
+                    }
+                }
+            }
+        }
+
+        public bool MarkCandidateNotificationAsRead(
+    int candidateId,
+    int notificationId)
+        {
+            using (SqlConnection cn = _db.GetConnection())
+            {
+                cn.Open();
+
+                string query = @"
+UPDATE R
+SET
+    R.IsRead = 1,
+    R.ReadDate = GETDATE()
+FROM tblTPONotificationRecipient R
+INNER JOIN tblTPONotification N
+    ON N.NotificationID = R.NotificationID
+WHERE
+    R.CandidateID = @CandidateID
+    AND R.NotificationID = @NotificationID
+    AND R.IsActive = 1
+    AND N.IsActive = 1
+    AND N.IsDeleted = 0
+    AND R.IsRead = 0;
+";
+
+                using (SqlCommand cmd = new SqlCommand(query, cn))
+                {
+                    cmd.Parameters.Add("@CandidateID", SqlDbType.Int)
+                                  .Value = candidateId;
+
+                    cmd.Parameters.Add("@NotificationID", SqlDbType.Int)
+                                  .Value = notificationId;
+
+                    int rows =
+                        cmd.ExecuteNonQuery();
+
+                    return rows > 0;
+                }
+            }
+        }
+
+
+
+
+
+        private string? GetSkillNames(
+  string? skillIds,
+  string tableName,
+  string idColumn,
+  string nameColumn)
+        {
+            if (string.IsNullOrWhiteSpace(skillIds))
+            {
+                return skillIds;
+            }
+
+            List<string> ids = skillIds
+                .Split(',', StringSplitOptions.RemoveEmptyEntries)
+                .Select(x => x.Trim())
+                .Where(x => int.TryParse(x, out _))
+                .ToList();
+
+            if (ids.Count == 0)
+            {
+                return "";
+            }
+
+            using (SqlConnection con = _db.GetConnection())
+            {
+                List<string> parameterNames = new List<string>();
+
+                for (int i = 0; i < ids.Count; i++)
+                {
+                    parameterNames.Add("@id" + i);
+                }
+
+                string parameters =
+                    string.Join(",", parameterNames);
+
+                string query = $@"
+     SELECT {nameColumn}
+     FROM {tableName}
+     WHERE {idColumn} IN ({parameters})
+     ORDER BY {idColumn}";
+
+                using (SqlCommand cmd =
+                       new SqlCommand(query, con))
+                {
+                    for (int i = 0; i < ids.Count; i++)
+                    {
+                        cmd.Parameters.Add(
+                            parameterNames[i],
+                            SqlDbType.Int).Value =
+                            Convert.ToInt32(ids[i]);
+                    }
+
+                    con.Open();
+
+                    List<string> names = new List<string>();
+
+                    using (SqlDataReader dr =
+                           cmd.ExecuteReader())
+                    {
+                        while (dr.Read())
+                        {
+                            if (dr[0] != DBNull.Value)
+                            {
+                                names.Add(
+                                    dr[0]?.ToString() ?? "");
+                            }
+                        }
+                    }
+
+                    return string.Join(", ", names);
+                }
+            }
+        }
+
+        // =====================================================
+        // GET ORGANIZATION POST BY POST ID
+        // =====================================================
+        public OrgPostM? GetOrganizationPostById(
+            int id,
+            int orgID)
+        {
+            OrgPostM? model = null;
+
+            using (SqlConnection con = _db.GetConnection())
+            {
+                using (SqlCommand cmd = new SqlCommand(
+                    "SP_GetOrganizationPostList",
+                    con))
+                {
+                    cmd.CommandType = CommandType.StoredProcedure;
+
+                    cmd.Parameters.Add(
+                        "@nOrgID",
+                        SqlDbType.Int).Value = orgID;
+
+                    con.Open();
+
+                    using (SqlDataReader dr = cmd.ExecuteReader())
+                    {
+                        while (dr.Read())
+                        {
+                            if (dr["nID"] == DBNull.Value)
+                            {
+                                continue;
+                            }
+
+                            int postID = Convert.ToInt32(dr["nID"]);
+
+                            if (postID != id)
+                            {
+                                continue;
+                            }
+
+                            model = new OrgPostM
+                            {
+                                nID = postID,
+
+                                nPositionID =
+                                    dr["nPositionID"] == DBNull.Value
+                                        ? 0
+                                        : Convert.ToInt32(
+                                            dr["nPositionID"]),
+
+                                sPositionName =
+                                    dr["sPositionName"] == DBNull.Value
+                                        ? ""
+                                        : dr["sPositionName"].ToString() ?? "",
+
+                                nRequiredTrainees =
+                                    dr["nRequiredTrainees"] == DBNull.Value
+                                        ? 0
+                                        : Convert.ToInt32(
+                                            dr["nRequiredTrainees"]),
+
+                                nGenderID =
+                                    dr["nGenderID"] == DBNull.Value
+                                        ? 0
+                                        : Convert.ToInt32(
+                                            dr["nGenderID"]),
+
+                                sGenderName =
+                                    dr["sGenderName"] == DBNull.Value
+                                        ? ""
+                                        : dr["sGenderName"].ToString() ?? "",
+
+                                nMinimumQualificationID =
+                                    dr["nMinimumQualificationID"] == DBNull.Value
+                                        ? 0
+                                        : Convert.ToInt32(
+                                            dr["nMinimumQualificationID"]),
+
+                                sMinimumQualificationName =
+                                    dr["sMinimumQualificationName"] == DBNull.Value
+                                        ? ""
+                                        : dr["sMinimumQualificationName"]
+                                            .ToString() ?? "",
+
+                                sCountryName =
+                                    dr["sCountryName"] == DBNull.Value
+                                        ? ""
+                                        : dr["sCountryName"].ToString() ?? "",
+
+                                sStateName =
+                                    dr["sStateName"] == DBNull.Value
+                                        ? ""
+                                        : dr["sStateName"].ToString() ?? "",
+
+                                nCityName =
+                                    dr["nCityName"] == DBNull.Value
+                                        ? ""
+                                        : dr["nCityName"].ToString() ?? "",
+
+                                sWorkingHours =
+                                    dr["sWorkingHours"] == DBNull.Value
+                                        ? ""
+                                        : dr["sWorkingHours"].ToString() ?? "",
+
+                                nInternshipTypeID =
+                                    dr["nInternshipTypeID"] == DBNull.Value
+                                        ? 0
+                                        : Convert.ToInt32(
+                                            dr["nInternshipTypeID"]),
+
+                                sInternshipTypeName =
+                                    dr["sInternshipTypeName"] == DBNull.Value
+                                        ? ""
+                                        : dr["sInternshipTypeName"]
+                                            .ToString() ?? "",
+
+                                sWorkingShift =
+                                    dr["sWorkingShift"] == DBNull.Value
+                                        ? ""
+                                        : dr["sWorkingShift"].ToString() ?? "",
+
+                                nInternshipFellowshipTypeID =
+                                    dr["nInternshipFellowshipTypeID"] == DBNull.Value
+                                        ? 0
+                                        : Convert.ToInt32(
+                                            dr["nInternshipFellowshipTypeID"]),
+
+                                sInternshipFellowshipTypeName =
+                                    dr["sInternshipFellowshipTypeName"] == DBNull.Value
+                                        ? ""
+                                        : dr["sInternshipFellowshipTypeName"]
+                                            .ToString() ?? "",
+
+                                sTotalCharges =
+                                    dr["sTotalCharges"] == DBNull.Value
+                                        ? null
+                                        : Convert.ToDecimal(
+                                            dr["sTotalCharges"]),
+
+                                sCurrency =
+                                    dr["sCurrency"] == DBNull.Value
+                                        ? ""
+                                        : dr["sCurrency"].ToString() ?? "",
+
+                                nTrainingInvolvedID =
+                                    dr["nTrainingInvolvedID"] == DBNull.Value
+                                        ? 0
+                                        : Convert.ToInt32(
+                                            dr["nTrainingInvolvedID"]),
+
+                                sTrainingInvolvedName =
+                                    dr["sTrainingInvolvedName"] == DBNull.Value
+                                        ? ""
+                                        : dr["sTrainingInvolvedName"]
+                                            .ToString() ?? "",
+
+                                nInternshipDurationID =
+                                    dr["nInternshipDurationID"] == DBNull.Value
+                                        ? 0
+                                        : Convert.ToInt32(
+                                            dr["nInternshipDurationID"]),
+
+                                sInternshipDurationName =
+                                    dr["sInternshipDurationName"] == DBNull.Value
+                                        ? ""
+                                        : dr["sInternshipDurationName"]
+                                            .ToString() ?? "",
+
+                                dStartDate =
+                                    dr["dStartDate"] == DBNull.Value
+                                        ? DateTime.MinValue
+                                        : Convert.ToDateTime(
+                                            dr["dStartDate"]),
+
+                                dCompletionDate =
+                                    dr["dCompletionDate"] == DBNull.Value
+                                        ? DateTime.MinValue
+                                        : Convert.ToDateTime(
+                                            dr["dCompletionDate"]),
+
+                                nInternshipModeID =
+                                    dr["nInternshipModeID"] == DBNull.Value
+                                        ? 0
+                                        : Convert.ToInt32(
+                                            dr["nInternshipModeID"]),
+
+                                sInternshipModeName =
+                                    dr["sInternshipModeName"] == DBNull.Value
+                                        ? ""
+                                        : dr["sInternshipModeName"]
+                                            .ToString() ?? "",
+
+                                sDivyang =
+                                    dr["sDivyang"] == DBNull.Value
+                                        ? ""
+                                        : dr["sDivyang"].ToString() ?? "",
+
+                                sLanguageKnown =
+                                    dr["sLanguageKnown"] == DBNull.Value
+                                        ? ""
+                                        : dr["sLanguageKnown"].ToString() ?? "",
+
+                                sWorkingDays =
+                                    dr["sWorkingDays"] == DBNull.Value
+                                        ? ""
+                                        : dr["sWorkingDays"].ToString() ?? "",
+
+                                sFacilities =
+                                    dr["sFacilities"] == DBNull.Value
+                                        ? ""
+                                        : dr["sFacilities"].ToString() ?? "",
+
+                                sMedicalSkills =
+                                    dr["sMedicalSkills"] == DBNull.Value
+                                        ? null
+                                        : dr["sMedicalSkills"].ToString(),
+
+                                sTechnicalSkills =
+                                    dr["sTechnicalSkills"] == DBNull.Value
+                                        ? null
+                                        : dr["sTechnicalSkills"].ToString(),
+
+                                sNonTechnicalSkills =
+                                    dr["sNonTechnicalSkills"] == DBNull.Value
+                                        ? null
+                                        : dr["sNonTechnicalSkills"].ToString(),
+
+                                dRegisterDate =
+                                    dr["dRegisterDate"] == DBNull.Value
+                                        ? null
+                                        : Convert.ToDateTime(
+                                            dr["dRegisterDate"]),
+
+                                dModDate =
+                                    dr["dModDate"] == DBNull.Value
+                                        ? null
+                                        : Convert.ToDateTime(
+                                            dr["dModDate"]),
+
+                                nBit =
+                                    dr["nBit"] != DBNull.Value &&
+                                    Convert.ToBoolean(dr["nBit"]),
+
+                                nSABit =
+                                    dr["nSABit"] != DBNull.Value &&
+                                    Convert.ToBoolean(dr["nSABit"]),
+
+                                nOrgID =
+                                    dr["nOrgID"] == DBNull.Value
+                                        ? orgID
+                                        : Convert.ToInt32(
+                                            dr["nOrgID"])
+                            };
+
+                            break;
+                        }
+                    }
+                }
+            }
+
+            if (model == null)
+            {
+                return null;
+            }
+
+            // =====================================================
+            // GET SKILL NAMES
+            // =====================================================
+
+            model.sMedicalSkills = GetSkillNames(
+                model.sMedicalSkills,
+                "tblMedicalSkills",
+                "nMedicalSkillID",
+                "sMedicalSkillName");
+
+            model.sTechnicalSkills = GetSkillNames(
+                model.sTechnicalSkills,
+                "tblTechnicalSkills",
+                "nTechnicalSkillID",
+                "sTechnicalSkillName");
+
+            model.sNonTechnicalSkills = GetSkillNames(
+                model.sNonTechnicalSkills,
+                "tblNonTechnicalSkills",
+                "nNonTechnicalSkillID",
+                "sNonTechnicalSkillName");
+
+            return model;
+        }
+
+
+        public List<OrgPostM> GetAppliedTraineePosts(int orgID)
+        {
+            List<OrgPostM> posts = new List<OrgPostM>();
+
+            using (SqlConnection con = _db.GetConnection())
+            {
+                using (SqlCommand cmd = new SqlCommand(
+                    "SP_BrowseTRApplyForAllPost",
+                    con))
+                {
+                    cmd.CommandType = CommandType.StoredProcedure;
+
+                    cmd.Parameters.Add(
+                        "@OrganizationID",
+                        SqlDbType.Int).Value = orgID;
+
+                    con.Open();
+
+                    using (SqlDataReader dr = cmd.ExecuteReader())
+                    {
+                        while (dr.Read())
+                        {
+                            OrgPostM item = new OrgPostM();
+
+                            // Post ID
+                            item.nID = dr["PostId"] == DBNull.Value
+                                ? 0
+                                : Convert.ToInt32(dr["PostId"]);
+
+                            // Position
+                            item.sPositionName =
+                                dr["PositionName"] == DBNull.Value
+                                    ? ""
+                                    : dr["PositionName"].ToString();
+
+                            // Position ID
+                            item.nPositionID =
+                                dr["PositionId"] == DBNull.Value
+                                    ? 0
+                                    : Convert.ToInt32(dr["PositionId"]);
+
+                            // Candidate Count
+                            item.MatchingTraineeCount =
+                                dr["CandidateCount"] == DBNull.Value
+                                    ? 0
+                                    : Convert.ToInt32(
+                                        dr["CandidateCount"]);
+
+                            // Date
+                            if (dr["PostCreationDate"] != DBNull.Value)
+                            {
+                                item.dStartDate =
+                                    Convert.ToDateTime(
+                                        dr["PostCreationDate"]);
+                            }
+                            else
+                            {
+                                item.dStartDate = DateTime.MinValue;
+                            }
+
+                            // Organization
+                            item.nOrgID = orgID;
+
+                            posts.Add(item);
+                        }
+                    }
+                }
+            }
+
+            return posts;
+        }
+
+        public List<OrgPostM> GetPreviousPosts(int orgID)
+        {
+            List<OrgPostM> posts = new List<OrgPostM>();
+
+            using (SqlConnection con = _db.GetConnection())
+            {
+                using (SqlCommand cmd = new SqlCommand(
+                    "SP_BrowseTRApplyForAllPost",
+                    con))
+                {
+                    cmd.CommandType = CommandType.StoredProcedure;
+
+                    cmd.Parameters.Add(
+                        "@OrganizationID",
+                        SqlDbType.Int).Value = orgID;
+
+                    con.Open();
+
+                    using (SqlDataReader dr = cmd.ExecuteReader())
+                    {
+                        while (dr.Read())
+                        {
+                            OrgPostM item = new OrgPostM();
+
+                            // =====================================================
+                            // POST ID
+                            // =====================================================
+
+                            item.nID =
+                                dr["PostId"] == DBNull.Value
+                                    ? 0
+                                    : Convert.ToInt32(dr["PostId"]);
+
+                            // =====================================================
+                            // POSITION
+                            // =====================================================
+
+                            item.sPositionName =
+                                dr["PositionName"] == DBNull.Value
+                                    ? ""
+                                    : dr["PositionName"].ToString();
+
+                            item.nPositionID =
+                                dr["PositionId"] == DBNull.Value
+                                    ? 0
+                                    : Convert.ToInt32(dr["PositionId"]);
+
+                            // =====================================================
+                            // MATCHING TRAINEE COUNT
+                            // =====================================================
+
+                            item.MatchingTraineeCount =
+                                dr["CandidateCount"] == DBNull.Value
+                                    ? 0
+                                    : Convert.ToInt32(
+                                        dr["CandidateCount"]);
+
+                            // =====================================================
+                            // POST DATE
+                            // =====================================================
+
+                            if (dr["PostCreationDate"] != DBNull.Value)
+                            {
+                                item.dRegisterDate =
+                                    Convert.ToDateTime(
+                                        dr["PostCreationDate"]);
+                            }
+                            else
+                            {
+                                item.dRegisterDate = null;
+                            }
+
+                            // =====================================================
+                            // ORGANIZATION
+                            // =====================================================
+
+                            item.nOrgID = orgID;
+
+                            posts.Add(item);
+                        }
+                    }
+                }
+            }
+
+            return posts;
+        }
+
+
     }
 }
