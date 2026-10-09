@@ -1,0 +1,1168 @@
+﻿@using ErJobPortal.Models
+@using Microsoft.AspNetCore.Http
+
+@model List<TPOViewNotificationM>
+
+@{
+    Layout = "~/Views/Shared/_DashboardLayout.cshtml";
+
+    ViewData["Title"] = "View Notifications / Events";
+    ViewData["Panel"] = "TPO";
+
+    string userName =
+        Context.Session.GetString("TPOName") ?? "TPO";
+
+    string selectedType =
+        ViewBag.SelectedType?.ToString() ?? "All";
+
+    string selectedAudience =
+        ViewBag.SelectedAudience?.ToString() ?? "All";
+
+    string fromDate =
+        ViewBag.FromDate?.ToString() ?? "";
+
+    string toDate =
+        ViewBag.ToDate?.ToString() ?? "";
+
+    int totalNotifications =
+        ViewBag.TotalNotifications ?? 0;
+}
+
+<div class="container-fluid py-4 notification-list-page">
+
+    <!-- =========================================================
+         PAGE HEADER
+    ========================================================== -->
+
+    <div class="notification-page-header">
+
+        <div>
+            <h3 class="page-title">
+                <i class="fas fa-bell me-2"></i>
+                Notifications / Events
+            </h3>
+
+            <p class="page-subtitle">
+                View and manage notifications and events created by you.
+            </p>
+        </div>
+
+        <a href="@Url.Action("CreateNotification", "TPO")"
+           class="btn btn-primary create-btn">
+
+            <i class="fas fa-plus me-1"></i>
+            Create Notification
+
+        </a>
+
+    </div>
+
+
+    <!-- =========================================================
+         FILTER CARD
+    ========================================================== -->
+
+    <div class="filter-card">
+
+        <form method="get"
+              action="@Url.Action("ViewNotificationEvent", "TPO")">
+
+            <div class="row g-3 align-items-end">
+
+                <!-- TYPE -->
+
+                <div class="col-lg-3 col-md-6">
+
+                    <label class="filter-label">
+                        Type
+                    </label>
+
+                    <select name="type"
+                            class="form-select filter-control">
+
+                        <option value="All"
+                                selected="@(selectedType == "All")">
+                            All
+                        </option>
+
+                        <option value="Notification"
+                                selected="@(selectedType == "Notification")">
+                            Notification / Event
+                        </option>
+
+                    </select>
+
+                </div>
+
+
+                <!-- AUDIENCE -->
+
+                <div class="col-lg-3 col-md-6">
+
+                    <label class="filter-label">
+                        Audience
+                    </label>
+
+                    <select name="audience"
+                            class="form-select filter-control">
+
+                        <option value="All"
+                                selected="@(selectedAudience == "All")">
+                            All
+                        </option>
+
+                        <option value="AllStudents"
+                                selected="@(selectedAudience == "AllStudents")">
+                            All Students
+                        </option>
+
+                    </select>
+
+                </div>
+
+
+                <!-- FROM DATE -->
+
+                <div class="col-lg-2 col-md-6">
+
+                    <label class="filter-label">
+                        From Date
+                    </label>
+
+                    <input type="date"
+                           name="fromDate"
+                           value="@fromDate"
+                           class="form-control filter-control" />
+
+                </div>
+
+
+                <!-- TO DATE -->
+
+                <div class="col-lg-2 col-md-6">
+
+                    <label class="filter-label">
+                        To Date
+                    </label>
+
+                    <input type="date"
+                           name="toDate"
+                           value="@toDate"
+                           class="form-control filter-control" />
+
+                </div>
+
+
+                <!-- SEARCH -->
+
+                <div class="col-lg-2 col-md-6">
+
+                    <button type="submit"
+                            class="btn btn-primary w-100 filter-btn">
+
+                        <i class="fas fa-search me-1"></i>
+                        Search
+
+                    </button>
+
+                </div>
+
+            </div>
+
+
+            <!-- RESET -->
+
+            <div class="mt-3">
+
+                <a href="@Url.Action("ViewNotificationEvent", "TPO")"
+                   class="reset-filter">
+
+                    <i class="fas fa-rotate-left me-1"></i>
+                    Reset Filters
+
+                </a>
+
+            </div>
+
+        </form>
+
+    </div>
+
+
+    <!-- =========================================================
+         LIST CARD
+    ========================================================== -->
+
+    <div class="notification-list-card">
+
+        <!-- CARD HEADER -->
+
+        <div class="notification-list-header">
+
+            <div>
+
+                <h5 class="mb-1">
+                    <i class="fas fa-list me-2"></i>
+                    Notification / Event List
+                </h5>
+
+                <span class="notification-count">
+                    @totalNotifications notification(s) found
+                </span>
+
+            </div>
+
+        </div>
+
+
+        <!-- =====================================================
+             TABLE
+        ====================================================== -->
+
+        @if (Model != null && Model.Any())
+        {
+            <div class="table-wrapper">
+
+                <table class="table notification-table">
+
+                    <thead>
+
+                        <tr>
+
+                            <th style="width:60px;">
+                                #
+                            </th>
+
+                            <th style="min-width:250px;">
+                                Title
+                            </th>
+
+                            <th style="width:150px;">
+                                Type
+                            </th>
+
+                            <th style="width:150px;">
+                                Audience
+                            </th>
+
+                            <th style="width:180px;">
+                                Date & Time
+                            </th>
+
+                            <th style="width:110px;">
+                                Total Sent
+                            </th>
+
+                            <th style="width:90px;">
+                                Read
+                            </th>
+
+                            <th style="width:100px;">
+                                Not Read
+                            </th>
+
+                            <th style="width:120px;">
+                                Status
+                            </th>
+
+                            <th style="width:130px;">
+                                Actions
+                            </th>
+
+                        </tr>
+
+                    </thead>
+
+
+                    <tbody>
+
+                        @{
+                            int serialNo = 1;
+                        }
+
+                        @foreach (var item in Model)
+                        {
+                            <tr>
+
+                                <!-- =================================================
+                                     NUMBER
+                                ================================================== -->
+
+                                <td class="serial-number">
+
+                                    @serialNo
+
+                                </td>
+
+
+                                <!-- =================================================
+                                     TITLE
+                                ================================================== -->
+
+                                <td>
+
+                                    <div class="notification-title">
+
+                                        <div class="notification-icon">
+
+                                            <i class="fas fa-bell"></i>
+
+                                        </div>
+
+                                        <div>
+
+                                            <div class="title-text">
+                                                @item.Title
+                                            </div>
+
+                                            <div class="created-info">
+
+                                                Created by:
+                                                @(string.IsNullOrWhiteSpace(item.CreatedByName)
+                                                    ? userName
+                                                    : item.CreatedByName)
+
+                                            </div>
+
+                                        </div>
+
+                                    </div>
+
+                                </td>
+
+
+                                <!-- =================================================
+                                     TYPE
+                                ================================================== -->
+
+                                <td>
+
+                                    @if (item.Type == "Notification")
+                                    {
+                                        <span class="type-badge notification-badge">
+
+                                            <i class="fas fa-bell me-1"></i>
+
+                                            Notification
+
+                                        </span>
+                                    }
+                                    else
+                                    {
+                                        <span class="type-badge">
+
+                                            @item.Type
+
+                                        </span>
+                                    }
+
+                                </td>
+
+
+                                <!-- =================================================
+                                     AUDIENCE
+                                ================================================== -->
+
+                                <td>
+
+                                    @if (item.Audience == "AllStudents")
+                                    {
+                                        <span class="audience-text">
+
+                                            <i class="fas fa-users me-1"></i>
+                                            All Students
+
+                                        </span>
+                                    }
+                                    else
+                                    {
+                                        <span class="audience-text">
+
+                                            @item.Audience
+
+                                        </span>
+                                    }
+
+                                </td>
+
+
+                                <!-- =================================================
+                                     DATE & TIME
+                                ================================================== -->
+
+                                <td>
+
+                                    @if (item.NotificationDate.HasValue)
+                                    {
+                                        <div class="date-text">
+
+                                            <i class="far fa-calendar me-1"></i>
+
+                                            @item.NotificationDate.Value
+                                                .ToString("dd MMM yyyy")
+
+                                        </div>
+                                    }
+                                    else
+                                    {
+                                        <div class="date-text text-muted">
+                                            No Date
+                                        </div>
+                                    }
+
+
+                                    @if (item.NotificationTime.HasValue)
+                                    {
+                                        <div class="time-text">
+
+                                            <i class="far fa-clock me-1"></i>
+
+                                            @DateTime.Today
+                                                .Add(item.NotificationTime.Value)
+                                                .ToString("hh:mm tt")
+
+                                        </div>
+                                    }
+                                    else
+                                    {
+                                        <div class="time-text text-muted">
+                                            No Time
+                                        </div>
+                                    }
+
+                                </td>
+
+                                <!-- =================================================
+     TOTAL SENT
+================================================== -->
+
+<td>
+
+    <span class="tracking-badge tracking-sent">
+
+        <i class="fas fa-paper-plane me-1"></i>
+
+        @item.TotalSent
+
+    </span>
+
+</td>
+
+
+<!-- =================================================
+     TOTAL READ
+================================================== -->
+
+<td>
+
+    <span class="tracking-badge tracking-read">
+
+        <i class="fas fa-check-circle me-1"></i>
+
+        @item.TotalRead
+
+    </span>
+
+</td>
+
+
+<!-- =================================================
+     TOTAL NOT READ
+================================================== -->
+
+<td>
+
+    <span class="tracking-badge tracking-unread">
+
+        <i class="fas fa-eye-slash me-1"></i>
+
+        @item.TotalUnread
+
+    </span>
+
+</td>
+
+
+                                <!-- =================================================
+                                     STATUS
+                                ================================================== -->
+
+                                <td>
+
+                                    @if (item.Status == "Active")
+                                    {
+                                        <span class="status-badge status-active">
+
+                                            <span class="status-dot"></span>
+
+                                            Active
+
+                                        </span>
+                                    }
+                                    else if (item.Status == "Completed")
+                                    {
+                                        <span class="status-badge status-completed">
+
+                                            <span class="status-dot"></span>
+
+                                            Completed
+
+                                        </span>
+                                    }
+                                    else
+                                    {
+                                        <span class="status-badge status-inactive">
+
+                                            <span class="status-dot"></span>
+
+                                            Inactive
+
+                                        </span>
+                                    }
+
+                                </td>
+
+
+                                <!-- =================================================
+                                     ACTIONS
+                                ================================================== -->
+
+                                <td>
+
+                                    <div class="action-buttons">
+
+                                        <!-- VIEW -->
+
+                                        <button type="button"
+        class="action-btn view-btn"
+        title="View Notification"
+        onclick="viewNotification(@item.NotificationID)">
+
+    <i class="fas fa-eye"></i>
+
+</button>
+
+
+                                        <!-- MORE -->
+
+                                        <button type="button"
+                                                class="action-btn more-btn"
+                                                title="More Options"
+                                                onclick="showNotificationInfo(@item.NotificationID)">
+
+                                            <i class="fas fa-ellipsis-v"></i>
+
+                                        </button>
+
+                                    </div>
+
+                                </td>
+
+                            </tr>
+
+                            serialNo++;
+                        }
+
+                    </tbody>
+
+                </table>
+
+            </div>
+        }
+        else
+        {
+            <!-- =====================================================
+                 EMPTY
+            ====================================================== -->
+
+            <div class="empty-notification">
+
+                <div class="empty-icon">
+
+                    <i class="fas fa-bell-slash"></i>
+
+                </div>
+
+                <h5>
+                    No Notifications / Events Found
+                </h5>
+
+                <p>
+                    No notification or event has been created
+                    matching the selected filters.
+                </p>
+
+                <a href="@Url.Action("CreateNotification", "TPO")"
+                   class="btn btn-primary">
+
+                    <i class="fas fa-plus me-1"></i>
+                    Create Notification
+
+                </a>
+
+            </div>
+        }
+
+    </div>
+
+</div>
+
+
+<!-- =============================================================
+     VIEW MODAL
+============================================================== -->
+
+<div class="modal fade"
+     id="notificationViewModal"
+     tabindex="-1"
+     aria-hidden="true">
+
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+
+        <div class="modal-content">
+
+            <div class="modal-header">
+
+                <h5 class="modal-title">
+
+                    <i class="fas fa-bell me-2"></i>
+                    Notification Details
+
+                </h5>
+
+                <button type="button"
+                        class="btn-close"
+                        data-bs-dismiss="modal">
+                </button>
+
+            </div>
+
+            <div class="modal-body">
+
+                <div id="notificationDetails">
+
+                    Loading...
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<style>
+
+    /* =========================================================
+       MAIN PAGE
+    ========================================================== */
+
+    .notification-list-page {
+        background: #f7f9fc;
+        min-height: calc(100vh - 100px);
+    }
+
+
+    /* =========================================================
+       HEADER
+    ========================================================== */
+
+    .notification-page-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 24px;
+    }
+
+    .page-title {
+        margin: 0;
+        font-size: 25px;
+        font-weight: 700;
+        color: #1f2937;
+    }
+
+    .page-subtitle {
+        margin: 6px 0 0;
+        color: #6b7280;
+        font-size: 14px;
+    }
+
+    .create-btn {
+        border-radius: 8px;
+        padding: 10px 18px;
+    }
+
+
+    /* =========================================================
+       FILTER
+    ========================================================== */
+
+    .filter-card {
+        background: #ffffff;
+        border: 1px solid #e5e7eb;
+        border-radius: 14px;
+        padding: 20px;
+        margin-bottom: 22px;
+        box-shadow: 0 2px 8px rgba(0,0,0,.04);
+    }
+
+    .filter-label {
+        display: block;
+        font-size: 13px;
+        font-weight: 600;
+        color: #374151;
+        margin-bottom: 6px;
+    }
+
+    .filter-control {
+        border-radius: 8px;
+        min-height: 42px;
+    }
+
+    .filter-btn {
+        min-height: 42px;
+        border-radius: 8px;
+    }
+
+    .reset-filter {
+        color: #6b7280;
+        text-decoration: none;
+        font-size: 13px;
+    }
+
+    .reset-filter:hover {
+        color: #0d6efd;
+    }
+
+
+    /* =========================================================
+       TABLE CARD
+    ========================================================== */
+
+    .notification-list-card {
+        background: #ffffff;
+        border: 1px solid #e5e7eb;
+        border-radius: 14px;
+        overflow: hidden;
+        box-shadow: 0 2px 8px rgba(0,0,0,.04);
+    }
+
+    .notification-list-header {
+        background: #f8fbff;
+        border-bottom: 1px solid #e5e7eb;
+        padding: 18px 20px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .notification-list-header h5 {
+        font-weight: 700;
+        color: #1f2937;
+    }
+
+    .notification-count {
+        font-size: 13px;
+        color: #6b7280;
+    }
+
+
+    /* =========================================================
+       TABLE
+    ========================================================== */
+
+    .table-wrapper {
+        width: 100%;
+        overflow-x: auto;
+    }
+
+   .notification-table {
+    margin: 0;
+    min-width: 1250px;
+    vertical-align: middle;
+}
+
+    .notification-table thead th {
+        background: #f8fbff;
+        color: #4b5563;
+        font-size: 12px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: .3px;
+        border-bottom: 1px solid #e5e7eb;
+        padding: 14px 16px;
+        white-space: nowrap;
+    }
+
+    .notification-table tbody td {
+        padding: 15px 16px;
+        border-bottom: 1px solid #eef0f3;
+        color: #374151;
+        font-size: 14px;
+    }
+
+    .notification-table tbody tr {
+        transition: background .2s ease;
+    }
+
+    .notification-table tbody tr:hover {
+        background: #f9fbff;
+    }
+
+    .notification-table tbody tr:last-child td {
+        border-bottom: none;
+    }
+
+
+    /* =========================================================
+       SERIAL
+    ========================================================== */
+
+    .serial-number {
+        font-weight: 600;
+        color: #6b7280;
+    }
+
+
+    /* =========================================================
+       TITLE
+    ========================================================== */
+
+    .notification-title {
+        display: flex;
+        align-items: center;
+        gap: 11px;
+    }
+
+    .notification-icon {
+        width: 38px;
+        height: 38px;
+        border-radius: 10px;
+        background: #eef5ff;
+        color: #0d6efd;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        flex-shrink: 0;
+    }
+
+    .title-text {
+        font-weight: 600;
+        color: #1f2937;
+        margin-bottom: 3px;
+    }
+
+    .created-info {
+        font-size: 11px;
+        color: #9ca3af;
+    }
+
+
+    /* =========================================================
+       TYPE
+    ========================================================== */
+
+    .type-badge {
+        display: inline-flex;
+        align-items: center;
+        padding: 6px 10px;
+        border-radius: 20px;
+        background: #eef5ff;
+        color: #0d6efd;
+        font-size: 12px;
+        font-weight: 600;
+    }
+
+    .notification-badge {
+        background: #eef5ff;
+        color: #0d6efd;
+    }
+
+
+    /* =========================================================
+       AUDIENCE
+    ========================================================== */
+
+    .audience-text {
+        color: #4b5563;
+        font-size: 13px;
+        font-weight: 500;
+        white-space: nowrap;
+    }
+
+
+    /* =========================================================
+       DATE / TIME
+    ========================================================== */
+
+    .date-text {
+        font-size: 13px;
+        font-weight: 600;
+        color: #374151;
+    }
+
+    .time-text {
+        font-size: 12px;
+        color: #6b7280;
+        margin-top: 4px;
+    }
+
+
+    /* =========================================================
+       STATUS
+    ========================================================== */
+
+    .status-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 6px 10px;
+        border-radius: 20px;
+        font-size: 12px;
+        font-weight: 600;
+    }
+
+    .status-dot {
+        width: 7px;
+        height: 7px;
+        border-radius: 50%;
+        display: inline-block;
+    }
+
+    .status-active {
+        background: #eaf8ef;
+        color: #198754;
+    }
+
+    .status-active .status-dot {
+        background: #198754;
+    }
+
+    .status-completed {
+        background: #f1f3f5;
+        color: #495057;
+    }
+
+    .status-completed .status-dot {
+        background: #495057;
+    }
+
+    .status-inactive {
+        background: #fff4db;
+        color: #9a6700;
+    }
+
+    .status-inactive .status-dot {
+        background: #d99a00;
+    }
+
+
+    /* =========================================================
+       ACTION BUTTONS
+    ========================================================== */
+
+    .action-buttons {
+        display: flex;
+        align-items: center;
+        gap: 7px;
+    }
+
+    .action-btn {
+        width: 34px;
+        height: 34px;
+        border-radius: 7px;
+        border: 1px solid #dee2e6;
+        background: #ffffff;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        transition: all .2s ease;
+    }
+
+    .view-btn {
+        color: #0d6efd;
+    }
+
+    .view-btn:hover {
+        background: #eef5ff;
+        border-color: #b8d4ff;
+    }
+
+    .more-btn {
+        color: #6c757d;
+    }
+
+    .more-btn:hover {
+        background: #f1f3f5;
+    }
+
+
+    /* =========================================================
+       EMPTY
+    ========================================================== */
+
+    .empty-notification {
+        text-align: center;
+        padding: 70px 20px;
+    }
+
+    .empty-icon {
+        width: 70px;
+        height: 70px;
+        border-radius: 50%;
+        background: #f1f5f9;
+        color: #94a3b8;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 18px;
+        font-size: 28px;
+    }
+
+    .empty-notification h5 {
+        font-weight: 700;
+        color: #374151;
+    }
+
+    .empty-notification p {
+        color: #6b7280;
+        font-size: 14px;
+        margin-bottom: 20px;
+    }
+
+
+    /* =========================================================
+       MOBILE
+    ========================================================== */
+
+    @@media (max-width: 768px) {
+
+        .notification-page-header {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 15px;
+        }
+
+        .create-btn {
+            width: 100%;
+        }
+
+        .page-title {
+            font-size: 21px;
+        }
+
+    }
+
+
+
+    /* =========================================================
+   NOTIFICATION TRACKING
+========================================================= */
+
+.tracking-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 55px;
+    padding: 6px 9px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 700;
+    white-space: nowrap;
+}
+
+.tracking-sent {
+    background: #eef5ff;
+    color: #0d6efd;
+}
+
+.tracking-read {
+    background: #eaf8ef;
+    color: #198754;
+}
+
+.tracking-unread {
+    background: #fff4db;
+    color: #9a6700;
+}
+
+</style>
+
+
+<script>
+
+    async function viewNotification(notificationId) {
+
+        const detailsContainer =
+            document.getElementById("notificationDetails");
+
+        detailsContainer.innerHTML = `
+            <div class="text-center py-5">
+
+                <i class="fas fa-spinner fa-spin fa-2x text-primary mb-3"></i>
+
+                <div class="text-muted">
+                    Loading notification details...
+                </div>
+
+            </div>
+        `;
+
+        var modalElement =
+            document.getElementById("notificationViewModal");
+
+        var modal =
+            bootstrap.Modal.getOrCreateInstance(modalElement);
+
+        modal.show();
+
+        try {
+
+            const response = await fetch(
+                '/TPO/ViewNotificationDetails/' + notificationId
+            );
+
+            if (!response.ok) {
+
+                throw new Error(
+                    "Unable to load notification."
+                );
+
+            }
+
+            const html =
+                await response.text();
+
+            detailsContainer.innerHTML = html;
+
+        }
+        catch (error) {
+
+            detailsContainer.innerHTML = `
+
+                <div class="alert alert-danger">
+
+                    <i class="fas fa-exclamation-triangle me-2"></i>
+
+                    Unable to load notification details.
+
+                </div>
+
+            `;
+
+            console.error(error);
+        }
+    }
+
+
+    function showNotificationInfo(notificationId) {
+
+        viewNotification(notificationId);
+
+    }
+
+</script>

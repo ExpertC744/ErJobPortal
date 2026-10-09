@@ -1,0 +1,127 @@
+﻿@{
+    Layout = "~/Views/Shared/_DashboardLayout.cshtml";
+
+    ViewData["Title"] = "Total Openings";
+    ViewData["Panel"] = "Candidate";
+    ViewData["UserName"] = "Candidate";
+
+    string openingCode = "SS33743034676794";
+}
+
+<!-- =====================================================
+     USE YOUR EXISTING MASTER TABLE CSS
+====================================================== -->
+
+<link rel="stylesheet"
+      href="~/css/EligibleTrainees.css"
+      asp-append-version="true" />
+
+
+<div class="container-fluid eligible-trainees-page">
+
+    <!-- =====================================================
+         PAGE HEADER
+    ====================================================== -->
+
+    <div class="eligible-page-header">
+
+        <div>
+
+            <h1>
+                Total Openings
+            </h1>
+
+            <p>
+                @openingCode
+            </p>
+
+        </div>
+
+
+        <!-- Back -->
+
+        <a asp-controller="Candidate"
+           asp-action="Dashboard"
+           class="master-back-btn"
+           title="Back to Dashboard">
+
+            <i class="fas fa-arrow-left"></i>
+
+        </a>
+
+    </div>
+
+
+    <!-- =====================================================
+         MASTER TABLE
+    ====================================================== -->
+
+    <div class="master-table-container">
+
+
+        <!-- =================================================
+             TABLE HEADER
+        ================================================== -->
+
+        <div class="master-table-title">
+
+             
+
+        </div>
+
+
+        <!-- =================================================
+             TABLE
+        ================================================== -->
+
+        <div class="table-responsive">
+
+            <table id="totalOpeningTable"
+                   class="master-data-table">
+
+                <thead>
+
+                    <tr>
+
+                        <th>
+                            Sr. No
+                        </th>
+
+                        <th>
+                            Company Name
+                        </th>
+
+                        <th>
+                            Position
+                        </th>
+
+                        <th>
+                            Location
+                        </th>
+
+                        <th>
+                            Internship / Fellowship Type
+                        </th>
+
+                        <th>
+                            Facilities
+                        </th>
+
+                    </tr>
+
+                </thead>
+
+
+                <tbody>
+
+                  
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+    </div>
+
+</div>

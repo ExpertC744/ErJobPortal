@@ -309,6 +309,7 @@ namespace ErJobPortal.Controllers
                 99 => "ViewProfile99",
                 100 => "ViewProfile100",
 
+               
             //    _ => "Resume"
             //};
 
