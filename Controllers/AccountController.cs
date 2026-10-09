@@ -1629,7 +1629,7 @@ public IActionResult OrganizationResetPassword()
 
 
 
-        #region "Post"
+        #region "View Post Master"
         [HttpGet]
         [Route("Account/ViewOrgPost/{id}")]
         public IActionResult ViewOrgPost(int id, int nOrgID)
@@ -1985,11 +1985,7 @@ public IActionResult OrganizationResetPassword()
 
         }
 
-        private string GetSkillNames(
-string? skillIds,
-string tableName,
-string idColumn,
-string nameColumn)
+        private string GetSkillNames(string? skillIds, string tableName, string idColumn, string nameColumn)
         {
             if (string.IsNullOrWhiteSpace(skillIds))
                 return "";
@@ -2040,6 +2036,13 @@ string nameColumn)
 
             return string.Join(", ", skillNames);
         }
+
+        #endregion
+
+        #region "View Profile"
+
+
+
         #endregion
     }
 }

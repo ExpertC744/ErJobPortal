@@ -1517,8 +1517,7 @@ GetOrganizationRegistrationDetails(int orgId)
 
         public List<OrganizationUser> GetAllOrganizationList()
         {
-            List<OrganizationUser> list =
-                new List<OrganizationUser>();
+            List<OrganizationUser> list = new List<OrganizationUser>();
 
             using (SqlConnection cn = _db.GetConnection())
             {
