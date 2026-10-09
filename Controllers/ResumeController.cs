@@ -119,14 +119,18 @@ namespace ErJobPortal.Controllers
         }
 
         //shrirang 02/10/26
+        //sanidhya 08/10/26
         // ============================================================
         // MAIN RESUME
         // ============================================================
         [HttpGet]
         public IActionResult Resume(
-     int id,
-     int? previousCandidateId,
-     int? nextCandidateId)
+      int id,
+ int? previousCandidateId,
+ int? nextCandidateId,
+ string? resumeSource,
+int? postID,
+int? orgID)
         {
             if (id <= 0)
             {
@@ -314,15 +318,18 @@ namespace ErJobPortal.Controllers
             };
 
             return RedirectToAction(
-                actionName,
-                "Resume",
-                new
-                {
-                    id = id,
-                    previousCandidateId = previousCandidateId,
-                    nextCandidateId = nextCandidateId
-                }
-            );
+    actionName,
+    "Resume",
+    new
+    {
+        id = id,
+        previousCandidateId = previousCandidateId,
+        nextCandidateId = nextCandidateId,
+        resumeSource = resumeSource,
+        postID = postID,
+        orgID = orgID
+    }
+);
         }
 
 

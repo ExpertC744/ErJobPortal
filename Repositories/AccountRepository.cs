@@ -487,21 +487,24 @@ GetOrganizationRegistrationDetails(int orgId)
             return departments;
         }
 
-
-        public List<BranchM> GetBranches(int departmentId)
+        //sanidhya 08/10/26
+        public List<BranchM> GetBranches()
         {
             List<BranchM> branches = new List<BranchM>();
 
             using (SqlConnection cn = _db.GetConnection())
             {
-                using (SqlCommand cmd = new SqlCommand(
-                    "SP_GetBranch", cn))
-                {
-                    cmd.CommandType = CommandType.StoredProcedure;
+                string query = @"
+     SELECT
+         nID,
+         nDepartmentID,
+         sBranch
+     FROM tblBranch
+     ORDER BY sBranch ASC";
 
-                    cmd.Parameters.Add(
-                        "@nDepartmentID",
-                        SqlDbType.Int).Value = departmentId;
+                using (SqlCommand cmd = new SqlCommand(query, cn))
+                {
+                    cmd.CommandType = CommandType.Text;
 
                     cn.Open();
 
@@ -514,8 +517,9 @@ GetOrganizationRegistrationDetails(int orgId)
                                 nID = Convert.ToInt32(dr["nID"]),
 
                                 nDepartmentID =
-                                    Convert.ToInt32(
-                                        dr["nDepartmentID"]),
+                                    dr["nDepartmentID"] != DBNull.Value
+                                        ? Convert.ToInt32(dr["nDepartmentID"])
+                                        : 0,
 
                                 sBranch =
                                     dr["sBranch"] != DBNull.Value
@@ -529,6 +533,58 @@ GetOrganizationRegistrationDetails(int orgId)
 
             return branches;
         }
+        //end
+
+        
+// Get branches by Department ID
+public List<BranchM> GetBranches(int departmentId)
+        {
+            List<BranchM> branches = new List<BranchM>();
+
+            using (SqlConnection cn = _db.GetConnection())
+            {
+                string query = @"
+            SELECT
+                nID,
+                nDepartmentID,
+                sBranch
+            FROM tblBranch
+            WHERE nDepartmentID = @DepartmentID
+            ORDER BY sBranch ASC";
+
+                using (SqlCommand cmd = new SqlCommand(query, cn))
+                {
+                    cmd.CommandType = CommandType.Text;
+
+                    cmd.Parameters.Add("@DepartmentID", SqlDbType.Int).Value = departmentId;
+
+                    cn.Open();
+
+                    using (SqlDataReader dr = cmd.ExecuteReader())
+                    {
+                        while (dr.Read())
+                        {
+                            branches.Add(new BranchM
+                            {
+                                nID = Convert.ToInt32(dr["nID"]),
+
+                                nDepartmentID = dr["nDepartmentID"] != DBNull.Value
+                                    ? Convert.ToInt32(dr["nDepartmentID"])
+                                    : 0,
+
+                                sBranch = dr["sBranch"] != DBNull.Value
+                                    ? dr["sBranch"].ToString()
+                                    : ""
+                            });
+                        }
+                    }
+                }
+            }
+
+            return branches;
+        }
+
+
         public List<CollegeM> GetColleges()
         {
             List<CollegeM> colleges = new List<CollegeM>();
@@ -3571,22 +3627,18 @@ ORDER BY C.nID DESC;
 
                             trainee.BranchName = "-";
 
-                            if (trainee.nDepartment.HasValue &&
-                                trainee.nBranch.HasValue)
+
+                            if (trainee.nBranch.HasValue)
                             {
-                                List<BranchM> branchList =
-                                    GetBranches(
-                                        trainee.nDepartment.Value);
+                                List<BranchM> branchList = GetBranches();
 
                                 BranchM? branch =
                                     branchList.FirstOrDefault(
-                                        x => x.nID ==
-                                             trainee.nBranch.Value);
+                                        x => x.nID == trainee.nBranch.Value);
 
                                 if (branch != null)
                                 {
-                                    trainee.BranchName =
-                                        branch.sBranch;
+                                    trainee.BranchName = branch.sBranch;
                                 }
                             }
 

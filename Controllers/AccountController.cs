@@ -35,15 +35,15 @@ namespace ErJobPortal.Controllers
             return Json(departments);
         }
 
+        //sanidhya 08/10/26
 
         // ==========================================
         // GET BRANCHES BY DEPARTMENT
         // ==========================================
 
-        [HttpGet]
-        public IActionResult GetCandidateBranches(int departmentId)
+        public IActionResult GetCandidateBranches()
         {
-            var branches = _accountRepository.GetBranches(departmentId);
+            var branches = _accountRepository.GetBranches();
             return Json(branches);
         }
 
@@ -255,15 +255,22 @@ namespace ErJobPortal.Controllers
 
             return Json(departments);
         }
-
+        //sanidhya 08/10/26
         [HttpGet]
-        public IActionResult GetBranches(int departmentId)
+        public IActionResult GetBranches()
         {
             var branches =
-                _accountRepository.GetBranches(departmentId);
+                _accountRepository.GetBranches();
 
             return Json(branches);
         }
+        //public IActionResult GetBranches(int departmentId)
+        //{
+        //    var branches =
+        //        _accountRepository.GetBranches(departmentId);
+
+        //    return Json(branches);
+        //}
 
         #region "College"
 
