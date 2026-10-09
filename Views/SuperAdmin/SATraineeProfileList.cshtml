@@ -110,7 +110,7 @@
 
                         foreach (var item in Model)
                         {
-                            <tr>
+                            @* <tr> *@
 
                                 <!-- SR NO -->
                                 <td class="master-id">
@@ -133,7 +133,7 @@
 
                                 <!-- ACTION -->
                                 <td>
-<<<<<<< HEAD
+
                                 <a asp-controller="SuperAdmin"
                                    asp-action="ViewTraineeResume"
                                    asp-route-id="@item.CandidateID"
@@ -143,8 +143,7 @@
                                     View
                                 </a>
                             </td>
-=======
-                                <a asp-controller="SuperAdmin"
+                               @*  <a asp-controller="SuperAdmin"
                                    asp-action="ViewTraineeResume"
                                    asp-route-id="@item.CandidateID"
                                    class="master-view-btn"
@@ -152,11 +151,11 @@
                                    rel="noopener noreferrer">
                                     View
                                 </a>
-                            </td>
->>>>>>> parent of bbd67a1 (Anam,Radhika,Karan)
+                                </td> *@
 
 
-                                <!-- PHOTO -->
+
+                                
                                 <td>
 
                                     @if (!string.IsNullOrEmpty(item.Photo))
@@ -302,10 +301,12 @@
 
                                 </td>
 
-                            </tr>
-
+                            
+                                
                             srNo++;
+
                         }
+
                     }
                     else
                     {
@@ -320,7 +321,7 @@
 
                         </tr>
                     }
-
+                   
                 </tbody>
 
             </table>

@@ -8,9 +8,8 @@
 
     ViewData["UserName"] =
         Context.Session.GetString("TPOName") ?? "TPO";
-﻿@{
-    ViewData["Title"] = "Create Notification";
 }
+
 
 <link rel="stylesheet"
       href="~/css/TPOCreateNotification.css"
@@ -277,105 +276,105 @@
             </div>
 
 
-<div class="form-group full-width">
+            <div class="form-group full-width">
 
-    <label for="AttachFile1">
-        Attach File 1
-    </label>
+                <label for="AttachFile1">
+                    Attach File 1
+                </label>
 
-    <div class="upload-box">
+                <div class="upload-box">
 
-        <input type="file"
-               id="AttachFile1"
-               name="AttachFile1"
-               accept=".pdf,.doc,.docx,.jpg,.jpeg,.png" />
+                    <input type="file"
+                           id="AttachFile1"
+                           name="AttachFile1"
+                           accept=".pdf,.doc,.docx,.jpg,.jpeg,.png" />
 
-        <label for="AttachFile1"
-               class="upload-label">
+                    <label for="AttachFile1"
+                           class="upload-label">
 
-            <div class="upload-icon">
-                <i class="fas fa-cloud-arrow-up"></i>
-            </div>
+                        <div class="upload-icon">
+                            <i class="fas fa-cloud-arrow-up"></i>
+                        </div>
 
-            <div class="upload-text">
+                        <div class="upload-text">
 
-                <strong>Choose a file</strong>
+                            <strong>Choose a file</strong>
 
-                <span>
-                    PDF, DOC, DOCX, JPG or PNG
-                </span>
+                            <span>
+                                PDF, DOC, DOCX, JPG or PNG
+                            </span>
 
-            </div>
+                        </div>
 
-            <div class="browse-button">
-                Browse
-            </div>
+                        <div class="browse-button">
+                            Browse
+                        </div>
 
-        </label>
+                    </label>
 
-        <div class="file-name"
-             id="fileName1">
+                    <div class="file-name"
+                         id="fileName1">
 
-            <i class="fas fa-paperclip"></i>
+                        <i class="fas fa-paperclip"></i>
 
-            <span>No file selected</span>
+                        <span>No file selected</span>
 
-        </div>
+                    </div>
 
-    </div>
-
-</div>
-
-
-
-<div class="form-group full-width">
-
-    <label for="AttachFile2">
-        Attach File 2
-    </label>
-
-    <div class="upload-box">
-
-        <input type="file"
-               id="AttachFile2"
-               name="AttachFile2"
-               accept=".pdf,.doc,.docx,.jpg,.jpeg,.png" />
-
-        <label for="AttachFile2"
-               class="upload-label">
-
-            <div class="upload-icon">
-                <i class="fas fa-cloud-arrow-up"></i>
-            </div>
-
-            <div class="upload-text">
-
-                <strong>Choose a file</strong>
-
-                <span>
-                    PDF, DOC, DOCX, JPG or PNG
-                </span>
+                </div>
 
             </div>
 
-            <div class="browse-button">
-                Browse
+
+
+            <div class="form-group full-width">
+
+                <label for="AttachFile2">
+                    Attach File 2
+                </label>
+
+                <div class="upload-box">
+
+                    <input type="file"
+                           id="AttachFile2"
+                           name="AttachFile2"
+                           accept=".pdf,.doc,.docx,.jpg,.jpeg,.png" />
+
+                    <label for="AttachFile2"
+                           class="upload-label">
+
+                        <div class="upload-icon">
+                            <i class="fas fa-cloud-arrow-up"></i>
+                        </div>
+
+                        <div class="upload-text">
+
+                            <strong>Choose a file</strong>
+
+                            <span>
+                                PDF, DOC, DOCX, JPG or PNG
+                            </span>
+
+                        </div>
+
+                        <div class="browse-button">
+                            Browse
+                        </div>
+
+                    </label>
+
+                    <div class="file-name"
+                         id="fileName2">
+
+                        <i class="fas fa-paperclip"></i>
+
+                        <span>No file selected</span>
+
+                    </div>
+
+                </div>
+
             </div>
-
-        </label>
-
-        <div class="file-name"
-             id="fileName2">
-
-            <i class="fas fa-paperclip"></i>
-
-            <span>No file selected</span>
-
-        </div>
-
-    </div>
-
-</div>
 
             <!-- Attach File -->
             <div class="form-group full-width">
@@ -460,307 +459,307 @@
 
 <script>
 
-    document.addEventListener("DOMContentLoaded", function () {
+        document.addEventListener("DOMContentLoaded", function () {
 
-        const editor =
-            document.getElementById("contentEditor");
+            const editor =
+                document.getElementById("contentEditor");
 
-        const content =
-            document.getElementById("Content");
+            const content =
+                document.getElementById("Content");
 
-        const form =
-            document.getElementById("notificationForm");
+            const form =
+                document.getElementById("notificationForm");
 
-        const fileInput1 =
-    document.getElementById("AttachFile1");
+            const fileInput1 =
+        document.getElementById("AttachFile1");
 
-const fileName1 =
-    document.getElementById("fileName1");
+    const fileName1 =
+        document.getElementById("fileName1");
 
-const fileInput2 =
-    document.getElementById("AttachFile2");
+    const fileInput2 =
+        document.getElementById("AttachFile2");
 
-const fileName2 =
-    document.getElementById("fileName2");
-        const fileInput =
-            document.getElementById("AttachFile");
+    const fileName2 =
+        document.getElementById("fileName2");
+            const fileInput =
+                document.getElementById("AttachFile");
 
-        const fileName =
-            document.getElementById("fileName");
-
-
-        /* =========================================
-           RICH TEXT EDITOR
-           ========================================= */
-
-        function syncContent() {
-            content.value = editor.innerHTML;
-        }
+            const fileName =
+                document.getElementById("fileName");
 
 
-        editor.addEventListener("input", function () {
-            syncContent();
-        });
+            /* =========================================
+               RICH TEXT EDITOR
+               ========================================= */
+
+            function syncContent() {
+                content.value = editor.innerHTML;
+            }
 
 
-        document
-            .querySelectorAll(".editor-toolbar button[data-command]")
-            .forEach(function (button) {
-
-                button.addEventListener("click", function () {
-
-                    editor.focus();
-
-                    document.execCommand(
-                        this.dataset.command,
-                        false,
-                        null
-                    );
-
-                    syncContent();
-
-                });
-
+            editor.addEventListener("input", function () {
+                syncContent();
             });
 
 
-        /* =========================================
-           INSERT LINK
-           ========================================= */
+            document
+                .querySelectorAll(".editor-toolbar button[data-command]")
+                .forEach(function (button) {
 
-        document
-            .getElementById("linkButton")
-            .addEventListener("click", function () {
+                    button.addEventListener("click", function () {
 
-                editor.focus();
+                        editor.focus();
 
-                const url = prompt("Enter URL:");
+                        document.execCommand(
+                            this.dataset.command,
+                            false,
+                            null
+                        );
 
-                if (url && url.trim() !== "") {
+                        syncContent();
 
-                    document.execCommand(
-                        "createLink",
-                        false,
-                        url.trim()
-                    );
+                    });
 
-                    syncContent();
+                });
+
+
+            /* =========================================
+               INSERT LINK
+               ========================================= */
+
+            document
+                .getElementById("linkButton")
+                .addEventListener("click", function () {
+
+                    editor.focus();
+
+                    const url = prompt("Enter URL:");
+
+                    if (url && url.trim() !== "") {
+
+                        document.execCommand(
+                            "createLink",
+                            false,
+                            url.trim()
+                        );
+
+                        syncContent();
+                    }
+
+                });
+
+
+            /* =========================================
+       FILE 1 NAME
+       ========================================= */
+
+    fileInput1.addEventListener("change", function () {
+
+        if (this.files.length > 0) {
+
+            fileName1.querySelector("span").textContent =
+                this.files[0].name;
+
+        } else {
+
+            fileName1.querySelector("span").textContent =
+                "No file selected";
+
+        }
+
+    });
+
+
+    /* =========================================
+       FILE 2 NAME
+       ========================================= */
+
+    fileInput2.addEventListener("change", function () {
+
+        if (this.files.length > 0) {
+
+            fileName2.querySelector("span").textContent =
+                this.files[0].name;
+
+        } else {
+
+            fileName2.querySelector("span").textContent =
+                "No file selected";
+
+        }
+
+    });
+               FILE NAME
+               ========================================= */
+
+            fileInput.addEventListener("change", function () {
+
+                if (this.files.length > 0) {
+
+                    fileName.querySelector("span").textContent =
+                        this.files[0].name;
+
+                } else {
+
+                    fileName.querySelector("span").textContent =
+                        "No file selected";
+
                 }
 
             });
 
 
-        /* =========================================
-   FILE 1 NAME
-   ========================================= */
+            /* =========================================
+               VALIDATION
+               ========================================= */
 
-fileInput1.addEventListener("change", function () {
+            form.addEventListener("submit", function (event) {
 
-    if (this.files.length > 0) {
+                syncContent();
 
-        fileName1.querySelector("span").textContent =
-            this.files[0].name;
+                const title =
+                    document.getElementById("Title");
 
-    } else {
+                const type =
+                    document.getElementById("Type");
 
-        fileName1.querySelector("span").textContent =
-            "No file selected";
+                const audience =
+                    document.getElementById("Audience");
 
-    }
+                const contentText =
+                    editor.innerText.trim();
 
-});
 
+                let valid = true;
 
-/* =========================================
-   FILE 2 NAME
-   ========================================= */
 
-fileInput2.addEventListener("change", function () {
+                if (title.value.trim() === "") {
 
-    if (this.files.length > 0) {
+                    title.classList.add("error");
 
-        fileName2.querySelector("span").textContent =
-            this.files[0].name;
+                    valid = false;
 
-    } else {
+                } else {
 
-        fileName2.querySelector("span").textContent =
-            "No file selected";
+                    title.classList.remove("error");
 
-    }
+                }
 
-});
-           FILE NAME
-           ========================================= */
 
-        fileInput.addEventListener("change", function () {
+                if (type.value === "") {
 
-            if (this.files.length > 0) {
+                    type.classList.add("error");
 
-                fileName.querySelector("span").textContent =
-                    this.files[0].name;
+                    valid = false;
 
-            } else {
+                } else {
 
-                fileName.querySelector("span").textContent =
-                    "No file selected";
+                    type.classList.remove("error");
 
-            }
+                }
 
-        });
 
+                if (audience.value === "") {
 
-        /* =========================================
-           VALIDATION
-           ========================================= */
+                    audience.classList.add("error");
 
-        form.addEventListener("submit", function (event) {
+                    valid = false;
 
-            syncContent();
+                } else {
 
-            const title =
-                document.getElementById("Title");
+                    audience.classList.remove("error");
 
-            const type =
-                document.getElementById("Type");
+                }
 
-            const audience =
-                document.getElementById("Audience");
 
-            const contentText =
-                editor.innerText.trim();
+                if (contentText === "") {
 
+                    document
+                        .querySelector(".editor-box")
+                        .classList.add("editor-error");
 
-            let valid = true;
+                    document.getElementById("contentError")
+                        .textContent = "Content is required.";
 
+                    valid = false;
 
-            if (title.value.trim() === "") {
+                } else {
 
-                title.classList.add("error");
+                    document
+                        .querySelector(".editor-box")
+                        .classList.remove("editor-error");
 
-                valid = false;
+                    document.getElementById("contentError")
+                        .textContent = "";
 
-            } else {
+                }
 
-                title.classList.remove("error");
 
-            }
+                if (!valid) {
 
+                    event.preventDefault();
 
-            if (type.value === "") {
-
-                type.classList.add("error");
-
-                valid = false;
-
-            } else {
-
-                type.classList.remove("error");
-
-            }
-
-
-            if (audience.value === "") {
-
-                audience.classList.add("error");
-
-                valid = false;
-
-            } else {
-
-                audience.classList.remove("error");
-
-            }
-
-
-            if (contentText === "") {
-
-                document
-                    .querySelector(".editor-box")
-                    .classList.add("editor-error");
-
-                document.getElementById("contentError")
-                    .textContent = "Content is required.";
-
-                valid = false;
-
-            } else {
-
-                document
-                    .querySelector(".editor-box")
-                    .classList.remove("editor-error");
-
-                document.getElementById("contentError")
-                    .textContent = "";
-
-            }
-
-
-            if (!valid) {
-
-                event.preventDefault();
-
-            }
-
-        });
-
-
-        /* =========================================
-           REMOVE ERROR
-           ========================================= */
-
-        document
-            .querySelectorAll("#Title, #Type, #Audience")
-            .forEach(function (element) {
-
-                element.addEventListener("input", function () {
-                    this.classList.remove("error");
-                });
-
-                element.addEventListener("change", function () {
-                    this.classList.remove("error");
-                });
+                }
 
             });
 
 
-        /* =========================================
-           RESET
-           ========================================= */
+            /* =========================================
+               REMOVE ERROR
+               ========================================= */
 
-        form.addEventListener("reset", function () {
+            document
+                .querySelectorAll("#Title, #Type, #Audience")
+                .forEach(function (element) {
 
-            setTimeout(function () {
-
-                editor.innerHTML = "";
-
-                content.value = "";
-
-               fileName1.querySelector("span").textContent =
-    "No file selected";
-
-fileName2.querySelector("span").textContent =
-    "No file selected";
-                fileName.querySelector("span").textContent =
-                    "No file selected";
-
-                document
-                    .querySelectorAll(".error")
-                    .forEach(function (element) {
-                        element.classList.remove("error");
+                    element.addEventListener("input", function () {
+                        this.classList.remove("error");
                     });
 
-                document
-                    .querySelector(".editor-box")
-                    .classList.remove("editor-error");
+                    element.addEventListener("change", function () {
+                        this.classList.remove("error");
+                    });
 
-                document.getElementById("contentError")
-                    .textContent = "";
+                });
 
-            }, 0);
+
+            /* =========================================
+               RESET
+               ========================================= */
+
+            form.addEventListener("reset", function () {
+
+                setTimeout(function () {
+
+                    editor.innerHTML = "";
+
+                    content.value = "";
+
+                   fileName1.querySelector("span").textContent =
+        "No file selected";
+
+    fileName2.querySelector("span").textContent =
+        "No file selected";
+                    fileName.querySelector("span").textContent =
+                        "No file selected";
+
+                    document
+                        .querySelectorAll(".error")
+                        .forEach(function (element) {
+                            element.classList.remove("error");
+                        });
+
+                    document
+                        .querySelector(".editor-box")
+                        .classList.remove("editor-error");
+
+                    document.getElementById("contentError")
+                        .textContent = "";
+
+                }, 0);
+
+            });
 
         });
-
-    });
 
 </script>

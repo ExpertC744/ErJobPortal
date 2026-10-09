@@ -1101,14 +1101,14 @@ namespace ErJobPortal.Controllers
             return View(model);
         }
 
-        [HttpGet]
-        [Route("TPO/CreateNotification")]
-        public IActionResult CreateNotification()
-        {
+        //[HttpGet]
+        //[Route("TPO/CreateNotification")]
+        //public IActionResult CreateNotification()
+        //{
 
 
-            return View();
-        }
+        //    return View();
+        //}
 
         [HttpGet]
         [Route("TPO/SendNotification")]
