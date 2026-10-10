@@ -4,6 +4,8 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Data.SqlClient;
 using System.Data;
 using Microsoft.AspNetCore.Http;
+using System.Text.RegularExpressions;
+using System.Net;
 
 
 namespace ErJobPortal.Controllers
@@ -14,14 +16,18 @@ namespace ErJobPortal.Controllers
         private readonly IConfiguration _configuration;
         private readonly IWebHostEnvironment _environment;
 
+        private readonly TPOSchedulerRepository _schedulerRepository;
+
         public TPOController(
             AccountRepository accountRepository,
             IConfiguration configuration,
-            IWebHostEnvironment environment)
+            IWebHostEnvironment environment,
+            TPOSchedulerRepository schedulerRepository)
         {
             _accountRepository = accountRepository;
             _configuration = configuration;
             _environment = environment;
+            _schedulerRepository = schedulerRepository;
         }
 
 
@@ -1110,14 +1116,14 @@ namespace ErJobPortal.Controllers
         //    return View();
         //}
 
-        [HttpGet]
-        [Route("TPO/SendNotification")]
-        public IActionResult SendNotification()
-        {
+        //[HttpGet]
+        //[Route("TPO/SendNotification")]
+        //public IActionResult SendNotification()
+        //{
 
 
-            return View();
-        }
+        //    return View();
+        //}
 
 
         [HttpPost]
@@ -3392,5 +3398,650 @@ namespace ErJobPortal.Controllers
 
             return Json(result);
         }
+
+
+        //shrirang 09/10/26
+
+        [HttpGet]
+        [Route("TPO/EditNotification/{id:int}")]
+        public IActionResult EditNotification(int id)
+        {
+            int? tpoId = HttpContext.Session.GetInt32("TPOID");
+
+            if (tpoId == null)
+                return RedirectToAction("TPOLogin", "Account");
+
+            TPOViewNotificationM? model = null;
+
+            using (SqlConnection cn = new SqlConnection(
+    _configuration.GetConnectionString("DefaultConnection")))
+            {
+                cn.Open();
+
+                string query = @"
+            SELECT *
+            FROM tblTPONotification
+            WHERE NotificationID = @NotificationID
+              AND CreatedBy = @TPOID
+              AND IsDeleted = 0";
+
+                using SqlCommand cmd = new SqlCommand(query, cn);
+
+                cmd.Parameters.Add("@NotificationID", SqlDbType.Int).Value = id;
+                cmd.Parameters.Add("@TPOID", SqlDbType.Int).Value = tpoId.Value;
+
+                using SqlDataReader reader = cmd.ExecuteReader();
+
+                if (reader.Read())
+                {
+                    model = new TPOViewNotificationM
+                    {
+                        NotificationID = Convert.ToInt32(reader["NotificationID"]),
+                        Title = reader["Title"]?.ToString() ?? "",
+                        Type = reader["Type"]?.ToString() ?? "",
+                        Audience = reader["Audience"]?.ToString() ?? "",
+                        NotificationDate = reader["NotificationDate"] == DBNull.Value
+                            ? null
+                            : Convert.ToDateTime(reader["NotificationDate"]),
+                        NotificationTime = reader["NotificationTime"] == DBNull.Value
+                            ? null
+                            : (TimeSpan?)reader["NotificationTime"],
+                        Content = WebUtility.HtmlDecode(
+    Regex.Replace(
+        reader["Content"]?.ToString() ?? "",
+        "<[^>]+>",
+        " "))
+    .Trim(),
+                        SendEmailNotification =
+                            reader["SendEmailNotification"] != DBNull.Value &&
+                            Convert.ToBoolean(reader["SendEmailNotification"]),
+
+                        Attachment1OriginalName =
+                            reader["Attachment1OriginalName"]?.ToString(),
+                        Attachment1FileName =
+                            reader["Attachment1FileName"]?.ToString(),
+                        Attachment1Path =
+                            reader["Attachment1Path"]?.ToString(),
+                        Attachment1ContentType =
+                            reader["Attachment1ContentType"]?.ToString(),
+                        Attachment1Size =
+                            reader["Attachment1Size"] == DBNull.Value
+                                ? null
+                                : Convert.ToInt64(reader["Attachment1Size"]),
+
+                        Attachment2OriginalName =
+                            reader["Attachment2OriginalName"]?.ToString(),
+                        Attachment2FileName =
+                            reader["Attachment2FileName"]?.ToString(),
+                        Attachment2Path =
+                            reader["Attachment2Path"]?.ToString(),
+                        Attachment2ContentType =
+                            reader["Attachment2ContentType"]?.ToString(),
+                        Attachment2Size =
+                            reader["Attachment2Size"] == DBNull.Value
+                                ? null
+                                : Convert.ToInt64(reader["Attachment2Size"]),
+
+                        IsActive = reader["IsActive"] != DBNull.Value &&
+                                   Convert.ToBoolean(reader["IsActive"]),
+
+                        IsDeleted = reader["IsDeleted"] != DBNull.Value &&
+                                    Convert.ToBoolean(reader["IsDeleted"]),
+
+                        CreatedDate = Convert.ToDateTime(reader["CreatedDate"]),
+
+                        CreatedBy = reader["CreatedBy"] == DBNull.Value
+                            ? null
+                            : Convert.ToInt32(reader["CreatedBy"]),
+
+                        CreatedByName = reader["CreatedByName"]?.ToString() ?? ""
+                    };
+                }
+            }
+
+            if (model == null)
+                return NotFound("Notification not found or you are not authorized to edit it.");
+
+            return View("EditNotification", model);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        [Route("TPO/EditNotification/{id:int}")]
+        public async Task<IActionResult> EditNotification(
+    int id,
+    TPOViewNotificationM model)
+        {
+            int? tpoId = HttpContext.Session.GetInt32("TPOID");
+
+            if (tpoId == null)
+                return RedirectToAction("TPOLogin", "Account");
+
+            if (id != model.NotificationID)
+                return BadRequest("Invalid notification ID.");
+
+            // Basic server-side validation
+            if (string.IsNullOrWhiteSpace(model.Title) ||
+                string.IsNullOrWhiteSpace(model.Type) ||
+                string.IsNullOrWhiteSpace(model.Audience) ||
+                string.IsNullOrWhiteSpace(model.Content))
+            {
+                ModelState.AddModelError("", "Please fill in all required fields.");
+                return await LoadEditNotificationView(id, tpoId.Value, model);
+            }
+
+            // Keep these values aligned with the options in your Create form.
+            if (model.Type != "Notification" && model.Type != "Event")
+            {
+                ModelState.AddModelError(nameof(model.Type), "Invalid notification type.");
+                return await LoadEditNotificationView(id, tpoId.Value, model);
+            }
+
+            if (model.Audience != "AllStudents")
+            {
+                ModelState.AddModelError(nameof(model.Audience), "Invalid audience.");
+                return await LoadEditNotificationView(id, tpoId.Value, model);
+            }
+
+            const long maxFileSize = 5 * 1024 * 1024; // 5 MB per attachment
+
+            string[] allowedExtensions =
+            {
+        ".pdf", ".doc", ".docx", ".xls", ".xlsx",
+        ".jpg", ".jpeg", ".png"
+    };
+
+            foreach (var file in new[] { model.AttachFile1, model.AttachFile2 })
+            {
+                if (file == null || file.Length == 0)
+                    continue;
+
+                string extension = Path.GetExtension(file.FileName);
+
+                if (file.Length > maxFileSize)
+                {
+                    ModelState.AddModelError("", "Each attachment must be 5 MB or smaller.");
+                }
+
+                if (!allowedExtensions.Contains(extension, StringComparer.OrdinalIgnoreCase))
+                {
+                    ModelState.AddModelError("", "Unsupported attachment type.");
+                }
+            }
+
+            if (!ModelState.IsValid)
+                return await LoadEditNotificationView(id, tpoId.Value, model);
+
+            // Load the existing record first and verify ownership.
+            TPOViewNotificationM? existing = null;
+
+            using (SqlConnection cn = new SqlConnection(
+    _configuration.GetConnectionString("DefaultConnection")))
+            {
+                await cn.OpenAsync();
+
+                const string selectSql = @"
+            SELECT *
+            FROM tblTPONotification
+            WHERE NotificationID = @NotificationID
+              AND CreatedBy = @TPOID
+              AND IsDeleted = 0;";
+
+                using SqlCommand cmd = new SqlCommand(selectSql, cn);
+
+                cmd.Parameters.Add("@NotificationID", SqlDbType.Int).Value = id;
+                cmd.Parameters.Add("@TPOID", SqlDbType.Int).Value = tpoId.Value;
+
+                using SqlDataReader reader = await cmd.ExecuteReaderAsync();
+
+                if (await reader.ReadAsync())
+                {
+                    existing = new TPOViewNotificationM
+                    {
+                        NotificationID = id,
+
+                        Attachment1OriginalName = reader["Attachment1OriginalName"] as string,
+                        Attachment1FileName = reader["Attachment1FileName"] as string,
+                        Attachment1Path = reader["Attachment1Path"] as string,
+                        Attachment1ContentType = reader["Attachment1ContentType"] as string,
+                        Attachment1Size = reader["Attachment1Size"] == DBNull.Value
+                            ? null : Convert.ToInt64(reader["Attachment1Size"]),
+
+                        Attachment2OriginalName = reader["Attachment2OriginalName"] as string,
+                        Attachment2FileName = reader["Attachment2FileName"] as string,
+                        Attachment2Path = reader["Attachment2Path"] as string,
+                        Attachment2ContentType = reader["Attachment2ContentType"] as string,
+                        Attachment2Size = reader["Attachment2Size"] == DBNull.Value
+                            ? null : Convert.ToInt64(reader["Attachment2Size"])
+                    };
+                }
+            }
+
+            if (existing == null)
+                return NotFound("Notification not found or you are not authorized to edit it.");
+
+            // Save replacement files using unique server-generated names.
+            string uploadFolder = Path.Combine(
+                _environment.WebRootPath,
+                "Uploads",
+                "TPO",
+                "Notifications");
+
+            Directory.CreateDirectory(uploadFolder);
+
+            async Task<(string OriginalName, string FileName, string WebPath,
+                string ContentType, long Size)> SaveAttachment(IFormFile file)
+            {
+                string originalName = Path.GetFileName(file.FileName);
+                string extension = Path.GetExtension(originalName).ToLowerInvariant();
+                string savedFileName = $"{Guid.NewGuid():N}{extension}";
+                string physicalPath = Path.Combine(uploadFolder, savedFileName);
+
+                await using (var stream = new FileStream(
+                    physicalPath, FileMode.CreateNew, FileAccess.Write))
+                {
+                    await file.CopyToAsync(stream);
+                }
+
+                string contentType = Path.GetExtension(originalName).ToLowerInvariant() switch
+                {
+                    ".pdf" => "application/pdf",
+                    ".doc" => "application/msword",
+                    ".docx" => "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+                    ".xls" => "application/vnd.ms-excel",
+                    ".xlsx" => "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                    ".jpg" or ".jpeg" => "image/jpeg",
+                    ".png" => "image/png",
+                    _ => "application/octet-stream"
+                };
+
+                return (
+                    originalName,
+                    savedFileName,
+                    "/Uploads/TPO/Notifications/" + savedFileName,
+                    contentType,
+                    file.Length
+                );
+            }
+
+            try
+            {
+                if (model.AttachFile1?.Length > 0)
+                {
+                    var file = await SaveAttachment(model.AttachFile1);
+
+                    existing.Attachment1OriginalName = file.OriginalName;
+                    existing.Attachment1FileName = file.FileName;
+                    existing.Attachment1Path = file.WebPath;
+                    existing.Attachment1ContentType = file.ContentType;
+                    existing.Attachment1Size = file.Size;
+                }
+
+                if (model.AttachFile2?.Length > 0)
+                {
+                    var file = await SaveAttachment(model.AttachFile2);
+
+                    existing.Attachment2OriginalName = file.OriginalName;
+                    existing.Attachment2FileName = file.FileName;
+                    existing.Attachment2Path = file.WebPath;
+                    existing.Attachment2ContentType = file.ContentType;
+                    existing.Attachment2Size = file.Size;
+                }
+
+                using SqlConnection cn = new SqlConnection(
+           _configuration.GetConnectionString("DefaultConnection"));
+
+                await cn.OpenAsync();
+
+                const string updateSql = @"
+            UPDATE tblTPONotification
+            SET
+                Title = @Title,
+                Type = @Type,
+                Audience = @Audience,
+                NotificationDate = @NotificationDate,
+                NotificationTime = @NotificationTime,
+                Content = @Content,
+                SendEmailNotification = @SendEmailNotification,
+
+                Attachment1OriginalName = @Attachment1OriginalName,
+                Attachment1FileName = @Attachment1FileName,
+                Attachment1Path = @Attachment1Path,
+                Attachment1ContentType = @Attachment1ContentType,
+                Attachment1Size = @Attachment1Size,
+
+                Attachment2OriginalName = @Attachment2OriginalName,
+                Attachment2FileName = @Attachment2FileName,
+                Attachment2Path = @Attachment2Path,
+                Attachment2ContentType = @Attachment2ContentType,
+                Attachment2Size = @Attachment2Size
+
+            WHERE NotificationID = @NotificationID
+              AND CreatedBy = @TPOID
+              AND IsDeleted = 0;";
+
+                using SqlCommand cmd = new SqlCommand(updateSql, cn);
+
+                cmd.Parameters.Add("@NotificationID", SqlDbType.Int).Value = id;
+                cmd.Parameters.Add("@TPOID", SqlDbType.Int).Value = tpoId.Value;
+
+                cmd.Parameters.Add("@Title", SqlDbType.NVarChar, 200).Value = model.Title.Trim();
+                cmd.Parameters.Add("@Type", SqlDbType.NVarChar, 50).Value = model.Type;
+                cmd.Parameters.Add("@Audience", SqlDbType.NVarChar, 100).Value = model.Audience;
+
+                cmd.Parameters.Add("@NotificationDate", SqlDbType.DateTime).Value =
+                    model.NotificationDate.HasValue
+                        ? model.NotificationDate.Value
+                        : DBNull.Value;
+
+                cmd.Parameters.Add("@NotificationTime", SqlDbType.Time).Value =
+                    model.NotificationTime.HasValue
+                        ? model.NotificationTime.Value
+                        : DBNull.Value;
+
+                cmd.Parameters.Add("@Content", SqlDbType.NVarChar, -1).Value = model.Content.Trim();
+
+                cmd.Parameters.Add("@SendEmailNotification", SqlDbType.Bit).Value =
+                    model.SendEmailNotification;
+
+                AddNullableParameter(cmd, "@Attachment1OriginalName", SqlDbType.NVarChar, 255, existing.Attachment1OriginalName);
+                AddNullableParameter(cmd, "@Attachment1FileName", SqlDbType.NVarChar, 255, existing.Attachment1FileName);
+                AddNullableParameter(cmd, "@Attachment1Path", SqlDbType.NVarChar, 500, existing.Attachment1Path);
+                AddNullableParameter(cmd, "@Attachment1ContentType", SqlDbType.NVarChar, 150, existing.Attachment1ContentType);
+                AddNullableParameter(cmd, "@Attachment1Size", SqlDbType.BigInt, 0, existing.Attachment1Size);
+
+                AddNullableParameter(cmd, "@Attachment2OriginalName", SqlDbType.NVarChar, 255, existing.Attachment2OriginalName);
+                AddNullableParameter(cmd, "@Attachment2FileName", SqlDbType.NVarChar, 255, existing.Attachment2FileName);
+                AddNullableParameter(cmd, "@Attachment2Path", SqlDbType.NVarChar, 500, existing.Attachment2Path);
+                AddNullableParameter(cmd, "@Attachment2ContentType", SqlDbType.NVarChar, 150, existing.Attachment2ContentType);
+                AddNullableParameter(cmd, "@Attachment2Size", SqlDbType.BigInt, 0, existing.Attachment2Size);
+
+                int rowsUpdated = await cmd.ExecuteNonQueryAsync();
+
+                if (rowsUpdated == 0)
+                    return NotFound("Notification could not be updated.");
+
+                TempData["SuccessMessage"] = "Notification updated successfully.";
+
+                return RedirectToAction(nameof(ViewNotificationEvent));
+            }
+            catch (Exception ex)
+            {
+                // Log the exception in your application's logger in production.
+                ModelState.AddModelError("", "Unable to update the notification. Please try again.");
+                return await LoadEditNotificationView(id, tpoId.Value, model);
+            }
+        }
+
+        private async Task<IActionResult> LoadEditNotificationView(
+    int id,
+    int tpoId,
+    TPOViewNotificationM model)
+        {
+            // Re-fetch the existing attachment links so they remain visible
+            // if the user submits the form with a validation error.
+            using SqlConnection cn = new SqlConnection(
+    _configuration.GetConnectionString("DefaultConnection"));
+
+            await cn.OpenAsync();
+
+            const string sql = @"
+        SELECT Attachment1OriginalName, Attachment1Path,
+               Attachment2OriginalName, Attachment2Path
+        FROM tblTPONotification
+        WHERE NotificationID = @ID
+          AND CreatedBy = @TPOID
+          AND IsDeleted = 0;";
+
+            using SqlCommand cmd = new SqlCommand(sql, cn);
+            cmd.Parameters.Add("@ID", SqlDbType.Int).Value = id;
+            cmd.Parameters.Add("@TPOID", SqlDbType.Int).Value = tpoId;
+
+            using SqlDataReader reader = await cmd.ExecuteReaderAsync();
+
+            if (!await reader.ReadAsync())
+                return NotFound();
+
+            model.Attachment1OriginalName =
+                reader["Attachment1OriginalName"] as string;
+            model.Attachment1Path =
+                reader["Attachment1Path"] as string;
+
+            model.Attachment2OriginalName =
+                reader["Attachment2OriginalName"] as string;
+            model.Attachment2Path =
+                reader["Attachment2Path"] as string;
+
+            return View("EditNotification", model);
+        }
+
+        private static void AddNullableParameter(
+            SqlCommand cmd,
+            string name,
+            SqlDbType type,
+            int size,
+            object? value)
+        {
+            SqlParameter parameter = size > 0
+                ? cmd.Parameters.Add(name, type, size)
+                : cmd.Parameters.Add(name, type);
+
+            parameter.Value = value ?? DBNull.Value;
+        }
+
+        // shriang 09/10/26
+        // tpo schedular
+        // =====================================================
+        // TPO SCHEDULER
+        // =====================================================
+
+        [HttpGet]
+        public IActionResult Scheduler()
+        {
+            int? tpoId = HttpContext.Session.GetInt32("TPOID");
+
+
+if (tpoId == null || tpoId <= 0)
+            {
+                return RedirectToAction("TPOLogin", "Account");
+            }
+
+            ViewData["Panel"] = "TPO";
+            ViewData["UserName"] =
+                HttpContext.Session.GetString("TPOName") ?? "TPO";
+
+            ViewData["Title"] = "TPO Scheduler";
+
+            // Load saved schedules for the logged-in TPO.
+            ViewBag.GeneralActivities =
+                _schedulerRepository.GetGeneralActivities(tpoId.Value);
+
+            ViewBag.PlacementDrives =
+                _schedulerRepository.GetPlacementDrives(tpoId.Value);
+
+            return View();
+
+
+}
+
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public IActionResult Scheduler(TPOSchedulerPageM model)
+        {
+            int? tpoId = HttpContext.Session.GetInt32("TPOID");
+
+            if (tpoId == null || tpoId <= 0)
+            {
+                return RedirectToAction("TPOLogin", "Account");
+            }
+
+            // Validate only the form the user selected.
+            if (model.ActivityType == "General")
+            {
+                foreach (var key in ModelState.Keys
+                             .Where(k => k.StartsWith(
+                                 "Placement.",
+                                 StringComparison.OrdinalIgnoreCase))
+                             .ToList())
+                {
+                    ModelState.Remove(key);
+                }
+            }
+            else if (model.ActivityType == "PlacementDrive")
+            {
+                foreach (var key in ModelState.Keys
+                             .Where(k => k.StartsWith(
+                                 "General.",
+                                 StringComparison.OrdinalIgnoreCase))
+                             .ToList())
+                {
+                    ModelState.Remove(key);
+                }
+            }
+            else
+            {
+                ModelState.AddModelError(
+                    "ActivityType", "Please select a valid activity type.");
+            }
+
+            if (ModelState.IsValid)
+            {
+                try
+                {
+                    if (model.ActivityType == "General")
+                    {
+                        var activity = model.General;
+
+                        if (activity.EndDate.Date < activity.StartDate.Date)
+                        {
+                            ModelState.AddModelError(
+                                "General.EndDate",
+                                "End date cannot be earlier than start date.");
+                        }
+                        else if (activity.EndDate.Date == activity.StartDate.Date
+                                 && activity.EndTime <= activity.StartTime)
+                        {
+                            ModelState.AddModelError(
+                                "General.EndTime",
+                                "End time must be later than start time.");
+                        }
+                        else
+                        {
+                            activity.TPOID = tpoId.Value;
+
+                            _schedulerRepository.SaveGeneralActivity(
+                                activity, tpoId.Value);
+
+                            TempData["SchedulerSuccess"] =
+                                "General activity saved successfully.";
+
+                            return RedirectToAction(nameof(Scheduler));
+                        }
+                    }
+                    else if (model.ActivityType == "PlacementDrive")
+                    {
+                        var drive = model.Placement;
+
+                        if (drive.EndDate.Date < drive.StartDate.Date)
+                        {
+                            ModelState.AddModelError(
+                                "Placement.EndDate",
+                                "End date cannot be earlier than start date.");
+                        }
+                        else if (drive.StartDate.Date == drive.EndDate.Date
+                                 && drive.StartTime.HasValue
+                                 && drive.EndTime.HasValue
+                                 && drive.EndTime.Value <= drive.StartTime.Value)
+                        {
+                            ModelState.AddModelError(
+                                "Placement.EndTime",
+                                "End time must be later than start time.");
+                        }
+                        else
+                        {
+                            drive.TPOID = tpoId.Value;
+
+                            if (drive.PlacementDriveID > 0)
+                            {
+                                bool updated = _schedulerRepository.UpdatePlacementDrive(
+                                    drive, tpoId.Value);
+
+                                if (!updated)
+                                {
+                                    ModelState.AddModelError(
+                                        string.Empty,
+                                        "Placement drive not found or you are not authorized to edit it.");
+                                }
+                                else
+                                {
+                                    TempData["SchedulerSuccess"] =
+                                        "Placement drive updated successfully.";
+
+                                    return RedirectToAction(nameof(Scheduler));
+                                }
+                            }
+                            else
+                            {
+                                _schedulerRepository.SavePlacementDrive(
+                                    drive, tpoId.Value);
+
+                                TempData["SchedulerSuccess"] =
+                                    "Placement drive saved successfully.";
+
+                                return RedirectToAction(nameof(Scheduler));
+                            }
+
+                            return RedirectToAction(nameof(Scheduler));
+                        }
+                    }
+                }
+                catch (Exception)
+                {
+                    // Log the exception using your application's logger.
+                    ModelState.AddModelError(
+                        string.Empty,
+                        "Unable to save the schedule. Please check the database configuration and try again.");
+                }
+            }
+
+            ViewData["Panel"] = "TPO";
+            ViewData["UserName"] =
+                HttpContext.Session.GetString("TPOName") ?? "TPO";
+            ViewData["Title"] = "TPO Scheduler";
+
+            ViewBag.GeneralActivities =
+                _schedulerRepository.GetGeneralActivities(tpoId.Value);
+
+            ViewBag.PlacementDrives =
+                _schedulerRepository.GetPlacementDrives(tpoId.Value);
+
+            return View(model);
+        }
+
+
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public IActionResult DeletePlacementDrive(int id)
+        {
+            int? tpoId = HttpContext.Session.GetInt32("TPOID");
+
+            if (tpoId == null || tpoId <= 0)
+            {
+                return RedirectToAction("TPOLogin", "Account");
+            }
+
+            bool deleted = _schedulerRepository.DeletePlacementDrive(
+                id, tpoId.Value);
+
+            TempData[deleted ? "SchedulerSuccess" : "SchedulerError"] =
+                deleted
+                    ? "Placement drive deleted successfully."
+                    : "Placement drive not found or already deleted.";
+
+            return RedirectToAction(nameof(Scheduler));
+        }
+
     }
 }

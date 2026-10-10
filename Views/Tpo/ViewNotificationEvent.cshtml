@@ -542,6 +542,8 @@
 
 </button>
 
+<!-- EDIT --> <a href="@Url.Action("EditNotification", "TPO", new { id = item.NotificationID })" class="action-btn edit-btn" title="Edit Notification"> <i class="fas fa-pen"></i> </a>
+
 
                                         <!-- MORE -->
 
@@ -1090,6 +1092,17 @@
     color: #9a6700;
 }
 
+
+.edit-btn {
+    color: #198754;
+    text-decoration: none;
+}
+
+.edit-btn:hover {
+    background: #eaf8ef;
+    border-color: #a3d9b1;
+    color: #146c43;
+}
 </style>
 
 
