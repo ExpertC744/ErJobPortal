@@ -14,7 +14,7 @@
         width: 55px;
         height: 55px;
         /*  max-width: 55px;
-        max-height: 55px; */
+            max-height: 55px; */
         object-fit: contain;
         display: block;
         margin: 0 auto;
@@ -211,20 +211,17 @@
 
                                 <!-- ACTION -->
                                 <td>
-                                <a asp-controller="SuperAdmin"
-                        <!-- ACTION -->
-                        <td>
-                            <a asp-controller="SuperAdmin"
-                               asp-action="ViewTraineeResume"
-                               asp-route-id="@item.CandidateID"
-                               class=""
-                               title="View"
-                               target="_blank"
-                               rel="noopener noreferrer">
-                                <i class="fas fa-eye"></i>
-                            </a>
-                        </td>
-                               @*  <a asp-controller="SuperAdmin"
+                                    <a asp-controller="SuperAdmin"
+                                       asp-action="ViewTraineeResume"
+                                       asp-route-id="@item.CandidateID"
+                                       class=""
+                                       title="View"
+                                       target="_blank"
+                                       rel="noopener noreferrer">
+                                        <i class="fas fa-eye"></i>
+                                    </a>
+                                </td>
+                                @*  <a asp-controller="SuperAdmin"
                                    asp-action="ViewTraineeResume"
                                    asp-route-id="@item.CandidateID"
                                    class="master-view-btn"
@@ -247,7 +244,7 @@
 
 
 
-                                
+
                                 <td>
 
                                     @if (!string.IsNullOrEmpty(item.Photo))
@@ -352,15 +349,15 @@
                                 </td>
 
 
-                        <!-- RESUME -->
-                        <td>
+                                <!-- RESUME -->
+                                <td>
 
-                            @if (!string.IsNullOrEmpty(item.Resume))
-                            {
-                                <a href="@item.Resume"
-                                   target="_blank"
-                                   title="View Resume"
-                                   class="">
+                                    @if (!string.IsNullOrEmpty(item.Resume))
+                                    {
+                                        <a href="@item.Resume"
+                                           target="_blank"
+                                           title="View Resume"
+                                           class="">
 
                 <!-- LOCATION -->
                 <td>@item.Location</td>
@@ -395,7 +392,7 @@
                 <td>@item.PreferredLocation</td>
 
                             </tr>
-                                
+
                             srNo++;
 
                 <!-- INTERNSHIP TYPE -->
