@@ -299,12 +299,18 @@
                                 <td>
                                     <div class="action-buttons">
                                         <button type="button"
-                                                class="action-btn view-btn"
-                                                title="View Notification"
-                                                aria-label="View Notification"
-                                                onclick="viewNotification(@item.NotificationID)">
-                                            <i class="fas fa-eye"></i>
-                                        </button>
+        class="action-btn view-btn"
+        title="View Notification"
+        onclick="viewNotification(@item.NotificationID)">
+
+    <i class="fas fa-eye"></i>
+
+</button>
+
+<!-- EDIT --> <a href="@Url.Action("EditNotification", "TPO", new { id = item.NotificationID })" class="action-btn edit-btn" title="Edit Notification"> <i class="fas fa-pen"></i> </a>
+
+
+                                        <!-- MORE -->
 
                                         <button type="button"
                                                 class="action-btn more-btn"

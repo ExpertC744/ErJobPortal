@@ -135,10 +135,55 @@
                 </thead>
 
 
-                <tbody>
+                
+<tbody>
+    @if (Model != null && Model.Count > 0)
+    {
+        int srNo = 1;
 
-                    @if (Model != null && Model.Count > 0)
+        foreach (var item in Model)
+        {
+            <tr>
+                <!-- SR NO -->
+                <td class="master-id">
+                    @srNo
+                </td>
+
+                <!-- PROFILE CREATED DATE -->
+                <td>
+                    @item.ProfileCreatedDate
+                </td>
+
+                <!-- TRAINEE NAME -->
+                <td>
+                    <strong>@item.TraineeName</strong>
+                </td>
+
+                <!-- ACTION: KEEP ONLY ONE CELL -->
+                <td>
+                    <a asp-controller="SuperAdmin"
+                       asp-action="ViewTraineeResume"
+                       asp-route-id="@item.CandidateID"
+                       class="master-view-btn"
+                       target="_blank"
+                       rel="noopener noreferrer">
+                        View
+                    </a>
+                </td>
+
+                <!-- PHOTO -->
+                <td>
+                    @if (!string.IsNullOrEmpty(item.Photo))
                     {
+                        <img src="@item.Photo"
+                             alt="Candidate Photo"
+                             class="candidate-profile-photo" />
+                    }
+                    else
+                    {
+                        <span class="text-muted">No Photo</span>
+                    }
+                </td>
                         int srNo = 1;
 
                         foreach (var item in Model)
@@ -314,61 +359,87 @@
                                            title="View Resume"
                                            class="">
 
-                                            <i class="fas fa-eye"></i>
+                <!-- LOCATION -->
+                <td>@item.Location</td>
 
-                                        </a>
-                                    }
-                                    else
-                                    {
-                                        <span class="text-muted">
-                                            Not Uploaded
-                                        </span>
-                                    }
+                <!-- PINCODE -->
+                <td>@item.Pincode</td>
 
-                                </td>
+                <!-- SSC -->
+                <td>@item.SSC_YEAR</td>
+                <td>@item.SSC_DIVISION</td>
 
+                <!-- HSC / DIPLOMA -->
+                <td>@item.HSC_DIPLOMA_YEAR</td>
+                <td>@item.HSC_DIPLOMA_DIVISION</td>
 
-                                <!-- RESUME STATUS -->
-                                <td>
+                <!-- GRADUATION -->
+                <td>@item.Graduation_Year</td>
+                <td>@item.Graduation_Division</td>
+                <td>@item.Graduation_Stream</td>
 
-                                    @if (item.ResumeUploaded)
-                                    {
-                                        <span class="badge bg-success">
-                                            Uploaded
-                                        </span>
-                                    }
-                                    else
-                                    {
-                                        <span class="badge bg-secondary">
-                                            Not Uploaded
-                                        </span>
-                                    }
+                <!-- PG -->
+                <td>@item.PG_Year</td>
+                <td>@item.PG_Division</td>
+                <td>@item.PG_Stream</td>
 
-                                </td>
+                <!-- PHD -->
+                <td>@item.PhD_Year</td>
+                <td>@item.PhD_Status</td>
+                <td>@item.PhD_Topic</td>
 
+                <!-- PREFERRED LOCATION -->
+                <td>@item.PreferredLocation</td>
 
                             </tr>
 
                             srNo++;
 
-                        }
+                <!-- INTERNSHIP TYPE -->
+                <td>@item.Internship_FellowshipType</td>
 
+                <!-- RESUME -->
+                <td>
+                    @if (!string.IsNullOrEmpty(item.Resume))
+                    {
+                        <a href="@item.Resume"
+                           target="_blank"
+                           rel="noopener noreferrer"
+                           class="btn btn-sm btn-primary">
+                            View Resume
+                        </a>
                     }
                     else
                     {
-                        <tr>
-
-                            <td colspan="24"
-                                class="text-center">
-
-                                No trainee profiles found.
-
-                            </td>
-
-                        </tr>
+                        <span class="text-muted">Not Uploaded</span>
                     }
+                </td>
 
-                </tbody>
+                <!-- RESUME STATUS -->
+                <td>
+                    @if (item.ResumeUploaded)
+                    {
+                        <span class="badge bg-success">Uploaded</span>
+                    }
+                    else
+                    {
+                        <span class="badge bg-secondary">Not Uploaded</span>
+                    }
+                </td>
+            </tr>
+
+            srNo++;
+        }
+    }
+    else
+    {
+        <tr>
+            <td colspan="24" class="text-center">
+                No trainee profiles found.
+            </td>
+        </tr>
+    }
+</tbody>
 
             </table>
 
