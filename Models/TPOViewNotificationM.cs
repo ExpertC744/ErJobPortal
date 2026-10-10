@@ -80,5 +80,15 @@
         public int TotalRead { get; set; }
 
         public int TotalUnread { get; set; }
+
+        public IFormFile? AttachFile1 { get; set; }
+
+        public IFormFile? AttachFile2 { get; set; }
+
+        //public DateTime? NotificationDate { get; set; }
+
+        //public TimeSpan? NotificationTime { get; set; }
+
+        
     }
 }

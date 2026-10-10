@@ -5937,11 +5937,13 @@ ORDER BY
         }
 
 
+
         [HttpGet]
         [Route("Candidate/Notification/UnreadCount")]
         public IActionResult GetUnreadNotificationCount()
         {
-            int? candidateId = HttpContext.Session.GetInt32("CandidateID");
+            int? candidateId =
+                HttpContext.Session.GetInt32("CandidateID");
 
             if (candidateId == null)
             {
@@ -5950,7 +5952,9 @@ ORDER BY
 
             try
             {
-                int count = _repository.GetCandidateUnreadNotificationCount(candidateId.Value);
+                int count =
+                    _repository.GetCandidateUnreadNotificationCount(
+                        candidateId.Value);
 
                 return Json(new
                 {
@@ -5966,7 +5970,9 @@ ORDER BY
                     count = 0
                 });
             }
-        //radhika07-10
+        } // <-- Missing method-closing brace added here
+
+        // radhika07-10
 
         [HttpGet]
         public IActionResult TotalOpening()
@@ -5981,3 +5987,4 @@ ORDER BY
         }
     }
 }
+

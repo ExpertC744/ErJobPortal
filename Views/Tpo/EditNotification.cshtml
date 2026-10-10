@@ -1,0 +1,187 @@
+﻿@model ErJobPortal.Models.TPOViewNotificationM
+
+@{
+    Layout = "~/Views/Shared/_DashboardLayout.cshtml";
+    ViewData["Title"] = "Edit Notification";
+    ViewData["Panel"] = "TPO";
+}
+
+<div class="container-fluid py-4">
+    <div class="card shadow-sm border-0">
+        <div class="card-header bg-primary text-white">
+            <h4 class="mb-0">
+                <i class="fas fa-edit me-2"></i>Edit Notification / Event
+            </h4>
+        </div>
+
+        <div class="card-body p-4">
+
+            <form asp-controller="TPO"
+                  asp-action="EditNotification"
+                  asp-route-id="@Model.NotificationID"
+                  method="post"
+                  enctype="multipart/form-data">
+
+                @Html.AntiForgeryToken()
+
+                <input type="hidden"
+                       asp-for="NotificationID" />
+
+                <div asp-validation-summary="ModelOnly"
+                     class="text-danger mb-3"></div>
+
+                <div class="row g-3">
+
+                    <div class="col-md-6">
+                        <label asp-for="Title" class="form-label">
+                            Title
+                        </label>
+                        <input asp-for="Title"
+                               class="form-control"
+                               required
+                               maxlength="200" />
+                        <span asp-validation-for="Title"
+                              class="text-danger"></span>
+                    </div>
+
+                    <div class="col-md-6">
+                        <label asp-for="Type" class="form-label">
+                            Type
+                        </label>
+                        <select asp-for="Type"
+                                class="form-select"
+                                required>
+                            <option value="">Select Type</option>
+                            <option value="Notification">Notification</option>
+                            <option value="Event">Event</option>
+                        </select>
+                    </div>
+
+                    <div class="col-md-6">
+                        <label asp-for="Audience" class="form-label">
+                            Audience
+                        </label>
+                        <select asp-for="Audience"
+                                class="form-select"
+                                required>
+                            <option value="">Select Audience</option>
+                            <option value="AllStudents">All Students</option>
+                        </select>
+                    </div>
+
+                    <div class="col-md-3">
+                        <label asp-for="NotificationDate"
+                               class="form-label">Date</label>
+                        <input asp-for="NotificationDate"
+       type="date"
+       class="form-control"
+       value="@(Model.NotificationDate.HasValue
+           ? Model.NotificationDate.Value.ToString("yyyy-MM-dd")
+           : "")" />
+                    </div>
+
+                    <div class="col-md-3">
+                        <label asp-for="NotificationTime"
+                               class="form-label">Time</label>
+                       <input asp-for="NotificationTime"
+       type="time"
+       class="form-control"
+       step="60"
+       value="@(Model.NotificationTime.HasValue
+           ? Model.NotificationTime.Value.ToString(@"hh\:mm")
+           : "")" />
+                    </div>
+
+                    <div class="col-12"> <label asp-for="Content" class="form-label"> Content </label> <textarea asp-for="Content" class="form-control" rows="8" required></textarea> <span asp-validation-for="Content" class="text-danger"></span> </div>
+
+                    <div class="col-12">
+                        <div class="form-check">
+                            <input asp-for="SendEmailNotification"
+                                   class="form-check-input" />
+                            <label asp-for="SendEmailNotification"
+                                   class="form-check-label">
+                                Send email notification
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <label class="form-label">
+                            Existing Attachment 1
+                        </label>
+
+                        @if (!string.IsNullOrWhiteSpace(Model.Attachment1Path))
+                        {
+                            <div class="mb-2">
+                                <a href="@Model.Attachment1Path"
+                                   target="_blank"
+                                   rel="noopener">
+                                    <i class="fas fa-paperclip me-1"></i>
+                                    @(Model.Attachment1OriginalName ?? "View attachment")
+                                </a>
+                            </div>
+                        }
+                        else
+                        {
+                            <p class="text-muted">No attachment</p>
+                        }
+
+                        <label asp-for="AttachFile1"
+                               class="form-label">Replace Attachment 1</label>
+                        <input asp-for="AttachFile1"
+                               type="file"
+                               class="form-control" />
+                    </div>
+
+                    <div class="col-md-6">
+                        <label class="form-label">
+                            Existing Attachment 2
+                        </label>
+
+                        @if (!string.IsNullOrWhiteSpace(Model.Attachment2Path))
+                        {
+                            <div class="mb-2">
+                                <a href="@Model.Attachment2Path"
+                                   target="_blank"
+                                   rel="noopener">
+                                    <i class="fas fa-paperclip me-1"></i>
+                                    @(Model.Attachment2OriginalName ?? "View attachment")
+                                </a>
+                            </div>
+                        }
+                        else
+                        {
+                            <p class="text-muted">No attachment</p>
+                        }
+
+                        <label asp-for="AttachFile2"
+                               class="form-label">Replace Attachment 2</label>
+                        <input asp-for="AttachFile2"
+                               type="file"
+                               class="form-control" />
+                    </div>
+
+                </div>
+
+                <hr class="my-4" />
+
+                <div class="d-flex flex-wrap gap-2">
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-save me-1"></i>Save Changes
+                    </button>
+
+                    <a asp-controller="TPO"
+                       asp-action="ViewNotificationEvent"
+                       class="btn btn-outline-secondary">
+                        <i class="fas fa-arrow-left me-1"></i>Back to List
+                    </a>
+                </div>
+
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}
