@@ -16,7 +16,7 @@ namespace ErJobPortal.Controllers
             _configuration = configuration;
             _repository = repository;
         }
-
+        //sanidhya 08/10/26
         [HttpGet]
         [Route("SuperAdmin/Dashboard/{id:int}")]
         public IActionResult Dashboard(int id)
@@ -29,6 +29,10 @@ namespace ErJobPortal.Controllers
             int traineeRegistrationCount = 0;
             int organizationRegistrationCount = 0;
 
+            int traineeProfileCount = 0;
+            int organizationProfileCount = 0;
+
+
             string connectionString =
                 _configuration.GetConnectionString("DefaultConnection");
 
@@ -37,12 +41,23 @@ namespace ErJobPortal.Controllers
                 con.Open();
 
                 string query = @"
- SELECT
-     (SELECT COUNT(nID)
-      FROM tblCandidateRegister) AS CandidateCount,
+   SELECT
 
-     (SELECT COUNT(nID)
-      FROM tblOrgRegistration) AS OrganizationCount;";
+      -- TRAINEE REGISTRATION COUNT
+      (SELECT COUNT(nID)
+       FROM tblCandidateRegister) AS CandidateCount,
+
+      -- ORGANIZATION REGISTRATION COUNT
+      (SELECT COUNT(nID)
+       FROM tblOrgRegistration) AS OrganizationCount,
+
+      -- TRAINEE PROFILE COUNT
+      (SELECT COUNT(nID)
+       FROM tblCandidateProfile) AS TraineeProfileCount,
+
+      -- ORGANIZATION PROFILE COUNT
+      (SELECT COUNT(nID)
+       FROM tblOrgProfile) AS OrganizationProfileCount;";
 
                 using (SqlCommand cmd = new SqlCommand(query, con))
                 using (SqlDataReader dr = cmd.ExecuteReader())
@@ -54,6 +69,13 @@ namespace ErJobPortal.Controllers
 
                         organizationRegistrationCount =
                             Convert.ToInt32(dr["OrganizationCount"]);
+
+                        traineeProfileCount =
+                            Convert.ToInt32(dr["TraineeProfileCount"]);
+
+                        organizationProfileCount =
+                            Convert.ToInt32(dr["OrganizationProfileCount"]);
+
                     }
                 }
             }
@@ -71,6 +93,12 @@ namespace ErJobPortal.Controllers
 
             ViewBag.OrganizationRegistrationCount =
                 organizationRegistrationCount;
+
+            ViewBag.TraineeProfileCount =
+    traineeProfileCount;
+
+            ViewBag.OrganizationProfileCount =
+                organizationProfileCount;
 
             ViewBag.Trainees = trainees;
 
@@ -3356,14 +3384,22 @@ ORDER BY SAF.nID DESC, OFB.nID DESC;
         {
             return View();
         }
+        // sanidhya 08/10/26
         [HttpGet]
         [Route("SuperAdmin/SAAllOrganizationPost")]
         public IActionResult SAAllOrganizationPost()
         {
             List<OrgPostM> posts = new List<OrgPostM>();
 
-            string connectionString =
+            string? connectionString =
                 _configuration.GetConnectionString("DefaultConnection");
+
+            // Check whether DefaultConnection is available
+            if (string.IsNullOrWhiteSpace(connectionString))
+            {
+                throw new InvalidOperationException(
+                    "DefaultConnection is missing or empty in appsettings.json.");
+            }
 
             using (SqlConnection con = new SqlConnection(connectionString))
             {
@@ -3380,13 +3416,15 @@ ORDER BY SAF.nID DESC, OFB.nID DESC;
                         {
                             OrgPostM item = new OrgPostM();
 
-                            item.nID = dr["nID"] == DBNull.Value
-                                ? 0
-                                : Convert.ToInt32(dr["nID"]);
+                            item.nID =
+                                dr["nID"] == DBNull.Value
+                                    ? 0
+                                    : Convert.ToInt32(dr["nID"]);
 
-                            item.nPositionID = dr["nPositionID"] == DBNull.Value
-                                ? 0
-                                : Convert.ToInt32(dr["nPositionID"]);
+                            item.nPositionID =
+                                dr["nPositionID"] == DBNull.Value
+                                    ? 0
+                                    : Convert.ToInt32(dr["nPositionID"]);
 
                             item.sPositionName =
                                 dr["sPositionName"]?.ToString() ?? "";
@@ -3412,7 +3450,8 @@ ORDER BY SAF.nID DESC, OFB.nID DESC;
                             item.nMinimumQualificationID =
                                 dr["nMinimumQualificationID"] == DBNull.Value
                                     ? 0
-                                    : Convert.ToInt32(dr["nMinimumQualificationID"]);
+                                    : Convert.ToInt32(
+                                        dr["nMinimumQualificationID"]);
 
                             item.sMinimumQualificationName =
                                 dr["sMinimumQualificationName"]?.ToString() ?? "";
@@ -3432,7 +3471,8 @@ ORDER BY SAF.nID DESC, OFB.nID DESC;
                             item.nInternshipTypeID =
                                 dr["nInternshipTypeID"] == DBNull.Value
                                     ? 0
-                                    : Convert.ToInt32(dr["nInternshipTypeID"]);
+                                    : Convert.ToInt32(
+                                        dr["nInternshipTypeID"]);
 
                             item.sInternshipTypeName =
                                 dr["sInternshipTypeName"]?.ToString() ?? "";
@@ -3443,7 +3483,8 @@ ORDER BY SAF.nID DESC, OFB.nID DESC;
                             item.nInternshipFellowshipTypeID =
                                 dr["nInternshipFellowshipTypeID"] == DBNull.Value
                                     ? 0
-                                    : Convert.ToInt32(dr["nInternshipFellowshipTypeID"]);
+                                    : Convert.ToInt32(
+                                        dr["nInternshipFellowshipTypeID"]);
 
                             item.sInternshipFellowshipTypeName =
                                 dr["sInternshipFellowshipTypeName"]?.ToString() ?? "";
@@ -3451,7 +3492,8 @@ ORDER BY SAF.nID DESC, OFB.nID DESC;
                             item.nTrainingInvolvedID =
                                 dr["nTrainingInvolvedID"] == DBNull.Value
                                     ? 0
-                                    : Convert.ToInt32(dr["nTrainingInvolvedID"]);
+                                    : Convert.ToInt32(
+                                        dr["nTrainingInvolvedID"]);
 
                             item.sTrainingInvolvedName =
                                 dr["sTrainingInvolvedName"]?.ToString() ?? "";
@@ -3459,7 +3501,8 @@ ORDER BY SAF.nID DESC, OFB.nID DESC;
                             item.nInternshipDurationID =
                                 dr["nInternshipDurationID"] == DBNull.Value
                                     ? 0
-                                    : Convert.ToInt32(dr["nInternshipDurationID"]);
+                                    : Convert.ToInt32(
+                                        dr["nInternshipDurationID"]);
 
                             item.sInternshipDurationName =
                                 dr["sInternshipDurationName"]?.ToString() ?? "";
@@ -3467,7 +3510,8 @@ ORDER BY SAF.nID DESC, OFB.nID DESC;
                             item.nInternshipModeID =
                                 dr["nInternshipModeID"] == DBNull.Value
                                     ? 0
-                                    : Convert.ToInt32(dr["nInternshipModeID"]);
+                                    : Convert.ToInt32(
+                                        dr["nInternshipModeID"]);
 
                             item.sInternshipModeName =
                                 dr["sInternshipModeName"]?.ToString() ?? "";
@@ -3484,12 +3528,14 @@ ORDER BY SAF.nID DESC, OFB.nID DESC;
                             item.dRegisterDate =
                                 dr["dRegisterDate"] == DBNull.Value
                                     ? DateTime.MinValue
-                                    : Convert.ToDateTime(dr["dRegisterDate"]);
+                                    : Convert.ToDateTime(
+                                        dr["dRegisterDate"]);
 
-                                                        item.dModDate =
+                            item.dModDate =
                                 dr["dModDate"] == DBNull.Value
-                                ? DateTime.MinValue
-                                : Convert.ToDateTime(dr["dModDate"]);
+                                    ? DateTime.MinValue
+                                    : Convert.ToDateTime(
+                                        dr["dModDate"]);
 
                             item.nBit =
                                 dr["nBit"] != DBNull.Value &&
@@ -3512,6 +3558,7 @@ ORDER BY SAF.nID DESC, OFB.nID DESC;
 
             return View(posts);
         }
+        //end
 
         // khushi 03-10-26
         [HttpPost]
@@ -4264,7 +4311,7 @@ ORDER BY SAF.nID DESC, OFB.nID DESC;
         // VIEW TRAINEE RESUME
         // Opens EXACTLY the same resume selected by the candidate
         // ============================================================
-
+        //sanidhya 08/10/26
         [HttpGet]
         [Route("SuperAdmin/ViewTraineeResume/{id:int}")]
         public IActionResult ViewTraineeResume(int id)
@@ -4274,21 +4321,104 @@ ORDER BY SAF.nID DESC, OFB.nID DESC;
                 return BadRequest("Invalid Candidate ID.");
             }
 
-            // IMPORTANT:
-            // Use the same Resume action already used by the
-            // Candidate section.
-            //
-            // Resume(int id) internally:
-            // 1. Gets candidate profile
-            // 2. Gets Resume_Profile
-            // 3. Finds selected template
-            // 4. Opens that exact ViewProfileXX page
+            string connectionString =
+                _configuration.GetConnectionString("DefaultConnection")
+                ?? throw new InvalidOperationException(
+                    "DefaultConnection is not configured."
+                );
+
+            var candidateIds = new List<int>();
+
+            using (SqlConnection con = new SqlConnection(connectionString))
+            {
+                string query = @"
+     SELECT CP.CandidateID
+     FROM tblCandidateProfile CP
+     INNER JOIN tblCandidateRegister CR
+         ON CP.CandidateID = CR.nID
+     WHERE CP.nBit = 1
+       AND CP.nSABit = 1
+       AND CR.nSABit = 1
+     ORDER BY CP.nID DESC;
+ ";
+
+                using (SqlCommand cmd = new SqlCommand(query, con))
+                {
+                    con.Open();
+
+                    using (SqlDataReader reader = cmd.ExecuteReader())
+                    {
+                        while (reader.Read())
+                        {
+                            if (reader["CandidateID"] != DBNull.Value)
+                            {
+                                candidateIds.Add(
+                                    Convert.ToInt32(reader["CandidateID"])
+                                );
+                            }
+                        }
+                    }
+                }
+            }
+
+            // ============================================================
+            // FIND CURRENT CANDIDATE
+            // ============================================================
+
+            int currentIndex = candidateIds.IndexOf(id);
+
+            if (currentIndex == -1)
+            {
+                return NotFound("Candidate profile not found.");
+            }
+
+            // ============================================================
+            // PREVIOUS CANDIDATE
+            // ============================================================
+
+            int? previousCandidateId = null;
+
+            if (currentIndex > 0)
+            {
+                previousCandidateId =
+                    candidateIds[currentIndex - 1];
+            }
+
+            // ============================================================
+            // NEXT CANDIDATE
+            // ============================================================
+
+            int? nextCandidateId = null;
+
+            if (currentIndex < candidateIds.Count - 1)
+            {
+                nextCandidateId =
+                    candidateIds[currentIndex + 1];
+            }
+
+            // ============================================================
+            // OPEN RESUME CONTROLLER
+            // ============================================================
 
             return RedirectToAction(
                 "Resume",
                 "Resume",
-                new { id = id }
+                new
+                {
+                    id = id,
+                    previousCandidateId = previousCandidateId,
+                    nextCandidateId = nextCandidateId,
+                    resumeSource = "superadmin"
+                }
             );
+        }
+
+
+        //radhika07
+        [HttpGet]
+        public IActionResult SuperAdminTopSkills()
+        {
+            return View();
         }
     }
 }

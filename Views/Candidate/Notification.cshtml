@@ -1,0 +1,458 @@
+﻿@using ErJobPortal.Models
+@model CandidateNotificationM
+
+@{
+    Layout = "~/Views/Shared/_DashboardLayout.cshtml";
+
+    ViewData["Title"] = "Notification Details";
+    ViewData["Panel"] = "Candidate";
+
+    ViewData["UserName"] =
+        Context.Session.GetString("CandidateName") ?? "Candidate";
+
+    string displayDate = "";
+
+    if (Model.SentDate != DateTime.MinValue)
+    {
+        displayDate =
+            Model.SentDate.ToString("dd MMM yyyy, hh:mm tt");
+    }
+    else if (Model.NotificationDate.HasValue)
+    {
+        displayDate =
+            Model.NotificationDate.Value.ToString("dd MMM yyyy");
+    }
+
+    bool hasAttachment1 =
+        !string.IsNullOrWhiteSpace(Model.Attachment1Path);
+
+    bool hasAttachment2 =
+        !string.IsNullOrWhiteSpace(Model.Attachment2Path);
+}
+
+<style>
+
+    .notification-detail-page {
+        padding: 25px;
+    }
+
+    .notification-detail-card {
+        background: #ffffff;
+        border: 1px solid #e5e7eb;
+        border-radius: 14px;
+        overflow: hidden;
+        box-shadow: 0 3px 15px rgba(0, 0, 0, 0.05);
+    }
+
+    .notification-detail-header {
+        padding: 22px 25px;
+        border-bottom: 1px solid #e5e7eb;
+        background: #f8fafc;
+    }
+
+    .notification-back {
+        display: inline-flex;
+        align-items: center;
+        gap: 7px;
+        margin-bottom: 18px;
+        color: #2563eb;
+        text-decoration: none;
+        font-size: 14px;
+        font-weight: 600;
+    }
+
+    .notification-back:hover {
+        color: #1d4ed8;
+        text-decoration: none;
+    }
+
+    .notification-heading-row {
+        display: flex;
+        align-items: flex-start;
+        gap: 15px;
+    }
+
+    .notification-detail-icon {
+        width: 48px;
+        height: 48px;
+        min-width: 48px;
+        border-radius: 50%;
+        background: #dbeafe;
+        color: #2563eb;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 19px;
+    }
+
+    .notification-detail-title {
+        margin: 0;
+        color: #111827;
+        font-size: 25px;
+        font-weight: 700;
+        line-height: 1.3;
+    }
+
+    .notification-detail-meta {
+        margin-top: 9px;
+        display: flex;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 8px;
+        color: #6b7280;
+        font-size: 13px;
+    }
+
+    .notification-type-badge {
+        padding: 4px 10px;
+        border-radius: 20px;
+        background: #eef2ff;
+        color: #4338ca;
+        font-weight: 600;
+    }
+
+    .notification-read-badge {
+        padding: 4px 10px;
+        border-radius: 20px;
+        background: #ecfdf5;
+        color: #047857;
+        font-weight: 600;
+    }
+
+    .notification-detail-body {
+        padding: 28px 25px;
+    }
+
+    .notification-content {
+        color: #374151;
+        font-size: 15px;
+        line-height: 1.7;
+        word-wrap: break-word;
+    }
+
+    .notification-content img {
+        max-width: 100%;
+        height: auto;
+    }
+
+    .notification-content table {
+        max-width: 100%;
+        overflow-x: auto;
+    }
+
+    .notification-attachments {
+        margin-top: 28px;
+        padding-top: 22px;
+        border-top: 1px solid #e5e7eb;
+    }
+
+    .notification-attachments-title {
+        font-size: 17px;
+        font-weight: 700;
+        color: #374151;
+        margin-bottom: 14px;
+    }
+
+    .attachment-list {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    .attachment-item {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 15px;
+        padding: 12px 14px;
+        background: #f8fafc;
+        border: 1px solid #e5e7eb;
+        border-radius: 9px;
+    }
+
+    .attachment-name {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        color: #374151;
+        font-size: 14px;
+        min-width: 0;
+    }
+
+    .attachment-name i {
+        color: #2563eb;
+    }
+
+    .attachment-name span {
+        word-break: break-word;
+    }
+
+    .attachment-open {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 7px 12px;
+        border-radius: 7px;
+        background: #2563eb;
+        color: #ffffff;
+        text-decoration: none;
+        font-size: 12px;
+        font-weight: 600;
+        white-space: nowrap;
+    }
+
+    .attachment-open:hover {
+        background: #1d4ed8;
+        color: #ffffff;
+        text-decoration: none;
+    }
+
+    .notification-footer {
+        padding: 18px 25px;
+        border-top: 1px solid #e5e7eb;
+        background: #fafafa;
+    }
+
+    .notification-footer-info {
+        color: #6b7280;
+        font-size: 12px;
+    }
+
+    @@media (max-width: 768px) {
+
+        .notification-detail-page {
+            padding: 15px;
+        }
+
+        .notification-detail-header {
+            padding: 18px;
+        }
+
+        .notification-detail-body {
+            padding: 20px 18px;
+        }
+
+        .notification-footer {
+            padding: 15px 18px;
+        }
+
+        .notification-detail-title {
+            font-size: 20px;
+        }
+
+        .notification-detail-icon {
+            width: 42px;
+            height: 42px;
+            min-width: 42px;
+        }
+
+        .attachment-item {
+            align-items: flex-start;
+            flex-direction: column;
+        }
+    }
+
+</style>
+
+
+<div class="notification-detail-page">
+
+    <div class="notification-detail-card">
+
+        <!-- =====================================================
+             HEADER
+        ====================================================== -->
+
+        <div class="notification-detail-header">
+
+            <a asp-controller="Candidate"
+               asp-action="Notifications"
+               class="notification-back">
+
+                <i class="fas fa-arrow-left"></i>
+
+                Back to Notifications
+
+            </a>
+
+
+            <div class="notification-heading-row">
+
+                <div class="notification-detail-icon">
+
+                    @if (Model.Type.Equals(
+                        "Event",
+                        StringComparison.OrdinalIgnoreCase))
+                    {
+                        <i class="fas fa-calendar-alt"></i>
+                    }
+                    else
+                    {
+                        <i class="fas fa-bell"></i>
+                    }
+
+                </div>
+
+
+                <div>
+
+                    <h2 class="notification-detail-title">
+                        @Model.Title
+                    </h2>
+
+
+                    <div class="notification-detail-meta">
+
+                        @if (!string.IsNullOrWhiteSpace(Model.Type))
+                        {
+                            <span class="notification-type-badge">
+                                @Model.Type
+                            </span>
+                        }
+
+
+                        @if (!string.IsNullOrWhiteSpace(displayDate))
+                        {
+                            <span>
+                                <i class="far fa-clock"></i>
+                                @displayDate
+                            </span>
+                        }
+
+
+                        @if (Model.IsRead)
+                        {
+                            <span class="notification-read-badge">
+                                <i class="fas fa-check"></i>
+                                Read
+                            </span>
+                        }
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- =====================================================
+             CONTENT
+        ====================================================== -->
+
+        <div class="notification-detail-body">
+
+            <div class="notification-content">
+
+                @Html.Raw(Model.Content)
+
+            </div>
+
+
+            <!-- =================================================
+                 ATTACHMENTS
+            ================================================== -->
+
+            @if (hasAttachment1 || hasAttachment2)
+            {
+                <div class="notification-attachments">
+
+                    <div class="notification-attachments-title">
+
+                        <i class="fas fa-paperclip"></i>
+
+                        Attachments
+
+                    </div>
+
+
+                    <div class="attachment-list">
+
+                        @if (hasAttachment1)
+                        {
+                            <div class="attachment-item">
+
+                                <div class="attachment-name">
+
+                                    <i class="fas fa-file"></i>
+
+                                    <span>
+                                        @(Model.Attachment1OriginalName
+                                            ?? "Attachment 1")
+                                    </span>
+
+                                </div>
+
+                                <a href="@Model.Attachment1Path"
+                                   target="_blank"
+                                   rel="noopener noreferrer"
+                                   class="attachment-open">
+
+                                    <i class="fas fa-eye"></i>
+
+                                    Open
+
+                                </a>
+
+                            </div>
+                        }
+
+
+                        @if (hasAttachment2)
+                        {
+                            <div class="attachment-item">
+
+                                <div class="attachment-name">
+
+                                    <i class="fas fa-file"></i>
+
+                                    <span>
+                                        @(Model.Attachment2OriginalName
+                                            ?? "Attachment 2")
+                                    </span>
+
+                                </div>
+
+                                <a href="@Model.Attachment2Path"
+                                   target="_blank"
+                                   rel="noopener noreferrer"
+                                   class="attachment-open">
+
+                                    <i class="fas fa-eye"></i>
+
+                                    Open
+
+                                </a>
+
+                            </div>
+                        }
+
+                    </div>
+
+                </div>
+            }
+
+        </div>
+
+
+        <!-- =====================================================
+             FOOTER
+        ====================================================== -->
+
+        <div class="notification-footer">
+
+            <div class="notification-footer-info">
+
+                <i class="fas fa-info-circle"></i>
+
+                Notification received on
+                @displayDate
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>

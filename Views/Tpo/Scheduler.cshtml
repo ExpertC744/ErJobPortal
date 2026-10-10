@@ -1,0 +1,1343 @@
+﻿@model ErJobPortal.Models.TPOSchedulerPageM
+@{
+    Layout = "~/Views/Shared/_DashboardLayout.cshtml";
+    ViewData["Title"] = "TPO Scheduler";
+    ViewData["Panel"] = "TPO";
+}
+
+<link rel="stylesheet"
+      href="~/css/tposcheduler.css"
+      asp-append-version="true" />
+
+<style>
+
+    
+.activity-actions {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+    margin-left: auto;
+}
+
+.activity-item {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    flex-wrap: wrap;
+}
+
+.activity-actions .btn {
+    white-space: nowrap;
+}
+
+@@media (max-width: 576px) {
+    .activity-actions {
+        width: 100%;
+        margin-left: 0;
+    }
+}
+
+/* ===== Modal layout and scrolling fix ===== */
+
+#addActivityModal .modal-dialog {
+    width: calc(100% - 2rem);
+    max-width: 1100px;
+    margin: 1rem auto;
+    height: calc(100vh - 2rem);
+    display: flex;
+    align-items: stretch;
+}
+
+#addActivityModal .modal-content {
+    width: 100%;
+    height: 100%;
+    max-height: 100%;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    min-height: 0;
+}
+
+/* Header stays fixed */
+#addActivityModal .modal-header {
+    flex: 0 0 auto;
+}
+
+/* Form must fill available modal height */
+#addActivityModal #schedulerActivityForm {
+    display: flex;
+    flex-direction: column;
+    flex: 1 1 auto;
+    min-height: 0;
+    overflow: hidden;
+}
+
+/* Only this section scrolls */
+#addActivityModal .scheduler-modal-body {
+    flex: 1 1 auto;
+    min-height: 0;
+    height: 0;
+    overflow-y: scroll;
+    overflow-x: hidden;
+    overscroll-behavior-y: contain;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-gutter: stable;
+    padding: 20px;
+}
+
+/* Footer stays fixed */
+#addActivityModal .modal-footer {
+    flex: 0 0 auto;
+    background: #fff;
+    position: relative;
+    z-index: 2;
+}
+
+/* Hide inactive form correctly */
+#generalActivityForm[hidden],
+#placementDriveForm[hidden] {
+    display: none !important;
+}
+
+#generalActivityForm,
+#placementDriveForm {
+    width: 100%;
+    min-width: 0;
+    margin: 0;
+}
+
+/* Visible scrollbar */
+#addActivityModal .scheduler-modal-body::-webkit-scrollbar {
+    width: 9px;
+}
+
+#addActivityModal .scheduler-modal-body::-webkit-scrollbar-track {
+    background: #f1f3f5;
+    border-radius: 8px;
+}
+
+#addActivityModal .scheduler-modal-body::-webkit-scrollbar-thumb {
+    background: #adb5bd;
+    border-radius: 8px;
+}
+
+#addActivityModal .scheduler-modal-body::-webkit-scrollbar-thumb:hover {
+    background: #6c757d;
+}
+
+@@media (max-width: 767px) {
+    #addActivityModal .modal-dialog {
+        width: calc(100% - 1rem);
+        height: calc(100dvh - 1rem);
+        margin: .5rem auto;
+    }
+
+    #addActivityModal .scheduler-modal-body {
+        padding: 12px;
+    }
+
+    .activity-type-options {
+        grid-template-columns: 1fr;
+    }
+
+    .activity-form-section {
+        padding: 12px;
+    }
+}
+
+
+</style>
+
+<div class="tpo-scheduler">
+
+    <!-- PAGE HEADER -->
+    <div class="scheduler-header">
+        <div>
+            <h2>TPO Scheduler</h2>
+            <p>Plan and manage your activities, meetings, drives and other important events.</p>
+        </div>
+
+       <button type="button"
+        id="btnAddActivity"
+        class="btn-add-activity"
+        data-bs-toggle="modal"
+        data-bs-target="#addActivityModal">
+    <i class="fas fa-plus"></i>
+    Add New Activity
+</button>
+    </div>
+
+    @if (TempData["SchedulerSuccess"] != null)
+{
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+        @TempData["SchedulerSuccess"]
+        <button type="button" class="btn-close"
+                data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+}
+@if (TempData["SchedulerError"] != null)
+{
+    <div class="alert alert-danger alert-dismissible fade show"
+         role="alert">
+        @TempData["SchedulerError"]
+
+        <button type="button"
+                class="btn-close"
+                data-bs-dismiss="alert"
+                aria-label="Close"></button>
+    </div>
+}
+
+@if (!ViewData.ModelState.IsValid)
+{
+    <div asp-validation-summary="All"
+         class="alert alert-danger"
+         role="alert"></div>
+}
+
+    <!-- SUMMARY CARDS -->
+    <div class="scheduler-stats">
+        <div class="scheduler-stat stat-blue">
+            <div class="stat-icon"><i class="fas fa-calendar-check"></i></div>
+            <div>
+                <span>Total Activities</span>
+                <h3 id="totalActivities">5</h3>
+            </div>
+        </div>
+
+        <div class="scheduler-stat stat-green">
+            <div class="stat-icon"><i class="fas fa-clock"></i></div>
+            <div>
+                <span>Upcoming</span>
+                <h3 id="upcomingActivities">3</h3>
+            </div>
+        </div>
+
+        <div class="scheduler-stat stat-yellow">
+            <div class="stat-icon"><i class="fas fa-check-circle"></i></div>
+            <div>
+                <span>Completed</span>
+                <h3 id="completedActivities">1</h3>
+            </div>
+        </div>
+
+        <div class="scheduler-stat stat-red">
+            <div class="stat-icon"><i class="fas fa-times-circle"></i></div>
+            <div>
+                <span>Cancelled</span>
+                <h3 id="cancelledActivities">0</h3>
+            </div>
+        </div>
+    </div>
+
+    <!-- CALENDAR AND ACTIVITY LIST -->
+    <div class="scheduler-content">
+
+        <section class="scheduler-panel calendar-panel">
+            <div class="calendar-header">
+                <div class="calendar-month-heading">
+                    <h4 id="calendarMonthYear"></h4>
+
+                    <div class="calendar-navigation">
+                        <button type="button" id="previousMonth" aria-label="Previous period">
+                            <i class="fas fa-chevron-left"></i>
+                        </button>
+                        <button type="button" id="nextMonth" aria-label="Next period">
+                            <i class="fas fa-chevron-right"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="calendar-toolbar">
+                    <button type="button" id="todayButton" class="calendar-today">
+                        Today
+                    </button>
+
+                    <div class="calendar-view-switch">
+                        <button type="button" class="calendar-view-btn active" data-view="month">Month</button>
+                        <button type="button" class="calendar-view-btn" data-view="week">Week</button>
+                        <button type="button" class="calendar-view-btn" data-view="day">Day</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="calendar-grid-wrapper">
+                <div class="calendar-weekdays">
+                    <div>Sun</div><div>Mon</div><div>Tue</div>
+                    <div>Wed</div><div>Thu</div><div>Fri</div><div>Sat</div>
+                </div>
+                <div id="calendarGrid" class="calendar-grid"></div>
+            </div>
+
+            <div class="calendar-legend">
+                <span><i class="legend-dot legend-blue"></i> Upcoming</span>
+                <span><i class="legend-dot legend-green"></i> Completed</span>
+                <span><i class="legend-dot legend-orange"></i> Pending</span>
+            </div>
+
+            <div id="selectedDateInfo" class="selected-date-info" aria-live="polite">
+                Select a date to view activities.
+            </div>
+        </section>
+
+        <section class="scheduler-panel activities-panel">
+            <div class="activities-header">
+                <div>
+                    <h4>Scheduled Activities</h4>
+                    <p>Keep track of your scheduled events</p>
+                </div>
+                <a href="#" id="viewAllActivities" class="view-all-link">
+                    View All <i class="fas fa-arrow-right"></i>
+                </a>
+            </div>
+
+            <div id="activityList" class="activity-list"></div>
+
+            <div id="emptyActivities" class="empty-activities" hidden>
+                <i class="far fa-calendar-times"></i>
+                <p>No activities found for this date.</p>
+            </div>
+        </section>
+
+    </div>
+</div>
+
+<!-- ADD ACTIVITY MODAL -->
+<div class="modal fade"
+     id="addActivityModal"
+     tabindex="-1"
+     aria-labelledby="addActivityModalLabel"
+     aria-hidden="true">
+
+    <div class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable">
+        <div class="modal-content scheduler-modal">
+
+            <div class="modal-header scheduler-modal-header">
+                <div>
+                    <h5 class="modal-title" id="addActivityModalLabel">
+                        <i class="fas fa-calendar-plus me-2"></i>
+                        Create Scheduler Activity
+                    </h5>
+                    <p class="mb-0">Choose an activity type and fill in the details.</p>
+                </div>
+
+                <button type="button"
+                        class="btn-close btn-close-white"
+                        data-bs-dismiss="modal"
+                        aria-label="Close"></button>
+            </div>
+
+            <form id="schedulerActivityForm"
+      asp-controller="TPO"
+      asp-action="Scheduler"
+      method="post">
+                @Html.AntiForgeryToken()
+                <input type="hidden"
+       name="Placement.PlacementDriveID"
+       id="placementDriveId"
+       value="0" />
+
+                <div class="modal-body scheduler-modal-body">
+
+                    <div class="scheduler-form-error alert alert-danger"
+                         id="schedulerFormError"
+                         role="alert"></div>
+
+                    <!-- ACTIVITY TYPE -->
+                    <div class="activity-type-selector">
+                        <label class="form-label fw-semibold">
+                            Select Activity Type
+                        </label>
+
+                        <div class="activity-type-options">
+                            <label class="activity-type-option active" for="generalActivityRadio">
+                                <input type="radio"
+                                       name="ActivityType"
+                                       id="generalActivityRadio"
+                                       value="General"
+                                       checked />
+
+                                <span class="activity-type-icon general-icon">
+                                    <i class="fas fa-calendar-alt"></i>
+                                </span>
+
+                                <span>
+                                    <strong>General Activity</strong>
+                                    <small>Meetings, training, events and reminders</small>
+                                </span>
+
+                                <i class="fas fa-check-circle type-check"></i>
+                            </label>
+
+                            <label class="activity-type-option" for="placementDriveRadio">
+                                <input type="radio"
+                                       name="ActivityType"
+                                       id="placementDriveRadio"
+                                       value="PlacementDrive" />
+
+                                <span class="activity-type-icon placement-icon">
+                                    <i class="fas fa-briefcase"></i>
+                                </span>
+
+                                <span>
+                                    <strong>Placement Drive</strong>
+                                    <small>Company, job and eligibility details</small>
+                                </span>
+
+                                <i class="fas fa-check-circle type-check"></i>
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- GENERAL ACTIVITY -->
+                    <fieldset id="generalActivityForm" class="activity-form-section">
+                        <div class="activity-section-heading">
+                            <span class="section-heading-icon general-icon">
+                                <i class="fas fa-calendar-check"></i>
+                            </span>
+                            <div>
+                                <h6>General Activity Details</h6>
+                                <p>Enter activity information and schedule.</p>
+                            </div>
+                        </div>
+
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label class="form-label">Activity Title *</label>
+                                <input type="text" name="General.Title" class="form-control"
+                                       maxlength="200" required
+                                       placeholder="e.g. TPO Staff Meeting" />
+                            </div>
+
+                            <div class="col-md-6">
+                                <label class="form-label">Category *</label>
+                                <select name="General.Category" class="form-select" required>
+                                    <option value="">Select Category</option>
+                                    <option value="General">General</option>
+                                    <option value="TrainingAndDevelopment">Training &amp; Development</option>
+                                    <option value="Meeting">Meeting</option>
+                                    <option value="CollegeEvent">College Event</option>
+                                    <option value="Other">Other</option>
+                                </select>
+                            </div>
+
+                            <div class="col-12">
+                                <label class="form-label">Description *</label>
+                                <textarea name="General.Description" class="form-control"
+                                          rows="3" required
+                                          placeholder="Describe the activity..."></textarea>
+                            </div>
+
+                            <div class="col-12">
+                                <div class="form-section-label">
+                                    <i class="far fa-clock me-2"></i>Date and Time
+                                </div>
+                            </div>
+
+                            <div class="col-md-6">
+                                <label class="form-label">Start Date *</label>
+                                <input type="date" name="General.StartDate"
+                                       class="form-control" required />
+                            </div>
+
+                            <div class="col-md-6">
+                                <label class="form-label">End Date *</label>
+                                <input type="date" name="General.EndDate"
+                                       class="form-control" required />
+                            </div>
+
+                            <div class="col-md-6">
+                                <label class="form-label">Start Time *</label>
+                                <input type="time" name="General.StartTime"
+                                       class="form-control" required />
+                            </div>
+
+                            <div class="col-md-6">
+                                <label class="form-label">End Time *</label>
+                                <input type="time" name="General.EndTime"
+                                       class="form-control" required />
+                            </div>
+
+                            <div class="col-12">
+                                <label class="form-label">Venue / Location</label>
+                                <input type="text" name="General.Location"
+                                       class="form-control"
+                                       placeholder="Conference Room / Lab 2" />
+                            </div>
+
+                            <div class="col-12">
+                                <div class="form-section-label">
+                                    <i class="fas fa-users me-2"></i>Visibility and Participants
+                                </div>
+                            </div>
+
+                            <div class="col-md-6">
+                                <label class="form-label">Participants *</label>
+                                <select name="General.Participants" class="form-select" required>
+                                    <option value="">Select Participants</option>
+                                    <option value="Students">Students</option>
+                                    <option value="Staff">Staff</option>
+                                    <option value="Everyone">Everyone</option>
+                                </select>
+                            </div>
+
+                            <div class="col-md-6">
+                                <label class="form-label">Reminder Before Activity</label>
+                                <select name="General.Reminder" class="form-select">
+                                    <option value="None">No Reminder</option>
+                                    <option value="15">15 minutes before</option>
+                                    <option value="30">30 minutes before</option>
+                                    <option value="60">1 hour before</option>
+                                    <option value="1440">1 day before</option>
+                                    <option value="10080">1 week before</option>
+                                </select>
+                            </div>
+
+                            <div class="col-md-6">
+                                <label class="form-label">Reminder Channel</label>
+                                <select name="General.ReminderChannel" class="form-select">
+                                    <option value="InApp">In-app notification</option>
+                                    <option value="Email">Email</option>
+                                    <option value="Both">Email and in-app</option>
+                                </select>
+                            </div>
+
+                            <div class="col-md-6">
+                                <label class="form-label">Activity Status</label>
+                                <select name="General.Status" class="form-select">
+                                    <option value="Upcoming">Upcoming</option>
+                                    <option value="Pending">Pending</option>
+                                </select>
+                            </div>
+                        </div>
+                    </fieldset>
+
+                    <!-- PLACEMENT DRIVE -->
+             <fieldset id="placementDriveForm"
+          class="activity-form-section"
+          hidden
+          disabled>
+
+                        <div class="activity-section-heading">
+                            <span class="section-heading-icon placement-icon">
+                                <i class="fas fa-building"></i>
+                            </span>
+                            <div>
+                                <h6>Placement Drive Details</h6>
+                                <p>Enter company, job, eligibility and recruitment information.</p>
+                            </div>
+                        </div>
+
+                        <div class="row g-3">
+                            <div class="col-12">
+                                <div class="form-section-label">
+                                    <i class="fas fa-building me-2"></i>Company and Job Details
+                                </div>
+                            </div>
+
+                            <div class="col-md-6">
+                                <label class="form-label">Company Name *</label>
+                                <input type="text" name="Placement.CompanyName"
+                                       class="form-control" maxlength="200" required />
+                            </div>
+
+                            <div class="col-md-6">
+                                <label class="form-label">Job Position *</label>
+                                <input type="text" name="Placement.JobPosition"
+                                       class="form-control" required
+                                       placeholder="e.g. Software Developer" />
+                            </div>
+
+                            <div class="col-md-6">
+                                <label class="form-label">Job Type *</label>
+                                <select name="Placement.JobType" class="form-select" required>
+                                    <option value="">Select Job Type</option>
+                                    <option value="FullTime">Full Time</option>
+                                    <option value="PartTime">Part Time</option>
+                                    <option value="Internship">Internship</option>
+                                    <option value="Contract">Contract</option>
+                                </select>
+                            </div>
+
+                            <div class="col-md-6">
+                                <label class="form-label">Salary / Stipend</label>
+                                <input type="text" name="Placement.Salary"
+                                       class="form-control"
+                                       placeholder="e.g. ₹4 LPA or ₹15,000/month" />
+                            </div>
+
+                            <div class="col-md-6">
+                                <label class="form-label">Job Location *</label>
+                                <input type="text" name="Placement.JobLocation"
+                                       class="form-control" required
+                                       placeholder="City / Work from home" />
+                            </div>
+
+                            <div class="col-md-6">
+                                <label class="form-label">Required Skills</label>
+                                <input type="text" name="Placement.RequiredSkills"
+                                       class="form-control"
+                                       placeholder="C#, SQL, ASP.NET Core" />
+                            </div>
+
+                            <div class="col-12">
+                                <label class="form-label">Job Description *</label>
+                                <textarea name="Placement.JobDescription"
+                                          class="form-control" rows="3" required></textarea>
+                            </div>
+
+                            <!-- ELIGIBILITY CRITERIA --> <div class="col-12"> <div class="form-section-label"> <i class="fas fa-user-check me-2"></i> Eligibility Criteria </div> </div> <div class="col-md-4"> <label class="form-label">10th Minimum Percentage (%)</label> <input type="number" name="Placement.TenthPercentage" class="form-control" min="0" max="100" step="0.01" placeholder="e.g. 60" /> </div> <div class="col-md-4"> <label class="form-label">12th Minimum Percentage (%)</label> <input type="number" name="Placement.TwelfthPercentage" class="form-control" min="0" max="100" step="0.01" placeholder="e.g. 60" /> </div> <div class="col-md-4"> <label class="form-label">Graduation Minimum Percentage (%)</label> <input type="number" name="Placement.MinimumPercentage" class="form-control" min="0" max="100" step="0.01" placeholder="e.g. 65" /> </div> <div class="col-md-6"> <label class="form-label">Eligible Course</label> <input type="text" name="Placement.EligibleCourse" class="form-control" placeholder="e.g. B.E., B.Tech, MCA" /> </div> <div class="col-md-6"> <label class="form-label">Graduation Year</label> <input type="number" name="Placement.GraduationYear" class="form-control" min="2000" max="2100" placeholder="e.g. 2027" /> </div> <div class="col-12"> <label class="form-label">Other Eligibility Requirements</label> <textarea name="Placement.EligibilityCriteria" class="form-control" rows="2" placeholder="e.g. No active backlogs, eligible branches, etc."></textarea> </div>
+
+                            <div class="col-12">
+                                <div class="form-section-label">
+                                    <i class="far fa-calendar-alt me-2"></i>Drive Schedule
+                                </div>
+                            </div>
+
+                            <div class="col-md-6">
+                                <label class="form-label">Drive Start Date *</label>
+                                <input type="date" name="Placement.StartDate"
+                                       class="form-control" required />
+                            </div>
+
+                            <div class="col-md-6">
+                                <label class="form-label">Drive End Date *</label>
+                                <input type="date" name="Placement.EndDate"
+                                       class="form-control" required />
+                            </div>
+
+                            <div class="col-md-6">
+                                <label class="form-label">Start Time</label>
+                                <input type="time" name="Placement.StartTime"
+                                       class="form-control" />
+                            </div>
+
+                            <div class="col-md-6">
+                                <label class="form-label">End Time</label>
+                                <input type="time" name="Placement.EndTime"
+                                       class="form-control" />
+                            </div>
+
+                            <div class="col-md-6">
+                                <label class="form-label">Drive Venue</label>
+                                <input type="text" name="Placement.Venue"
+                                       class="form-control"
+                                       placeholder="Campus / Online / Company office" />
+                            </div>
+
+                            <div class="col-md-6">
+                                <label class="form-label">Company Contact Person</label>
+                                <input type="text" name="Placement.ContactPerson"
+                                       class="form-control" />
+                            </div>
+
+                            <div class="col-md-6">
+                                <label class="form-label">Contact Email</label>
+                                <input type="email" name="Placement.ContactEmail"
+                                       class="form-control" />
+                            </div>
+
+                            <div class="col-md-6">
+                                <label class="form-label">Contact Phone</label>
+                                <input type="tel" name="Placement.ContactPhone"
+                                       class="form-control" />
+                            </div>
+
+                            <div class="col-12">
+                                <div class="form-section-label">
+                                    <i class="fas fa-bullhorn me-2"></i>Participants and Publication
+                                </div>
+                            </div>
+
+                            <div class="col-md-6">
+                                <label class="form-label">Eligible Participants</label>
+                                <select name="Placement.Participants" class="form-select">
+                                    <option value="EligibleStudents">Eligible Students</option>
+                                    <option value="Students">All Students</option>
+                                </select>
+                            </div>
+
+                            <div class="col-md-6">
+                                <label class="form-label">Publication Status</label>
+                                <select name="Placement.PublicationStatus" class="form-select">
+                                    <option value="Draft">Save as Draft</option>
+                                    <option value="Published">Publish Drive</option>
+                                </select>
+                            </div>
+
+                            <div class="col-12">
+                                <label class="form-label">Additional Instructions</label>
+                                <textarea name="Placement.Instructions"
+                                          class="form-control" rows="2"></textarea>
+                            </div>
+                        </div>
+                    </fieldset>
+                </div>
+
+                <div class="modal-footer scheduler-modal-footer">
+                    <button type="button" class="btn btn-light border"
+                            data-bs-dismiss="modal">
+                        Cancel
+                    </button>
+
+                    <button type="submit" class="btn btn-primary px-4">
+                        <i class="fas fa-save me-2"></i>
+                        <span id="activitySubmitText">Save Activity</span>
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+    "use strict";
+
+    // =========================================================
+    // MODAL AND FORM ELEMENTS
+    // =========================================================
+    const modalElement = document.getElementById("addActivityModal");
+    const activityForm = document.getElementById("schedulerActivityForm");
+
+    const generalRadio = document.getElementById("generalActivityRadio");
+    const placementRadio = document.getElementById("placementDriveRadio");
+
+    const generalForm = document.getElementById("generalActivityForm");
+    const placementForm = document.getElementById("placementDriveForm");
+
+    const submitText = document.getElementById("activitySubmitText");
+    const formError = document.getElementById("schedulerFormError");
+
+    const calendarGrid = document.getElementById("calendarGrid");
+    const monthYear = document.getElementById("calendarMonthYear");
+    const selectedDateInfo = document.getElementById("selectedDateInfo");
+    const activityList = document.getElementById("activityList");
+    const emptyActivities = document.getElementById("emptyActivities");
+
+    if (!modalElement || !activityForm ||
+        !generalRadio || !placementRadio ||
+        !generalForm || !placementForm) {
+        console.error("Scheduler modal markup is incomplete. Check the element IDs.");
+        return;
+    }
+
+    // =========================================================
+    // SWITCH BETWEEN GENERAL ACTIVITY AND PLACEMENT DRIVE
+    // =========================================================
+    
+function updateActivityType(resetScroll = true) {
+    const isGeneral = generalRadio.checked;
+
+    // General Activity
+    generalForm.hidden = !isGeneral;
+    generalForm.disabled = !isGeneral;
+
+    // Placement Drive
+    placementForm.hidden = isGeneral;
+    placementForm.disabled = isGeneral;
+
+    // Update selected card styling
+    const generalOption =
+        generalRadio.closest(".activity-type-option");
+
+    const placementOption =
+        placementRadio.closest(".activity-type-option");
+
+    if (generalOption) {
+        generalOption.classList.toggle("active", isGeneral);
+    }
+
+    if (placementOption) {
+        placementOption.classList.toggle("active", !isGeneral);
+    }
+
+    // Update submit button text
+    if (submitText) {
+        submitText.textContent = isGeneral
+            ? "Save Activity"
+            : "Save Placement Drive";
+    }
+
+    // Clear form error
+    if (formError) {
+        formError.style.display = "none";
+        formError.textContent = "";
+    }
+
+    // Reset scroll position
+    if (resetScroll) {
+        const body =
+            modalElement.querySelector(".scheduler-modal-body");
+
+        if (body) {
+            body.scrollTop = 0;
+        }
+    }
+}
+
+// Switch immediately when the radio button changes
+generalRadio.addEventListener("change", function () {
+    updateActivityType(true);
+});
+
+placementRadio.addEventListener("change", function () {
+    updateActivityType(true);
+});
+
+// Initialize the selected form
+updateActivityType(false);
+
+    // =========================================================
+    // CALENDAR DATA (DEMO ONLY)
+    // =========================================================
+    if (!calendarGrid || !monthYear || !activityList ||
+        !selectedDateInfo || !emptyActivities) {
+        console.error("Scheduler calendar elements are missing.");
+        return;
+    }
+
+    
+const generalActivitiesFromDb =
+    @Html.Raw(System.Text.Json.JsonSerializer.Serialize(
+        ViewBag.GeneralActivities ?? new object[0]));
+
+const placementDrivesFromDb =
+    @Html.Raw(System.Text.Json.JsonSerializer.Serialize(
+        ViewBag.PlacementDrives ?? new object[0]));
+
+const generalActivities = generalActivitiesFromDb.map(a => ({
+    title: a.Title,
+    category: a.Category || "General",
+    date: String(a.StartDate).substring(0, 10),
+    endDate: String(a.EndDate).substring(0, 10),
+    time: a.StartTime ? String(a.StartTime).substring(0, 5) : "",
+    location: a.Location || "",
+    status: a.Status || "Upcoming"
+}));
+
+
+const placementActivities = placementDrivesFromDb
+    .filter(p => p.PublicationStatus === "Published")
+    .map(p => ({
+        id: p.PlacementDriveID,
+        title: (p.CompanyName || "Company") + " - " +
+               (p.JobPosition || "Placement Drive"),
+        category: "Placement",
+        date: String(p.StartDate).substring(0, 10),
+        endDate: String(p.EndDate).substring(0, 10),
+        time: p.StartTime
+            ? String(p.StartTime).substring(0, 5)
+            : "",
+        location: p.Venue || p.JobLocation || "",
+        status: "Upcoming",
+        isPlacement: true
+    }));
+
+const activities = [
+    ...generalActivities,
+    ...placementActivities
+];
+
+
+function editPlacementDrive(id) {
+    const drive = placementDrivesFromDb.find(
+        p => Number(p.PlacementDriveID) === Number(id)
+    );
+
+    if (!drive) {
+        alert("Placement drive not found.");
+        return;
+    }
+
+    // Select Placement Drive form
+    const placementRadio = document.querySelector(
+        'input[name="ActivityType"][value="PlacementDrive"]'
+    );
+
+    if (placementRadio) {
+        placementRadio.checked = true;
+        placementRadio.dispatchEvent(new Event("change", {
+            bubbles: true
+        }));
+    }
+
+    // Set the existing database ID for UPDATE
+    document.getElementById("placementDriveId").value =
+        drive.PlacementDriveID;
+
+    // Fill placement drive fields
+    const fields = [
+        "CompanyName",
+        "JobPosition",
+        "JobType",
+        "Salary",
+        "JobLocation",
+        "RequiredSkills",
+        "JobDescription",
+        "TenthPercentage",
+        "TwelfthPercentage",
+        "MinimumPercentage",
+        "EligibleCourse",
+        "GraduationYear",
+        "EligibilityCriteria",
+        "StartDate",
+        "EndDate",
+        "StartTime",
+        "EndTime",
+        "Venue",
+        "ContactPerson",
+        "ContactEmail",
+        "ContactPhone",
+        "Participants",
+        "PublicationStatus",
+        "Instructions"
+    ];
+
+    fields.forEach(field => {
+        const input = document.querySelector(
+            '[name="Placement.' + field + '"]'
+        );
+
+        if (!input) return;
+
+        let value = drive[field];
+
+        if (value === null || value === undefined) {
+            value = "";
+        }
+
+        // Format date/time values for HTML inputs
+        if (input.type === "date" && value) {
+            value = String(value).substring(0, 10);
+        } else if (input.type === "time" && value) {
+            value = String(value).substring(0, 5);
+        }
+
+        input.value = value;
+    });
+
+    // Update modal title and submit button
+    const modalElement = document.getElementById("addActivityModal");
+    const modalTitle = modalElement.querySelector(".modal-title");
+    const submitButton = modalElement.querySelector(
+        'button[type="submit"]'
+    );
+
+    if (modalTitle) {
+        modalTitle.textContent = "Edit Placement Drive";
+    }
+
+    if (submitButton) {
+        submitButton.textContent = "Update Placement Drive";
+    }
+
+    bootstrap.Modal.getOrCreateInstance(modalElement).show();
+}
+
+
+function deletePlacementDrive(id, title) {
+    const confirmed = confirm(
+        'Are you sure you want to delete "' + title + '"?'
+    );
+
+    if (!confirmed) return;
+
+    // Create a secure POST form with the anti-forgery token
+    const tokenInput = document.querySelector(
+        '#schedulerActivityForm input[name="__RequestVerificationToken"]'
+    );
+
+    if (!tokenInput) {
+        alert("Security token not found. Please refresh the page.");
+        return;
+    }
+
+    const form = document.createElement("form");
+    form.method = "POST";
+    form.action = '@Url.Action("DeletePlacementDrive", "TPO")';
+    form.style.display = "none";
+
+    const idInput = document.createElement("input");
+    idInput.type = "hidden";
+    idInput.name = "id";
+    idInput.value = id;
+
+    const antiForgeryInput = document.createElement("input");
+    antiForgeryInput.type = "hidden";
+    antiForgeryInput.name = "__RequestVerificationToken";
+    antiForgeryInput.value = tokenInput.value;
+
+    form.append(idInput, antiForgeryInput);
+    document.body.appendChild(form);
+    form.submit();
+}
+
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    let currentMonth = new Date(today.getFullYear(), today.getMonth(), 1);
+    let selectedDate = toDateKey(today);
+    let currentView = "month";
+    let showAllActivities = false;
+
+    const monthNames = [
+        "January", "February", "March", "April",
+        "May", "June", "July", "August",
+        "September", "October", "November", "December"
+    ];
+
+    function toDateKey(date) {
+        return date.getFullYear() + "-" +
+            String(date.getMonth() + 1).padStart(2, "0") + "-" +
+            String(date.getDate()).padStart(2, "0");
+    }
+
+    function parseDate(dateKey) {
+        return new Date(dateKey + "T00:00:00");
+    }
+
+    function formatDate(dateKey) {
+        return parseDate(dateKey).toLocaleDateString("en-IN", {
+            day: "2-digit",
+            month: "short",
+            year: "numeric"
+        });
+    }
+
+    function formatTime(time) {
+        if (!time) return "Time not specified";
+
+        const parts = time.split(":");
+        let hour = Number(parts[0]);
+        const minute = parts[1] || "00";
+        const suffix = hour >= 12 ? "PM" : "AM";
+
+        hour = hour % 12 || 12;
+        return hour + ":" + minute + " " + suffix;
+    }
+
+    function getActivityForDate(dateKey) {
+        return activities.filter(item => {
+            if (item.endDate) {
+                return dateKey >= item.date && dateKey <= item.endDate;
+            }
+            return item.date === dateKey;
+        });
+    }
+
+    function getMarkerClass(activity) {
+        if (activity.status === "Completed") return "marker-green";
+        if (activity.status === "Pending") return "marker-orange";
+        return "marker-blue";
+    }
+
+    function getCategoryClass(category) {
+        switch (category) {
+            case "Placement": return "category-blue";
+            case "Training":
+            case "TrainingAndDevelopment": return "category-purple";
+            case "Meeting": return "category-orange";
+            case "College Event":
+            case "CollegeEvent": return "category-pink";
+            default: return "category-green";
+        }
+    }
+
+    function getStatusClass(status) {
+        switch (status) {
+            case "Completed": return "status-completed";
+            case "Pending": return "status-pending";
+            case "Cancelled": return "status-cancelled";
+            default: return "status-upcoming";
+        }
+    }
+
+   
+function renderActivityList(items) {
+    activityList.innerHTML = "";
+
+    items.forEach(activity => {
+        const item = document.createElement("article");
+        item.className = "activity-item";
+        item.dataset.date = activity.date;
+        item.dataset.status = activity.status;
+
+        const category = document.createElement("div");
+        category.className =
+            "activity-category " + getCategoryClass(activity.category);
+        category.textContent = activity.category;
+
+        const details = document.createElement("div");
+        details.className = "activity-details";
+
+        const title = document.createElement("h5");
+        title.textContent = activity.title;
+
+        const meta = document.createElement("div");
+        meta.className = "activity-meta";
+
+        [
+            formatDate(activity.date),
+            formatTime(activity.time),
+            activity.location || "Location not specified"
+        ].forEach(value => {
+            const span = document.createElement("span");
+            span.textContent = value;
+            meta.appendChild(span);
+        });
+
+        details.append(title, meta);
+
+        const status = document.createElement("span");
+        status.className =
+            "activity-status " + getStatusClass(activity.status);
+        status.textContent = activity.status;
+
+        item.append(category, details, status);
+
+        // EDIT AND DELETE BUTTONS FOR PLACEMENT DRIVES ONLY
+        if (activity.isPlacement === true) {
+            const actions = document.createElement("div");
+            actions.className = "activity-actions";
+
+            const editButton = document.createElement("button");
+            editButton.type = "button";
+            editButton.className = "btn btn-sm btn-outline-primary";
+            editButton.innerHTML =
+                '<i class="fas fa-edit"></i> Edit';
+            editButton.title = "Edit placement drive";
+
+            editButton.addEventListener("click", function () {
+                editPlacementDrive(activity.id);
+            });
+
+            const deleteButton = document.createElement("button");
+            deleteButton.type = "button";
+            deleteButton.className = "btn btn-sm btn-outline-danger";
+            deleteButton.innerHTML =
+                '<i class="fas fa-trash-alt"></i> Delete';
+            deleteButton.title = "Delete placement drive";
+
+            deleteButton.addEventListener("click", function () {
+                deletePlacementDrive(activity.id, activity.title);
+            });
+
+            actions.append(editButton, deleteButton);
+            item.appendChild(actions);
+        }
+
+        activityList.appendChild(item);
+    });
+
+    emptyActivities.hidden = items.length !== 0;
+    activityList.hidden = items.length === 0;
+}
+
+
+document.getElementById("btnAddActivity")
+    .addEventListener("click", function () {
+
+        const form = document.getElementById("schedulerActivityForm");
+        const modalElement = document.getElementById("addActivityModal");
+
+        // Reset form for a new activity
+        form.reset();
+
+        // Reset placement drive ID: 0 means INSERT
+        document.getElementById("placementDriveId").value = "0";
+
+        // Select General activity by default
+        const generalRadio = document.querySelector(
+            'input[name="ActivityType"][value="General"]'
+        );
+
+        if (generalRadio) {
+            generalRadio.checked = true;
+            generalRadio.dispatchEvent(new Event("change", {
+                bubbles: true
+            }));
+        }
+
+        // Restore default modal title and button
+        const modalTitle = modalElement.querySelector(".modal-title");
+        const submitButton = modalElement.querySelector(
+            'button[type="submit"]'
+        );
+
+        if (modalTitle) {
+            modalTitle.textContent = "Create Scheduler Activity";
+        }
+
+        if (submitButton) {
+            submitButton.textContent = "Save Activity";
+        }
+    });
+
+    function showSelectedDateActivities() {
+        const matching = getActivityForDate(selectedDate);
+
+        selectedDateInfo.textContent =
+            "Selected date: " + formatDate(selectedDate) + ". " +
+            matching.length + " activity/activities scheduled.";
+
+        renderActivityList(showAllActivities ? activities : matching);
+    }
+
+    function renderCalendar() {
+        calendarGrid.innerHTML = "";
+        calendarGrid.className = "calendar-grid";
+
+        if (currentView === "week") calendarGrid.classList.add("week-mode");
+        if (currentView === "day") calendarGrid.classList.add("day-mode");
+
+        monthYear.textContent =
+            monthNames[currentMonth.getMonth()] + " " + currentMonth.getFullYear();
+
+        document.querySelectorAll(".calendar-view-btn").forEach(button => {
+            button.classList.toggle("active", button.dataset.view === currentView);
+        });
+
+        let startDate;
+
+        if (currentView === "day") {
+            startDate = parseDate(selectedDate);
+        } else if (currentView === "week") {
+            startDate = parseDate(selectedDate);
+            startDate.setDate(startDate.getDate() - startDate.getDay());
+        } else {
+            startDate = new Date(
+                currentMonth.getFullYear(),
+                currentMonth.getMonth(),
+                1
+            );
+            startDate.setDate(startDate.getDate() - startDate.getDay());
+        }
+
+        const dayCount = currentView === "day"
+            ? 1
+            : currentView === "week" ? 7 : 42;
+
+        for (let i = 0; i < dayCount; i++) {
+            const date = new Date(startDate);
+            date.setDate(startDate.getDate() + i);
+
+            const dateKey = toDateKey(date);
+            const dayActivities = getActivityForDate(dateKey);
+
+            const cell = document.createElement("button");
+            cell.type = "button";
+            cell.className = "calendar-day";
+            cell.setAttribute("aria-label", formatDate(dateKey));
+
+            if (currentView === "month" &&
+                date.getMonth() !== currentMonth.getMonth()) {
+                cell.classList.add("other-month");
+            }
+
+            if (dateKey === toDateKey(today)) cell.classList.add("today");
+            if (dateKey === selectedDate) cell.classList.add("selected");
+
+            const dayNumber = document.createElement("span");
+            dayNumber.className = "day-number";
+            dayNumber.textContent = date.getDate();
+            cell.appendChild(dayNumber);
+
+            if (dayActivities.length) {
+                const markers = document.createElement("span");
+                markers.className = "day-markers";
+
+                dayActivities.slice(0, 3).forEach(activity => {
+                    const marker = document.createElement("span");
+                    marker.className =
+                        "day-marker " + getMarkerClass(activity);
+                    markers.appendChild(marker);
+                });
+
+                cell.appendChild(markers);
+            }
+
+            cell.addEventListener("click", function () {
+                selectedDate = dateKey;
+                currentMonth = new Date(date.getFullYear(), date.getMonth(), 1);
+                showAllActivities = false;
+                renderCalendar();
+            });
+
+            calendarGrid.appendChild(cell);
+        }
+
+        showSelectedDateActivities();
+        updateSummaryCards();
+    }
+
+    function updateSummaryCards() {
+        const total = activities.length;
+        const upcoming = activities.filter(x => x.status === "Upcoming").length;
+        const completed = activities.filter(x => x.status === "Completed").length;
+        const cancelled = activities.filter(x => x.status === "Cancelled").length;
+
+        document.getElementById("totalActivities").textContent = total;
+        document.getElementById("upcomingActivities").textContent = upcoming;
+        document.getElementById("completedActivities").textContent = completed;
+        document.getElementById("cancelledActivities").textContent = cancelled;
+    }
+
+    function changePeriod(direction) {
+        showAllActivities = false;
+
+        if (currentView === "day" || currentView === "week") {
+            const date = parseDate(selectedDate);
+            date.setDate(date.getDate() +
+                direction * (currentView === "week" ? 7 : 1));
+
+            selectedDate = toDateKey(date);
+            currentMonth = new Date(date.getFullYear(), date.getMonth(), 1);
+        } else {
+            currentMonth.setMonth(currentMonth.getMonth() + direction);
+        }
+
+        renderCalendar();
+    }
+
+    document.getElementById("previousMonth")
+        ?.addEventListener("click", () => changePeriod(-1));
+
+    document.getElementById("nextMonth")
+        ?.addEventListener("click", () => changePeriod(1));
+
+    document.getElementById("todayButton")
+        ?.addEventListener("click", function () {
+            selectedDate = toDateKey(today);
+            currentMonth = new Date(today.getFullYear(), today.getMonth(), 1);
+            showAllActivities = false;
+            renderCalendar();
+        });
+
+    document.querySelectorAll(".calendar-view-btn").forEach(button => {
+        button.addEventListener("click", function () {
+            currentView = this.dataset.view;
+            renderCalendar();
+        });
+    });
+
+   document.getElementById("viewAllActivities")
+    ?.addEventListener("click", function (event) {
+        event.preventDefault();
+
+        showAllActivities = true;
+        renderActivityList(activities);
+
+        selectedDateInfo.textContent =
+            "Showing all " + activities.length + " demo activities.";
+    });
+
+// Initial calendar display.
+renderCalendar();
+
+}); // IMPORTANT: closes DOMContentLoaded
+
+</script>
+}

@@ -16,6 +16,11 @@ builder.Services.AddScoped<DbConnection>();
 builder.Services.AddScoped<AccountRepository>();
 builder.Services.AddScoped<CandidateProfileRepository>();
 
+// shrirang 09/10/26
+builder.Services.AddScoped<ErJobPortal.Data.DbConnection>();
+builder.Services.AddScoped<ErJobPortal.Repositories.TPOSchedulerRepository>();
+//end
+
 // Register HttpClientFactory
 builder.Services.AddHttpClient();
 

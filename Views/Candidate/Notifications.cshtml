@@ -1,0 +1,526 @@
+﻿@using ErJobPortal.Models
+@model List<CandidateNotificationM>
+
+@{
+    Layout = "~/Views/Shared/_DashboardLayout.cshtml";
+
+    ViewData["Title"] = "Notifications";
+    ViewData["Panel"] = "Candidate";
+
+    ViewData["UserName"] =
+        Context.Session.GetString("CandidateName") ?? "Candidate";
+
+    int unreadCount =
+        ViewBag.UnreadNotificationCount ?? 0;
+}
+
+<style>
+
+    .notification-page {
+        padding: 25px;
+    }
+
+    .notification-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 22px;
+        flex-wrap: wrap;
+        gap: 15px;
+    }
+
+    .notification-title {
+        font-size: 26px;
+        font-weight: 700;
+        color: #1f2937;
+        margin: 0;
+    }
+
+    .notification-subtitle {
+        margin-top: 5px;
+        color: #6b7280;
+        font-size: 14px;
+    }
+
+    .unread-summary {
+        background: #fff;
+        border-radius: 10px;
+        padding: 10px 16px;
+        border: 1px solid #e5e7eb;
+        color: #374151;
+        font-size: 14px;
+    }
+
+    .unread-summary strong {
+        color: #dc2626;
+        font-size: 17px;
+    }
+
+    .notification-list {
+        display: flex;
+        flex-direction: column;
+        gap: 14px;
+    }
+
+    .notification-card {
+        display: block;
+        text-decoration: none;
+        color: inherit;
+        background: #ffffff;
+        border: 1px solid #e5e7eb;
+        border-radius: 12px;
+        padding: 18px 20px;
+        transition: all 0.2s ease;
+        position: relative;
+    }
+
+    .notification-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 18px rgba(0, 0, 0, 0.08);
+        border-color: #cbd5e1;
+        text-decoration: none;
+        color: inherit;
+    }
+
+    .notification-card.unread {
+    background: #f8fbff;
+    border-left: 4px solid #2563eb;
+    box-shadow: 0 2px 8px rgba(37, 99, 235, 0.08);
+}
+
+.notification-card.unread .notification-title-text {
+    font-weight: 800;
+}
+
+    .notification-card.read {
+        opacity: 0.88;
+    }
+
+    .notification-top {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        gap: 15px;
+    }
+
+    .notification-left {
+        display: flex;
+        gap: 13px;
+        min-width: 0;
+    }
+
+    .notification-icon {
+        width: 42px;
+        height: 42px;
+        min-width: 42px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: #eef2ff;
+        color: #4f46e5;
+        font-size: 17px;
+    }
+
+    .notification-card.unread .notification-icon {
+        background: #dbeafe;
+        color: #2563eb;
+    }
+
+    .notification-info {
+        min-width: 0;
+    }
+
+    .notification-title-text {
+        font-size: 17px;
+        font-weight: 700;
+        color: #111827;
+        margin: 0 0 5px 0;
+        word-break: break-word;
+    }
+
+    .notification-card.read .notification-title-text {
+        font-weight: 600;
+    }
+
+    .notification-meta {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        align-items: center;
+        color: #6b7280;
+        font-size: 12px;
+    }
+
+    .notification-type {
+        display: inline-block;
+        padding: 3px 8px;
+        border-radius: 20px;
+        background: #f3f4f6;
+        color: #4b5563;
+        font-weight: 600;
+    }
+
+    .unread-label {
+        display: inline-block;
+        padding: 3px 9px;
+        border-radius: 20px;
+        background: #fee2e2;
+        color: #b91c1c;
+        font-size: 11px;
+        font-weight: 700;
+    }
+
+    .read-label {
+        display: inline-block;
+        padding: 3px 9px;
+        border-radius: 20px;
+        background: #ecfdf5;
+        color: #047857;
+        font-size: 11px;
+        font-weight: 700;
+    }
+
+    .notification-date {
+        white-space: nowrap;
+        color: #6b7280;
+        font-size: 12px;
+    }
+
+    .notification-preview {
+        margin-top: 12px;
+        margin-left: 55px;
+        color: #6b7280;
+        font-size: 14px;
+        line-height: 1.5;
+    }
+
+    .attachment-badge {
+        margin-top: 12px;
+        margin-left: 55px;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        font-size: 12px;
+        color: #2563eb;
+        background: #eff6ff;
+        padding: 5px 9px;
+        border-radius: 6px;
+    }
+
+    .notification-arrow {
+        color: #9ca3af;
+        font-size: 16px;
+        margin-top: 4px;
+    }
+
+    .empty-notification {
+        background: #ffffff;
+        border: 1px solid #e5e7eb;
+        border-radius: 12px;
+        padding: 55px 20px;
+        text-align: center;
+    }
+
+    .empty-notification-icon {
+        width: 70px;
+        height: 70px;
+        margin: 0 auto 15px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: #f3f4f6;
+        color: #9ca3af;
+        font-size: 28px;
+    }
+
+    .empty-notification h4 {
+        margin: 0 0 8px;
+        color: #374151;
+        font-weight: 700;
+    }
+
+    .empty-notification p {
+        margin: 0;
+        color: #9ca3af;
+        font-size: 14px;
+    }
+
+    @@media (max-width: 768px) {
+
+        .notification-page {
+            padding: 15px;
+        }
+
+        .notification-title {
+            font-size: 22px;
+        }
+
+        .notification-card {
+            padding: 15px;
+        }
+
+        .notification-top {
+            gap: 8px;
+        }
+
+        .notification-date {
+            display: none;
+        }
+
+        .notification-preview {
+            margin-left: 0;
+            margin-top: 10px;
+        }
+
+        .attachment-badge {
+            margin-left: 0;
+        }
+
+        .notification-arrow {
+            display: none;
+        }
+
+        .notification-icon {
+            width: 38px;
+            height: 38px;
+            min-width: 38px;
+        }
+
+        .notification-title-text {
+            font-size: 15px;
+        }
+    }
+
+</style>
+
+
+<div class="notification-page">
+
+    <!-- =====================================================
+         HEADER
+    ====================================================== -->
+
+    <div class="notification-header">
+
+        <div>
+
+            <h2 class="notification-title">
+                <i class="fas fa-bell"></i>
+                Notifications
+            </h2>
+
+            <div class="notification-subtitle">
+                Notifications and events sent to you by your college.
+            </div>
+
+        </div>
+
+        <div class="unread-summary">
+
+            <i class="fas fa-envelope"></i>
+
+            Unread:
+            <strong>@unreadCount</strong>
+
+        </div>
+
+    </div>
+
+
+    <!-- =====================================================
+         TEMP DATA MESSAGES
+    ====================================================== -->
+
+    @if (TempData["Success"] != null)
+    {
+        <div class="alert alert-success">
+            @TempData["Success"]
+        </div>
+    }
+
+    @if (TempData["Error"] != null)
+    {
+        <div class="alert alert-danger">
+            @TempData["Error"]
+        </div>
+    }
+
+
+    <!-- =====================================================
+         NOTIFICATION LIST
+    ====================================================== -->
+
+    @if (Model != null && Model.Count > 0)
+    {
+        <div class="notification-list">
+
+            
+            @foreach (var notification in Model)
+            {
+                string preview = notification.Content ?? "";
+
+                preview = System.Text.RegularExpressions.Regex
+                    .Replace(preview, "<.*?>", " ");
+
+                preview = System.Net.WebUtility
+                    .HtmlDecode(preview);
+
+                preview = preview
+                    .Replace("\r", " ")
+                    .Replace("\n", " ")
+                    .Trim();
+
+                if (preview.Length > 160)
+                {
+                    preview =
+                        preview.Substring(0, 160)
+                        + "...";
+                }
+
+                string displayDate = "";
+
+                if (notification.SentDate != DateTime.MinValue)
+                {
+                    displayDate =
+                        notification.SentDate
+                            .ToString("dd MMM yyyy, hh:mm tt");
+                }
+                else if (notification.NotificationDate.HasValue)
+                {
+                    displayDate =
+                        notification.NotificationDate.Value
+                            .ToString("dd MMM yyyy");
+                }
+
+                bool hasAttachment =
+                    !string.IsNullOrWhiteSpace(
+                        notification.Attachment1Path)
+                    ||
+                    !string.IsNullOrWhiteSpace(
+                        notification.Attachment2Path);
+
+                <a asp-controller="Candidate"
+                   asp-action="Notification"
+                   asp-route-id="@notification.NotificationID"
+                   class="notification-card @(notification.IsRead ? "read" : "unread")">
+
+                    <div class="notification-top">
+
+                        <div class="notification-left">
+
+                            <div class="notification-icon">
+
+                                @if (notification.Type
+                                    .Equals(
+                                        "Event",
+                                        StringComparison.OrdinalIgnoreCase))
+                                {
+                                    <i class="fas fa-calendar-alt"></i>
+                                }
+                                else
+                                {
+                                    <i class="fas fa-bell"></i>
+                                }
+
+                            </div>
+
+                            <div class="notification-info">
+
+                                <div class="notification-title-text">
+                                    @notification.Title
+                                </div>
+
+                                <div class="notification-meta">
+
+                                    @if (!string.IsNullOrWhiteSpace(
+                                        notification.Type))
+                                    {
+                                        <span class="notification-type">
+                                            @notification.Type
+                                        </span>
+                                    }
+
+                                    @if (notification.IsRead)
+                                    {
+                                        <span class="read-label">
+                                            <i class="fas fa-check"></i>
+                                            Read
+                                        </span>
+                                    }
+                                    else
+                                    {
+                                        <span class="unread-label">
+                                            <i class="fas fa-circle"></i>
+                                            Unread
+                                        </span>
+                                    }
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                        <div class="notification-date">
+
+                            @displayDate
+
+                            <div class="notification-arrow">
+                                <i class="fas fa-chevron-right"></i>
+                            </div>
+
+                        </div>
+
+                    </div>
+
+
+                    @if (!string.IsNullOrWhiteSpace(preview))
+                    {
+                        <div class="notification-preview">
+                            @preview
+                        </div>
+                    }
+
+
+                    @if (hasAttachment)
+                    {
+                        <div class="attachment-badge">
+
+                            <i class="fas fa-paperclip"></i>
+
+                            Attachment available
+
+                        </div>
+                    }
+
+                </a>
+            }
+
+        </div>
+    }
+    else
+    {
+        <!-- =================================================
+             NO NOTIFICATIONS
+        ================================================== -->
+
+        <div class="empty-notification">
+
+            <div class="empty-notification-icon">
+                <i class="far fa-bell"></i>
+            </div>
+
+            <h4>
+                No Notifications
+            </h4>
+
+            <p>
+                You don't have any notifications at the moment.
+            </p>
+
+        </div>
+    }
+
+</div>

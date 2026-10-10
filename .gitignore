@@ -373,3 +373,4 @@ appsettings.*.json
 
 
 /Controllers/CandidateController.cs
+/Views/SuperAdmin/SATraineeProfileList.cshtml

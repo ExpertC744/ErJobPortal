@@ -119,51 +119,99 @@ namespace ErJobPortal.Controllers
         }
 
         //shrirang 02/10/26
+        //sanidhya 08/10/26
         // ============================================================
         // MAIN RESUME
         // ============================================================
         [HttpGet]
-        public IActionResult Resume(int id)
+        public IActionResult Resume(
+      int id,
+ int? previousCandidateId,
+ int? nextCandidateId,
+ string? resumeSource,
+int? postID,
+int? orgID)
         {
             if (id <= 0)
             {
                 return BadRequest("Invalid Candidate ID.");
             }
 
-            // ============================================================
-            // GET CANDIDATE PROFILE
-            // ============================================================
-
             var profile = _repository.GetProfile(id);
 
             if (profile == null)
             {
-                return NotFound(
-                    $"Candidate profile not found for CandidateID: {id}"
-                );
+                return NotFound("Candidate profile not found.");
             }
 
-            // ============================================================
-            // GET SELECTED RESUME PROFILE
-            // ============================================================
-
             int resumeProfile = profile.Resume_Profile ?? 1;
-
-            // ============================================================
-            // VALIDATE TEMPLATE NUMBER
-            // ============================================================
 
             if (resumeProfile < 1 || resumeProfile > 59)
             {
                 resumeProfile = 1;
             }
 
-            // ============================================================
-            // OPEN SELECTED TEMPLATE
-            // ============================================================
-
             string actionName = resumeProfile switch
             {
+                //1 => "ViewProfileOne",
+                //2 => "ViewProfileTwo",
+                //3 => "ViewProfileThree",
+                //4 => "ViewProfileFour",
+                //5 => "ViewProfileFive",
+                //6 => "ViewProfileSix",
+                //7 => "ViewProfileSeven",
+                //8 => "ViewProfileEight",
+                //9 => "ViewProfileNine",
+                //10 => "ViewProfileTen",
+                //11 => "ViewProfileEleven",
+                //12 => "ViewProfileTwelve",
+                //13 => "ViewProfileThirteen",
+                //14 => "ViewProfileFourteen",
+                //15 => "ViewProfileFifteen",
+                //16 => "ViewProfileSixteen",
+                //17 => "ViewProfileSeventeen",
+                //18 => "ViewProfileEighteen",
+                //19 => "ViewProfileNineteen",
+                //20 => "ViewProfileTwenty",
+                //21 => "ViewProfileTwentyOne",
+                //22 => "ViewProfileTwentyTwo",
+                //23 => "ViewProfileTwentyThree",
+                //24 => "ViewProfileTwentyFour",
+                //25 => "ViewProfileTwentyFive",
+                //26 => "ViewProfileTwentySix",
+                //27 => "ViewProfileTwentySeven",
+                //28 => "ViewProfileTwentyEight",
+                //29 => "ViewProfileTwentyNine",
+                //30 => "ViewProfileThirty",
+                //31 => "ViewProfileThirtyOne",
+                //32 => "ViewProfileThirtyTwo",
+                //33 => "ViewProfileThirtyThree",
+                //34 => "ViewProfileThirtyFour",
+                //35 => "ViewProfileThirtyFive",
+                //36 => "ViewProfileThirtySix",
+                //37 => "ViewProfileThirtySeven",
+                //38 => "ViewProfileThirtyEight",
+                //39 => "ViewProfileThirtyNine",
+                //40 => "ViewProfileForty",
+                //41 => "ViewProfileFortyOne",
+                //42 => "ViewProfileFortyTwo",
+                //43 => "ViewProfileFortyThree",
+                //44 => "ViewProfileFortyFour",
+                //45 => "ViewProfileFortyFive",
+                //46 => "ViewProfileFortySix",
+                //47 => "ViewProfileFortySeven",
+                //48 => "ViewProfileFortyEight",
+                //49 => "ViewProfileFortyNine",
+                //50 => "ViewProfileFifty",
+                //51 => "ViewProfileFiftyOne",
+                //52 => "ViewProfileFiftyTwo",
+                //53 => "ViewProfileFiftyThree",
+                //54 => "ViewProfileFiftyFour",
+                //55 => "ViewProfileFiftyFive",
+                //56 => "ViewProfileFiftySix",
+                //57 => "ViewProfileFiftySeven",
+                //58 => "ViewProfileFiftyEight",
+                //59 => "ViewProfileFiftyNine",
                 1 => "ViewProfile1",
                 2 => "ViewProfile2",
                 3 => "ViewProfile3",
@@ -265,18 +313,26 @@ namespace ErJobPortal.Controllers
                 99 => "ViewProfile99",
                 100 => "ViewProfile100",
 
-                _ => "Resume"
+               
+            //    _ => "Resume"
+            //};
+
+            _ => "ViewProfileOne"
             };
 
-            // ============================================================
-            // REDIRECT TO SELECTED TEMPLATE
-            // ============================================================
-
             return RedirectToAction(
-                actionName,
-                "Resume",
-                new { id = id }
-            );
+    actionName,
+    "Resume",
+    new
+    {
+        id = id,
+        previousCandidateId = previousCandidateId,
+        nextCandidateId = nextCandidateId,
+        resumeSource = resumeSource,
+        postID = postID,
+        orgID = orgID
+    }
+);
         }
 
 

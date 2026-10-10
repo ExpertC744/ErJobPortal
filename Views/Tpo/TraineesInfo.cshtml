@@ -1,4 +1,5 @@
-﻿@model List<ErJobPortal.Models.TPOTraineeInfoM>
+﻿@using ErJobPortal.Models
+@model List<TPOTraineeInfoM>
 
 @{
     Layout = "~/Views/Shared/_DashboardLayout.cshtml";
@@ -7,270 +8,1051 @@
     ViewData["Panel"] = "TPO";
     ViewData["UserName"] = Context.Session.GetString("TPOName") ?? "TPO";
 
-    string collegeName =
-        ViewBag.CollegeName?.ToString() ?? "";
+    string collegeName = ViewBag.CollegeName?.ToString() ?? "";
+    int collegeId = ViewBag.CollegeId != null ? Convert.ToInt32(ViewBag.CollegeId) : 0;
 
-    int traineeCount =
-        ViewBag.TraineeCount != null
-            ? Convert.ToInt32(ViewBag.TraineeCount)
-            : 0;
+    string departmentName = ViewBag.DepartmentName?.ToString() ?? "";
+    int? departmentId = ViewBag.DepartmentId != null ? Convert.ToInt32(ViewBag.DepartmentId) : null;
+
+    int traineeCount = ViewBag.TraineeCount != null ? Convert.ToInt32(ViewBag.TraineeCount) : 0;
+
+    string searchText = ViewBag.SearchText?.ToString() ?? "";
+    int? selectedBranch = ViewBag.BranchId != null ? Convert.ToInt32(ViewBag.BranchId) : null;
+    int? selectedCurrentYear = ViewBag.CurrentYear != null ? Convert.ToInt32(ViewBag.CurrentYear) : null;
+    int? selectedAdmissionYear = ViewBag.AdmissionYear != null ? Convert.ToInt32(ViewBag.AdmissionYear) : null;
+    int? selectedPassoutYear = ViewBag.PassoutYear != null ? Convert.ToInt32(ViewBag.PassoutYear) : null;
+    int? selectedGender = ViewBag.Gender != null ? Convert.ToInt32(ViewBag.Gender) : null;
+
+    List<BranchM> branches =
+        ViewBag.Branches as List<BranchM> ?? new List<BranchM>();
 }
 
-<div class="container-fluid">
+<!-- Bootstrap Icons: required for bi bi-* icons -->
+<link rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" />
 
-    <!-- =====================================================
-         PAGE HEADER
-    ====================================================== -->
+<style>
+    :root {
+        --trainee-primary: #1e7b67;
+        --trainee-secondary: #269b80;
+        --trainee-light: #52b99f;
+        --trainee-gradient: linear-gradient(135deg, #1e7b67 0%, #269b80 55%, #52b99f 100%);
+        --trainee-ink: #183b35;
+        --trainee-muted: #72847f;
+        --trainee-border: #e2eee9;
+        --trainee-bg: #f4f9f7;
+    }
 
-    <div class="d-flex justify-content-between align-items-center mb-3">
+    .trainee-page {
+        min-height: 100%;
+        padding: 26px 22px;
+        color: var(--trainee-ink);
+        background: var(--trainee-bg);
+    }
 
-        <div>
+        .trainee-page *,
+        .trainee-page *::before,
+        .trainee-page *::after {
+            box-sizing: border-box;
+        }
 
-            <h2 class="mb-1">
+        /* ICON FIX */
+
+        .trainee-page .bi {
+            display: inline-block !important;
+            font-family: "bootstrap-icons" !important;
+            font-style: normal !important;
+            font-weight: normal !important;
+            font-variant: normal !important;
+            line-height: 1;
+            text-transform: none;
+            vertical-align: middle;
+            -webkit-font-smoothing: antialiased;
+        }
+
+    /* PAGE HEADER */
+
+    .trainee-hero {
+        position: relative;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 20px;
+        overflow: hidden;
+        padding: 27px 30px;
+        margin-bottom: 24px;
+        border-radius: 18px;
+        color: #fff;
+        background: var(--trainee-gradient);
+        box-shadow: 0 9px 24px rgba(30, 123, 103, .16);
+    }
+
+        .trainee-hero::after {
+            content: "";
+            position: absolute;
+            top: -135px;
+            right: 115px;
+            width: 210px;
+            height: 210px;
+            border: 1px solid rgba(255, 255, 255, .17);
+            border-radius: 50%;
+            box-shadow: 0 0 0 28px rgba(255, 255, 255, .045), 0 0 0 58px rgba(255, 255, 255, .035);
+            pointer-events: none;
+        }
+
+    .trainee-hero-content,
+    .trainee-count-card {
+        position: relative;
+        z-index: 1;
+    }
+
+    .trainee-heading {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        margin: 0 0 10px;
+        color: #fff;
+        font-size: clamp(23px, 2.2vw, 30px);
+        font-weight: 750;
+        letter-spacing: -.6px;
+    }
+
+    .trainee-heading-icon {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+        width: 49px;
+        height: 49px;
+        border: 1px solid rgba(255, 255, 255, .3);
+        border-radius: 14px;
+        background: rgba(255, 255, 255, .16);
+    }
+
+        .trainee-heading-icon .bi {
+            color: #fff !important;
+            font-size: 24px;
+        }
+
+    .trainee-subtitle {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px 20px;
+        color: rgba(255, 255, 255, .9);
+        font-size: 13px;
+    }
+
+        .trainee-subtitle strong {
+            color: #fff;
+            font-weight: 700;
+        }
+
+    .trainee-count-card {
+        min-width: 145px;
+        padding: 15px 23px;
+        border: 1px solid rgba(255, 255, 255, .28);
+        border-radius: 15px;
+        background: rgba(255, 255, 255, .14);
+        text-align: center;
+    }
+
+    .trainee-count-label {
+        display: block;
+        margin-bottom: 4px;
+        color: rgba(255, 255, 255, .9);
+        font-size: 12px;
+        font-weight: 600;
+    }
+
+    .trainee-count-number {
+        display: block;
+        color: #fff;
+        font-size: 34px;
+        font-weight: 800;
+        line-height: 1.2;
+    }
+
+    /* CARDS */
+
+    .trainee-card {
+        overflow: hidden;
+        margin-bottom: 24px;
+        border: 1px solid var(--trainee-border);
+        border-radius: 16px;
+        background: #fff;
+        box-shadow: 0 4px 17px rgba(25, 75, 62, .045);
+    }
+
+    .trainee-card-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        padding: 18px 22px;
+        border-bottom: 1px solid var(--trainee-border);
+        background: #fff;
+    }
+
+    .trainee-card-title {
+        display: flex;
+        align-items: center;
+        gap: 11px;
+        margin: 0;
+        color: var(--trainee-ink);
+        font-size: 16px;
+        font-weight: 750;
+    }
+
+    .trainee-card-title-icon {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+        width: 35px;
+        height: 35px;
+        border-radius: 10px;
+        color: var(--trainee-primary);
+        background: #eaf6f1;
+    }
+
+        .trainee-card-title-icon .bi {
+            color: var(--trainee-primary) !important;
+            font-size: 17px;
+        }
+
+    .trainee-card-body {
+        padding: 23px;
+    }
+
+    /* FILTER FORM */
+
+    .trainee-page .form-label {
+        display: block;
+        margin-bottom: 8px;
+        color: #38564e;
+        font-size: 12px;
+        font-weight: 700;
+        letter-spacing: .15px;
+    }
+
+    .trainee-page .form-control,
+    .trainee-page .form-select {
+        width: 100%;
+        min-height: 43px;
+        border: 1px solid #dce9e3;
+        border-radius: 9px;
+        background-color: #fff;
+        color: #27483f;
+        font-size: 13px;
+        box-shadow: none;
+        transition: border-color .2s ease, box-shadow .2s ease;
+    }
+
+    .trainee-page .form-control {
+        padding: 10px 12px;
+    }
+
+    .trainee-page .form-select {
+        padding: 9px 34px 9px 12px;
+    }
+
+    .trainee-page .form-control::placeholder {
+        color: #9aaba5;
+    }
+
+    .trainee-page .form-control:focus,
+    .trainee-page .form-select:focus {
+        border-color: var(--trainee-secondary);
+        box-shadow: 0 0 0 3px rgba(38, 155, 128, .12);
+    }
+
+    .trainee-page .form-control[readonly] {
+        background: #f5f9f7;
+        color: #647a72;
+    }
+
+    .trainee-filter-row {
+        row-gap: 17px;
+    }
+
+    .trainee-page .btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 7px;
+        min-height: 41px;
+        padding: 9px 15px;
+        border-radius: 9px;
+        font-size: 12px;
+        font-weight: 700;
+        transition: background .2s ease, border-color .2s ease, box-shadow .2s ease, transform .2s ease;
+    }
+
+        .trainee-page .btn i.bi {
+            flex-shrink: 0;
+            font-size: 15px;
+        }
+
+    .trainee-page .btn-primary,
+    .trainee-page .trainee-filter-btn {
+        border: 1px solid transparent;
+        color: #fff;
+        background: var(--trainee-gradient);
+        box-shadow: 0 4px 10px rgba(30, 123, 103, .15);
+    }
+
+        .trainee-page .btn-primary:hover,
+        .trainee-page .trainee-filter-btn:hover {
+            color: #fff;
+            background: linear-gradient(135deg, #176654 0%, #20876f 100%);
+            box-shadow: 0 6px 14px rgba(30, 123, 103, .2);
+            transform: translateY(-1px);
+        }
+
+    .trainee-page .btn-outline-secondary {
+        border: 1px solid #d8e5df;
+        color: #526d63;
+        background: #fff;
+    }
+
+        .trainee-page .btn-outline-secondary:hover {
+            border-color: #9ccdbb;
+            color: var(--trainee-primary);
+            background: #f1f9f5;
+        }
+
+    /* TABLE HEADER AND COUNT */
+
+    .trainee-table-count {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        min-width: 37px;
+        min-height: 29px;
+        padding: 5px 11px;
+        border-radius: 8px;
+        color: #fff;
+        background: var(--trainee-gradient);
+        font-size: 12px;
+        font-weight: 750;
+    }
+
+    /* RESPONSIVE TABLE */
+
+    .trainee-table-scroll {
+        width: 100%;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    .trainee-data-table {
+        width: 100%;
+        min-width: 1250px;
+        margin: 0;
+        border-collapse: separate;
+        border-spacing: 0;
+        color: #38534b;
+        font-size: 12px;
+        vertical-align: middle;
+    }
+
+        .trainee-data-table thead th {
+            padding: 15px 13px;
+            border: 0;
+            border-bottom: 1px solid #dcebe4;
+            background: #edf7f2;
+            color: #285e4e;
+            font-size: 11px;
+            font-weight: 800;
+            letter-spacing: .25px;
+            white-space: nowrap;
+        }
+
+        .trainee-data-table tbody td {
+            padding: 13px;
+            border-top: 0;
+            border-bottom: 1px solid #edf2ef;
+            background: #fff;
+            white-space: nowrap;
+        }
+
+        .trainee-data-table tbody tr:last-child td {
+            border-bottom: 0;
+        }
+
+        .trainee-data-table tbody tr:hover td {
+            background: #f5fbf8;
+        }
+
+        .trainee-data-table .trainee-sr {
+            width: 70px;
+            color: #82968d;
+            font-weight: 650;
+        }
+
+    .trainee-name {
+        color: #24483c;
+        font-size: 12px;
+        font-weight: 750;
+    }
+
+    .trainee-muted {
+        color: #a0afa8;
+    }
+
+    /* PROFILE IMAGE */
+
+    .trainee-profile-image,
+    .trainee-profile-placeholder {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 43px;
+        height: 43px;
+        border: 2px solid #e1f0e8;
+        border-radius: 50%;
+        object-fit: cover;
+    }
+
+    .trainee-profile-placeholder {
+        background: #edf7f2;
+        color: var(--trainee-primary);
+        font-size: 19px;
+    }
+
+        .trainee-profile-placeholder .bi {
+            color: var(--trainee-primary) !important;
+        }
+
+    /* RESUME BUTTON */
+
+    .trainee-page .trainee-resume-btn {
+        width: 36px;
+        min-height: 35px;
+        padding: 6px;
+        border: 1px solid #c8e7d9;
+        border-radius: 9px;
+        color: #1c8065;
+        background: #edf8f2;
+        font-size: 15px;
+    }
+
+        .trainee-page .trainee-resume-btn i.bi {
+            color: inherit !important;
+            font-size: 16px;
+        }
+
+        .trainee-page .trainee-resume-btn:hover {
+            border-color: var(--trainee-primary);
+            color: #fff;
+            background: var(--trainee-gradient);
+        }
+
+    /* EMPTY STATE */
+
+    .trainee-empty {
+        padding: 58px 20px;
+        text-align: center;
+    }
+
+    .trainee-empty-icon {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 76px;
+        height: 76px;
+        margin-bottom: 18px;
+        border-radius: 22px;
+        color: var(--trainee-primary);
+        background: #eaf6f0;
+    }
+
+        .trainee-empty-icon .bi {
+            color: var(--trainee-primary) !important;
+            font-size: 34px;
+        }
+
+    .trainee-empty h5 {
+        margin-bottom: 8px;
+        color: #294b40;
+        font-size: 17px;
+        font-weight: 750;
+    }
+
+    .trainee-empty p {
+        margin: 0;
+        color: var(--trainee-muted);
+        font-size: 13px;
+    }
+
+    /* RESPONSIVE */
+
+    @@media (max-width: 991.98px) {
+        .trainee-page {
+            padding: 20px 15px;
+        }
+
+        .trainee-hero {
+            padding: 23px;
+        }
+
+        .trainee-card-body {
+            padding: 19px;
+        }
+    }
+
+    @@media (max-width: 767.98px) {
+        .trainee-page {
+            padding: 15px 10px;
+        }
+
+        .trainee-hero {
+            align-items: flex-start;
+            flex-direction: column;
+            gap: 18px;
+            padding: 22px 19px;
+            border-radius: 14px;
+        }
+
+            .trainee-hero::after {
+                right: -35px;
+            }
+
+        .trainee-heading {
+            font-size: 23px;
+        }
+
+        .trainee-heading-icon {
+            width: 43px;
+            height: 43px;
+        }
+
+        .trainee-subtitle {
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .trainee-count-card {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            width: 100%;
+            min-width: 0;
+            padding: 12px 15px;
+            text-align: left;
+        }
+
+        .trainee-count-label {
+            margin: 0;
+        }
+
+        .trainee-count-number {
+            font-size: 26px;
+        }
+
+        .trainee-card {
+            margin-bottom: 17px;
+            border-radius: 13px;
+        }
+
+        .trainee-card-header {
+            padding: 15px;
+        }
+
+        .trainee-card-body {
+            padding: 16px;
+        }
+
+        .trainee-filter-row {
+            row-gap: 14px;
+        }
+
+        .trainee-data-table thead th,
+        .trainee-data-table tbody td {
+            padding: 12px 10px;
+        }
+    }
+
+    @@media (max-width: 420px) {
+        .trainee-heading {
+            font-size: 20px;
+        }
+
+        .trainee-card-title {
+            font-size: 14px;
+        }
+
+        .trainee-page .btn {
+            padding: 9px 10px;
+            font-size: 11px;
+        }
+    }
+</style>
+
+<div class="container-fluid trainee-page">
+
+    <!-- PAGE HEADER -->
+
+    <div class="trainee-hero">
+        <div class="trainee-hero-content">
+            <h1 class="trainee-heading">
+                <span class="trainee-heading-icon">
+                    <i class="bi bi-people-fill" aria-hidden="true"></i>
+                </span>
                 Trainee Information
+            </h1>
+
+            <div class="trainee-subtitle">
+                @if (!string.IsNullOrWhiteSpace(collegeName))
+                {
+                    <span>
+                        <i class="bi bi-building me-1" aria-hidden="true"></i>
+                        College: <strong>@collegeName</strong>
+                    </span>
+                }
+
+                @if (departmentId.HasValue)
+                {
+                    <span>
+                        <i class="bi bi-diagram-3 me-1" aria-hidden="true"></i>
+                        Department: <strong>@departmentName</strong>
+                    </span>
+                }
+            </div>
+        </div>
+
+        <div class="trainee-count-card">
+            <span class="trainee-count-label">
+                <i class="bi bi-person-check me-1" aria-hidden="true"></i>
+                Total Trainees
+            </span>
+            <span class="trainee-count-number">@traineeCount</span>
+        </div>
+    </div>
+
+    <!-- FILTER CARD -->
+
+    <div class="trainee-card">
+        <div class="trainee-card-header">
+            <h2 class="trainee-card-title">
+                <span class="trainee-card-title-icon">
+                    <i class="bi bi-funnel-fill" aria-hidden="true"></i>
+                </span>
+                Filter Trainees
+            </h2>
+        </div>
+
+        <div class="trainee-card-body">
+            <form asp-controller="TPO"
+                  asp-action="TraineesInfo"
+                  method="get">
+
+                <div class="row g-3 trainee-filter-row">
+
+                    <!-- SEARCH -->
+
+                    <div class="col-lg-4 col-md-6">
+                        <label class="form-label">Search</label>
+                        <input type="text"
+                               name="searchText"
+                               value="@searchText"
+                               class="form-control"
+                               placeholder="Search by name, mobile, email, DOB..." />
+                    </div>
+
+                    <!-- BRANCH -->
+
+                    <div class="col-lg-2 col-md-6">
+                        <label class="form-label">Branch</label>
+                        <select name="branchId" class="form-select">
+                            <option value="">All Branches</option>
+
+                            @foreach (BranchM branch in branches)
+                            {
+                                if (selectedBranch.HasValue && selectedBranch.Value == branch.nID)
+                                {
+                                    <option value="@branch.nID" selected>@branch.sBranch</option>
+                                }
+                                else
+                                {
+                                    <option value="@branch.nID">@branch.sBranch</option>
+                                }
+                            }
+                        </select>
+                    </div>
+
+                    <!-- CURRENT YEAR -->
+
+                    <div class="col-lg-2 col-md-6">
+                        <label class="form-label">Current Year</label>
+                        <select name="currentYear" class="form-select">
+                            <option value="">All Years</option>
+
+                            @for (int year = 1; year <= 5; year++)
+                            {
+                                if (selectedCurrentYear.HasValue && selectedCurrentYear.Value == year)
+                                {
+                                    <option value="@year" selected>Year @year</option>
+                                }
+                                else
+                                {
+                                    <option value="@year">Year @year</option>
+                                }
+                            }
+                        </select>
+                    </div>
+
+                    <!-- GENDER -->
+
+                    <div class="col-lg-2 col-md-6">
+                        <label class="form-label">Gender</label>
+                        <select name="gender" class="form-select">
+                            <option value="">All Gender</option>
+
+                            @if (selectedGender == 1)
+                            {
+                                <option value="1" selected>Male</option>
+                            }
+                            else
+                            {
+                                <option value="1">Male</option>
+                            }
+
+                            @if (selectedGender == 2)
+                            {
+                                <option value="2" selected>Female</option>
+                            }
+                            else
+                            {
+                                <option value="2">Female</option>
+                            }
+
+                            @if (selectedGender == 3)
+                            {
+                                <option value="3" selected>Other</option>
+                            }
+                            else
+                            {
+                                <option value="3">Other</option>
+                            }
+                        </select>
+                    </div>
+
+                    <!-- FILTER BUTTON -->
+
+                    <div class="col-lg-2 col-md-6 d-flex align-items-end">
+                        <button type="submit" class="btn btn-primary trainee-filter-btn w-100">
+                            <i class="bi bi-funnel" aria-hidden="true"></i>
+                            Filter
+                        </button>
+                    </div>
+
+                    <!-- ADMISSION YEAR -->
+
+                    <div class="col-lg-3 col-md-6">
+                        <label class="form-label">Admission Year</label>
+                        <input type="number"
+                               name="admissionYear"
+                               value="@selectedAdmissionYear"
+                               class="form-control"
+                               placeholder="e.g. 2025"
+                               min="1900"
+                               max="2100" />
+                    </div>
+
+                    <!-- PASSOUT YEAR -->
+
+                    <div class="col-lg-3 col-md-6">
+                        <label class="form-label">Passout Year</label>
+                        <input type="number"
+                               name="passoutYear"
+                               value="@selectedPassoutYear"
+                               class="form-control"
+                               placeholder="e.g. 2027"
+                               min="1900"
+                               max="2100" />
+                    </div>
+
+                    <!-- DEPARTMENT -->
+
+                    <div class="col-lg-3 col-md-6">
+                        <label class="form-label">Department</label>
+                        <input type="text"
+                               class="form-control"
+                               value="@departmentName"
+                               readonly />
+                    </div>
+
+                    <!-- CLEAR FILTERS -->
+
+                    <div class="col-lg-3 col-md-6 d-flex align-items-end">
+                        <a asp-controller="TPO"
+                           asp-action="TraineesInfo"
+                           class="btn btn-outline-secondary w-100">
+                            <i class="bi bi-arrow-counterclockwise" aria-hidden="true"></i>
+                            Clear Filters
+                        </a>
+                    </div>
+
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- TRAINEE TABLE -->
+
+    <div class="trainee-card">
+        <div class="trainee-card-header">
+            <h2 class="trainee-card-title">
+                <span class="trainee-card-title-icon">
+                    <i class="bi bi-card-list" aria-hidden="true"></i>
+                </span>
+                Trainee List
             </h2>
 
-            <div class="text-muted">
-                College:
-                <strong>
-                    @collegeName
-                </strong>
-            </div>
-
+            <span class="trainee-table-count">@traineeCount</span>
         </div>
 
-        <div>
+        <div class="p-0">
+            @if (Model != null && Model.Any())
+            {
+                <div class="trainee-table-scroll">
+                    <table class="table trainee-data-table align-middle">
+                        <thead>
+                            <tr>
+                                <th class="text-center">Sr. No.</th>
+                                <th>Name</th>
+                                <th>Gender</th>
+                                <th>Mobile</th>
+                                <th>Email</th>
+                                <th class="text-center">Profile</th>
+                                <th>DOB</th>
+                                <th>Branch</th>
+                                <th>Current Year</th>
+                                <th>Admission Year</th>
+                                <th>Passout Year</th>
+                                <th>Registration Date</th>
+                                <th class="text-center">Resume</th>
+                            </tr>
+                        </thead>
 
-            <span class="badge bg-primary"
-                  style="font-size:15px; padding:10px 15px;">
-                Total Trainees:
-                @traineeCount
-            </span>
+                        <tbody>
+                            @{
+                                int srNo = 1;
+                            }
 
-        </div>
-
-    </div>
-
-
-    <!-- =====================================================
-         SEARCH
-    ====================================================== -->
-
-    <div class="card mb-3">
-
-        <div class="card-body">
-
-            <input type="text"
-                   id="traineeSearch"
-                   class="form-control"
-                   placeholder="Search by name, email or mobile..." />
-
-        </div>
-
-    </div>
-
-
-    <!-- =====================================================
-         TABLE
-    ====================================================== -->
-
-    <div class="card">
-
-        <div class="card-body">
-
-            <div class="table-responsive">
-
-                <table class="table table-bordered table-hover"
-                       id="traineeTable">
-
-                    <thead>
-
-                        <tr>
-
-                            <th>
-                                Sr. No.
-                            </th>
-
-                            <th>
-                                Name
-                            </th>
-
-                            <th>
-                                Mobile
-                            </th>
-
-                            <th>
-                                Email
-                            </th>
-
-                            <th>
-                                DOB
-                            </th>
-
-                            <th>
-                                College Code
-                            </th>
-
-                            <th>
-                                Current Year
-                            </th>
-
-                            <th>
-                                Admission Year
-                            </th>
-
-                            <th>
-                                Passout Year
-                            </th>
-
-                            <th>
-                                Registration Date
-                            </th>
-
-                        </tr>
-
-                    </thead>
-
-                    <tbody>
-
-                        @if (Model != null &&
-                             Model.Count > 0)
-                        {
-                            int srNo = 1;
-
-                            foreach (var trainee in Model)
+                            @foreach (TPOTraineeInfoM trainee in Model)
                             {
                                 <tr>
+                                    <!-- SR NO -->
+
+                                    <td class="text-center trainee-sr">@srNo</td>
+
+                                    <!-- NAME -->
 
                                     <td>
-                                        @srNo
+                                        <span class="trainee-name">
+                                            @if (!string.IsNullOrWhiteSpace(trainee.PrefixName))
+                                            {
+                                                @trainee.PrefixName
+
+                                                <text> </text>
+                                            }
+                                            @trainee.FullName
+                                        </span>
                                     </td>
+
+                                    <!-- GENDER -->
 
                                     <td>
-                                        @trainee.FullName
+                                        @(string.IsNullOrWhiteSpace(trainee.GenderName)
+                                            ? "-"
+                                            : trainee.GenderName)
                                     </td>
+
+                                    <!-- MOBILE -->
 
                                     <td>
-                                        @trainee.sMobile
+                                        @if (!string.IsNullOrWhiteSpace(trainee.sMobile))
+                                        {
+                                            @trainee.sMobile
+                                        }
+                                        else
+                                        {
+                                            <span class="trainee-muted">-</span>
+                                        }
                                     </td>
+
+                                    <!-- EMAIL -->
 
                                     <td>
-                                        @trainee.sEmail
+                                        @if (!string.IsNullOrWhiteSpace(trainee.sEmail))
+                                        {
+                                            @trainee.sEmail
+                                        }
+                                        else
+                                        {
+                                            <span class="trainee-muted">-</span>
+                                        }
                                     </td>
+
+                                    <!-- PROFILE IMAGE -->
+
+                                    <td class="text-center">
+                                        @if (!string.IsNullOrWhiteSpace(trainee.sProfileImage))
+                                        {
+                                            string imagePath = trainee.sProfileImage.StartsWith("/")
+                                            ? trainee.sProfileImage
+                                            : Url.Content("~/Uploads/Profile/" + trainee.sProfileImage);
+
+                                            <img src="@imagePath"
+                                                 alt="Profile"
+                                                 class="trainee-profile-image"
+                                                 onerror="this.style.display='none';" />
+                                        }
+                                        else
+                                        {
+                                            <span class="trainee-profile-placeholder">
+                                                <i class="bi bi-person-fill" aria-hidden="true"></i>
+                                            </span>
+                                        }
+                                    </td>
+
+                                    <!-- DOB -->
 
                                     <td>
-                                        @(trainee.DOB.HasValue
-                                            ? trainee.DOB.Value.ToString("dd-MM-yyyy")
-                                            : "-")
+                                        @if (trainee.DOB.HasValue)
+                                        {
+                                            @trainee.DOB.Value.ToString("dd-MM-yyyy")
+                                        }
+                                        else
+                                        {
+                                            <span class="trainee-muted">-</span>
+                                        }
                                     </td>
+
+                                    <!-- BRANCH -->
 
                                     <td>
-                                        @trainee.nCollegeCode
+                                        @if (!string.IsNullOrWhiteSpace(trainee.BranchName)
+                                       && trainee.BranchName != "-")
+                                        {
+                                            @trainee.BranchName
+                                        }
+                                        else
+                                        {
+                                            <span class="trainee-muted">-</span>
+                                        }
                                     </td>
+
+                                    <!-- CURRENT YEAR -->
 
                                     <td>
-                                        @(trainee.nCurrentYear.HasValue
-                                            ? trainee.nCurrentYear.ToString()
-                                            : "-")
+                                        @if (trainee.nCurrentYear.HasValue)
+                                        {
+                                            @trainee.nCurrentYear
+                                        }
+                                        else
+                                        {
+                                            <span class="trainee-muted">-</span>
+                                        }
                                     </td>
+
+                                    <!-- ADMISSION YEAR -->
 
                                     <td>
-                                        @(trainee.nAdmissionYear.HasValue
-                                            ? trainee.nAdmissionYear.ToString()
-                                            : "-")
+                                        @if (trainee.nAdmissionYear.HasValue)
+                                        {
+                                            @trainee.nAdmissionYear
+                                        }
+                                        else
+                                        {
+                                            <span class="trainee-muted">-</span>
+                                        }
                                     </td>
+
+                                    <!-- PASSOUT YEAR -->
 
                                     <td>
-                                        @(trainee.nPassoutYear.HasValue
-                                            ? trainee.nPassoutYear.ToString()
-                                            : "-")
+                                        @if (trainee.nPassoutYear.HasValue)
+                                        {
+                                            @trainee.nPassoutYear
+                                        }
+                                        else
+                                        {
+                                            <span class="trainee-muted">-</span>
+                                        }
                                     </td>
+
+                                    <!-- REGISTRATION DATE -->
 
                                     <td>
-                                        @(trainee.RegDate.HasValue
-                                            ? trainee.RegDate.Value.ToString("dd-MM-yyyy")
-                                            : "-")
+                                        @if (trainee.RegDate.HasValue)
+                                        {
+                                            @trainee.RegDate.Value.ToString("dd-MM-yyyy")
+                                        }
+                                        else
+                                        {
+                                            <span class="trainee-muted">-</span>
+                                        }
                                     </td>
 
+                                    <!-- RESUME -->
+
+                                    <td class="text-center">
+                                        <a href="@Url.Action("Resume", "Resume", new { id = trainee.nID })"
+                                           target="_blank"
+                                           rel="noopener noreferrer"
+                                           class="btn trainee-resume-btn"
+                                           title="View Selected Resume"
+                                           aria-label="View resume">
+                                            <i class="bi bi-eye-fill" aria-hidden="true"></i>
+                                        </a>
+                                    </td>
                                 </tr>
 
                                 srNo++;
                             }
-                        }
-                        else
-                        {
-                            <tr>
+                        </tbody>
+                    </table>
+                </div>
+            }
+            else
+            {
+                <!-- NO DATA -->
 
-                                <td colspan="10"
-                                    class="text-center">
+                <div class="trainee-empty">
+                    <div class="trainee-empty-icon">
+                        <i class="bi bi-people-fill" aria-hidden="true"></i>
+                    </div>
 
-                                    No trainees found
-                                    for this college.
-
-                                </td>
-
-                            </tr>
-                        }
-
-                    </tbody>
-
-                </table>
-
-            </div>
-
+                    <h5>No trainees found</h5>
+                    <p>No trainee records match the selected filters.</p>
+                </div>
+            }
         </div>
-
     </div>
-
 </div>
 
+@section Scripts
+{
+    <script>
+        $(document).ready(function () {
 
-<!-- =====================================================
-     SEARCH SCRIPT
-====================================================== -->
+            // Remove leading spaces from search.
+            $('input[name="searchText"]').on('input', function () {
+                this.value = this.value.replace(/^\s+/, '');
+            });
 
-<script>
+            // Trim search before submitting the filter form.
+            $('form').on('submit', function () {
+                const search = $('input[name="searchText"]');
 
-    document.addEventListener("DOMContentLoaded", function () {
-
-        const searchBox =
-            document.getElementById("traineeSearch");
-
-        const table =
-            document.getElementById("traineeTable");
-
-        if (!searchBox || !table) {
-            return;
-        }
-
-        searchBox.addEventListener("keyup", function () {
-
-            const searchValue =
-                this.value.toLowerCase().trim();
-
-            const rows =
-                table.querySelectorAll("tbody tr");
-
-            rows.forEach(function (row) {
-
-                const rowText =
-                    row.textContent.toLowerCase();
-
-                if (rowText.includes(searchValue)) {
-
-                    row.style.display = "";
-
+                if (search.length > 0) {
+                    search.val(search.val().trim());
                 }
-                else {
-
-                    row.style.display = "none";
-
-                }
-
             });
 
         });
-
-    });
-
-</script>
+    </script>
+}
