@@ -578,4 +578,35 @@ body {
     }
 }
 
+.post-navigation {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 15px;
+    margin: 25px 0;
+}
+
+.post-nav-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    min-width: 120px;
+    padding: 10px 20px;
+    border-radius: 8px;
+    background: #198f7a;
+    color: #ffffff;
+    text-decoration: none;
+    font-size: 14px;
+    font-weight: 600;
+    transition: 0.2s ease;
+}
+
+    .post-nav-btn:hover {
+        background: #147564;
+        color: #ffffff;
+        text-decoration: none;
+    }
+
  
