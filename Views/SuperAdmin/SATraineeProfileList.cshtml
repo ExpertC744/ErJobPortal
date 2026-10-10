@@ -184,6 +184,183 @@
                         <span class="text-muted">No Photo</span>
                     }
                 </td>
+                        int srNo = 1;
+
+                        foreach (var item in Model)
+                        {
+                            <tr>
+
+                                <!-- SR NO -->
+                                <td class="master-id">
+                                    @srNo
+                                </td>
+
+                                <!-- PROFILE CREATED DATE -->
+                                <td>
+                                    @item.ProfileCreatedDate
+                                </td>
+
+
+                                <!-- TRAINEE NAME -->
+                                <td>
+                                    <strong>
+                                        @item.TraineeName
+                                    </strong>
+                                </td>
+
+
+                                <!-- ACTION -->
+                                <td>
+                                <a asp-controller="SuperAdmin"
+                        <!-- ACTION -->
+                        <td>
+                            <a asp-controller="SuperAdmin"
+                               asp-action="ViewTraineeResume"
+                               asp-route-id="@item.CandidateID"
+                               class=""
+                               title="View"
+                               target="_blank"
+                               rel="noopener noreferrer">
+                                <i class="fas fa-eye"></i>
+                            </a>
+                        </td>
+                               @*  <a asp-controller="SuperAdmin"
+                                   asp-action="ViewTraineeResume"
+                                   asp-route-id="@item.CandidateID"
+                                   class="master-view-btn"
+                                   target="_blank"
+                                   rel="noopener noreferrer">
+                                    View
+                                </a>
+                            </td>
+                                <a asp-controller="SuperAdmin"
+                                   asp-action="ViewTraineeResume"
+                                   asp-route-id="@item.CandidateID"
+                                   class="master-view-btn"
+                                   target="_blank"
+                                   rel="noopener noreferrer">
+                                    View
+                                </a>
+                            </tr>
+
+                                </td> *@
+
+
+
+                                
+                                <td>
+
+                                    @if (!string.IsNullOrEmpty(item.Photo))
+                                    {
+                                        <img src="@item.Photo"
+                                             alt="Candidate Photo"
+                                             class="candidate-profile-photo" />
+                                    }
+                                    else
+                                    {
+                                        <span class="text-muted">
+                                            No Photo
+                                        </span>
+                                    }
+
+                                </td>
+
+
+                                <!-- LOCATION -->
+                                <td>
+                                    @item.Location
+                                </td>
+
+
+                                <!-- PINCODE -->
+                                <td>
+                                    @item.Pincode
+                                </td>
+
+
+                                <!-- SSC -->
+                                <td>
+                                    @item.SSC_YEAR
+                                </td>
+
+                                <td>
+                                    @item.SSC_DIVISION
+                                </td>
+
+
+                                <!-- HSC / DIPLOMA -->
+                                <td>
+                                    @item.HSC_DIPLOMA_YEAR
+                                </td>
+
+                                <td>
+                                    @item.HSC_DIPLOMA_DIVISION
+                                </td>
+
+
+                                <!-- GRADUATION -->
+                                <td>
+                                    @item.Graduation_Year
+                                </td>
+
+                                <td>
+                                    @item.Graduation_Division
+                                </td>
+
+                                <td>
+                                    @item.Graduation_Stream
+                                </td>
+
+
+                                <!-- PG -->
+                                <td>
+                                    @item.PG_Year
+                                </td>
+
+                                <td>
+                                    @item.PG_Division
+                                </td>
+
+                                <td>
+                                    @item.PG_Stream
+                                </td>
+
+
+                                <!-- PHD -->
+                                <td>
+                                    @item.PhD_Year
+                                </td>
+
+                                <td>
+                                    @item.PhD_Status
+                                </td>
+
+                                <td>
+                                    @item.PhD_Topic
+                                </td>
+
+
+                                <!-- PREFERRED LOCATION -->
+                                <td>
+                                    @item.PreferredLocation
+                                </td>
+
+
+                                <!-- INTERNSHIP TYPE -->
+                                <td>
+                                    @item.Internship_FellowshipType
+                                </td>
+
+
+                        <!-- RESUME -->
+                        <td>
+
+                            @if (!string.IsNullOrEmpty(item.Resume))
+                            {
+                                <a href="@item.Resume"
+                                   target="_blank"
+                                   title="View Resume"
+                                   class="">
 
                 <!-- LOCATION -->
                 <td>@item.Location</td>
@@ -216,6 +393,10 @@
 
                 <!-- PREFERRED LOCATION -->
                 <td>@item.PreferredLocation</td>
+
+                            </tr>
+                                
+                            srNo++;
 
                 <!-- INTERNSHIP TYPE -->
                 <td>@item.Internship_FellowshipType</td>
