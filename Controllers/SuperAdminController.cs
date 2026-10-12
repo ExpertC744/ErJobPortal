@@ -4420,5 +4420,26 @@ ORDER BY SAF.nID DESC, OFB.nID DESC;
         {
             return View();
         }
+
+        // View Organization Profile - Master
+        [HttpGet]
+        [Route("SuperAdmin/ViewOrgProfile/{id}")]
+        public IActionResult ViewOrgProfile(string id)
+        {
+            OrgProfile? model = _repository.GetOrganizationProfileByCode(id);
+
+            if (model == null)
+            {
+                return Content(
+                    $"No organization found for ID: {id}. " +
+                    "Check whether this ID matches nOrgID in the database.");
+            }
+
+            ViewData["Title"] = "View Organization Profile";
+            ViewData["Panel"] = "SuperAdmin";
+            ViewData["UserName"] = "ItNetworkZ";
+
+            return View("~/Views/Organization/ViewOrgProfile.cshtml", model);
+        }
     }
 }

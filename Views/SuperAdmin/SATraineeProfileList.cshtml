@@ -8,39 +8,6 @@
     ViewData["UserName"] = "Super Admin";
 }
 
-<style>
-    /* Trainee Profile Photo - Fixed Table Size */
-    .master-data-table .candidate-profile-photo {
-        width: 55px;
-        height: 55px;
-        /*  max-width: 55px;
-            max-height: 55px; */
-        object-fit: contain;
-        display: block;
-        margin: 0 auto;
-        border-radius: 8px;
-        border: 1px solid #e2e8f0;
-        background-color: #f8fafc;
-    }
-
-    /* Keep photo column aligned */
-    .master-data-table td:has(.candidate-profile-photo) {
-        text-align: center;
-        vertical-align: middle;
-        min-width: 85px;
-    }
-
-    /* Responsive photo on smaller screens */
-    @@media (max-width: 768px) {
-        .master-data-table .candidate-profile-photo {
-            width: 45px;
-            height: 45px;
-            max-width: 45px;
-            max-height: 45px;
-        }
-    }
-</style>
-
 <div class="container-fluid">
 
     <!-- MASTER TABLE CARD -->
@@ -61,12 +28,12 @@
 
             </div>
 
-            <!-- Back -->
             <a asp-controller="SuperAdmin"
                asp-action="Dashboard"
-               class="master-back-btn"
-               title="Back to Dashboard">
-                <i class="fas fa-arrow-left"></i>
+               class="btn btn-secondary">
+
+                Back to Dashboard
+
             </a>
 
         </div>
@@ -135,93 +102,48 @@
                 </thead>
 
 
-                
-<tbody>
-    @if (Model != null && Model.Count > 0)
-    {
-        int srNo = 1;
+                <tbody>
 
-        foreach (var item in Model)
-        {
-            <tr>
-                <!-- SR NO -->
-                <td class="master-id">
-                    @srNo
-                </td>
-
-                <!-- PROFILE CREATED DATE -->
-                <td>
-                    @item.ProfileCreatedDate
-                </td>
-
-                <!-- TRAINEE NAME -->
-                <td>
-                    <strong>@item.TraineeName</strong>
-                </td>
-
-                <!-- ACTION: KEEP ONLY ONE CELL -->
-                <td>
-                    <a asp-controller="SuperAdmin"
-                       asp-action="ViewTraineeResume"
-                       asp-route-id="@item.CandidateID"
-                       class="master-view-btn"
-                       target="_blank"
-                       rel="noopener noreferrer">
-                        View
-                    </a>
-                </td>
-
-                <!-- PHOTO -->
-                <td>
-                    @if (!string.IsNullOrEmpty(item.Photo))
+                    @if (Model != null && Model.Count > 0)
                     {
-                        <img src="@item.Photo"
-                             alt="Candidate Photo"
-                             class="candidate-profile-photo" />
-                    }
-                    else
-                    {
-                        <span class="text-muted">No Photo</span>
-                    }
-                </td>
                         int srNo = 1;
 
                         foreach (var item in Model)
                         {
-                            <tr>
+                            @* <tr> *@
 
-                                <!-- SR NO -->
-                                <td class="master-id">
-                                    @srNo
-                                </td>
+                            <!-- SR NO -->
+                        <td class="master-id">
+                            @srNo
+                        </td>
 
-                                <!-- PROFILE CREATED DATE -->
-                                <td>
-                                    @item.ProfileCreatedDate
-                                </td>
-
-
-                                <!-- TRAINEE NAME -->
-                                <td>
-                                    <strong>
-                                        @item.TraineeName
-                                    </strong>
-                                </td>
+                        <!-- PROFILE CREATED DATE -->
+                        <td>
+                            @item.ProfileCreatedDate
+                        </td>
 
 
-                                <!-- ACTION -->
-                                <td>
-                                    <a asp-controller="SuperAdmin"
-                                       asp-action="ViewTraineeResume"
-                                       asp-route-id="@item.CandidateID"
-                                       class=""
-                                       title="View"
-                                       target="_blank"
-                                       rel="noopener noreferrer">
-                                        <i class="fas fa-eye"></i>
-                                    </a>
-                                </td>
-                                @*  <a asp-controller="SuperAdmin"
+                        <!-- TRAINEE NAME -->
+                        <td>
+                            <strong>
+                                @item.TraineeName
+                            </strong>
+                        </td>
+
+
+                        <!-- ACTION -->
+                        <td>
+
+                            <a asp-controller="SuperAdmin"
+                               asp-action="ViewTraineeResume"
+                               asp-route-id="@item.CandidateID"
+                               class="master-view-btn"
+                               target="_blank"
+                               rel="noopener noreferrer">
+                                View
+                            </a>
+                        </td>
+                        @*  <a asp-controller="SuperAdmin"
                                    asp-action="ViewTraineeResume"
                                    asp-route-id="@item.CandidateID"
                                    class="master-view-btn"
@@ -229,217 +151,178 @@
                                    rel="noopener noreferrer">
                                     View
                                 </a>
-                            </td>
-                                <a asp-controller="SuperAdmin"
-                                   asp-action="ViewTraineeResume"
-                                   asp-route-id="@item.CandidateID"
-                                   class="master-view-btn"
-                                   target="_blank"
-                                   rel="noopener noreferrer">
-                                    View
-                                </a>
-                            </tr>
-
                                 </td> *@
 
 
 
 
-                                <td>
+                        <td>
 
-                                    @if (!string.IsNullOrEmpty(item.Photo))
-                                    {
-                                        <img src="@item.Photo"
-                                             alt="Candidate Photo"
-                                             class="candidate-profile-photo" />
-                                    }
-                                    else
-                                    {
-                                        <span class="text-muted">
-                                            No Photo
-                                        </span>
-                                    }
+                            @if (!string.IsNullOrEmpty(item.Photo))
+                            {
+                                <img src="@item.Photo"
+                                     alt="Candidate Photo"
+                                     class="candidate-profile-photo" />
+                            }
+                            else
+                            {
+                                <span class="text-muted">
+                                    No Photo
+                                </span>
+                            }
 
-                                </td>
-
-
-                                <!-- LOCATION -->
-                                <td>
-                                    @item.Location
-                                </td>
+                        </td>
 
 
-                                <!-- PINCODE -->
-                                <td>
-                                    @item.Pincode
-                                </td>
+                        <!-- LOCATION -->
+                        <td>
+                            @item.Location
+                        </td>
 
 
-                                <!-- SSC -->
-                                <td>
-                                    @item.SSC_YEAR
-                                </td>
-
-                                <td>
-                                    @item.SSC_DIVISION
-                                </td>
+                        <!-- PINCODE -->
+                        <td>
+                            @item.Pincode
+                        </td>
 
 
-                                <!-- HSC / DIPLOMA -->
-                                <td>
-                                    @item.HSC_DIPLOMA_YEAR
-                                </td>
+                        <!-- SSC -->
+                        <td>
+                            @item.SSC_YEAR
+                        </td>
 
-                                <td>
-                                    @item.HSC_DIPLOMA_DIVISION
-                                </td>
-
-
-                                <!-- GRADUATION -->
-                                <td>
-                                    @item.Graduation_Year
-                                </td>
-
-                                <td>
-                                    @item.Graduation_Division
-                                </td>
-
-                                <td>
-                                    @item.Graduation_Stream
-                                </td>
+                        <td>
+                            @item.SSC_DIVISION
+                        </td>
 
 
-                                <!-- PG -->
-                                <td>
-                                    @item.PG_Year
-                                </td>
+                        <!-- HSC / DIPLOMA -->
+                        <td>
+                            @item.HSC_DIPLOMA_YEAR
+                        </td>
 
-                                <td>
-                                    @item.PG_Division
-                                </td>
-
-                                <td>
-                                    @item.PG_Stream
-                                </td>
+                        <td>
+                            @item.HSC_DIPLOMA_DIVISION
+                        </td>
 
 
-                                <!-- PHD -->
-                                <td>
-                                    @item.PhD_Year
-                                </td>
+                        <!-- GRADUATION -->
+                        <td>
+                            @item.Graduation_Year
+                        </td>
 
-                                <td>
-                                    @item.PhD_Status
-                                </td>
+                        <td>
+                            @item.Graduation_Division
+                        </td>
 
-                                <td>
-                                    @item.PhD_Topic
-                                </td>
-
-
-                                <!-- PREFERRED LOCATION -->
-                                <td>
-                                    @item.PreferredLocation
-                                </td>
+                        <td>
+                            @item.Graduation_Stream
+                        </td>
 
 
-                                <!-- INTERNSHIP TYPE -->
-                                <td>
-                                    @item.Internship_FellowshipType
-                                </td>
+                        <!-- PG -->
+                        <td>
+                            @item.PG_Year
+                        </td>
+
+                        <td>
+                            @item.PG_Division
+                        </td>
+
+                        <td>
+                            @item.PG_Stream
+                        </td>
 
 
-                                <!-- RESUME -->
-                                <td>
+                        <!-- PHD -->
+                        <td>
+                            @item.PhD_Year
+                        </td>
 
-                                    @if (!string.IsNullOrEmpty(item.Resume))
-                                    {
-                                        <a href="@item.Resume"
-                                           target="_blank"
-                                           title="View Resume"
-                                           class="">
+                        <td>
+                            @item.PhD_Status
+                        </td>
 
-                <!-- LOCATION -->
-                <td>@item.Location</td>
+                        <td>
+                            @item.PhD_Topic
+                        </td>
 
-                <!-- PINCODE -->
-                <td>@item.Pincode</td>
 
-                <!-- SSC -->
-                <td>@item.SSC_YEAR</td>
-                <td>@item.SSC_DIVISION</td>
+                        <!-- PREFERRED LOCATION -->
+                        <td>
+                            @item.PreferredLocation
+                        </td>
 
-                <!-- HSC / DIPLOMA -->
-                <td>@item.HSC_DIPLOMA_YEAR</td>
-                <td>@item.HSC_DIPLOMA_DIVISION</td>
 
-                <!-- GRADUATION -->
-                <td>@item.Graduation_Year</td>
-                <td>@item.Graduation_Division</td>
-                <td>@item.Graduation_Stream</td>
+                        <!-- INTERNSHIP TYPE -->
+                        <td>
+                            @item.Internship_FellowshipType
+                        </td>
 
-                <!-- PG -->
-                <td>@item.PG_Year</td>
-                <td>@item.PG_Division</td>
-                <td>@item.PG_Stream</td>
 
-                <!-- PHD -->
-                <td>@item.PhD_Year</td>
-                <td>@item.PhD_Status</td>
-                <td>@item.PhD_Topic</td>
+                        <!-- RESUME -->
+                        <td>
 
-                <!-- PREFERRED LOCATION -->
-                <td>@item.PreferredLocation</td>
+                            @if (!string.IsNullOrEmpty(item.Resume))
+                            {
+                                <a href="@item.Resume"
+                                   target="_blank"
+                                   class="btn btn-sm btn-primary">
 
-                            </tr>
+                                    View Resume
 
-                            srNo++;
+                                </a>
+                            }
+                            else
+                            {
+                                <span class="text-muted">
+                                    Not Uploaded
+                                </span>
+                            }
 
-                <!-- INTERNSHIP TYPE -->
-                <td>@item.Internship_FellowshipType</td>
+                        </td>
 
-                <!-- RESUME -->
-                <td>
-                    @if (!string.IsNullOrEmpty(item.Resume))
-                    {
-                        <a href="@item.Resume"
-                           target="_blank"
-                           rel="noopener noreferrer"
-                           class="btn btn-sm btn-primary">
-                            View Resume
-                        </a>
+
+                        <!-- RESUME STATUS -->
+                        <td>
+
+                            @if (item.ResumeUploaded)
+                            {
+                                <span class="badge bg-success">
+                                    Uploaded
+                                </span>
+                            }
+                            else
+                            {
+                                <span class="badge bg-secondary">
+                                    Not Uploaded
+                                </span>
+                            }
+
+                        </td>
+
+
+
+                        srNo++;
+
                     }
-                    else
-                    {
-                        <span class="text-muted">Not Uploaded</span>
-                    }
-                </td>
 
-                <!-- RESUME STATUS -->
-                <td>
-                    @if (item.ResumeUploaded)
-                    {
-                        <span class="badge bg-success">Uploaded</span>
-                    }
-                    else
-                    {
-                        <span class="badge bg-secondary">Not Uploaded</span>
-                    }
-                </td>
-            </tr>
+                }
+                else
+                {
+                    <tr>
 
-            srNo++;
-        }
-    }
-    else
-    {
-        <tr>
-            <td colspan="24" class="text-center">
-                No trainee profiles found.
-            </td>
-        </tr>
-    }
-</tbody>
+                        <td colspan="24"
+                            class="text-center">
+
+                            No trainee profiles found.
+
+                        </td>
+
+                    </tr>
+                }
+
+                </tbody>
 
             </table>
 

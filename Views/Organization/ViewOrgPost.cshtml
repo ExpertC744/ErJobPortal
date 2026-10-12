@@ -832,6 +832,7 @@
             <a asp-controller="Organization"
                asp-action="ViewOrgPost"
                asp-route-id="@ViewBag.PreviousPostId"
+               asp-route-source="@ViewBag.PostSource"
                class="post-nav-btn previous-btn"
                title="Previous Post">
 
@@ -846,6 +847,7 @@
             <a asp-controller="Organization"
                asp-action="ViewOrgPost"
                asp-route-id="@ViewBag.NextPostId"
+               asp-route-source="@ViewBag.PostSource"
                class="post-nav-btn next-btn"
                title="Next Post">
 
