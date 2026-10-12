@@ -1,1004 +1,561 @@
-﻿@{
-    ViewData["Title"] = "Top Career Options";
-}
+﻿<link rel="stylesheet"
+      href="~/css/TopCarriers.css"
+      asp-append-version="true" />
 
-<link rel="stylesheet"
-      href="~/css/Top_Careers.css"
-      asp-append-version="true">
+<section class="top-careers-page">
+    <div class="top-careers-container">
 
-<div class="career-page">
-
-    <!-- =====================================================
-         HERO
-    ====================================================== -->
-
-    <section class="career-hero">
-
-        <div class="career-container">
-
-            <div class="career-hero-content">
-
-                <div class="career-badge">
-                    <i class="fa-solid fa-compass"></i>
+        <!-- PAGE HEADER -->
+        <div class="careers-hero">
+            <div class="careers-hero-content">
+                <div class="careers-badge">
+                    <i class="fas fa-compass"></i>
                     Explore Your Future
                 </div>
 
-                <h1>
-                    Discover the Right
-                    <span>Career Path</span>
-                    for You
-                </h1>
+                <h1>Top Career Options</h1>
 
                 <p>
-                    Explore career opportunities across technology,
-                    engineering, business, healthcare, creative fields,
-                    education, science, law and skilled trades.
-                    Find a path that matches  interests, skills and goals.
+                    Check out top career options across various fields.
+                    The right choice depends on your interests, skills,
+                    strengths, and career goals.
                 </p>
-
             </div>
-
         </div>
 
-    </section>
-
-
-    <!-- =====================================================
-         STATS
-    ====================================================== -->
-
-    <section class="career-stats">
-
-        <div class="career-container">
-
-            <div class="career-stats-grid">
-
-                <div class="career-stat">
-
-                    <div class="career-stat-icon">
-                        <i class="fa-solid fa-layer-group"></i>
-                    </div>
-
-                    <div>
-                        <h3>9+</h3>
-                        <p>Career Fields</p>
-                    </div>
-
-                </div>
-
-
-                <div class="career-stat">
-
-                    <div class="career-stat-icon">
-                        <i class="fa-solid fa-briefcase"></i>
-                    </div>
-
-                    <div>
-                        <h3>40+</h3>
-                        <p>Career Options</p>
-                    </div>
-
-                </div>
-
-
-                <div class="career-stat">
-
-                    <div class="career-stat-icon">
-                        <i class="fa-solid fa-graduation-cap"></i>
-                    </div>
-
-                    <div>
-                        <h3>1Trainee</h3>
-                        <p>Build Your Career</p>
-                    </div>
-
-                </div>
-
-            </div>
-
-        </div>
-
-    </section>
-
-
-    <!-- =====================================================
-         CAREER OPTIONS
-    ====================================================== -->
-
-    <section class="career-section">
-
-        <div class="career-container">
-
-            <div class="career-section-header">
-
-                <span class="career-section-label">
-                    Career Opportunities
-                </span>
-
-                <h2>
-                    Top Career Options
-                </h2>
-
-                <p>
-                    Each career field offers different opportunities.
-                    Explore the options below and discover careers
-                    that align with  strengths and ambitions.
-                </p>
-
-            </div>
-
-
-            <!-- =================================================
-                 TECHNOLOGY
-            ================================================== -->
-
-            <div class="career-category">
-
-                <div class="career-category-header">
-
+        <!-- TECHNOLOGY AND IT -->
+        <div class="career-category">
+            <div class="career-category-header">
+                <div class="career-category-title">
                     <div class="career-category-icon">
-                        <i class="fa-solid fa-code"></i>
+                        <i class="fas fa-laptop-code"></i>
                     </div>
-
-                    <div>
-                        <h3>Technology & IT</h3>
-                        <span>Build the technology of tomorrow</span>
-                    </div>
-
+                    <h3>Technology and IT</h3>
                 </div>
+                <span class="career-count">5 Careers</span>
+            </div>
 
-
-                <div class="career-grid">
-
-                    <div class="career-card">
-                        <div class="career-card-icon">
-                            <i class="fa-solid fa-laptop-code"></i>
-                        </div>
+            <div class="career-grid">
+                <div class="career-item">
+                    <div class="career-item-top">
+                        <div class="career-item-icon"><i class="fas fa-code"></i></div>
                         <h4>Software Developer / Engineer</h4>
-                        <p>
-                            Design and create software applications,
-                            platforms and digital systems.
-                        </p>
                     </div>
+                    <p>Design and create software applications or systems.</p>
+                </div>
 
-
-                    <div class="career-card">
-                        <div class="career-card-icon">
-                            <i class="fa-solid fa-chart-line"></i>
-                        </div>
+                <div class="career-item">
+                    <div class="career-item-top">
+                        <div class="career-item-icon"><i class="fas fa-chart-line"></i></div>
                         <h4>Data Scientist / Analyst</h4>
-                        <p>
-                            Analyze data and transform information
-                            into useful business insights.
-                        </p>
                     </div>
+                    <p>Analyze data to help businesses make informed decisions.</p>
+                </div>
 
-
-                    <div class="career-card">
-                        <div class="career-card-icon">
-                            <i class="fa-solid fa-shield-halved"></i>
-                        </div>
+                <div class="career-item">
+                    <div class="career-item-top">
+                        <div class="career-item-icon"><i class="fas fa-shield-alt"></i></div>
                         <h4>Cybersecurity Specialist</h4>
-                        <p>
-                            Protect systems, applications and
-                            networks from cyber threats.
-                        </p>
                     </div>
+                    <p>Protect systems and networks from cyber threats.</p>
+                </div>
 
-
-                    <div class="career-card">
-                        <div class="career-card-icon">
-                            <i class="fa-solid fa-network-wired"></i>
-                        </div>
+                <div class="career-item">
+                    <div class="career-item-top">
+                        <div class="career-item-icon"><i class="fas fa-user-tie"></i></div>
                         <h4>IT Consultant</h4>
-                        <p>
-                            Help organizations use technology
-                            to achieve business objectives.
-                        </p>
                     </div>
+                    <p>Advise organizations on using technology to achieve their goals.</p>
+                </div>
 
-
-                    <div class="career-card">
-                        <div class="career-card-icon">
-                            <i class="fa-solid fa-cloud"></i>
-                        </div>
+                <div class="career-item">
+                    <div class="career-item-top">
+                        <div class="career-item-icon"><i class="fas fa-cloud"></i></div>
                         <h4>Cloud Engineer</h4>
-                        <p>
-                            Manage cloud infrastructure, services
-                            and scalable digital environments.
-                        </p>
                     </div>
-
+                    <p>Manage cloud infrastructure and services.</p>
                 </div>
-
             </div>
-
-
-            <!-- =================================================
-                 ENGINEERING
-            ================================================== -->
-
-            <div class="career-category">
-
-                <div class="career-category-header">
-
-                    <div class="career-category-icon">
-                        <i class="fa-solid fa-gears"></i>
-                    </div>
-
-                    <div>
-                        <h3>Engineering</h3>
-                        <span>Design, build and solve real-world problems</span>
-                    </div>
-
-                </div>
-
-
-                <div class="career-grid">
-
-                    <div class="career-card">
-                        <div class="career-card-icon">
-                            <i class="fa-solid fa-gears"></i>
-                        </div>
-                        <h4>Mechanical Engineer</h4>
-                        <p>
-                            Design and develop mechanical systems,
-                            machines and devices.
-                        </p>
-                    </div>
-
-
-                    <div class="career-card">
-                        <div class="career-card-icon">
-                            <i class="fa-solid fa-building"></i>
-                        </div>
-                        <h4>Civil Engineer</h4>
-                        <p>
-                            Plan, design and oversee construction
-                            and infrastructure projects.
-                        </p>
-                    </div>
-
-
-                    <div class="career-card">
-                        <div class="career-card-icon">
-                            <i class="fa-solid fa-bolt"></i>
-                        </div>
-                        <h4>Electrical Engineer</h4>
-                        <p>
-                            Work with electrical systems,
-                            electronics and power technologies.
-                        </p>
-                    </div>
-
-
-                    <div class="career-card">
-                        <div class="career-card-icon">
-                            <i class="fa-solid fa-flask"></i>
-                        </div>
-                        <h4>Chemical Engineer</h4>
-                        <p>
-                            Apply chemical processes to create
-                            useful products and solutions.
-                        </p>
-                    </div>
-
-
-                    <div class="career-card">
-                        <div class="career-card-icon">
-                            <i class="fa-solid fa-code"></i>
-                        </div>
-                        <h4>Software Engineer</h4>
-                        <p>
-                            Develop reliable and scalable software
-                            systems and applications.
-                        </p>
-                    </div>
-
-                </div>
-
-            </div>
-
-
-            <!-- =================================================
-                 BUSINESS
-            ================================================== -->
-
-            <div class="career-category">
-
-                <div class="career-category-header">
-
-                    <div class="career-category-icon">
-                        <i class="fa-solid fa-chart-pie"></i>
-                    </div>
-
-                    <div>
-                        <h3>Business & Finance</h3>
-                        <span>Turn ideas into business growth</span>
-                    </div>
-
-                </div>
-
-
-                <div class="career-grid">
-
-                    <div class="career-card">
-                        <div class="career-card-icon">
-                            <i class="fa-solid fa-chart-column"></i>
-                        </div>
-                        <h4>Financial Analyst</h4>
-                        <p>
-                            Analyze financial information to
-                            support business and investment decisions.
-                        </p>
-                    </div>
-
-
-                    <div class="career-card">
-                        <div class="career-card-icon">
-                            <i class="fa-solid fa-bullhorn"></i>
-                        </div>
-                        <h4>Marketing Manager</h4>
-                        <p>
-                            Develop and implement marketing
-                            strategies and campaigns.
-                        </p>
-                    </div>
-
-
-                    <div class="career-card">
-                        <div class="career-card-icon">
-                            <i class="fa-solid fa-lightbulb"></i>
-                        </div>
-                        <h4>Management Consultant</h4>
-                        <p>
-                            Advise organizations on business
-                            improvement and growth strategies.
-                        </p>
-                    </div>
-
-
-                    <div class="career-card">
-                        <div class="career-card-icon">
-                            <i class="fa-solid fa-calculator"></i>
-                        </div>
-                        <h4>Accountant</h4>
-                        <p>
-                            Manage financial records and
-                            support financial compliance.
-                        </p>
-                    </div>
-
-
-                    <div class="career-card">
-                        <div class="career-card-icon">
-                            <i class="fa-solid fa-users"></i>
-                        </div>
-                        <h4>Human Resources Manager</h4>
-                        <p>
-                            Manage recruitment, employee relations
-                            and organizational development.
-                        </p>
-                    </div>
-
-                </div>
-
-            </div>
-
-
-            <!-- =================================================
-                 HEALTHCARE
-            ================================================== -->
-
-            <div class="career-category">
-
-                <div class="career-category-header">
-
-                    <div class="career-category-icon">
-                        <i class="fa-solid fa-heart-pulse"></i>
-                    </div>
-
-                    <div>
-                        <h3>Healthcare</h3>
-                        <span>Make a meaningful difference in people's lives</span>
-                    </div>
-
-                </div>
-
-
-                <div class="career-grid">
-
-                    <div class="career-card">
-                        <div class="career-card-icon">
-                            <i class="fa-solid fa-user-doctor"></i>
-                        </div>
-                        <h4>Doctor / Physician</h4>
-                        <p>
-                            Diagnose and treat medical conditions
-                            while supporting patient health.
-                        </p>
-                    </div>
-
-
-                    <div class="career-card">
-                        <div class="career-card-icon">
-                            <i class="fa-solid fa-user-nurse"></i>
-                        </div>
-                        <h4>Nurse</h4>
-                        <p>
-                            Provide professional care,
-                            assistance and patient support.
-                        </p>
-                    </div>
-
-
-                    <div class="career-card">
-                        <div class="career-card-icon">
-                            <i class="fa-solid fa-pills"></i>
-                        </div>
-                        <h4>Pharmacist</h4>
-                        <p>
-                            Dispense medications and provide
-                            guidance on their appropriate use.
-                        </p>
-                    </div>
-
-
-                    <div class="career-card">
-                        <div class="career-card-icon">
-                            <i class="fa-solid fa-microscope"></i>
-                        </div>
-                        <h4>Medical Researcher</h4>
-                        <p>
-                            Conduct research to advance medical
-                            knowledge and treatments.
-                        </p>
-                    </div>
-
-
-                    <div class="career-card">
-                        <div class="career-card-icon">
-                            <i class="fa-solid fa-hospital"></i>
-                        </div>
-                        <h4>Healthcare Administrator</h4>
-                        <p>
-                            Manage healthcare facilities,
-                            services and operations.
-                        </p>
-                    </div>
-
-                </div>
-
-            </div>
-
-
-            <!-- =================================================
-                 ARTS & MEDIA
-            ================================================== -->
-
-            <div class="career-category">
-
-                <div class="career-category-header">
-
-                    <div class="career-category-icon">
-                        <i class="fa-solid fa-palette"></i>
-                    </div>
-
-                    <div>
-                        <h3>Arts & Media</h3>
-                        <span>Turn creativity into a career</span>
-                    </div>
-
-                </div>
-
-
-                <div class="career-grid">
-
-                    <div class="career-card">
-                        <div class="career-card-icon">
-                            <i class="fa-solid fa-pen-ruler"></i>
-                        </div>
-                        <h4>Graphic Designer</h4>
-                        <p>
-                            Create visual content for digital
-                            and traditional media.
-                        </p>
-                    </div>
-
-
-                    <div class="career-card">
-                        <div class="career-card-icon">
-                            <i class="fa-solid fa-newspaper"></i>
-                        </div>
-                        <h4>Journalist / Reporter</h4>
-                        <p>
-                            Research, investigate and report
-                            news and events.
-                        </p>
-                    </div>
-
-
-                    <div class="career-card">
-                        <div class="career-card-icon">
-                            <i class="fa-solid fa-film"></i>
-                        </div>
-                        <h4>Film Director / Producer</h4>
-                        <p>
-                            Manage creative and production
-                            processes for film projects.
-                        </p>
-                    </div>
-
-
-                    <div class="career-card">
-                        <div class="career-card-icon">
-                            <i class="fa-solid fa-file-lines"></i>
-                        </div>
-                        <h4>Content Writer</h4>
-                        <p>
-                            Develop useful and engaging content
-                            for different platforms.
-                        </p>
-                    </div>
-
-
-                    <div class="career-card">
-                        <div class="career-card-icon">
-                            <i class="fa-solid fa-bullhorn"></i>
-                        </div>
-                        <h4>Public Relations Specialist</h4>
-                        <p>
-                            Manage the public image and
-                            communication of organizations.
-                        </p>
-                    </div>
-
-                </div>
-
-            </div>
-
-
-            <!-- =================================================
-                 EDUCATION
-            ================================================== -->
-
-            <div class="career-category">
-
-                <div class="career-category-header">
-
-                    <div class="career-category-icon">
-                        <i class="fa-solid fa-book-open"></i>
-                    </div>
-
-                    <div>
-                        <h3>Education</h3>
-                        <span>Shape the next generation</span>
-                    </div>
-
-                </div>
-
-
-                <div class="career-grid">
-
-                    <div class="career-card">
-                        <div class="career-card-icon">
-                            <i class="fa-solid fa-chalkboard-user"></i>
-                        </div>
-                        <h4>Teacher</h4>
-                        <p>
-                            Educate and support students across
-                            different subjects and levels.
-                        </p>
-                    </div>
-
-
-                    <div class="career-card">
-                        <div class="career-card-icon">
-                            <i class="fa-solid fa-user-tie"></i>
-                        </div>
-                        <h4>Educational Consultant</h4>
-                        <p>
-                            Advise institutions on educational
-                            strategies and improvements.
-                        </p>
-                    </div>
-
-
-                    <div class="career-card">
-                        <div class="career-card-icon">
-                            <i class="fa-solid fa-book"></i>
-                        </div>
-                        <h4>Curriculum Developer</h4>
-                        <p>
-                            Design educational programs,
-                            resources and learning materials.
-                        </p>
-                    </div>
-
-
-                    <div class="career-card">
-                        <div class="career-card-icon">
-                            <i class="fa-solid fa-compass"></i>
-                        </div>
-                        <h4>Academic Advisor</h4>
-                        <p>
-                            Guide students in academic planning
-                            and career development.
-                        </p>
-                    </div>
-
-
-                    <div class="career-card">
-                        <div class="career-card-icon">
-                            <i class="fa-solid fa-school"></i>
-                        </div>
-                        <h4>Education Administrator</h4>
-                        <p>
-                            Manage educational institutions
-                            and learning programs.
-                        </p>
-                    </div>
-
-                </div>
-
-            </div>
-
-
-            <!-- =================================================
-                 SCIENCE
-            ================================================== -->
-
-            <div class="career-category">
-
-                <div class="career-category-header">
-
-                    <div class="career-category-icon">
-                        <i class="fa-solid fa-atom"></i>
-                    </div>
-
-                    <div>
-                        <h3>Science & Research</h3>
-                        <span>Explore, discover and innovate</span>
-                    </div>
-
-                </div>
-
-
-                <div class="career-grid">
-
-                    <div class="career-card">
-                        <div class="career-card-icon">
-                            <i class="fa-solid fa-dna"></i>
-                        </div>
-                        <h4>Biologist</h4>
-                        <p>
-                            Study living organisms and their
-                            interactions with the environment.
-                        </p>
-                    </div>
-
-
-                    <div class="career-card">
-                        <div class="career-card-icon">
-                            <i class="fa-solid fa-flask"></i>
-                        </div>
-                        <h4>Chemist</h4>
-                        <p>
-                            Conduct experiments and research
-                            chemical processes.
-                        </p>
-                    </div>
-
-
-                    <div class="career-card">
-                        <div class="career-card-icon">
-                            <i class="fa-solid fa-earth-americas"></i>
-                        </div>
-                        <h4>Environmental Scientist</h4>
-                        <p>
-                            Address environmental challenges
-                            and develop sustainable solutions.
-                        </p>
-                    </div>
-
-
-                    <div class="career-card">
-                        <div class="career-card-icon">
-                            <i class="fa-solid fa-atom"></i>
-                        </div>
-                        <h4>Physicist</h4>
-                        <p>
-                            Research and analyze physical
-                            phenomena and scientific principles.
-                        </p>
-                    </div>
-
-
-                    <div class="career-card">
-                        <div class="career-card-icon">
-                            <i class="fa-solid fa-square-root-variable"></i>
-                        </div>
-                        <h4>Mathematician</h4>
-                        <p>
-                            Apply mathematical theories and
-                            techniques to solve complex problems.
-                        </p>
-                    </div>
-
-                </div>
-
-            </div>
-
-
-            <!-- =================================================
-                 SOCIAL SCIENCES
-            ================================================== -->
-
-            <div class="career-category">
-
-                <div class="career-category-header">
-
-                    <div class="career-category-icon">
-                        <i class="fa-solid fa-people-group"></i>
-                    </div>
-
-                    <div>
-                        <h3>Social Sciences</h3>
-                        <span>Understand people and society</span>
-                    </div>
-
-                </div>
-
-
-                <div class="career-grid">
-
-                    <div class="career-card">
-                        <div class="career-card-icon">
-                            <i class="fa-solid fa-brain"></i>
-                        </div>
-                        <h4>Psychologist</h4>
-                        <p>
-                            Study behavior and mental processes
-                            to support individuals.
-                        </p>
-                    </div>
-
-
-                    <div class="career-card">
-                        <div class="career-card-icon">
-                            <i class="fa-solid fa-users"></i>
-                        </div>
-                        <h4>Sociologist</h4>
-                        <p>
-                            Research social behavior and
-                            structures within society.
-                        </p>
-                    </div>
-
-
-                    <div class="career-card">
-                        <div class="career-card-icon">
-                            <i class="fa-solid fa-coins"></i>
-                        </div>
-                        <h4>Economist</h4>
-                        <p>
-                            Analyze economic data, trends
-                            and market behavior.
-                        </p>
-                    </div>
-
-
-                    <div class="career-card">
-                        <div class="career-card-icon">
-                            <i class="fa-solid fa-landmark"></i>
-                        </div>
-                        <h4>Political Scientist</h4>
-                        <p>
-                            Study political systems and
-                            political behavior.
-                        </p>
-                    </div>
-
-
-                    <div class="career-card">
-                        <div class="career-card-icon">
-                            <i class="fa-solid fa-hand-holding-heart"></i>
-                        </div>
-                        <h4>Social Worker</h4>
-                        <p>
-                            Support individuals and communities
-                            facing social challenges.
-                        </p>
-                    </div>
-
-                </div>
-
-            </div>
-
-
-            <!-- =================================================
-                 LAW
-            ================================================== -->
-
-            <div class="career-category">
-
-                <div class="career-category-header">
-
-                    <div class="career-category-icon">
-                        <i class="fa-solid fa-scale-balanced"></i>
-                    </div>
-
-                    <div>
-                        <h3>Law & Criminal Justice</h3>
-                        <span>Support justice and legal systems</span>
-                    </div>
-
-                </div>
-
-
-                <div class="career-grid">
-
-                    <div class="career-card">
-                        <div class="career-card-icon">
-                            <i class="fa-solid fa-gavel"></i>
-                        </div>
-                        <h4>Lawyer / Attorney</h4>
-                        <p>
-                            Provide legal advice and represent
-                            clients in legal matters.
-                        </p>
-                    </div>
-
-
-                    <div class="career-card">
-                        <div class="career-card-icon">
-                            <i class="fa-solid fa-scale-balanced"></i>
-                        </div>
-                        <h4>Judge</h4>
-                        <p>
-                            Preside over court proceedings
-                            and make legal judgments.
-                        </p>
-                    </div>
-
-
-                    <div class="career-card">
-                        <div class="career-card-icon">
-                            <i class="fa-solid fa-user-secret"></i>
-                        </div>
-                        <h4>Criminal Investigator</h4>
-                        <p>
-                            Investigate crimes and gather
-                            relevant evidence.
-                        </p>
-                    </div>
-
-
-                    <div class="career-card">
-                        <div class="career-card-icon">
-                            <i class="fa-solid fa-file-contract"></i>
-                        </div>
-                        <h4>Paralegal</h4>
-                        <p>
-                            Assist lawyers with research,
-                            documents and case preparation.
-                        </p>
-                    </div>
-
-
-                    <div class="career-card">
-                        <div class="career-card-icon">
-                            <i class="fa-solid fa-user-tie"></i>
-                        </div>
-                        <h4>Legal Consultant</h4>
-                        <p>
-                            Provide expert guidance on
-                            legal matters and requirements.
-                        </p>
-                    </div>
-
-                </div>
-
-            </div>
-
-
-            <!-- =================================================
-                 SKILLED TRADES
-            ================================================== -->
-
-            <div class="career-category">
-
-                <div class="career-category-header">
-
-                    <div class="career-category-icon">
-                        <i class="fa-solid fa-screwdriver-wrench"></i>
-                    </div>
-
-                    <div>
-                        <h3>Skilled Trades</h3>
-                        <span>Build practical skills for valuable careers</span>
-                    </div>
-
-                </div>
-
-
-                <div class="career-grid">
-
-                    <div class="career-card">
-                        <div class="career-card-icon">
-                            <i class="fa-solid fa-bolt"></i>
-                        </div>
-                        <h4>Skilled Electrician</h4>
-                        <p>
-                            Install, maintain and repair
-                            electrical systems.
-                        </p>
-                    </div>
-
-
-                    <div class="career-card">
-                        <div class="career-card-icon">
-                            <i class="fa-solid fa-temperature-half"></i>
-                        </div>
-                        <h4>HVAC Technician</h4>
-                        <p>
-                            Install and maintain heating,
-                            ventilation and cooling systems.
-                        </p>
-                    </div>
-
-
-                    <div class="career-card">
-                        <div class="career-card-icon">
-                            <i class="fa-solid fa-fire-flame-curved"></i>
-                        </div>
-                        <h4>Welder</h4>
-                        <p>
-                            Join metal components using
-                            professional welding techniques.
-                        </p>
-                    </div>
-
-                </div>
-
-            </div>
-
-
-            <!-- =================================================
-                 FINAL CTA
-            ================================================== -->
-
-            <div class="career-cta">
-
-                <div class="career-cta-content">
-
-                    <h2>
-                        Your Career Starts With One Decision
-                    </h2>
-
-                    <p>
-                        Every career requires different skills,
-                        education and experience. Explore 
-                        interests, understand  strengths and
-                        choose a path that supports  long-term goals.
-                    </p>
-
-                    <a asp-controller="Account"
-                       asp-action="Register"
-                       class="career-cta-btn">
-
-                        Start Your Journey
-
-                        <i class="fa-solid fa-arrow-right"></i>
-
-                    </a>
-
-                </div>
-
-            </div>
-
         </div>
 
-    </section>
+        <!-- ENGINEERING -->
+        <div class="career-category">
+            <div class="career-category-header">
+                <div class="career-category-title">
+                    <div class="career-category-icon">
+                        <i class="fas fa-cogs"></i>
+                    </div>
+                    <h3>Engineering</h3>
+                </div>
+                <span class="career-count">5 Careers</span>
+            </div>
 
-</div>
+            <div class="career-grid">
+                <div class="career-item">
+                    <div class="career-item-top">
+                        <div class="career-item-icon"><i class="fas fa-cogs"></i></div>
+                        <h4>Mechanical Engineer</h4>
+                    </div>
+                    <p>Design and develop mechanical systems and devices.</p>
+                </div>
+
+                <div class="career-item">
+                    <div class="career-item-top">
+                        <div class="career-item-icon"><i class="fas fa-building"></i></div>
+                        <h4>Civil Engineer</h4>
+                    </div>
+                    <p>Plan, design, and oversee construction projects.</p>
+                </div>
+
+                <div class="career-item">
+                    <div class="career-item-top">
+                        <div class="career-item-icon"><i class="fas fa-bolt"></i></div>
+                        <h4>Electrical Engineer</h4>
+                    </div>
+                    <p>Work with electrical systems and electronics.</p>
+                </div>
+
+                <div class="career-item">
+                    <div class="career-item-top">
+                        <div class="career-item-icon"><i class="fas fa-flask"></i></div>
+                        <h4>Chemical Engineer</h4>
+                    </div>
+                    <p>Apply chemical processes to develop products and solutions.</p>
+                </div>
+
+                <div class="career-item">
+                    <div class="career-item-top">
+                        <div class="career-item-icon"><i class="fas fa-laptop-code"></i></div>
+                        <h4>Software Engineer</h4>
+                    </div>
+                    <p>Develop software systems and applications.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- BUSINESS AND FINANCE -->
+        <div class="career-category">
+            <div class="career-category-header">
+                <div class="career-category-title">
+                    <div class="career-category-icon">
+                        <i class="fas fa-briefcase"></i>
+                    </div>
+                    <h3>Business and Finance</h3>
+                </div>
+                <span class="career-count">5 Careers</span>
+            </div>
+
+            <div class="career-grid">
+                <div class="career-item">
+                    <div class="career-item-top">
+                        <div class="career-item-icon"><i class="fas fa-chart-pie"></i></div>
+                        <h4>Financial Analyst</h4>
+                    </div>
+                    <p>Analyze financial data to guide investment decisions.</p>
+                </div>
+
+                <div class="career-item">
+                    <div class="career-item-top">
+                        <div class="career-item-icon"><i class="fas fa-bullhorn"></i></div>
+                        <h4>Marketing Manager</h4>
+                    </div>
+                    <p>Develop and implement marketing strategies.</p>
+                </div>
+
+                <div class="career-item">
+                    <div class="career-item-top">
+                        <div class="career-item-icon"><i class="fas fa-lightbulb"></i></div>
+                        <h4>Management Consultant</h4>
+                    </div>
+                    <p>Provide advice on business improvements and strategies.</p>
+                </div>
+
+                <div class="career-item">
+                    <div class="career-item-top">
+                        <div class="career-item-icon"><i class="fas fa-calculator"></i></div>
+                        <h4>Accountant</h4>
+                    </div>
+                    <p>Manage financial records and ensure compliance with regulations.</p>
+                </div>
+
+                <div class="career-item">
+                    <div class="career-item-top">
+                        <div class="career-item-icon"><i class="fas fa-users"></i></div>
+                        <h4>Human Resources Manager</h4>
+                    </div>
+                    <p>Oversee recruitment, employee relations, and organizational development.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- HEALTHCARE -->
+        <div class="career-category">
+            <div class="career-category-header">
+                <div class="career-category-title">
+                    <div class="career-category-icon">
+                        <i class="fas fa-heartbeat"></i>
+                    </div>
+                    <h3>Healthcare</h3>
+                </div>
+                <span class="career-count">5 Careers</span>
+            </div>
+
+            <div class="career-grid">
+                <div class="career-item">
+                    <div class="career-item-top">
+                        <div class="career-item-icon"><i class="fas fa-user-md"></i></div>
+                        <h4>Doctor / Physician</h4>
+                    </div>
+                    <p>Diagnose and treat medical conditions.</p>
+                </div>
+
+                <div class="career-item">
+                    <div class="career-item-top">
+                        <div class="career-item-icon"><i class="fas fa-user-nurse"></i></div>
+                        <h4>Nurse</h4>
+                    </div>
+                    <p>Provide care and support to patients.</p>
+                </div>
+
+                <div class="career-item">
+                    <div class="career-item-top">
+                        <div class="career-item-icon"><i class="fas fa-pills"></i></div>
+                        <h4>Pharmacist</h4>
+                    </div>
+                    <p>Dispense medications and advise on their use.</p>
+                </div>
+
+                <div class="career-item">
+                    <div class="career-item-top">
+                        <div class="career-item-icon"><i class="fas fa-microscope"></i></div>
+                        <h4>Medical Researcher</h4>
+                    </div>
+                    <p>Conduct research to advance medical knowledge and treatments.</p>
+                </div>
+
+                <div class="career-item">
+                    <div class="career-item-top">
+                        <div class="career-item-icon"><i class="fas fa-hospital"></i></div>
+                        <h4>Healthcare Administrator</h4>
+                    </div>
+                    <p>Manage healthcare facilities and services.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- ARTS AND MEDIA -->
+        <div class="career-category">
+            <div class="career-category-header">
+                <div class="career-category-title">
+                    <div class="career-category-icon">
+                        <i class="fas fa-palette"></i>
+                    </div>
+                    <h3>Arts and Media</h3>
+                </div>
+                <span class="career-count">5 Careers</span>
+            </div>
+
+            <div class="career-grid">
+                <div class="career-item">
+                    <div class="career-item-top">
+                        <div class="career-item-icon"><i class="fas fa-pen-nib"></i></div>
+                        <h4>Graphic Designer</h4>
+                    </div>
+                    <p>Create visual content for print and digital media.</p>
+                </div>
+
+                <div class="career-item">
+                    <div class="career-item-top">
+                        <div class="career-item-icon"><i class="fas fa-newspaper"></i></div>
+                        <h4>Journalist / Reporter</h4>
+                    </div>
+                    <p>Research and report on news and events.</p>
+                </div>
+
+                <div class="career-item">
+                    <div class="career-item-top">
+                        <div class="career-item-icon"><i class="fas fa-film"></i></div>
+                        <h4>Film Director / Producer</h4>
+                    </div>
+                    <p>Oversee and manage film production processes.</p>
+                </div>
+
+                <div class="career-item">
+                    <div class="career-item-top">
+                        <div class="career-item-icon"><i class="fas fa-file-alt"></i></div>
+                        <h4>Content Writer</h4>
+                    </div>
+                    <p>Develop engaging content for various platforms.</p>
+                </div>
+
+                <div class="career-item">
+                    <div class="career-item-top">
+                        <div class="career-item-icon"><i class="fas fa-bullhorn"></i></div>
+                        <h4>Public Relations Specialist</h4>
+                    </div>
+                    <p>Manage the public image of organizations or individuals.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- EDUCATION -->
+        <div class="career-category">
+            <div class="career-category-header">
+                <div class="career-category-title">
+                    <div class="career-category-icon">
+                        <i class="fas fa-graduation-cap"></i>
+                    </div>
+                    <h3>Education</h3>
+                </div>
+                <span class="career-count">5 Careers</span>
+            </div>
+
+            <div class="career-grid">
+                <div class="career-item">
+                    <div class="career-item-top">
+                        <div class="career-item-icon"><i class="fas fa-chalkboard-teacher"></i></div>
+                        <h4>Teacher</h4>
+                    </div>
+                    <p>Educate students in various subjects and at different levels.</p>
+                </div>
+
+                <div class="career-item">
+                    <div class="career-item-top">
+                        <div class="career-item-icon"><i class="fas fa-user-tie"></i></div>
+                        <h4>Educational Consultant</h4>
+                    </div>
+                    <p>Advise on educational strategies and improvements.</p>
+                </div>
+
+                <div class="career-item">
+                    <div class="career-item-top">
+                        <div class="career-item-icon"><i class="fas fa-book"></i></div>
+                        <h4>Curriculum Developer</h4>
+                    </div>
+                    <p>Design and develop educational programs and materials.</p>
+                </div>
+
+                <div class="career-item">
+                    <div class="career-item-top">
+                        <div class="career-item-icon"><i class="fas fa-user-graduate"></i></div>
+                        <h4>Academic Advisor</h4>
+                    </div>
+                    <p>Guide students in academic planning and career development.</p>
+                </div>
+
+                <div class="career-item">
+                    <div class="career-item-top">
+                        <div class="career-item-icon"><i class="fas fa-school"></i></div>
+                        <h4>Education Administrator</h4>
+                    </div>
+                    <p>Manage educational institutions and programs.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- SCIENCE AND RESEARCH -->
+        <div class="career-category">
+            <div class="career-category-header">
+                <div class="career-category-title">
+                    <div class="career-category-icon">
+                        <i class="fas fa-flask"></i>
+                    </div>
+                    <h3>Science and Research</h3>
+                </div>
+                <span class="career-count">5 Careers</span>
+            </div>
+
+            <div class="career-grid">
+                <div class="career-item">
+                    <div class="career-item-top">
+                        <div class="career-item-icon"><i class="fas fa-dna"></i></div>
+                        <h4>Biologist</h4>
+                    </div>
+                    <p>Study living organisms and their interactions with the environment.</p>
+                </div>
+
+                <div class="career-item">
+                    <div class="career-item-top">
+                        <div class="career-item-icon"><i class="fas fa-flask"></i></div>
+                        <h4>Chemist</h4>
+                    </div>
+                    <p>Conduct experiments and research chemical processes.</p>
+                </div>
+
+                <div class="career-item">
+                    <div class="career-item-top">
+                        <div class="career-item-icon"><i class="fas fa-leaf"></i></div>
+                        <h4>Environmental Scientist</h4>
+                    </div>
+                    <p>Address environmental issues and develop sustainable solutions.</p>
+                </div>
+
+                <div class="career-item">
+                    <div class="career-item-top">
+                        <div class="career-item-icon"><i class="fas fa-atom"></i></div>
+                        <h4>Physicist</h4>
+                    </div>
+                    <p>Research and analyze physical phenomena.</p>
+                </div>
+
+                <div class="career-item">
+                    <div class="career-item-top">
+                        <div class="career-item-icon"><i class="fas fa-square-root-alt"></i></div>
+                        <h4>Mathematician</h4>
+                    </div>
+                    <p>Apply mathematical theories and techniques to solve problems.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- SOCIAL SCIENCES -->
+        <div class="career-category">
+            <div class="career-category-header">
+                <div class="career-category-title">
+                    <div class="career-category-icon">
+                        <i class="fas fa-users"></i>
+                    </div>
+                    <h3>Social Sciences</h3>
+                </div>
+                <span class="career-count">5 Careers</span>
+            </div>
+
+            <div class="career-grid">
+                <div class="career-item">
+                    <div class="career-item-top">
+                        <div class="career-item-icon"><i class="fas fa-brain"></i></div>
+                        <h4>Psychologist</h4>
+                    </div>
+                    <p>Study behavior and mental processes to help individuals.</p>
+                </div>
+
+                <div class="career-item">
+                    <div class="career-item-top">
+                        <div class="career-item-icon"><i class="fas fa-people-group"></i></div>
+                        <h4>Sociologist</h4>
+                    </div>
+                    <p>Research social behavior and societal structures.</p>
+                </div>
+
+                <div class="career-item">
+                    <div class="career-item-top">
+                        <div class="career-item-icon"><i class="fas fa-chart-line"></i></div>
+                        <h4>Economist</h4>
+                    </div>
+                    <p>Analyze economic data and trends to provide insights.</p>
+                </div>
+
+                <div class="career-item">
+                    <div class="career-item-top">
+                        <div class="career-item-icon"><i class="fas fa-landmark"></i></div>
+                        <h4>Political Scientist</h4>
+                    </div>
+                    <p>Study political systems and conduct research on political behavior.</p>
+                </div>
+
+                <div class="career-item">
+                    <div class="career-item-top">
+                        <div class="career-item-icon"><i class="fas fa-hands-helping"></i></div>
+                        <h4>Social Worker</h4>
+                    </div>
+                    <p>Support individuals and communities in addressing social issues.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- LAW AND CRIMINAL JUSTICE -->
+        <div class="career-category">
+            <div class="career-category-header">
+                <div class="career-category-title">
+                    <div class="career-category-icon">
+                        <i class="fas fa-balance-scale"></i>
+                    </div>
+                    <h3>Law and Criminal Justice</h3>
+                </div>
+                <span class="career-count">5 Careers</span>
+            </div>
+
+            <div class="career-grid">
+                <div class="career-item">
+                    <div class="career-item-top">
+                        <div class="career-item-icon"><i class="fas fa-gavel"></i></div>
+                        <h4>Lawyer / Attorney</h4>
+                    </div>
+                    <p>Provide legal advice and represent clients in legal matters.</p>
+                </div>
+
+                <div class="career-item">
+                    <div class="career-item-top">
+                        <div class="career-item-icon"><i class="fas fa-balance-scale"></i></div>
+                        <h4>Judge</h4>
+                    </div>
+                    <p>Preside over court proceedings and make legal judgments.</p>
+                </div>
+
+                <div class="career-item">
+                    <div class="career-item-top">
+                        <div class="career-item-icon"><i class="fas fa-search"></i></div>
+                        <h4>Criminal Investigator</h4>
+                    </div>
+                    <p>Investigate crimes and gather evidence.</p>
+                </div>
+
+                <div class="career-item">
+                    <div class="career-item-top">
+                        <div class="career-item-icon"><i class="fas fa-file-alt"></i></div>
+                        <h4>Paralegal</h4>
+                    </div>
+                    <p>Assist lawyers with legal research and case preparation.</p>
+                </div>
+
+                <div class="career-item">
+                    <div class="career-item-top">
+                        <div class="career-item-icon"><i class="fas fa-briefcase"></i></div>
+                        <h4>Legal Consultant</h4>
+                    </div>
+                    <p>Offer expert advice on legal matters to individuals or organizations.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- SKILLED TRADES -->
+        <div class="career-category">
+            <div class="career-category-header">
+                <div class="career-category-title">
+                    <div class="career-category-icon">
+                        <i class="fas fa-tools"></i>
+                    </div>
+                    <h3>Skilled Trades</h3>
+                </div>
+                <span class="career-count">3 Careers</span>
+            </div>
+
+            <div class="career-grid">
+                <div class="career-item">
+                    <div class="career-item-top">
+                        <div class="career-item-icon"><i class="fas fa-bolt"></i></div>
+                        <h4>Skilled Electrician</h4>
+                    </div>
+                    <p>Install and maintain electrical systems.</p>
+                </div>
+
+                <div class="career-item">
+                    <div class="career-item-top">
+                        <div class="career-item-icon"><i class="fas fa-temperature-half"></i></div>
+                        <h4>HVAC Technician</h4>
+                    </div>
+                    <p>Install and maintain heating, ventilation, and air conditioning systems.</p>
+                </div>
+
+                <div class="career-item">
+                    <div class="career-item-top">
+                        <div class="career-item-icon"><i class="fas fa-fire"></i></div>
+                        <h4>Welder</h4>
+                    </div>
+                    <p>Join metal parts using welding techniques.</p>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</section>

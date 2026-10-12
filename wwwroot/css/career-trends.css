@@ -1,0 +1,583 @@
+﻿/* =========================================================
+   CAREER TRENDS - FORMAL STYLESHEET
+   Teal theme (matching PopularLinks pages)
+   ========================================================= */
+
+:root {
+    --primary-color: #0d9488;
+    --primary-dark: #0f766e;
+    --primary-deeper: #115e59;
+    --primary-light: #f0fdfa;
+    --primary-soft: #ccfbf1;
+    --primary-border: #99f6e4;
+    --text-main: #1f2937;
+    --text-muted: #4b5563;
+    --border-color: #e5e7eb;
+    --card-bg: #ffffff;
+    --page-bg: #f8fafc;
+    --radius: 10px;
+    --shadow-sm: 0 1px 3px rgba(15, 23, 42, 0.06);
+    --shadow-md: 0 8px 22px rgba(13, 148, 136, 0.12);
+    --ease: cubic-bezier(0.22, 0.61, 0.36, 1);
+}
+
+.career-trends-page {
+    font-family: inherit;
+    color: var(--text-main);
+    background-color: var(--page-bg);
+    overflow-x: hidden;
+}
+
+/* =========================================================
+   SCROLL PROGRESS BAR
+   ========================================================= */
+.career-trends-progress {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 3px;
+    background: linear-gradient(90deg, var(--primary-color), #5eead4);
+    transform: scaleX(0);
+    transform-origin: left;
+    z-index: 2000;
+    pointer-events: none;
+}
+
+/* =========================================================
+   HERO
+   ========================================================= */
+.career-trends-hero {
+    position: relative;
+    background: linear-gradient(135deg, var(--primary-dark) 0%, var(--primary-color) 55%, var(--primary-deeper) 100%);
+    background-size: 160% 160%;
+    animation: ctGradient 14s ease-in-out infinite alternate;
+    color: #ffffff;
+    padding: 3.5rem 0;
+    overflow: hidden;
+    border-bottom: 3px solid #5eead4;
+}
+
+    .career-trends-hero::before {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background-image: radial-gradient(rgba(255, 255, 255, 0.12) 1px, transparent 1px);
+        background-size: 24px 24px;
+        pointer-events: none;
+    }
+
+.career-trends-shape {
+    position: absolute;
+    border-radius: 50%;
+    border: 1px solid rgba(255, 255, 255, 0.18);
+    pointer-events: none;
+}
+
+.career-trends-shape-1 {
+    width: 340px;
+    height: 340px;
+    right: -110px;
+    top: -130px;
+    box-shadow: 0 0 0 40px rgba(255, 255, 255, 0.05);
+    animation: ctDrift 12s ease-in-out infinite alternate;
+}
+
+.career-trends-shape-2 {
+    width: 180px;
+    height: 180px;
+    left: 8%;
+    bottom: -90px;
+    background: rgba(255, 255, 255, 0.05);
+    animation: ctDrift 16s ease-in-out infinite alternate-reverse;
+}
+
+.career-trends-hero .container {
+    position: relative;
+    z-index: 2;
+}
+
+.career-trends-small-title {
+    display: inline-block;
+    font-size: 0.72rem;
+    font-weight: 600;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--primary-soft);
+    background: rgba(255, 255, 255, 0.12);
+    border: 1px solid rgba(255, 255, 255, 0.22);
+    padding: 0.3rem 0.8rem;
+    border-radius: 50rem;
+    margin-bottom: 0.9rem;
+    animation: ctFadeUp 0.7s var(--ease) both;
+}
+
+.career-trends-title {
+    font-size: 2.2rem;
+    font-weight: 700;
+    letter-spacing: -0.01em;
+    color: #ffffff;
+    margin-bottom: 0.7rem;
+    animation: ctFadeUp 0.7s var(--ease) 0.1s both;
+}
+
+.career-trends-title-line {
+    width: 56px;
+    height: 3px;
+    background: #5eead4;
+    border-radius: 2px;
+    margin: 0 0 0.9rem;
+    animation: ctGrowLine 0.8s var(--ease) 0.3s both;
+}
+
+.career-trends-subtitle {
+    font-size: 1rem;
+    line-height: 1.65;
+    color: #e6fffa;
+    margin-bottom: 0;
+    max-width: 540px;
+    animation: ctFadeUp 0.7s var(--ease) 0.25s both;
+}
+
+/* Breadcrumb */
+.career-trends-breadcrumb {
+    display: inline-flex;
+    align-items: center;
+    background: rgba(255, 255, 255, 0.10);
+    border: 1px solid rgba(255, 255, 255, 0.24);
+    padding: 0.45rem 1.1rem;
+    border-radius: 50rem;
+    backdrop-filter: blur(6px);
+    animation: ctFadeUp 0.7s var(--ease) 0.35s both;
+}
+
+.career-trends-btn {
+    color: #ffffff;
+    text-decoration: none;
+    font-size: 0.88rem;
+    font-weight: 500;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    transition: color 0.2s ease;
+}
+
+    .career-trends-btn:hover {
+        color: var(--primary-soft);
+    }
+
+.career-trends-arrow {
+    color: var(--primary-border);
+    margin: 0 0.65rem;
+    font-size: 0.8rem;
+}
+
+.career-trends-current-page {
+    color: #ffffff;
+    font-size: 0.88rem;
+    font-weight: 600;
+}
+
+@keyframes ctFadeUp {
+    from {
+        opacity: 0;
+        transform: translateY(14px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes ctGrowLine {
+    from {
+        width: 0;
+    }
+
+    to {
+        width: 56px;
+    }
+}
+
+@keyframes ctGradient {
+    from {
+        background-position: 0% 50%;
+    }
+
+    to {
+        background-position: 100% 50%;
+    }
+}
+
+@keyframes ctDrift {
+    from {
+        transform: translate(0, 0);
+    }
+
+    to {
+        transform: translate(-22px, 16px);
+    }
+}
+
+/* =========================================================
+   MAIN LAYOUT & CONTENT CARDS
+   ========================================================= */
+.career-trends-content {
+    padding: 2.5rem 0 3rem;
+}
+
+.career-trends-section {
+    background: var(--card-bg);
+    border: 1px solid var(--border-color);
+    border-left: 3px solid var(--primary-color);
+    border-radius: var(--radius);
+    padding: 1.5rem 1.75rem;
+    margin-bottom: 1.25rem;
+    box-shadow: var(--shadow-sm);
+    transition: box-shadow 0.3s var(--ease), border-color 0.3s var(--ease), transform 0.3s var(--ease);
+}
+
+    .career-trends-section:hover {
+        box-shadow: var(--shadow-md);
+        border-color: var(--primary-border);
+        border-left-color: var(--primary-color);
+        transform: translateY(-2px);
+    }
+
+.career-trends-heading {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 0.65rem;
+    font-size: 1.08rem;
+    font-weight: 700;
+    color: var(--primary-dark);
+    padding-bottom: 0.7rem;
+    margin: 0 0 1rem;
+    border-bottom: 1px solid var(--border-color);
+}
+
+    .career-trends-heading::after {
+        content: "";
+        position: absolute;
+        left: 0;
+        bottom: -1px;
+        width: 0;
+        height: 2px;
+        background: var(--primary-color);
+        transition: width 0.8s var(--ease) 0.3s;
+    }
+
+.career-trends-intro .career-trends-heading {
+    font-size: 1.2rem;
+}
+
+    .career-trends-intro .career-trends-heading::after,
+    .show .career-trends-heading::after {
+        width: 64px;
+    }
+
+.career-trends-number {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    background: var(--primary-light);
+    border: 1px solid var(--primary-border);
+    color: var(--primary-dark);
+    font-size: 0.82rem;
+    font-weight: 700;
+    flex-shrink: 0;
+    transition: background 0.3s ease, color 0.3s ease;
+}
+
+.career-trends-section:hover .career-trends-number {
+    background: var(--primary-color);
+    color: #ffffff;
+}
+
+.career-trends-section p {
+    font-size: 0.94rem;
+    line-height: 1.75;
+    color: var(--text-muted);
+    margin-bottom: 0;
+}
+
+/* =========================================================
+   CLOSING HIGHLIGHT BOX
+   ========================================================= */
+.career-trends-important-box {
+    position: relative;
+    background: linear-gradient(135deg, var(--primary-light) 0%, var(--primary-soft) 100%);
+    border: 1px solid var(--primary-border);
+    border-radius: var(--radius);
+    padding: 1.5rem 1.7rem;
+    margin-bottom: 1.25rem;
+    overflow: hidden;
+    transition: box-shadow 0.3s var(--ease);
+}
+
+    .career-trends-important-box::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: -60%;
+        width: 40%;
+        height: 100%;
+        background: linear-gradient(100deg, transparent, rgba(255, 255, 255, 0.6), transparent);
+        transform: skewX(-20deg);
+        animation: ctSheen 6s ease-in-out infinite;
+    }
+
+    .career-trends-important-box:hover {
+        box-shadow: var(--shadow-md);
+    }
+
+.career-trends-important-content h2 {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--primary-dark);
+    margin-bottom: 0.4rem;
+}
+
+.career-trends-important-content p {
+    font-size: 0.94rem;
+    line-height: 1.7;
+    color: var(--text-muted);
+    margin: 0;
+}
+
+@keyframes ctSheen {
+    0%, 60% {
+        left: -60%;
+    }
+
+    100% {
+        left: 130%;
+    }
+}
+
+/* =========================================================
+   SIDEBAR
+   ========================================================= */
+.career-trends-sticky {
+    position: relative;
+}
+
+@media (min-width: 992px) {
+    .career-trends-sticky {
+        position: sticky;
+        top: 90px;
+    }
+}
+
+.career-trends-side-item {
+    margin-bottom: 1.5rem;
+}
+
+.career-trends-image-box {
+    background: var(--card-bg);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius);
+    padding: 0.7rem;
+    box-shadow: var(--shadow-sm);
+    overflow: hidden;
+    transition: box-shadow 0.3s var(--ease), border-color 0.3s var(--ease), transform 0.3s var(--ease);
+}
+
+    .career-trends-image-box:hover {
+        box-shadow: var(--shadow-md);
+        border-color: var(--primary-border);
+        transform: translateY(-3px);
+    }
+
+    .career-trends-image-box img {
+        display: block;
+        width: 100%;
+        height: auto;
+        border-radius: 6px;
+        object-fit: cover;
+        transition: transform 0.6s var(--ease);
+    }
+
+    .career-trends-image-box:hover img {
+        transform: scale(1.04);
+    }
+
+.career-trends-placeholder {
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 0.35rem;
+    aspect-ratio: 4 / 3;
+    border: 1.5px dashed var(--primary-border);
+    border-radius: 6px;
+    background: repeating-linear-gradient(45deg, rgba(13, 148, 136, 0.05) 0, rgba(13, 148, 136, 0.05) 10px, transparent 10px, transparent 20px), var(--primary-light);
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+}
+
+    .career-trends-placeholder::after {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 60%;
+        height: 100%;
+        background: linear-gradient(100deg, transparent, rgba(255, 255, 255, 0.55), transparent);
+        animation: ctShimmer 3.2s ease-in-out infinite;
+    }
+
+.career-trends-image-box.no-image .career-trends-placeholder {
+    display: flex;
+}
+
+.career-trends-image-box.no-image img {
+    display: none;
+}
+
+.career-trends-placeholder i {
+    font-size: 2rem;
+    color: var(--primary-color);
+    animation: ctFloat 3s ease-in-out infinite;
+}
+
+.career-trends-placeholder-title {
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: var(--primary-dark);
+}
+
+.career-trends-placeholder-note {
+    font-size: 0.8rem;
+    color: #8a929e;
+}
+
+@keyframes ctShimmer {
+    0% {
+        left: -100%;
+    }
+
+    100% {
+        left: 160%;
+    }
+}
+
+@keyframes ctFloat {
+    0%, 100% {
+        transform: translateY(0);
+    }
+
+    50% {
+        transform: translateY(-5px);
+    }
+}
+
+.career-trends-side-text {
+    text-align: center;
+    padding: 0.9rem 0.5rem 0;
+}
+
+    .career-trends-side-text h2 {
+        font-size: 1.05rem;
+        font-weight: 700;
+        color: var(--primary-dark);
+        margin: 0 0 0.35rem;
+    }
+
+        .career-trends-side-text h2::after {
+            content: "";
+            display: block;
+            width: 36px;
+            height: 2px;
+            background: var(--primary-color);
+            margin: 0.4rem auto 0;
+            transition: width 0.4s var(--ease);
+        }
+
+.career-trends-side-item:hover .career-trends-side-text h2::after {
+    width: 72px;
+}
+
+.career-trends-side-text p {
+    font-size: 0.9rem;
+    line-height: 1.55;
+    color: var(--text-muted);
+    margin: 0.5rem 0 0;
+}
+
+/* =========================================================
+   BACK TO TOP
+   ========================================================= */
+.career-trends-back-to-top {
+    position: fixed;
+    right: 24px;
+    bottom: 24px;
+    width: 42px;
+    height: 42px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--primary-color);
+    color: #ffffff;
+    border-radius: 8px;
+    text-decoration: none;
+    box-shadow: 0 6px 16px rgba(13, 148, 136, 0.35);
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(10px);
+    transition: opacity 0.3s ease, transform 0.3s ease, background 0.2s ease, visibility 0.3s;
+    z-index: 1000;
+}
+
+    .career-trends-back-to-top.visible {
+        opacity: 1;
+        visibility: visible;
+        transform: translateY(0);
+    }
+
+    .career-trends-back-to-top:hover {
+        background: var(--primary-dark);
+        color: #ffffff;
+        transform: translateY(-3px);
+    }
+
+/* =========================================================
+   SCROLL REVEAL
+   ========================================================= */
+.js-reveal .scroll-reveal {
+    opacity: 0;
+    transform: translateY(20px);
+    transition: opacity 0.6s var(--ease), transform 0.6s var(--ease), box-shadow 0.3s var(--ease), border-color 0.3s var(--ease);
+}
+
+.js-reveal .scroll-right {
+    opacity: 0;
+    transform: translateX(22px);
+    transition: opacity 0.6s var(--ease), transform 0.6s var(--ease);
+}
+
+    .js-reveal .scroll-reveal.show,
+    .js-reveal .scroll-right.show {
+        opacity: 1;
+        transform: none;
+    }
+
+@media (max-width: 768px) {
+    .career-trends-hero {
+        padding: 2.5rem 0;
+    }
+
+    .career-trends-title {
+        font-size: 1.65rem;
+    }
+
+    .career-trends-section {
+        padding: 1.15rem 1.1rem;
+    }
+}

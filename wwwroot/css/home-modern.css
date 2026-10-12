@@ -905,7 +905,7 @@ body.site-modern {
     body.site-modern .footer {
         position: relative;
         background: linear-gradient(135deg, #0f766e 0%, #0d9488 45%, #0f766e 100%);
-        padding: 70px 0 55px;
+        padding: 70px 0 0px;
         overflow: hidden;
         border-radius: 0 !important;
         color: #fff;
@@ -1886,7 +1886,9 @@ body.site-modern {
         translate: 0 0;
         scale: 1;
         will-change: auto;
+        flex-direction: column;
     }
+
 
 
 /* ==========================================================================
