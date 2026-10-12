@@ -1,497 +1,182 @@
 ﻿@{
-    ViewData["Title"] = "Market Insight";
+    ViewData["Title"] = "Market Insights";
+
+    // Sidebar image slots: set Src to e.g. "~/img/your-image.jpg" when ready (null = placeholder)
+    var slots = new[]
+    {
+        (Src: (string)null, Alt: "Market Intelligence", Title: "Market Intelligence",
+         Text: "Stay informed with industry reports, trend analysis and expert insights."),
+        (Src: (string)null, Alt: "Stay Ahead", Title: "Stay Ahead",
+         Text: "Use market knowledge to plan your career path with confidence.")
+    };
 }
 
-<div class="market-page">
+<link rel="stylesheet" href="~/css/market-insight.css" />
 
-    <!-- =====================================================
-         TOP SPACE
-         ===================================================== -->
-    <div class="market-top-space"></div>
+<div class="market-insight-page">
 
+    <!-- Scroll progress -->
+    <div class="market-insight-progress" id="marketProgress"></div>
 
-    <!-- =====================================================
-         HERO SECTION
-         ===================================================== -->
-    <section class="market-hero">
-
-        <!-- Background Glows -->
-        <div class="market-glow market-glow-1"></div>
-        <div class="market-glow market-glow-2"></div>
-        <div class="market-glow market-glow-3"></div>
-
-        <!-- Particles -->
-        <div class="market-particles">
-            <span></span>
-            <span></span>
-            <span></span>
-            <span></span>
-            <span></span>
-            <span></span>
-        </div>
-
-
-        <div class="container market-hero-container">
-
-            <div class="row align-items-center py-5">
-
-                <!-- =========================
-                     TITLE
-                     ========================= -->
-                <div class="col-md-7 text-center text-md-left">
-
-                    <div class="market-title-wrapper">
-
-                        <span class="market-small-title">
-                            1TRAINEE.COM
-                        </span>
-
-                        <h1 class="market-title">
-                            MARKET INSIGHT
-                        </h1>
-
-                        <div class="market-title-line"></div>
-
-                        <p class="market-subtitle">
-                            Stay informed with valuable market information,
-                            business trends, economic developments,
-                            industry movements and emerging opportunities.
-                        </p>
-
-                    </div>
-
-                </div>
-
-
-                <!-- =========================
-                     BREADCRUMB
-                     ========================= -->
-                <div class="col-md-5 text-center text-md-right">
-
-                    <div class="market-breadcrumb">
-
-                        <a class="market-btn"
-                           asp-controller="Home"
-                           asp-action="Index">
-
-                            <i class="fas fa-home"></i>
-
-                            <span>Home</span>
-
-                        </a>
-
-                        <i class="fas fa-angle-double-right market-arrow"></i>
-
-                        <span class="market-current-page">
-                            Market Insight
-                        </span>
-
-                    </div>
-
-                </div>
-
-            </div>
-
-        </div>
-
-    </section>
-
-
-    <!-- =====================================================
-         MAIN CONTENT
-         ===================================================== -->
-    <section class="market-content">
+    <!-- Hero -->
+    <section class="market-insight-hero">
+        <span class="market-insight-shape market-insight-shape-1"></span>
+        <span class="market-insight-shape market-insight-shape-2"></span>
 
         <div class="container">
-
-            <div class="row market-main-row">
-
-                <!-- =================================================
-                     LEFT CONTENT
-                     ================================================= -->
-                <div class="col-lg-8 market-left-content">
-
-
-                    <!-- =================================================
-                         SECTION 1
-                         ================================================= -->
-                    <div class="market-section scroll-reveal">
-
-                        <h4>
-                            Market Overview
-                        </h4>
-
-                        <p>
-                            Market insight provides valuable information
-                            about current business conditions, economic
-                            developments, industry movements and changing
-                            customer expectations.
-                        </p>
-
-                        <p>
-                            Understanding market conditions helps students,
-                            professionals, organizations and job seekers
-                            make informed decisions and identify emerging
-                            opportunities.
-                        </p>
-
-                        <p>
-                            Markets continuously change because of
-                            technological developments, economic conditions,
-                            consumer behavior, government policies and
-                            global business trends.
-                        </p>
-
-                    </div>
-
-
-                    <!-- =================================================
-                         SECTION 2
-                         ================================================= -->
-                    <div class="market-section scroll-reveal">
-
-                        <h4>
-                            Business Trends
-                        </h4>
-
-                        <p>
-                            Business trends provide information about how
-                            organizations are changing their strategies,
-                            products, services and operations according to
-                            market requirements.
-                        </p>
-
-                        <p>
-                            Organizations continuously monitor customer
-                            preferences, competition and economic conditions
-                            to remain competitive.
-                        </p>
-
-                    </div>
-
-
-                    <!-- =================================================
-                         SECTION 3
-                         ================================================= -->
-                    <div class="market-section scroll-reveal">
-
-                        <h4>
-                            Technology and Innovation
-                        </h4>
-
-                        <p>
-                            Technology continues to transform industries by
-                            introducing new tools, platforms and methods
-                            of working.
-                        </p>
-
-                        <p>
-                            Businesses are adopting digital solutions to
-                            improve productivity, customer experience and
-                            operational efficiency.
-                        </p>
-
-                        <p>
-                            Emerging technologies are creating new roles
-                            while also changing the skills required for
-                            existing positions.
-                        </p>
-
-                    </div>
-
-
-                    <!-- =================================================
-                         SECTION 4
-                         ================================================= -->
-                    <div class="market-section scroll-reveal">
-
-                        <h4>
-                            Employment and Career Opportunities
-                        </h4>
-
-                        <p>
-                            Changes in the market can create new career
-                            opportunities across different industries.
-                            Students and professionals should continuously
-                            improve their technical and professional skills.
-                        </p>
-
-                        <ul class="market-list">
-
-                            <li>
-                                <b>Technology:</b>
-                                Growing demand for software and digital
-                                technology professionals.
-                            </li>
-
-                            <li>
-                                <b>Business:</b>
-                                Increasing opportunities in business
-                                management and operations.
-                            </li>
-
-                            <li>
-                                <b>Finance:</b>
-                                New opportunities created by changing
-                                financial markets and digital finance.
-                            </li>
-
-                            <li>
-                                <b>Healthcare:</b>
-                                Growing demand for healthcare and
-                                technology professionals.
-                            </li>
-
-                        </ul>
-
-                    </div>
-
-
-                    <!-- =================================================
-                         SECTION 5
-                         ================================================= -->
-                    <div class="market-section scroll-reveal">
-
-                        <h4>
-                            Importance of Market Information
-                        </h4>
-
-                        <p>
-                            Staying updated with market information helps
-                            individuals understand changing opportunities
-                            and prepare themselves for future career
-                            requirements.
-                        </p>
-
-                        <p>
-                            Organizations can also use market information
-                            to identify opportunities, understand
-                            competition and improve their business
-                            strategies.
-                        </p>
-
-                    </div>
-
-
-                    <!-- =================================================
-                         IMPORTANT INFORMATION
-                         ================================================= -->
-                    <div class="market-important-box scroll-reveal">
-
-                        <div class="market-important-content">
-
-                            <h2>
-                                Important Information
-                            </h2>
-
-                            <p>
-                                Stay updated with the latest market
-                                developments, business trends, technology
-                                changes and career opportunities.
-                            </p>
-
-                        </div>
-
-                    </div>
-
+            <div class="row align-items-center">
+                <div class="col-md-7 text-center text-md-start text-md-left">
+                    <span class="market-insight-small-title">Career Intelligence</span>
+                    <h1 class="market-insight-title">Market Insights</h1>
+                    <div class="market-insight-title-line"></div>
+                    <p class="market-insight-subtitle">
+                        Understand industry trends, emerging opportunities and expert perspectives to make confident career decisions.
+                    </p>
                 </div>
 
-
-                <!-- =================================================
-                     RIGHT CONTENT
-                     ================================================= -->
-                <div class="col-lg-4 market-right-content">
-
-                    <div class="market-sticky">
-
-
-                        <!-- IMAGE 1 -->
-                        <div class="market-image-box scroll-right">
-
-                            <img src="~/img/5.jpg"
-                                 alt="Market Insight"
-                                 loading="lazy"
-                                 onerror="this.style.display='none';">
-
-                        </div>
-
-
-                        <!-- CARD 1 -->
-                        <div class="market-info-card scroll-right">
-
-                            <h2>
-                                Market Updates
-                            </h2>
-
-                            <p>
-                                Stay informed about important market
-                                developments, business trends and
-                                opportunities.
-                            </p>
-
-                        </div>
-
-
-                        <!-- IMAGE 2 -->
-                        <div class="market-image-box scroll-right">
-
-                            <img src="~/img/2 (1).jpg"
-                                 alt="Business Trends"
-                                 loading="lazy"
-                                 onerror="this.style.display='none';">
-
-                        </div>
-
-
-                        <!-- CARD 2 -->
-                        <div class="market-info-card scroll-right">
-
-                            <h2>
-                                Business Trends
-                            </h2>
-
-                            <p>
-                                Understand changing business strategies,
-                                customer expectations and industry
-                                developments.
-                            </p>
-
-                        </div>
-
-
-                        <!-- IMAGE 3 -->
-                        <div class="market-image-box scroll-right">
-
-                            <img src="~/img/2 (1).jpg"
-                                 alt="Career Opportunities"
-                                 loading="lazy"
-                                 onerror="this.style.display='none';">
-
-                        </div>
-
-
-                        <!-- CARD 3 -->
-                        <div class="market-info-card scroll-right">
-
-                            <h2>
-                                Career Opportunities
-                            </h2>
-
-                            <p>
-                                Explore changing market requirements and
-                                prepare yourself for future career
-                                opportunities.
-                            </p>
-
-                        </div>
-
-                    </div>
-
+                <div class="col-md-5 text-center text-md-end text-md-right mt-4 mt-md-0">
+                    <nav class="market-insight-breadcrumb" aria-label="Breadcrumb">
+                        <a class="market-insight-btn" href="~/Home/Index">
+                            <i class="fas fa-home"></i>
+                            <span>Home</span>
+                        </a>
+                        <span class="market-insight-arrow"><i class="fas fa-angle-double-right"></i></span>
+                        <span class="market-insight-current-page">Market Insights</span>
+                    </nav>
                 </div>
-
             </div>
-
         </div>
-
     </section>
 
+    <!-- Main Content -->
+    <section class="market-insight-content">
+        <div class="container">
+            <div class="row g-4">
 
-    <!-- =====================================================
-         BACK TO TOP
-         ===================================================== -->
-    <a href="#"
-       class="market-back-to-top">
+                <!-- LEFT CONTENT -->
+                <div class="col-lg-8">
 
+                    <!-- Intro -->
+                    <div class="market-insight-section market-insight-intro">
+                        <h2 class="market-insight-heading">Uncover Industry Trends</h2>
+                        <p>
+                            Dive deep into comprehensive analyses and detailed reports on the latest trends shaping your industry. 1trainee.com’s Market Insights section offers valuable intelligence to help you stay ahead of the curve, make informed decisions, and discover emerging opportunities. Whether you’re seeking to understand market dynamics or gain a competitive edge, our expert insights provide the information you need to navigate your career path with confidence.
+                        </p>
+                        <p>
+                            Explore comprehensive Market Insights to gain a deeper understanding of the trends and forces shaping your industry. Create in-depth analyses and reports which will design to provide you with actionable intelligence, helping you make informed decisions and seize emerging opportunities.
+                        </p>
+                    </div>
+
+                    <!-- Get -->
+                    <div class="market-insight-section scroll-reveal">
+                        <h3 class="market-insight-heading"><span class="market-insight-icon"><i class="fas fa-layer-group"></i></span>Get</h3>
+
+                        <div class="market-insight-tiles" data-stagger>
+                            <div class="market-insight-tile">
+                                <span class="market-insight-tile-icon"><i class="fas fa-file-alt"></i></span>
+                                <div>
+                                    <h4>Detailed Industry Reports</h4>
+                                    <p>Access thorough reports that cover market dynamics, competitive landscapes, and growth forecasts.</p>
+                                </div>
+                            </div>
+
+                            <div class="market-insight-tile">
+                                <span class="market-insight-tile-icon"><i class="fas fa-chart-line"></i></span>
+                                <div>
+                                    <h4>Trend Analysis</h4>
+                                    <p>Stay updated with the latest trends influencing your field, from technological advancements to shifts in consumer behavior.</p>
+                                </div>
+                            </div>
+
+                            <div class="market-insight-tile">
+                                <span class="market-insight-tile-icon"><i class="fas fa-user-tie"></i></span>
+                                <div>
+                                    <h4>Expert Opinions</h4>
+                                    <p>Read insights from industry leaders and analysts who offer their perspectives on future developments and strategic moves.</p>
+                                </div>
+                            </div>
+
+                            <div class="market-insight-tile">
+                                <span class="market-insight-tile-icon"><i class="fas fa-chart-pie"></i></span>
+                                <div>
+                                    <h4>Data-Driven Insights</h4>
+                                    <p>Utilize data visualizations and analytics to grasp complex industry changes and their implications.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Why It Matters -->
+                    <div class="market-insight-section scroll-reveal">
+                        <h3 class="market-insight-heading"><span class="market-insight-icon"><i class="fas fa-lightbulb"></i></span>Why It Matters</h3>
+                        <p class="market-insight-lead">Understanding market trends can help you:</p>
+
+                        <ul class="market-insight-list market-insight-check-list" data-stagger>
+                            <li>Identify new career opportunities and industries on the rise.</li>
+                            <li>Make strategic decisions based on current and projected market conditions.</li>
+                            <li>Position yourself as a knowledgeable candidate with a forward-thinking approach.</li>
+                        </ul>
+                    </div>
+
+                    <!-- Explore More -->
+                    <div class="market-insight-section scroll-reveal">
+                        <h3 class="market-insight-heading"><span class="market-insight-icon"><i class="fas fa-compass"></i></span>Explore More</h3>
+
+                        <ul class="market-insight-list" data-stagger>
+                            <li><b>Industry Reports:</b> Access detailed reports tailored to various sectors.</li>
+                            <li><b>Trend Analysis Articles:</b> Read the latest articles on emerging trends and their impact.</li>
+                            <li><b>Expert Interviews:</b> Gain insights from thought leaders and industry experts.</li>
+                            <li><b>Data Visualizations:</b> Utilize interactive charts and graphs to understand market shifts.</li>
+                        </ul>
+                    </div>
+
+                    <!-- Closing -->
+                    <div class="market-insight-important-box scroll-reveal">
+                        <div class="market-insight-important-content">
+                            <h2>Stay Ahead in Your Career Journey</h2>
+                            <p>
+                                Stay ahead in your career journey by leveraging these insights to navigate your professional path with confidence and strategic foresight.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- RIGHT SIDEBAR -->
+                <aside class="col-lg-4">
+                    <div class="market-insight-sticky">
+                        @foreach (var slot in slots)
+                        {
+                            <div class="market-insight-side-item scroll-right">
+                                <div class="market-insight-image-box @(string.IsNullOrEmpty(slot.Src) ? "no-image" : "")">
+                                    @if (!string.IsNullOrEmpty(slot.Src))
+                                    {
+                                        <img src="@Url.Content(slot.Src)"
+                                             alt="@slot.Alt"
+                                             loading="lazy"
+                                             onerror="this.closest('.market-insight-image-box').classList.add('no-image');" />
+                                    }
+                                    <div class="market-insight-placeholder">
+                                        <i class="far fa-image"></i>
+                                        <span class="market-insight-placeholder-title">Image Space</span>
+                                        <span class="market-insight-placeholder-note">Image will appear here</span>
+                                    </div>
+                                </div>
+
+                                <div class="market-insight-side-text">
+                                    <h2>@slot.Title</h2>
+                                    <p>@slot.Text</p>
+                                </div>
+                            </div>
+                        }
+                    </div>
+                </aside>
+
+            </div>
+        </div>
+    </section>
+
+    <!-- Back to top -->
+    <a href="#" class="market-insight-back-to-top" aria-label="Back to top">
         <i class="fa fa-angle-double-up"></i>
-
     </a>
-
 </div>
-
-
-<!-- =========================================================
-     MARKET INSIGHT SCROLL REVEAL
-     ========================================================= -->
-<script>
-
-    document.addEventListener("DOMContentLoaded", function () {
-
-        const revealElements = document.querySelectorAll(
-            ".market-page .scroll-reveal, " +
-            ".market-page .scroll-right"
-        );
-
-        /* First section should ALWAYS be visible */
-        const firstSection =
-            document.querySelector(".market-page .scroll-reveal");
-
-        if (firstSection) {
-            firstSection.classList.add("show");
-        }
-
-
-        /* Intersection Observer */
-        const observer = new IntersectionObserver(
-
-            function (entries) {
-
-                entries.forEach(function (entry) {
-
-                    if (entry.isIntersecting) {
-
-                        entry.target.classList.add("show");
-
-                    }
-                    else {
-
-                        entry.target.classList.remove("show");
-
-                    }
-
-                });
-
-            },
-
-            {
-                threshold: 0.12
-            }
-
-        );
-
-
-        revealElements.forEach(function (element) {
-
-            observer.observe(element);
-
-        });
-
-    });
-
-
-    /* =====================================================
-       BACK TO TOP
-       ===================================================== */
-
-    document.addEventListener("DOMContentLoaded", function () {
-
-        const backTop =
-            document.querySelector(".market-back-to-top");
-
-        if (backTop) {
-
-            backTop.addEventListener("click", function (e) {
-
-                e.preventDefault();
-
-                window.scrollTo({
-                    top: 0,
-                    behavior: "smooth"
-                });
-
-            });
-
-        }
-
-    });
-
-</script>

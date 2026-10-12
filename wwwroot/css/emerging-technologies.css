@@ -1,0 +1,714 @@
+﻿/* =========================================================
+   EMERGING TECHNOLOGIES - FORMAL STYLESHEET
+   Teal theme (same as other PopularLinks pages)
+   ========================================================= */
+
+:root {
+    --primary-color: #0d9488;
+    --primary-dark: #0f766e;
+    --primary-deeper: #115e59;
+    --primary-light: #f0fdfa;
+    --primary-soft: #ccfbf1;
+    --primary-border: #99f6e4;
+    --text-main: #1f2937;
+    --text-muted: #4b5563;
+    --border-color: #e5e7eb;
+    --card-bg: #ffffff;
+    --page-bg: #f8fafc;
+    --radius: 10px;
+    --shadow-sm: 0 1px 3px rgba(15, 23, 42, 0.06);
+    --shadow-md: 0 8px 22px rgba(13, 148, 136, 0.12);
+    --ease: cubic-bezier(0.22, 0.61, 0.36, 1);
+}
+
+.emerging-tech-page {
+    font-family: inherit;
+    color: var(--text-main);
+    background-color: var(--page-bg);
+    overflow-x: hidden;
+}
+
+/* =========================================================
+   SCROLL PROGRESS BAR
+   ========================================================= */
+.emerging-tech-progress {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 3px;
+    background: linear-gradient(90deg, var(--primary-color), #5eead4);
+    transform: scaleX(0);
+    transform-origin: left;
+    z-index: 2000;
+    pointer-events: none;
+}
+
+/* =========================================================
+   HERO
+   ========================================================= */
+.emerging-tech-hero {
+    position: relative;
+    background: linear-gradient(135deg, var(--primary-dark) 0%, var(--primary-color) 55%, var(--primary-deeper) 100%);
+    background-size: 160% 160%;
+    animation: emergingGradient 14s ease-in-out infinite alternate;
+    color: #ffffff;
+    padding: 3.5rem 0;
+    overflow: hidden;
+    border-bottom: 3px solid #5eead4;
+}
+
+    .emerging-tech-hero::before {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background-image: radial-gradient(rgba(255, 255, 255, 0.12) 1px, transparent 1px);
+        background-size: 24px 24px;
+        pointer-events: none;
+    }
+
+.emerging-tech-shape {
+    position: absolute;
+    border-radius: 50%;
+    border: 1px solid rgba(255, 255, 255, 0.18);
+    pointer-events: none;
+}
+
+.emerging-tech-shape-1 {
+    width: 340px;
+    height: 340px;
+    right: -110px;
+    top: -130px;
+    box-shadow: 0 0 0 40px rgba(255, 255, 255, 0.05);
+    animation: emergingDrift 12s ease-in-out infinite alternate;
+}
+
+.emerging-tech-shape-2 {
+    width: 180px;
+    height: 180px;
+    left: 8%;
+    bottom: -90px;
+    background: rgba(255, 255, 255, 0.05);
+    animation: emergingDrift 16s ease-in-out infinite alternate-reverse;
+}
+
+.emerging-tech-hero .container {
+    position: relative;
+    z-index: 2;
+}
+
+.emerging-tech-small-title {
+    display: inline-block;
+    font-size: 0.72rem;
+    font-weight: 600;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--primary-soft);
+    background: rgba(255, 255, 255, 0.12);
+    border: 1px solid rgba(255, 255, 255, 0.22);
+    padding: 0.3rem 0.8rem;
+    border-radius: 50rem;
+    margin-bottom: 0.9rem;
+    animation: emergingFadeUp 0.7s var(--ease) both;
+}
+
+.emerging-tech-title {
+    font-size: 2.2rem;
+    font-weight: 700;
+    letter-spacing: -0.01em;
+    color: #ffffff;
+    margin-bottom: 0.7rem;
+    animation: emergingFadeUp 0.7s var(--ease) 0.1s both;
+}
+
+.emerging-tech-title-line {
+    width: 56px;
+    height: 3px;
+    background: #5eead4;
+    border-radius: 2px;
+    margin: 0 0 0.9rem;
+    animation: emergingGrowLine 0.8s var(--ease) 0.3s both;
+}
+
+.emerging-tech-subtitle {
+    font-size: 1rem;
+    line-height: 1.65;
+    color: #e6fffa;
+    margin-bottom: 0;
+    max-width: 540px;
+    animation: emergingFadeUp 0.7s var(--ease) 0.25s both;
+}
+
+/* Breadcrumb */
+.emerging-tech-breadcrumb {
+    display: inline-flex;
+    align-items: center;
+    background: rgba(255, 255, 255, 0.10);
+    border: 1px solid rgba(255, 255, 255, 0.24);
+    padding: 0.45rem 1.1rem;
+    border-radius: 50rem;
+    backdrop-filter: blur(6px);
+    animation: emergingFadeUp 0.7s var(--ease) 0.35s both;
+}
+
+.emerging-tech-btn {
+    color: #ffffff;
+    text-decoration: none;
+    font-size: 0.88rem;
+    font-weight: 500;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    transition: color 0.2s ease;
+}
+
+    .emerging-tech-btn:hover {
+        color: var(--primary-soft);
+    }
+
+.emerging-tech-arrow {
+    color: var(--primary-border);
+    margin: 0 0.65rem;
+    font-size: 0.8rem;
+}
+
+.emerging-tech-current-page {
+    color: #ffffff;
+    font-size: 0.88rem;
+    font-weight: 600;
+}
+
+@keyframes emergingFadeUp {
+    from {
+        opacity: 0;
+        transform: translateY(14px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes emergingGrowLine {
+    from {
+        width: 0;
+    }
+
+    to {
+        width: 56px;
+    }
+}
+
+@keyframes emergingGradient {
+    from {
+        background-position: 0% 50%;
+    }
+
+    to {
+        background-position: 100% 50%;
+    }
+}
+
+@keyframes emergingDrift {
+    from {
+        transform: translate(0, 0);
+    }
+
+    to {
+        transform: translate(-22px, 16px);
+    }
+}
+
+/* =========================================================
+   MAIN LAYOUT
+   ========================================================= */
+.emerging-tech-content {
+    padding: 2.5rem 0 3rem;
+}
+
+/* =========================================================
+   CONTENT CARDS
+   ========================================================= */
+.emerging-tech-section {
+    background: var(--card-bg);
+    border: 1px solid var(--border-color);
+    border-left: 3px solid var(--primary-color);
+    border-radius: var(--radius);
+    padding: 1.5rem 1.75rem;
+    margin-bottom: 1.25rem;
+    box-shadow: var(--shadow-sm);
+    transition: box-shadow 0.3s var(--ease), border-color 0.3s var(--ease), transform 0.3s var(--ease);
+}
+
+    .emerging-tech-section:hover {
+        box-shadow: var(--shadow-md);
+        border-color: var(--primary-border);
+        border-left-color: var(--primary-color);
+        transform: translateY(-2px);
+    }
+
+.emerging-tech-heading {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 0.65rem;
+    font-size: 1.08rem;
+    font-weight: 700;
+    color: var(--primary-dark);
+    padding-bottom: 0.7rem;
+    margin: 0 0 1rem;
+    border-bottom: 1px solid var(--border-color);
+}
+
+    /* Animated accent underline */
+    .emerging-tech-heading::after {
+        content: "";
+        position: absolute;
+        left: 0;
+        bottom: -1px;
+        width: 0;
+        height: 2px;
+        background: var(--primary-color);
+        transition: width 0.8s var(--ease) 0.3s;
+    }
+
+.emerging-tech-intro .emerging-tech-heading {
+    font-size: 1.2rem;
+}
+
+    .emerging-tech-intro .emerging-tech-heading::after,
+    .show .emerging-tech-heading::after {
+        width: 64px;
+    }
+
+.emerging-tech-number {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    background: var(--primary-light);
+    border: 1px solid var(--primary-border);
+    color: var(--primary-dark);
+    font-size: 0.82rem;
+    font-weight: 700;
+    flex-shrink: 0;
+    transition: background 0.3s ease, color 0.3s ease;
+}
+
+.emerging-tech-section:hover .emerging-tech-number {
+    background: var(--primary-color);
+    color: #ffffff;
+}
+
+.emerging-tech-section p {
+    font-size: 0.94rem;
+    line-height: 1.75;
+    color: var(--text-muted);
+    margin-bottom: 0;
+}
+
+/* =========================================================
+   LISTS
+   ========================================================= */
+.emerging-tech-list {
+    list-style: none;
+    padding-left: 0;
+    margin: 0;
+}
+
+    .emerging-tech-list li {
+        position: relative;
+        padding-left: 1.3rem;
+        margin-bottom: 0.8rem;
+        font-size: 0.94rem;
+        line-height: 1.7;
+        color: var(--text-muted);
+    }
+
+        .emerging-tech-list li::before {
+            content: "";
+            position: absolute;
+            left: 0.15rem;
+            top: 0.7em;
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: var(--primary-color);
+            transition: transform 0.3s var(--ease);
+        }
+
+        .emerging-tech-list li:hover::before {
+            transform: scale(1.6);
+        }
+
+        .emerging-tech-list li b {
+            color: var(--text-main);
+            font-weight: 600;
+        }
+
+        .emerging-tech-list li:last-child {
+            margin-bottom: 0;
+        }
+
+/* =========================================================
+   CLOSING HIGHLIGHT BOX
+   ========================================================= */
+.emerging-tech-important-box {
+    position: relative;
+    background: linear-gradient(135deg, var(--primary-light) 0%, var(--primary-soft) 100%);
+    border: 1px solid var(--primary-border);
+    border-radius: var(--radius);
+    padding: 1.5rem 1.7rem;
+    margin-bottom: 1.25rem;
+    overflow: hidden;
+    transition: box-shadow 0.3s var(--ease);
+}
+
+    .emerging-tech-important-box::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: -60%;
+        width: 40%;
+        height: 100%;
+        background: linear-gradient(100deg, transparent, rgba(255, 255, 255, 0.6), transparent);
+        transform: skewX(-20deg);
+        animation: emergingSheen 6s ease-in-out infinite;
+    }
+
+    .emerging-tech-important-box:hover {
+        box-shadow: var(--shadow-md);
+    }
+
+.emerging-tech-important-content {
+    position: relative;
+}
+
+    .emerging-tech-important-content h2 {
+        font-size: 1.1rem;
+        font-weight: 700;
+        color: var(--primary-dark);
+        margin-bottom: 0.4rem;
+    }
+
+    .emerging-tech-important-content p {
+        font-size: 0.94rem;
+        line-height: 1.7;
+        color: var(--text-muted);
+        margin: 0;
+    }
+
+@keyframes emergingSheen {
+    0%, 60% {
+        left: -60%;
+    }
+
+    100% {
+        left: 130%;
+    }
+}
+
+/* =========================================================
+   SIDEBAR (image sections)
+   ========================================================= */
+.emerging-tech-sticky {
+    position: relative;
+}
+
+@media (min-width: 992px) {
+    .emerging-tech-sticky {
+        position: sticky;
+        top: 90px;
+    }
+}
+
+.emerging-tech-side-item {
+    margin-bottom: 1.5rem;
+}
+
+.emerging-tech-image-box {
+    background: var(--card-bg);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius);
+    padding: 0.7rem;
+    box-shadow: var(--shadow-sm);
+    overflow: hidden;
+    transition: box-shadow 0.3s var(--ease), border-color 0.3s var(--ease), transform 0.3s var(--ease);
+}
+
+    .emerging-tech-image-box:hover {
+        box-shadow: var(--shadow-md);
+        border-color: var(--primary-border);
+        transform: translateY(-3px);
+    }
+
+    .emerging-tech-image-box img {
+        display: block;
+        width: 100%;
+        height: auto;
+        border-radius: 6px;
+        object-fit: cover;
+        transition: transform 0.6s var(--ease);
+    }
+
+    .emerging-tech-image-box:hover img {
+        transform: scale(1.04);
+    }
+
+/* Placeholder */
+.emerging-tech-placeholder {
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 0.35rem;
+    aspect-ratio: 4 / 3;
+    border: 1.5px dashed var(--primary-border);
+    border-radius: 6px;
+    background: repeating-linear-gradient(45deg, rgba(13, 148, 136, 0.05) 0, rgba(13, 148, 136, 0.05) 10px, transparent 10px, transparent 20px), var(--primary-light);
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+}
+
+    .emerging-tech-placeholder::after {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 60%;
+        height: 100%;
+        background: linear-gradient(100deg, transparent, rgba(255, 255, 255, 0.55), transparent);
+        animation: emergingShimmer 3.2s ease-in-out infinite;
+    }
+
+.emerging-tech-image-box.no-image .emerging-tech-placeholder {
+    display: flex;
+}
+
+.emerging-tech-image-box.no-image img {
+    display: none;
+}
+
+.emerging-tech-placeholder i {
+    font-size: 2rem;
+    color: var(--primary-color);
+    animation: emergingFloat 3s ease-in-out infinite;
+}
+
+.emerging-tech-placeholder-title {
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: var(--primary-dark);
+}
+
+.emerging-tech-placeholder-note {
+    font-size: 0.8rem;
+    color: #8a929e;
+}
+
+@keyframes emergingShimmer {
+    0% {
+        left: -100%;
+    }
+
+    100% {
+        left: 160%;
+    }
+}
+
+@keyframes emergingFloat {
+    0%, 100% {
+        transform: translateY(0);
+    }
+
+    50% {
+        transform: translateY(-5px);
+    }
+}
+
+/* Caption under each image */
+.emerging-tech-side-text {
+    text-align: center;
+    padding: 0.9rem 0.5rem 0;
+}
+
+    .emerging-tech-side-text h2 {
+        font-size: 1.05rem;
+        font-weight: 700;
+        color: var(--primary-dark);
+        margin: 0 0 0.35rem;
+    }
+
+        .emerging-tech-side-text h2::after {
+            content: "";
+            display: block;
+            width: 36px;
+            height: 2px;
+            background: var(--primary-color);
+            margin: 0.4rem auto 0;
+            transition: width 0.4s var(--ease);
+        }
+
+.emerging-tech-side-item:hover .emerging-tech-side-text h2::after {
+    width: 72px;
+}
+
+.emerging-tech-side-text p {
+    font-size: 0.9rem;
+    line-height: 1.55;
+    color: var(--text-muted);
+    margin: 0.5rem 0 0;
+}
+
+/* =========================================================
+   BACK TO TOP
+   ========================================================= */
+.emerging-tech-back-to-top {
+    position: fixed;
+    right: 24px;
+    bottom: 24px;
+    width: 42px;
+    height: 42px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--primary-color);
+    color: #ffffff;
+    border-radius: 8px;
+    text-decoration: none;
+    box-shadow: 0 6px 16px rgba(13, 148, 136, 0.35);
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(10px);
+    transition: opacity 0.3s ease, transform 0.3s ease, background 0.2s ease, visibility 0.3s;
+    z-index: 1000;
+}
+
+    .emerging-tech-back-to-top.visible {
+        opacity: 1;
+        visibility: visible;
+        transform: translateY(0);
+    }
+
+    .emerging-tech-back-to-top:hover {
+        background: var(--primary-dark);
+        color: #ffffff;
+        transform: translateY(-3px);
+    }
+
+/* =========================================================
+   SCROLL REVEAL + STAGGER (only when JS is available)
+   ========================================================= */
+.js-reveal .scroll-reveal {
+    opacity: 0;
+    transform: translateY(20px);
+    transition: opacity 0.6s var(--ease), transform 0.6s var(--ease), box-shadow 0.3s var(--ease), border-color 0.3s var(--ease);
+}
+
+.js-reveal .scroll-right {
+    opacity: 0;
+    transform: translateX(22px);
+    transition: opacity 0.6s var(--ease), transform 0.6s var(--ease);
+}
+
+    .js-reveal .scroll-reveal.show,
+    .js-reveal .scroll-right.show {
+        opacity: 1;
+        transform: none;
+    }
+
+/* List items appear one after another */
+.js-reveal [data-stagger] > * {
+    opacity: 0;
+    transform: translateX(-14px);
+    transition: opacity 0.5s var(--ease), transform 0.5s var(--ease);
+}
+
+.js-reveal .show [data-stagger] > * {
+    opacity: 1;
+    transform: none;
+    transition-delay: calc(var(--i, 0) * 120ms + 250ms);
+}
+
+/* Number badge pop-in */
+.js-reveal .scroll-reveal .emerging-tech-number {
+    transform: scale(0);
+}
+
+.js-reveal .scroll-reveal.show .emerging-tech-number {
+    animation: emergingPop 0.5s var(--ease) 0.2s both;
+}
+
+@keyframes emergingPop {
+    0% {
+        transform: scale(0);
+    }
+
+    70% {
+        transform: scale(1.15);
+    }
+
+    100% {
+        transform: scale(1);
+    }
+}
+
+/* =========================================================
+   RESPONSIVE
+   ========================================================= */
+@media (max-width: 768px) {
+    .emerging-tech-hero {
+        padding: 2.5rem 0;
+    }
+
+    .emerging-tech-title {
+        font-size: 1.65rem;
+    }
+
+    .emerging-tech-title-line {
+        margin-left: auto;
+        margin-right: auto;
+    }
+
+    .emerging-tech-subtitle {
+        margin-left: auto;
+        margin-right: auto;
+    }
+
+    .emerging-tech-section {
+        padding: 1.15rem 1.1rem;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .emerging-tech-hero,
+    .emerging-tech-shape,
+    .emerging-tech-small-title,
+    .emerging-tech-title,
+    .emerging-tech-title-line,
+    .emerging-tech-subtitle,
+    .emerging-tech-breadcrumb,
+    .emerging-tech-important-box::before,
+    .emerging-tech-placeholder::after,
+    .emerging-tech-placeholder i {
+        animation: none;
+    }
+
+    .js-reveal .scroll-reveal,
+    .js-reveal .scroll-right,
+    .js-reveal [data-stagger] > *,
+    .js-reveal .scroll-reveal .emerging-tech-number {
+        opacity: 1;
+        transform: none;
+        transition: none;
+    }
+
+    .emerging-tech-section:hover,
+    .emerging-tech-image-box:hover {
+        transform: none;
+    }
+}

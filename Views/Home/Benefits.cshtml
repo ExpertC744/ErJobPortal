@@ -1,631 +1,740 @@
-﻿
-
-@{
-    ViewData["Title"] = "Benefits for Organizations";
-
+﻿@{
+    ViewData["Title"] = "Benefits of Hosting Interns";
 }
 
 <link rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" />
+
+<link rel="stylesheet"
       href="~/css/Benefits.css"
-      asp-append-version="true">
+      asp-append-version="true" />
 
 <div class="benefits-page">
+    <div class="benefits-container">
 
-    <!-- =====================================================
-         HERO 
-    ====================================================== -->
+        <div class="benefits-layout">
 
-    <section class="benefits-hero">
+            <!-- ================= MAIN ARTICLE ================= -->
+            <main class="benefits-article">
 
-        <div class="benefits-hero-glow"></div>
+                <!-- ARTICLE HEADER -->
+                <header class="benefits-header">
 
-        <div class="benefits-hero-content">
+                    <span class="benefits-eyebrow">
+                        <i class="bi bi-buildings"></i>
+                        ORGANIZATION INSIGHTS
+                    </span>
 
-            <div class="benefits-badge">
-                <i class="fa-solid fa-building"></i>
-                Benefits for Organizations
-            </div>
+                    <h1>
+                        The Benefits of Hosting Interns for Your Organization
+                    </h1>
 
-            <h1>
-                Unlock the Potential of <span>Your Organization</span>
-            </h1>
-
-            <p>
-                Discover how hosting trainees and interns through
-                1Trainee can help  organization build talent,
-                improve productivity, encourage innovation and
-                create a stronger future workforce.
-            </p>
-
-            <div class="benefits-hero-actions">
-
-                <a asp-controller="Account"
-                   asp-action="OrganizationRegister"
-                   class="benefits-hero-btn">
-                    Register Your Organization
-                    <i class="fa-solid fa-arrow-right"></i>
-                </a>
-
-                <a href="#benefits-grid" class="benefits-hero-btn ghost">
-                    See the Benefits
-                </a>
-
-            </div>
-
-        </div>
-
-    </section>
-
-
-    <!-- =====================================================
-         MAIN BENEFITS
-    ====================================================== -->
-
-    <section class="benefits-intro" id="benefits-grid">
-
-        <div class="benefits-section-heading reveal">
-
-            <span class="eyebrow">Why Host Trainees?</span>
-
-            <h2>
-                Turn Fresh Talent Into Organizational Growth
-            </h2>
-
-            <p>
-                Hosting interns is more than providing an opportunity
-                to students. A structured internship program can become
-                a valuable talent and business strategy for  organization.
-            </p>
-
-        </div>
-
-
-        <div class="benefits-grid reveal">
-
-            <div class="benefit-card">
-
-                <div class="benefit-icon">
-                    <i class="fa-solid fa-lightbulb"></i>
-                </div>
-
-                <h3>Fresh Perspectives & Innovation</h3>
-
-                <p>
-                    Trainees bring new ideas, academic knowledge and
-                    different perspectives that can encourage creativity
-                    and help  team approach challenges differently.
-                </p>
-
-            </div>
-
-
-            <div class="benefit-card">
-
-                <div class="benefit-icon">
-                    <i class="fa-solid fa-users"></i>
-                </div>
-
-                <h3>Build Your Talent Pipeline</h3>
-
-                <p>
-                    Evaluate potential future employees in a real
-                    working environment and identify candidates who
-                    fit  organization and culture.
-                </p>
-
-            </div>
-
-
-            <div class="benefit-card">
-
-                <div class="benefit-icon">
-                    <i class="fa-solid fa-chart-line"></i>
-                </div>
-
-                <h3>Cost-Effective Support</h3>
-
-                <p>
-                    Trainees can support suitable projects and
-                    operational activities while allowing experienced
-                    employees to focus on higher-priority initiatives.
-                </p>
-
-            </div>
-
-
-            <div class="benefit-card">
-
-                <div class="benefit-icon">
-                    <i class="fa-solid fa-face-smile"></i>
-                </div>
-
-                <h3>Enhance Company Culture</h3>
-
-                <p>
-                    New trainees can bring enthusiasm, curiosity and
-                    fresh energy that can contribute positively to
-                    team collaboration and workplace morale.
-                </p>
-
-            </div>
-
-
-            <div class="benefit-card">
-
-                <div class="benefit-icon">
-                    <i class="fa-solid fa-award"></i>
-                </div>
-
-                <h3>Strengthen Your Employer Brand</h3>
-
-                <p>
-                    A well-designed internship experience can position
-                     organization as a company that values learning,
-                    development and emerging talent.
-                </p>
-
-            </div>
-
-
-            <div class="benefit-card">
-
-                <div class="benefit-icon">
-                    <i class="fa-solid fa-rocket"></i>
-                </div>
-
-                <h3>Increase Team Productivity</h3>
-
-                <p>
-                    With appropriate supervision and clearly defined
-                    responsibilities, trainees can contribute to projects
-                    and help teams accomplish more.
-                </p>
-
-            </div>
-
-        </div>
-
-    </section>
-
-
-    <!-- =====================================================
-         PROGRAM DESIGN
-    ====================================================== -->
-
-    <section class="program-section">
-
-        <div class="program-layout">
-
-            <div class="program-content reveal">
-
-                <span class="eyebrow">Build Better Programs</span>
-
-                <h2>
-                    Create an Internship Program That Delivers Results
-                </h2>
-
-                <p>
-                    A successful internship requires more than assigning
-                    tasks. Define clear objectives, provide mentorship
-                    and create meaningful learning opportunities that
-                    align trainee development with organizational goals.
-                </p>
-
-            </div>
-
-
-            <div class="program-list reveal">
-
-                <div class="program-item">
-
-                    <div class="program-check">
-                        <i class="fa-solid fa-bullseye"></i>
-                    </div>
-
-                    <div>
-                        <strong>Set Clear Objectives</strong>
-                        <p>
-                            Define the skills, projects and outcomes
-                            expected from the internship.
-                        </p>
-                    </div>
-
-                </div>
-
-
-                <div class="program-item">
-
-                    <div class="program-check">
-                        <i class="fa-solid fa-list-check"></i>
-                    </div>
-
-                    <div>
-                        <strong>Develop a Structured Plan</strong>
-                        <p>
-                            Create a clear timeline, responsibilities
-                            and project assignments.
-                        </p>
-                    </div>
-
-                </div>
-
-
-                <div class="program-item">
-
-                    <div class="program-check">
-                        <i class="fa-solid fa-user-tie"></i>
-                    </div>
-
-                    <div>
-                        <strong>Provide Mentorship</strong>
-                        <p>
-                            Give trainees access to guidance, training
-                            and experienced professionals.
-                        </p>
-                    </div>
-
-                </div>
-
-
-                <div class="program-item">
-
-                    <div class="program-check">
-                        <i class="fa-solid fa-briefcase"></i>
-                    </div>
-
-                    <div>
-                        <strong>Offer Meaningful Work</strong>
-                        <p>
-                            Involve trainees in practical projects
-                            that contribute to their development.
-                        </p>
-                    </div>
-
-                </div>
-
-
-                <div class="program-item">
-
-                    <div class="program-check">
-                        <i class="fa-solid fa-comments"></i>
-                    </div>
-
-                    <div>
-                        <strong>Gather Feedback</strong>
-                        <p>
-                            Conduct regular reviews to improve both
-                            trainee performance and the program.
-                        </p>
-                    </div>
-
-                </div>
-
-
-                <div class="program-item">
-
-                    <div class="program-check">
-                        <i class="fa-solid fa-chart-simple"></i>
-                    </div>
-
-                    <div>
-                        <strong>Track Progress</strong>
-                        <p>
-                            Monitor development and evaluate outcomes
-                            against  original objectives.
-                        </p>
-                    </div>
-
-                </div>
-
-            </div>
-
-        </div>
-
-    </section>
-
-
-    <!-- =====================================================
-         ATTRACT TOP TALENT
-    ====================================================== -->
-
-    <section class="talent-section">
-
-        <div class="benefits-section-heading reveal">
-
-            <span class="eyebrow">Attract Top Talent</span>
-
-            <h2>
-                Make Your Internship Program Stand Out
-            </h2>
-
-            <p>
-                A clear, engaging and well-promoted internship program
-                can help  organization attract motivated trainees
-                and create stronger connections with emerging talent.
-            </p>
-
-        </div>
-
-
-        <div class="talent-grid reveal">
-
-            <div class="talent-card">
-
-                <i class="fa-solid fa-building"></i>
-
-                <h3>Strong Employer Brand</h3>
-
-                <p>
-                    Showcase  workplace culture, values and
-                    opportunities for professional development.
-                </p>
-
-            </div>
-
-
-            <div class="talent-card">
-
-                <i class="fa-solid fa-file-lines"></i>
-
-                <h3>Clear Job Descriptions</h3>
-
-                <p>
-                    Clearly explain responsibilities, qualifications,
-                    learning opportunities and expected outcomes.
-                </p>
-
-            </div>
-
-
-            <div class="talent-card">
-
-                <i class="fa-solid fa-graduation-cap"></i>
-
-                <h3>University Partnerships</h3>
-
-                <p>
-                    Build relationships with educational institutions
-                    and connect with motivated emerging talent.
-                </p>
-
-            </div>
-
-
-            <div class="talent-card">
-
-                <i class="fa-solid fa-share-nodes"></i>
-
-                <h3>Digital Promotion</h3>
-
-                <p>
-                    Promote internship opportunities through suitable
-                    online platforms and student communities.
-                </p>
-
-            </div>
-
-        </div>
-
-    </section>
-
-
-    <!-- =====================================================
-         KEY BENEFITS
-    ====================================================== -->
-
-    <section class="process-section">
-
-        <div class="benefits-section-heading reveal">
-
-            <span class="eyebrow">What Your Organization Gains</span>
-
-            <h2>
-                Key Benefits of Hosting Trainees
-            </h2>
-
-        </div>
-
-
-        <div class="process-track reveal">
-
-            <div class="process-grid">
-
-                <div class="process-card">
-
-                    <div class="process-number">01</div>
-
-                    <h3>Fresh Perspectives</h3>
-
-                    <p>
-                        New ideas and approaches to business challenges.
+                    <p class="benefits-subtitle">
+                        Unlocking the Potential: Why Your Organization Should Host Interns
                     </p>
 
-                </div>
+                    <div class="benefits-title-line"></div>
 
-
-                <div class="process-card">
-
-                    <div class="process-number">02</div>
-
-                    <h3>Cost-Effective Talent</h3>
-
-                    <p>
-                        Additional support for suitable business projects.
+                    <p class="benefits-intro">
+                        In today’s competitive landscape, hosting interns is more than
+                        just a way to give back; it’s a strategic move that offers
+                        numerous benefits for your organization. 1trainee.com suggests
+                        why you should consider integrating interns into your team.
                     </p>
 
-                </div>
+                </header>
 
+                <!-- ================= SECTION 1 ================= -->
+                <section class="benefits-section" id="organizational-benefits">
 
-                <div class="process-card">
+                    <div class="benefits-section-heading">
+                        <span class="benefits-heading-icon">
+                            <i class="bi bi-lightbulb"></i>
+                        </span>
 
-                    <div class="process-number">03</div>
+                        <div>
+                            <span class="benefits-section-label">SECTION 01</span>
+                            <h2>Benefits of Hosting Interns</h2>
+                        </div>
+                    </div>
 
-                    <h3>Future Leaders</h3>
-
-                    <p>
-                        Identify and develop promising future employees.
+                    <p class="benefits-section-intro">
+                        Bringing interns into your organization can create valuable
+                        opportunities for innovation, productivity, talent development,
+                        and a stronger workplace culture.
                     </p>
 
-                </div>
+                    <div class="benefits-detail-list">
 
+                        <article class="benefit-detail">
+                            <span class="benefit-detail-icon">
+                                <i class="bi bi-lightbulb-fill"></i>
+                            </span>
 
-                <div class="process-card">
+                            <div>
+                                <h3>Fresh Perspectives &amp; Innovation</h3>
+                                <p>
+                                    Interns bring new ideas and perspectives that can
+                                    spark creativity and innovation within the company
+                                    team. Their academic knowledge and enthusiasm can
+                                    provide unique solutions to ongoing challenges and
+                                    projects.
+                                </p>
+                            </div>
+                        </article>
 
-                    <div class="process-number">04</div>
+                        <article class="benefit-detail">
+                            <span class="benefit-detail-icon">
+                                <i class="bi bi-people-fill"></i>
+                            </span>
 
-                    <h3>Skill Development</h3>
+                            <div>
+                                <h3>Talent Pipeline Development</h3>
+                                <p>
+                                    Internships are an excellent way to identify and
+                                    nurture future talent. By providing internships,
+                                    companies can evaluate potential future employees
+                                    in a real-world setting, making recruitment more
+                                    efficient and targeted.
+                                </p>
+                            </div>
+                        </article>
+
+                        <article class="benefit-detail">
+                            <span class="benefit-detail-icon">
+                                <i class="bi bi-wallet2"></i>
+                            </span>
+
+                            <div>
+                                <h3>Cost-Effective Support</h3>
+                                <p>
+                                    Interns offer valuable support at a fraction of the
+                                    cost of full-time employees. They can take on
+                                    essential tasks, enabling the company's full-time
+                                    staff to focus on more strategic initiatives.
+                                </p>
+                            </div>
+                        </article>
+
+                        <article class="benefit-detail">
+                            <span class="benefit-detail-icon">
+                                <i class="bi bi-emoji-smile-fill"></i>
+                            </span>
+
+                            <div>
+                                <h3>Enhanced Company Culture</h3>
+                                <p>
+                                    Hosting interns can infuse your workplace with
+                                    energy and enthusiasm. They often bring a fresh,
+                                    optimistic outlook that can positively impact
+                                    team dynamics and morale.
+                                </p>
+                            </div>
+                        </article>
+
+                        <article class="benefit-detail">
+                            <span class="benefit-detail-icon">
+                                <i class="bi bi-award-fill"></i>
+                            </span>
+
+                            <div>
+                                <h3>Building Your Brand</h3>
+                                <p>
+                                    A well-structured internship program enhances your
+                                    employer brand and showcases your organization as
+                                    a desirable place to work. Positive intern
+                                    experiences can lead to strong referrals and
+                                    an improved company reputation.
+                                </p>
+                            </div>
+                        </article>
+
+                    </div>
+                </section>
+
+                <!-- ================= SECTION 2 ================= -->
+                <section class="benefits-section" id="effective-program">
+
+                    <div class="benefits-section-heading">
+                        <span class="benefits-heading-icon">
+                            <i class="bi bi-clipboard2-check"></i>
+                        </span>
+
+                        <div>
+                            <span class="benefits-section-label">SECTION 02</span>
+                            <h2>Crafting an Effective Internship Program</h2>
+                        </div>
+                    </div>
+
+                    <h3 class="benefits-secondary-heading">
+                        Designing an Internship Program That Delivers Results
+                    </h3>
 
                     <p>
-                        Help emerging professionals develop practical skills.
+                        Creating an effective internship program requires careful
+                        planning and execution. Here are key steps to design a
+                        program that benefits both your organization and selected
+                        interns or trainees.
                     </p>
 
-                </div>
+                    <div class="program-step-list">
 
+                        <article class="program-step">
+                            <span class="program-step-number">01</span>
+                            <div>
+                                <h3>Set Clear Objectives</h3>
+                                <p>
+                                    Define what you want to achieve with your internship
+                                    program. Whether it’s filling a skills gap, working
+                                    on specific projects, or evaluating potential hires,
+                                    clear objectives will guide the program’s structure
+                                    and goals.
+                                </p>
+                            </div>
+                        </article>
 
-                <div class="process-card">
+                        <article class="program-step">
+                            <span class="program-step-number">02</span>
+                            <div>
+                                <h3>Develop a Structured Plan</h3>
+                                <p>
+                                    Outline a detailed plan for the internship, including
+                                    project assignments, learning objectives, and a
+                                    timeline. Ensure that interns have clear tasks and
+                                    responsibilities that align with your organizational
+                                    goals.
+                                </p>
+                            </div>
+                        </article>
 
-                    <div class="process-number">05</div>
+                        <article class="program-step">
+                            <span class="program-step-number">03</span>
+                            <div>
+                                <h3>Provide Mentorship &amp; Training</h3>
+                                <p>
+                                    Assign mentors to guide interns through their
+                                    experience. Provide training and resources to help
+                                    them develop relevant skills and integrate into
+                                    the team effectively.
+                                </p>
+                            </div>
+                        </article>
 
-                    <h3>Stronger Brand</h3>
+                        <article class="program-step">
+                            <span class="program-step-number">04</span>
+                            <div>
+                                <h3>Offer Meaningful Work</h3>
+                                <p>
+                                    Ensure that interns are involved in meaningful
+                                    projects that contribute to their professional
+                                    growth. Avoid relegating them to menial tasks;
+                                    instead, provide opportunities for them to make
+                                    a tangible impact.
+                                </p>
+                            </div>
+                        </article>
+
+                        <article class="program-step">
+                            <span class="program-step-number">05</span>
+                            <div>
+                                <h3>Gather Feedback</h3>
+                                <p>
+                                    Implement regular feedback sessions to discuss
+                                    progress and address any concerns. This feedback
+                                    loop helps interns improve and also allows you to
+                                    refine the program based on their experiences.
+                                </p>
+                            </div>
+                        </article>
+
+                    </div>
+                </section>
+
+                <!-- ================= SECTION 3 ================= -->
+                <section class="benefits-section" id="attract-interns">
+
+                    <div class="benefits-section-heading">
+                        <span class="benefits-heading-icon">
+                            <i class="bi bi-person-hearts"></i>
+                        </span>
+
+                        <div>
+                            <span class="benefits-section-label">SECTION 03</span>
+                            <h2>Attracting Top Intern Talent</h2>
+                        </div>
+                    </div>
+
+                    <h3 class="benefits-secondary-heading">
+                        How to Attract the Best Interns to Your Organization
+                    </h3>
 
                     <p>
-                        Build a reputation as an organization that develops talent.
+                        Attracting top internship trainees and candidates requires
+                        a strategic approach. Here’s how to make your internship
+                        program stand out and draw in top talent.
                     </p>
+
+                    <div class="attraction-grid">
+
+                        <article class="attraction-card">
+                            <span class="attraction-icon">
+                                <i class="bi bi-stars"></i>
+                            </span>
+                            <h3>Build a Strong Employer Brand</h3>
+                            <p>
+                                Promote your organization as an exciting and rewarding
+                                place to work. Highlight your company’s values, culture,
+                                and any unique benefits you offer to interns.
+                            </p>
+                        </article>
+
+                        <article class="attraction-card">
+                            <span class="attraction-icon">
+                                <i class="bi bi-file-earmark-text"></i>
+                            </span>
+                            <h3>Optimize Your Job Descriptions</h3>
+                            <p>
+                                Craft clear and engaging job descriptions that outline
+                                the responsibilities, learning opportunities, and
+                                qualifications required. Emphasize the skills interns
+                                will gain and the impact they can make.
+                            </p>
+                        </article>
+
+                        <article class="attraction-card">
+                            <span class="attraction-icon">
+                                <i class="bi bi-mortarboard"></i>
+                            </span>
+                            <h3>Leverage University Partnerships</h3>
+                            <p>
+                                Collaborate with universities and attend career fairs
+                                to reach potential trainees. Building relationships
+                                with educational institutions can help you tap into
+                                a pool of motivated and qualified students.
+                            </p>
+                        </article>
+
+                        <article class="attraction-card">
+                            <span class="attraction-icon">
+                                <i class="bi bi-share"></i>
+                            </span>
+                            <h3>Use Social Media and Online Platforms</h3>
+                            <p>
+                                Promote your internship opportunities on social media
+                                and job boards. Engage with student communities and
+                                showcase your internship program’s successes and benefits.
+                            </p>
+                        </article>
+
+                        <article class="attraction-card attraction-card-wide">
+                            <span class="attraction-icon">
+                                <i class="bi bi-cash-coin"></i>
+                            </span>
+                            <div>
+                                <h3>Offer Competitive Compensation &amp; Benefits</h3>
+                                <p>
+                                    While internships may be unpaid or low-paid,
+                                    offering competitive stipends, flexible hours,
+                                    and other benefits can make your program more
+                                    attractive to top trainees.
+                                </p>
+                            </div>
+                        </article>
+
+                    </div>
+                </section>
+
+                <!-- ================= SECTION 4 ================= -->
+                <section class="benefits-section" id="measure-success">
+
+                    <div class="benefits-section-heading">
+                        <span class="benefits-heading-icon">
+                            <i class="bi bi-graph-up-arrow"></i>
+                        </span>
+
+                        <div>
+                            <span class="benefits-section-label">SECTION 04</span>
+                            <h2>Measuring the Success of Your Internship Program</h2>
+                        </div>
+                    </div>
+
+                    <h3 class="benefits-secondary-heading">
+                        Evaluating the Impact: How to Measure the Success of Your Program
+                    </h3>
+
+                    <p>
+                        To ensure that your internship program is achieving its goals,
+                        it’s important to measure its success. Here’s how you can
+                        evaluate the impact of your program.
+                    </p>
+
+                    <div class="measurement-list">
+
+                        <article class="measurement-item">
+                            <span class="measurement-icon">
+                                <i class="bi bi-person-check"></i>
+                            </span>
+                            <div>
+                                <h3>Assess Intern Performance</h3>
+                                <p>
+                                    Monitor and evaluate the performance of your interns
+                                    through regular reviews and feedback. Assess their
+                                    contributions, skills developed, and overall impact
+                                    on projects.
+                                </p>
+                            </div>
+                        </article>
+
+                        <article class="measurement-item">
+                            <span class="measurement-icon">
+                                <i class="bi bi-chat-square-text"></i>
+                            </span>
+                            <div>
+                                <h3>Gather Feedback</h3>
+                                <p>
+                                    Collect feedback from interns about their experience.
+                                    Surveys and exit interviews can provide valuable
+                                    insights into what worked well and what could be improved.
+                                </p>
+                            </div>
+                        </article>
+
+                        <article class="measurement-item">
+                            <span class="measurement-icon">
+                                <i class="bi bi-person-workspace"></i>
+                            </span>
+                            <div>
+                                <h3>Analyze Recruitment Outcomes</h3>
+                                <p>
+                                    Track the success of your internship program in
+                                    terms of recruitment. Evaluate how many interns
+                                    transition into full-time roles and the overall
+                                    quality of these hires.
+                                </p>
+                            </div>
+                        </article>
+
+                        <article class="measurement-item">
+                            <span class="measurement-icon">
+                                <i class="bi bi-bar-chart-line"></i>
+                            </span>
+                            <div>
+                                <h3>Measure ROI</h3>
+                                <p>
+                                    Assess the return on investment by comparing the
+                                    costs associated with the internship program to
+                                    the benefits gained, such as increased productivity
+                                    or successful project outcomes.
+                                </p>
+                            </div>
+                        </article>
+
+                        <article class="measurement-item">
+                            <span class="measurement-icon">
+                                <i class="bi bi-bullseye"></i>
+                            </span>
+                            <div>
+                                <h3>Review Program Objectives</h3>
+                                <p>
+                                    Regularly review whether the internship program is
+                                    meeting its defined objectives. Adjust the program
+                                    based on performance data and feedback to enhance
+                                    its effectiveness.
+                                </p>
+                            </div>
+                        </article>
+
+                    </div>
+
+                    <div class="benefits-insight">
+                        <i class="bi bi-info-circle-fill"></i>
+                        <p>
+                            Measuring the success of your internship program helps
+                            ensure that it delivers value to both your organization
+                            and the interns. By implementing these evaluation
+                            strategies, you can continually improve your program
+                            and achieve better results.
+                        </p>
+                    </div>
+
+                </section>
+
+                <!-- ================= SECTION 5 ================= -->
+                <section class="benefits-section" id="key-benefits">
+
+                    <div class="benefits-section-heading">
+                        <span class="benefits-heading-icon">
+                            <i class="bi bi-check2-circle"></i>
+                        </span>
+
+                        <div>
+                            <span class="benefits-section-label">SECTION 05</span>
+                            <h2>Key Benefits of Trainee Interns</h2>
+                        </div>
+                    </div>
+
+                    <p class="benefits-section-intro">
+                        The benefits of trainee interns to your organization or company
+                        extend beyond completing everyday tasks. A well-planned
+                        internship can create opportunities for growth, collaboration,
+                        and long-term success.
+                    </p>
+
+                    <div class="key-benefits-grid">
+
+                        <div class="key-benefit-card">
+                            <span><i class="bi bi-lightbulb"></i></span>
+                            <h3>Fresh Perspectives</h3>
+                        </div>
+
+                        <div class="key-benefit-card">
+                            <span><i class="bi bi-wallet2"></i></span>
+                            <h3>Cost-Effective Talent</h3>
+                        </div>
+
+                        <div class="key-benefit-card">
+                            <span><i class="bi bi-people"></i></span>
+                            <h3>Future Leaders</h3>
+                        </div>
+
+                        <div class="key-benefit-card">
+                            <span><i class="bi bi-speedometer2"></i></span>
+                            <h3>Enhanced Productivity</h3>
+                        </div>
+
+                        <div class="key-benefit-card">
+                            <span><i class="bi bi-mortarboard"></i></span>
+                            <h3>Skill Development</h3>
+                        </div>
+
+                        <div class="key-benefit-card">
+                            <span><i class="bi bi-arrow-left-right"></i></span>
+                            <h3>Flexibility and Adaptability</h3>
+                        </div>
+
+                        <div class="key-benefit-card">
+                            <span><i class="bi bi-award"></i></span>
+                            <h3>Strengthen Your Brand</h3>
+                        </div>
+
+                        <div class="key-benefit-card">
+                            <span><i class="bi bi-emoji-smile"></i></span>
+                            <h3>Energize Your Team</h3>
+                        </div>
+
+                        <div class="key-benefit-card">
+                            <span><i class="bi bi-handshake"></i></span>
+                            <h3>Build Strong Relationships</h3>
+                        </div>
+
+                        <div class="key-benefit-card">
+                            <span><i class="bi bi-person-gear"></i></span>
+                            <h3>Customized Learning Experiences</h3>
+                        </div>
+
+                    </div>
+                </section>
+
+                <!-- ================= CONCLUSION ================= -->
+                <section class="benefits-conclusion" id="conclusion">
+
+                    <div class="conclusion-icon">
+                        <i class="bi bi-rocket-takeoff"></i>
+                    </div>
+
+                    <div>
+                        <span class="benefits-section-label">LOOKING AHEAD</span>
+                        <h2>Build a Stronger Future With Internships</h2>
+
+                        <p>
+                            A well-designed internship program not only enhances your
+                            company’s or organization’s capabilities but also provides
+                            interns with valuable experience. Follow the guidelines
+                            mentioned above to create a program that delivers results
+                            and fosters mutual growth.
+                        </p>
+
+                        <p>
+                            Embracing an internship program can provide substantial
+                            benefits to your organization, from driving innovation
+                            to developing future talent. Consider integrating interns
+                            into your team and watch your organization thrive.
+                        </p>
+
+                        <p>
+                            Attracting the best interns involves showcasing your
+                            organization’s strengths and providing compelling
+                            opportunities. By implementing these strategies, you can
+                            draw in talented interns who will contribute positively
+                            to your organization.
+                        </p>
+                    </div>
+
+                </section>
+
+                <!-- ================= CTA ================= -->
+                <section class="benefits-cta">
+
+                    <div class="benefits-cta-icon">
+                        <i class="bi bi-people-fill"></i>
+                    </div>
+
+                    <div class="benefits-cta-content">
+                        <h2>Ready to Welcome Your Next Generation of Talent?</h2>
+                        <p>
+                            Connect with aspiring trainees and start building
+                            meaningful internship opportunities for your organization.
+                        </p>
+                    </div>
+
+                    <a href="https://www.1trainee.com/"
+                       class="benefits-cta-button">
+                        Explore 1Trainee
+                        <i class="bi bi-arrow-right"></i>
+                    </a>
+
+                </section>
+
+            </main>
+
+            <!-- ================= RIGHT SIDEBAR ================= -->
+            <aside class="benefits-sidebar">
+
+                <div class="benefits-sidebar-sticky">
+
+                    <div class="benefits-sidebar-heading">
+                        <span class="benefits-sidebar-heading-icon">
+                            <i class="bi bi-journal-richtext"></i>
+                        </span>
+
+                        <div>
+                            <h2>Organization Insights</h2>
+                            <p>Build a better internship program</p>
+                        </div>
+                    </div>
+
+                    <!-- SIDEBAR CARD 1 -->
+                    <article class="benefits-sidebar-card">
+
+                        <a href="#organizational-benefits"
+                           class="benefits-sidebar-image">
+                            <img src="~/images/why-trainee-exam.jpg"
+                                 alt="Students preparing to develop their professional skills"
+                                 loading="lazy" />
+                            <span class="benefits-image-overlay">
+                                <i class="bi bi-arrow-up-right"></i>
+                            </span>
+                        </a>
+
+                        <div class="benefits-sidebar-card-content">
+                            <span class="benefits-sidebar-tag">WHY HOST INTERNS?</span>
+
+                            <h3>Discover the Value of Young Talent</h3>
+
+                            <p>
+                                Bring fresh ideas, new perspectives, and enthusiasm
+                                into your workplace.
+                            </p>
+
+                            <a href="#organizational-benefits"
+                               class="benefits-sidebar-link">
+                                Explore benefits
+                                <i class="bi bi-arrow-right"></i>
+                            </a>
+                        </div>
+
+                    </article>
+
+                    <!-- SIDEBAR CARD 2 -->
+                    <article class="benefits-sidebar-card">
+
+                        <a href="#effective-program"
+                           class="benefits-sidebar-image">
+                            <img src="~/images/why-professional-training.jpg"
+                                 alt="Professional training and mentorship at work"
+                                 loading="lazy" />
+                            <span class="benefits-image-overlay">
+                                <i class="bi bi-arrow-up-right"></i>
+                            </span>
+                        </a>
+
+                        <div class="benefits-sidebar-card-content">
+                            <span class="benefits-sidebar-tag">PROGRAM PLANNING</span>
+
+                            <h3>Create Meaningful Internship Experiences</h3>
+
+                            <p>
+                                Set objectives, provide mentorship, and give interns
+                                meaningful projects.
+                            </p>
+
+                            <a href="#effective-program"
+                               class="benefits-sidebar-link">
+                                Plan your program
+                                <i class="bi bi-arrow-right"></i>
+                            </a>
+                        </div>
+
+                    </article>
+
+                    <!-- SIDEBAR CARD 3 -->
+                    <article class="benefits-sidebar-card">
+
+                        <a href="#attract-interns"
+                           class="benefits-sidebar-image">
+                            <img src="~/images/why-find-internships.jpg"
+                                 alt="Students exploring internship and career opportunities"
+                                 loading="lazy" />
+                            <span class="benefits-image-overlay">
+                                <i class="bi bi-arrow-up-right"></i>
+                            </span>
+                        </a>
+
+                        <div class="benefits-sidebar-card-content">
+                            <span class="benefits-sidebar-tag">TALENT DISCOVERY</span>
+
+                            <h3>Attract the Right Candidates</h3>
+
+                            <p>
+                                Showcase your workplace and make your opportunities
+                                stand out to aspiring trainees.
+                            </p>
+
+                            <a href="#attract-interns"
+                               class="benefits-sidebar-link">
+                                Find your approach
+                                <i class="bi bi-arrow-right"></i>
+                            </a>
+                        </div>
+
+                    </article>
+
+                    <!-- SIDEBAR NOTE -->
+                    <div class="benefits-sidebar-note">
+                        <span class="benefits-note-icon">
+                            <i class="bi bi-lightbulb-fill"></i>
+                        </span>
+
+                        <div>
+                            <h3>A Better Way to Grow</h3>
+                            <p>
+                                Invest in learning, encourage innovation, and
+                                create opportunities for future professionals.
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- SIDEBAR CTA -->
+                    <a href="https://www.1trainee.com/"
+                       class="benefits-sidebar-cta">
+                        Visit 1trainee.com
+                        <i class="bi bi-arrow-up-right"></i>
+                    </a>
 
                 </div>
 
-            </div>
+            </aside>
 
         </div>
-
-    </section>
-
-
-    <!-- =====================================================
-         MEASURING SUCCESS
-    ====================================================== -->
-
-    <section class="measurement-section">
-
-        <div class="benefits-section-heading reveal">
-
-            <span class="eyebrow">Measure Your Impact</span>
-
-            <h2>
-                Evaluate the Success of Your Internship Program
-            </h2>
-
-            <p>
-                Regular evaluation helps organizations understand
-                what is working and continuously improve their
-                internship experience.
-            </p>
-
-        </div>
-
-
-        <div class="measurement-grid reveal">
-
-            <div class="measurement-card">
-
-                <i class="fa-solid fa-user-check"></i>
-
-                <h3>Intern Performance</h3>
-
-            </div>
-
-
-            <div class="measurement-card">
-
-                <i class="fa-solid fa-comments"></i>
-
-                <h3>Intern Feedback</h3>
-
-            </div>
-
-
-            <div class="measurement-card">
-
-                <i class="fa-solid fa-user-plus"></i>
-
-                <h3>Recruitment Outcomes</h3>
-
-            </div>
-
-
-            <div class="measurement-card">
-
-                <i class="fa-solid fa-chart-pie"></i>
-
-                <h3>Program ROI</h3>
-
-            </div>
-
-
-            <div class="measurement-card">
-
-                <i class="fa-solid fa-rotate"></i>
-
-                <h3>Program Improvement</h3>
-
-            </div>
-
-        </div>
-
-    </section>
-
-
-    <!-- =====================================================
-         FINAL CTA
-    ====================================================== -->
-
-    <section class="benefits-cta">
-
-        <div class="benefits-cta-inner reveal">
-
-            <h2>
-                Build Your Future Talent With 1Trainee
-            </h2>
-
-            <p>
-                Create meaningful opportunities for trainees while
-                strengthening  organization with fresh talent,
-                practical skills and new perspectives.
-            </p>
-
-            <a asp-controller="Account"
-               asp-action="OrganizationRegister"
-               class="benefits-cta-btn">
-
-                Register Your Organization
-
-                <i class="fa-solid fa-arrow-right"></i>
-
-            </a>
-
-        </div>
-
-    </section>
-
+    </div>
 </div>
-
-<script>
-    (function () {
-        var revealEls = document.querySelectorAll('.benefits-page .reveal');
-
-        if ('IntersectionObserver' in window) {
-            var io = new IntersectionObserver(function (entries) {
-                entries.forEach(function (entry) {
-                    if (entry.isIntersecting) {
-                        entry.target.classList.add('in-view');
-                        io.unobserve(entry.target);
-                    }
-                });
-            }, { threshold: 0.12 });
-
-            revealEls.forEach(function (el) { io.observe(el); });
-        } else {
-            revealEls.forEach(function (el) { el.classList.add('in-view'); });
-        }
-    })();
-</script>
