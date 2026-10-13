@@ -743,81 +743,70 @@ namespace ErJobPortal.Controllers
 
         // khushi 08-10
         [HttpGet]
-        public IActionResult ViewOrgPost(int id)
+        public IActionResult ViewOrgPost(int id, string source = "PostDetails")
         {
             int? orgID = HttpContext.Session.GetInt32("OrgID");
 
-            if (orgID == null)
+            if (!orgID.HasValue)
             {
-                return RedirectToAction(
-                    "OrganizationLogin",
-                    "Account");
+                return RedirectToAction("OrganizationLogin", "Account");
             }
 
-            // =====================================================
-            // GET CURRENT POST
-            // =====================================================
-
-            var post = _repository.GetOrganizationPostById(
-                id,
-                orgID.Value);
+            var post = _repository.GetOrganizationPostById(id, orgID.Value);
 
             if (post == null)
             {
                 return NotFound();
             }
 
-            // =====================================================
-            // GET ONLY THE POSTS FROM APPLIED TRAINEES TABLE
-            // =====================================================
+            ViewBag.PostSource = source;
 
-            List<OrgPostM> appliedPosts =
-                _repository.GetAppliedTraineePosts(
-                    orgID.Value);
+            List<int> postIds;
 
-            // =====================================================
-            // GET IDs
-            // =====================================================
-
-            List<int> postIds = appliedPosts
-                .Select(x => x.nID)
-                .Where(x => x > 0)
-                .ToList();
-
-            // =====================================================
-            // FIND CURRENT POST
-            // =====================================================
+            // 1. PostDetails
+            if (source == "PostDetails")
+            {
+                postIds = _repository
+                    .GetOrgPostsWithMatchingTraineeCount(orgID.Value)
+                    .Select(x => x.nID)
+                    .Where(x => x > 0)
+                    .Distinct()
+                    .ToList();
+            }
+            // 2. Applied Trainees
+            else if (source == "AppliedTrainees")
+            {
+                postIds = _repository
+                    .GetAppliedTraineePostIds(orgID.Value);
+            }
+            // 3. Previous Posts
+            else if (source == "PreviousPosts")
+            {
+                postIds = _repository
+                    .GetOrganizationPreviousPostIds(orgID.Value);
+            }
+            else
+            {
+                postIds = new List<int>();
+            }
 
             int currentIndex = postIds.IndexOf(id);
 
-            // =====================================================
-            // PREVIOUS
-            // =====================================================
+            int? previousPostId = null;
+            int? nextPostId = null;
 
             if (currentIndex > 0)
             {
-                ViewBag.PreviousPostId =
-                    postIds[currentIndex - 1];
-            }
-            else
-            {
-                ViewBag.PreviousPostId = null;
+                previousPostId = postIds[currentIndex - 1];
             }
 
-            // =====================================================
-            // NEXT
-            // =====================================================
+            if (currentIndex >= 0 && currentIndex < postIds.Count - 1)
+            {
+                nextPostId = postIds[currentIndex + 1];
+            }
 
-            if (currentIndex >= 0 &&
-                currentIndex < postIds.Count - 1)
-            {
-                ViewBag.NextPostId =
-                    postIds[currentIndex + 1];
-            }
-            else
-            {
-                ViewBag.NextPostId = null;
-            }
+            ViewBag.PreviousPostId = previousPostId;
+            ViewBag.NextPostId = nextPostId;
 
             return View(post);
         }
