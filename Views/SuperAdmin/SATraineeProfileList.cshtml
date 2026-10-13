@@ -1,4 +1,5 @@
-﻿@model List<SATraineeProfileListM>
+
+@model List<SATraineeProfileListM>
 
 @{
     Layout = "~/Views/Shared/_DashboardLayout.cshtml";
@@ -8,24 +9,42 @@
     ViewData["UserName"] = "Super Admin";
 }
 
-<div class="container-fluid">
+<style>
+    .master-data-table .candidate-profile-photo {
+        width: 55px;
+        height: 55px;
+        object-fit: contain;
+        display: block;
+        margin: 0 auto;
+        border-radius: 8px;
+        border: 1px solid #e2e8f0;
+        background-color: #f8fafc;
+    }
 
-    <!-- MASTER TABLE CARD -->
+    .master-data-table td:has(.candidate-profile-photo) {
+        text-align: center;
+        vertical-align: middle;
+        min-width: 85px;
+    }
+
+    @@media (max-width: 768px) {
+        .master-data-table .candidate-profile-photo {
+            width: 45px;
+            height: 45px;
+            max-width: 45px;
+            max-height: 45px;
+        }
+    }
+</style>
+
+<div class="container-fluid">
     <div class="master-table-container">
 
-        <!-- MASTER TABLE HEADER -->
+        <!-- PAGE HEADER -->
         <div class="master-table-title">
-
             <div>
-
-                <h2>
-                    Trainee Profile List
-                </h2>
-
-                <p>
-                    View and manage complete trainee profile information
-                </p>
-
+                <h2>Trainee Profile List</h2>
+                <p>View and manage complete trainee profile information</p>
             </div>
 
             <a asp-controller="SuperAdmin"
@@ -35,70 +54,39 @@
                 Back to Dashboard
 
             </a>
-
         </div>
 
-
-        <!-- MASTER TABLE -->
+        <!-- TRAINEE PROFILE TABLE -->
         <div class="table-responsive">
-
-            <table id="candidateProfileTable"
-                   class="master-data-table">
+            <table id="candidateProfileTable" class="master-data-table">
 
                 <thead>
-
                     <tr>
-
                         <th>Sr. No</th>
-
                         <th>Profile Created Date</th>
-
                         <th>Trainee Name</th>
-
                         <th>Action</th>
-
                         <th>Photo</th>
-
                         <th>Location</th>
-
                         <th>Pin Code</th>
-
                         <th>SSC Year</th>
-
                         <th>SSC Division</th>
-
                         <th>HSC / Diploma Year</th>
-
                         <th>HSC / Diploma Division</th>
-
                         <th>Graduation Year</th>
-
                         <th>Graduation Division</th>
-
                         <th>Graduation Stream</th>
-
                         <th>PG Year</th>
-
                         <th>PG Division</th>
-
                         <th>PG Stream</th>
-
                         <th>PhD Year</th>
-
                         <th>PhD Status</th>
-
                         <th>PhD Topic</th>
-
                         <th>Preferred Location</th>
-
                         <th>Internship Type</th>
-
                         <th>Uploaded Resume</th>
-
                         <th>Resume Status</th>
-
                     </tr>
-
                 </thead>
 
 
@@ -185,6 +173,8 @@
                             @item.Pincode
                         </td>
 
+                                <!-- PIN CODE -->
+                                <td>@item.Pincode</td>
 
                         <!-- SSC -->
                         <td>
@@ -233,6 +223,10 @@
                             @item.PG_Stream
                         </td>
 
+                                <!-- POST GRADUATION -->
+                                <td>@item.PG_Year</td>
+                                <td>@item.PG_Division</td>
+                                <td>@item.PG_Stream</td>
 
                         <!-- PHD -->
                         <td>
@@ -247,6 +241,8 @@
                             @item.PhD_Topic
                         </td>
 
+                                <!-- INTERNSHIP TYPE -->
+                                <td>@item.Internship_FellowshipType</td>
 
                         <!-- PREFERRED LOCATION -->
                         <td>
@@ -325,18 +321,13 @@
                 </tbody>
 
             </table>
-
         </div>
 
-
-        <!-- MASTER PAGE INFO -->
+        <!-- PAGINATION INFORMATION -->
         <div id="candidateProfilePageInfo"
              class="master-page-info text-center">
         </div>
 
     </div>
-
 </div>
-
-
-}
+```

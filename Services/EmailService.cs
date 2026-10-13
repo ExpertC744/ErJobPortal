@@ -587,5 +587,52 @@ Er Job Portal Team
 
             await smtp.SendMailAsync(message);
         }
+
+        // shrirang 10/10/26
+
+        public async Task SendSchedulerReminderEmailAsync(
+            string email,
+            string tpoName,
+            string activityTitle,
+            DateTime startDate,
+            TimeSpan startTime,
+            string? location)
+        {
+            if (string.IsNullOrWhiteSpace(email))
+                throw new ArgumentException("TPO email is required.", nameof(email));
+
+            string smtpServer = _configuration["EmailSettings:SmtpServer"] ?? "";
+            int port = Convert.ToInt32(_configuration["EmailSettings:Port"] ?? "587");
+            string username = _configuration["EmailSettings:Username"] ?? "";
+            string smtpPassword = _configuration["EmailSettings:Password"] ?? "";
+            string fromEmail = _configuration["EmailSettings:FromEmail"] ?? username;
+            string fromName = _configuration["EmailSettings:FromName"] ?? "Er Job Portal";
+
+            using var message = new MailMessage();
+            message.From = new MailAddress(fromEmail, fromName);
+            message.To.Add(email.Trim());
+            message.Subject = "Upcoming TPO Scheduler Activity Reminder";
+
+            message.Body =
+                $"Dear {tpoName},\r\n\r\n" +
+                "This is a reminder for your upcoming scheduled activity.\r\n\r\n" +
+                $"Activity: {activityTitle}\r\n" +
+                $"Date: {startDate:dd MMM yyyy}\r\n" +
+                $"Time: {startTime:hh\\:mm}\r\n" +
+                $"Location: {location ?? "Not specified"}\r\n\r\n" +
+                "Please check your TPO Scheduler for details.\r\n\r\n" +
+                "Regards,\r\nEr Job Portal Team";
+
+            message.IsBodyHtml = false;
+
+            using var smtp = new SmtpClient(smtpServer, port)
+            {
+                EnableSsl = true,
+                Credentials = new NetworkCredential(username, smtpPassword)
+            };
+
+            await smtp.SendMailAsync(message);
+        }
+
     }
 }

@@ -4091,13 +4091,13 @@ ORDER BY CreatedDate DESC,
         // TPO SEND NOTIFICATION
         // GET TPO NOTIFICATIONS
         // =====================================================
+
+        //shrirang 12/10/26
         #region "Get TPO Notifications For Send"
 
-        public List<TPONotificationListM> GetTPONotificationsForSend(
-            int tpoId)
+        public List<TPONotificationListM> GetTPONotificationsForSend(int tpoId)
         {
-            List<TPONotificationListM> list =
-                new List<TPONotificationListM>();
+            List<TPONotificationListM> list = new List<TPONotificationListM>();
 
             using (SqlConnection cn = _db.GetConnection())
             {
@@ -4114,330 +4114,167 @@ SELECT
 
     N.Attachment1OriginalName,
     N.Attachment1Path,
-
     N.Attachment2OriginalName,
     N.Attachment2Path,
 
     N.CreatedBy,
     N.CreatedByName,
-
     N.IsActive,
     N.IsDeleted,
     N.CreatedDate,
 
-    -- =====================================================
-    -- NOTIFICATION TRACKING
-    -- =====================================================
+    ISNULL(N.ApprovalStatus, 'Pending') AS ApprovalStatus,
 
     ISNULL(T.TotalSent, 0) AS TotalSent,
-
     ISNULL(T.TotalRead, 0) AS TotalRead,
-
     ISNULL(T.TotalUnread, 0) AS TotalUnread
 
-FROM tblTPONotification N
-
--- =========================================================
--- CALCULATE STUDENT NOTIFICATION TRACKING
--- =========================================================
+FROM dbo.tblTPONotification N
 
 OUTER APPLY
 (
     SELECT
         COUNT(1) AS TotalSent,
-
-        SUM(
-    CASE
-        WHEN ISNULL(R.IsRead, 0) = 1
-        THEN 1
-        ELSE 0
-    END
-) AS TotalRead,
-
-SUM(
-    CASE
-        WHEN ISNULL(R.IsRead, 0) = 0
-        THEN 1
-        ELSE 0
-    END
-) AS TotalUnread
-
-    FROM tblTPONotificationRecipient R
-
-    WHERE
-        R.NotificationID = N.NotificationID
-        AND R.IsActive = 1
-
+        SUM(CASE WHEN ISNULL(R.IsRead, 0) = 1 THEN 1 ELSE 0 END) AS TotalRead,
+        SUM(CASE WHEN ISNULL(R.IsRead, 0) = 0 THEN 1 ELSE 0 END) AS TotalUnread
+    FROM dbo.tblTPONotificationRecipient R
+    WHERE R.NotificationID = N.NotificationID
+      AND R.IsActive = 1
 ) T
 
-WHERE
-    N.CreatedBy = @CreatedBy
+INNER JOIN dbo.TPORegistration LoggedTPO
+    ON LoggedTPO.TPOID = @TPOID
 
-    AND N.IsDeleted = 0
+LEFT JOIN dbo.TPORegistration CreatorTPO
+    ON CreatorTPO.TPOID = N.CreatedBy
+
+WHERE
+    ISNULL(N.IsDeleted, 0) = 0
+    AND
+    (
+        -- Main TPO: its own notifications
+        (
+            N.CreatedBy = @TPOID
+            AND ISNULL(LoggedTPO.subtopbit, 0) = 0
+        )
+
+        OR
+
+        -- Sub TPO: only its own approved notifications
+        (
+            N.CreatedBy = @TPOID
+            AND ISNULL(LoggedTPO.subtopbit, 0) = 1
+            AND N.ApprovalStatus = 'Approved'
+        )
+
+        OR
+
+        -- Main TPO: approved notifications created by its own Sub TPOs
+        (
+            ISNULL(LoggedTPO.subtopbit, 0) = 0
+            AND ISNULL(CreatorTPO.subtopbit, 0) = 1
+            AND CreatorTPO.ParentTPOID = @TPOID
+            AND N.ApprovalStatus = 'Approved'
+        )
+    )
 
 ORDER BY
     N.CreatedDate DESC,
     N.NotificationID DESC;
 ";
 
-                using (SqlCommand cmd =
-                       new SqlCommand(query, cn))
+                using (SqlCommand cmd = new SqlCommand(query, cn))
                 {
-                    cmd.Parameters.Add(
-                        "@CreatedBy",
-                        SqlDbType.Int).Value = tpoId;
+                    cmd.Parameters.Add("@TPOID", SqlDbType.Int).Value = tpoId;
 
                     cn.Open();
 
-                    using (SqlDataReader reader =
-                           cmd.ExecuteReader())
+                    using (SqlDataReader reader = cmd.ExecuteReader())
                     {
                         while (reader.Read())
                         {
-                            TPONotificationListM item =
-                                new TPONotificationListM();
+                            TPONotificationListM item = new TPONotificationListM();
 
+                            item.NotificationID = Convert.ToInt32(reader["NotificationID"]);
+                            item.Title = reader["Title"]?.ToString() ?? string.Empty;
+                            item.Type = reader["Type"]?.ToString() ?? string.Empty;
+                            item.Audience = reader["Audience"]?.ToString() ?? string.Empty;
 
-                            // =================================================
-                            // BASIC INFORMATION
-                            // =================================================
+                            if (reader["NotificationDate"] != DBNull.Value)
+                                item.NotificationDate = Convert.ToDateTime(reader["NotificationDate"]);
 
-                            item.NotificationID =
-                                Convert.ToInt32(
-                                    reader["NotificationID"]);
+                            if (reader["NotificationTime"] != DBNull.Value)
+                                item.NotificationTime = (TimeSpan)reader["NotificationTime"];
 
-                            item.Title =
-                                reader["Title"]?.ToString()
-                                ?? string.Empty;
-
-                            item.Type =
-                                reader["Type"]?.ToString()
-                                ?? string.Empty;
-
-                            item.Audience =
-                                reader["Audience"]?.ToString()
-                                ?? string.Empty;
-
-
-                            // =================================================
-                            // DATE
-                            // =================================================
-
-                            if (reader["NotificationDate"]
-                                != DBNull.Value)
-                            {
-                                item.NotificationDate =
-                                    Convert.ToDateTime(
-                                        reader["NotificationDate"]);
-                            }
-
-
-                            // =================================================
-                            // TIME
-                            // =================================================
-
-                            if (reader["NotificationTime"]
-                                != DBNull.Value)
-                            {
-                                item.NotificationTime =
-                                    (TimeSpan)
-                                    reader["NotificationTime"];
-                            }
-
-
-                            // =================================================
-                            // CONTENT
-                            // =================================================
-
-                            item.Content =
-                                reader["Content"]?.ToString()
-                                ?? string.Empty;
-
-
-                            // =================================================
-                            // EMAIL
-                            // =================================================
+                            item.Content = reader["Content"]?.ToString() ?? string.Empty;
 
                             item.SendEmailNotification =
-                                reader["SendEmailNotification"]
-                                != DBNull.Value
-                                &&
-                                Convert.ToBoolean(
-                                    reader[
-                                        "SendEmailNotification"]);
-
-
-                            // =================================================
-                            // ATTACHMENT 1
-                            // =================================================
+                                reader["SendEmailNotification"] != DBNull.Value &&
+                                Convert.ToBoolean(reader["SendEmailNotification"]);
 
                             item.Attachment1OriginalName =
-                                reader[
-                                    "Attachment1OriginalName"]
-                                != DBNull.Value
-                                ?
-                                reader[
-                                    "Attachment1OriginalName"]
-                                    .ToString()
-                                :
-                                null;
+                                reader["Attachment1OriginalName"] == DBNull.Value
+                                    ? null : reader["Attachment1OriginalName"].ToString();
 
                             item.Attachment1Path =
-                                reader[
-                                    "Attachment1Path"]
-                                != DBNull.Value
-                                ?
-                                reader[
-                                    "Attachment1Path"]
-                                    .ToString()
-                                :
-                                null;
-
-
-                            // =================================================
-                            // ATTACHMENT 2
-                            // =================================================
+                                reader["Attachment1Path"] == DBNull.Value
+                                    ? null : reader["Attachment1Path"].ToString();
 
                             item.Attachment2OriginalName =
-                                reader[
-                                    "Attachment2OriginalName"]
-                                != DBNull.Value
-                                ?
-                                reader[
-                                    "Attachment2OriginalName"]
-                                    .ToString()
-                                :
-                                null;
+                                reader["Attachment2OriginalName"] == DBNull.Value
+                                    ? null : reader["Attachment2OriginalName"].ToString();
 
                             item.Attachment2Path =
-                                reader[
-                                    "Attachment2Path"]
-                                != DBNull.Value
-                                ?
-                                reader[
-                                    "Attachment2Path"]
-                                    .ToString()
-                                :
-                                null;
+                                reader["Attachment2Path"] == DBNull.Value
+                                    ? null : reader["Attachment2Path"].ToString();
 
-
-                            // =================================================
-                            // CREATED BY
-                            // =================================================
-
-                            if (reader["CreatedBy"]
-                                != DBNull.Value)
-                            {
-                                item.CreatedBy =
-                                    Convert.ToInt32(
-                                        reader["CreatedBy"]);
-                            }
+                            if (reader["CreatedBy"] != DBNull.Value)
+                                item.CreatedBy = Convert.ToInt32(reader["CreatedBy"]);
 
                             item.CreatedByName =
-                                reader["CreatedByName"]
-                                != DBNull.Value
-                                ?
-                                reader["CreatedByName"]
-                                    .ToString()
-                                :
-                                null;
-
-
-                            // =================================================
-                            // ACTIVE / DELETED
-                            // =================================================
+                                reader["CreatedByName"] == DBNull.Value
+                                    ? null : reader["CreatedByName"].ToString();
 
                             item.IsActive =
-                                reader["IsActive"]
-                                != DBNull.Value
-                                &&
-                                Convert.ToBoolean(
-                                    reader["IsActive"]);
+                                reader["IsActive"] != DBNull.Value &&
+                                Convert.ToBoolean(reader["IsActive"]);
 
                             item.IsDeleted =
-                                reader["IsDeleted"]
-                                != DBNull.Value
-                                &&
-                                Convert.ToBoolean(
-                                    reader["IsDeleted"]);
+                                reader["IsDeleted"] != DBNull.Value &&
+                                Convert.ToBoolean(reader["IsDeleted"]);
 
+                            item.CreatedDate = Convert.ToDateTime(reader["CreatedDate"]);
 
-                            // =================================================
-                            // CREATED DATE
-                            // =================================================
+                            item.TotalSent = Convert.ToInt32(reader["TotalSent"]);
+                            item.TotalRead = Convert.ToInt32(reader["TotalRead"]);
+                            item.TotalUnread = Convert.ToInt32(reader["TotalUnread"]);
 
-                            item.CreatedDate =
-                                Convert.ToDateTime(
-                                    reader["CreatedDate"]);
-
-                            // =================================================
-                            // NOTIFICATION TRACKING
-                            // =================================================
-
-                            item.TotalSent =
-                                reader["TotalSent"] != DBNull.Value
-                                ? Convert.ToInt32(reader["TotalSent"])
-                                : 0;
-
-                            item.TotalRead =
-                                reader["TotalRead"] != DBNull.Value
-                                ? Convert.ToInt32(reader["TotalRead"])
-                                : 0;
-
-                            item.TotalUnread =
-                                reader["TotalUnread"] != DBNull.Value
-                                ? Convert.ToInt32(reader["TotalUnread"])
-                                : 0;
-
-
-                            // =================================================
-                            // DISPLAY DATE / TIME
-                            // =================================================
-
-                            DateTime? notificationDateTime =
-                                null;
+                            DateTime? notificationDateTime = null;
 
                             if (item.NotificationDate.HasValue)
                             {
-                                notificationDateTime =
-                                    item.NotificationDate.Value.Date;
+                                notificationDateTime = item.NotificationDate.Value.Date;
 
                                 if (item.NotificationTime.HasValue)
                                 {
                                     notificationDateTime =
-                                        notificationDateTime.Value.Add(
-                                            item.NotificationTime.Value);
+                                        notificationDateTime.Value.Add(item.NotificationTime.Value);
                                 }
                             }
-
 
                             if (notificationDateTime.HasValue)
                             {
                                 item.DisplayDateTime =
-                                    notificationDateTime.Value.ToString(
-                                        "dd/MM/yyyy hh:mm tt");
+                                    notificationDateTime.Value.ToString("dd/MM/yyyy hh:mm tt");
 
-
-                                if (notificationDateTime.Value
-                                    < DateTime.Now)
-                                {
-                                    item.Status =
-                                        "Completed";
-                                }
-                                else
-                                {
-                                    item.Status =
-                                        "Active";
-                                }
+                                item.Status = notificationDateTime.Value < DateTime.Now
+                                    ? "Completed"
+                                    : "Active";
                             }
                             else
                             {
-                                item.Status =
-                                    item.IsActive
-                                    ? "Active"
-                                    : "Inactive";
+                                item.Status = item.IsActive ? "Active" : "Inactive";
                             }
-
 
                             list.Add(item);
                         }
@@ -4490,40 +4327,72 @@ ORDER BY
                         // VERIFY NOTIFICATION BELONGS TO THIS TPO
                         // =====================================================
 
+                        // =====================================================
+                        // STEP 1
+                        // VERIFY NOTIFICATION OWNERSHIP AND APPROVAL
+                        // =====================================================
+
                         string notificationQuery = @"
 SELECT COUNT(1)
-FROM tblTPONotification
+FROM dbo.tblTPONotification N
+
+INNER JOIN dbo.TPORegistration LoggedTPO
+    ON LoggedTPO.TPOID = @TPOID
+
+LEFT JOIN dbo.TPORegistration CreatorTPO
+    ON CreatorTPO.TPOID = N.CreatedBy
+
 WHERE
-    NotificationID = @NotificationID
-    AND CreatedBy = @TPOID
-    AND ISNULL(IsDeleted, 0) = 0;
+    N.NotificationID = @NotificationID
+    AND ISNULL(N.IsDeleted, 0) = 0
+
+    AND
+    (
+        -- Main TPO sending its own notification
+        (
+            N.CreatedBy = @TPOID
+            AND ISNULL(LoggedTPO.subtopbit, 0) = 0
+        )
+
+        OR
+
+        -- Sub TPO sending its own approved notification
+        (
+            N.CreatedBy = @TPOID
+            AND ISNULL(LoggedTPO.subtopbit, 0) = 1
+            AND N.ApprovalStatus = 'Approved'
+        )
+
+        OR
+
+        -- Main TPO sending an approved notification
+        -- created by its own Sub TPO
+        (
+            ISNULL(LoggedTPO.subtopbit, 0) = 0
+            AND ISNULL(CreatorTPO.subtopbit, 0) = 1
+            AND CreatorTPO.ParentTPOID = @TPOID
+            AND N.ApprovalStatus = 'Approved'
+        )
+    );
 ";
 
-                        using (SqlCommand notificationCmd =
-                               new SqlCommand(
-                                   notificationQuery,
-                                   cn,
-                                   transaction))
+                        using (SqlCommand notificationCmd = new SqlCommand(
+                            notificationQuery, cn, transaction))
                         {
                             notificationCmd.Parameters.Add(
-                                "@NotificationID",
-                                SqlDbType.Int).Value =
-                                    notificationId;
+                                "@NotificationID", SqlDbType.Int).Value = notificationId;
 
                             notificationCmd.Parameters.Add(
-                                "@TPOID",
-                                SqlDbType.Int).Value =
-                                    tpoId;
+                                "@TPOID", SqlDbType.Int).Value = tpoId;
 
-                            int notificationExists =
-                                Convert.ToInt32(
-                                    notificationCmd.ExecuteScalar());
+                            int notificationExists = Convert.ToInt32(
+                                notificationCmd.ExecuteScalar());
 
                             if (notificationExists == 0)
                             {
                                 throw new InvalidOperationException(
-                                    "The selected notification does not belong to the logged-in TPO."
-                                );
+                                    "This notification is not available for sending. " +
+                                    "Check its ownership and approval status.");
                             }
                         }
 
