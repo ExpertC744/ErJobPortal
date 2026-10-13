@@ -4142,10 +4142,10 @@ OUTER APPLY
       AND R.IsActive = 1
 ) T
 
-INNER JOIN dbo.TPORegistration LoggedTPO
+INNER JOIN dbo.tblTPORegistration LoggedTPO
     ON LoggedTPO.TPOID = @TPOID
 
-LEFT JOIN dbo.TPORegistration CreatorTPO
+LEFT JOIN dbo.tblTPORegistration CreatorTPO
     ON CreatorTPO.TPOID = N.CreatedBy
 
 WHERE
@@ -4336,10 +4336,10 @@ ORDER BY
 SELECT COUNT(1)
 FROM dbo.tblTPONotification N
 
-INNER JOIN dbo.TPORegistration LoggedTPO
+INNER JOIN dbo.tblTPORegistration LoggedTPO
     ON LoggedTPO.TPOID = @TPOID
 
-LEFT JOIN dbo.TPORegistration CreatorTPO
+LEFT JOIN dbo.tblTPORegistration CreatorTPO
     ON CreatorTPO.TPOID = N.CreatedBy
 
 WHERE
