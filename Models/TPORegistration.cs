@@ -156,5 +156,8 @@ namespace ErJobPortal.Models
 
 
         public int? nDepartment { get; set; }
+
+
+        public bool? SubTpoBit { get; set; }
     }
 }

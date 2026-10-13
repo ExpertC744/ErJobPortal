@@ -476,54 +476,48 @@ var org = Model.Organization;
         <div class="navigation-buttons">
 
 
-            @if (Model.HasPrevious)
-            {
-                <a asp-controller="SuperAdminOrganization"
-                   asp-action="OrganizationProfileDetails"
-                   asp-route-id="@Model.PreviousId"
-                   class="nav-btn prev-btn">
+            
+@if (Model.HasPrevious)
+{
+    <a asp-controller="SuperAdmin"
+       asp-action="OrganizationProfileDetails"
+       asp-route-id="@Model.PreviousId"
+       class="nav-btn prev-btn">
 
-                    <i class="fa-solid fa-chevron-left"></i>
-
-                    Previous
-
-                </a>
-            }
-            else
-            {
-                <span class="nav-btn prev-btn disabled">
-
-                    <i class="fa-solid fa-chevron-left"></i>
-
-                    Previous
-
-                </span>
-            }
+        <i class="fa-solid fa-chevron-left"></i>
+        Previous
+    </a>
+}
+else
+{
+    <span class="nav-btn prev-btn disabled">
+        <i class="fa-solid fa-chevron-left"></i>
+        Previous
+    </span>
+}
 
 
-            @if (Model.HasNext)
-            {
-                <a asp-controller="SuperAdminOrganization"
-                   asp-action="OrganizationProfileDetails"
-                   asp-route-id="@Model.NextId"
-                   class="nav-btn next-btn">
 
-                    Next
+            
+@if (Model.HasNext)
+{
+    <a asp-controller="SuperAdmin"
+       asp-action="OrganizationProfileDetails"
+       asp-route-id="@Model.NextId"
+       class="nav-btn next-btn">
 
-                    <i class="fa-solid fa-chevron-right"></i>
+        Next
+        <i class="fa-solid fa-chevron-right"></i>
+    </a>
+}
+else
+{
+    <span class="nav-btn next-btn disabled">
+        Next
+        <i class="fa-solid fa-chevron-right"></i>
+    </span>
+}
 
-                </a>
-            }
-            else
-            {
-                <span class="nav-btn next-btn disabled">
-
-                    Next
-
-                    <i class="fa-solid fa-chevron-right"></i>
-
-                </span>
-            }
 
         </div>
 

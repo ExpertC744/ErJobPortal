@@ -2137,12 +2137,17 @@ public OrganizationLogin? GetOrganizationLoginDetails(string email)
         // TPO LOGIN
         // =========================================================
 
-        public TPOLoginResult LoginTPO(string collegeMailID)
-        {
-            using (SqlConnection cn = _db.GetConnection())
-            {
-                string query = @"
-            SELECT
+     
+            // =========================================================
+            // TPO LOGIN
+            // =========================================================
+
+            public TPOLoginResult LoginTPO(string collegeMailID)
+                    {
+                        using (SqlConnection cn = _db.GetConnection())
+                        {
+                            string query = @"
+                        SELECT
                 TPOID,
                 FullName,
                 CollegeMailID,
@@ -2155,7 +2160,8 @@ public OrganizationLogin? GetOrganizationLoginDetails(string email)
                 OTPVerified,
                 Status,
                 IsApproved,
-                IsActive
+                IsActive,
+                subtopbit
             FROM tblTPORegistration
             WHERE CollegeMailID = @CollegeMailID";
 
@@ -2175,41 +2181,26 @@ public OrganizationLogin? GetOrganizationLoginDetails(string email)
                                 TPOID = Convert.ToInt32(reader["TPOID"]),
 
                                 FullName = reader["FullName"].ToString(),
+                                CollegeMailID = reader["CollegeMailID"].ToString(),
+                                MobileNo = reader["MobileNo"].ToString(),
+                                PasswordHash = reader["PasswordHash"].ToString(),
+                                CollegeName = reader["CollegeName"].ToString(),
 
-                                CollegeMailID =
-                                    reader["CollegeMailID"].ToString(),
+                                CollegeCode = reader["CollegeCode"] == DBNull.Value
+                                    ? null
+                                    : reader["CollegeCode"].ToString(),
 
-                                MobileNo =
-                                    reader["MobileNo"].ToString(),
+                                Designation = reader["Designation"].ToString(),
+                                DepartmentName = reader["DepartmentName"].ToString(),
 
-                                PasswordHash =
-                                    reader["PasswordHash"].ToString(),
+                                OTPVerified = Convert.ToBoolean(reader["OTPVerified"]),
+                                Status = reader["Status"].ToString(),
+                                IsApproved = Convert.ToBoolean(reader["IsApproved"]),
+                                IsActive = Convert.ToBoolean(reader["IsActive"]),
 
-                                CollegeName =
-                                    reader["CollegeName"].ToString(),
-
-                                CollegeCode =
-                                    reader["CollegeCode"] == DBNull.Value
-                                        ? null
-                                        : reader["CollegeCode"].ToString(),
-
-                                Designation =
-                                    reader["Designation"].ToString(),
-
-                                DepartmentName =
-                                    reader["DepartmentName"].ToString(),
-
-                                OTPVerified =
-                                    Convert.ToBoolean(reader["OTPVerified"]),
-
-                                Status =
-                                    reader["Status"].ToString(),
-
-                                IsApproved =
-                                    Convert.ToBoolean(reader["IsApproved"]),
-
-                                IsActive =
-                                    Convert.ToBoolean(reader["IsActive"])
+                                // 0 = Main TPO, 1 = Sub-TPO
+                                SubTpoBit = reader["subtopbit"] != DBNull.Value
+                                     && Convert.ToBoolean(reader["subtopbit"])
                             };
                         }
                     }
@@ -2218,6 +2209,7 @@ public OrganizationLogin? GetOrganizationLoginDetails(string email)
 
             return null;
         }
+
 
 
         public bool TPOEmailExists(string collegeMailID)
@@ -2917,6 +2909,10 @@ public OrganizationLogin? GetOrganizationLoginDetails(string email)
                                     reader["CreatedDate"] == DBNull.Value
                                         ? null
                                         : Convert.ToDateTime(reader["CreatedDate"]),
+
+                                SubTpoBit = reader["subtopbit"] == DBNull.Value
+                                        ? null
+                                        : Convert.ToBoolean(reader["subtopbit"]),
 
                                 UpdatedDate =
                                     reader["UpdatedDate"] == DBNull.Value
@@ -5639,6 +5635,104 @@ WHERE
                 nBit = GetBool("nBit"),
                 nSABit = GetBool("nSABit")
             };
+        }
+
+
+        // shrirang 13/10/26
+        // tpo vrification through superadmin 
+
+
+        public bool ApproveTPORegistration(int tpoId, int superAdminId)
+        {
+            using (SqlConnection cn = _db.GetConnection())
+            {
+                string query = @"
+            UPDATE tblTPORegistration
+            SET IsApproved = 1,
+                IsActive = 1,
+                Status = 'Approved',
+                ApprovedBy = @ApprovedBy,
+                ApprovedDate = GETDATE(),
+                RejectionReason = NULL,
+                UpdatedDate = GETDATE()
+            WHERE TPOID = @TPOID
+              AND ISNULL(OTPVerified, 0) = 1
+              AND ISNULL(IsApproved, 0) = 0
+              AND ISNULL(IsActive, 0) = 0
+              AND ISNULL(Status, '') = 'Pending';";
+
+                using (SqlCommand cmd = new SqlCommand(query, cn))
+                {
+                    cmd.Parameters.Add("@TPOID", SqlDbType.Int).Value = tpoId;
+                    cmd.Parameters.Add("@ApprovedBy", SqlDbType.Int).Value =
+                        superAdminId;
+
+                    cn.Open();
+                    return cmd.ExecuteNonQuery() > 0;
+                }
+            }
+        }
+
+        public bool RejectTPORegistration(
+            int tpoId,
+            int superAdminId,
+            string rejectionReason)
+        {
+            using (SqlConnection cn = _db.GetConnection())
+            {
+                string query = @"
+            UPDATE tblTPORegistration
+            SET IsApproved = 0,
+                IsActive = 0,
+                Status = 'Rejected',
+                ApprovedBy = @ApprovedBy,
+                ApprovedDate = GETDATE(),
+                RejectionReason = @RejectionReason,
+                UpdatedDate = GETDATE()
+            WHERE TPOID = @TPOID
+              AND ISNULL(IsApproved, 0) = 0
+              AND ISNULL(IsActive, 0) = 0
+              AND ISNULL(Status, '') = 'Pending';";
+
+                using (SqlCommand cmd = new SqlCommand(query, cn))
+                {
+                    cmd.Parameters.Add("@TPOID", SqlDbType.Int).Value = tpoId;
+                    cmd.Parameters.Add("@ApprovedBy", SqlDbType.Int).Value =
+                        superAdminId;
+                    cmd.Parameters.Add("@RejectionReason", SqlDbType.NVarChar, 1000)
+                        .Value = rejectionReason.Trim();
+
+                    cn.Open();
+                    return cmd.ExecuteNonQuery() > 0;
+                }
+            }
+        }
+
+        // shrirang 13/10/26
+
+       
+        // Rollback an accidentally rejected TPO/Sub-TPO
+        public bool RollbackTPORejection(int tpoId)
+        {
+            using (SqlConnection cn = _db.GetConnection())
+            {
+                const string query = @"
+            UPDATE dbo.tblTPORegistration
+            SET Status = 'Pending',
+                IsApproved = 0,
+                RejectionReason = NULL,
+                UpdatedDate = GETDATE()
+            WHERE TPOID = @TPOID
+              AND Status = 'Rejected';";
+
+                using (SqlCommand cmd = new SqlCommand(query, cn))
+                {
+                    cmd.Parameters.Add("@TPOID", SqlDbType.Int).Value = tpoId;
+
+                    cn.Open();
+                    return cmd.ExecuteNonQuery() > 0;
+                }
+            }
         }
 
 

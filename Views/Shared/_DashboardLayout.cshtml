@@ -4005,6 +4005,14 @@
 
 
 			<!-- ================= TPO ================= -->
+
+			@{
+    var subTpoBit = Context.Session.GetString("SubTpoBit");
+}
+
+<div class="text-warning">
+    
+</div>
 			@if (ViewData["Panel"]?.ToString() == "TPO")
 			{
 				var tpoId = Context.Session.GetInt32("TPOID");
@@ -4097,18 +4105,18 @@
 					<!-- ================= TRAINEES INFO ================= -->
 
 					<a asp-controller="TPO"
-   asp-action="TraineesInfo"
-   class="sidebar-link">
+					   asp-action="TraineesInfo"
+					   class="sidebar-link">
 
-    <span class="menu-icon">
-        <i class="fas fa-users"></i>
-    </span>
+						<span class="menu-icon">
+							<i class="fas fa-users"></i>
+						</span>
 
-    <span class="menu-text">
-        Trainees Info
-    </span>
+						<span class="menu-text">
+							Trainees Info
+						</span>
 
-</a>
+					</a>
 
 
 					<!-- ================= CREATE USER ================= -->
@@ -4127,24 +4135,27 @@
 
 					</a>
 
-				@*shrirang 08/10/26*@
-					<!-- ================= NOTIFICATION / EVENT ================= -->
+				
+@*shrirang 08/10/26*@
+<!-- ================= NOTIFICATION / EVENT ================= -->
 
-							<a href="javascript:void(0);"
-							   class="sidebar-link"
-							   onclick="toggleSubMenu('notificationSubmenu')">
+@{
+    var currentSubTpoBit = Context.Session.GetString("SubTpoBit");
+    bool isSubTPO = currentSubTpoBit == "1";
+}
 
-								<span class="menu-icon">
-									<i class="fas fa-bell"></i>
-								</span>
+<a href="javascript:void(0);"
+   class="sidebar-link"
+   onclick="toggleSubMenu('notificationSubmenu')">
 
-								<span class="menu-text">
-									Notification / Event
-								</span>
+    <span class="menu-icon">
+        <i class="fas fa-bell"></i>
+    </span>
 
-							</a>
+    <span class="menu-text">Notification / Event</span>
+</a>
 
-							<div class="profile-submenu" id="notificationSubmenu">
+<div class="profile-submenu" id="notificationSubmenu">
 
     <a asp-controller="TPO"
        asp-action="ViewNotificationEvent"
@@ -4158,6 +4169,15 @@
         Add Notification/Event
     </a>
 
+    @if (!isSubTPO)
+    {
+        <a asp-controller="TPO"
+           asp-action="NotificationApprovals"
+           class="profile-submenu-link">
+            Approve Sub-TPO Notifications
+        </a>
+    }
+
     <a asp-controller="TPO"
        asp-action="SendNotification"
        class="profile-submenu-link">
@@ -4165,7 +4185,9 @@
     </a>
 
 </div>
-							@*end*@
+
+@*end*@
+
 
 					@*Shrirang 03/10/26*@
 
@@ -4389,10 +4411,57 @@
 
 					</div>
 
+					@*shrirang 13/10/26*@
+					
+						@*<!-- =========================================================
+							 TPO VERIFICATION
+						========================================================== -->*@
+						<div class="sidebar-menu">
 
-					<!-- =========================================================
+							<div class="sidebar-link sidebar-dropdown"
+								 data-bs-toggle="collapse"
+								 data-bs-target="#tpoVerificationMenu"
+								 aria-expanded="false">
+
+								<span class="menu-icon">
+									<i class="fas fa-user-check"></i>
+								</span>
+
+								<span class="menu-text">
+									TPO Verification
+								</span>
+
+								<span class="menu-arrow">
+									<i class="fas fa-chevron-down"></i>
+								</span>
+
+							</div>
+
+							<div id="tpoVerificationMenu"
+								 class="sidebar-submenu collapse">
+
+								<a asp-controller="SuperAdmin"
+								   asp-action="TPOVerification"
+								   asp-route-id="1">
+									Pending Registrations
+								</a>
+
+								<a href="/SuperAdmin/TPOStatusList/1"
+									class="nav-link">
+									<i class="bi bi-people"></i>
+									<span>TPO & Sub-TPO Status List</span>
+								</a>
+
+							</div>
+
+						</div>
+
+					@*end*@
+
+
+					@*<!-- =========================================================
 						 CHARTS
-					========================================================== -->
+					========================================================== -->*@
 					<div class="sidebar-menu">
 
 						<div class="sidebar-link sidebar-dropdown"
