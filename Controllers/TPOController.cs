@@ -2896,6 +2896,12 @@ namespace ErJobPortal.Controllers
         // SEND NOTIFICATION
         // =====================================================
 
+        // shrirang 08/10/26
+        // tpo send notification
+        // =====================================================
+        // SEND NOTIFICATION
+        // =====================================================
+
         [HttpGet]
         [Route("TPO/SendNotification")]
         public IActionResult SendNotification(
@@ -2942,23 +2948,14 @@ namespace ErJobPortal.Controllers
             // GET TPO COLLEGE
             // =====================================================
 
-            
-
-            string collegeName = tpo.CollegeName?.Trim() ?? "";
-
-            if (string.IsNullOrWhiteSpace(collegeName))
-            {
-                TempData["Error"] = "College information is not available.";
-                return RedirectToAction("TPODashboard");
-            }
-
-            // IMPORTANT:
-            // GetTPOTraineesByCollege expects a numeric CollegeId.
-            // Do not convert CollegeName to an integer.
-            // Resolve the real CollegeId from your existing college
-            // table/repository mapping before creating the filter.
-
             int collegeId = 0;
+
+            if (tpo.CollegeName != null)
+            {
+                collegeId =
+                    Convert.ToInt32(
+                        tpo.CollegeName);
+            }
 
 
             if (collegeId <= 0)
@@ -3372,6 +3369,49 @@ namespace ErJobPortal.Controllers
                     notificationId =
                         model.NotificationID
                 });
+        }
+
+
+        // =====================================================
+        // HELPER: RESOLVE THE TPO COLLEGE ID
+        // Supports either a numeric CollegeName value (legacy
+        // data) or an actual college name.
+        // =====================================================
+
+        private int ResolveTPOCollegeId(TPORegistration tpo)
+        {
+            string collegeName = tpo.CollegeName?.Trim() ?? "";
+
+            if (string.IsNullOrWhiteSpace(collegeName))
+            {
+                return 0;
+            }
+
+            List<CollegeM> colleges =
+                _accountRepository.GetColleges()
+                ?? new List<CollegeM>();
+
+            // Support legacy records where CollegeName contains
+            // the numeric college ID.
+            if (int.TryParse(collegeName, out int parsedCollegeId))
+            {
+                CollegeM? collegeById = colleges.FirstOrDefault(
+                    c => c.nID == parsedCollegeId);
+
+                if (collegeById != null)
+                {
+                    return collegeById.nID;
+                }
+            }
+
+            // Otherwise, resolve the ID using the actual college name.
+            CollegeM? collegeByName = colleges.FirstOrDefault(c =>
+                string.Equals(
+                    c.sCollegeName?.Trim(),
+                    collegeName,
+                    StringComparison.OrdinalIgnoreCase));
+
+            return collegeByName?.nID ?? 0;
         }
 
         // =====================================================
