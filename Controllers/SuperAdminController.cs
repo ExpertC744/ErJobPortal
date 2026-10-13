@@ -4441,5 +4441,205 @@ ORDER BY SAF.nID DESC, OFB.nID DESC;
 
             return View("~/Views/Organization/ViewOrgProfile.cshtml", model);
         }
+
+        // shrirang 13/10/26
+        // tpo and subtpo verification code 
+        [HttpGet]
+        [Route("SuperAdmin/TPOVerification/{id:int}")]
+        public IActionResult TPOVerification(int id)
+        {
+            // Validate Super Admin session
+            string? saId = HttpContext.Session.GetString("SAID");
+            string? saRole = HttpContext.Session.GetString("SARole");
+
+            if (string.IsNullOrEmpty(saId) ||
+                !int.TryParse(saId, out int sessionId) ||
+                sessionId != id ||
+                id != 1 ||
+                !string.Equals(saRole, "SuperAdmin",
+                    StringComparison.OrdinalIgnoreCase))
+            {
+                return RedirectToAction("Index", "SALogin");
+            }
+
+            var allTpos = _repository.GetAllTPODetails();
+
+            var pendingTpos = allTpos
+                .Where(t => string.Equals(
+                    t.Status, "Pending",
+                    StringComparison.OrdinalIgnoreCase))
+                .OrderBy(t => t.CreatedDate)
+                .ToList();
+
+            ViewData["Panel"] = "SuperAdmin";
+            ViewBag.PendingCount = pendingTpos.Count;
+
+            return View(pendingTpos);
+        }
+
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        [Route("SuperAdmin/ApproveTPO/{id:int}")]
+        public IActionResult ApproveTPO(int id)
+        {
+            string? saId = HttpContext.Session.GetString("SAID");
+            string? saRole = HttpContext.Session.GetString("SARole");
+
+            if (string.IsNullOrEmpty(saId) ||
+                !int.TryParse(saId, out int superAdminId) ||
+                superAdminId != 1 ||
+                !string.Equals(
+                    saRole, "SuperAdmin",
+                    StringComparison.OrdinalIgnoreCase))
+            {
+                return RedirectToAction("Index", "SALogin");
+            }
+
+            bool approved =
+                _repository.ApproveTPORegistration(id, superAdminId);
+
+            TempData[approved ? "SuccessMessage" : "ErrorMessage"] =
+                approved
+                    ? "TPO registration approved successfully."
+                    : "Approval failed. The registration may no longer be pending.";
+
+            return RedirectToAction(
+                nameof(TPOVerification),
+                new { id = superAdminId });
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        [Route("SuperAdmin/RejectTPO/{id:int}")]
+        public IActionResult RejectTPO(int id, string rejectionReason)
+        {
+            string? saId = HttpContext.Session.GetString("SAID");
+            string? saRole = HttpContext.Session.GetString("SARole");
+
+            if (string.IsNullOrEmpty(saId) ||
+                !int.TryParse(saId, out int superAdminId) ||
+                superAdminId != 1 ||
+                !string.Equals(
+                    saRole, "SuperAdmin",
+                    StringComparison.OrdinalIgnoreCase))
+            {
+                return RedirectToAction("Index", "SALogin");
+            }
+
+            if (string.IsNullOrWhiteSpace(rejectionReason))
+            {
+                TempData["ErrorMessage"] =
+                    "Please enter a reason for rejection.";
+
+                return RedirectToAction(
+                    nameof(TPOVerification),
+                    new { id = superAdminId });
+            }
+
+            if (rejectionReason.Trim().Length > 1000)
+            {
+                TempData["ErrorMessage"] =
+                    "The rejection reason cannot exceed 1000 characters.";
+
+                return RedirectToAction(
+                    nameof(TPOVerification),
+                    new { id = superAdminId });
+            }
+
+            bool rejected = _repository.RejectTPORegistration(
+                id, superAdminId, rejectionReason);
+
+            TempData[rejected ? "SuccessMessage" : "ErrorMessage"] =
+                rejected
+                    ? "TPO registration rejected."
+                    : "Rejection failed. The registration may no longer be pending.";
+
+            return RedirectToAction(
+                nameof(TPOVerification),
+                new { id = superAdminId });
+        }
+
+
+       
+        // =====================================================
+        // TPO AND SUB-TPO APPROVED / REJECTED LIST
+        // =====================================================
+        [HttpGet]
+        [Route("SuperAdmin/TPOStatusList/{id:int}")]
+        public IActionResult TPOStatusList(int id)
+        {
+            // Validate Super Admin session
+            string? saId = HttpContext.Session.GetString("SAID");
+            string? saRole = HttpContext.Session.GetString("SARole");
+
+            if (string.IsNullOrEmpty(saId) ||
+                !int.TryParse(saId, out int sessionId) ||
+                sessionId != id ||
+                id != 1 ||
+                !string.Equals(
+                    saRole,
+                    "SuperAdmin",
+                    StringComparison.OrdinalIgnoreCase))
+            {
+                return RedirectToAction("Index", "SALogin");
+            }
+
+            // Fetch all TPO and Sub-TPO records
+            var allTpos = _repository.GetAllTPODetails();
+
+            // Show only Approved and Rejected records
+            var statusList = allTpos
+                .Where(t =>
+                    string.Equals(t.Status, "Approved",
+                        StringComparison.OrdinalIgnoreCase)
+                    ||
+                    string.Equals(t.Status, "Rejected",
+                        StringComparison.OrdinalIgnoreCase))
+                .OrderByDescending(t => t.CreatedDate)
+                .ToList();
+
+            ViewData["Panel"] = "SuperAdmin";
+            ViewBag.ApprovedCount = statusList.Count(
+                t => string.Equals(t.Status, "Approved",
+                    StringComparison.OrdinalIgnoreCase));
+
+            ViewBag.RejectedCount = statusList.Count(
+                t => string.Equals(t.Status, "Rejected",
+                    StringComparison.OrdinalIgnoreCase));
+
+            return View(statusList);
+        }
+
+       
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        [Route("SuperAdmin/RollbackTPORejection")]
+        public IActionResult RollbackTPORejection(int tpoId)
+        {
+            string? saId = HttpContext.Session.GetString("SAID");
+            string? saRole = HttpContext.Session.GetString("SARole");
+
+            if (!int.TryParse(saId, out int sessionId) ||
+                sessionId != 1 ||
+                !string.Equals(
+                    saRole,
+                    "SuperAdmin",
+                    StringComparison.OrdinalIgnoreCase))
+            {
+                return RedirectToAction("Index", "SALogin");
+            }
+
+            bool restored = _repository.RollbackTPORejection(tpoId);
+
+            TempData[restored ? "SuccessMessage" : "ErrorMessage"] =
+                restored
+                    ? "Registration restored to Pending successfully."
+                    : "Rollback failed. The record may not be Rejected.";
+
+            return RedirectToAction("TPOStatusList", new { id = 1 });
+        }
+
+
     }
 }

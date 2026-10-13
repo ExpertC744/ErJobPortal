@@ -92,9 +92,16 @@
                             <!-- ORGANIZATION -->
 
                             <td>
-                                <a asp-controller="Account" asp-action="ViewOrgPost" asp-route-id="@post.nID" asp-route-nOrgID="@post.nOrgID" class="organization-link">
-                                    @post.sName
-                                </a>
+                               
+<a asp-controller="Account"
+   asp-action="ViewOrgPost"
+   asp-route-id="@post.nID"
+   asp-route-nOrgID="@post.nOrgID"
+   asp-route-matchingPostIds="@string.Join(",", traineeAppliedPosts.Select(p => p.nID).Distinct())"
+   class="organization-link">
+    @post.sName
+</a>
+
                             </td>
 
 

@@ -808,14 +808,58 @@
 
             </div>
 
-        </div>
+                </div>
 
+                @* <div style="background:#fff3cd; padding:10px; margin:10px 0;">
+    <strong>Debug Navigation</strong><br />
+    Current Post ID: @Model.nID<br />
+    Previous Post ID: @(ViewBag.PreviousPostId ?? "NULL")<br />
+    Next Post ID: @(ViewBag.NextPostId ?? "NULL")<br />
+    Post Source: @(ViewBag.PostSource ?? "NULL")
+</div>
+ *@
+        <!-- =================================================
+             PREVIOUS / NEXT POST NAVIGATION
+             ================================================= -->
+
+       <div class="post-navigation">
+
+    @if (ViewBag.PreviousPostId != null)
+    {
+        <a asp-controller="Account"
+           asp-action="ViewOrgPost"
+           asp-route-id="@ViewBag.PreviousPostId"
+           asp-route-nOrgID="@Model.nOrgID"
+            asp-route-matchingPostIds="@ViewBag.MatchingPostIds"
+           class="post-nav-btn previous-btn">
+          
+            <i class="fa-solid fa-chevron-left"></i>
+            Previous
+        </a>
+    }
+
+    @if (ViewBag.NextPostId != null)
+    {
+        <a asp-controller="Account"
+           asp-action="ViewOrgPost"
+           asp-route-id="@ViewBag.NextPostId"
+           asp-route-nOrgID="@Model.nOrgID"
+           asp-route-matchingPostIds="@ViewBag.MatchingPostIds"
+           class="post-nav-btn next-btn">
+            Next
+            <i class="fa-solid fa-chevron-right"></i>
+        </a>
+    }
+
+</div>
 
         <!-- =================================================
              FOOTER
              ================================================= -->
 
-        <div class="post-footer">
+        <div class="post-footer"> 
+
+
 
             Powered by
             <strong>www.1trainee.com</strong>
