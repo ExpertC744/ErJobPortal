@@ -5447,6 +5447,200 @@ WHERE
             return posts;
         }
 
+        // khushi 09-10-26
+        public List<OrgPostM> GetOrgPostsWithMatchingTraineeCount(int orgID)
+        {
+            List<OrgPostM> posts = new List<OrgPostM>();
+
+            using (SqlConnection con = _db.GetConnection())
+            using (SqlCommand cmd = new SqlCommand(
+                "SP_GetOrgPostsWithMatchingTraineeCount", con))
+            {
+                cmd.CommandType = CommandType.StoredProcedure;
+                cmd.Parameters.Add("@nOrgID", SqlDbType.Int).Value = orgID;
+
+                con.Open();
+
+                using (SqlDataReader dr = cmd.ExecuteReader())
+                {
+                    while (dr.Read())
+                    {
+                        OrgPostM item = new OrgPostM();
+
+                        item.nID = Convert.ToInt32(dr["nID"]);
+
+                        posts.Add(item);
+                    }
+                }
+            }
+
+            return posts;
+        }
+
+        // khushi 09-10-26
+        public List<int> GetAppliedTraineePostIds(int orgID)
+        {
+            List<int> postIds = new List<int>();
+
+            using (SqlConnection con = _db.GetConnection())
+            using (SqlCommand cmd = new SqlCommand(
+                "SP_BrowseTRApplyForAllPost", con))
+            {
+                cmd.CommandType = CommandType.StoredProcedure;
+
+                cmd.Parameters.Add("@OrganizationID", SqlDbType.Int)
+                              .Value = orgID;
+
+                con.Open();
+
+                using (SqlDataReader dr = cmd.ExecuteReader())
+                {
+                    while (dr.Read())
+                    {
+                        if (dr["PostId"] != DBNull.Value)
+                        {
+                            int postId = Convert.ToInt32(dr["PostId"]);
+
+                            if (postId > 0 && !postIds.Contains(postId))
+                            {
+                                postIds.Add(postId);
+                            }
+                        }
+                    }
+                }
+            }
+
+            return postIds;
+        }
+
+
+        // khushi 09-10-26
+        public List<int> GetOrganizationPreviousPostIds(int orgID)
+        {
+            List<int> postIds = new List<int>();
+
+            using (SqlConnection con = _db.GetConnection())
+            using (SqlCommand cmd = new SqlCommand(
+                "SP_GetOrganizationRepostList", con))
+            {
+                cmd.CommandType = CommandType.StoredProcedure;
+
+                cmd.Parameters.Add("@nOrgID", SqlDbType.Int).Value = orgID;
+
+                con.Open();
+
+                using (SqlDataReader dr = cmd.ExecuteReader())
+                {
+                    while (dr.Read())
+                    {
+                        if (dr["nID"] != DBNull.Value)
+                        {
+                            int postId = Convert.ToInt32(dr["nID"]);
+
+                            if (postId > 0 && !postIds.Contains(postId))
+                            {
+                                postIds.Add(postId);
+                            }
+                        }
+                    }
+                }
+            }
+
+            return postIds;
+        }
+
+
+        public OrgProfile? GetOrganizationProfileByCode(string id)
+        {
+            if (string.IsNullOrWhiteSpace(id))
+                return null;
+
+            id = id.Trim();
+
+            int orgId;
+
+            // Numeric ID: 2
+            if (int.TryParse(id, out int numericId))
+            {
+                orgId = numericId;
+            }
+            // Organization code: OR26072602
+            else if (id.Length == 10 &&
+                     id.StartsWith("OR", StringComparison.OrdinalIgnoreCase) &&
+                     int.TryParse(id.Substring(8, 2), out int codeId))
+            {
+                orgId = codeId;
+            }
+            else
+            {
+                return null;
+            }
+
+            if (orgId <= 0)
+                return null;
+
+            using SqlConnection cn = _db.GetConnection();
+            using SqlCommand cmd = new SqlCommand("SP_GetOrganizationProfile", cn);
+
+            cmd.CommandType = CommandType.StoredProcedure;
+            cmd.Parameters.Add("@nOrgID", SqlDbType.Int).Value = orgId;
+
+            if (cn.State != ConnectionState.Open)
+                cn.Open();
+
+            using SqlDataReader dr = cmd.ExecuteReader();
+
+            if (!dr.Read())
+                return null;
+
+            string GetString(string column)
+            {
+                int index = dr.GetOrdinal(column);
+                return dr.IsDBNull(index)
+                    ? string.Empty
+                    : Convert.ToString(dr.GetValue(index)) ?? string.Empty;
+            }
+
+            int GetInt(string column)
+            {
+                int index = dr.GetOrdinal(column);
+                return dr.IsDBNull(index) ? 0 : Convert.ToInt32(dr.GetValue(index));
+            }
+
+            DateTime? GetDate(string column)
+            {
+                int index = dr.GetOrdinal(column);
+                return dr.IsDBNull(index) ? null : Convert.ToDateTime(dr.GetValue(index));
+            }
+
+            bool GetBool(string column)
+            {
+                int index = dr.GetOrdinal(column);
+                return !dr.IsDBNull(index) && Convert.ToBoolean(dr.GetValue(index));
+            }
+
+            return new OrgProfile
+            {
+                nID = GetInt("nID"),
+                nOrgID = GetInt("nOrgID"),
+                sOrganizationName = GetString("sName"),
+                sOrganizationEmail = GetString("sEmail"),
+                sMobile = GetString("sMobile"),
+                sDesignation = GetString("sDesignation"),
+                dDateOfBirth = GetDate("dDateOfBirth"),
+                sCompanyLogo = GetString("sCompanyLogo"),
+                sCompanyAddress = GetString("sCompanyAddress"),
+                nEstablishmentYear = GetInt("nEstablishmentYear"),
+                sGSTNo = GetString("sGSTNo"),
+                sCINNo = GetString("sCINNo"),
+                nEmployeeStrength = GetString("nEmployeeStrength"),
+                dCreatedDate = GetDate("dCreatedDate") ?? DateTime.MinValue,
+                dModifiedDate = GetDate("dModifiedDate"),
+                nBit = GetBool("nBit"),
+                nSABit = GetBool("nSABit")
+            };
+        }
+
 
     }
 }

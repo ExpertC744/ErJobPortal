@@ -552,7 +552,7 @@ namespace ErJobPortal.Controllers
         {
             return View();
         }
-        public IActionResult TopCarriers()
+        public IActionResult TopCareers()
         {
             return View();
         }

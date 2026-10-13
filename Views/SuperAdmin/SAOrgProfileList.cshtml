@@ -1,5 +1,4 @@
-﻿
-@model List<OrgProfileListM>
+﻿@model List<OrgProfileListM>
 
 @{
     Layout = "~/Views/Shared/_DashboardLayout.cshtml";
@@ -13,35 +12,35 @@
 
 <style>
     .status {
-    color: white;
-    padding: 7px 12px;
-    border: none;
-    border-radius: 6px;
-    display: inline-block;
-    font-size: 12px;
-    cursor: pointer;
-    min-width: 75px;
-    transition: 0.2s ease;
-}
+        color: white;
+        padding: 7px 12px;
+        border: none;
+        border-radius: 6px;
+        display: inline-block;
+        font-size: 12px;
+        cursor: pointer;
+        min-width: 75px;
+        transition: 0.2s ease;
+    }
 
-.enabled {
-    background: #198754;
-}
+    .enabled {
+        background: #198754;
+    }
 
-.disabled {
-    background: #dc3545;
-}
+    .disabled {
+        background: #dc3545;
+    }
 
-.status:hover {
-    opacity: 0.85;
-    transform: translateY(-1px);
-}
+    .status:hover {
+        opacity: 0.85;
+        transform: translateY(-1px);
+    }
 
-.status:disabled {
-    opacity: 0.6;
-    cursor: not-allowed;
-    transform: none;
-}
+    .status:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+        transform: none;
+    }
 </style>
 
 <div class="container-fluid">
@@ -136,8 +135,8 @@
                                 <td>
 
                                     @(item.ProfileCreationDate.HasValue
-                                        ? item.ProfileCreationDate.Value.ToString("dd-MM-yyyy")
-                                        : "N/A")
+                                                                ? item.ProfileCreationDate.Value.ToString("dd-MM-yyyy")
+                                                                : "N/A")
 
                                 </td>
 
@@ -154,17 +153,12 @@
 
                                 <!-- ACTION -->
                                 <td>
-
-                                    <a href="@Url.Action(
-                                        "OrganizationProfileDetails",
-                                        "SuperAdmin",
-                                        new { id = item.nID })"
+                                    <a asp-controller="SuperAdmin"
+                                       asp-action="ViewOrgProfile"
+                                       asp-route-id="@item.nOrgID"
                                        class="master-view-btn">
-
                                         View
-
                                     </a>
-
                                 </td>
 
 
@@ -241,21 +235,21 @@
                                         </span>
                                     }
 
-                                </td>
+                        </td>
 
 
-                                <!-- CURRENT EMPLOYEE STRENGTH -->
-                                <td>
-                                    @item.CurrentEmployeeStrength
-                                </td>
+                        <!-- CURRENT EMPLOYEE STRENGTH -->
+                        <td>
+                            @item.CurrentEmployeeStrength
+                        </td>
 
 
-                                <!-- DOB -->
-                                <td>
+                        <!-- DOB -->
+                        <td>
 
-                                    @(item.DOB.HasValue
-                                        ? item.DOB.Value.ToString("dd-MM-yyyy")
-                                        : "N/A")
+                            @(item.DOB.HasValue
+                                                        ? item.DOB.Value.ToString("dd-MM-yyyy")
+                                                        : "N/A")
 
                                 </td>
 
@@ -264,13 +258,13 @@
                                 <td>
 
                                     @(item.EstablishmentYear.HasValue
-                                        ? item.EstablishmentYear.ToString()
-                                        : "N/A")
+                                                                ? item.EstablishmentYear.ToString()
+                                                                : "N/A")
 
                                 </td>
 
-                               
-                                
+
+
                                 <!-- STATUS -->
                                 <td>
 
@@ -279,7 +273,7 @@
                                             data-id="@item.nID"
                                             onclick="toggleOrganizationStatus(this)">
 
-                                       @(item.nSABit ? "Enabled" : "Disabled")
+                                        @(item.nSABit ? "Enabled" : "Disabled")
 
                                     </button>
 
@@ -405,7 +399,7 @@
 
 
 
-            <script>
+<script>
 
     function toggleOrganizationStatus(button) {
 

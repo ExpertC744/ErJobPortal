@@ -1,1554 +1,831 @@
 ﻿/* =========================================================
-   COVER LETTER GUIDANCE PAGE
-   COMPLETE SEPARATE CSS
+   COVER LETTER GUIDANCE
+   1Trainee - Emerging Technologies UI reference
+   Theme: Professional teal and white
    ========================================================= */
-
-
-/* =========================================================
-   GLOBAL PAGE
-   ========================================================= */
-
-.cover-letter-page {
-    width: 100%;
-    max-width: 100%;
-    background: #ffffff;
-    overflow-x: hidden;
-}
-
-    .cover-letter-page,
-    .cover-letter-page * {
-        box-sizing: border-box;
-    }
-
-
-/* Prevent horizontal scrollbar from animations */
-
-html,
-body {
-    max-width: 100%;
-}
-
-
-/* =========================================================
-   COVER LETTER HERO
-   ========================================================= */
-
-.cover-letter-hero {
+#coverLetterPage {
+    --cover-primary: #0d9488;
+    --cover-dark: #0f766e;
+    --cover-deeper: #115e59;
+    --cover-light: #f0fdfa;
+    --cover-soft: #ccfbf1;
+    --cover-border: #99f6e4;
+    --cover-ink: #1f2937;
+    --cover-muted: #4b5563;
+    --cover-line: #e5e7eb;
+    --cover-card: #ffffff;
+    --cover-bg: #f8fafc;
+    --cover-radius: 10px;
+    --cover-shadow: 0 1px 3px rgba(15, 23, 42, 0.06);
+    --cover-shadow-hover: 0 8px 22px rgba(13, 148, 136, 0.12);
+    --cover-ease: cubic-bezier(0.22, 0.61, 0.36, 1);
     position: relative;
-    width: 100%;
-    margin-top: 25px;
-    min-height: 300px;
-    display: flex;
-    align-items: center;
-    overflow: hidden;
-    isolation: isolate;
-    background: linear-gradient( 135deg, #102a43 0%, #164e63 45%, #0f766e 100% );
+    color: var(--cover-ink);
+    background: var(--cover-bg);
+    font-family: inherit;
+    overflow-x: clip;
 }
-
-
-.cover-letter-page .cover-section h4 {
-    position: relative;
-    display: block;
-    width: fit-content;
-    max-width: 100%;
-    margin-top: 30px;
-    margin-bottom: 20px;
-    color: #222222;
-    font-size: 22px;
-    font-weight: 600;
-    line-height: 1.5;
-    white-space: normal;
-    clear: both;
-}
-
-    .cover-letter-page .cover-section h4::after {
-        content: "";
-        position: absolute;
-        left: 0;
-        bottom: -7px;
-        width: 60px;
-        height: 3px;
-        border-radius: 10px;
-        background: #14b8a6;
-    }
-
-    /* =========================================================
-   HERO DARK OVERLAY
-   ========================================================= */
-
-    .cover-letter-hero::before {
-        content: "";
-        position: absolute;
-        inset: 0;
-        z-index: -4;
-        background: linear-gradient( 90deg, rgba(10, 31, 51, .96), rgba(18, 78, 94, .75), rgba(15, 118, 110, .90) );
-    }
-
-
-    /* =========================================================
-   HERO GRID PATTERN
-   ========================================================= */
-
-    .cover-letter-hero::after {
-        content: "";
-        position: absolute;
-        inset: 0;
-        z-index: -3;
-        opacity: .65;
-        background-image: linear-gradient( rgba(255,255,255,.035) 1px, transparent 1px ), linear-gradient( 90deg, rgba(255,255,255,.035) 1px, transparent 1px );
-        background-size: 45px 45px;
-        mask-image: linear-gradient( to bottom, black, transparent );
-        -webkit-mask-image: linear-gradient( to bottom, black, transparent );
-    }
-
-
-    /* =========================================================
-   HERO CONTAINER
-   ========================================================= */
-
-    .cover-letter-hero .container {
-        position: relative;
-        z-index: 10;
-    }
-
 
 /* =========================================================
-   HERO GLOW BASE
+   SCROLL PROGRESS
    ========================================================= */
 
-.cover-glow {
-    position: absolute;
-    border-radius: 50%;
-    pointer-events: none;
-    z-index: -1;
-}
-
-
-/* =========================================================
-   LEFT GLOW
-   ========================================================= */
-
-.cover-glow-1 {
-    width: 320px;
-    height: 320px;
-    left: -110px;
-    top: -130px;
-    background: rgba(45, 212, 191, .20);
-    filter: blur(8px);
-    animation: coverGlowOne 8s ease-in-out infinite;
-}
-
-
-/* =========================================================
-   RIGHT GLOW
-   ========================================================= */
-
-.cover-glow-2 {
-    width: 400px;
-    height: 400px;
-    right: -160px;
-    bottom: -220px;
-    background: rgba(59, 130, 246, .20);
-    filter: blur(12px);
-    animation: coverGlowTwo 10s ease-in-out infinite;
-}
-
-
-/* =========================================================
-   CENTER GLOW
-   ========================================================= */
-
-.cover-glow-3 {
-    width: 200px;
-    height: 200px;
-    left: 50%;
-    top: 5%;
-    background: rgba(255,255,255,.055);
-    filter: blur(25px);
-    animation: coverGlowThree 6s ease-in-out infinite;
-}
-
-
-/* =========================================================
-   HERO PARTICLES
-   ========================================================= */
-
-.cover-particles span {
-    position: absolute;
-    display: block;
-    width: 5px;
-    height: 5px;
-    border-radius: 50%;
-    background: rgba(255,255,255,.60);
-    box-shadow: 0 0 12px rgba(255,255,255,.45);
-    pointer-events: none;
-    z-index: -1;
-    animation: coverParticleFloat 6s ease-in-out infinite;
-}
-
-
-    /* =========================================================
-   PARTICLE 1
-   ========================================================= */
-
-    .cover-particles span:nth-child(1) {
-        left: 10%;
-        top: 25%;
-        animation-delay: 0s;
-    }
-
-
-    /* =========================================================
-   PARTICLE 2
-   ========================================================= */
-
-    .cover-particles span:nth-child(2) {
-        left: 25%;
-        top: 70%;
-        animation-delay: 1s;
-    }
-
-
-    /* =========================================================
-   PARTICLE 3
-   ========================================================= */
-
-    .cover-particles span:nth-child(3) {
-        left: 48%;
-        top: 20%;
-        animation-delay: 2s;
-    }
-
-
-    /* =========================================================
-   PARTICLE 4
-   ========================================================= */
-
-    .cover-particles span:nth-child(4) {
-        right: 25%;
-        top: 65%;
-        animation-delay: 1.5s;
-    }
-
-
-    /* =========================================================
-   PARTICLE 5
-   ========================================================= */
-
-    .cover-particles span:nth-child(5) {
-        right: 12%;
-        top: 25%;
-        animation-delay: 3s;
-    }
-
-
-    /* =========================================================
-   PARTICLE 6
-   ========================================================= */
-
-    .cover-particles span:nth-child(6) {
-        right: 40%;
-        top: 80%;
-        animation-delay: 2.5s;
-    }
-
-
-/* =========================================================
-   HERO TITLE WRAPPER
-   ========================================================= */
-
-.cover-title-wrapper {
-    position: relative;
-}
-
-
-/* =========================================================
-   SMALL TITLE
-   ========================================================= */
-
-.cover-small-title {
-    display: inline-block;
-    margin-bottom: 8px;
-    color: #5eead4;
-    font-size: 12px;
-    font-weight: 700;
-    letter-spacing: 3px;
-    opacity: 0;
-    animation: coverFadeUp .8s ease forwards;
-}
-
-
-/* =========================================================
-   MAIN HERO TITLE
-   ========================================================= */
-
-.cover-title {
-    margin: 0 !important;
-    color: whitesmoke !important;
-    font-size: 42px;
-    font-weight: 700;
-    line-height: 1.2;
-    letter-spacing: 1px;
-    text-transform: uppercase;
-    opacity: 0;
-    animation: coverTitleReveal 1s cubic-bezier(.16,1,.3,1) .15s forwards;
-}
-
-
-/* =========================================================
-   FORCE HERO TITLE COLOR
-   ========================================================= */
-
-.cover-letter-page
-.cover-letter-hero
-.cover-title {
-    color: whitesmoke !important;
-}
-
-
-/* =========================================================
-   TITLE UNDERLINE
-   ========================================================= */
-
-.cover-title-line {
+#coverLetterPage .cover-progress {
+    position: fixed;
+    top: 0;
+    left: 0;
     width: 0;
     height: 3px;
-    margin-top: 13px;
-    border-radius: 10px;
-    background: linear-gradient( 90deg, #2dd4bf, #60a5fa );
-    animation: coverLineReveal .8s ease .8s forwards;
+    background: linear-gradient( 90deg, var(--cover-primary), #5eead4 );
+    z-index: 2000;
+    pointer-events: none;
 }
 
-
 /* =========================================================
-   HERO SUBTITLE
+   HERO
    ========================================================= */
 
-.cover-subtitle {
-    max-width: 500px;
-    margin-top: 14px;
-    margin-bottom: 0;
-    color: rgba(255,255,255,.76);
-    font-size: 15px;
-    line-height: 1.7;
-    opacity: 0;
-    animation: coverFadeUp .8s ease .55s forwards;
-}
-
-
-/* =========================================================
-   BREADCRUMB
-   ========================================================= */
-
-.cover-breadcrumb {
-    display: inline-flex;
-    align-items: center;
-    gap: 12px;
-    padding: 10px 14px;
-    border: 1px solid rgba(255,255,255,.16);
-    border-radius: 50px;
-    background: rgba(255,255,255,.08);
-    box-shadow: 0 10px 35px rgba(0,0,0,.14);
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
-    opacity: 0;
-    animation: coverBreadcrumbReveal .9s cubic-bezier(.16,1,.3,1) .4s forwards;
-}
-
-
-/* =========================================================
-   HOME BUTTON
-   ========================================================= */
-
-.cover-btn {
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    padding: 9px 18px;
-    border: 1px solid rgba(255,255,255,.18);
-    border-radius: 30px;
+#coverLetterPage .cover-hero {
+    position: relative;
+    isolation: isolate;
+    overflow: hidden;
+    padding: 3.5rem 0;
     color: #ffffff;
-    background: rgba(255,255,255,.10);
-    font-size: 14px;
+    background: linear-gradient( 135deg, var(--cover-dark) 0%, var(--cover-primary) 55%, var(--cover-deeper) 100% );
+    background-size: 160% 160%;
+    animation: coverGradient 14s ease-in-out infinite alternate;
+    border-bottom: 3px solid #5eead4;
+}
+
+    #coverLetterPage .cover-hero::before {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background-image: radial-gradient( rgba(255, 255, 255, 0.12) 1px, transparent 1px );
+        background-size: 24px 24px;
+        pointer-events: none;
+        z-index: -1;
+    }
+
+#coverLetterPage .cover-shape {
+    position: absolute;
+    border: 1px solid rgba(255, 255, 255, 0.18);
+    border-radius: 50%;
+    pointer-events: none;
+}
+
+#coverLetterPage .cover-shape-one {
+    width: 340px;
+    height: 340px;
+    top: -130px;
+    right: -110px;
+    box-shadow: 0 0 0 40px rgba(255, 255, 255, 0.05);
+    animation: coverDrift 12s ease-in-out infinite alternate;
+}
+
+#coverLetterPage .cover-shape-two {
+    width: 180px;
+    height: 180px;
+    left: 8%;
+    bottom: -90px;
+    background: rgba(255, 255, 255, 0.05);
+    animation: coverDrift 16s ease-in-out infinite alternate-reverse;
+}
+
+#coverLetterPage .cover-hero .container {
+    position: relative;
+    z-index: 1;
+}
+
+#coverLetterPage .cover-eyebrow {
+    display: inline-block;
+    padding: 0.3rem 0.8rem;
+    margin-bottom: 0.9rem;
+    color: var(--cover-soft);
+    background: rgba(255, 255, 255, 0.12);
+    border: 1px solid rgba(255, 255, 255, 0.22);
+    border-radius: 50rem;
+    font-size: 0.72rem;
     font-weight: 600;
-    text-decoration: none;
-    transition: all .35s ease;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    animation: coverFadeUp 0.7s var(--cover-ease) both;
 }
 
-
-    /* =========================================================
-   HOME ICON
-   ========================================================= */
-
-    .cover-btn i {
-        color: #5eead4;
-        transition: transform .35s ease, color .35s ease;
-    }
-
-
-    /* =========================================================
-   HOME BUTTON HOVER
-   ========================================================= */
-
-    .cover-btn:hover {
-        color: #ffffff;
-        text-decoration: none;
-        background: #14b8a6;
-        border-color: #14b8a6;
-        transform: translateY(-3px);
-        box-shadow: 0 8px 22px rgba(20,184,166,.30);
-    }
-
-
-        /* =========================================================
-   ICON HOVER
-   ========================================================= */
-
-        .cover-btn:hover i {
-            color: #ffffff;
-            transform: scale(1.15);
-        }
-
-
-/* =========================================================
-   BREADCRUMB ARROW
-   ========================================================= */
-
-.cover-arrow {
-    color: #5eead4;
-    font-size: 14px;
-    animation: coverArrowPulse 2s ease-in-out infinite;
+#coverLetterPage .cover-hero-title {
+    margin: 0 0 0.7rem;
+    color: #ffffff;
+    font-size: 2.2rem;
+    font-weight: 700;
+    line-height: 1.25;
+    letter-spacing: -0.02em;
+    animation: coverFadeUp 0.7s var(--cover-ease) 0.1s both;
 }
 
+#coverLetterPage .cover-title-line {
+    width: 56px;
+    height: 3px;
+    margin: 0 0 0.9rem;
+    border-radius: 2px;
+    background: #5eead4;
+    animation: coverGrowLine 0.8s var(--cover-ease) 0.3s both;
+}
 
-/* =========================================================
-   CURRENT PAGE
-   ========================================================= */
+#coverLetterPage .cover-hero-subtitle {
+    max-width: 540px;
+    margin: 0;
+    color: #e6fffa;
+    font-size: 1rem;
+    line-height: 1.7;
+    animation: coverFadeUp 0.7s var(--cover-ease) 0.25s both;
+}
 
-.cover-current-page {
-    color: rgba(255,255,255,.85);
-    font-size: 14px;
+/* Breadcrumb */
+
+#coverLetterPage .cover-breadcrumb {
+    display: inline-flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+    gap: 0.15rem;
+    max-width: 100%;
+    padding: 0.45rem 1rem;
+    border: 1px solid rgba(255, 255, 255, 0.24);
+    border-radius: 50rem;
+    background: rgba(255, 255, 255, 0.10);
+    animation: coverFadeUp 0.7s var(--cover-ease) 0.35s both;
+}
+
+#coverLetterPage .cover-breadcrumb-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    color: #ffffff;
+    font-size: 0.88rem;
     font-weight: 500;
-    white-space: nowrap;
+    text-decoration: none;
+    transition: color 0.2s ease;
 }
 
+    #coverLetterPage .cover-breadcrumb-link:hover {
+        color: var(--cover-soft);
+    }
+
+#coverLetterPage .cover-breadcrumb-arrow {
+    margin: 0 0.5rem;
+    color: var(--cover-border);
+    font-size: 0.8rem;
+}
+
+#coverLetterPage .cover-breadcrumb-current {
+    color: #ffffff;
+    font-size: 0.84rem;
+    font-weight: 600;
+}
+
+/* =========================================================
+   ANIMATIONS
+   ========================================================= */
+
+@keyframes coverFadeUp {
+    from {
+        opacity: 0;
+        transform: translateY(14px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes coverGrowLine {
+    from {
+        width: 0;
+    }
+
+    to {
+        width: 56px;
+    }
+}
+
+@keyframes coverGradient {
+    from {
+        background-position: 0% 50%;
+    }
+
+    to {
+        background-position: 100% 50%;
+    }
+}
+
+@keyframes coverDrift {
+    from {
+        transform: translate(0, 0);
+    }
+
+    to {
+        transform: translate(-22px, 16px);
+    }
+}
 
 /* =========================================================
    MAIN CONTENT
    ========================================================= */
 
-.cover-letter-content {
-    width: 100%;
-    padding-top: 70px;
-    padding-bottom: 70px;
+#coverLetterPage .cover-content {
+    padding: 2.5rem 0 3rem;
+}
+
+    #coverLetterPage .cover-content > .container > .row {
+        align-items: start;
+    }
+
+/* =========================================================
+   CONTENT CARDS
+   ========================================================= */
+
+#coverLetterPage .cover-section {
+    min-width: 0;
+    padding: 1.5rem 1.65rem;
+    margin-bottom: 1.25rem;
+    background: var(--cover-card);
+    border: 1px solid var(--cover-line);
+    border-left: 3px solid var(--cover-primary);
+    border-radius: var(--cover-radius);
+    box-shadow: var(--cover-shadow);
+    transition: box-shadow 0.3s var(--cover-ease), border-color 0.3s var(--cover-ease), transform 0.3s var(--cover-ease);
+}
+
+    #coverLetterPage .cover-section:hover {
+        border-color: var(--cover-border);
+        border-left-color: var(--cover-primary);
+        box-shadow: var(--cover-shadow-hover);
+        transform: translateY(-2px);
+    }
+
+#coverLetterPage .cover-intro {
     background: #ffffff;
 }
 
+#coverLetterPage .cover-section p {
+    margin: 0 0 0.85rem;
+    color: var(--cover-muted);
+    font-size: 0.94rem;
+    line-height: 1.75;
+    overflow-wrap: anywhere;
+}
 
-    /* =========================================================
-   MAIN CONTAINER
-   ========================================================= */
-
-    .cover-letter-content .container {
-        max-width: 1200px;
+    #coverLetterPage .cover-section p:last-child {
+        margin-bottom: 0;
     }
 
+/* Section headings */
 
-    /* =========================================================
-   LEFT COLUMN
-   ========================================================= */
-
-    .cover-letter-content .col-lg-7 {
-        padding-right: 25px;
-    }
-
-
-    /* =========================================================
-   RIGHT COLUMN
-   ========================================================= */
-
-    .cover-letter-content .col-lg-4 {
-        padding-left: 15px;
-    }
-
-
-/* =========================================================
-   COVER SECTION
-   ========================================================= */
-
-.cover-section {
+#coverLetterPage .cover-heading {
     position: relative;
-    margin-bottom: 55px;
-    width: 100%;
+    display: flex;
+    align-items: center;
+    gap: 0.65rem;
+    padding-bottom: 0.75rem;
+    margin: 0 0 1rem;
+    border-bottom: 1px solid var(--cover-line);
+    color: var(--cover-dark);
+    font-size: 1.08rem;
+    font-weight: 700;
+    line-height: 1.5;
+    overflow-wrap: anywhere;
 }
 
-
-/* =========================================================
-   SCROLL REVEAL
-   ========================================================= */
-
-.cover-letter-page .scroll-reveal {
-    opacity: 0;
-    visibility: hidden;
-    transform: translateY(70px);
-    transition: opacity .75s ease, transform .75s cubic-bezier(.22,1,.36,1), visibility 0s linear .75s;
-}
-
-
-    /* =========================================================
-   SCROLL REVEAL ACTIVE
-   ========================================================= */
-
-    .cover-letter-page .scroll-reveal.show {
-        opacity: 1;
-        visibility: visible;
-        transform: translateY(0);
-        transition: opacity .75s ease, transform .75s cubic-bezier(.22,1,.36,1), visibility 0s linear 0s;
-    }
-
-
-/* =========================================================
-   SECTION HEADING
-   ========================================================= */
-
-.cover-section h4 {
-    position: relative;
-    display: inline-block;
-    margin-top: 18px;
-    margin-bottom: 25px;
-    color: #222222;
-    font-size: 22px;
-    font-weight: 600;
-    line-height: 1.4;
-}
-
-
-    /* =========================================================
-   HEADING UNDERLINE
-   ========================================================= */
-
-    .cover-section h4::after {
+    #coverLetterPage .cover-heading::after {
         content: "";
         position: absolute;
+        bottom: -1px;
         left: 0;
-        bottom: -7px;
         width: 0;
-        height: 3px;
-        border-radius: 10px;
-        background: #14b8a6;
-        transition: width .7s ease .25s;
+        height: 2px;
+        background: var(--cover-primary);
+        transition: width 0.7s var(--cover-ease);
     }
 
-
-/* =========================================================
-   SHOW HEADING LINE
-   ========================================================= */
-
-.cover-section.show h4::after {
-    width: 60%;
+#coverLetterPage .cover-section.show .cover-heading::after,
+#coverLetterPage .cover-section:hover .cover-heading::after {
+    width: 64px;
 }
 
-
-/* =========================================================
-   PARAGRAPH
-   ========================================================= */
-
-.cover-section p {
-    color: #536174;
-    font-size: 15px;
-    line-height: 1.8;
-    margin-top: 0;
-    margin-bottom: 20px;
-    text-align: justify;
-    transition: color .3s ease, transform .3s ease;
+#coverLetterPage .cover-heading-icon {
+    display: inline-flex;
+    flex: 0 0 34px;
+    align-items: center;
+    justify-content: center;
+    width: 34px;
+    height: 34px;
+    border: 1px solid var(--cover-border);
+    border-radius: 9px;
+    background: var(--cover-light);
+    color: var(--cover-dark);
+    font-size: 0.95rem;
 }
 
+/* Number badges */
 
-    /* =========================================================
-   PARAGRAPH HOVER
+#coverLetterPage .cover-number {
+    display: inline-flex;
+    flex: 0 0 28px;
+    align-items: center;
+    justify-content: center;
+    width: 28px;
+    min-width: 28px;
+    height: 28px;
+    border: 1px solid var(--cover-border);
+    border-radius: 50%;
+    background: var(--cover-light);
+    color: var(--cover-dark);
+    font-size: 0.82rem;
+    font-weight: 700;
+    transition: background 0.3s ease, color 0.3s ease;
+}
+
+#coverLetterPage .cover-section:hover > .cover-heading .cover-number {
+    background: var(--cover-primary);
+    color: #ffffff;
+}
+
+/* =========================================================
+   GENERAL TIPS
    ========================================================= */
 
-    .cover-section p:hover {
-        color: #303b4d;
-        transform: translateX(3px);
+#coverLetterPage .cover-tip-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+}
+
+#coverLetterPage .cover-tip-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.85rem;
+    padding: 1rem 0;
+    border-bottom: 1px solid #edf2f2;
+}
+
+    #coverLetterPage .cover-tip-item:first-child {
+        padding-top: 0.25rem;
     }
 
+    #coverLetterPage .cover-tip-item:last-child {
+        padding-bottom: 0;
+        border-bottom: 0;
+    }
+
+    #coverLetterPage .cover-tip-item > div {
+        flex: 1;
+        min-width: 0;
+    }
+
+    #coverLetterPage .cover-tip-item h3 {
+        margin: 0 0 0.35rem;
+        color: var(--cover-ink);
+        font-size: 0.96rem;
+        font-weight: 700;
+        line-height: 1.5;
+    }
+
+    #coverLetterPage .cover-tip-item p {
+        margin: 0;
+        color: var(--cover-muted);
+        font-size: 0.92rem;
+        line-height: 1.7;
+    }
+
+    #coverLetterPage .cover-tip-item:hover .cover-number {
+        background: var(--cover-primary);
+        color: #ffffff;
+    }
 
 /* =========================================================
-   LETTER SAMPLE BOX
+   SAMPLE COVER LETTER PAPER
    ========================================================= */
 
-.letter-box {
+#coverLetterPage .cover-letter-paper {
     position: relative;
-    width: 100%;
-    margin-top: 25px;
-    margin-bottom: 30px;
-    padding: 28px;
-    border-left: 4px solid #14b8a6;
-    border-radius: 14px;
-    background: #f7fbfb;
-    box-shadow: 0 8px 25px rgba(0,0,0,.05);
     overflow: hidden;
-    transition: transform .4s ease, box-shadow .4s ease;
+    margin-top: 1.15rem;
+    background: #ffffff;
+    border: 1px solid #dbe7e7;
+    border-radius: 8px;
+    box-shadow: 0 3px 12px rgba(15, 23, 42, 0.04);
 }
 
+#coverLetterPage .cover-paper-label {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    padding: 0.8rem 1.1rem;
+    color: var(--cover-dark);
+    background: var(--cover-light);
+    border-bottom: 1px solid var(--cover-border);
+    font-size: 0.85rem;
+    font-weight: 700;
+}
 
-    /* =========================================================
-   LETTER BOX GLOW
-   ========================================================= */
-
-    .letter-box::before {
-        content: "";
-        position: absolute;
-        top: -50px;
-        right: -50px;
-        width: 130px;
-        height: 130px;
-        border-radius: 50%;
-        background: rgba(20,184,166,.07);
-        pointer-events: none;
-        animation: letterGlow 5s ease-in-out infinite;
+    #coverLetterPage .cover-paper-label i {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 30px;
+        height: 30px;
+        border-radius: 8px;
+        background: #ffffff;
+        color: var(--cover-primary);
+        border: 1px solid var(--cover-border);
     }
 
+#coverLetterPage .cover-letter-text {
+    padding: 1.25rem 1.3rem;
+}
 
-    /* =========================================================
-   LETTER BOX HOVER
-   ========================================================= */
-
-    .letter-box:hover {
-        transform: translateY(-5px);
-        box-shadow: 0 15px 35px rgba(20,184,166,.12);
-    }
-
-
-    /* =========================================================
-   LETTER BOX PARAGRAPH
-   ========================================================= */
-
-    .letter-box p {
-        position: relative;
-        z-index: 2;
-        margin-bottom: 18px;
-        color: #536174;
-        font-size: 15px;
+    #coverLetterPage .cover-letter-text p {
+        margin: 0 0 1rem;
+        color: #46535f;
+        font-size: 0.9rem;
         line-height: 1.8;
-        text-align: left;
+        overflow-wrap: anywhere;
     }
 
+        #coverLetterPage .cover-letter-text p:last-child {
+            margin-bottom: 0;
+        }
 
-    /* =========================================================
-   LETTER BOX BOLD
-   ========================================================= */
-
-    .letter-box strong {
-        color: #263548;
+    #coverLetterPage .cover-letter-text strong {
+        color: var(--cover-ink);
         font-weight: 700;
     }
-
 
 /* =========================================================
    IMPORTANT INFORMATION
    ========================================================= */
 
-.cover-important {
+#coverLetterPage .cover-important {
     position: relative;
+    display: flex;
+    align-items: flex-start;
+    gap: 1rem;
     overflow: hidden;
-    padding: 25px;
-    margin-top: 20px;
-    margin-bottom: 30px;
-    border-left: 4px solid #14b8a6;
-    border-radius: 14px;
-    background: #f7fbfb;
-    box-shadow: 0 8px 25px rgba(0,0,0,.05);
-    transition: transform .4s ease, box-shadow .4s ease;
+    padding: 1.5rem 1.65rem;
+    margin-bottom: 1.25rem;
+    background: linear-gradient( 135deg, var(--cover-light) 0%, var(--cover-soft) 100% );
+    border: 1px solid var(--cover-border);
+    border-radius: var(--cover-radius);
+    transition: box-shadow 0.3s var(--cover-ease);
 }
 
-
-    /* =========================================================
-   IMPORTANT INFORMATION HOVER
-   ========================================================= */
-
-    .cover-important:hover {
-        transform: translateY(-6px);
-        box-shadow: 0 15px 35px rgba(20,184,166,.14);
+    #coverLetterPage .cover-important:hover {
+        box-shadow: var(--cover-shadow-hover);
     }
 
+#coverLetterPage .cover-important-icon {
+    display: flex;
+    flex: 0 0 38px;
+    align-items: center;
+    justify-content: center;
+    width: 38px;
+    height: 38px;
+    border: 1px solid var(--cover-border);
+    border-radius: 10px;
+    background: #ffffff;
+    color: var(--cover-primary);
+    font-size: 1rem;
+}
 
-    /* =========================================================
-   IMPORTANT INFORMATION GLOW
-   ========================================================= */
+#coverLetterPage .cover-important h2 {
+    margin: 0 0 0.45rem;
+    color: var(--cover-dark);
+    font-size: 1.1rem;
+    font-weight: 700;
+}
 
-    .cover-important::before {
-        content: "";
-        position: absolute;
-        top: -45px;
-        right: -45px;
-        width: 110px;
-        height: 110px;
-        border-radius: 50%;
-        background: rgba(20,184,166,.08);
-        animation: coverInfoGlow 4s ease-in-out infinite;
-    }
-
-
-    /* =========================================================
-   IMPORTANT HEADING
-   ========================================================= */
-
-    .cover-important h2 {
-        position: relative;
-        z-index: 2;
-        margin: 0 0 10px;
-        color: #202838;
-        font-size: 24px;
-        font-weight: 600;
-    }
-
-
-    /* =========================================================
-   IMPORTANT TEXT
-   ========================================================= */
-
-    .cover-important p {
-        position: relative;
-        z-index: 2;
-        margin: 0;
-        color: #536174;
-        font-size: 15px;
-        line-height: 1.7;
-    }
-
+#coverLetterPage .cover-important p {
+    margin: 0;
+    color: var(--cover-muted);
+    font-size: 0.94rem;
+    line-height: 1.7;
+}
 
 /* =========================================================
    RIGHT SIDEBAR
    ========================================================= */
 
-.cover-sidebar {
-    width: 100%;
+#coverLetterPage .cover-sidebar {
+    position: relative;
 }
 
-
-/* =========================================================
-   RIGHT SIDE SCROLL REVEAL
-   ========================================================= */
-
-.cover-letter-page .scroll-right {
-    opacity: 0;
-    visibility: hidden;
-    transform: translateX(80px);
-    transition: opacity .9s ease, transform .9s cubic-bezier(.22,1,.36,1), visibility 0s linear .9s;
+@media (min-width: 992px) {
+    #coverLetterPage .cover-sidebar {
+        position: sticky;
+        top: 90px;
+    }
 }
 
+#coverLetterPage .cover-sidebar-card {
+    margin-bottom: 1.5rem;
+}
 
-    /* =========================================================
-   RIGHT SIDE ACTIVE
-   ========================================================= */
+#coverLetterPage .cover-image-box {
+    position: relative;
+    overflow: hidden;
+    padding: 0.65rem;
+    background: #ffffff;
+    border: 1px solid var(--cover-line);
+    border-radius: var(--cover-radius);
+    box-shadow: var(--cover-shadow);
+    transition: box-shadow 0.3s var(--cover-ease), border-color 0.3s var(--cover-ease), transform 0.3s var(--cover-ease);
+}
 
-    .cover-letter-page .scroll-right.show {
-        opacity: 1;
-        visibility: visible;
-        transform: translateX(0);
-        transition: opacity .9s ease, transform .9s cubic-bezier(.22,1,.36,1), visibility 0s linear 0s;
+    #coverLetterPage .cover-image-box:hover {
+        border-color: var(--cover-border);
+        box-shadow: var(--cover-shadow-hover);
+        transform: translateY(-3px);
     }
 
-
-/* =========================================================
-   ADVERTISEMENT / IMAGE BOX
-   ========================================================= */
-
-.cover-ad-box {
-    position: relative;
-    width: 100%;
-    margin-bottom: 30px;
-    overflow: hidden;
-    border-radius: 14px;
-    background: #f8fafb;
-    transition: transform .4s ease, box-shadow .4s ease;
-}
-
-
-    /* =========================================================
-   AD BOX HOVER
-   ========================================================= */
-
-    .cover-ad-box:hover {
-        transform: translateY(-6px);
-        box-shadow: 0 15px 35px rgba(0,0,0,.10);
-    }
-
-
-/* =========================================================
-   IMAGE CONTAINER
-   ========================================================= */
-
-.cover-ad-image {
-    position: relative;
-    width: 100%;
-    overflow: hidden;
-    border-radius: 14px;
-}
-
-
-    /* =========================================================
-   SIDEBAR IMAGE
-   ========================================================= */
-
-    .cover-ad-image img {
+    #coverLetterPage .cover-image-box img {
         display: block;
         width: 100%;
-        max-width: 100%;
         height: auto;
-        object-fit: contain;
-        transition: transform .7s cubic-bezier(.2,.8,.2,1), filter .5s ease;
+        max-height: 270px;
+        object-fit: cover;
+        border-radius: 6px;
+        transition: transform 0.6s var(--cover-ease);
     }
 
-
-    /* =========================================================
-   SMALL IMAGE
-   ========================================================= */
-
-    .cover-ad-image.small-image img {
-        width: 100%;
-        height: auto;
-        object-fit: contain;
+    #coverLetterPage .cover-image-box:hover img {
+        transform: scale(1.035);
     }
 
+/* Image fallback */
 
-/* =========================================================
-   IMAGE HOVER
-   ========================================================= */
-
-.cover-ad-box:hover
-.cover-ad-image img {
-    transform: scale(1.04);
-    filter: brightness(1.04);
+#coverLetterPage .cover-image-placeholder {
+    display: none;
+    min-height: 190px;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 0.6rem;
+    padding: 1rem;
+    text-align: center;
+    background: var(--cover-light);
+    border: 1px dashed var(--cover-border);
+    border-radius: 6px;
+    color: var(--cover-dark);
+    font-size: 0.88rem;
+    font-weight: 600;
 }
 
+    #coverLetterPage .cover-image-placeholder i {
+        font-size: 2rem;
+        color: var(--cover-primary);
+    }
 
-/* =========================================================
-   IMAGE SHINE
-   ========================================================= */
-
-.cover-ad-box::after {
-    content: "";
-    position: absolute;
-    top: 0;
-    left: -120%;
-    width: 70%;
-    height: 100%;
-    pointer-events: none;
-    background: linear-gradient( 90deg, transparent, rgba(255,255,255,.28), transparent );
-    transform: skewX(-20deg);
-    transition: left .8s ease;
+#coverLetterPage .cover-image-box.cover-no-image .cover-image-placeholder {
+    display: flex;
 }
 
-
-/* =========================================================
-   SHINE HOVER
-   ========================================================= */
-
-.cover-ad-box:hover::after {
-    left: 140%;
+#coverLetterPage .cover-image-box.cover-no-image img {
+    display: none;
 }
 
+/* Sidebar captions */
 
-/* =========================================================
-   IMPORTANT CARD RIGHT SIDE
-   ========================================================= */
-
-.cover-important-card {
-    position: relative;
-    width: 100%;
-    overflow: hidden;
-    padding: 22px;
-    margin-bottom: 35px;
-    border-left: 4px solid #14b8a6;
-    border-radius: 14px;
-    background: #f7fbfb;
-    box-shadow: 0 8px 25px rgba(0,0,0,.05);
-    transition: transform .4s ease, box-shadow .4s ease;
+#coverLetterPage .cover-sidebar-text {
+    padding: 0.85rem 0.5rem 0;
+    text-align: center;
 }
 
-
-    /* =========================================================
-   RIGHT IMPORTANT HOVER
-   ========================================================= */
-
-    .cover-important-card:hover {
-        transform: translateY(-6px);
-        box-shadow: 0 15px 35px rgba(20,184,166,.14);
+    #coverLetterPage .cover-sidebar-text h2 {
+        margin: 0 0 0.4rem;
+        color: var(--cover-dark);
+        font-size: 1.02rem;
+        font-weight: 700;
     }
 
+        #coverLetterPage .cover-sidebar-text h2::after {
+            content: "";
+            display: block;
+            width: 36px;
+            height: 2px;
+            margin: 0.45rem auto 0;
+            background: var(--cover-primary);
+            transition: width 0.4s var(--cover-ease);
+        }
 
-    /* =========================================================
-   RIGHT IMPORTANT GLOW
+#coverLetterPage .cover-sidebar-card:hover .cover-sidebar-text h2::after {
+    width: 70px;
+}
+
+#coverLetterPage .cover-sidebar-text p {
+    margin: 0.5rem 0 0;
+    color: var(--cover-muted);
+    font-size: 0.9rem;
+    line-height: 1.6;
+}
+
+/* =========================================================
+   SCROLL REVEAL
    ========================================================= */
 
-    .cover-important-card::before {
-        content: "";
-        position: absolute;
-        top: -40px;
-        right: -40px;
-        width: 100px;
-        height: 100px;
-        border-radius: 50%;
-        background: rgba(20,184,166,.08);
-        animation: coverInfoGlow 4s ease-in-out infinite;
+#coverLetterPage.cover-js-reveal .scroll-reveal,
+#coverLetterPage.cover-js-reveal .scroll-right {
+    opacity: 0;
+    transform: translateY(18px);
+    transition: opacity 0.6s var(--cover-ease), transform 0.6s var(--cover-ease), box-shadow 0.3s var(--cover-ease), border-color 0.3s var(--cover-ease);
+}
+
+#coverLetterPage.cover-js-reveal .scroll-right {
+    transform: translateX(20px);
+}
+
+    #coverLetterPage.cover-js-reveal .scroll-reveal.show,
+    #coverLetterPage.cover-js-reveal .scroll-right.show {
+        opacity: 1;
+        transform: none;
     }
-
-
-    /* =========================================================
-   RIGHT CARD HEADING
-   ========================================================= */
-
-    .cover-important-card h2 {
-        position: relative;
-        z-index: 2;
-        margin: 0 0 10px;
-        color: #202838;
-        font-size: 22px;
-        font-weight: 600;
-    }
-
-
-    /* =========================================================
-   RIGHT CARD TEXT
-   ========================================================= */
-
-    .cover-important-card p {
-        position: relative;
-        z-index: 2;
-        margin: 0;
-        color: #536174;
-        font-size: 15px;
-        line-height: 1.7;
-    }
-
 
 /* =========================================================
    BACK TO TOP
    ========================================================= */
 
-.cover-letter-page .back-to-top {
-    z-index: 999;
-    border: none;
-    background: #14b8a6;
-    transition: all .3s ease;
+#coverLetterPage .cover-back-to-top {
+    position: fixed;
+    right: 24px;
+    bottom: 24px;
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 42px;
+    height: 42px;
+    padding: 0;
+    color: #ffffff;
+    background: var(--cover-primary);
+    border: 0;
+    border-radius: 8px;
+    box-shadow: 0 6px 16px rgba(13, 148, 136, 0.3);
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+    transform: translateY(10px);
+    transition: opacity 0.3s ease, transform 0.3s ease, background 0.2s ease, visibility 0.3s;
+    cursor: pointer;
 }
 
-
-    .cover-letter-page .back-to-top:hover {
-        background: #0f766e;
-        transform: translateY(-4px);
-        box-shadow: 0 8px 20px rgba(20,184,166,.30);
-    }
-
-
-/* =========================================================
-   HERO TITLE ANIMATION
-   ========================================================= */
-
-@keyframes coverTitleReveal {
-
-    0% {
-        opacity: 0;
-        transform: translateY(35px) translateX(-20px);
-        filter: blur(6px);
-    }
-
-    100% {
+    #coverLetterPage .cover-back-to-top.visible {
         opacity: 1;
-        transform: translateY(0) translateX(0);
-        filter: blur(0);
-    }
-}
-
-
-/* =========================================================
-   FADE UP
-   ========================================================= */
-
-@keyframes coverFadeUp {
-
-    from {
-        opacity: 0;
-        transform: translateY(20px);
-    }
-
-    to {
-        opacity: 1;
+        visibility: visible;
+        pointer-events: auto;
         transform: translateY(0);
     }
-}
 
+    #coverLetterPage .cover-back-to-top:hover {
+        color: #ffffff;
+        background: var(--cover-dark);
+        transform: translateY(-3px);
+    }
 
 /* =========================================================
-   BREADCRUMB REVEAL
+   RESPONSIVE
    ========================================================= */
 
-@keyframes coverBreadcrumbReveal {
-
-    from {
-        opacity: 0;
-        transform: translateX(45px);
-        filter: blur(5px);
+@media (max-width: 991.98px) {
+    #coverLetterPage .cover-content {
+        padding-top: 1.75rem;
     }
 
-    to {
-        opacity: 1;
-        transform: translateX(0);
-        filter: blur(0);
-    }
-}
-
-
-/* =========================================================
-   TITLE LINE
-   ========================================================= */
-
-@keyframes coverLineReveal {
-
-    from {
-        width: 0;
+    #coverLetterPage .cover-sidebar {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 1rem;
+        position: static;
     }
 
-    to {
-        width: 100px;
+    #coverLetterPage .cover-sidebar-card {
+        min-width: 0;
+        margin-bottom: 0.75rem;
+    }
+
+    #coverLetterPage .cover-image-box img {
+        max-height: 220px;
     }
 }
 
-
-/* =========================================================
-   LEFT GLOW
-   ========================================================= */
-
-@keyframes coverGlowOne {
-
-    0%, 100% {
-        transform: translate(0,0) scale(1);
+@media (max-width: 767.98px) {
+    #coverLetterPage .cover-hero {
+        padding: 2.5rem 0;
     }
 
-    50% {
-        transform: translate(80px,40px) scale(1.15);
-    }
-}
-
-
-/* =========================================================
-   RIGHT GLOW
-   ========================================================= */
-
-@keyframes coverGlowTwo {
-
-    0%, 100% {
-        transform: translate(0,0) scale(1);
+    #coverLetterPage .cover-hero-title {
+        font-size: 1.7rem;
     }
 
-    50% {
-        transform: translate(-70px,-50px) scale(1.12);
-    }
-}
-
-
-/* =========================================================
-   CENTER GLOW
-   ========================================================= */
-
-@keyframes coverGlowThree {
-
-    0%, 100% {
-        transform: scale(1);
-        opacity: .5;
-    }
-
-    50% {
-        transform: scale(1.4);
-        opacity: 1;
-    }
-}
-
-
-/* =========================================================
-   PARTICLE ANIMATION
-   ========================================================= */
-
-@keyframes coverParticleFloat {
-
-    0% {
-        opacity: .2;
-        transform: translateY(0) scale(.8);
-    }
-
-    50% {
-        opacity: 1;
-        transform: translateY(-25px) scale(1.2);
-    }
-
-    100% {
-        opacity: .2;
-        transform: translateY(0) scale(.8);
-    }
-}
-
-
-/* =========================================================
-   BREADCRUMB ARROW
-   ========================================================= */
-
-@keyframes coverArrowPulse {
-
-    0%, 100% {
-        transform: translateX(0);
-    }
-
-    50% {
-        transform: translateX(5px);
-    }
-}
-
-
-/* =========================================================
-   INFORMATION GLOW
-   ========================================================= */
-
-@keyframes coverInfoGlow {
-
-    0% {
-        transform: scale(1);
-        opacity: .5;
-    }
-
-    50% {
-        transform: scale(1.3);
-        opacity: 1;
-    }
-
-    100% {
-        transform: scale(1);
-        opacity: .5;
-    }
-}
-
-
-/* =========================================================
-   LETTER BOX GLOW
-   ========================================================= */
-
-@keyframes letterGlow {
-
-    0%, 100% {
-        transform: scale(1);
-        opacity: .5;
-    }
-
-    50% {
-        transform: scale(1.25);
-        opacity: 1;
-    }
-}
-
-
-/* =========================================================
-   TABLET
-   ========================================================= */
-
-@media (max-width: 991px) {
-
-    .cover-letter-hero {
-        min-height: 320px;
-    }
-
-
-    .cover-title {
-        font-size: 34px;
-    }
-
-
-    .cover-subtitle {
-        margin-left: auto;
+    #coverLetterPage .cover-title-line {
         margin-right: auto;
+        margin-left: auto;
     }
 
-
-    .cover-breadcrumb {
-        margin-top: 25px;
+    #coverLetterPage .cover-hero-subtitle {
+        margin-right: auto;
+        margin-left: auto;
+        font-size: 0.94rem;
     }
 
-
-    .cover-letter-content {
-        padding-top: 55px;
+    #coverLetterPage .cover-breadcrumb {
+        padding: 0.45rem 0.8rem;
     }
 
-
-        .cover-letter-content .col-lg-7 {
-            padding-right: 15px;
-        }
-
-
-        .cover-letter-content .col-lg-4 {
-            padding-left: 15px;
-            margin-top: 40px;
-        }
-
-
-    /* Right sidebar becomes vertical animation */
-
-    .cover-letter-page .scroll-right {
-        transform: translateY(50px);
+    #coverLetterPage .cover-section {
+        padding: 1.2rem 1.1rem;
     }
 
+    #coverLetterPage .cover-heading {
+        font-size: 1rem;
+        gap: 0.55rem;
+    }
 
-        .cover-letter-page .scroll-right.show {
-            transform: translateY(0);
-        }
+    #coverLetterPage .cover-letter-text {
+        padding: 1rem;
+    }
 
+    #coverLetterPage .cover-important {
+        padding: 1.2rem 1.1rem;
+    }
 
-    .cover-section {
-        margin-bottom: 45px;
+    #coverLetterPage .cover-back-to-top {
+        right: 15px;
+        bottom: 15px;
     }
 }
-
-
-/* =========================================================
-   MOBILE
-   ========================================================= */
-
-@media (max-width: 767px) {
-
-    .cover-letter-hero {
-        min-height: 360px;
-        text-align: center;
-    }
-
-
-    .cover-title {
-        font-size: 28px;
-        color: whitesmoke !important;
-    }
-
-
-    .cover-small-title {
-        font-size: 10px;
-        letter-spacing: 2px;
-    }
-
-
-    .cover-subtitle {
-        padding: 0 15px;
-        font-size: 14px;
-    }
-
-
-    .cover-breadcrumb {
-        gap: 7px;
-        padding: 8px 10px;
-    }
-
-
-    .cover-btn {
-        padding: 8px 13px;
-        font-size: 13px;
-    }
-
-
-    .cover-current-page {
-        font-size: 12px;
-    }
-
-
-    .cover-glow-1 {
-        width: 220px;
-        height: 220px;
-    }
-
-
-    .cover-glow-2 {
-        width: 250px;
-        height: 250px;
-    }
-
-
-    .cover-letter-content {
-        padding-top: 45px;
-        padding-bottom: 50px;
-    }
-
-
-    .cover-section {
-        margin-bottom: 40px;
-    }
-
-
-        .cover-section h4 {
-            font-size: 21px;
-            margin-top: 15px;
-            margin-bottom: 23px;
-        }
-
-
-        .cover-section p {
-            font-size: 14px;
-            line-height: 1.7;
-        }
-
-
-    /* Mobile scroll reveal */
-
-    .cover-letter-page .scroll-reveal {
-        transform: translateY(50px);
-    }
-
-
-        .cover-letter-page .scroll-reveal.show {
-            transform: translateY(0);
-        }
-
-
-    /* Mobile right side */
-
-    .cover-letter-page .scroll-right {
-        transform: translateY(50px);
-    }
-
-
-        .cover-letter-page .scroll-right.show {
-            transform: translateY(0);
-        }
-
-
-    .letter-box {
-        padding: 20px;
-        margin-top: 20px;
-    }
-
-
-        .letter-box p {
-            font-size: 14px;
-            line-height: 1.7;
-        }
-
-
-    .cover-important {
-        padding: 20px;
-    }
-
-
-        .cover-important h2 {
-            font-size: 21px;
-        }
-
-
-        .cover-important p {
-            font-size: 14px;
-        }
-
-
-    .cover-important-card {
-        padding: 20px;
-    }
-
-
-        .cover-important-card h2 {
-            font-size: 20px;
-        }
-
-
-        .cover-important-card p {
-            font-size: 14px;
-        }
-}
-
-
-/* =========================================================
-   SMALL MOBILE
-   ========================================================= */
 
 @media (max-width: 480px) {
-
-    .cover-letter-hero {
-        min-height: 380px;
+    #coverLetterPage .cover-sidebar {
+        grid-template-columns: minmax(0, 1fr);
+        gap: 0.5rem;
     }
 
-
-    .cover-title {
-        font-size: 24px;
-        color: whitesmoke !important;
+    #coverLetterPage .cover-image-box img {
+        max-height: none;
     }
 
-
-    .cover-subtitle {
-        font-size: 13px;
+    #coverLetterPage .cover-tip-item {
+        gap: 0.65rem;
     }
 
-
-    .cover-breadcrumb {
-        flex-wrap: wrap;
-        justify-content: center;
-        border-radius: 18px;
+    #coverLetterPage .cover-heading-icon {
+        flex-basis: 30px;
+        width: 30px;
+        height: 30px;
     }
 
-
-    .cover-arrow {
-        display: none;
+    #coverLetterPage .cover-letter-text p {
+        font-size: 0.87rem;
     }
 
-
-    .cover-section h4 {
-        font-size: 20px;
-    }
-
-
-    .letter-box {
-        padding: 17px;
-    }
-
-
-        .letter-box p {
-            font-size: 13px;
-            line-height: 1.7;
-        }
-
-
-    .cover-important {
-        padding: 18px;
-    }
-
-
-        .cover-important h2 {
-            font-size: 20px;
-        }
-
-
-    .cover-important-card {
-        padding: 18px;
-    }
-
-
-        .cover-important-card h2 {
-            font-size: 19px;
-        }
-
-
-    .cover-ad-box {
-        border-radius: 12px;
+    #coverLetterPage .cover-important {
+        gap: 0.7rem;
     }
 }
 
-
 /* =========================================================
-   VERY SMALL MOBILE
-   ========================================================= */
-
-@media (max-width: 360px) {
-
-    .cover-letter-hero {
-        min-height: 400px;
-    }
-
-
-    .cover-title {
-        font-size: 22px;
-    }
-
-
-    .cover-small-title {
-        font-size: 9px;
-        letter-spacing: 1.5px;
-    }
-
-
-    .cover-subtitle {
-        font-size: 12px;
-    }
-
-
-    .cover-btn {
-        padding: 7px 11px;
-        font-size: 12px;
-    }
-
-
-    .cover-current-page {
-        font-size: 11px;
-    }
-}
-
-
-/* =========================================================
-   REDUCED MOTION
+   ACCESSIBILITY: REDUCED MOTION
    ========================================================= */
 
 @media (prefers-reduced-motion: reduce) {
-
-    .cover-letter-hero *,
-    .cover-letter-hero::before,
-    .cover-letter-hero::after,
-    .cover-glow,
-    .cover-particles span {
+    #coverLetterPage .cover-hero,
+    #coverLetterPage .cover-shape,
+    #coverLetterPage .cover-eyebrow,
+    #coverLetterPage .cover-hero-title,
+    #coverLetterPage .cover-title-line,
+    #coverLetterPage .cover-hero-subtitle,
+    #coverLetterPage .cover-breadcrumb {
         animation: none !important;
-        transition: none !important;
     }
 
-
-    .cover-letter-page .scroll-reveal,
-    .cover-letter-page .scroll-right {
-        opacity: 1 !important;
-        visibility: visible !important;
-        transform: none !important;
-        transition: none !important;
-    }
-}
-
-
-/* =========================================================
-   SAFETY - NO HORIZONTAL SCROLL
-   ========================================================= */
-
-.cover-letter-page,
-.cover-letter-page .container,
-.cover-letter-page .row,
-.cover-letter-page img,
-.cover-letter-page .letter-box,
-.cover-letter-page .cover-important,
-.cover-letter-page .cover-important-card {
-    max-width: 100%;
-}
-
-
-    /* =========================================================
-   IMAGE SAFETY
-   ========================================================= */
-
-    .cover-letter-page img {
-        height: auto;
-        max-width: 100%;
+    #coverLetterPage.cover-js-reveal .scroll-reveal,
+    #coverLetterPage.cover-js-reveal .scroll-right {
+        opacity: 1;
+        transform: none;
+        transition: none;
     }
 
-
-    /* =========================================================
-   BOOTSTRAP ROW SAFETY
-   ========================================================= */
-
-    .cover-letter-page .row {
-        margin-left: 0;
-        margin-right: 0;
+    #coverLetterPage .cover-section,
+    #coverLetterPage .cover-image-box,
+    #coverLetterPage .cover-image-box img,
+    #coverLetterPage .cover-back-to-top {
+        transition: none;
     }
 
-
-    /* =========================================================
-   LINK RESET
-   ========================================================= */
-
-    .cover-letter-page a {
-        text-decoration: none;
-    }
-
-
-        /* =========================================================
-   FOCUS ACCESSIBILITY
-   ========================================================= */
-
-        .cover-letter-page a:focus-visible {
-            outline: 2px solid #5eead4;
-            outline-offset: 3px;
+        #coverLetterPage .cover-section:hover,
+        #coverLetterPage .cover-image-box:hover,
+        #coverLetterPage .cover-image-box:hover img {
+            transform: none;
         }
+}
+

@@ -743,81 +743,70 @@ namespace ErJobPortal.Controllers
 
         // khushi 08-10
         [HttpGet]
-        public IActionResult ViewOrgPost(int id)
+        public IActionResult ViewOrgPost(int id, string source = "PostDetails")
         {
             int? orgID = HttpContext.Session.GetInt32("OrgID");
 
-            if (orgID == null)
+            if (!orgID.HasValue)
             {
-                return RedirectToAction(
-                    "OrganizationLogin",
-                    "Account");
+                return RedirectToAction("OrganizationLogin", "Account");
             }
 
-            // =====================================================
-            // GET CURRENT POST
-            // =====================================================
-
-            var post = _repository.GetOrganizationPostById(
-                id,
-                orgID.Value);
+            var post = _repository.GetOrganizationPostById(id, orgID.Value);
 
             if (post == null)
             {
                 return NotFound();
             }
 
-            // =====================================================
-            // GET ONLY THE POSTS FROM APPLIED TRAINEES TABLE
-            // =====================================================
+            ViewBag.PostSource = source;
 
-            List<OrgPostM> appliedPosts =
-                _repository.GetAppliedTraineePosts(
-                    orgID.Value);
+            List<int> postIds;
 
-            // =====================================================
-            // GET IDs
-            // =====================================================
-
-            List<int> postIds = appliedPosts
-                .Select(x => x.nID)
-                .Where(x => x > 0)
-                .ToList();
-
-            // =====================================================
-            // FIND CURRENT POST
-            // =====================================================
+            // 1. PostDetails
+            if (source == "PostDetails")
+            {
+                postIds = _repository
+                    .GetOrgPostsWithMatchingTraineeCount(orgID.Value)
+                    .Select(x => x.nID)
+                    .Where(x => x > 0)
+                    .Distinct()
+                    .ToList();
+            }
+            // 2. Applied Trainees
+            else if (source == "AppliedTrainees")
+            {
+                postIds = _repository
+                    .GetAppliedTraineePostIds(orgID.Value);
+            }
+            // 3. Previous Posts
+            else if (source == "PreviousPosts")
+            {
+                postIds = _repository
+                    .GetOrganizationPreviousPostIds(orgID.Value);
+            }
+            else
+            {
+                postIds = new List<int>();
+            }
 
             int currentIndex = postIds.IndexOf(id);
 
-            // =====================================================
-            // PREVIOUS
-            // =====================================================
+            int? previousPostId = null;
+            int? nextPostId = null;
 
             if (currentIndex > 0)
             {
-                ViewBag.PreviousPostId =
-                    postIds[currentIndex - 1];
-            }
-            else
-            {
-                ViewBag.PreviousPostId = null;
+                previousPostId = postIds[currentIndex - 1];
             }
 
-            // =====================================================
-            // NEXT
-            // =====================================================
+            if (currentIndex >= 0 && currentIndex < postIds.Count - 1)
+            {
+                nextPostId = postIds[currentIndex + 1];
+            }
 
-            if (currentIndex >= 0 &&
-                currentIndex < postIds.Count - 1)
-            {
-                ViewBag.NextPostId =
-                    postIds[currentIndex + 1];
-            }
-            else
-            {
-                ViewBag.NextPostId = null;
-            }
+            ViewBag.PreviousPostId = previousPostId;
+            ViewBag.NextPostId = nextPostId;
 
             return View(post);
         }
@@ -3061,7 +3050,6 @@ string nameColumn)
                 });
             }
         }
-
         [HttpGet]
         [Route("Organization/PostDetails/{id}")]
         public IActionResult PostDetails(string? id)
@@ -3127,7 +3115,7 @@ string nameColumn)
             }
 
             ViewBag.OrgCode = organizationCode;
-            
+
             List<OrgPostM> posts = new List<OrgPostM>();
             using (SqlConnection con = new SqlConnection(_configuration.GetConnectionString("DefaultConnection")))
             {
@@ -5173,319 +5161,319 @@ WHERE nID = @nID
         }
 
         //khushi 03-10-26
-        [HttpGet]
-        [Route("Organization/ViewOrgProfile/{id}")]
-        public IActionResult ViewOrgProfile(string id)
-        {
-            // =====================================================
-            // VALIDATE ORGANIZATION CODE
-            // =====================================================
-
-            if (string.IsNullOrWhiteSpace(id))
-                return NotFound();
-
-            if (!IsValidOrganizationCode(id))
-                return NotFound();
-
-
-            // =====================================================
-            // GET ORGANIZATION ID FROM ORGANIZATION CODE
-            // Example: OR07082601 -> 01
-            // =====================================================
-
-            if (id.Length < 2 ||
-                !int.TryParse(
-                    id.Substring(id.Length - 2),
-                    out int orgId) ||
-                orgId <= 0)
-            {
-                return NotFound();
-            }
-
-
-            // =====================================================
-            // CONNECTION STRING
-            // =====================================================
-
-            string? connectionString =
-                _configuration.GetConnectionString(
-                    "DefaultConnection");
-
-            if (string.IsNullOrWhiteSpace(connectionString))
-            {
-                return StatusCode(
-                    500,
-                    "Database connection string not found.");
-            }
-
-
-            // =====================================================
-            // ORGANIZATION PROFILE MODEL
-            // =====================================================
-
-            OrgProfile? model = null;
-
+        //[HttpGet]
+        //[Route("Organization/ViewOrgProfile/{id}")]
+        //public IActionResult ViewOrgProfile(string id)
+        //{
+        //    // =====================================================
+        //    // VALIDATE ORGANIZATION CODE
+        //    // =====================================================
+
+        //    if (string.IsNullOrWhiteSpace(id))
+        //        return NotFound();
+
+        //    if (!IsValidOrganizationCode(id))
+        //        return NotFound();
+
+
+        //    // =====================================================
+        //    // GET ORGANIZATION ID FROM ORGANIZATION CODE
+        //    // Example: OR07082601 -> 01
+        //    // =====================================================
+
+        //    if (id.Length < 2 ||
+        //        !int.TryParse(
+        //            id.Substring(id.Length - 2),
+        //            out int orgId) ||
+        //        orgId <= 0)
+        //    {
+        //        return NotFound();
+        //    }
+
+
+        //    // =====================================================
+        //    // CONNECTION STRING
+        //    // =====================================================
+
+        //    string? connectionString =
+        //        _configuration.GetConnectionString(
+        //            "DefaultConnection");
+
+        //    if (string.IsNullOrWhiteSpace(connectionString))
+        //    {
+        //        return StatusCode(
+        //            500,
+        //            "Database connection string not found.");
+        //    }
+
+
+        //    // =====================================================
+        //    // ORGANIZATION PROFILE MODEL
+        //    // =====================================================
+
+        //    OrgProfile? model = null;
+
 
-            // =====================================================
-            // DATABASE
-            // =====================================================
-
-            using (SqlConnection cn =
-                   new SqlConnection(connectionString))
-            {
-                using (SqlCommand cmd =
-                       new SqlCommand(
-                           "SP_GetOrganizationProfile",
-                           cn))
-                {
-                    cmd.CommandType =
-                        CommandType.StoredProcedure;
-
+        //    // =====================================================
+        //    // DATABASE
+        //    // =====================================================
+
+        //    using (SqlConnection cn =
+        //           new SqlConnection(connectionString))
+        //    {
+        //        using (SqlCommand cmd =
+        //               new SqlCommand(
+        //                   "SP_GetOrganizationProfile",
+        //                   cn))
+        //        {
+        //            cmd.CommandType =
+        //                CommandType.StoredProcedure;
+
 
-                    // =================================================
-                    // ORGANIZATION ID
-                    // =================================================
+        //            // =================================================
+        //            // ORGANIZATION ID
+        //            // =================================================
 
-                    cmd.Parameters.Add(
-                        "@nOrgID",
-                        SqlDbType.Int
-                    ).Value = orgId;
-
+        //            cmd.Parameters.Add(
+        //                "@nOrgID",
+        //                SqlDbType.Int
+        //            ).Value = orgId;
+
 
-                    // =================================================
-                    // OPEN CONNECTION
-                    // =================================================
+        //            // =================================================
+        //            // OPEN CONNECTION
+        //            // =================================================
 
-                    cn.Open();
+        //            cn.Open();
 
 
-                    // =================================================
-                    // READ DATA
-                    // =================================================
+        //            // =================================================
+        //            // READ DATA
+        //            // =================================================
 
-                    using (SqlDataReader dr =
-                           cmd.ExecuteReader())
-                    {
-                        if (dr.Read())
-                        {
-                            model = new OrgProfile
-                            {
-                                // =====================================
-                                // BASIC INFORMATION
-                                // =====================================
+        //            using (SqlDataReader dr =
+        //                   cmd.ExecuteReader())
+        //            {
+        //                if (dr.Read())
+        //                {
+        //                    model = new OrgProfile
+        //                    {
+        //                        // =====================================
+        //                        // BASIC INFORMATION
+        //                        // =====================================
 
-                                nID =
-                                    dr["nID"] != DBNull.Value
-                                        ? Convert.ToInt32(
-                                            dr["nID"])
-                                        : 0,
+        //                        nID =
+        //                            dr["nID"] != DBNull.Value
+        //                                ? Convert.ToInt32(
+        //                                    dr["nID"])
+        //                                : 0,
 
-                                nOrgID =
-                                    dr["nOrgID"] != DBNull.Value
-                                        ? Convert.ToInt32(
-                                            dr["nOrgID"])
-                                        : orgId,
+        //                        nOrgID =
+        //                            dr["nOrgID"] != DBNull.Value
+        //                                ? Convert.ToInt32(
+        //                                    dr["nOrgID"])
+        //                                : orgId,
 
 
-                                // =====================================
-                                // ORGANIZATION NAME
-                                // DATABASE = sName
-                                // MODEL = sOrganizationName
-                                // =====================================
+        //                        // =====================================
+        //                        // ORGANIZATION NAME
+        //                        // DATABASE = sName
+        //                        // MODEL = sOrganizationName
+        //                        // =====================================
 
-                                sOrganizationName =
-                                    dr["sName"] != DBNull.Value
-                                        ? dr["sName"].ToString()!
-                                        : string.Empty,
+        //                        sOrganizationName =
+        //                            dr["sName"] != DBNull.Value
+        //                                ? dr["sName"].ToString()!
+        //                                : string.Empty,
 
 
-                                // =====================================
-                                // EMAIL
-                                // DATABASE = sEmail
-                                // MODEL = sOrganizationEmail
-                                // =====================================
+        //                        // =====================================
+        //                        // EMAIL
+        //                        // DATABASE = sEmail
+        //                        // MODEL = sOrganizationEmail
+        //                        // =====================================
 
-                                sOrganizationEmail =
-                                    dr["sEmail"] != DBNull.Value
-                                        ? dr["sEmail"].ToString()!
-                                        : string.Empty,
+        //                        sOrganizationEmail =
+        //                            dr["sEmail"] != DBNull.Value
+        //                                ? dr["sEmail"].ToString()!
+        //                                : string.Empty,
 
 
-                                // =====================================
-                                // MOBILE
-                                // =====================================
+        //                        // =====================================
+        //                        // MOBILE
+        //                        // =====================================
 
-                                sMobile =
-                                    dr["sMobile"] != DBNull.Value
-                                        ? dr["sMobile"].ToString()!
-                                        : string.Empty,
+        //                        sMobile =
+        //                            dr["sMobile"] != DBNull.Value
+        //                                ? dr["sMobile"].ToString()!
+        //                                : string.Empty,
 
 
-                                // =====================================
-                                // DESIGNATION
-                                // =====================================
+        //                        // =====================================
+        //                        // DESIGNATION
+        //                        // =====================================
 
-                                sDesignation =
-                                    dr["sDesignation"] != DBNull.Value
-                                        ? dr["sDesignation"].ToString()!
-                                        : string.Empty,
+        //                        sDesignation =
+        //                            dr["sDesignation"] != DBNull.Value
+        //                                ? dr["sDesignation"].ToString()!
+        //                                : string.Empty,
 
 
-                                // =====================================
-                                // DATE OF BIRTH
-                                // =====================================
+        //                        // =====================================
+        //                        // DATE OF BIRTH
+        //                        // =====================================
 
-                                dDateOfBirth =
-                                    dr["dDateOfBirth"] != DBNull.Value
-                                        ? Convert.ToDateTime(
-                                            dr["dDateOfBirth"])
-                                        : null,
+        //                        dDateOfBirth =
+        //                            dr["dDateOfBirth"] != DBNull.Value
+        //                                ? Convert.ToDateTime(
+        //                                    dr["dDateOfBirth"])
+        //                                : null,
 
 
-                                // =====================================
-                                // COMPANY LOGO
-                                // =====================================
+        //                        // =====================================
+        //                        // COMPANY LOGO
+        //                        // =====================================
 
-                                sCompanyLogo =
-                                    dr["sCompanyLogo"] != DBNull.Value
-                                        ? dr["sCompanyLogo"].ToString()!
-                                        : string.Empty,
+        //                        sCompanyLogo =
+        //                            dr["sCompanyLogo"] != DBNull.Value
+        //                                ? dr["sCompanyLogo"].ToString()!
+        //                                : string.Empty,
 
 
-                                // =====================================
-                                // COMPANY ADDRESS
-                                // =====================================
+        //                        // =====================================
+        //                        // COMPANY ADDRESS
+        //                        // =====================================
 
-                                sCompanyAddress =
-                                    dr["sCompanyAddress"] != DBNull.Value
-                                        ? dr["sCompanyAddress"].ToString()!
-                                        : string.Empty,
+        //                        sCompanyAddress =
+        //                            dr["sCompanyAddress"] != DBNull.Value
+        //                                ? dr["sCompanyAddress"].ToString()!
+        //                                : string.Empty,
 
 
-                                // =====================================
-                                // ESTABLISHMENT YEAR
-                                // =====================================
+        //                        // =====================================
+        //                        // ESTABLISHMENT YEAR
+        //                        // =====================================
 
-                                nEstablishmentYear =
-                                    dr["nEstablishmentYear"] != DBNull.Value
-                                        ? Convert.ToInt32(
-                                            dr["nEstablishmentYear"])
-                                        : 0,
+        //                        nEstablishmentYear =
+        //                            dr["nEstablishmentYear"] != DBNull.Value
+        //                                ? Convert.ToInt32(
+        //                                    dr["nEstablishmentYear"])
+        //                                : 0,
 
 
-                                // =====================================
-                                // GST NUMBER
-                                // =====================================
+        //                        // =====================================
+        //                        // GST NUMBER
+        //                        // =====================================
 
-                                sGSTNo =
-                                    dr["sGSTNo"] != DBNull.Value
-                                        ? dr["sGSTNo"].ToString()!
-                                        : string.Empty,
+        //                        sGSTNo =
+        //                            dr["sGSTNo"] != DBNull.Value
+        //                                ? dr["sGSTNo"].ToString()!
+        //                                : string.Empty,
 
 
-                                // =====================================
-                                // CIN NUMBER
-                                // =====================================
+        //                        // =====================================
+        //                        // CIN NUMBER
+        //                        // =====================================
 
-                                sCINNo =
-                                    dr["sCINNo"] != DBNull.Value
-                                        ? dr["sCINNo"].ToString()!
-                                        : string.Empty,
+        //                        sCINNo =
+        //                            dr["sCINNo"] != DBNull.Value
+        //                                ? dr["sCINNo"].ToString()!
+        //                                : string.Empty,
 
 
-                                // =====================================
-                                // EMPLOYEE STRENGTH
-                                // =====================================
+        //                        // =====================================
+        //                        // EMPLOYEE STRENGTH
+        //                        // =====================================
 
-                                nEmployeeStrength =
-                                    dr["nEmployeeStrength"] != DBNull.Value
-                                        ? dr["nEmployeeStrength"].ToString()!
-                                        : string.Empty,
+        //                        nEmployeeStrength =
+        //                            dr["nEmployeeStrength"] != DBNull.Value
+        //                                ? dr["nEmployeeStrength"].ToString()!
+        //                                : string.Empty,
 
 
-                                // =====================================
-                                // CREATED DATE
-                                // =====================================
+        //                        // =====================================
+        //                        // CREATED DATE
+        //                        // =====================================
 
-                                dCreatedDate =
-                                    dr["dCreatedDate"] != DBNull.Value
-                                        ? Convert.ToDateTime(
-                                            dr["dCreatedDate"])
-                                        : DateTime.MinValue,
+        //                        dCreatedDate =
+        //                            dr["dCreatedDate"] != DBNull.Value
+        //                                ? Convert.ToDateTime(
+        //                                    dr["dCreatedDate"])
+        //                                : DateTime.MinValue,
 
 
-                                // =====================================
-                                // MODIFIED DATE
-                                // =====================================
+        //                        // =====================================
+        //                        // MODIFIED DATE
+        //                        // =====================================
 
-                                dModifiedDate =
-                                    dr["dModifiedDate"] != DBNull.Value
-                                        ? Convert.ToDateTime(
-                                            dr["dModifiedDate"])
-                                        : null,
+        //                        dModifiedDate =
+        //                            dr["dModifiedDate"] != DBNull.Value
+        //                                ? Convert.ToDateTime(
+        //                                    dr["dModifiedDate"])
+        //                                : null,
 
 
-                                // =====================================
-                                // BIT
-                                // =====================================
+        //                        // =====================================
+        //                        // BIT
+        //                        // =====================================
 
-                                nBit =
-                                    dr["nBit"] != DBNull.Value &&
-                                    Convert.ToBoolean(
-                                        dr["nBit"]),
+        //                        nBit =
+        //                            dr["nBit"] != DBNull.Value &&
+        //                            Convert.ToBoolean(
+        //                                dr["nBit"]),
 
 
-                                // =====================================
-                                // SA BIT
-                                // =====================================
+        //                        // =====================================
+        //                        // SA BIT
+        //                        // =====================================
 
-                                nSABit =
-                                    dr["nSABit"] != DBNull.Value
-                                        ? Convert.ToBoolean(
-                                            dr["nSABit"])
-                                        : null
-                            };
-                        }
-                    }
-                }
-            }
+        //                        nSABit =
+        //                            dr["nSABit"] != DBNull.Value
+        //                                ? Convert.ToBoolean(
+        //                                    dr["nSABit"])
+        //                                : null
+        //                    };
+        //                }
+        //            }
+        //        }
+        //    }
 
 
-            // =====================================================
-            // PROFILE NOT FOUND
-            // =====================================================
+        //    // =====================================================
+        //    // PROFILE NOT FOUND
+        //    // =====================================================
 
-            if (model == null)
-                return NotFound();
+        //    if (model == null)
+        //        return NotFound();
 
 
-            // =====================================================
-            // SEND ORGANIZATION CODE
-            // =====================================================
+        //    // =====================================================
+        //    // SEND ORGANIZATION CODE
+        //    // =====================================================
 
-            ViewBag.OrgCode = id;
+        //    ViewBag.OrgCode = id;
 
 
-            // =====================================================
-            // OPTIONAL SESSION VALUES
-            // Same parameters as EditProfile
-            // =====================================================
+        //    // =====================================================
+        //    // OPTIONAL SESSION VALUES
+        //    // Same parameters as EditProfile
+        //    // =====================================================
 
-            ViewBag.OrgID = orgId;
+        //    ViewBag.OrgID = orgId;
 
-            ViewBag.OrgName =
-                model.sOrganizationName;
+        //    ViewBag.OrgName =
+        //        model.sOrganizationName;
 
-            ViewBag.OrgEmail =
-                model.sOrganizationEmail;
+        //    ViewBag.OrgEmail =
+        //        model.sOrganizationEmail;
 
 
-            // =====================================================
-            // RETURN VIEW
-            // =====================================================
+        //    // =====================================================
+        //    // RETURN VIEW
+        //    // =====================================================
 
-            return View(model);
-        }
+        //    return View(model);
+        //}
 
         #region "Org dashboard Table inner data table matching on count"
         // =========================================================
@@ -5750,6 +5738,43 @@ WHERE nID = @nID
             }
 
             return View(trainees);
+        }
+
+        [HttpGet]
+        [Route("Organization/ViewOrgProfile/{id?}")]
+        public IActionResult ViewOrgProfile(string? id)
+        {
+            int? orgID = HttpContext.Session.GetInt32("OrgID");
+
+            if (!orgID.HasValue)
+            {
+                return RedirectToAction("OrganizationLogin", "Account");
+            }
+
+            // Use the URL ID when provided; otherwise use the logged-in organization ID.
+            string profileId = string.IsNullOrWhiteSpace(id)
+                ? orgID.Value.ToString()
+                : id;
+
+            OrgProfile? model =
+                _repository.GetOrganizationProfileByCode(profileId);
+
+            if (model == null)
+            {
+                return NotFound("Organization profile not found.");
+            }
+
+            // Organization users can view only their own profile.
+            if (model.nOrgID != orgID.Value)
+            {
+                return Forbid();
+            }
+
+            ViewData["Title"] = "View Organization Profile";
+            ViewData["Panel"] = "Organization";
+            ViewData["UserName"] = model.sOrganizationName;
+
+            return View("~/Views/Organization/ViewOrgProfile.cshtml", model);
         }
     }
 }

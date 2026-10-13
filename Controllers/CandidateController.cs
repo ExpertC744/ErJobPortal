@@ -5985,6 +5985,27 @@ ORDER BY
         {
             return View();
         }
+
+        [HttpGet]
+        [Route("Candidate/ViewOrgProfile/{id}")]
+        public IActionResult ViewOrgProfile(string id)
+        {
+            int? candidateID = HttpContext.Session.GetInt32("CandidateID");
+
+            if (!candidateID.HasValue)
+                return RedirectToAction("CandidateLogin", "Account");
+
+            OrgProfile? model = _repository.GetOrganizationProfileByCode(id);
+
+            if (model == null)
+                return NotFound("Organization profile not found.");
+
+            ViewData["Title"] = "View Organization Profile";
+            ViewData["Panel"] = "Candidate";
+            ViewData["UserName"] = "Candidate";
+
+            return View("~/Views/Organization/ViewOrgProfile.cshtml", model);
+        }
     }
 }
 
