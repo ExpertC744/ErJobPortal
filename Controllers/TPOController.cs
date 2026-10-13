@@ -2942,14 +2942,23 @@ namespace ErJobPortal.Controllers
             // GET TPO COLLEGE
             // =====================================================
 
-            int collegeId = 0;
+            
 
-            if (tpo.CollegeName != null)
+            string collegeName = tpo.CollegeName?.Trim() ?? "";
+
+            if (string.IsNullOrWhiteSpace(collegeName))
             {
-                collegeId =
-                    Convert.ToInt32(
-                        tpo.CollegeName);
+                TempData["Error"] = "College information is not available.";
+                return RedirectToAction("TPODashboard");
             }
+
+            // IMPORTANT:
+            // GetTPOTraineesByCollege expects a numeric CollegeId.
+            // Do not convert CollegeName to an integer.
+            // Resolve the real CollegeId from your existing college
+            // table/repository mapping before creating the filter.
+
+            int collegeId = 0;
 
 
             if (collegeId <= 0)
@@ -3930,13 +3939,35 @@ if (tpoId == null || tpoId <= 0)
                         {
                             activity.TPOID = tpoId.Value;
 
-                            _schedulerRepository.SaveGeneralActivity(
-                                activity, tpoId.Value);
+                            if (activity.ActivityID > 0)
+                            {
+                                bool updated = _schedulerRepository.UpdateGeneralActivity(
+                                    activity, tpoId.Value);
 
-                            TempData["SchedulerSuccess"] =
-                                "General activity saved successfully.";
+                                if (!updated)
+                                {
+                                    ModelState.AddModelError(
+                                        string.Empty,
+                                        "Activity not found or you are not authorized to edit it.");
+                                }
+                                else
+                                {
+                                    TempData["SchedulerSuccess"] =
+                                        "General activity updated successfully.";
 
-                            return RedirectToAction(nameof(Scheduler));
+                                    return RedirectToAction(nameof(Scheduler));
+                                }
+                            }
+                            else
+                            {
+                                _schedulerRepository.SaveGeneralActivity(
+                                    activity, tpoId.Value);
+
+                                TempData["SchedulerSuccess"] =
+                                    "General activity saved successfully.";
+
+                                return RedirectToAction(nameof(Scheduler));
+                            }
                         }
                     }
                     else if (model.ActivityType == "PlacementDrive")
@@ -4021,27 +4052,148 @@ if (tpoId == null || tpoId <= 0)
 
 
 
+
+
+
+        // shrirang 10/10/26
+
+
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult DeletePlacementDrive(int id)
+        [Route("TPO/CancelGeneralActivity")]
+        public IActionResult CancelGeneralActivity(int id)
         {
             int? tpoId = HttpContext.Session.GetInt32("TPOID");
 
             if (tpoId == null || tpoId <= 0)
+                return Unauthorized("Your TPO session has expired.");
+
+            if (id <= 0)
+                return BadRequest("Invalid activity ID.");
+
+            try
             {
-                return RedirectToAction("TPOLogin", "Account");
+                bool result = _schedulerRepository.CancelGeneralActivity(id, tpoId.Value);
+
+                if (!result)
+                    return NotFound("Activity not found or already cancelled.");
+
+                return Ok("Activity cancelled successfully.");
             }
-
-            bool deleted = _schedulerRepository.DeletePlacementDrive(
-                id, tpoId.Value);
-
-            TempData[deleted ? "SchedulerSuccess" : "SchedulerError"] =
-                deleted
-                    ? "Placement drive deleted successfully."
-                    : "Placement drive not found or already deleted.";
-
-            return RedirectToAction(nameof(Scheduler));
+            catch (Exception ex)
+            {
+                // Log ex using your application's logger.
+                return StatusCode(500, "Unable to cancel the activity.");
+            }
         }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        [Route("TPO/UncancelGeneralActivity")]
+        public IActionResult UncancelGeneralActivity(int id)
+        {
+            int? tpoId = HttpContext.Session.GetInt32("TPOID");
+
+            if (tpoId == null || tpoId <= 0)
+                return Unauthorized("Your TPO session has expired.");
+
+            if (id <= 0)
+                return BadRequest("Invalid activity ID.");
+
+            try
+            {
+                bool result = _schedulerRepository.UncancelGeneralActivity(id, tpoId.Value);
+
+                if (!result)
+                    return NotFound("Activity not found or not eligible for restoration.");
+
+                return Ok("Activity restored successfully.");
+            }
+            catch (Exception ex)
+            {
+                // Log ex using your application's logger.
+                return StatusCode(500, "Unable to restore the activity.");
+            }
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        [Route("TPO/CancelPlacementDrive")]
+        public IActionResult CancelPlacementDrive(int id)
+        {
+            int? tpoId = HttpContext.Session.GetInt32("TPOID");
+
+            if (tpoId == null || tpoId <= 0)
+                return Unauthorized("Your TPO session has expired.");
+
+            if (id <= 0)
+                return BadRequest("Invalid placement drive ID.");
+
+            try
+            {
+                bool result = _schedulerRepository.CancelPlacementDrive(id, tpoId.Value);
+
+                if (!result)
+                    return NotFound("Placement drive not found or already cancelled.");
+
+                return Ok("Placement drive cancelled successfully.");
+            }
+            catch (Exception ex)
+            {
+                // Log ex using your application's logger.
+                return StatusCode(500, "Unable to cancel the placement drive.");
+            }
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        [Route("TPO/UncancelPlacementDrive")]
+        public IActionResult UncancelPlacementDrive(int id)
+        {
+            int? tpoId = HttpContext.Session.GetInt32("TPOID");
+
+            if (tpoId == null || tpoId <= 0)
+                return Unauthorized("Your TPO session has expired.");
+
+            if (id <= 0)
+                return BadRequest("Invalid placement drive ID.");
+
+            try
+            {
+                bool result = _schedulerRepository.UncancelPlacementDrive(id, tpoId.Value);
+
+                if (!result)
+                    return NotFound("Placement drive not found or not eligible for restoration.");
+
+                return Ok("Placement drive restored successfully.");
+            }
+            catch (Exception ex)
+            {
+                // Log ex using your application's logger.
+                return StatusCode(500, "Unable to restore the placement drive.");
+            }
+        }
+
+
+        [HttpGet]
+        [Route("TPO/GeneralActivityDetails")]
+        public IActionResult GeneralActivityDetails(int id)
+        {
+            int? tpoId = HttpContext.Session.GetInt32("TPOID");
+
+            if (tpoId == null || tpoId <= 0)
+                return RedirectToAction("TPOLogin", "Account");
+
+            var activity = _schedulerRepository
+                .GetGeneralActivities(tpoId.Value)
+                .FirstOrDefault(a => a.ActivityID == id);
+
+            if (activity == null)
+                return NotFound("Activity not found or you are not authorized to view it.");
+
+            return View("GeneralActivityDetails", activity);
+        }
+
 
     }
 }

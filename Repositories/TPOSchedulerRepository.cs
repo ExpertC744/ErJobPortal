@@ -62,15 +62,16 @@ namespace ErJobPortal.Repositories
             var activities = new List<TPOSchedulerActivityM>();
 
             const string query = @"
-            SELECT
-                ActivityID, TPOID, Title, Category, Description,
-                StartDate, EndDate, StartTime, EndTime,
-                Location, Participants, Reminder,
-                ReminderChannel, Status, CreatedDate, ModifiedDate
-            FROM dbo.tblTPOSchedulerActivity
-            WHERE TPOID = @TPOID
-              AND IsActive = 1
-            ORDER BY StartDate, StartTime, ActivityID;";
+    SELECT
+        ActivityID, TPOID, Title, Category, Description,
+        StartDate, EndDate, StartTime, EndTime,
+        Location, Participants, Reminder,
+        ReminderChannel, Status, CreatedDate, ModifiedDate,
+        IsCancelled
+    FROM dbo.tblTPOSchedulerActivity
+    WHERE TPOID = @TPOID
+      AND IsActive = 1
+    ORDER BY StartDate, StartTime, ActivityID;";
 
             using (SqlConnection cn = _db.GetConnection())
             using (SqlCommand cmd = new SqlCommand(query, cn))
@@ -98,7 +99,8 @@ namespace ErJobPortal.Repositories
                             Participants = GetString(reader, "Participants"),
                             Reminder = GetNullableString(reader, "Reminder"),
                             ReminderChannel = GetNullableString(reader, "ReminderChannel"),
-                            Status = GetString(reader, "Status")
+                            Status = GetString(reader, "Status"),
+                            IsCancelled = Convert.ToBoolean(reader["IsCancelled"])
                         });
                     }
                 }
@@ -150,26 +152,95 @@ namespace ErJobPortal.Repositories
         // =========================================================
         // GENERAL ACTIVITY - SOFT DELETE
         // =========================================================
-        public bool DeleteGeneralActivity(int activityId, int tpoId)
+
+        public bool CancelGeneralActivity(int activityId, int tpoId)
         {
             const string query = @"
-            UPDATE dbo.tblTPOSchedulerActivity
-            SET IsActive = 0,
-                ModifiedDate = SYSDATETIME()
-            WHERE ActivityID = @ActivityID
-              AND TPOID = @TPOID
-              AND IsActive = 1;";
+        UPDATE dbo.tblTPOSchedulerActivity
+        SET IsCancelled = 1,
+            ModifiedDate = SYSDATETIME()
+        WHERE ActivityID = @ID
+          AND TPOID = @TPOID
+          AND IsActive = 1
+          AND IsCancelled = 0;";
 
             using (SqlConnection cn = _db.GetConnection())
             using (SqlCommand cmd = new SqlCommand(query, cn))
             {
-                cmd.Parameters.Add("@ActivityID", SqlDbType.Int).Value = activityId;
+                cmd.Parameters.Add("@ID", SqlDbType.Int).Value = activityId;
                 cmd.Parameters.Add("@TPOID", SqlDbType.Int).Value = tpoId;
 
                 cn.Open();
                 return cmd.ExecuteNonQuery() > 0;
             }
         }
+
+        public bool UncancelGeneralActivity(int activityId, int tpoId)
+        {
+            const string query = @"
+        UPDATE dbo.tblTPOSchedulerActivity
+        SET IsCancelled = 0,
+            ModifiedDate = SYSDATETIME()
+        WHERE ActivityID = @ID
+          AND TPOID = @TPOID
+          AND IsActive = 1
+          AND IsCancelled = 1;";
+
+            using (SqlConnection cn = _db.GetConnection())
+            using (SqlCommand cmd = new SqlCommand(query, cn))
+            {
+                cmd.Parameters.Add("@ID", SqlDbType.Int).Value = activityId;
+                cmd.Parameters.Add("@TPOID", SqlDbType.Int).Value = tpoId;
+
+                cn.Open();
+                return cmd.ExecuteNonQuery() > 0;
+            }
+        }
+
+        public bool CancelPlacementDrive(int placementDriveId, int tpoId)
+        {
+            const string query = @"
+        UPDATE dbo.tblTPOSchedulerPlacementDrive
+        SET IsCancelled = 1,
+            ModifiedDate = SYSDATETIME()
+        WHERE PlacementDriveID = @ID
+          AND TPOID = @TPOID
+          AND IsActive = 1
+          AND IsCancelled = 0;";
+
+            using (SqlConnection cn = _db.GetConnection())
+            using (SqlCommand cmd = new SqlCommand(query, cn))
+            {
+                cmd.Parameters.Add("@ID", SqlDbType.Int).Value = placementDriveId;
+                cmd.Parameters.Add("@TPOID", SqlDbType.Int).Value = tpoId;
+
+                cn.Open();
+                return cmd.ExecuteNonQuery() > 0;
+            }
+        }
+
+        public bool UncancelPlacementDrive(int placementDriveId, int tpoId)
+        {
+            const string query = @"
+        UPDATE dbo.tblTPOSchedulerPlacementDrive
+        SET IsCancelled = 0,
+            ModifiedDate = SYSDATETIME()
+        WHERE PlacementDriveID = @ID
+          AND TPOID = @TPOID
+          AND IsActive = 1
+          AND IsCancelled = 1;";
+
+            using (SqlConnection cn = _db.GetConnection())
+            using (SqlCommand cmd = new SqlCommand(query, cn))
+            {
+                cmd.Parameters.Add("@ID", SqlDbType.Int).Value = placementDriveId;
+                cmd.Parameters.Add("@TPOID", SqlDbType.Int).Value = tpoId;
+
+                cn.Open();
+                return cmd.ExecuteNonQuery() > 0;
+            }
+        }
+
 
         // =========================================================
         // PLACEMENT DRIVE - INSERT
@@ -224,18 +295,19 @@ namespace ErJobPortal.Repositories
             var drives = new List<TPOSchedulerPlacementDriveM>();
 
             const string query = @"
-            SELECT
-                PlacementDriveID, TPOID, CompanyName, JobPosition,
-                JobType, Salary, JobLocation, RequiredSkills,
-                JobDescription, EligibleCourse, TenthPercentage,
-                TwelfthPercentage, MinimumPercentage, GraduationYear,
-                EligibilityCriteria, StartDate, EndDate, StartTime,
-                EndTime, Venue, ContactPerson, ContactEmail,
-                ContactPhone, Participants, PublicationStatus, Instructions
-            FROM dbo.tblTPOSchedulerPlacementDrive
-            WHERE TPOID = @TPOID
-              AND IsActive = 1
-            ORDER BY StartDate, StartTime, PlacementDriveID;";
+    SELECT
+        PlacementDriveID, TPOID, CompanyName, JobPosition,
+        JobType, Salary, JobLocation, RequiredSkills,
+        JobDescription, EligibleCourse, TenthPercentage,
+        TwelfthPercentage, MinimumPercentage, GraduationYear,
+        EligibilityCriteria, StartDate, EndDate, StartTime,
+        EndTime, Venue, ContactPerson, ContactEmail,
+        ContactPhone, Participants, PublicationStatus, Instructions,
+        IsCancelled
+    FROM dbo.tblTPOSchedulerPlacementDrive
+    WHERE TPOID = @TPOID
+      AND IsActive = 1
+    ORDER BY StartDate, StartTime, PlacementDriveID;";
 
             using (SqlConnection cn = _db.GetConnection())
             using (SqlCommand cmd = new SqlCommand(query, cn))
@@ -280,7 +352,8 @@ namespace ErJobPortal.Repositories
                             ContactPhone = GetNullableString(reader, "ContactPhone"),
                             Participants = GetNullableString(reader, "Participants"),
                             PublicationStatus = GetString(reader, "PublicationStatus"),
-                            Instructions = GetNullableString(reader, "Instructions")
+                            Instructions = GetNullableString(reader, "Instructions"),
+                            IsCancelled = Convert.ToBoolean(reader["IsCancelled"])
                         });
                     }
                 }
@@ -344,26 +417,26 @@ namespace ErJobPortal.Repositories
         // =========================================================
         // PLACEMENT DRIVE - SOFT DELETE
         // =========================================================
-        public bool DeletePlacementDrive(int placementDriveId, int tpoId)
-        {
-            const string query = @"
-            UPDATE dbo.tblTPOSchedulerPlacementDrive
-            SET IsActive = 0,
-                ModifiedDate = SYSDATETIME()
-            WHERE PlacementDriveID = @PlacementDriveID
-              AND TPOID = @TPOID
-              AND IsActive = 1;";
+        //public bool DeletePlacementDrive(int placementDriveId, int tpoId)
+        //{
+        //    const string query = @"
+        //    UPDATE dbo.tblTPOSchedulerPlacementDrive
+        //    SET IsActive = 0,
+        //        ModifiedDate = SYSDATETIME()
+        //    WHERE PlacementDriveID = @PlacementDriveID
+        //      AND TPOID = @TPOID
+        //      AND IsActive = 1;";
 
-            using (SqlConnection cn = _db.GetConnection())
-            using (SqlCommand cmd = new SqlCommand(query, cn))
-            {
-                cmd.Parameters.Add("@PlacementDriveID", SqlDbType.Int).Value = placementDriveId;
-                cmd.Parameters.Add("@TPOID", SqlDbType.Int).Value = tpoId;
+        //    using (SqlConnection cn = _db.GetConnection())
+        //    using (SqlCommand cmd = new SqlCommand(query, cn))
+        //    {
+        //        cmd.Parameters.Add("@PlacementDriveID", SqlDbType.Int).Value = placementDriveId;
+        //        cmd.Parameters.Add("@TPOID", SqlDbType.Int).Value = tpoId;
 
-                cn.Open();
-                return cmd.ExecuteNonQuery() > 0;
-            }
-        }
+        //        cn.Open();
+        //        return cmd.ExecuteNonQuery() > 0;
+        //    }
+        //}
 
         // =========================================================
         // GENERAL ACTIVITY PARAMETERS
@@ -540,6 +613,111 @@ namespace ErJobPortal.Repositories
                 ? (decimal?)null
                 : Convert.ToDecimal(reader[column]);
         }
+
+
+
+        public List<TPOSchedulerReminderM> GetDueGeneralActivityReminders()
+        {
+            var reminders = new List<TPOSchedulerReminderM>();
+
+            const string query = @"
+        SELECT
+            a.ActivityID,
+            a.TPOID,
+            a.Title,
+            a.Description,
+            a.Location,
+            a.StartDate,
+            a.StartTime,
+            a.Reminder,
+            a.ReminderChannel,
+            t.FullName AS TPOName,
+            t.CollegeMailID AS TPOEmail,
+
+            DATEADD(SECOND,
+                DATEDIFF(SECOND, CAST('00:00:00' AS TIME), a.StartTime),
+                CAST(a.StartDate AS DATETIME2)
+            ) AS ActivityStart,
+
+            DATEADD(MINUTE,
+                -TRY_CONVERT(INT, a.Reminder),
+                DATEADD(SECOND,
+                    DATEDIFF(SECOND, CAST('00:00:00' AS TIME), a.StartTime),
+                    CAST(a.StartDate AS DATETIME2)
+                )
+            ) AS ReminderDueAt
+
+        FROM dbo.tblTPOSchedulerActivity a
+        INNER JOIN dbo.tblTPORegistration t
+            ON t.TPOID = a.TPOID
+
+        WHERE
+            a.IsActive = 1
+            AND ISNULL(a.IsCancelled, 0) = 0
+            AND ISNULL(a.Status, '') <> 'Cancelled'
+            AND TRY_CONVERT(INT, a.Reminder) IN (15, 30, 60, 1440, 10080)
+            AND UPPER(ISNULL(a.ReminderChannel, '')) IN
+                ('INAPP', 'EMAIL', 'BOTH')
+            AND a.StartDate IS NOT NULL
+            AND a.StartTime IS NOT NULL
+
+            -- Activity must still be in the future.
+            AND DATEADD(SECOND,
+                DATEDIFF(SECOND, CAST('00:00:00' AS TIME), a.StartTime),
+                CAST(a.StartDate AS DATETIME2)
+            ) > SYSDATETIME()
+
+            -- Reminder is due now or overdue, but activity is upcoming.
+            AND DATEADD(MINUTE,
+                -TRY_CONVERT(INT, a.Reminder),
+                DATEADD(SECOND,
+                    DATEDIFF(SECOND, CAST('00:00:00' AS TIME), a.StartTime),
+                    CAST(a.StartDate AS DATETIME2)
+                )
+            ) <= SYSDATETIME()
+
+        ORDER BY ReminderDueAt, a.ActivityID;";
+
+            using (SqlConnection cn = _db.GetConnection())
+            using (SqlCommand cmd = new SqlCommand(query, cn))
+            {
+                cn.Open();
+
+                using (SqlDataReader reader = cmd.ExecuteReader())
+                {
+                    while (reader.Read())
+                    {
+                        reminders.Add(new TPOSchedulerReminderM
+                        {
+                            ActivityID = Convert.ToInt32(reader["ActivityID"]),
+                            TPOID = Convert.ToInt32(reader["TPOID"]),
+                            Title = reader["Title"]?.ToString() ?? "",
+                            Description = reader["Description"] == DBNull.Value
+                                ? null : reader["Description"].ToString(),
+                            Location = reader["Location"] == DBNull.Value
+                                ? null : reader["Location"].ToString(),
+
+                            StartDate = Convert.ToDateTime(reader["StartDate"]),
+                            StartTime = (TimeSpan)reader["StartTime"],
+
+                            Reminder = reader["Reminder"]?.ToString(),
+                            ReminderChannel = reader["ReminderChannel"]?.ToString(),
+
+                            TPOName = reader["TPOName"] == DBNull.Value
+                                ? null : reader["TPOName"].ToString(),
+                            TPOEmail = reader["TPOEmail"] == DBNull.Value
+                                ? null : reader["TPOEmail"].ToString(),
+
+                            ActivityStart = Convert.ToDateTime(reader["ActivityStart"]),
+                            ReminderDueAt = Convert.ToDateTime(reader["ReminderDueAt"])
+                        });
+                    }
+                }
+            }
+
+            return reminders;
+        }
+
     }
 
 
