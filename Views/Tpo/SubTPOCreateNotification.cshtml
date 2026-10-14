@@ -1,0 +1,711 @@
+﻿@using Microsoft.AspNetCore.Http
+
+@{
+    Layout = "~/Views/Shared/_DashboardLayout.cshtml";
+
+    ViewData["Title"] = "Sub-TPO - Create Notification";
+    ViewData["Panel"] = "TPO";
+
+    ViewData["UserName"] =
+        Context.Session.GetString("TPOName") ?? "Sub-TPO";
+}
+
+
+<link rel="stylesheet"
+      href="~/css/TPOCreateNotification.css"
+      asp-append-version="true" />
+
+<div class="notification-page">
+
+    <div class="notification-card">
+
+        <!-- Header -->
+        <div class="notification-header">
+
+            <div class="notification-header-icon">
+                <i class="fas fa-bell"></i>
+            </div>
+
+            <div>
+               <h1>Create Notification</h1>
+               <p>Create a notification or event for students.</p>
+            </div>
+
+        </div>
+
+
+      
+<form asp-controller="TPO"
+      asp-action="SubTPOCreateNotification"
+      method="post"
+      enctype="multipart/form-data"
+      id="notificationForm">
+
+    @Html.AntiForgeryToken()
+
+
+
+            <!-- Title -->
+            <div class="form-group full-width">
+
+                <label for="Title">
+                    Title
+                    <span>*</span>
+                </label>
+
+                <div class="input-box">
+
+                    <i class="fas fa-heading"></i>
+
+                    <input type="text"
+                           id="Title"
+                           name="Title"
+                           placeholder="e.g. Campus Drive – TCS"
+                           required />
+
+                </div>
+
+            </div>
+
+
+            <!-- Type + Audience -->
+            <div class="form-row">
+
+                <!-- Type -->
+                <div class="form-group">
+
+                    <label for="Type">
+                        Type
+                        <span>*</span>
+                    </label>
+
+                    <div class="input-box">
+
+                        <i class="fas fa-layer-group"></i>
+
+                        <select id="Type"
+                                name="Type"
+                                required>
+
+                            <option value="">Select Type</option>
+                            <option value="Notification">Notification / Event</option>
+
+                        </select>
+
+                    </div>
+
+                </div>
+
+
+                <!-- Audience -->
+                <div class="form-group">
+
+                    <label for="Audience">
+                        Audience
+                        <span>*</span>
+                    </label>
+
+                    <div class="input-box">
+
+                        <i class="fas fa-users"></i>
+
+                        <select id="Audience"
+                                name="Audience"
+                                required>
+
+                            <option value="">Select Audience</option>
+                            <option value="AllStudents">All Students</option>
+
+                        </select>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <!-- Date + Time -->
+            <div class="form-row">
+
+                <!-- Date -->
+                <div class="form-group">
+
+                    <label for="Date">
+                        Date
+                    </label>
+
+                    <div class="input-box">
+
+                        <i class="fas fa-calendar-days"></i>
+
+                        <input type="date"
+                               id="Date"
+                               name="Date" />
+
+                    </div>
+
+                </div>
+
+
+                <!-- Time -->
+                <div class="form-group">
+
+                    <label for="Time">
+                        Time
+                    </label>
+
+                    <div class="input-box">
+
+                        <i class="fas fa-clock"></i>
+
+                        <input type="time"
+                               id="Time"
+                               name="Time" />
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <!-- Content -->
+            <div class="form-group full-width">
+
+                <label for="Content">
+                    Content
+                    <span>*</span>
+                </label>
+
+                <div class="editor-box">
+
+                    <div class="editor-toolbar">
+
+                        <button type="button"
+                                data-command="bold"
+                                title="Bold">
+                            <i class="fas fa-bold"></i>
+                        </button>
+
+                        <button type="button"
+                                data-command="italic"
+                                title="Italic">
+                            <i class="fas fa-italic"></i>
+                        </button>
+
+                        <button type="button"
+                                data-command="underline"
+                                title="Underline">
+                            <i class="fas fa-underline"></i>
+                        </button>
+
+                        <div class="toolbar-line"></div>
+
+                        <button type="button"
+                                data-command="insertUnorderedList"
+                                title="Bullet List">
+                            <i class="fas fa-list-ul"></i>
+                        </button>
+
+                        <button type="button"
+                                data-command="insertOrderedList"
+                                title="Numbered List">
+                            <i class="fas fa-list-ol"></i>
+                        </button>
+
+                        <div class="toolbar-line"></div>
+
+                        <button type="button"
+                                id="linkButton"
+                                title="Insert Link">
+                            <i class="fas fa-link"></i>
+                        </button>
+
+                        <button type="button"
+                                data-command="removeFormat"
+                                title="Remove Formatting">
+                            <i class="fas fa-eraser"></i>
+                        </button>
+
+                    </div>
+
+
+                    <div id="contentEditor"
+                         class="editor-content"
+                         contenteditable="true"
+                         data-placeholder="Write event or notification details here...">
+                    </div>
+
+                </div>
+
+                <!-- Actual MVC field -->
+                <textarea id="Content"
+                          name="Content"
+                          hidden></textarea>
+
+                <small class="validation-message"
+                       id="contentError"></small>
+
+            </div>
+
+
+            <!-- Email Notification -->
+            <div class="form-group full-width">
+
+                <label class="checkbox-label">
+
+                    <input type="hidden"
+                           name="SendEmailNotification"
+                           value="false" />
+
+                    <input type="checkbox"
+                           id="SendEmailNotification"
+                           name="SendEmailNotification"
+                           value="true" />
+
+                    <span class="checkmark">
+                        <i class="fas fa-check"></i>
+                    </span>
+
+                    <span class="checkbox-text">
+                        <strong>Send Email Notification</strong>
+                        <small>
+                            Send this notification to the selected audience by email.
+                        </small>
+                    </span>
+
+                </label>
+
+            </div>
+
+
+            <div class="form-group full-width">
+
+                <label for="AttachFile1">
+                    Attach File 1
+                </label>
+
+                <div class="upload-box">
+
+                    <input type="file"
+                           id="AttachFile1"
+                           name="AttachFile1"
+                           accept=".pdf,.doc,.docx,.jpg,.jpeg,.png" />
+
+                    <label for="AttachFile1"
+                           class="upload-label">
+
+                        <div class="upload-icon">
+                            <i class="fas fa-cloud-arrow-up"></i>
+                        </div>
+
+                        <div class="upload-text">
+
+                            <strong>Choose a file</strong>
+
+                            <span>
+                                PDF, DOC, DOCX, JPG or PNG
+                            </span>
+
+                        </div>
+
+                        <div class="browse-button">
+                            Browse
+                        </div>
+
+                    </label>
+
+                    <div class="file-name"
+                         id="fileName1">
+
+                        <i class="fas fa-paperclip"></i>
+
+                        <span>No file selected</span>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+
+            <div class="form-group full-width">
+
+                <label for="AttachFile2">
+                    Attach File 2
+                </label>
+
+                <div class="upload-box">
+
+                    <input type="file"
+                           id="AttachFile2"
+                           name="AttachFile2"
+                           accept=".pdf,.doc,.docx,.jpg,.jpeg,.png" />
+
+                    <label for="AttachFile2"
+                           class="upload-label">
+
+                        <div class="upload-icon">
+                            <i class="fas fa-cloud-arrow-up"></i>
+                        </div>
+
+                        <div class="upload-text">
+
+                            <strong>Choose a file</strong>
+
+                            <span>
+                                PDF, DOC, DOCX, JPG or PNG
+                            </span>
+
+                        </div>
+
+                        <div class="browse-button">
+                            Browse
+                        </div>
+
+                    </label>
+
+                    <div class="file-name"
+                         id="fileName2">
+
+                        <i class="fas fa-paperclip"></i>
+
+                        <span>No file selected</span>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+            <!-- Attach File -->
+            <div class="form-group full-width">
+
+                <label for="AttachFile">
+                    Attach File
+                </label>
+
+                <div class="upload-box">
+
+                    <input type="file"
+                           id="AttachFile"
+                           name="AttachFile"
+                           accept=".pdf,.doc,.docx,.jpg,.jpeg,.png" />
+
+                    <label for="AttachFile"
+                           class="upload-label">
+
+                        <div class="upload-icon">
+                            <i class="fas fa-cloud-arrow-up"></i>
+                        </div>
+
+                        <div class="upload-text">
+
+                            <strong>Choose a file</strong>
+
+                            <span>
+                                PDF, DOC, DOCX, JPG or PNG
+                            </span>
+
+                        </div>
+
+                        <div class="browse-button">
+                            Browse
+                        </div>
+
+                    </label>
+
+                    <div class="file-name"
+                         id="fileName">
+
+                        <i class="fas fa-paperclip"></i>
+
+                        <span>No file selected</span>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <!-- Buttons -->
+            <div class="form-actions">
+
+                <button type="reset"
+                        class="btn-reset">
+
+                    <i class="fas fa-rotate-left"></i>
+
+                    Reset
+
+                </button>
+
+                <button type="submit"
+                        class="btn-save">
+
+                    <i class="fas fa-paper-plane"></i>
+
+                    Save &amp; Create
+
+                </button>
+
+            </div>
+
+        </form>
+
+    </div>
+
+</div>
+
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+
+    const editor = document.getElementById("contentEditor");
+    const content = document.getElementById("Content");
+    const form = document.getElementById("notificationForm");
+    const contentError = document.getElementById("contentError");
+    const submitButton = form.querySelector('button[type="submit"]');
+
+    if (!editor || !content || !form) {
+        console.error("Notification form, editor, or Content field is missing.");
+        return;
+    }
+
+    // =========================================
+    // SYNCHRONIZE EDITOR WITH MVC FIELD
+    // =========================================
+
+    function syncContent() {
+        content.value = editor.innerHTML;
+    }
+
+    editor.addEventListener("input", function () {
+        syncContent();
+
+        if (editor.innerText.trim() !== "") {
+            contentError.textContent = "";
+            document.querySelector(".editor-box")
+                .classList.remove("editor-error");
+        }
+    });
+
+    // =========================================
+    // RICH TEXT TOOLBAR
+    // =========================================
+
+    document.querySelectorAll(
+        ".editor-toolbar button[data-command]"
+    ).forEach(function (button) {
+
+        button.addEventListener("click", function () {
+            editor.focus();
+
+            document.execCommand(
+                this.dataset.command,
+                false,
+                null
+            );
+
+            syncContent();
+        });
+    });
+
+    // =========================================
+    // INSERT LINK
+    // =========================================
+
+    const linkButton = document.getElementById("linkButton");
+
+    if (linkButton) {
+        linkButton.addEventListener("click", function () {
+            editor.focus();
+
+            const url = prompt("Enter URL:");
+
+            if (!url || !url.trim()) {
+                return;
+            }
+
+            try {
+                const parsedUrl = new URL(url.trim());
+
+                if (!["http:", "https:"].includes(parsedUrl.protocol)) {
+                    alert("Please enter a valid HTTP or HTTPS URL.");
+                    return;
+                }
+
+                document.execCommand(
+                    "createLink",
+                    false,
+                    parsedUrl.href
+                );
+
+                syncContent();
+
+            } catch (error) {
+                alert("Please enter a valid URL.");
+            }
+        });
+    }
+
+    // =========================================
+    // ATTACHMENT FILENAMES
+    // =========================================
+
+    const attachmentFields = [
+        { input: "AttachFile1", display: "fileName1" },
+        { input: "AttachFile2", display: "fileName2" },
+        { input: "AttachFile", display: "fileName" }
+    ];
+
+    attachmentFields.forEach(function (item) {
+
+        const input = document.getElementById(item.input);
+        const display = document.getElementById(item.display);
+
+        if (!input || !display) {
+            return;
+        }
+
+        input.addEventListener("change", function () {
+            const span = display.querySelector("span");
+
+            if (span) {
+                span.textContent = this.files.length > 0
+                    ? this.files[0].name
+                    : "No file selected";
+            }
+        });
+    });
+
+    // =========================================
+    // FORM VALIDATION AND SUBMISSION
+    // =========================================
+
+    form.addEventListener("submit", function (event) {
+
+        // IMPORTANT: Copy content immediately before POST.
+        syncContent();
+
+        console.log("Editor HTML:", editor.innerHTML);
+        console.log("Content submitted:", content.value);
+
+        const title = document.getElementById("Title");
+        const type = document.getElementById("Type");
+        const audience = document.getElementById("Audience");
+
+        const contentText = editor.innerText
+            .replace(/\u00a0/g, " ")
+            .trim();
+
+        let valid = true;
+
+        [title, type, audience].forEach(function (element) {
+            element.classList.remove("error");
+        });
+
+        if (!title.value.trim()) {
+            title.classList.add("error");
+            valid = false;
+        }
+
+        if (!type.value) {
+            type.classList.add("error");
+            valid = false;
+        }
+
+        if (!audience.value) {
+            audience.classList.add("error");
+            valid = false;
+        }
+
+        if (!contentText) {
+            contentError.textContent = "Content is required.";
+
+            document.querySelector(".editor-box")
+                .classList.add("editor-error");
+
+            editor.focus();
+            valid = false;
+        } else {
+            contentError.textContent = "";
+
+            document.querySelector(".editor-box")
+                .classList.remove("editor-error");
+        }
+
+        if (!valid) {
+            event.preventDefault();
+            return;
+        }
+
+        // Keep the button enabled if the browser cancels navigation.
+        submitButton.disabled = true;
+        submitButton.textContent = "Submitting...";
+    });
+
+    // =========================================
+    // REMOVE FIELD ERRORS
+    // =========================================
+
+    ["Title", "Type", "Audience"].forEach(function (id) {
+
+        const element = document.getElementById(id);
+
+        element.addEventListener("input", function () {
+            this.classList.remove("error");
+        });
+
+        element.addEventListener("change", function () {
+            this.classList.remove("error");
+        });
+    });
+
+    // =========================================
+    // RESET FORM
+    // =========================================
+
+    form.addEventListener("reset", function () {
+
+        setTimeout(function () {
+
+            editor.innerHTML = "";
+            content.value = "";
+            contentError.textContent = "";
+
+            document.querySelector(".editor-box")
+                .classList.remove("editor-error");
+
+            document.querySelectorAll(".error")
+                .forEach(function (element) {
+                    element.classList.remove("error");
+                });
+
+            attachmentFields.forEach(function (item) {
+                const display = document.getElementById(item.display);
+
+                if (display) {
+                    const span = display.querySelector("span");
+
+                    if (span) {
+                        span.textContent = "No file selected";
+                    }
+                }
+            });
+
+            submitButton.disabled = false;
+            submitButton.innerHTML =
+                '<i class="fas fa-paper-plane"></i> Save &amp; Create';
+
+        }, 0);
+    });
+
+    // Initialize.
+    syncContent();
+
+});
+</script>

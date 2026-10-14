@@ -4148,7 +4148,7 @@
 
 					<a href="javascript:void(0);"
 					   class="sidebar-link"
-					   onclick="toggleSubMenu('notificationSubmenu')">	
+					   onclick="toggleSubMenu('notificationSubmenu')">
 
 						<span class="menu-icon">
 							<i class="fas fa-bell"></i>
@@ -4159,34 +4159,59 @@
 
 					<div class="profile-submenu" id="notificationSubmenu">
 
-						<a asp-controller="TPO"
-						   asp-action="ViewNotificationEvent"
-						   class="profile-submenu-link">
-							View Notification/Event
-						</a>
-
-						<a asp-controller="TPO"
-						   asp-action="CreateNotification"
-						   class="profile-submenu-link">
-							Add Notification/Event
-						</a>
-
-						@if (currentSubTpoBit == "0")
+						@if (isSubTPO)
 						{
+							@* SUB-TPO PAGES *@
+
+							<a asp-controller="TPO"
+							   asp-action="SubTPOViewNotificationEvent"
+							   class="profile-submenu-link">
+								View Notification/Event
+							</a>
+
+							<a asp-controller="TPO"
+							   asp-action="SubTPOCreateNotification"
+							   class="profile-submenu-link">
+								Add Notification/Event
+							</a>
+
+							<a asp-controller="TPO"
+							   asp-action="SubTPOSendNotification"
+							   class="profile-submenu-link">
+								Send Notification/Event
+							</a>
+						}
+						else
+						{
+							@* MAIN TPO PAGES *@
+
+							<a asp-controller="TPO"
+							   asp-action="ViewNotificationEvent"
+							   class="profile-submenu-link">
+								View Notification/Event
+							</a>
+
+							<a asp-controller="TPO"
+							   asp-action="CreateNotification"
+							   class="profile-submenu-link">
+								Add Notification/Event
+							</a>
+
 							<a asp-controller="TPO"
 							   asp-action="NotificationApprovals"
 							   class="profile-submenu-link">
 								Approve Sub-TPO Notifications
 							</a>
+
+							<a asp-controller="TPO"
+							   asp-action="SendNotification"
+							   class="profile-submenu-link">
+								Send Notification/Event
+							</a>
 						}
 
-						<a asp-controller="TPO"
-						   asp-action="SendNotification"
-						   class="profile-submenu-link">
-							Send Notification/Event
-						</a>
-
 					</div>
+
 					
 
 

@@ -1208,15 +1208,15 @@ public IActionResult OrganizationResetPassword()
                 }
 
                 // CHECK OTP
-                if (!tpo.OTPVerified)
-                {
-                    ModelState.AddModelError(
-                        "",
-                        "Your OTP verification is not completed."
-                    );
+                //if (!tpo.OTPVerified)
+                //{
+                //    ModelState.AddModelError(
+                //        "",
+                //        "Your OTP verification is not completed."
+                //    );
 
-                    return View(model);
-                }
+                //    return View(model);
+                //}
 
                 // SET TPO SESSION
                 HttpContext.Session.SetInt32(

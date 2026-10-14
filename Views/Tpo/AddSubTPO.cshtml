@@ -584,6 +584,8 @@
                 }
 
                 // LOAD COLLEGES
+                
+                // LOAD COLLEGES
                 $.ajax({
                     url: '@Url.Action("GetColleges", "Account")',
                     method: "GET",
@@ -599,38 +601,56 @@
                     );
 
                     if (!Array.isArray(data) || data.length === 0) {
-                        setPlaceholder($collegeName, "No colleges available");
-                        $("#collegeStatus").text("No colleges were returned.");
+                        setPlaceholder(
+                            $collegeName,
+                            "No colleges available"
+                        );
+
+                        $("#collegeStatus").text(
+                            "No colleges were returned."
+                        );
                         return;
                     }
 
                     data.forEach(function (college) {
-                        if (!college.sCollegeName) return;
+                        if (college.nID == null ||
+                            !college.sCollegeName) {
+                            return;
+                        }
 
                         $("<option>", {
-                            value: college.sCollegeName,
+                            value: college.nID,
                             text: college.sCollegeName
-                        })
-                        .attr("data-college-id", college.nID)
-                        .appendTo($collegeName);
+                        }).appendTo($collegeName);
                     });
 
                     $("#collegeStatus").text("");
                 })
                 .fail(function (xhr) {
-                    setPlaceholder($collegeName, "Unable to load colleges");
-                    $("#collegeStatus").text("Failed to load colleges.");
+                    setPlaceholder(
+                        $collegeName,
+                        "Unable to load colleges"
+                    );
+
+                    $("#collegeStatus").text(
+                        "Failed to load colleges."
+                    );
+
                     showRequestError("GetColleges", xhr);
                 });
 
+
+                // LOAD COLLEGE CODES WHEN COLLEGE CHANGES
+                
                 // LOAD COLLEGE CODES WHEN COLLEGE CHANGES
                 $collegeName.on("change", function () {
-                    const option = this.options[this.selectedIndex];
-                    const collegeId = option
-                        ? option.getAttribute("data-college-id")
-                        : null;
+                    const collegeId = $(this).val();
 
-                    setPlaceholder($collegeCode, "-- Select College Code --");
+                    setPlaceholder(
+                        $collegeCode,
+                        "-- Select College Code --"
+                    );
+
                     $collegeCode.prop("disabled", true);
                     $("#collegeCodeStatus").text("");
 
@@ -647,7 +667,11 @@
                         console.log("GetCollegeCodes response:", data);
 
                         if (!Array.isArray(data) || data.length === 0) {
-                            setPlaceholder($collegeCode, "No codes available");
+                            setPlaceholder(
+                                $collegeCode,
+                                "No codes available"
+                            );
+
                             $("#collegeCodeStatus").text(
                                 "No college codes were returned."
                             );
@@ -670,12 +694,15 @@
                             $collegeCode,
                             "Unable to load college codes"
                         );
+
                         $("#collegeCodeStatus").text(
                             "Failed to load college codes."
                         );
+
                         showRequestError("GetCollegeCodes", xhr);
                     });
                 });
+
 
                 // LOAD DEPARTMENTS
                 $.ajax({
