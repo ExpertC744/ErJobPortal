@@ -2489,10 +2489,49 @@ public OrganizationLogin? GetOrganizationLoginDetails(string email)
         // INSERT SUB TPO
         // =========================================================
 
+
         public bool InsertSubTPO(TPORegistration model)
         {
+            if (model == null)
+                throw new ArgumentNullException(nameof(model));
+
+            // CollegeName now receives the selected numeric college ID
+            // from the College dropdown.
+            if (!int.TryParse(model.CollegeName, out int collegeId) ||
+                collegeId <= 0)
+            {
+                throw new InvalidOperationException(
+                    "Please select a valid college.");
+            }
+
             using (SqlConnection cn = _db.GetConnection())
             {
+                cn.Open();
+
+                // Validate the selected college.
+                // Change tblCollege if your actual college table has another name.
+                using (SqlCommand checkCmd = new SqlCommand(@"
+            SELECT COUNT(1)
+            FROM tblCollege
+            WHERE nID = @CollegeID
+              AND ISNULL(nBit, 0) = 1;", cn))
+                {
+                    checkCmd.Parameters.Add("@CollegeID", SqlDbType.Int)
+                        .Value = collegeId;
+
+                    int collegeExists =
+                        Convert.ToInt32(checkCmd.ExecuteScalar());
+
+                    if (collegeExists == 0)
+                    {
+                        throw new InvalidOperationException(
+                            "The selected college does not exist or is inactive.");
+                    }
+                }
+
+                // Insert Sub-TPO.
+                // ParentTPOID must be populated by the controller
+                // from the logged-in main TPO's session.
                 string query = @"
             INSERT INTO tblTPORegistration
             (
@@ -2517,7 +2556,8 @@ public OrganizationLogin? GetOrganizationLoginDetails(string email)
                 IsActive,
                 CreatedDate,
                 UpdatedDate,
-                subtopbit
+                subtopbit,
+                ParentTPOID
             )
             VALUES
             (
@@ -2542,138 +2582,100 @@ public OrganizationLogin? GetOrganizationLoginDetails(string email)
                 @IsActive,
                 GETDATE(),
                 GETDATE(),
-                1
-            )";
+                1,
+                @ParentTPOID
+            );";
 
-                using (SqlCommand cmd =
-                       new SqlCommand(query, cn))
+                using (SqlCommand cmd = new SqlCommand(query, cn))
                 {
-                    cmd.Parameters.AddWithValue(
-                        "@FullName",
-                        model.FullName ?? "");
+                    cmd.Parameters.Add("@FullName", SqlDbType.NVarChar, 150)
+                        .Value = (object?)model.FullName ?? DBNull.Value;
 
-                    cmd.Parameters.AddWithValue(
-                        "@CollegeMailID",
-                        model.CollegeMailID ?? "");
+                    cmd.Parameters.Add("@CollegeMailID", SqlDbType.NVarChar, 150)
+                        .Value = (object?)model.CollegeMailID ?? DBNull.Value;
 
-                    cmd.Parameters.AddWithValue(
-                        "@MobileNo",
-                        model.MobileNo ?? "");
+                    cmd.Parameters.Add("@MobileNo", SqlDbType.NVarChar, 20)
+                        .Value = (object?)model.MobileNo ?? DBNull.Value;
 
-                    // =====================================================
-                    // PASSWORD
-                    // =====================================================
+                    // IMPORTANT:
+                    // Store a password hash here, not the raw password.
+                    // Use the same hashing mechanism as your TPO login.
+                    cmd.Parameters.Add("@PasswordHash", SqlDbType.NVarChar, 500)
+                        .Value = (object?)model.Password ?? DBNull.Value;
 
-                    cmd.Parameters.AddWithValue(
-                        "@PasswordHash",
-                        model.Password ?? "");
+                    // Store numeric college ID as text in the existing
+                    // CollegeName column, without changing the schema.
+                    cmd.Parameters.Add("@CollegeName", SqlDbType.NVarChar, 250)
+                        .Value = collegeId.ToString();
 
-                    // =====================================================
-                    // COLLEGE
-                    // =====================================================
+                    cmd.Parameters.Add("@CollegeCode", SqlDbType.NVarChar, 50)
+                        .Value = (object?)model.CollegeCode ?? DBNull.Value;
 
-                    cmd.Parameters.AddWithValue(
-                        "@CollegeName",
-                        model.CollegeName ?? "");
+                    cmd.Parameters.Add("@CollegeAddress", SqlDbType.NVarChar, 500)
+                        .Value = (object?)model.CollegeAddress ?? DBNull.Value;
 
-                    cmd.Parameters.AddWithValue(
-                        "@CollegeCode",
-                        model.CollegeCode ?? "");
+                    cmd.Parameters.Add("@OrganizationWebsiteURL", SqlDbType.NVarChar, 250)
+                        .Value = string.IsNullOrWhiteSpace(model.OrganizationWebsiteURL)
+                            ? DBNull.Value
+                            : (object)model.OrganizationWebsiteURL.Trim();
 
-                    cmd.Parameters.AddWithValue(
-                        "@CollegeAddress",
-                        model.CollegeAddress ?? "");
+                    cmd.Parameters.Add("@Designation", SqlDbType.NVarChar, 150)
+                        .Value = (object?)model.Designation ?? DBNull.Value;
 
-                    cmd.Parameters.AddWithValue(
-                        "@OrganizationWebsiteURL",
-                        string.IsNullOrWhiteSpace(
-                            model.OrganizationWebsiteURL)
-                            ? (object)DBNull.Value
-                            : model.OrganizationWebsiteURL);
+                    cmd.Parameters.Add("@DepartmentName", SqlDbType.NVarChar, 150)
+                        .Value = (object?)model.DepartmentName ?? DBNull.Value;
 
-                    // =====================================================
-                    // PROFESSIONAL
-                    // =====================================================
+                    cmd.Parameters.Add("@CollegeEmployeeID", SqlDbType.NVarChar, 100)
+                        .Value = (object?)model.CollegeEmployeeID ?? DBNull.Value;
 
-                    cmd.Parameters.AddWithValue(
-                        "@Designation",
-                        model.Designation ?? "");
+                    cmd.Parameters.Add("@SupportingDocument1", SqlDbType.NVarChar, 500)
+                        .Value = string.IsNullOrWhiteSpace(model.SupportingDocument1)
+                            ? DBNull.Value
+                            : (object)model.SupportingDocument1;
 
-                    cmd.Parameters.AddWithValue(
-                        "@DepartmentName",
-                        model.DepartmentName ?? "");
+                    cmd.Parameters.Add("@SupportingDocument2", SqlDbType.NVarChar, 500)
+                        .Value = string.IsNullOrWhiteSpace(model.SupportingDocument2)
+                            ? DBNull.Value
+                            : (object)model.SupportingDocument2;
 
-                    cmd.Parameters.AddWithValue(
-                        "@CollegeEmployeeID",
-                        model.CollegeEmployeeID ?? "");
+                    cmd.Parameters.Add("@ProfilePhoto", SqlDbType.NVarChar, 500)
+                        .Value = string.IsNullOrWhiteSpace(model.ProfilePhoto)
+                            ? DBNull.Value
+                            : (object)model.ProfilePhoto;
 
-                    // =====================================================
-                    // DOCUMENTS
-                    // =====================================================
+                    cmd.Parameters.Add("@OTP", SqlDbType.NVarChar, 10)
+                        .Value = string.IsNullOrWhiteSpace(model.OTP)
+                            ? DBNull.Value
+                            : (object)model.OTP;
 
-                    cmd.Parameters.AddWithValue(
-                        "@SupportingDocument1",
-                        string.IsNullOrWhiteSpace(
-                            model.SupportingDocument1)
-                            ? (object)DBNull.Value
-                            : model.SupportingDocument1);
+                    cmd.Parameters.Add("@OTPVerified", SqlDbType.Bit)
+                        .Value = model.OTPVerified;
 
-                    cmd.Parameters.AddWithValue(
-                        "@SupportingDocument2",
-                        string.IsNullOrWhiteSpace(
-                            model.SupportingDocument2)
-                            ? (object)DBNull.Value
-                            : model.SupportingDocument2);
+                    // New Sub-TPO registration awaits approval.
+                    cmd.Parameters.Add("@Status", SqlDbType.NVarChar, 50)
+                        .Value = "Pending";
 
-                    cmd.Parameters.AddWithValue(
-                        "@ProfilePhoto",
-                        string.IsNullOrWhiteSpace(
-                            model.ProfilePhoto)
-                            ? (object)DBNull.Value
-                            : model.ProfilePhoto);
+                    cmd.Parameters.Add("@IsApproved", SqlDbType.Bit)
+                        .Value = false;
 
-                    // =====================================================
-                    // OTP
-                    // =====================================================
+                    cmd.Parameters.Add("@IsActive", SqlDbType.Bit)
+                        .Value = false;
 
-                    cmd.Parameters.AddWithValue(
-                        "@OTP",
-                        string.IsNullOrWhiteSpace(model.OTP)
-                            ? (object)DBNull.Value
-                            : model.OTP);
+                    // ParentTPOID must be set by the controller.
+                    if (model.ParentTPOID <= 0)
+                    {
+                        throw new InvalidOperationException(
+                            "The parent TPO could not be identified.");
+                    }
 
-                    cmd.Parameters.AddWithValue(
-                        "@OTPVerified",
-                        model.OTPVerified);
-
-                    // =====================================================
-                    // APPROVAL
-                    // =====================================================
-
-                    cmd.Parameters.AddWithValue(
-                        "@Status",
-                        string.IsNullOrWhiteSpace(model.Status)
-                            ? "Pending"
-                            : model.Status);
-
-                    cmd.Parameters.AddWithValue(
-                        "@IsApproved",
-                        model.IsApproved);
-
-                    cmd.Parameters.AddWithValue(
-                        "@IsActive",
-                        model.IsActive);
-
-                    // =====================================================
-                    // EXECUTE
-                    // =====================================================
-
-                    cn.Open();
+                    cmd.Parameters.Add("@ParentTPOID", SqlDbType.Int)
+                        .Value = model.ParentTPOID;
 
                     return cmd.ExecuteNonQuery() > 0;
                 }
             }
         }
+
 
 
 
@@ -4244,6 +4246,11 @@ ORDER BY
                                 Convert.ToBoolean(reader["IsDeleted"]);
 
                             item.CreatedDate = Convert.ToDateTime(reader["CreatedDate"]);
+
+                            item.ApprovalStatus =
+    reader["ApprovalStatus"] == DBNull.Value
+        ? "Pending"
+        : reader["ApprovalStatus"]?.ToString() ?? "Pending";
 
                             item.TotalSent = Convert.ToInt32(reader["TotalSent"]);
                             item.TotalRead = Convert.ToInt32(reader["TotalRead"]);

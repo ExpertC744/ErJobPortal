@@ -1,0 +1,234 @@
+﻿
+@model List<Dictionary<string, object?>>
+
+@{
+    ViewData["Title"] = "Approve Sub-TPO Notifications";
+    Layout = "~/Views/Shared/_DashboardLayout.cshtml";
+}
+
+<link rel="stylesheet"
+      href="~/css/TPOViewNotificationEvent.css"
+      asp-append-version="true" />
+
+<div class="container-fluid py-4">
+
+    <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
+        <div>
+            <h2 class="fw-bold mb-1">Approve Sub-TPO Notifications</h2>
+            <p class="text-muted mb-0">
+                Review Sub-TPO notifications before they can be sent.
+            </p>
+        </div>
+
+        <span class="badge bg-warning text-dark fs-6">
+            Pending: @(Model?.Count ?? 0)
+        </span>
+    </div>
+
+    @if (TempData["Success"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show">
+            @TempData["Success"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    }
+
+    @if (TempData["Error"] != null)
+    {
+        <div class="alert alert-danger alert-dismissible fade show">
+            @TempData["Error"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    }
+
+    <div class="card shadow-sm border-0">
+        <div class="card-body">
+
+            @if (Model == null || !Model.Any())
+            {
+                <div class="text-center py-5">
+                    <h5>No pending notifications</h5>
+                    <p class="text-muted mb-0">
+                        New Sub-TPO notifications awaiting approval will appear here.
+                    </p>
+                </div>
+            }
+            else
+            {
+                <div class="table-responsive">
+                    <table class="table table-bordered table-hover align-middle">
+                        <thead class="table-dark">
+                            <tr>
+                                <th>#</th>
+                                <th>Notification</th>
+                                <th>Type</th>
+                                <th>Audience</th>
+                                <th>Created By</th>
+                                <th>Notification Date</th>
+                                <th>Attachments</th>
+                                <th>Status</th>
+                                <th style="min-width: 220px;">Action</th>
+                            </tr>
+                        </thead>
+
+                        <tbody>
+                            @for (int i = 0; i < Model.Count; i++)
+                            {
+                                var item = Model[i];
+
+                                int notificationId =
+                                    Convert.ToInt32(item["NotificationID"]);
+
+                                string title =
+                                    Convert.ToString(item["Title"]) ?? "";
+
+                                string type =
+                                    Convert.ToString(item["Type"]) ?? "";
+
+                                string audience =
+                                    Convert.ToString(item["Audience"]) ?? "";
+
+                                string createdByName =
+                                    Convert.ToString(item["CreatedByName"]) ?? "Sub-TPO";
+
+                                string approvalStatus =
+                                    Convert.ToString(item["ApprovalStatus"]) ?? "Pending";
+
+                                string content =
+                                    Convert.ToString(item["Content"]) ?? "";
+
+                                <tr>
+                                    <td>@(i + 1)</td>
+
+                                    <td>
+                                        <strong>@title</strong>
+                                        <details class="mt-2">
+                                            <summary class="text-primary"
+                                                     style="cursor:pointer">
+                                                View content
+                                            </summary>
+                                            <div class="mt-2 text-break"
+                                                 style="white-space:pre-wrap">@content</div>
+                                        </details>
+                                    </td>
+
+                                    <td>@type</td>
+                                    <td>@audience</td>
+                                    <td>@createdByName</td>
+
+                                    <td>
+                                        @{
+                                            object? notificationDate =
+                                                item["NotificationDate"];
+                                        }
+                                        @(notificationDate == null
+                                            ? "—"
+                                            : Convert.ToDateTime(notificationDate).ToString("dd-MMM-yyyy"))
+                                    </td>
+
+                                    <td>
+                                        @{
+                                            string? attachment1 =
+                                                Convert.ToString(item["Attachment1Path"]);
+                                            string? attachment1Name =
+                                                Convert.ToString(item["Attachment1OriginalName"]);
+
+                                            string? attachment2 =
+                                                Convert.ToString(item["Attachment2Path"]);
+                                            string? attachment2Name =
+                                                Convert.ToString(item["Attachment2OriginalName"]);
+                                        }
+
+                                        @if (!string.IsNullOrWhiteSpace(attachment1))
+                                        {
+                                            <a href="@attachment1"
+                                               target="_blank"
+                                               rel="noopener noreferrer">
+                                                @(string.IsNullOrWhiteSpace(attachment1Name)
+                                                    ? "Attachment 1"
+                                                    : attachment1Name)
+                                            </a>
+                                        }
+
+                                        @if (!string.IsNullOrWhiteSpace(attachment1) &&
+                                             !string.IsNullOrWhiteSpace(attachment2))
+                                        {
+                                            <br />
+                                        }
+
+                                        @if (!string.IsNullOrWhiteSpace(attachment2))
+                                        {
+                                            <a href="@attachment2"
+                                               target="_blank"
+                                               rel="noopener noreferrer">
+                                                @(string.IsNullOrWhiteSpace(attachment2Name)
+                                                    ? "Attachment 2"
+                                                    : attachment2Name)
+                                            </a>
+                                        }
+
+                                        @if (string.IsNullOrWhiteSpace(attachment1) &&
+                                             string.IsNullOrWhiteSpace(attachment2))
+                                        {
+                                            <span class="text-muted">None</span>
+                                        }
+                                    </td>
+
+                                    <td>
+                                        <span class="badge bg-warning text-dark">
+                                            @approvalStatus
+                                        </span>
+                                    </td>
+
+                                    <td>
+                                        <div class="d-flex flex-column gap-2">
+
+                                            <form asp-controller="TPO"
+                                                  asp-action="ApproveSubTPONotification"
+                                                  method="post">
+                                                @Html.AntiForgeryToken()
+
+                                                <input type="hidden"
+                                                       name="id"
+                                                       value="@notificationId" />
+
+                                                <button type="submit"
+                                                        class="btn btn-success btn-sm w-100">
+                                                    Approve
+                                                </button>
+                                            </form>
+
+                                            <form asp-controller="TPO"
+                                                  asp-action="RejectSubTPONotification"
+                                                  method="post">
+                                                @Html.AntiForgeryToken()
+
+                                                <input type="hidden"
+                                                       name="id"
+                                                       value="@notificationId" />
+
+                                                <input type="text"
+                                                       name="rejectionReason"
+                                                       class="form-control form-control-sm mb-2"
+                                                       placeholder="Reason for rejection"
+                                                       required
+                                                       maxlength="1000" />
+
+                                                <button type="submit"
+                                                        class="btn btn-danger btn-sm w-100">
+                                                    Reject
+                                                </button>
+                                            </form>
+
+                                        </div>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            }
+
+        </div>
+    </div>
+</div>

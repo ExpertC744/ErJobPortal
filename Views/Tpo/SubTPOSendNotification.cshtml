@@ -1,0 +1,160 @@
+﻿@model ErJobPortal.Models.TPOSendNotificationM
+@using ErJobPortal.Models
+
+@{
+    ViewData["Title"] = "Sub-TPO Send Notification";
+    Layout = "~/Views/Shared/_DashboardLayout.cshtml";
+
+    var notifications =
+        ViewBag.Notifications as List<TPONotificationListM>
+        ?? new List<TPONotificationListM>();
+}
+
+<div class="container-fluid py-4">
+    <h3>Send Approved Notification</h3>
+    <p class="text-muted">
+        Select an approved notification and the candidates who should receive it.
+    </p>
+
+    @if (TempData["Success"] != null)
+    {
+        <div class="alert alert-success">
+            @TempData["Success"]
+        </div>
+    }
+
+    @if (TempData["Info"] != null)
+    {
+        <div class="alert alert-info">
+            @TempData["Info"]
+        </div>
+    }
+
+    @if (TempData["Error"] != null)
+    {
+        <div class="alert alert-danger">
+            @TempData["Error"]
+        </div>
+    }
+
+    <form method="get" action="/TPO/SubTPOSendNotification"
+          class="card card-body mb-4">
+        <label class="form-label" for="notificationId">
+            Approved Notification
+        </label>
+
+        <select id="notificationId"
+                name="notificationId"
+                class="form-select"
+                onchange="this.form.submit()">
+            <option value="">-- Select Notification --</option>
+
+            @foreach (var notification in notifications)
+            {
+                <option value="@notification.NotificationID"
+                        selected="@(Model.NotificationID == notification.NotificationID)">
+                    @notification.Title
+                </option>
+            }
+        </select>
+    </form>
+
+    @if (Model.NotificationID > 0)
+    {
+        <div class="card mb-4">
+            <div class="card-header">
+                <strong>Notification Details</strong>
+            </div>
+            <div class="card-body">
+                <h5>@Model.Title</h5>
+                <p><strong>Type:</strong> @Model.Type</p>
+                <p><strong>Audience:</strong> @Model.Audience</p>
+                <p><strong>Content:</strong></p>
+                <div style="white-space:pre-wrap">@Model.Content</div>
+
+                @if (!string.IsNullOrWhiteSpace(Model.Attachment1Path))
+                {
+                    <p>
+                        <a href="@Model.Attachment1Path"
+                           target="_blank"
+                           rel="noopener">
+                            @Model.Attachment1OriginalName
+                        </a>
+                    </p>
+                }
+
+                @if (!string.IsNullOrWhiteSpace(Model.Attachment2Path))
+                {
+                    <p>
+                        <a href="@Model.Attachment2Path"
+                           target="_blank"
+                           rel="noopener">
+                            @Model.Attachment2OriginalName
+                        </a>
+                    </p>
+                }
+            </div>
+        </div>
+
+        <form method="post" action="/TPO/SubTPOSendNotification">
+            @Html.AntiForgeryToken()
+
+            <input type="hidden"
+                   name="NotificationID"
+                   value="@Model.NotificationID" />
+
+            <h5>Select Candidates</h5>
+
+            @if (Model.Students != null && Model.Students.Any())
+            {
+                <div class="table-responsive">
+                    <table class="table table-bordered table-striped">
+                        <thead>
+                            <tr>
+                                <th>
+                                    <input type="checkbox"
+                                           id="selectAll" />
+                                </th>
+                                <th>Candidate ID</th>
+                                <th>Candidate Name</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                           @foreach (var student in Model.Students)
+                            {
+                                <tr>
+                                    <td>
+                                        <input type="checkbox"
+                                               class="candidate-checkbox"
+                                               name="SelectedCandidateIDs"
+                                               value="@student.nID" />
+                                    </td>
+                                    <td>@student.nID</td>
+                                    <td>@student.FullName</td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+
+                <button type="submit" class="btn btn-primary">
+                    Send Notification
+                </button>
+            }
+            else
+            {
+                <div class="alert alert-warning">
+                    No eligible candidates were found.
+                </div>
+            }
+        </form>
+    }
+</div>
+
+<script>
+    document.getElementById("selectAll")?.addEventListener("change", function () {
+        document.querySelectorAll(".candidate-checkbox").forEach(function (checkbox) {
+            checkbox.checked = document.getElementById("selectAll").checked;
+        });
+    });
+</script>

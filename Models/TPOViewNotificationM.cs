@@ -89,6 +89,8 @@
 
         //public TimeSpan? NotificationTime { get; set; }
 
-        
+        public string ApprovalStatus { get; set; } = "Pending";
+
+        public string? RejectionReason { get; set; }
     }
 }
