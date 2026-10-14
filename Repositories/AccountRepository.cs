@@ -2137,17 +2137,18 @@ public OrganizationLogin? GetOrganizationLoginDetails(string email)
         // TPO LOGIN
         // =========================================================
 
-     
-            // =========================================================
-            // TPO LOGIN
-            // =========================================================
 
-            public TPOLoginResult LoginTPO(string collegeMailID)
-                    {
-                        using (SqlConnection cn = _db.GetConnection())
-                        {
-                            string query = @"
-                        SELECT
+        // =========================================================
+        // TPO LOGIN
+        // =========================================================
+
+
+        public TPOLoginResult? LoginTPO(string collegeMailID)
+        {
+            using (SqlConnection cn = _db.GetConnection())
+            {
+                string query = @"
+            SELECT
                 TPOID,
                 FullName,
                 CollegeMailID,
@@ -2168,47 +2169,50 @@ public OrganizationLogin? GetOrganizationLoginDetails(string email)
                 using (SqlCommand cmd = new SqlCommand(query, cn))
                 {
                     cmd.Parameters.Add("@CollegeMailID", SqlDbType.NVarChar, 200)
-                                  .Value = collegeMailID.Trim();
+                        .Value = collegeMailID.Trim();
 
                     cn.Open();
 
                     using (SqlDataReader reader = cmd.ExecuteReader())
                     {
-                        if (reader.Read())
+                        if (!reader.Read())
+                            return null;
+
+                        return new TPOLoginResult
                         {
-                            return new TPOLoginResult
-                            {
-                                TPOID = Convert.ToInt32(reader["TPOID"]),
+                            TPOID = Convert.ToInt32(reader["TPOID"]),
+                            FullName = reader["FullName"]?.ToString() ?? "",
+                            CollegeMailID = reader["CollegeMailID"]?.ToString() ?? "",
+                            MobileNo = reader["MobileNo"]?.ToString() ?? "",
+                            PasswordHash = reader["PasswordHash"]?.ToString() ?? "",
+                            CollegeName = reader["CollegeName"]?.ToString() ?? "",
 
-                                FullName = reader["FullName"].ToString(),
-                                CollegeMailID = reader["CollegeMailID"].ToString(),
-                                MobileNo = reader["MobileNo"].ToString(),
-                                PasswordHash = reader["PasswordHash"].ToString(),
-                                CollegeName = reader["CollegeName"].ToString(),
+                            CollegeCode = reader["CollegeCode"] == DBNull.Value
+                                ? null
+                                : reader["CollegeCode"].ToString(),
 
-                                CollegeCode = reader["CollegeCode"] == DBNull.Value
-                                    ? null
-                                    : reader["CollegeCode"].ToString(),
+                            Designation = reader["Designation"]?.ToString() ?? "",
+                            DepartmentName = reader["DepartmentName"]?.ToString() ?? "",
 
-                                Designation = reader["Designation"].ToString(),
-                                DepartmentName = reader["DepartmentName"].ToString(),
+                            OTPVerified = reader["OTPVerified"] != DBNull.Value
+                                && Convert.ToBoolean(reader["OTPVerified"]),
 
-                                OTPVerified = Convert.ToBoolean(reader["OTPVerified"]),
-                                Status = reader["Status"].ToString(),
-                                IsApproved = Convert.ToBoolean(reader["IsApproved"]),
-                                IsActive = Convert.ToBoolean(reader["IsActive"]),
+                            Status = reader["Status"]?.ToString() ?? "",
 
-                                // 0 = Main TPO, 1 = Sub-TPO
-                                SubTpoBit = reader["subtopbit"] != DBNull.Value
-                                     && Convert.ToBoolean(reader["subtopbit"])
-                            };
-                        }
+                            IsApproved = reader["IsApproved"] != DBNull.Value
+                                && Convert.ToBoolean(reader["IsApproved"]),
+
+                            IsActive = reader["IsActive"] != DBNull.Value
+                                && Convert.ToBoolean(reader["IsActive"]),
+
+                            SubTpoBit = reader["subtopbit"] != DBNull.Value
+                                && Convert.ToBoolean(reader["subtopbit"])
+                        };
                     }
                 }
             }
-
-            return null;
         }
+
 
 
 
