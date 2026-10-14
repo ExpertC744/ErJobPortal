@@ -1153,6 +1153,7 @@ public IActionResult OrganizationResetPassword()
             return View();
         }
 
+
         // =========================================================
         // TPO LOGIN - POST
         // =========================================================
@@ -1168,15 +1169,22 @@ public IActionResult OrganizationResetPassword()
 
             try
             {
+                if (string.IsNullOrWhiteSpace(model.CollegeMailID))
+                {
+                    ModelState.AddModelError(
+                        "",
+                        "Please enter your College Mail ID."
+                    );
+
+                    return View(model);
+                }
+
                 string email = model.CollegeMailID.Trim();
 
                 TPOLoginResult? tpo =
                     _accountRepository.LoginTPO(email);
 
-                // =====================================================
                 // CHECK TPO EXISTS
-                // =====================================================
-
                 if (tpo == null)
                 {
                     ModelState.AddModelError(
@@ -1187,11 +1195,8 @@ public IActionResult OrganizationResetPassword()
                     return View(model);
                 }
 
-                // =====================================================
                 // CHECK PASSWORD
-                // PasswordHash column currently contains plain password
-                // =====================================================
-
+                // PasswordHash currently contains plain password
                 if (tpo.PasswordHash != model.Password)
                 {
                     ModelState.AddModelError(
@@ -1202,10 +1207,7 @@ public IActionResult OrganizationResetPassword()
                     return View(model);
                 }
 
-                // =====================================================
                 // CHECK OTP
-                // =====================================================
-
                 if (!tpo.OTPVerified)
                 {
                     ModelState.AddModelError(
@@ -1216,10 +1218,7 @@ public IActionResult OrganizationResetPassword()
                     return View(model);
                 }
 
-                // =====================================================
                 // SET TPO SESSION
-                // =====================================================
-
                 HttpContext.Session.SetInt32(
                     "TPOID",
                     tpo.TPOID
@@ -1245,11 +1244,15 @@ public IActionResult OrganizationResetPassword()
                     "TPO"
                 );
 
-                // =====================================================
-                // SUCCESSFUL LOGIN
-                // REDIRECT TO TPO DASHBOARD
-                // =====================================================
+                // IMPORTANT:
+                // 0 = Main TPO
+                // 1 = Sub-TPO
+                HttpContext.Session.SetString(
+                    "SubTpoBit",
+                    tpo.SubTpoBit ? "1" : "0"
+                );
 
+                // REDIRECT TO TPO DASHBOARD
                 return RedirectToAction(
                     "Dashboard",
                     "TPO"
@@ -1270,6 +1273,7 @@ public IActionResult OrganizationResetPassword()
                 return View(model);
             }
         }
+
 
 
         // ==========================================================

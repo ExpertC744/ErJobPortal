@@ -4136,57 +4136,58 @@
 					</a>
 
 				
-@*shrirang 08/10/26*@
-<!-- ================= NOTIFICATION / EVENT ================= -->
+					
+					@* shrirang 08/10/26 *@
+					<!-- NOTIFICATION / EVENT -->
+					@{
+						var currentSubTpoBit =
+							Context.Session.GetString("SubTpoBit");
 
-@{
-    var currentSubTpoBit = Context.Session.GetString("SubTpoBit");
-    bool isSubTPO = currentSubTpoBit == "1";
-}
+						bool isSubTPO = currentSubTpoBit == "1";
+					}
 
-<a href="javascript:void(0);"
-   class="sidebar-link"
-   onclick="toggleSubMenu('notificationSubmenu')">
+					<a href="javascript:void(0);"
+					   class="sidebar-link"
+					   onclick="toggleSubMenu('notificationSubmenu')">	
 
-    <span class="menu-icon">
-        <i class="fas fa-bell"></i>
-    </span>
+						<span class="menu-icon">
+							<i class="fas fa-bell"></i>
+						</span>
 
-    <span class="menu-text">Notification / Event</span>
-</a>
+						<span class="menu-text">Notification / Event</span>
+					</a>
 
-<div class="profile-submenu" id="notificationSubmenu">
+					<div class="profile-submenu" id="notificationSubmenu">
 
-    <a asp-controller="TPO"
-       asp-action="ViewNotificationEvent"
-       class="profile-submenu-link">
-        View Notification/Event
-    </a>
+						<a asp-controller="TPO"
+						   asp-action="ViewNotificationEvent"
+						   class="profile-submenu-link">
+							View Notification/Event
+						</a>
 
-    <a asp-controller="TPO"
-       asp-action="CreateNotification"
-       class="profile-submenu-link">
-        Add Notification/Event
-    </a>
+						<a asp-controller="TPO"
+						   asp-action="CreateNotification"
+						   class="profile-submenu-link">
+							Add Notification/Event
+						</a>
 
-    @if (!isSubTPO)
-    {
-        <a asp-controller="TPO"
-           asp-action="NotificationApprovals"
-           class="profile-submenu-link">
-            Approve Sub-TPO Notifications
-        </a>
-    }
+						@if (currentSubTpoBit == "0")
+						{
+							<a asp-controller="TPO"
+							   asp-action="NotificationApprovals"
+							   class="profile-submenu-link">
+								Approve Sub-TPO Notifications
+							</a>
+						}
 
-    <a asp-controller="TPO"
-       asp-action="SendNotification"
-       class="profile-submenu-link">
-        Send Notification/Event
-    </a>
+						<a asp-controller="TPO"
+						   asp-action="SendNotification"
+						   class="profile-submenu-link">
+							Send Notification/Event
+						</a>
 
-</div>
-
-@*end*@
+					</div>
+					
 
 
 					@*Shrirang 03/10/26*@
