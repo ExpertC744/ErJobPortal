@@ -4641,5 +4641,88 @@ ORDER BY SAF.nID DESC, OFB.nID DESC;
         }
 
 
+        // sanidhya 14/10/26
+
+        [HttpGet]
+        [Route("SuperAdmin/ViewOrgProfile/{id:int}")]
+        public IActionResult ViewOrgProfile(int id)
+        {
+            string connectionString =
+                _configuration.GetConnectionString("DefaultConnection")
+                ?? throw new InvalidOperationException(
+                    "DefaultConnection is not configured.");
+
+            // Get organization IDs in the same order as SAOrgProfileList.
+            List<int> organizationIds = new List<int>();
+
+            using (SqlConnection con = new SqlConnection(connectionString))
+            {
+                string query = @"
+            SELECT OP.nOrgID
+            FROM tblOrgProfile OP
+            INNER JOIN tblOrgRegistration ORG
+                ON OP.nOrgID = ORG.nID
+            WHERE ORG.nSABit = 1
+            ORDER BY OP.nID DESC;";
+
+                using (SqlCommand cmd = new SqlCommand(query, con))
+                {
+                    con.Open();
+
+                    using (SqlDataReader reader = cmd.ExecuteReader())
+                    {
+                        while (reader.Read())
+                        {
+                            if (reader["nOrgID"] != DBNull.Value)
+                            {
+                                organizationIds.Add(
+                                    Convert.ToInt32(reader["nOrgID"]));
+                            }
+                        }
+                    }
+                }
+            }
+
+            // Find the current organization in the ordered list.
+            int currentIndex = organizationIds.IndexOf(id);
+
+            if (currentIndex == -1)
+            {
+                return NotFound("Organization not found in the profile list.");
+            }
+
+            // Previous and Next IDs follow the list order.
+            int? previousId = currentIndex > 0
+                ? organizationIds[currentIndex - 1]
+                : null;
+
+            int? nextId = currentIndex < organizationIds.Count - 1
+                ? organizationIds[currentIndex + 1]
+                : null;
+
+            // Get the current organization profile.
+            OrgProfile? model =
+                _repository.GetOrganizationProfileByCode(id.ToString());
+
+            if (model == null)
+            {
+                return NotFound("Organization profile not found.");
+            }
+
+            ViewBag.PreviousId = previousId;
+            ViewBag.NextId = nextId;
+            ViewBag.CurrentRecord = currentIndex + 1;
+            ViewBag.TotalRecords = organizationIds.Count;
+
+            ViewData["Title"] = "View Organization Profile";
+            ViewData["Panel"] = "SuperAdmin";
+            ViewData["UserName"] = "ItNetworkZ";
+
+            return View("~/Views/Organization/ViewOrgProfile.cshtml", model);
+        }
+
+
+
+
     }
 }
