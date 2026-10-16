@@ -643,22 +643,53 @@ namespace ErJobPortal.Controllers
         }
 
         #endregion
+        // khushi 16-10-26
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> OrganizationRegister(OrganizationRegister model)
         {
             try
             {
-                // STATIC OTP FOR NOW
-                if (model.sOTP != "123456")
+                // 1. Verify email OTP using server-side Session.
+                string email = (model.sEmail ?? "")
+                    .Trim()
+                    .ToLowerInvariant();
+
+                string? verifiedEmail =
+                    HttpContext.Session.GetString("OrgOtpEmail");
+
+                string? verified =
+                    HttpContext.Session.GetString("OrgOtpVerified");
+
+                string? savedOtp =
+                    HttpContext.Session.GetString("OrgOtp");
+
+                string? expiryValue =
+                    HttpContext.Session.GetString("OrgOtpExpiry");
+
+                bool validExpiry =
+                    long.TryParse(expiryValue, out long expiry) &&
+                    DateTimeOffset.UtcNow.ToUnixTimeSeconds() < expiry;
+
+                bool otpVerified =
+                    verified == "true" &&
+                    !string.IsNullOrWhiteSpace(savedOtp) &&
+                    validExpiry &&
+                    string.Equals(
+                        email,
+                        verifiedEmail,
+                        StringComparison.OrdinalIgnoreCase
+                    );
+
+                if (!otpVerified)
                 {
                     ModelState.AddModelError(
                         "sOTP",
-                        "Invalid OTP. Please enter 123456."
+                        "Please verify your email using a valid OTP before registration."
                     );
                 }
 
-                // Check validation errors
+                // 2. Check model validation.
                 if (!ModelState.IsValid)
                 {
                     foreach (var item in ModelState)
@@ -674,12 +705,12 @@ namespace ErJobPortal.Controllers
                     return View(model);
                 }
 
-                // Register organization
+                // 3. Register organization only after OTP verification.
                 int result = _accountRepository.RegisterOrganization(model);
 
                 if (result > 0)
                 {
-                    // Send registration success email
+                    // 4. Send registration confirmation email.
                     try
                     {
                         await SendOrganizationRegistrationEmail(
@@ -689,16 +720,21 @@ namespace ErJobPortal.Controllers
                     }
                     catch (Exception emailEx)
                     {
-                        // Registration succeeded, even if email failed
+                        // Registration succeeded even if confirmation email fails.
                         Console.WriteLine(
-                            "Organization registration email error: "
-                            + emailEx
+                            "Organization registration email error: " +
+                            emailEx
                         );
                     }
 
+                    // 5. Clear OTP session after successful registration.
+                    HttpContext.Session.Remove("OrgOtp");
+                    HttpContext.Session.Remove("OrgOtpEmail");
+                    HttpContext.Session.Remove("OrgOtpExpiry");
+                    HttpContext.Session.Remove("OrgOtpVerified");
+
                     TempData["Success"] =
-                        "Organization registered successfully! " +
-                        "Please check your email for confirmation.";
+                        "Organization registered successfully! Please check your email for confirmation.";
 
                     return RedirectToAction("OrganizationRegister");
                 }
@@ -720,6 +756,7 @@ namespace ErJobPortal.Controllers
                 return View(model);
             }
         }
+
         //[HttpPost]
         //[ValidateAntiForgeryToken]
         //public IActionResult OrganizationRegister(OrganizationRegister model)
@@ -2720,6 +2757,101 @@ public IActionResult OrganizationResetPassword()
             {
                 success = true,
                 message = "Email verified successfully!"
+            });
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> SendOrganizationOtp(string email)
+        {
+            if (string.IsNullOrWhiteSpace(email) ||
+                !System.Net.Mail.MailAddress.TryCreate(email.Trim(), out var address) ||
+                !string.Equals(address.Address, email.Trim(),
+                    StringComparison.OrdinalIgnoreCase))
+            {
+                return Json(new { success = false, message = "Enter a valid email address." });
+            }
+
+            email = address.Address.Trim().ToLowerInvariant();
+
+            string otp = RandomNumberGenerator.GetInt32(100000, 1000000).ToString();
+
+            try
+            {
+                // Send first. Store the OTP only after the email succeeds.
+                await _emailService.SendOrganizationOtpEmailAsync(email, otp);
+
+                HttpContext.Session.SetString("OrgOtp", otp);
+                HttpContext.Session.SetString("OrgOtpEmail", email);
+                HttpContext.Session.SetString(
+                    "OrgOtpExpiry",
+                    DateTimeOffset.UtcNow.AddMinutes(10).ToUnixTimeSeconds().ToString());
+
+                HttpContext.Session.Remove("OrgOtpVerified");
+
+                return Json(new
+                {
+                    success = true,
+                    message = "OTP sent to your email. It is valid for 10 minutes."
+                });
+            }
+            catch (Exception ex)
+            {
+                // Log the exception on the server; do not expose SMTP details to the user.
+                Console.WriteLine($"Organization OTP email failed: {ex}");
+
+                HttpContext.Session.Remove("OrgOtp");
+                HttpContext.Session.Remove("OrgOtpEmail");
+                HttpContext.Session.Remove("OrgOtpExpiry");
+                HttpContext.Session.Remove("OrgOtpVerified");
+
+                return StatusCode(500, new
+                {
+                    success = false,
+                    message = "Could not send OTP. Check the email settings and try again."
+                });
+            }
+        }
+
+
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public IActionResult VerifyOrganizationOtp(string email, string otp)
+        {
+            string savedOtp = HttpContext.Session.GetString("OrgOtp") ?? "";
+            string savedEmail = HttpContext.Session.GetString("OrgOtpEmail") ?? "";
+            string expiryValue = HttpContext.Session.GetString("OrgOtpExpiry") ?? "";
+
+            bool validExpiry =
+                long.TryParse(expiryValue, out long expiry) &&
+                DateTimeOffset.UtcNow.ToUnixTimeSeconds() < expiry;
+
+            string normalizedEmail = (email ?? "").Trim().ToLowerInvariant();
+
+            if (string.IsNullOrWhiteSpace(savedOtp) ||
+                string.IsNullOrWhiteSpace(otp) ||
+                otp.Length != 6 ||
+                !otp.All(char.IsDigit) ||
+                !validExpiry ||
+                !string.Equals(normalizedEmail, savedEmail, StringComparison.Ordinal) ||
+                !string.Equals(otp, savedOtp, StringComparison.Ordinal))
+            {
+                HttpContext.Session.Remove("OrgOtpVerified");
+
+                return Json(new
+                {
+                    success = false,
+                    message = "Invalid OTP, incorrect email, or OTP expired."
+                });
+            }
+
+            HttpContext.Session.SetString("OrgOtpVerified", "true");
+
+            return Json(new
+            {
+                success = true,
+                message = "Email verified successfully."
             });
         }
 
