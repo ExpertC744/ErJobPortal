@@ -4,9 +4,11 @@ using ErJobPortal.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
 using System.Data;
 using System.Net;
 using System.Net.Mail;
+using System.Security.Cryptography;
 
 
 namespace ErJobPortal.Controllers
@@ -16,12 +18,14 @@ namespace ErJobPortal.Controllers
         private readonly IConfiguration _configuration;
         private readonly AccountRepository _accountRepository;
         private readonly EmailService _emailService;
+        private readonly ILogger<AccountController> _logger;
 
-        public AccountController(AccountRepository accountRepository, EmailService emailService, IConfiguration configuration)
+        public AccountController(AccountRepository accountRepository, EmailService emailService, IConfiguration configuration, ILogger<AccountController> logger)
         {
             _accountRepository = accountRepository;
             _emailService = emailService;
             _configuration = configuration;
+            _logger = logger;
         }
 
         // Candidate Registration
@@ -80,51 +84,59 @@ namespace ErJobPortal.Controllers
         // ==============================
         // CANDIDATE REGISTER - POST
         // ==============================
+
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult CandidateRegister(CandidateRegister model)
+        public async Task<IActionResult> CandidateRegister(CandidateRegister model)
         {
-            // STATIC OTP FOR NOW
-            //if (model.sOTP != "123456")
-            //{
-            //    ModelState.AddModelError(
-            //        "sOTP",
-            //        "Invalid OTP. Please enter 123456."
-            //    );
-            //}
+            // ==========================================
+            // 1. VERIFY EMAIL OTP
+            // ==========================================
 
-            if (!ModelState.IsValid)
+            string? verified =
+                HttpContext.Session.GetString("CandidateOTPVerified");
+
+            string? verifiedEmail =
+                HttpContext.Session.GetString("CandidateOTPVerifiedEmail");
+
+            string? otpEmail =
+                HttpContext.Session.GetString("CandidateOTPEmail");
+
+            string candidateEmail = (model.sEmail ?? "").Trim();
+
+            if (verified != "true" ||
+                string.IsNullOrWhiteSpace(verifiedEmail) ||
+                string.IsNullOrWhiteSpace(otpEmail) ||
+                !string.Equals(
+                    candidateEmail, verifiedEmail,
+                    StringComparison.OrdinalIgnoreCase) ||
+                !string.Equals(
+                    candidateEmail, otpEmail,
+                    StringComparison.OrdinalIgnoreCase))
             {
+                TempData["Error"] =
+                    "Please verify your email address using OTP before registering.";
+
                 return View(model);
             }
 
             try
             {
-
                 // ==========================================
-                // PROFILE IMAGE UPLOAD
+                // 2. PROFILE IMAGE UPLOAD
                 // ==========================================
 
-                if (model.ProfileImageFile != null && model.ProfileImageFile.Length > 0)
+                if (model.ProfileImageFile != null &&
+                    model.ProfileImageFile.Length > 0)
                 {
-                    // ==========================================
-                    // ALLOWED IMAGE TYPES
-                    // ==========================================
-
                     string[] allowedExtensions =
                     {
-    ".png",
-    ".jpg",
-    ".jpeg"
-};
+                ".png", ".jpg", ".jpeg"
+            };
 
                     string extension = Path.GetExtension(
-                            model.ProfileImageFile.FileName
-                        ).ToLowerInvariant();
-
-                    // ==========================================
-                    // CHECK IMAGE EXTENSION
-                    // ==========================================
+                        model.ProfileImageFile.FileName
+                    ).ToLowerInvariant();
 
                     if (!allowedExtensions.Contains(extension))
                     {
@@ -136,23 +148,15 @@ namespace ErJobPortal.Controllers
                         return View(model);
                     }
 
-                    // ==========================================
-                    // MAXIMUM 5 MB
-                    // ==========================================
-
                     if (model.ProfileImageFile.Length > 5 * 1024 * 1024)
                     {
                         ModelState.AddModelError(
                             "ProfileImageFile",
-                            "Image size must be less than 5 MB."
+                            "Image size must not exceed 5 MB."
                         );
 
                         return View(model);
                     }
-
-                    // ==========================================
-                    // CREATE UPLOAD FOLDER
-                    // ==========================================
 
                     string uploadFolder = Path.Combine(
                         Directory.GetCurrentDirectory(),
@@ -161,14 +165,7 @@ namespace ErJobPortal.Controllers
                         "candidates"
                     );
 
-                    if (!Directory.Exists(uploadFolder))
-                    {
-                        Directory.CreateDirectory(uploadFolder);
-                    }
-
-                    // ==========================================
-                    // GENERATE IMAGE NAME: 1, 2, 3, 4...
-                    // ==========================================
+                    Directory.CreateDirectory(uploadFolder);
 
                     int nextNumber = 1;
 
@@ -180,30 +177,19 @@ namespace ErJobPortal.Controllers
                         nextNumber++;
                     }
 
-                    // Example: 1.jpg, 2.png, 3.jpeg
-                    string imageName =
-                        nextNumber + extension;
-
-                    // ==========================================
-                    // SAVE IMAGE
-                    // ==========================================
+                    string imageName = nextNumber + extension;
 
                     string filePath = Path.Combine(
                         uploadFolder,
                         imageName
                     );
 
-                    using (FileStream stream =
-                           new FileStream(
-                               filePath,
-                               FileMode.Create))
+                    using (var stream = new FileStream(
+                        filePath,
+                        FileMode.CreateNew))
                     {
-                        model.ProfileImageFile.CopyTo(stream);
+                        await model.ProfileImageFile.CopyToAsync(stream);
                     }
-
-                    // ==========================================
-                    // ONLY IMAGE NAME GOES TO DATABASE
-                    // ==========================================
 
                     model.sProfileImage = imageName;
                 }
@@ -212,33 +198,387 @@ namespace ErJobPortal.Controllers
                     model.sProfileImage = "";
                 }
 
+                // ==========================================
+                // 3. REGISTER CANDIDATE
+                // ==========================================
+
                 int result = _accountRepository.Register(model);
 
-                if (result > 0)
+                if (result <= 0)
                 {
-                    TempData["Success"] =
-                        "Registration successful. Please login.";
+                    ModelState.AddModelError(
+                        "",
+                        "Registration failed. Please try again."
+                    );
 
-                    return RedirectToAction("CandidateLogin");
+                    return View(model);
                 }
 
-                ModelState.AddModelError(
-                    "",
-                    "Registration failed."
-                );
+                // ==========================================
+                // 4. CLEAR OTP SESSION AFTER REGISTRATION
+                // ==========================================
 
-                return View(model);
+                HttpContext.Session.Remove("CandidateOTP");
+                HttpContext.Session.Remove("CandidateOTPEmail");
+                HttpContext.Session.Remove("CandidateOTPExpiry");
+                HttpContext.Session.Remove("CandidateOTPVerified");
+                HttpContext.Session.Remove("CandidateOTPVerifiedEmail");
+
+                // ==========================================
+                // 5. SEND REGISTRATION SUCCESS EMAIL
+                // ==========================================
+
+                try
+                {
+                    await SendTRRegistrationEmail(
+                        candidateEmail,
+                        model.sFName ?? "Candidate"
+                    );
+                }
+                catch (Exception emailEx)
+                {
+                    // Registration has succeeded.
+                    // Email failure must not undo the registration.
+                    Console.Error.WriteLine(
+                        "Candidate registration email failed: " +
+                        emailEx
+                    );
+                }
+
+                TempData["Success"] =
+                    "Registration successful. Please login.";
+
+                return RedirectToAction("CandidateLogin");
             }
             catch (Exception ex)
             {
+                Console.Error.WriteLine(
+                    "Candidate registration failed: " + ex
+                );
+
                 ModelState.AddModelError(
                     "",
-                    ex.Message
+                    "Registration failed. Please try again."
                 );
 
                 return View(model);
             }
         }
+
+        //   [HttpPost]
+        //   [ValidateAntiForgeryToken]
+        //   public IActionResult CandidateRegister(CandidateRegister model)
+        //   {
+        //       // ==========================================
+        //       // 1. VERIFY EMAIL OTP FIRST
+        //       // ==========================================
+
+        //       string? verified = HttpContext.Session.GetString("CandidateOTPVerified");
+
+        //       string? verifiedEmail = HttpContext.Session.GetString("CandidateOTPVerifiedEmail");
+
+        //       string? otpEmail = HttpContext.Session.GetString("CandidateOTPEmail");
+
+        //       string candidateEmail = (model.sEmail ?? string.Empty).Trim();
+
+        //       if (verified != "true" || string.IsNullOrWhiteSpace(verifiedEmail) ||
+        //           string.IsNullOrWhiteSpace(otpEmail) || !string.Equals(candidateEmail, verifiedEmail, StringComparison.OrdinalIgnoreCase) ||
+        //           !string.Equals(candidateEmail, otpEmail, StringComparison.OrdinalIgnoreCase))
+        //       {
+        //           TempData["Error"] = "Please verify your email address using OTP before registering.";
+        //           return View(model);
+        //       }
+
+        //       try
+        //       {
+        //           // ==========================================
+        //           // PROFILE IMAGE UPLOAD
+        //           // ==========================================
+
+        //           if (model.ProfileImageFile != null && model.ProfileImageFile.Length > 0)
+        //           {
+        //               string[] allowedExtensions =
+        //               {
+        //    ".png", ".jpg", ".jpeg"
+        //};
+
+        //               string extension = Path.GetExtension(model.ProfileImageFile.FileName).ToLowerInvariant();
+
+        //               if (!allowedExtensions.Contains(extension))
+        //               {
+        //                   ModelState.AddModelError(
+        //                       "ProfileImageFile",
+        //                       "Only PNG, JPG and JPEG images are allowed."
+        //                   );
+
+        //                   return View(model);
+        //               }
+
+        //               if (model.ProfileImageFile.Length > 5 * 1024 * 1024)
+        //               {
+        //                   ModelState.AddModelError(
+        //                       "ProfileImageFile",
+        //                       "Image size must be less than 5 MB."
+        //                   );
+
+        //                   return View(model);
+        //               }
+
+        //               string uploadFolder = Path.Combine(
+        //                   Directory.GetCurrentDirectory(),
+        //                   "wwwroot",
+        //                   "uploads",
+        //                   "candidates"
+        //               );
+
+        //               if (!Directory.Exists(uploadFolder))
+        //               {
+        //                   Directory.CreateDirectory(uploadFolder);
+        //               }
+
+        //               int nextNumber = 1;
+
+        //               while (Directory.GetFiles(
+        //                   uploadFolder,
+        //                   nextNumber + ".*"
+        //               ).Length > 0)
+        //               {
+        //                   nextNumber++;
+        //               }
+
+        //               string imageName = nextNumber + extension;
+
+        //               string filePath = Path.Combine(
+        //                   uploadFolder,
+        //                   imageName
+        //               );
+
+        //               using (FileStream stream = new FileStream(
+        //                   filePath,
+        //                   FileMode.Create))
+        //               {
+        //                   model.ProfileImageFile.CopyTo(stream);
+        //               }
+
+        //               model.sProfileImage = imageName;
+        //           }
+        //           else
+        //           {
+        //               model.sProfileImage = "";
+        //           }
+
+        //           // ==========================================
+        //           // REGISTER CANDIDATE
+        //           // ==========================================
+
+        //           int result = _accountRepository.Register(model);
+
+        //           if (result > 0)
+        //           {
+        //               // OTP must not be reusable.
+        //               HttpContext.Session.Remove("CandidateOTP");
+        //               HttpContext.Session.Remove("CandidateOTPEmail");
+        //               HttpContext.Session.Remove("CandidateOTPExpiry");
+
+        //               if (result > 0)
+        //               {
+        //                   // Send registration success email
+        //                   try
+        //                   {
+        //                       SendTRRegistrationEmail(model.sEmail, model.sFName);
+        //                   }
+        //                   catch (Exception emailEx)
+        //                   {
+        //                       // Registration succeeded, even if email failed
+        //                       Console.WriteLine("Organization registration email error: "
+        //                           + emailEx
+        //                       );
+        //                   }
+
+        //                   TempData["Success"] =
+        //                   "Registration successful. Please login.";
+
+        //               return RedirectToAction("CandidateLogin");
+        //           }
+
+        //           ModelState.AddModelError(
+        //               "",
+        //               "Registration failed."
+        //           );
+
+        //           return View(model);
+        //       }
+        //       catch (Exception ex)
+        //       {
+        //           ModelState.AddModelError(
+        //               "",
+        //               "Registration failed. Please try again."
+        //           );
+
+        //           // Log ex using your application's logger if available.
+        //           return View(model);
+        //       }
+        //   }
+
+        //        [HttpPost]
+        //        [ValidateAntiForgeryToken]
+        //        public IActionResult CandidateRegister(CandidateRegister model)
+        //        {
+        //            // STATIC OTP FOR NOW
+        //            //if (model.sOTP != "123456")
+        //            //{
+        //            //    ModelState.AddModelError(
+        //            //        "sOTP",
+        //            //        "Invalid OTP. Please enter 123456."
+        //            //    );
+        //            //}
+
+        //            if (!ModelState.IsValid)
+        //            {
+        //                return View(model);
+        //            }
+
+        //            try
+        //            {
+
+        //                // ==========================================
+        //                // PROFILE IMAGE UPLOAD
+        //                // ==========================================
+
+        //                if (model.ProfileImageFile != null && model.ProfileImageFile.Length > 0)
+        //                {
+        //                    // ==========================================
+        //                    // ALLOWED IMAGE TYPES
+        //                    // ==========================================
+
+        //                    string[] allowedExtensions =
+        //                    {
+        //    ".png",
+        //    ".jpg",
+        //    ".jpeg"
+        //};
+
+        //                    string extension = Path.GetExtension(
+        //                            model.ProfileImageFile.FileName
+        //                        ).ToLowerInvariant();
+
+        //                    // ==========================================
+        //                    // CHECK IMAGE EXTENSION
+        //                    // ==========================================
+
+        //                    if (!allowedExtensions.Contains(extension))
+        //                    {
+        //                        ModelState.AddModelError(
+        //                            "ProfileImageFile",
+        //                            "Only PNG, JPG and JPEG images are allowed."
+        //                        );
+
+        //                        return View(model);
+        //                    }
+
+        //                    // ==========================================
+        //                    // MAXIMUM 5 MB
+        //                    // ==========================================
+
+        //                    if (model.ProfileImageFile.Length > 5 * 1024 * 1024)
+        //                    {
+        //                        ModelState.AddModelError(
+        //                            "ProfileImageFile",
+        //                            "Image size must be less than 5 MB."
+        //                        );
+
+        //                        return View(model);
+        //                    }
+
+        //                    // ==========================================
+        //                    // CREATE UPLOAD FOLDER
+        //                    // ==========================================
+
+        //                    string uploadFolder = Path.Combine(
+        //                        Directory.GetCurrentDirectory(),
+        //                        "wwwroot",
+        //                        "uploads",
+        //                        "candidates"
+        //                    );
+
+        //                    if (!Directory.Exists(uploadFolder))
+        //                    {
+        //                        Directory.CreateDirectory(uploadFolder);
+        //                    }
+
+        //                    // ==========================================
+        //                    // GENERATE IMAGE NAME: 1, 2, 3, 4...
+        //                    // ==========================================
+
+        //                    int nextNumber = 1;
+
+        //                    while (Directory.GetFiles(
+        //                        uploadFolder,
+        //                        nextNumber + ".*"
+        //                    ).Length > 0)
+        //                    {
+        //                        nextNumber++;
+        //                    }
+
+        //                    // Example: 1.jpg, 2.png, 3.jpeg
+        //                    string imageName =
+        //                        nextNumber + extension;
+
+        //                    // ==========================================
+        //                    // SAVE IMAGE
+        //                    // ==========================================
+
+        //                    string filePath = Path.Combine(
+        //                        uploadFolder,
+        //                        imageName
+        //                    );
+
+        //                    using (FileStream stream =
+        //                           new FileStream(
+        //                               filePath,
+        //                               FileMode.Create))
+        //                    {
+        //                        model.ProfileImageFile.CopyTo(stream);
+        //                    }
+
+        //                    // ==========================================
+        //                    // ONLY IMAGE NAME GOES TO DATABASE
+        //                    // ==========================================
+
+        //                    model.sProfileImage = imageName;
+        //                }
+        //                else
+        //                {
+        //                    model.sProfileImage = "";
+        //                }
+
+        //                int result = _accountRepository.Register(model);
+
+        //                if (result > 0)
+        //                {
+        //                    TempData["Success"] =
+        //                        "Registration successful. Please login.";
+
+        //                    return RedirectToAction("CandidateLogin");
+        //                }
+
+        //                ModelState.AddModelError(
+        //                    "",
+        //                    "Registration failed."
+        //                );
+
+        //                return View(model);
+        //            }
+        //            catch (Exception ex)
+        //            {
+        //                ModelState.AddModelError(
+        //                    "",
+        //                    ex.Message
+        //                );
+
+        //                return View(model);
+        //            }
+        //        }
 
 
 
@@ -2110,6 +2450,277 @@ public IActionResult OrganizationResetPassword()
             smtp.Credentials = new NetworkCredential(mailUser, mailPass);
 
             await smtp.SendMailAsync(message);
+        }
+
+
+        private async Task SendTRRegistrationEmail(string email, string candidateName)
+        {
+            if (string.IsNullOrWhiteSpace(email))
+            {
+                throw new ArgumentException(
+                    "Candidate email is required.",
+                    nameof(email)
+                );
+            }
+
+            string mailUser = _configuration["RegistrationEmailSettings:Username"] ?? "";
+
+            string mailPass = _configuration["RegistrationEmailSettings:Password"] ?? "";
+
+            string fromName =
+                _configuration["RegistrationEmailSettings:FromName"]
+                ?? "1Trainee";
+
+            string smtpServer =
+                _configuration["RegistrationEmailSettings:SmtpServer"]
+                ?? "smtp.gmail.com";
+
+            int port = int.TryParse(
+                _configuration["RegistrationEmailSettings:Port"],
+                out int configuredPort)
+                    ? configuredPort
+                    : 587;
+
+            if (string.IsNullOrWhiteSpace(mailUser) || string.IsNullOrWhiteSpace(mailPass))
+            {
+                throw new InvalidOperationException("Registration email SMTP settings are missing.");
+            }
+
+            string safeName = WebUtility.HtmlEncode(
+                string.IsNullOrWhiteSpace(candidateName)
+                    ? "Candidate"
+                    : candidateName
+            );
+
+            using var message = new MailMessage();
+
+            message.From = new MailAddress(mailUser, fromName);
+            message.To.Add(email.Trim());
+
+            message.Subject =
+                "Candidate Registration Successful - 1Trainee";
+
+            message.IsBodyHtml = true;
+
+            message.Body = $@"
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset='UTF-8'>
+</head>
+<body style='margin:0;padding:20px;background:#f5f7fa;
+             font-family:Arial,Helvetica,sans-serif;'>
+
+    <div style='max-width:600px;margin:auto;background:#ffffff;
+                border:1px solid #e2e8f0;border-radius:10px;
+                overflow:hidden;'>
+
+        <div style='background:#0d9488;padding:22px;text-align:center;'>
+            <h2 style='color:#ffffff;margin:0;'>1Trainee</h2>
+        </div>
+
+        <div style='padding:28px;'>
+            <p>Dear <strong>{safeName}</strong>,</p>
+
+            <h3 style='color:#198754;'>
+                Registration Successful!
+            </h3>
+
+            <p style='color:#555;font-size:14px;line-height:1.8;'>
+                Your candidate registration has been completed
+                successfully on 1Trainee.
+            </p>
+
+            <p style='color:#555;font-size:14px;line-height:1.8;'>
+                You can now log in using your registered account.
+            </p>
+
+            <p>
+                Regards,<br>
+                <strong>1Trainee Team</strong>
+            </p>
+        </div>
+
+        <div style='background:#f8fafc;padding:14px;text-align:center;'>
+            <p style='margin:0;color:#888;font-size:12px;'>
+                This is an automated email. Please do not reply directly.
+            </p>
+        </div>
+
+    </div>
+</body>
+</html>";
+
+            using var smtp = new SmtpClient(smtpServer, port)
+            {
+                EnableSsl = true,
+                UseDefaultCredentials = false,
+                Credentials = new NetworkCredential(mailUser, mailPass),
+                DeliveryMethod = SmtpDeliveryMethod.Network,
+                Timeout = 30000
+            };
+
+            await smtp.SendMailAsync(message);
+        }
+
+        // khushi 14-10
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> SendCandidateOTP(
+            string email,
+            string otpType)
+        {
+            if (string.IsNullOrWhiteSpace(email))
+            {
+                return Json(new
+                {
+                    success = false,
+                    message = "Please enter your email address."
+                });
+            }
+
+            if (!string.Equals(
+                otpType, "Email",
+                StringComparison.OrdinalIgnoreCase))
+            {
+                return Json(new
+                {
+                    success = false,
+                    message = "Please select Email OTP verification."
+                });
+            }
+
+            email = email.Trim();
+
+            try
+            {
+                string otp = RandomNumberGenerator
+                    .GetInt32(100000, 1000000)
+                    .ToString();
+
+                // Send email first
+                await _emailService.SendOtpEmailAsync(email, otp);
+
+                // Save OTP only after SMTP sending completes
+                HttpContext.Session.SetString("CandidateOTP", otp);
+                HttpContext.Session.SetString("CandidateOTPEmail", email);
+
+                HttpContext.Session.SetString(
+                    "CandidateOTPExpiry",
+                    DateTimeOffset.UtcNow
+                        .AddMinutes(10)
+                        .ToUnixTimeSeconds()
+                        .ToString());
+
+                HttpContext.Session.Remove("CandidateOTPVerified");
+                HttpContext.Session.Remove("CandidateOTPVerifiedEmail");
+
+                return Json(new
+                {
+                    success = true,
+                    message = "OTP sending request completed. Check your inbox and Spam folder."
+                });
+            }
+            catch (Exception ex)
+            {
+                // Log the actual SMTP error
+                _logger.LogError(
+                    ex,
+                    "SendCandidateOTP failed for {Email}",
+                    email);
+
+                return Json(new
+                {
+                    success = false,
+                    message = "Email sending failed. Check the application logs."
+                });
+            }
+        }
+
+
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public IActionResult VerifyCandidateOTP(string email, string otp)
+        {
+            email = (email ?? string.Empty).Trim();
+            otp = (otp ?? string.Empty).Trim();
+
+            string? savedOTP =
+                HttpContext.Session.GetString("CandidateOTP");
+
+            string? savedEmail =
+                HttpContext.Session.GetString("CandidateOTPEmail");
+
+            string? expiryText =
+                HttpContext.Session.GetString("CandidateOTPExpiry");
+
+            if (string.IsNullOrWhiteSpace(savedOTP) ||
+                string.IsNullOrWhiteSpace(savedEmail) ||
+                string.IsNullOrWhiteSpace(expiryText))
+            {
+                return Json(new
+                {
+                    success = false,
+                    message = "Please request a new OTP first."
+                });
+            }
+
+            if (!long.TryParse(expiryText, out long expiry))
+            {
+                return Json(new
+                {
+                    success = false,
+                    message = "Invalid OTP session. Please request a new OTP."
+                });
+            }
+
+            if (DateTimeOffset.UtcNow.ToUnixTimeSeconds() > expiry)
+            {
+                HttpContext.Session.Remove("CandidateOTP");
+                HttpContext.Session.Remove("CandidateOTPEmail");
+                HttpContext.Session.Remove("CandidateOTPExpiry");
+                HttpContext.Session.Remove("CandidateOTPVerified");
+                HttpContext.Session.Remove("CandidateOTPVerifiedEmail");
+
+                return Json(new
+                {
+                    success = false,
+                    message = "OTP has expired. Please request a new OTP."
+                });
+            }
+
+            if (!string.Equals(email, savedEmail,
+                StringComparison.OrdinalIgnoreCase))
+            {
+                return Json(new
+                {
+                    success = false,
+                    message = "The email address has changed. Please request a new OTP."
+                });
+            }
+
+            if (!string.Equals(otp, savedOTP, StringComparison.Ordinal))
+            {
+                return Json(new
+                {
+                    success = false,
+                    message = "Incorrect OTP. Please try again."
+                });
+            }
+
+            // Mark this exact email as verified.
+            HttpContext.Session.SetString("CandidateOTPVerified", "true");
+            HttpContext.Session.SetString("CandidateOTPVerifiedEmail", savedEmail);
+
+            // OTP can no longer be reused.
+            HttpContext.Session.Remove("CandidateOTP");
+
+            return Json(new
+            {
+                success = true,
+                message = "Email verified successfully!"
+            });
         }
 
     }

@@ -839,5 +839,82 @@ bool isEnabled)
 
             await smtp.SendMailAsync(message);
         }
+
+
+        public async Task SendOtpEmailAsync(string email, string otp)
+        {
+            string smtpServer =
+                _configuration["EmailSettings:SmtpServer"] ?? "";
+
+            string portValue =
+                _configuration["EmailSettings:Port"] ?? "587";
+
+            string username =
+                _configuration["EmailSettings:Username"] ?? "";
+
+            string password =
+                _configuration["EmailSettings:Password"] ?? "";
+
+            string fromEmail =
+                _configuration["EmailSettings:FromEmail"] ?? "";
+
+            string fromName =
+                _configuration["EmailSettings:FromName"]
+                ?? "Er Job Portal";
+
+            if (string.IsNullOrWhiteSpace(smtpServer) ||
+                string.IsNullOrWhiteSpace(username) ||
+                string.IsNullOrWhiteSpace(password) ||
+                string.IsNullOrWhiteSpace(fromEmail))
+            {
+                throw new InvalidOperationException(
+                    "EmailSettings are missing or incomplete in configuration.");
+            }
+
+            if (!int.TryParse(portValue, out int port))
+            {
+                throw new InvalidOperationException(
+                    "EmailSettings:Port must be a valid number.");
+            }
+
+            using var message = new MailMessage();
+
+            message.From = new MailAddress(fromEmail, fromName);
+            message.To.Add(new MailAddress(email));
+            message.Subject = "Your Er Job Portal OTP";
+            message.Body =
+                $"Your OTP is: {otp}\n\n" +
+                "This OTP is valid for 10 minutes.";
+
+            using var smtp = new SmtpClient(smtpServer, port)
+            {
+                Credentials = new NetworkCredential(username, password),
+                EnableSsl = true,
+                DeliveryMethod = SmtpDeliveryMethod.Network,
+                Timeout = 20000
+            };
+
+            try
+            {
+                _logger.LogInformation(
+                    "Sending OTP email. SMTP server: {Server}, Port: {Port}, From: {From}, To: {To}",
+                    smtpServer, port, fromEmail, email);
+
+                await smtp.SendMailAsync(message);
+
+                _logger.LogInformation(
+                    "SMTP send completed for recipient {Email}. Check sender delivery status.",
+                    email);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(
+                    ex,
+                    "SMTP send failed. Server: {Server}, Recipient: {Email}",
+                    smtpServer, email);
+
+                throw;
+            }
+        }
     }
 }
