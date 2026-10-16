@@ -5,6 +5,8 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Configuration;
 using System.Data;
+using System.Net;
+using System.Net.Mail;
 
 
 namespace ErJobPortal.Controllers
@@ -301,10 +303,9 @@ namespace ErJobPortal.Controllers
         }
 
         #endregion
-
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult OrganizationRegister(OrganizationRegister model)
+        public async Task<IActionResult> OrganizationRegister(OrganizationRegister model)
         {
             try
             {
@@ -333,18 +334,36 @@ namespace ErJobPortal.Controllers
                     return View(model);
                 }
 
+                // Register organization
                 int result = _accountRepository.RegisterOrganization(model);
 
                 if (result > 0)
                 {
+                    // Send registration success email
+                    try
+                    {
+                        await SendOrganizationRegistrationEmail(
+                            model.sEmail,
+                            model.sOrgName
+                        );
+                    }
+                    catch (Exception emailEx)
+                    {
+                        // Registration succeeded, even if email failed
+                        Console.WriteLine(
+                            "Organization registration email error: "
+                            + emailEx
+                        );
+                    }
+
                     TempData["Success"] =
-                        "Organization Registration Successfully.";
+                        "Organization registered successfully! " +
+                        "Please check your email for confirmation.";
 
                     return RedirectToAction("OrganizationRegister");
                 }
 
-                TempData["Error"] =
-                    "Organization Registration Failed.";
+                TempData["Error"] = "Organization registration failed.";
 
                 return View(model);
             }
@@ -355,12 +374,71 @@ namespace ErJobPortal.Controllers
 
                 ModelState.AddModelError(
                     "",
-                    ex.Message
+                    "An error occurred while registering the organization. Please try again."
                 );
 
                 return View(model);
             }
         }
+        //[HttpPost]
+        //[ValidateAntiForgeryToken]
+        //public IActionResult OrganizationRegister(OrganizationRegister model)
+        //{
+        //    try
+        //    {
+        //        // STATIC OTP FOR NOW
+        //        if (model.sOTP != "123456")
+        //        {
+        //            ModelState.AddModelError(
+        //                "sOTP",
+        //                "Invalid OTP. Please enter 123456."
+        //            );
+        //        }
+
+        //        // Check validation errors
+        //        if (!ModelState.IsValid)
+        //        {
+        //            foreach (var item in ModelState)
+        //            {
+        //                foreach (var error in item.Value.Errors)
+        //                {
+        //                    Console.WriteLine(
+        //                        $"Field: {item.Key}, Error: {error.ErrorMessage}"
+        //                    );
+        //                }
+        //            }
+
+        //            return View(model);
+        //        }
+
+        //        int result = _accountRepository.RegisterOrganization(model);
+
+        //        if (result > 0)
+        //        {
+        //            TempData["Success"] =
+        //                "Organization Registration Successfully.";
+
+        //            return RedirectToAction("OrganizationRegister");
+        //        }
+
+        //        TempData["Error"] =
+        //            "Organization Registration Failed.";
+
+        //        return View(model);
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        Console.WriteLine("Organization Register Error:");
+        //        Console.WriteLine(ex.ToString());
+
+        //        ModelState.AddModelError(
+        //            "",
+        //            ex.Message
+        //        );
+
+        //        return View(model);
+        //    }
+        //}
 
         [HttpGet]
         public IActionResult OrganizationLogin()
@@ -2004,5 +2082,35 @@ public IActionResult OrganizationResetPassword()
 
 
         #endregion
+
+
+
+        private async Task SendOrganizationRegistrationEmail(string email, string organizationName)
+        {
+            string mailUser = "certwala.iipl@gmail.com";
+            string mailPass = "yfwc saci hntt gbee";
+
+            using var message = new MailMessage();
+
+            message.From = new MailAddress(mailUser, "1Trainee");
+            message.To.Add(email);
+            message.Subject = "Organization Registration Successful";
+            message.IsBodyHtml = true;
+
+            message.Body =
+                $"<p>Dear <strong>{WebUtility.HtmlEncode(organizationName)}</strong>,</p>" +
+                "<p>Your organization has been registered successfully on 1Trainee.</p>" +
+                "<p>You can now access the platform using your registered account.</p>" +
+                "<p>Regards,<br/>Team 1Trainee</p>";
+
+            using var smtp = new SmtpClient("smtp.gmail.com", 587);
+
+            smtp.EnableSsl = true;
+            smtp.UseDefaultCredentials = false;
+            smtp.Credentials = new NetworkCredential(mailUser, mailPass);
+
+            await smtp.SendMailAsync(message);
+        }
+
     }
 }
