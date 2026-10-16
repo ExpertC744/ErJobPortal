@@ -5746,6 +5746,123 @@ WHERE
             }
         }
 
+        public (string Email, string Name, bool IsEnabled)?
+    GetCandidateStatusEmailDetails(int id)
+        {
+            using (SqlConnection cn = _db.GetConnection())
+            {
+                string query = @"
+      SELECT sEmail, sFName, sLName, nSABit
+      FROM tblCandidateRegister
+      WHERE nID = @nID";
 
+                using (SqlCommand cmd = new SqlCommand(query, cn))
+                {
+                    cmd.Parameters.AddWithValue("@nID", id);
+
+                    cn.Open();
+
+                    using (SqlDataReader reader = cmd.ExecuteReader())
+                    {
+                        if (!reader.Read())
+                            return null;
+
+                        string email = reader["sEmail"] == DBNull.Value
+                            ? ""
+                            : reader["sEmail"].ToString() ?? "";
+
+                        string firstName = reader["sFName"] == DBNull.Value
+                            ? ""
+                            : reader["sFName"].ToString() ?? "";
+
+                        string lastName = reader["sLName"] == DBNull.Value
+                            ? ""
+                            : reader["sLName"].ToString() ?? "";
+
+                        bool isEnabled =
+                            reader["nSABit"] != DBNull.Value &&
+                            Convert.ToInt32(reader["nSABit"]) == 1;
+
+                        return (
+                            email,
+                            (firstName + " " + lastName).Trim(),
+                            isEnabled
+                        );
+                    }
+                }
+            }
+        }
+
+        //khushi 15-10
+        public (string Email, string Name)? GetOrganizationStatusEmailDetails(int id)
+        {
+            using (SqlConnection cn = _db.GetConnection())
+            {
+                string query = @"
+    SELECT sEmail, sName
+    FROM tblOrgRegistration
+    WHERE nID = @nID";
+
+                using (SqlCommand cmd = new SqlCommand(query, cn))
+                {
+                    cmd.Parameters.AddWithValue("@nID", id);
+
+                    cn.Open();
+
+                    using (SqlDataReader reader = cmd.ExecuteReader())
+                    {
+                        if (reader.Read())
+                        {
+                            string email = reader["sEmail"]?.ToString() ?? "";
+                            string name = reader["sName"]?.ToString() ?? "";
+
+                            return (email, name);
+                        }
+                    }
+                }
+            }
+
+            return null;
+        }
+
+
+
+        //khushi 15-10
+        public bool ToggleOrganizationProfileStatus(int id, bool status)
+        {
+            try
+            {
+                using (var connection = _db.GetConnection())
+                {
+                    using (var command = connection.CreateCommand())
+                    {
+                        command.CommandText = "UPDATE tblOrgProfile SET nSABit = @Status WHERE nID = @ID";
+                        command.CommandType = System.Data.CommandType.Text;
+
+                        var statusParameter = command.CreateParameter();
+                        statusParameter.ParameterName = "@Status";
+                        statusParameter.Value = status;
+                        command.Parameters.Add(statusParameter);
+
+                        var idParameter = command.CreateParameter();
+                        idParameter.ParameterName = "@ID";
+                        idParameter.Value = id;
+                        command.Parameters.Add(idParameter);
+
+                        if (connection.State != System.Data.ConnectionState.Open)
+                        {
+                            connection.Open();
+                        }
+
+                        return command.ExecuteNonQuery() > 0;
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"ToggleOrganizationProfileStatus failed: {ex}");
+                return false;
+            }
+        }
     }
 }

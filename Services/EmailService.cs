@@ -6,10 +6,12 @@ namespace ErJobPortal.Services
     public class EmailService
     {
         private readonly IConfiguration _configuration;
+        private readonly ILogger<EmailService> _logger;
 
-        public EmailService(IConfiguration configuration)
+        public EmailService(IConfiguration configuration, ILogger<EmailService> logger)
         {
             _configuration = configuration;
+            _logger = logger;
         }
 
         public async Task SendSuperAdminLoginDetailsAsync(
@@ -634,5 +636,208 @@ Er Job Portal Team
             await smtp.SendMailAsync(message);
         }
 
+
+        public async Task SendCandidateStatusEmailAsync(string email, string candidateName, bool isEnabled)
+        {
+            if (string.IsNullOrWhiteSpace(email))
+                throw new ArgumentException("Candidate email is required.", nameof(email));
+
+            string smtpServer = _configuration["EmailSettings:SmtpServer"] ?? "";
+            int port = Convert.ToInt32(_configuration["EmailSettings:Port"] ?? "587");
+            string username = _configuration["EmailSettings:Username"] ?? "";
+            string smtpPassword = _configuration["EmailSettings:Password"] ?? "";
+            string fromEmail = _configuration["EmailSettings:FromEmail"] ?? username;
+            string fromName = _configuration["EmailSettings:FromName"] ?? "Er Job Portal";
+
+            string subject = isEnabled
+                ? "Your Er Job Portal Registration Has Been Enabled"
+                : "Your Er Job Portal Registration Has Been Disabled";
+
+            string safeName = WebUtility.HtmlEncode(candidateName ?? "Candidate");
+
+            string statusMessage = isEnabled
+                ? "Your candidate registration has been enabled by the Super Admin. You can now access your Er Job Portal account."
+                : "Your candidate registration has been disabled by the Super Admin. Access to your candidate account may be restricted.";
+
+            string safeMessage = WebUtility.HtmlEncode(statusMessage);
+
+            string additionalMessage = isEnabled
+                ? "Thank you for being part of Er Job Portal."
+                : "If you believe this action was taken by mistake, please contact the Er Job Portal administration team.";
+
+            string safeAdditionalMessage = WebUtility.HtmlEncode(additionalMessage);
+
+            using var message = new MailMessage();
+
+            message.From = new MailAddress(fromEmail, fromName);
+            message.To.Add(email.Trim());
+            message.Subject = subject;
+            message.IsBodyHtml = true;
+
+            message.Body = $@"
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset='UTF-8'>
+</head>
+<body style='margin:0;padding:20px;background:#f5f7fa;
+             font-family:Arial,Helvetica,sans-serif;'>
+    <div style='max-width:600px;margin:auto;background:#fff;
+                border:1px solid #e2e8f0;border-radius:10px;overflow:hidden;'>
+        <div style='background:#0d9488;padding:22px;text-align:center;'>
+            <h2 style='color:#fff;margin:0;'>Er Job Portal</h2>
+        </div>
+
+        <div style='padding:28px;'>
+            <p>Dear <strong>{safeName}</strong>,</p>
+
+            <h3 style='color:{(isEnabled ? "#198754" : "#dc3545")};'>
+                Registration {(isEnabled ? "Enabled" : "Disabled")}
+            </h3>
+
+            <p style='color:#555;font-size:14px;line-height:1.8;'>
+                {safeMessage}
+            </p>
+
+            <p style='color:#555;font-size:14px;line-height:1.8;'>
+                {safeAdditionalMessage}
+            </p>
+
+            <p>Regards,<br><strong>Er Job Portal Team</strong></p>
+        </div>
+
+        <div style='background:#f8fafc;padding:14px;text-align:center;'>
+            <p style='margin:0;color:#888;font-size:12px;'>
+                This is an automated email. Please do not reply directly.
+            </p>
+        </div>
+    </div>
+</body>
+</html>";
+
+
+            try
+            {
+                using var smtp = new SmtpClient(smtpServer, port)
+                {
+                    EnableSsl = bool.TryParse(
+                        _configuration["EmailSettings:EnableSsl"],
+                        out bool enableSsl) && enableSsl,
+
+                    UseDefaultCredentials = false,
+                    Credentials = new NetworkCredential(username, smtpPassword),
+                    DeliveryMethod = SmtpDeliveryMethod.Network,
+                    Timeout = 30000
+                };
+
+                await smtp.SendMailAsync(message);
+
+                _logger.LogInformation(
+                    "Status email accepted by SMTP for recipient {Email}.",
+                    email);
+            }
+            catch (SmtpException ex)
+            {
+                _logger.LogError(
+                    ex,
+                    "SMTP error sending candidate status email to {Email}. " +
+                    "StatusCode: {StatusCode}; Details: {Details}",
+                    email,
+                    ex.StatusCode,
+                    ex.Message);
+
+                throw;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(
+                    ex,
+                    "Unexpected error sending candidate status email to {Email}.",
+                    email);
+
+                throw;
+            }
+
+
+            //await smtp.SendMailAsync(message);
+        }
+
+
+        public async Task SendOrganizationProfileStatusEmailAsync(
+string email,
+string organizationName,
+bool isEnabled)
+        {
+            string smtpServer = _configuration["EmailSettings:SmtpServer"] ?? "";
+            int port = Convert.ToInt32(_configuration["EmailSettings:Port"] ?? "587");
+            string username = _configuration["EmailSettings:Username"] ?? "";
+            string password = _configuration["EmailSettings:Password"] ?? "";
+            string fromEmail = _configuration["EmailSettings:FromEmail"] ?? username;
+            string fromName = _configuration["EmailSettings:FromName"] ?? "ErJobPortal";
+
+            if (string.IsNullOrWhiteSpace(email))
+            {
+                throw new ArgumentException(
+                    "Organization email is required.", nameof(email));
+            }
+
+            if (string.IsNullOrWhiteSpace(smtpServer) ||
+                string.IsNullOrWhiteSpace(fromEmail) ||
+                string.IsNullOrWhiteSpace(username) ||
+                string.IsNullOrWhiteSpace(password))
+            {
+                throw new InvalidOperationException(
+                    "Email SMTP settings are missing in appsettings.json.");
+            }
+
+            string safeName = WebUtility.HtmlEncode(
+                string.IsNullOrWhiteSpace(organizationName)
+                    ? "Organization"
+                    : organizationName);
+
+            string statusText = isEnabled ? "Enabled" : "Disabled";
+
+            using var message = new MailMessage();
+
+            message.From = new MailAddress(fromEmail, fromName);
+            message.To.Add(email.Trim());
+
+            message.Subject = isEnabled
+                ? "ErJobPortal - Organization Profile Enabled"
+                : "ErJobPortal - Organization Profile Disabled";
+
+            message.IsBodyHtml = true;
+
+            message.Body = $@"
+<!DOCTYPE html>
+<html>
+<body style='font-family:Arial,sans-serif;color:#333;'>
+    <div style='max-width:600px;margin:auto;padding:20px;border:1px solid #ddd;border-radius:8px;'>
+        <h2 style='color:#2457a7;'>ErJobPortal</h2>
+
+        <p>Hello {safeName},</p>
+
+        <p>Your organization profile status has been updated.</p>
+
+        <p>Current status: <strong>{statusText}</strong></p>
+
+        {(isEnabled
+                    ? "<p>Your organization profile is now enabled.</p>"
+                    : "<p>Your organization profile is now disabled. Please contact the administrator if you believe this is an error.</p>")}
+
+        <p>Regards,<br/>ErJobPortal Team</p>
+    </div>
+</body>
+</html>";
+
+            using var smtp = new SmtpClient(smtpServer, port)
+            {
+                EnableSsl = true,
+                UseDefaultCredentials = false,
+                Credentials = new NetworkCredential(username, password)
+            };
+
+            await smtp.SendMailAsync(message);
+        }
     }
 }
