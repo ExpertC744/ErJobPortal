@@ -210,81 +210,57 @@ namespace ErJobPortal.Controllers
         //}
 
 
-
         public IActionResult Index()
         {
-            // ============================================================
-            // CODE 1 : TRAINEE + FEEDBACK LIST
-            // ============================================================
-
             List<HomeTraineeCardM> trainees = new List<HomeTraineeCardM>();
             List<HomeFeedbackCardM> feedbacks = new List<HomeFeedbackCardM>();
 
-
-            // ============================================================
-            // CODE 2 : DASHBOARD COUNTS
-            // ============================================================
-
-            int traineeCount = 0;
-            int organizationCount = 0;
-            int postCount = 0;
-            int stateCount = 0;
-            int countryCount = 0;
-
-
-            // ============================================================
-            // DATABASE CONNECTION
-            // ============================================================
-
             string connectionString =
                 _configuration.GetConnectionString("DefaultConnection");
-
 
             using (SqlConnection cn = new SqlConnection(connectionString))
             {
                 cn.Open();
 
-
-                // ========================================================
-                // CODE 1
+                // ============================================================
                 // TRAINEE LIST
-                // ========================================================
+                // ============================================================
 
                 string traineeQuery = @"
-       SELECT  
-           CR.nID AS CandidateID,
+         SELECT 
+             CR.nID AS CandidateID,
 
-           LTRIM(RTRIM(
-               ISNULL(CR.sFName, '') + ' ' +
-               ISNULL(CR.sLName, '')
-           )) AS TraineeName,
+             LTRIM(RTRIM(
+                 ISNULL(CR.sFName, '') + ' ' +
+                 ISNULL(CR.sLName, '')
+             )) AS TraineeName,
 
-           CP.sPhoto AS ProfileImage,
+             CP.sPhoto AS ProfileImage,
 
-           '' AS Designation,
+             '' AS Designation,
 
-           LTRIM(RTRIM(
-               ISNULL(CP.Preferred_City, '') +
-               CASE
-                   WHEN CP.Preferred_City IS NOT NULL
-                        AND CP.Preferred_City <> ''
-                        AND CP.Preferred_State IS NOT NULL
-                        AND CP.Preferred_State <> ''
-                   THEN ', '
-                   ELSE ''
-               END +
-               ISNULL(CP.Preferred_State, '')
-           )) AS Location
+             LTRIM(RTRIM(
+                 ISNULL(CP.Preferred_City, '') +
+                 CASE 
+                     WHEN CP.Preferred_City IS NOT NULL
+                          AND CP.Preferred_City <> ''
+                          AND CP.Preferred_State IS NOT NULL
+                          AND CP.Preferred_State <> ''
+                     THEN ', '
+                     ELSE ''
+                 END +
+                 ISNULL(CP.Preferred_State, '')
+             )) AS Location
 
-       FROM tblCandidateRegister CR
+         FROM tblCandidateRegister CR
 
-       INNER JOIN tblCandidateProfile CP
-           ON CP.CandidateID = CR.nID
+         INNER JOIN tblCandidateProfile CP
+             ON CP.CandidateID = CR.nID
 
-       WHERE ISNULL(CR.nBit, 1) = 1
-         AND ISNULL(CP.nBit, 1) = 1
+         WHERE ISNULL(CR.nBit, 1) = 1
+           AND ISNULL(CP.nBit, 1) = 1
 
-       ORDER BY CR.nID DESC";
+         ORDER BY CR.nID DESC";
 
 
                 using (SqlCommand cmd = new SqlCommand(traineeQuery, cn))
@@ -315,61 +291,60 @@ namespace ErJobPortal.Controllers
                 }
 
 
-                // ========================================================
-                // CODE 1
+                // ============================================================
                 // CANDIDATE FEEDBACK
-                // ========================================================
+                // ============================================================
 
                 string feedbackQuery = @"
-       SELECT
-           CF.nAdminID AS CandidateID,
+         SELECT
+             CF.nAdminID AS CandidateID,
 
-           LTRIM(RTRIM(
-               ISNULL(CR.sFName, '') + ' ' +
-               ISNULL(CR.sLName, '')
-           )) AS TraineeName,
+             LTRIM(RTRIM(
+                 ISNULL(CR.sFName, '') + ' ' +
+                 ISNULL(CR.sLName, '')
+             )) AS TraineeName,
 
-           CP.sPhoto AS ProfileImage,
+             CP.sPhoto AS ProfileImage,
 
-           '' AS Designation,
+             '' AS Designation,
 
-           LTRIM(RTRIM(
-               ISNULL(CP.Preferred_City, '') +
-               CASE
-                   WHEN CP.Preferred_City IS NOT NULL
-                        AND CP.Preferred_City <> ''
-                        AND CP.Preferred_State IS NOT NULL
-                        AND CP.Preferred_State <> ''
-                   THEN ', '
-                   ELSE ''
-               END +
-               ISNULL(CP.Preferred_State, '')
-           )) AS Location,
+             LTRIM(RTRIM(
+                 ISNULL(CP.Preferred_City, '') +
+                 CASE
+                     WHEN CP.Preferred_City IS NOT NULL
+                          AND CP.Preferred_City <> ''
+                          AND CP.Preferred_State IS NOT NULL
+                          AND CP.Preferred_State <> ''
+                     THEN ', '
+                     ELSE ''
+                 END +
+                 ISNULL(CP.Preferred_State, '')
+             )) AS Location,
 
-           ISNULL(CF.sQue5, '') AS Feedback,
+             ISNULL(CF.sQue5, '') AS Feedback,
 
-           ISNULL(
-               TRY_CONVERT(INT, CF.sQue2),
-               0
-           ) AS Rating
+             ISNULL(
+                 TRY_CONVERT(INT, CF.sQue2),
+                 0
+             ) AS Rating
 
-       FROM tblCandidateFeedback CF
+         FROM tblCandidateFeedback CF
 
-       INNER JOIN tblCandidateRegister CR
-           ON CR.nID = CF.nAdminID
+         INNER JOIN tblCandidateRegister CR
+             ON CR.nID = CF.nAdminID
 
-       INNER JOIN tblCandidateProfile CP
-           ON CP.CandidateID = CR.nID
+         INNER JOIN tblCandidateProfile CP
+             ON CP.CandidateID = CR.nID
 
-       WHERE ISNULL(CF.nSABit, 0) = 1
+         WHERE ISNULL(CF.nSABit, 0) = 1
 
-         AND ISNULL(CR.nBit, 1) = 1
+           AND ISNULL(CR.nBit, 1) = 1
 
-         AND ISNULL(CP.nBit, 1) = 1
+           AND ISNULL(CP.nBit, 1) = 1
 
-         AND ISNULL(LTRIM(RTRIM(CF.sQue5)), '') <> ''
+           AND ISNULL(LTRIM(RTRIM(CF.sQue5)), '') <> ''
 
-       ORDER BY CF.nID DESC";
+         ORDER BY CF.nID DESC";
 
 
                 using (SqlCommand cmd = new SqlCommand(feedbackQuery, cn))
@@ -406,119 +381,10 @@ namespace ErJobPortal.Controllers
                         }
                     }
                 }
-
-
-                // ========================================================
-                // CODE 2
-                // TRAINEE, ORGANIZATION AND POST COUNT
-                // ========================================================
-
-                string countQuery = @"
-       SELECT
-           (SELECT COUNT(nID)
-            FROM tblCandidateRegister) AS CandidateCount,
-
-           (SELECT COUNT(nID)
-            FROM tblOrgRegistration) AS OrganizationCount,
-
-           (SELECT COUNT(nID)
-            FROM tblPost) AS PostCount;";
-
-
-                using (SqlCommand cmd = new SqlCommand(countQuery, cn))
-                using (SqlDataReader dr = cmd.ExecuteReader())
-                {
-                    if (dr.Read())
-                    {
-                        traineeCount =
-                            Convert.ToInt32(dr["CandidateCount"]);
-
-                        organizationCount =
-                            Convert.ToInt32(dr["OrganizationCount"]);
-
-                        postCount =
-                            Convert.ToInt32(dr["PostCount"]);
-                    }
-                }
-
-
-                // ========================================================
-                // CODE 2
-                // STATE COUNT
-                // ========================================================
-
-                using (SqlCommand cmdState =
-                       new SqlCommand("SP_CountState", cn))
-                {
-                    cmdState.CommandType =
-                        CommandType.StoredProcedure;
-
-                    object? result =
-                        cmdState.ExecuteScalar();
-
-                    if (result != null &&
-                        result != DBNull.Value)
-                    {
-                        stateCount =
-                            Convert.ToInt32(result);
-                    }
-                }
-
-
-                // ========================================================
-                // CODE 2
-                // COUNTRY COUNT
-                // ========================================================
-
-                using (SqlCommand cmdCountry =
-                       new SqlCommand("SP_CountCountry", cn))
-                {
-                    cmdCountry.CommandType =
-                        CommandType.StoredProcedure;
-
-                    object? result =
-                        cmdCountry.ExecuteScalar();
-
-                    if (result != null &&
-                        result != DBNull.Value)
-                    {
-                        countryCount =
-                            Convert.ToInt32(result);
-                    }
-                }
             }
 
-
-            // ============================================================
-            // SEND FEEDBACK LIST TO VIEW
-            // ============================================================
-
+            // Send feedback to Home/Index.cshtml
             ViewBag.Feedbacks = feedbacks;
-
-
-            // ============================================================
-            // SEND DASHBOARD COUNTS TO VIEW
-            // ============================================================
-
-            ViewBag.TraineeCount =
-                traineeCount;
-
-            ViewBag.OrganizationCount =
-                organizationCount;
-
-            ViewBag.PostCount =
-                postCount;
-
-            ViewBag.StateCount =
-                stateCount;
-
-            ViewBag.CountryCount =
-                countryCount;
-
-
-            // ============================================================
-            // RETURN HOME VIEW
-            // ============================================================
 
             return View(trainees);
         }
