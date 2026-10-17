@@ -367,20 +367,30 @@
                     </div>
 
 
-                    <!-- OTP Input -->
-
                     <div class="otp-input-container">
 
                         <input asp-for="sOTP"
                                type="text"
                                class="otp-input"
-                               placeholder="Enter OTP"
+                               placeholder="Enter 6-digit OTP"
                                maxlength="6"
+                               inputmode="numeric"
                                autocomplete="one-time-code" />
 
                         <span asp-validation-for="sOTP"
-                              class="text-danger register-validation">
-                        </span>
+                              class="text-danger register-validation"></span>
+
+                        <button type="button"
+                                class="send-otp-btn"
+                                id="btnVerifyOTP"
+                                disabled>
+                            Verify OTP
+                        </button>
+
+                        <span id="otpStatus"
+                              class="register-validation"
+                              role="status"
+                              aria-live="polite"></span>
 
                     </div>
 
@@ -1122,11 +1132,312 @@
 }
 
 
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+
+        // =====================================================
+        // 1. CAPITALIZE FIRST LETTER OF FIRST NAME AND LAST NAME
+        // =====================================================
+        const nameFields = ["sFName", "sLName"];
+
+        nameFields.forEach(function (fieldName) {
+            const input = document.querySelector(
+                `[name="${fieldName}"]`
+            );
+
+            if (!input) return;
+
+            input.addEventListener("input", function () {
+                if (this.value.length > 0) {
+                    this.value =
+                        this.value.charAt(0).toUpperCase() +
+                        this.value.slice(1);
+                }
+            });
+        });
+
+        // =====================================================
+        // 2. EMAIL OTP VERIFICATION
+        // =====================================================
+        $(document).ready(function () {
+
+            const sendButton = $("#btnSendOTP");
+            const verifyButton = $("#btnVerifyOTP");
+            const emailInput = $("#sEmail");
+            const otpInput = $("#sOTP");
+            const status = $("#otpStatus");
+            const registerButton = $(".register-main-btn");
+            const registrationForm = $("#candidateRegistrationForm");
+
+            let otpSent = false;
+            let emailVerified = false;
+            let verifiedEmail = "";
+
+            function showStatus(message, success) {
+                status.text(message).css(
+                    "color",
+                    success ? "green" : "red"
+                );
+            }
+
+            function resetVerification() {
+                otpSent = false;
+                emailVerified = false;
+                verifiedEmail = "";
+
+                otpInput.val("").prop("readonly", false);
+                verifyButton.prop("disabled", true);
+                registerButton.prop("disabled", true);
+            }
+
+            // Initial state
+            resetVerification();
+
+            // -------------------------------------------------
+            // Email changed: previous verification is invalid
+            // -------------------------------------------------
+            emailInput.on("input", function () {
+                resetVerification();
+
+                showStatus(
+                    "Email changed. Please send a new OTP.",
+                    false
+                );
+            });
+
+            // -------------------------------------------------
+            // SEND OTP
+            // -------------------------------------------------
+            sendButton.on("click", function (e) {
+                e.preventDefault();
+
+                const email = emailInput.val().trim();
+                const otpType =
+                    $('input[name="OTPType"]:checked').val();
+
+                if (otpType !== "Email") {
+                    showStatus(
+                        "Mobile OTP is not implemented yet. Please select Email.",
+                        false
+                    );
+                    return;
+                }
+
+                if (!email) {
+                    showStatus(
+                        "Please enter your email address.",
+                        false
+                    );
+
+                    emailInput.trigger("focus");
+                    return;
+                }
+
+                if (!emailInput[0].checkValidity()) {
+                    emailInput[0].reportValidity();
+                    return;
+                }
+
+                resetVerification();
+
+                sendButton
+                    .prop("disabled", true)
+                    .text("Sending...");
+
+                showStatus(
+                    "Sending OTP to your email...",
+                    true
+                );
+
+                $.ajax({
+                    url: '@Url.Action("SendCandidateOTP", "Account")',
+                    type: "POST",
+
+                    data: {
+                        email: email,
+                        otpType: "Email",
+                        __RequestVerificationToken:
+                            $('input[name="__RequestVerificationToken"]').val()
+                    },
+
+                    success: function (response) {
+                        if (response && response.success) {
+                            otpSent = true;
+
+                            verifyButton.prop("disabled", false);
+                            otpInput.val("").trigger("focus");
+
+                            showStatus(
+                                response.message ||
+                                "OTP request completed. Please check your email.",
+                                true
+                            );
+                        } else {
+                            showStatus(
+                                response?.message ||
+                                "Unable to send OTP.",
+                                false
+                            );
+                        }
+                    },
+
+                    error: function (xhr) {
+                        console.error(
+                            "Send OTP HTTP status:",
+                            xhr.status
+                        );
+
+                        console.error(
+                            "Send OTP response:",
+                            xhr.responseText
+                        );
+
+                        showStatus(
+                            xhr.responseJSON?.message ||
+                            "OTP request failed. Check the browser Console and Network tabs.",
+                            false
+                        );
+                    },
+
+                    complete: function () {
+                        sendButton
+                            .prop("disabled", false)
+                            .text("Send OTP");
+                    }
+                });
+            });
+
+            // -------------------------------------------------
+            // VERIFY OTP
+            // -------------------------------------------------
+            verifyButton.on("click", function (e) {
+                e.preventDefault();
+
+                const email = emailInput.val().trim();
+                const otp = otpInput.val().trim();
+
+                if (!otpSent) {
+                    showStatus(
+                        "Please send an OTP first.",
+                        false
+                    );
+                    return;
+                }
+
+                if (!/^\d{6}$/.test(otp)) {
+                    showStatus(
+                        "Enter the six-digit OTP received in your email.",
+                        false
+                    );
+
+                    otpInput.trigger("focus");
+                    return;
+                }
+
+                verifyButton
+                    .prop("disabled", true)
+                    .text("Verifying...");
+
+                $.ajax({
+                    url: '@Url.Action("VerifyCandidateOTP", "Account")',
+                    type: "POST",
+
+                    data: {
+                        email: email,
+                        otp: otp,
+                        __RequestVerificationToken:
+                            $('input[name="__RequestVerificationToken"]').val()
+                    },
+
+                    success: function (response) {
+                        if (response && response.success) {
+                            otpSent = true;
+                            emailVerified = true;
+                            verifiedEmail = email;
+
+                            otpInput.prop("readonly", true);
+
+                            registerButton.prop("disabled", false);
+
+                            showStatus(
+                                response.message ||
+                                "Email verified successfully!",
+                                true
+                            );
+                        } else {
+                            emailVerified = false;
+                            verifiedEmail = "";
+
+                            registerButton.prop("disabled", true);
+
+                            showStatus(
+                                response?.message ||
+                                "OTP verification failed.",
+                                false
+                            );
+                        }
+                    },
+
+                    error: function (xhr) {
+                        console.error(
+                            "Verify OTP HTTP status:",
+                            xhr.status
+                        );
+
+                        console.error(
+                            "Verify OTP response:",
+                            xhr.responseText
+                        );
+
+                        showStatus(
+                            xhr.responseJSON?.message ||
+                            "Unable to verify OTP. Please try again.",
+                            false
+                        );
+                    },
+
+                    complete: function () {
+                        verifyButton
+                            .prop("disabled", false)
+                            .text("Verify OTP");
+                    }
+                });
+            });
+
+            // -------------------------------------------------
+            // REGISTRATION SUBMISSION GUARD
+            // -------------------------------------------------
+            registrationForm.on("submit", function (e) {
+
+                const currentEmail =
+                    emailInput.val().trim().toLowerCase();
+
+                if (
+                    !emailVerified ||
+                    currentEmail !== verifiedEmail.toLowerCase()
+                ) {
+                    e.preventDefault();
+
+                    showStatus(
+                        "Please verify your email OTP before registering.",
+                        false
+                    );
+
+                    alert(
+                        "Please verify your email OTP before registering."
+                    );
+                }
+            });
+
+        });
+    });
+</script>
+
 <!-- =========================================================
      CAPITALIZE FIRST LETTER OF FIRST NAME / LAST NAME
 ========================================================== -->
 
-<script>
+@* <script>
 
     document.addEventListener("DOMContentLoaded", function () {
 
@@ -1161,4 +1472,217 @@
 
     });
 
-</script>
+
+
+        $(document).ready(function () {
+
+            const sendButton = $('#btnSendOTP');
+            const verifyButton = $('#btnVerifyOTP');
+            const emailInput = $('#sEmail');
+            const otpInput = $('#sOTP');
+            const status = $('#otpStatus');
+            const registerButton = $('.register-main-btn');
+            const registrationForm = $('#candidateRegistrationForm');
+
+            let otpSent = false;
+            let emailVerified = false;
+            let verifiedEmail = '';
+
+            function showStatus(message, success) {
+                status.text(message)
+                      .css('color', success ? 'green' : 'red');
+            }
+
+            function resetVerification() {
+                otpSent = false;
+                emailVerified = false;
+                verifiedEmail = '';
+
+                otpInput.val('').prop('readonly', false);
+                verifyButton.prop('disabled', true);
+                registerButton.prop('disabled', true);
+            }
+
+            resetVerification();
+
+            // Email changed: a new OTP is required.
+            emailInput.on('input', function () {
+                resetVerification();
+                showStatus('Email changed. Please send a new OTP.', false);
+            });
+
+            // Send email OTP.
+            sendButton.on('click', function (e) {
+                e.preventDefault();
+
+                const email = emailInput.val().trim();
+                const otpType = $('input[name="OTPType"]:checked').val();
+
+                if (otpType !== 'Email') {
+                    showStatus(
+                        'Mobile OTP is not implemented yet. Please select Email.',
+                        false
+                    );
+                    return;
+                }
+
+                if (!email) {
+                    showStatus('Please enter your email address.', false);
+                    emailInput.trigger('focus');
+                    return;
+                }
+
+                if (!emailInput[0].checkValidity()) {
+                    emailInput[0].reportValidity();
+                    return;
+                }
+
+                resetVerification();
+
+                sendButton.prop('disabled', true).text('Sending...');
+                showStatus('Sending OTP to your email...', true);
+
+                $.ajax({
+                    url: '@Url.Action("SendCandidateOTP", "Account")',
+                    type: 'POST',
+                    data: {
+                        email: email,
+                        otpType: 'Email',
+                        __RequestVerificationToken:
+                            $('input[name="__RequestVerificationToken"]').val()
+                    },
+
+                    success: function (response) {
+                        if (response && response.success) {
+                            otpSent = true;
+                            verifyButton.prop('disabled', false);
+                            otpInput.val('').trigger('focus');
+
+                            showStatus(
+                                response.message ||
+                                'OTP sent successfully. Check your inbox.',
+                                true
+                            );
+                        } else {
+                            showStatus(
+                                response?.message || 'Unable to send OTP.',
+                                false
+                            );
+                        }
+                    },
+
+                    error: function (xhr) {
+                        console.error(
+                            'Send OTP HTTP status:',
+                            xhr.status
+                        );
+                        console.error('Send OTP response:', xhr.responseText);
+
+                        showStatus(
+                            xhr.responseJSON?.message ||
+                            'OTP request failed. Check the browser Console and Network tabs.',
+                            false
+                        );
+                    },
+
+                    complete: function () {
+                        sendButton.prop('disabled', false)
+                                  .text('Send OTP');
+                    }
+                });
+            });
+
+            // Verify email OTP.
+            verifyButton.on('click', function (e) {
+                e.preventDefault();
+
+                const email = emailInput.val().trim();
+                const otp = otpInput.val().trim();
+
+                if (!otpSent) {
+                    showStatus('Please send an OTP first.', false);
+                    return;
+                }
+
+                if (!/^\d{6}$/.test(otp)) {
+                    showStatus(
+                        'Enter the six-digit OTP received in your email.',
+                        false
+                    );
+                    otpInput.trigger('focus');
+                    return;
+                }
+
+                verifyButton.prop('disabled', true)
+                            .text('Verifying...');
+
+                $.ajax({
+                    url: '@Url.Action("VerifyCandidateOTP", "Account")',
+                    type: 'POST',
+                    data: {
+                        email: email,
+                        otp: otp,
+                        __RequestVerificationToken:
+                            $('input[name="__RequestVerificationToken"]').val()
+                    },
+
+                    success: function (response) {
+                        if (response && response.success) {
+                            emailVerified = true;
+                            verifiedEmail = email;
+
+                            otpInput.prop('readonly', true);
+                            registerButton.prop('disabled', false);
+
+                            showStatus(
+                                response.message ||
+                                'Email verified successfully!',
+                                true
+                            );
+                        } else {
+                            emailVerified = false;
+                            registerButton.prop('disabled', true);
+
+                            showStatus(
+                                response?.message ||
+                                'OTP verification failed.',
+                                false
+                            );
+                        }
+                    },
+
+                    error: function (xhr) {
+                        console.error(
+                            'Verify OTP HTTP status:',
+                            xhr.status
+                        );
+                        console.error('Verify OTP response:', xhr.responseText);
+
+                        showStatus(
+                            xhr.responseJSON?.message ||
+                            'Unable to verify OTP. Please try again.',
+                            false
+                        );
+                    },
+
+                    complete: function () {
+                        verifyButton.prop('disabled', false)
+                                    .text('Verify OTP');
+                    }
+                });
+            });
+
+            // Client-side registration guard.
+            registrationForm.on('submit', function (e) {
+                if (!emailVerified ||
+                    emailInput.val().trim().toLowerCase() !==
+                    verifiedEmail.toLowerCase()) {
+
+                    e.preventDefault();
+
+                    alert('Please verify your email OTP before registering.');
+                }
+            });
+
+        });
+    </script> *@
