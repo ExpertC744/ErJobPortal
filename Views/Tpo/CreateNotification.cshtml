@@ -458,308 +458,250 @@
 
 
 <script>
+document.addEventListener("DOMContentLoaded", function () {
 
-        document.addEventListener("DOMContentLoaded", function () {
+    const editor = document.getElementById("contentEditor");
+    const content = document.getElementById("Content");
+    const form = document.getElementById("notificationForm");
+    const contentError = document.getElementById("contentError");
+    const submitButton = form.querySelector('button[type="submit"]');
 
-            const editor =
-                document.getElementById("contentEditor");
+    if (!editor || !content || !form) {
+        console.error("Notification form, editor, or Content field is missing.");
+        return;
+    }
 
-            const content =
-                document.getElementById("Content");
+    // =========================================
+    // SYNCHRONIZE EDITOR WITH MVC FIELD
+    // =========================================
 
-            const form =
-                document.getElementById("notificationForm");
+    function syncContent() {
+        content.value = editor.innerHTML;
+    }
 
-            const fileInput1 =
-        document.getElementById("AttachFile1");
+    editor.addEventListener("input", function () {
+        syncContent();
 
-    const fileName1 =
-        document.getElementById("fileName1");
+        if (editor.innerText.trim() !== "") {
+            contentError.textContent = "";
+            document.querySelector(".editor-box")
+                .classList.remove("editor-error");
+        }
+    });
 
-    const fileInput2 =
-        document.getElementById("AttachFile2");
+    // =========================================
+    // RICH TEXT TOOLBAR
+    // =========================================
 
-    const fileName2 =
-        document.getElementById("fileName2");
-            const fileInput =
-                document.getElementById("AttachFile");
+    document.querySelectorAll(
+        ".editor-toolbar button[data-command]"
+    ).forEach(function (button) {
 
-            const fileName =
-                document.getElementById("fileName");
+        button.addEventListener("click", function () {
+            editor.focus();
 
+            document.execCommand(
+                this.dataset.command,
+                false,
+                null
+            );
 
-            /* =========================================
-               RICH TEXT EDITOR
-               ========================================= */
+            syncContent();
+        });
+    });
 
-            function syncContent() {
-                content.value = editor.innerHTML;
+    // =========================================
+    // INSERT LINK
+    // =========================================
+
+    const linkButton = document.getElementById("linkButton");
+
+    if (linkButton) {
+        linkButton.addEventListener("click", function () {
+            editor.focus();
+
+            const url = prompt("Enter URL:");
+
+            if (!url || !url.trim()) {
+                return;
             }
 
+            try {
+                const parsedUrl = new URL(url.trim());
 
-            editor.addEventListener("input", function () {
-                syncContent();
-            });
-
-
-            document
-                .querySelectorAll(".editor-toolbar button[data-command]")
-                .forEach(function (button) {
-
-                    button.addEventListener("click", function () {
-
-                        editor.focus();
-
-                        document.execCommand(
-                            this.dataset.command,
-                            false,
-                            null
-                        );
-
-                        syncContent();
-
-                    });
-
-                });
-
-
-            /* =========================================
-               INSERT LINK
-               ========================================= */
-
-            document
-                .getElementById("linkButton")
-                .addEventListener("click", function () {
-
-                    editor.focus();
-
-                    const url = prompt("Enter URL:");
-
-                    if (url && url.trim() !== "") {
-
-                        document.execCommand(
-                            "createLink",
-                            false,
-                            url.trim()
-                        );
-
-                        syncContent();
-                    }
-
-                });
-
-
-            /* =========================================
-       FILE 1 NAME
-       ========================================= */
-
-    fileInput1.addEventListener("change", function () {
-
-        if (this.files.length > 0) {
-
-            fileName1.querySelector("span").textContent =
-                this.files[0].name;
-
-        } else {
-
-            fileName1.querySelector("span").textContent =
-                "No file selected";
-
-        }
-
-    });
-
-
-    /* =========================================
-       FILE 2 NAME
-       ========================================= */
-
-    fileInput2.addEventListener("change", function () {
-
-        if (this.files.length > 0) {
-
-            fileName2.querySelector("span").textContent =
-                this.files[0].name;
-
-        } else {
-
-            fileName2.querySelector("span").textContent =
-                "No file selected";
-
-        }
-
-    });
-               FILE NAME
-               ========================================= */
-
-            fileInput.addEventListener("change", function () {
-
-                if (this.files.length > 0) {
-
-                    fileName.querySelector("span").textContent =
-                        this.files[0].name;
-
-                } else {
-
-                    fileName.querySelector("span").textContent =
-                        "No file selected";
-
+                if (!["http:", "https:"].includes(parsedUrl.protocol)) {
+                    alert("Please enter a valid HTTP or HTTPS URL.");
+                    return;
                 }
 
-            });
-
-
-            /* =========================================
-               VALIDATION
-               ========================================= */
-
-            form.addEventListener("submit", function (event) {
+                document.execCommand(
+                    "createLink",
+                    false,
+                    parsedUrl.href
+                );
 
                 syncContent();
 
-                const title =
-                    document.getElementById("Title");
+            } catch (error) {
+                alert("Please enter a valid URL.");
+            }
+        });
+    }
 
-                const type =
-                    document.getElementById("Type");
+    // =========================================
+    // ATTACHMENT FILENAMES
+    // =========================================
 
-                const audience =
-                    document.getElementById("Audience");
+    const attachmentFields = [
+        { input: "AttachFile1", display: "fileName1" },
+        { input: "AttachFile2", display: "fileName2" },
+        { input: "AttachFile", display: "fileName" }
+    ];
 
-                const contentText =
-                    editor.innerText.trim();
+    attachmentFields.forEach(function (item) {
 
+        const input = document.getElementById(item.input);
+        const display = document.getElementById(item.display);
 
-                let valid = true;
+        if (!input || !display) {
+            return;
+        }
 
+        input.addEventListener("change", function () {
+            const span = display.querySelector("span");
 
-                if (title.value.trim() === "") {
+            if (span) {
+                span.textContent = this.files.length > 0
+                    ? this.files[0].name
+                    : "No file selected";
+            }
+        });
+    });
 
-                    title.classList.add("error");
+    // =========================================
+    // FORM VALIDATION AND SUBMISSION
+    // =========================================
 
-                    valid = false;
+    form.addEventListener("submit", function (event) {
 
-                } else {
+        // IMPORTANT: Copy content immediately before POST.
+        syncContent();
 
-                    title.classList.remove("error");
+        console.log("Editor HTML:", editor.innerHTML);
+        console.log("Content submitted:", content.value);
 
-                }
+        const title = document.getElementById("Title");
+        const type = document.getElementById("Type");
+        const audience = document.getElementById("Audience");
 
+        const contentText = editor.innerText
+            .replace(/\u00a0/g, " ")
+            .trim();
 
-                if (type.value === "") {
+        let valid = true;
 
-                    type.classList.add("error");
-
-                    valid = false;
-
-                } else {
-
-                    type.classList.remove("error");
-
-                }
-
-
-                if (audience.value === "") {
-
-                    audience.classList.add("error");
-
-                    valid = false;
-
-                } else {
-
-                    audience.classList.remove("error");
-
-                }
-
-
-                if (contentText === "") {
-
-                    document
-                        .querySelector(".editor-box")
-                        .classList.add("editor-error");
-
-                    document.getElementById("contentError")
-                        .textContent = "Content is required.";
-
-                    valid = false;
-
-                } else {
-
-                    document
-                        .querySelector(".editor-box")
-                        .classList.remove("editor-error");
-
-                    document.getElementById("contentError")
-                        .textContent = "";
-
-                }
-
-
-                if (!valid) {
-
-                    event.preventDefault();
-
-                }
-
-            });
-
-
-            /* =========================================
-               REMOVE ERROR
-               ========================================= */
-
-            document
-                .querySelectorAll("#Title, #Type, #Audience")
-                .forEach(function (element) {
-
-                    element.addEventListener("input", function () {
-                        this.classList.remove("error");
-                    });
-
-                    element.addEventListener("change", function () {
-                        this.classList.remove("error");
-                    });
-
-                });
-
-
-            /* =========================================
-               RESET
-               ========================================= */
-
-            form.addEventListener("reset", function () {
-
-                setTimeout(function () {
-
-                    editor.innerHTML = "";
-
-                    content.value = "";
-
-                   fileName1.querySelector("span").textContent =
-        "No file selected";
-
-    fileName2.querySelector("span").textContent =
-        "No file selected";
-                    fileName.querySelector("span").textContent =
-                        "No file selected";
-
-                    document
-                        .querySelectorAll(".error")
-                        .forEach(function (element) {
-                            element.classList.remove("error");
-                        });
-
-                    document
-                        .querySelector(".editor-box")
-                        .classList.remove("editor-error");
-
-                    document.getElementById("contentError")
-                        .textContent = "";
-
-                }, 0);
-
-            });
-
+        [title, type, audience].forEach(function (element) {
+            element.classList.remove("error");
         });
 
+        if (!title.value.trim()) {
+            title.classList.add("error");
+            valid = false;
+        }
+
+        if (!type.value) {
+            type.classList.add("error");
+            valid = false;
+        }
+
+        if (!audience.value) {
+            audience.classList.add("error");
+            valid = false;
+        }
+
+        if (!contentText) {
+            contentError.textContent = "Content is required.";
+
+            document.querySelector(".editor-box")
+                .classList.add("editor-error");
+
+            editor.focus();
+            valid = false;
+        } else {
+            contentError.textContent = "";
+
+            document.querySelector(".editor-box")
+                .classList.remove("editor-error");
+        }
+
+        if (!valid) {
+            event.preventDefault();
+            return;
+        }
+
+        // Keep the button enabled if the browser cancels navigation.
+        submitButton.disabled = true;
+        submitButton.textContent = "Submitting...";
+    });
+
+    // =========================================
+    // REMOVE FIELD ERRORS
+    // =========================================
+
+    ["Title", "Type", "Audience"].forEach(function (id) {
+
+        const element = document.getElementById(id);
+
+        element.addEventListener("input", function () {
+            this.classList.remove("error");
+        });
+
+        element.addEventListener("change", function () {
+            this.classList.remove("error");
+        });
+    });
+
+    // =========================================
+    // RESET FORM
+    // =========================================
+
+    form.addEventListener("reset", function () {
+
+        setTimeout(function () {
+
+            editor.innerHTML = "";
+            content.value = "";
+            contentError.textContent = "";
+
+            document.querySelector(".editor-box")
+                .classList.remove("editor-error");
+
+            document.querySelectorAll(".error")
+                .forEach(function (element) {
+                    element.classList.remove("error");
+                });
+
+            attachmentFields.forEach(function (item) {
+                const display = document.getElementById(item.display);
+
+                if (display) {
+                    const span = display.querySelector("span");
+
+                    if (span) {
+                        span.textContent = "No file selected";
+                    }
+                }
+            });
+
+            submitButton.disabled = false;
+            submitButton.innerHTML =
+                '<i class="fas fa-paper-plane"></i> Save &amp; Create';
+
+        }, 0);
+    });
+
+    // Initialize.
+    syncContent();
+
+});
 </script>

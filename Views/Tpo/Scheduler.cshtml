@@ -273,7 +273,7 @@
             <div class="calendar-legend">
                 <span><i class="legend-dot legend-blue"></i> Upcoming</span>
                 <span><i class="legend-dot legend-green"></i> Completed</span>
-                <span><i class="legend-dot legend-orange"></i> Pending</span>
+                <span><i class="legend-dot legend-orange"></i> Save as Draft</span>
             </div>
 
             <div id="selectedDateInfo" class="selected-date-info" aria-live="polite">
@@ -300,8 +300,53 @@
             </div>
         </section>
 
+    </div> <!-- scheduler-content -->
+</div> <!-- tpo-scheduler -->
+
+<!-- ACTIVITY MANAGEMENT TABLE -->
+<div class="scheduler-panel activity-management-panel mt-4">
+
+    <div class="activities-header">
+        <div>
+            <h4>Activity Management</h4>
+            <p>View, edit, cancel and restore your saved activities and placement drives.</p>
+        </div>
     </div>
+
+    <div class="table-responsive">
+        <table class="table table-bordered table-hover align-middle"
+               id="activityManagementTable">
+
+            <thead class="table-light">
+                <tr>
+                    <th>Sr. No.</th>
+                    <th>Type</th>
+                    <th>Title / Company</th>
+                    <th>Category / Position</th>
+                    <th>Start Date</th>
+                    <th>End Date</th>
+                    <th>Start Time</th>
+                    <th>End Time</th>
+                    <th>Location / Venue</th>
+                    <th>Participants</th>
+                    <th>Status</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+
+            <tbody id="activityManagementBody">
+                <tr>
+                    <td colspan="12" class="text-center">
+                        Loading activities...
+                    </td>
+                </tr>
+            </tbody>
+
+        </table>
+    </div>
+
 </div>
+<!-- END ACTIVITY MANAGEMENT TABLE -->
 
 <!-- ADD ACTIVITY MODAL -->
 <div class="modal fade"
@@ -392,6 +437,11 @@
 
                     <!-- GENERAL ACTIVITY -->
                     <fieldset id="generalActivityForm" class="activity-form-section">
+
+                        <input type="hidden"
+       name="General.ActivityID"
+       id="generalActivityId"
+       value="0" />
                         <div class="activity-section-heading">
                             <span class="section-heading-icon general-icon">
                                 <i class="fas fa-calendar-check"></i>
@@ -507,7 +557,7 @@
                                 <label class="form-label">Activity Status</label>
                                 <select name="General.Status" class="form-select">
                                     <option value="Upcoming">Upcoming</option>
-                                    <option value="Pending">Pending</option>
+                                    <option value="Pending">Save as Draft</option>
                                 </select>
                             </div>
                         </div>
@@ -691,653 +741,954 @@
     </div>
 </div>
 
+
+
 @section Scripts {
-<script>
-document.addEventListener("DOMContentLoaded", function () {
-    "use strict";
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            "use strict";
 
-    // =========================================================
-    // MODAL AND FORM ELEMENTS
-    // =========================================================
-    const modalElement = document.getElementById("addActivityModal");
-    const activityForm = document.getElementById("schedulerActivityForm");
+            // =========================================================
+            // ELEMENTS
+            // =========================================================
+            const modalElement = document.getElementById("addActivityModal");
+            const activityForm = document.getElementById("schedulerActivityForm");
+            const generalRadio = document.getElementById("generalActivityRadio");
+            const placementRadio = document.getElementById("placementDriveRadio");
+            const generalForm = document.getElementById("generalActivityForm");
+            const placementForm = document.getElementById("placementDriveForm");
+            const submitText = document.getElementById("activitySubmitText");
+            const formError = document.getElementById("schedulerFormError");
 
-    const generalRadio = document.getElementById("generalActivityRadio");
-    const placementRadio = document.getElementById("placementDriveRadio");
+            const calendarGrid = document.getElementById("calendarGrid");
+            const monthYear = document.getElementById("calendarMonthYear");
+            const selectedDateInfo = document.getElementById("selectedDateInfo");
+            const activityList = document.getElementById("activityList");
+            const emptyActivities = document.getElementById("emptyActivities");
+            const managementBody = document.getElementById("activityManagementBody");
 
-    const generalForm = document.getElementById("generalActivityForm");
-    const placementForm = document.getElementById("placementDriveForm");
-
-    const submitText = document.getElementById("activitySubmitText");
-    const formError = document.getElementById("schedulerFormError");
-
-    const calendarGrid = document.getElementById("calendarGrid");
-    const monthYear = document.getElementById("calendarMonthYear");
-    const selectedDateInfo = document.getElementById("selectedDateInfo");
-    const activityList = document.getElementById("activityList");
-    const emptyActivities = document.getElementById("emptyActivities");
-
-    if (!modalElement || !activityForm ||
-        !generalRadio || !placementRadio ||
-        !generalForm || !placementForm) {
-        console.error("Scheduler modal markup is incomplete. Check the element IDs.");
-        return;
-    }
-
-    // =========================================================
-    // SWITCH BETWEEN GENERAL ACTIVITY AND PLACEMENT DRIVE
-    // =========================================================
-    
-function updateActivityType(resetScroll = true) {
-    const isGeneral = generalRadio.checked;
-
-    // General Activity
-    generalForm.hidden = !isGeneral;
-    generalForm.disabled = !isGeneral;
-
-    // Placement Drive
-    placementForm.hidden = isGeneral;
-    placementForm.disabled = isGeneral;
-
-    // Update selected card styling
-    const generalOption =
-        generalRadio.closest(".activity-type-option");
-
-    const placementOption =
-        placementRadio.closest(".activity-type-option");
-
-    if (generalOption) {
-        generalOption.classList.toggle("active", isGeneral);
-    }
-
-    if (placementOption) {
-        placementOption.classList.toggle("active", !isGeneral);
-    }
-
-    // Update submit button text
-    if (submitText) {
-        submitText.textContent = isGeneral
-            ? "Save Activity"
-            : "Save Placement Drive";
-    }
-
-    // Clear form error
-    if (formError) {
-        formError.style.display = "none";
-        formError.textContent = "";
-    }
-
-    // Reset scroll position
-    if (resetScroll) {
-        const body =
-            modalElement.querySelector(".scheduler-modal-body");
-
-        if (body) {
-            body.scrollTop = 0;
-        }
-    }
-}
-
-// Switch immediately when the radio button changes
-generalRadio.addEventListener("change", function () {
-    updateActivityType(true);
-});
-
-placementRadio.addEventListener("change", function () {
-    updateActivityType(true);
-});
-
-// Initialize the selected form
-updateActivityType(false);
-
-    // =========================================================
-    // CALENDAR DATA (DEMO ONLY)
-    // =========================================================
-    if (!calendarGrid || !monthYear || !activityList ||
-        !selectedDateInfo || !emptyActivities) {
-        console.error("Scheduler calendar elements are missing.");
-        return;
-    }
-
-    
-const generalActivitiesFromDb =
-    @Html.Raw(System.Text.Json.JsonSerializer.Serialize(
-        ViewBag.GeneralActivities ?? new object[0]));
-
-const placementDrivesFromDb =
-    @Html.Raw(System.Text.Json.JsonSerializer.Serialize(
-        ViewBag.PlacementDrives ?? new object[0]));
-
-const generalActivities = generalActivitiesFromDb.map(a => ({
-    title: a.Title,
-    category: a.Category || "General",
-    date: String(a.StartDate).substring(0, 10),
-    endDate: String(a.EndDate).substring(0, 10),
-    time: a.StartTime ? String(a.StartTime).substring(0, 5) : "",
-    location: a.Location || "",
-    status: a.Status || "Upcoming"
-}));
-
-
-const placementActivities = placementDrivesFromDb
-    .filter(p => p.PublicationStatus === "Published")
-    .map(p => ({
-        id: p.PlacementDriveID,
-        title: (p.CompanyName || "Company") + " - " +
-               (p.JobPosition || "Placement Drive"),
-        category: "Placement",
-        date: String(p.StartDate).substring(0, 10),
-        endDate: String(p.EndDate).substring(0, 10),
-        time: p.StartTime
-            ? String(p.StartTime).substring(0, 5)
-            : "",
-        location: p.Venue || p.JobLocation || "",
-        status: "Upcoming",
-        isPlacement: true
-    }));
-
-const activities = [
-    ...generalActivities,
-    ...placementActivities
-];
-
-
-function editPlacementDrive(id) {
-    const drive = placementDrivesFromDb.find(
-        p => Number(p.PlacementDriveID) === Number(id)
-    );
-
-    if (!drive) {
-        alert("Placement drive not found.");
-        return;
-    }
-
-    // Select Placement Drive form
-    const placementRadio = document.querySelector(
-        'input[name="ActivityType"][value="PlacementDrive"]'
-    );
-
-    if (placementRadio) {
-        placementRadio.checked = true;
-        placementRadio.dispatchEvent(new Event("change", {
-            bubbles: true
-        }));
-    }
-
-    // Set the existing database ID for UPDATE
-    document.getElementById("placementDriveId").value =
-        drive.PlacementDriveID;
-
-    // Fill placement drive fields
-    const fields = [
-        "CompanyName",
-        "JobPosition",
-        "JobType",
-        "Salary",
-        "JobLocation",
-        "RequiredSkills",
-        "JobDescription",
-        "TenthPercentage",
-        "TwelfthPercentage",
-        "MinimumPercentage",
-        "EligibleCourse",
-        "GraduationYear",
-        "EligibilityCriteria",
-        "StartDate",
-        "EndDate",
-        "StartTime",
-        "EndTime",
-        "Venue",
-        "ContactPerson",
-        "ContactEmail",
-        "ContactPhone",
-        "Participants",
-        "PublicationStatus",
-        "Instructions"
-    ];
-
-    fields.forEach(field => {
-        const input = document.querySelector(
-            '[name="Placement.' + field + '"]'
-        );
-
-        if (!input) return;
-
-        let value = drive[field];
-
-        if (value === null || value === undefined) {
-            value = "";
-        }
-
-        // Format date/time values for HTML inputs
-        if (input.type === "date" && value) {
-            value = String(value).substring(0, 10);
-        } else if (input.type === "time" && value) {
-            value = String(value).substring(0, 5);
-        }
-
-        input.value = value;
-    });
-
-    // Update modal title and submit button
-    const modalElement = document.getElementById("addActivityModal");
-    const modalTitle = modalElement.querySelector(".modal-title");
-    const submitButton = modalElement.querySelector(
-        'button[type="submit"]'
-    );
-
-    if (modalTitle) {
-        modalTitle.textContent = "Edit Placement Drive";
-    }
-
-    if (submitButton) {
-        submitButton.textContent = "Update Placement Drive";
-    }
-
-    bootstrap.Modal.getOrCreateInstance(modalElement).show();
-}
-
-
-function deletePlacementDrive(id, title) {
-    const confirmed = confirm(
-        'Are you sure you want to delete "' + title + '"?'
-    );
-
-    if (!confirmed) return;
-
-    // Create a secure POST form with the anti-forgery token
-    const tokenInput = document.querySelector(
-        '#schedulerActivityForm input[name="__RequestVerificationToken"]'
-    );
-
-    if (!tokenInput) {
-        alert("Security token not found. Please refresh the page.");
-        return;
-    }
-
-    const form = document.createElement("form");
-    form.method = "POST";
-    form.action = '@Url.Action("DeletePlacementDrive", "TPO")';
-    form.style.display = "none";
-
-    const idInput = document.createElement("input");
-    idInput.type = "hidden";
-    idInput.name = "id";
-    idInput.value = id;
-
-    const antiForgeryInput = document.createElement("input");
-    antiForgeryInput.type = "hidden";
-    antiForgeryInput.name = "__RequestVerificationToken";
-    antiForgeryInput.value = tokenInput.value;
-
-    form.append(idInput, antiForgeryInput);
-    document.body.appendChild(form);
-    form.submit();
-}
-
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-
-    let currentMonth = new Date(today.getFullYear(), today.getMonth(), 1);
-    let selectedDate = toDateKey(today);
-    let currentView = "month";
-    let showAllActivities = false;
-
-    const monthNames = [
-        "January", "February", "March", "April",
-        "May", "June", "July", "August",
-        "September", "October", "November", "December"
-    ];
-
-    function toDateKey(date) {
-        return date.getFullYear() + "-" +
-            String(date.getMonth() + 1).padStart(2, "0") + "-" +
-            String(date.getDate()).padStart(2, "0");
-    }
-
-    function parseDate(dateKey) {
-        return new Date(dateKey + "T00:00:00");
-    }
-
-    function formatDate(dateKey) {
-        return parseDate(dateKey).toLocaleDateString("en-IN", {
-            day: "2-digit",
-            month: "short",
-            year: "numeric"
-        });
-    }
-
-    function formatTime(time) {
-        if (!time) return "Time not specified";
-
-        const parts = time.split(":");
-        let hour = Number(parts[0]);
-        const minute = parts[1] || "00";
-        const suffix = hour >= 12 ? "PM" : "AM";
-
-        hour = hour % 12 || 12;
-        return hour + ":" + minute + " " + suffix;
-    }
-
-    function getActivityForDate(dateKey) {
-        return activities.filter(item => {
-            if (item.endDate) {
-                return dateKey >= item.date && dateKey <= item.endDate;
+            if (!modalElement || !activityForm || !generalRadio ||
+                !placementRadio || !generalForm || !placementForm) {
+                console.error("Scheduler modal elements are missing.");
+                return;
             }
-            return item.date === dateKey;
-        });
-    }
 
-    function getMarkerClass(activity) {
-        if (activity.status === "Completed") return "marker-green";
-        if (activity.status === "Pending") return "marker-orange";
-        return "marker-blue";
-    }
+            // =========================================================
+            // SERVER-GENERATED URLS
+            // =========================================================
+                const detailsGeneralUrl =
+                '@Url.Action("GeneralActivityDetails", "TPO")';
 
-    function getCategoryClass(category) {
-        switch (category) {
-            case "Placement": return "category-blue";
-            case "Training":
-            case "TrainingAndDevelopment": return "category-purple";
-            case "Meeting": return "category-orange";
-            case "College Event":
-            case "CollegeEvent": return "category-pink";
-            default: return "category-green";
-        }
-    }
+            const detailsPlacementUrl =
+                '@Url.Action("PlacementDriveDetails", "TPO")';
 
-    function getStatusClass(status) {
-        switch (status) {
-            case "Completed": return "status-completed";
-            case "Pending": return "status-pending";
-            case "Cancelled": return "status-cancelled";
-            default: return "status-upcoming";
-        }
-    }
+            const cancelGeneralUrl =
+                '@Url.Action("CancelGeneralActivity", "TPO")';
 
-   
-function renderActivityList(items) {
-    activityList.innerHTML = "";
+            const cancelPlacementUrl =
+                '@Url.Action("CancelPlacementDrive", "TPO")';
 
-    items.forEach(activity => {
-        const item = document.createElement("article");
-        item.className = "activity-item";
-        item.dataset.date = activity.date;
-        item.dataset.status = activity.status;
+            const uncancelGeneralUrl =
+                '@Url.Action("UncancelGeneralActivity", "TPO")';
 
-        const category = document.createElement("div");
-        category.className =
-            "activity-category " + getCategoryClass(activity.category);
-        category.textContent = activity.category;
+            const uncancelPlacementUrl =
+                '@Url.Action("UncancelPlacementDrive", "TPO")';
 
-        const details = document.createElement("div");
-        details.className = "activity-details";
+            // =========================================================
+            // DATABASE DATA
+            // =========================================================
+            const generalActivitiesFromDb =
+                @Html.Raw(System.Text.Json.JsonSerializer.Serialize(
+                        ViewBag.GeneralActivities ?? new object[0]));
 
-        const title = document.createElement("h5");
-        title.textContent = activity.title;
+            const placementDrivesFromDb =
+                @Html.Raw(System.Text.Json.JsonSerializer.Serialize(
+                        ViewBag.PlacementDrives ?? new object[0]));
 
-        const meta = document.createElement("div");
-        meta.className = "activity-meta";
+            // Handle boolean values consistently.
+            function isCancelled(record) {
+                return record?.IsCancelled === true ||
+                       record?.IsCancelled === 1 ||
+                       String(record?.IsCancelled).toLowerCase() === "true";
+            }
 
-        [
-            formatDate(activity.date),
-            formatTime(activity.time),
-            activity.location || "Location not specified"
-        ].forEach(value => {
-            const span = document.createElement("span");
-            span.textContent = value;
-            meta.appendChild(span);
-        });
+            function isPublished(drive) {
+                return String(drive?.PublicationStatus || "")
+                    .toLowerCase() === "published";
+            }
 
-        details.append(title, meta);
+            function normalizeStatus(status) {
+                const value = String(status || "").trim().toLowerCase();
 
-        const status = document.createElement("span");
-        status.className =
-            "activity-status " + getStatusClass(activity.status);
-        status.textContent = activity.status;
+                if (value === "completed") return "Completed";
+                if (value === "cancelled" || value === "canceled") {
+                    return "Cancelled";
+                }
+                if (value === "pending" || value === "draft") {
+                    return "Save as Draft";
+                }
+                if (value === "published") return "Published";
+                return status || "Upcoming";
+            }
 
-        item.append(category, details, status);
+            function escapeSelectorValue(value) {
+                if (window.CSS && typeof window.CSS.escape === "function") {
+                    return window.CSS.escape(String(value));
+                }
 
-        // EDIT AND DELETE BUTTONS FOR PLACEMENT DRIVES ONLY
-        if (activity.isPlacement === true) {
-            const actions = document.createElement("div");
-            actions.className = "activity-actions";
+                return String(value).replace(/["\\]/g, "\\$&");
+            }
 
-            const editButton = document.createElement("button");
-            editButton.type = "button";
-            editButton.className = "btn btn-sm btn-outline-primary";
-            editButton.innerHTML =
-                '<i class="fas fa-edit"></i> Edit';
-            editButton.title = "Edit placement drive";
+            // =========================================================
+            // FORM TYPE SWITCHING
+            // =========================================================
+            function updateActivityType(resetScroll = true) {
+                const isGeneral = generalRadio.checked;
 
-            editButton.addEventListener("click", function () {
-                editPlacementDrive(activity.id);
-            });
+                generalForm.hidden = !isGeneral;
+                generalForm.disabled = !isGeneral;
 
-            const deleteButton = document.createElement("button");
-            deleteButton.type = "button";
-            deleteButton.className = "btn btn-sm btn-outline-danger";
-            deleteButton.innerHTML =
-                '<i class="fas fa-trash-alt"></i> Delete';
-            deleteButton.title = "Delete placement drive";
+                placementForm.hidden = isGeneral;
+                placementForm.disabled = isGeneral;
 
-            deleteButton.addEventListener("click", function () {
-                deletePlacementDrive(activity.id, activity.title);
-            });
+                generalRadio.closest(".activity-type-option")
+                    ?.classList.toggle("active", isGeneral);
 
-            actions.append(editButton, deleteButton);
-            item.appendChild(actions);
-        }
+                placementRadio.closest(".activity-type-option")
+                    ?.classList.toggle("active", !isGeneral);
 
-        activityList.appendChild(item);
-    });
+                const generalId = Number(
+                    document.getElementById("generalActivityId")?.value || 0
+                );
 
-    emptyActivities.hidden = items.length !== 0;
-    activityList.hidden = items.length === 0;
-}
+                const placementId = Number(
+                    document.getElementById("placementDriveId")?.value || 0
+                );
 
+                if (submitText) {
+                    if (isGeneral && generalId > 0) {
+                        submitText.textContent = "Update Activity";
+                    } else if (!isGeneral && placementId > 0) {
+                        submitText.textContent = "Update Placement Drive";
+                    } else {
+                        submitText.textContent = isGeneral
+                            ? "Save Activity"
+                            : "Save Placement Drive";
+                    }
+                }
 
-document.getElementById("btnAddActivity")
-    .addEventListener("click", function () {
+                if (formError) {
+                    formError.style.display = "none";
+                    formError.textContent = "";
+                }
 
-        const form = document.getElementById("schedulerActivityForm");
-        const modalElement = document.getElementById("addActivityModal");
+                if (resetScroll) {
+                    const body = modalElement.querySelector(
+                        ".scheduler-modal-body"
+                    );
+                    if (body) body.scrollTop = 0;
+                }
+            }
 
-        // Reset form for a new activity
-        form.reset();
+            generalRadio.addEventListener("change", () => updateActivityType());
+            placementRadio.addEventListener("change", () => updateActivityType());
+            updateActivityType(false);
 
-        // Reset placement drive ID: 0 means INSERT
-        document.getElementById("placementDriveId").value = "0";
+            if (!calendarGrid || !monthYear || !activityList ||
+                !selectedDateInfo || !emptyActivities) {
+                console.error("Scheduler calendar elements are missing.");
+                return;
+            }
 
-        // Select General activity by default
-        const generalRadio = document.querySelector(
-            'input[name="ActivityType"][value="General"]'
-        );
+            // =========================================================
+            // CALENDAR DATA
+            // Cancelled activities and unpublished drives are excluded.
+            // =========================================================
+            const generalActivities = generalActivitiesFromDb
+                .filter(a => !isCancelled(a))
+                .map(a => ({
+                    id: a.ActivityID,
+                    title: a.Title || "General Activity",
+                    category: a.Category || "General",
+                    date: String(a.StartDate || "").substring(0, 10),
+                    endDate: String(a.EndDate || a.StartDate || "").substring(0, 10),
+                    time: a.StartTime
+                        ? String(a.StartTime).substring(0, 5) : "",
+                    location: a.Location || "",
+                    status: normalizeStatus(a.Status),
+                    isPlacement: false
+                }));
 
-        if (generalRadio) {
-            generalRadio.checked = true;
-            generalRadio.dispatchEvent(new Event("change", {
-                bubbles: true
-            }));
-        }
+            const placementActivities = placementDrivesFromDb
+                .filter(p => isPublished(p) && !isCancelled(p))
+                .map(p => ({
+                    id: p.PlacementDriveID,
+                    title: (p.CompanyName || "Company") + " - " +
+                           (p.JobPosition || "Placement Drive"),
+                    category: "Placement",
+                    date: String(p.StartDate || "").substring(0, 10),
+                    endDate: String(p.EndDate || p.StartDate || "").substring(0, 10),
+                    time: p.StartTime
+                        ? String(p.StartTime).substring(0, 5) : "",
+                    location: p.Venue || p.JobLocation || "",
+                    status: "Upcoming",
+                    isPlacement: true
+                }));
 
-        // Restore default modal title and button
-        const modalTitle = modalElement.querySelector(".modal-title");
-        const submitButton = modalElement.querySelector(
-            'button[type="submit"]'
-        );
+            const activities = [...generalActivities, ...placementActivities];
 
-        if (modalTitle) {
-            modalTitle.textContent = "Create Scheduler Activity";
-        }
+            // =========================================================
+            // DATE HELPERS
+            // =========================================================
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
 
-        if (submitButton) {
-            submitButton.textContent = "Save Activity";
-        }
-    });
-
-    function showSelectedDateActivities() {
-        const matching = getActivityForDate(selectedDate);
-
-        selectedDateInfo.textContent =
-            "Selected date: " + formatDate(selectedDate) + ". " +
-            matching.length + " activity/activities scheduled.";
-
-        renderActivityList(showAllActivities ? activities : matching);
-    }
-
-    function renderCalendar() {
-        calendarGrid.innerHTML = "";
-        calendarGrid.className = "calendar-grid";
-
-        if (currentView === "week") calendarGrid.classList.add("week-mode");
-        if (currentView === "day") calendarGrid.classList.add("day-mode");
-
-        monthYear.textContent =
-            monthNames[currentMonth.getMonth()] + " " + currentMonth.getFullYear();
-
-        document.querySelectorAll(".calendar-view-btn").forEach(button => {
-            button.classList.toggle("active", button.dataset.view === currentView);
-        });
-
-        let startDate;
-
-        if (currentView === "day") {
-            startDate = parseDate(selectedDate);
-        } else if (currentView === "week") {
-            startDate = parseDate(selectedDate);
-            startDate.setDate(startDate.getDate() - startDate.getDay());
-        } else {
-            startDate = new Date(
-                currentMonth.getFullYear(),
-                currentMonth.getMonth(),
-                1
+            let currentMonth = new Date(
+                today.getFullYear(), today.getMonth(), 1
             );
-            startDate.setDate(startDate.getDate() - startDate.getDay());
-        }
 
-        const dayCount = currentView === "day"
-            ? 1
-            : currentView === "week" ? 7 : 42;
+            let selectedDate = toDateKey(today);
+            let currentView = "month";
+            let showAllActivities = false;
 
-        for (let i = 0; i < dayCount; i++) {
-            const date = new Date(startDate);
-            date.setDate(startDate.getDate() + i);
+            const monthNames = [
+                "January", "February", "March", "April",
+                "May", "June", "July", "August",
+                "September", "October", "November", "December"
+            ];
 
-            const dateKey = toDateKey(date);
-            const dayActivities = getActivityForDate(dateKey);
-
-            const cell = document.createElement("button");
-            cell.type = "button";
-            cell.className = "calendar-day";
-            cell.setAttribute("aria-label", formatDate(dateKey));
-
-            if (currentView === "month" &&
-                date.getMonth() !== currentMonth.getMonth()) {
-                cell.classList.add("other-month");
+            function toDateKey(date) {
+                return date.getFullYear() + "-" +
+                    String(date.getMonth() + 1).padStart(2, "0") + "-" +
+                    String(date.getDate()).padStart(2, "0");
             }
 
-            if (dateKey === toDateKey(today)) cell.classList.add("today");
-            if (dateKey === selectedDate) cell.classList.add("selected");
+            function parseDate(dateKey) {
+                return new Date(dateKey + "T00:00:00");
+            }
 
-            const dayNumber = document.createElement("span");
-            dayNumber.className = "day-number";
-            dayNumber.textContent = date.getDate();
-            cell.appendChild(dayNumber);
+            function formatDate(dateKey) {
+                if (!dateKey) return "-";
 
-            if (dayActivities.length) {
-                const markers = document.createElement("span");
-                markers.className = "day-markers";
+                const parsed = parseDate(dateKey);
 
-                dayActivities.slice(0, 3).forEach(activity => {
-                    const marker = document.createElement("span");
-                    marker.className =
-                        "day-marker " + getMarkerClass(activity);
-                    markers.appendChild(marker);
+                if (Number.isNaN(parsed.getTime())) return String(dateKey);
+
+                return parsed.toLocaleDateString("en-IN", {
+                    day: "2-digit",
+                    month: "short",
+                    year: "numeric"
+                });
+            }
+
+            function formatTime(time) {
+                if (!time) return "Time not specified";
+
+                const parts = String(time).split(":");
+                let hour = Number(parts[0]);
+                const minute = parts[1] || "00";
+
+                if (!Number.isFinite(hour)) return String(time);
+
+                const suffix = hour >= 12 ? "PM" : "AM";
+                hour = hour % 12 || 12;
+
+                return hour + ":" + minute + " " + suffix;
+            }
+
+            function getActivityForDate(dateKey) {
+                return activities.filter(item => {
+                    if (!item.date) return false;
+
+                    const endDate = item.endDate || item.date;
+                    return dateKey >= item.date && dateKey <= endDate;
+                });
+            }
+
+            function getMarkerClass(activity) {
+                if (activity.status === "Completed") return "marker-green";
+                if (activity.status === "Save as Draft") return "marker-orange";
+                return "marker-blue";
+            }
+
+            function getCategoryClass(category) {
+                switch (category) {
+                    case "Placement":
+                        return "category-blue";
+                    case "Training":
+                    case "TrainingAndDevelopment":
+                        return "category-purple";
+                    case "Meeting":
+                        return "category-orange";
+                    case "College Event":
+                    case "CollegeEvent":
+                        return "category-pink";
+                    default:
+                        return "category-green";
+                }
+            }
+
+            function getStatusClass(status) {
+                switch (String(status || "").toLowerCase()) {
+                    case "completed":
+                        return "status-completed";
+                    case "pending":
+                    case "save as draft":
+                    case "draft":
+                        return "status-pending";
+                    case "cancelled":
+                    case "canceled":
+                        return "status-cancelled";
+                    default:
+                        return "status-upcoming";
+                }
+            }
+
+            // =========================================================
+            // SCHEDULED ACTIVITIES LIST
+            // =========================================================
+            function renderActivityList(items) {
+                activityList.innerHTML = "";
+
+                items.forEach(activity => {
+                    const item = document.createElement("article");
+                    item.className = "activity-item";
+                    item.dataset.date = activity.date;
+                    item.dataset.status = activity.status;
+
+                    const category = document.createElement("div");
+                    category.className =
+                        "activity-category " + getCategoryClass(activity.category);
+                    category.textContent = activity.category;
+
+                    const details = document.createElement("div");
+                    details.className = "activity-details";
+
+                    const title = document.createElement("h5");
+                    title.textContent = activity.title;
+
+                    const meta = document.createElement("div");
+                    meta.className = "activity-meta";
+
+                    [
+                        formatDate(activity.date),
+                        formatTime(activity.time),
+                        activity.location || "Location not specified"
+                    ].forEach(value => {
+                        const span = document.createElement("span");
+                        span.textContent = value;
+                        meta.appendChild(span);
+                    });
+
+                    details.append(title, meta);
+
+                    const status = document.createElement("span");
+                    status.className =
+                        "activity-status " + getStatusClass(activity.status);
+                    status.textContent = activity.status;
+
+                    item.append(category, details, status);
+                    activityList.appendChild(item);
                 });
 
-                cell.appendChild(markers);
+                emptyActivities.hidden = items.length !== 0;
+                activityList.hidden = items.length === 0;
             }
 
-            cell.addEventListener("click", function () {
-                selectedDate = dateKey;
-                currentMonth = new Date(date.getFullYear(), date.getMonth(), 1);
+            function showSelectedDateActivities() {
+                const matching = getActivityForDate(selectedDate);
+
+                selectedDateInfo.textContent =
+                    "Selected date: " + formatDate(selectedDate) + ". " +
+                    matching.length + " activity/activities scheduled.";
+
+                renderActivityList(showAllActivities ? activities : matching);
+            }
+
+            // =========================================================
+            // EDIT GENERAL ACTIVITY
+            // =========================================================
+            function editGeneralActivity(id) {
+                const activity = generalActivitiesFromDb.find(
+                    a => Number(a.ActivityID) === Number(id)
+                );
+
+                if (!activity) {
+                    alert("General activity not found.");
+                    return;
+                }
+
+                if (isCancelled(activity)) {
+                   alert("Restore this activity before editing it.");
+                    return;
+                }
+
+                document.getElementById("generalActivityId").value =
+                    activity.ActivityID;
+
+                document.getElementById("placementDriveId").value = "0";
+
+                generalRadio.checked = true;
+                updateActivityType(false);
+
+                const fields = [
+                    "Title", "Category", "Description",
+                    "StartDate", "EndDate", "StartTime", "EndTime",
+                    "Location", "Participants", "Reminder",
+                    "ReminderChannel", "Status"
+                ];
+
+                fields.forEach(field => {
+                    const input = document.querySelector(
+                        '[name="General.' + escapeSelectorValue(field) + '"]'
+                    );
+
+                    if (!input) return;
+
+                    let value = activity[field];
+
+                    if (value === null || value === undefined) value = "";
+
+                    if ((input.type === "date" || input.type === "time") && value) {
+                        value = String(value).substring(
+                            0, input.type === "date" ? 10 : 5
+                        );
+                    }
+
+                    input.value = value;
+                });
+
+                const title = modalElement.querySelector(".modal-title");
+                if (title) title.textContent = "Edit General Activity";
+
+                updateActivityType(false);
+                bootstrap.Modal.getOrCreateInstance(modalElement).show();
+            }
+
+            // =========================================================
+            // EDIT PLACEMENT DRIVE
+            // =========================================================
+            function editPlacementDrive(id) {
+                const drive = placementDrivesFromDb.find(
+                    p => Number(p.PlacementDriveID) === Number(id)
+                );
+
+                if (!drive) {
+                    alert("Placement drive not found.");
+                    return;
+                }
+
+                if (isCancelled(drive)) {
+                   alert("Restore this placement drive before editing it.");
+                    return;
+                }
+
+                document.getElementById("generalActivityId").value = "0";
+                document.getElementById("placementDriveId").value =
+                    drive.PlacementDriveID;
+
+                placementRadio.checked = true;
+                updateActivityType(false);
+
+                const fields = [
+                    "CompanyName", "JobPosition", "JobType", "Salary",
+                    "JobLocation", "RequiredSkills", "JobDescription",
+                    "TenthPercentage", "TwelfthPercentage", "MinimumPercentage",
+                    "EligibleCourse", "GraduationYear", "EligibilityCriteria",
+                    "StartDate", "EndDate", "StartTime", "EndTime", "Venue",
+                    "ContactPerson", "ContactEmail", "ContactPhone",
+                    "Participants", "PublicationStatus", "Instructions"
+                ];
+
+                fields.forEach(field => {
+                    const input = document.querySelector(
+                        '[name="Placement.' + escapeSelectorValue(field) + '"]'
+                    );
+
+                    if (!input) return;
+
+                    let value = drive[field];
+
+                    if (value === null || value === undefined) value = "";
+
+                    if ((input.type === "date" || input.type === "time") && value) {
+                        value = String(value).substring(
+                            0, input.type === "date" ? 10 : 5
+                        );
+                    }
+
+                    input.value = value;
+                });
+
+                const title = modalElement.querySelector(".modal-title");
+                if (title) title.textContent = "Edit Placement Drive";
+
+                updateActivityType(false);
+                bootstrap.Modal.getOrCreateInstance(modalElement).show();
+            }
+
+         
+        // =========================================================
+        // POST CANCEL / UNCANCEL — WITH DIAGNOSTIC ERRORS
+        // =========================================================
+        async function changeCancellationState(id, title, type, cancel) {
+
+            const actionText = cancel ? "cancel" : "restore";
+
+            if (!confirm(
+                "Are you sure you want to " + actionText +
+                ' "' + (title || "this record") + '"?'
+            )) {
+                return;
+            }
+
+            const tokenInput = activityForm.querySelector(
+                'input[name="__RequestVerificationToken"]'
+            );
+
+            if (!tokenInput) {
+                alert("Security token not found. Refresh the page and try again.");
+                return;
+            }
+
+            const url = type === "General"
+                ? (cancel ? cancelGeneralUrl : uncancelGeneralUrl)
+                : (cancel ? cancelPlacementUrl : uncancelPlacementUrl);
+
+            try {
+                const body = new URLSearchParams();
+                body.append("id", String(id));
+                body.append("__RequestVerificationToken", tokenInput.value);
+
+                const response = await fetch(url, {
+                    method: "POST",
+                    headers: {
+                        "Content-Type":
+                            "application/x-www-form-urlencoded; charset=UTF-8",
+                        "X-Requested-With": "XMLHttpRequest"
+                    },
+                    body: body.toString(),
+                    credentials: "same-origin"
+                });
+
+                if (!response.ok) {
+                    alert("Unable to " + actionText +
+                          " this record. HTTP status: " + response.status);
+                    return;
+                }
+
+                window.location.reload();
+
+            } catch (error) {
+                console.error("Cancellation state update failed:", error);
+                alert("Unable to contact the server. Please try again.");
+            }
+        }
+
+        
+
+            // =========================================================
+            // MANAGEMENT TABLE HELPERS
+            // =========================================================
+            function safeValue(value) {
+                return value === null || value === undefined || value === ""
+                    ? "-"
+                    : String(value);
+            }
+
+            function addCell(row, value) {
+                const cell = document.createElement("td");
+                cell.textContent = safeValue(value);
+                row.appendChild(cell);
+                return cell;
+            }
+
+            function makeActionButton(text, className, handler) {
+                const button = document.createElement("button");
+                button.type = "button";
+                button.className = className;
+                button.textContent = text;
+                button.addEventListener("click", handler);
+                return button;
+            }
+
+            function openDetails(record) {
+                const baseUrl = record.type === "General"
+                    ? detailsGeneralUrl
+                    : detailsPlacementUrl;
+
+                const url = new URL(baseUrl, window.location.origin);
+                url.searchParams.set("id", String(record.id));
+
+                const newTab = window.open(url.toString(), "_blank");
+
+                if (!newTab) {
+                    alert("Your browser blocked the new tab. Please allow pop-ups.");
+                }
+            }
+
+            // =========================================================
+            // ACTIVITY MANAGEMENT TABLE
+            // Includes drafts and cancelled records.
+            // =========================================================
+            function renderManagementTable() {
+                if (!managementBody) return;
+
+                managementBody.innerHTML = "";
+
+                const records = [
+                    ...generalActivitiesFromDb.map(a => ({
+                        type: "General",
+                        id: a.ActivityID,
+                        title: a.Title,
+                        category: a.Category,
+                        startDate: a.StartDate,
+                        endDate: a.EndDate,
+                        startTime: a.StartTime,
+                        endTime: a.EndTime,
+                        location: a.Location,
+                        participants: a.Participants,
+                        status: a.Status,
+                        cancelled: isCancelled(a),
+                        data: a
+                    })),
+                    ...placementDrivesFromDb.map(p => ({
+                        type: "Placement Drive",
+                        id: p.PlacementDriveID,
+                        title: p.CompanyName,
+                        category: p.JobPosition,
+                        startDate: p.StartDate,
+                        endDate: p.EndDate,
+                        startTime: p.StartTime,
+                        endTime: p.EndTime,
+                        location: p.Venue || p.JobLocation,
+                        participants: p.Participants,
+                        status: p.PublicationStatus,
+                        cancelled: isCancelled(p),
+                        data: p
+                    }))
+                ];
+
+                if (records.length === 0) {
+                    const row = document.createElement("tr");
+                    const cell = document.createElement("td");
+                    cell.colSpan = 12;
+                    cell.className = "text-center";
+                    cell.textContent = "No saved activities found.";
+                    row.appendChild(cell);
+                    managementBody.appendChild(row);
+                    return;
+                }
+
+                records.forEach((record, index) => {
+                    const row = document.createElement("tr");
+
+                    if (record.cancelled) {
+                        row.classList.add("table-secondary");
+                    }
+
+                    addCell(row, index + 1);
+                    addCell(row, record.type);
+                    addCell(row, record.title);
+                    addCell(row, record.category);
+                    addCell(row, record.startDate
+                        ? String(record.startDate).substring(0, 10) : "-");
+                    addCell(row, record.endDate
+                        ? String(record.endDate).substring(0, 10) : "-");
+                    addCell(row, record.startTime
+                        ? String(record.startTime).substring(0, 5) : "-");
+                    addCell(row, record.endTime
+                        ? String(record.endTime).substring(0, 5) : "-");
+                    addCell(row, record.location);
+                    addCell(row, record.participants);
+
+                    let displayStatus = record.cancelled
+                        ? "Cancelled"
+                        : normalizeStatus(record.status);
+
+                    addCell(row, displayStatus);
+
+                    const actions = document.createElement("td");
+
+                    actions.appendChild(makeActionButton(
+                        "Details",
+                        "btn btn-sm btn-outline-info me-1 mb-1",
+                        () => openDetails(record)
+                    ));
+
+                    if (!record.cancelled) {
+                        actions.appendChild(makeActionButton(
+                            "Edit",
+                            "btn btn-sm btn-primary me-1 mb-1",
+                            () => {
+                                if (record.type === "General") {
+                                    editGeneralActivity(record.id);
+                                } else {
+                                    editPlacementDrive(record.id);
+                                }
+                            }
+                        ));
+                    }
+
+                            actions.appendChild(makeActionButton(
+            record.cancelled ? "Restore" : "Cancel",
+            record.cancelled
+                ? "btn btn-sm btn-success mb-1"
+                : "btn btn-sm btn-warning mb-1",
+            () => changeCancellationState(
+                record.id,
+                record.title,
+                record.type,
+                !record.cancelled
+            )
+        ));
+
+                    row.appendChild(actions);
+                    managementBody.appendChild(row);
+                });
+            }
+
+            // =========================================================
+            // ADD NEW ACTIVITY
+            // =========================================================
+            document.getElementById("btnAddActivity")
+                ?.addEventListener("click", function () {
+                    activityForm.reset();
+
+                    document.getElementById("generalActivityId").value = "0";
+                    document.getElementById("placementDriveId").value = "0";
+
+                    generalRadio.checked = true;
+                    updateActivityType(false);
+
+                    const title = modalElement.querySelector(".modal-title");
+                    if (title) title.textContent = "Create Scheduler Activity";
+
+                    const body = modalElement.querySelector(
+                        ".scheduler-modal-body"
+                    );
+                    if (body) body.scrollTop = 0;
+                });
+
+            // =========================================================
+            // CALENDAR RENDERING
+            // =========================================================
+            function renderCalendar() {
+                calendarGrid.innerHTML = "";
+                calendarGrid.className = "calendar-grid";
+
+                if (currentView === "week") {
+                    calendarGrid.classList.add("week-mode");
+                }
+
+                if (currentView === "day") {
+                    calendarGrid.classList.add("day-mode");
+                }
+
+                monthYear.textContent =
+                    monthNames[currentMonth.getMonth()] + " " +
+                    currentMonth.getFullYear();
+
+                document.querySelectorAll(".calendar-view-btn")
+                    .forEach(button => {
+                        button.classList.toggle(
+                            "active",
+                            button.dataset.view === currentView
+                        );
+                    });
+
+                let startDate;
+
+                if (currentView === "day") {
+                    startDate = parseDate(selectedDate);
+                } else if (currentView === "week") {
+                    startDate = parseDate(selectedDate);
+                    startDate.setDate(startDate.getDate() - startDate.getDay());
+                } else {
+                    startDate = new Date(
+                        currentMonth.getFullYear(),
+                        currentMonth.getMonth(),
+                        1
+                    );
+                    startDate.setDate(startDate.getDate() - startDate.getDay());
+                }
+
+                const dayCount = currentView === "day"
+                    ? 1
+                    : currentView === "week" ? 7 : 42;
+
+                for (let i = 0; i < dayCount; i++) {
+                    const date = new Date(startDate);
+                    date.setDate(startDate.getDate() + i);
+
+                    const dateKey = toDateKey(date);
+                    const dayActivities = getActivityForDate(dateKey);
+
+                    const cell = document.createElement("button");
+                    cell.type = "button";
+                    cell.className = "calendar-day";
+                    cell.setAttribute("aria-label", formatDate(dateKey));
+
+                    if (currentView === "month" &&
+                        date.getMonth() !== currentMonth.getMonth()) {
+                        cell.classList.add("other-month");
+                    }
+
+                    if (dateKey === toDateKey(today)) {
+                        cell.classList.add("today");
+                    }
+
+                    if (dateKey === selectedDate) {
+                        cell.classList.add("selected");
+                    }
+
+                    const dayNumber = document.createElement("span");
+                    dayNumber.className = "day-number";
+                    dayNumber.textContent = date.getDate();
+                    cell.appendChild(dayNumber);
+
+                    if (dayActivities.length > 0) {
+                        const markers = document.createElement("span");
+                        markers.className = "day-markers";
+
+                        dayActivities.slice(0, 3).forEach(activity => {
+                            const marker = document.createElement("span");
+                            marker.className =
+                                "day-marker " + getMarkerClass(activity);
+                            markers.appendChild(marker);
+                        });
+
+                        cell.appendChild(markers);
+                    }
+
+                    cell.addEventListener("click", function () {
+                        selectedDate = dateKey;
+                        currentMonth = new Date(
+                            date.getFullYear(), date.getMonth(), 1
+                        );
+                        showAllActivities = false;
+                        renderCalendar();
+                    });
+
+                    calendarGrid.appendChild(cell);
+                }
+
+                showSelectedDateActivities();
+                updateSummaryCards();
+            }
+
+            // =========================================================
+            // SUMMARY CARDS
+            // Counts use all records, including cancelled and draft records.
+            // =========================================================
+            function updateSummaryCards() {
+                const allGeneral = generalActivitiesFromDb;
+                const allPlacements = placementDrivesFromDb;
+
+                const activeGeneral = allGeneral.filter(a => !isCancelled(a));
+                const activePlacements = allPlacements.filter(p => !isCancelled(p));
+
+                const cancelledCount =
+                    allGeneral.filter(isCancelled).length +
+                    allPlacements.filter(isCancelled).length;
+
+                const completedCount = activeGeneral.filter(a =>
+                    String(a.Status || "").toLowerCase() === "completed"
+                ).length;
+
+                const upcomingGeneralCount = activeGeneral.filter(a =>
+                    String(a.Status || "").toLowerCase() === "upcoming"
+                ).length;
+
+                const upcomingPlacementCount = activePlacements.filter(p =>
+                    isPublished(p)
+                ).length;
+
+                const totalCount = allGeneral.length + allPlacements.length;
+
+                const totalElement = document.getElementById("totalActivities");
+                const upcomingElement = document.getElementById("upcomingActivities");
+                const completedElement = document.getElementById("completedActivities");
+                const cancelledElement = document.getElementById("cancelledActivities");
+
+                if (totalElement) totalElement.textContent = totalCount;
+                if (upcomingElement) {
+                    upcomingElement.textContent =
+                        upcomingGeneralCount + upcomingPlacementCount;
+                }
+                if (completedElement) {
+                    completedElement.textContent = completedCount;
+                }
+                if (cancelledElement) {
+                    cancelledElement.textContent = cancelledCount;
+                }
+            }
+
+            // =========================================================
+            // CALENDAR NAVIGATION
+            // =========================================================
+            function changePeriod(direction) {
                 showAllActivities = false;
+
+                if (currentView === "day" || currentView === "week") {
+                    const date = parseDate(selectedDate);
+                    date.setDate(date.getDate() +
+                        direction * (currentView === "week" ? 7 : 1));
+
+                    selectedDate = toDateKey(date);
+                    currentMonth = new Date(
+                        date.getFullYear(), date.getMonth(), 1
+                    );
+                } else {
+                    currentMonth.setMonth(currentMonth.getMonth() + direction);
+                }
+
                 renderCalendar();
-            });
+            }
 
-            calendarGrid.appendChild(cell);
-        }
+            document.getElementById("previousMonth")
+                ?.addEventListener("click", () => changePeriod(-1));
 
-        showSelectedDateActivities();
-        updateSummaryCards();
-    }
+            document.getElementById("nextMonth")
+                ?.addEventListener("click", () => changePeriod(1));
 
-    function updateSummaryCards() {
-        const total = activities.length;
-        const upcoming = activities.filter(x => x.status === "Upcoming").length;
-        const completed = activities.filter(x => x.status === "Completed").length;
-        const cancelled = activities.filter(x => x.status === "Cancelled").length;
+            document.getElementById("todayButton")
+                ?.addEventListener("click", function () {
+                    selectedDate = toDateKey(today);
+                    currentMonth = new Date(
+                        today.getFullYear(), today.getMonth(), 1
+                    );
+                    showAllActivities = false;
+                    renderCalendar();
+                });
 
-        document.getElementById("totalActivities").textContent = total;
-        document.getElementById("upcomingActivities").textContent = upcoming;
-        document.getElementById("completedActivities").textContent = completed;
-        document.getElementById("cancelledActivities").textContent = cancelled;
-    }
+            document.querySelectorAll(".calendar-view-btn")
+                .forEach(button => {
+                    button.addEventListener("click", function () {
+                        currentView = this.dataset.view;
+                        renderCalendar();
+                    });
+                });
 
-    function changePeriod(direction) {
-        showAllActivities = false;
+            document.getElementById("viewAllActivities")
+                ?.addEventListener("click", function (event) {
+                    event.preventDefault();
 
-        if (currentView === "day" || currentView === "week") {
-            const date = parseDate(selectedDate);
-            date.setDate(date.getDate() +
-                direction * (currentView === "week" ? 7 : 1));
+                    showAllActivities = true;
+                    renderActivityList(activities);
 
-            selectedDate = toDateKey(date);
-            currentMonth = new Date(date.getFullYear(), date.getMonth(), 1);
-        } else {
-            currentMonth.setMonth(currentMonth.getMonth() + direction);
-        }
+                    selectedDateInfo.textContent =
+                        "Showing all " + activities.length +
+                        " scheduled activities.";
+                });
 
-        renderCalendar();
-    }
-
-    document.getElementById("previousMonth")
-        ?.addEventListener("click", () => changePeriod(-1));
-
-    document.getElementById("nextMonth")
-        ?.addEventListener("click", () => changePeriod(1));
-
-    document.getElementById("todayButton")
-        ?.addEventListener("click", function () {
-            selectedDate = toDateKey(today);
-            currentMonth = new Date(today.getFullYear(), today.getMonth(), 1);
-            showAllActivities = false;
+            // =========================================================
+            // INITIAL PAGE RENDER
+            // =========================================================
             renderCalendar();
+            renderManagementTable();
         });
-
-    document.querySelectorAll(".calendar-view-btn").forEach(button => {
-        button.addEventListener("click", function () {
-            currentView = this.dataset.view;
-            renderCalendar();
-        });
-    });
-
-   document.getElementById("viewAllActivities")
-    ?.addEventListener("click", function (event) {
-        event.preventDefault();
-
-        showAllActivities = true;
-        renderActivityList(activities);
-
-        selectedDateInfo.textContent =
-            "Showing all " + activities.length + " demo activities.";
-    });
-
-// Initial calendar display.
-renderCalendar();
-
-}); // IMPORTANT: closes DOMContentLoaded
-
-</script>
+    </script>
 }
+
+

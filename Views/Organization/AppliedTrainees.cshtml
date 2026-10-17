@@ -95,17 +95,15 @@
                                     <a asp-controller="Organization"
                                        asp-action="ViewOrgPost"
                                        asp-route-id="@item.nID"
-                                       class="resume-view-btn"
-                                       title="View Post">
-
-                                        <i class="fas fa-eye"></i>
-
+                                       asp-route-source="AppliedTrainees"
+                                       title="View">
+                                        <i class="fa-solid fa-eye"></i>
                                     </a>
 
                                 </td>
 
                                 @* AppliedTrainee.cshtml *@ 
-                                        <td class="text-center">
+                                                <td class="text-center">
 
                                     <a asp-controller="Organization"
                                        asp-action="OrgPositionTR"

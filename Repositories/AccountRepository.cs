@@ -2137,7 +2137,13 @@ public OrganizationLogin? GetOrganizationLoginDetails(string email)
         // TPO LOGIN
         // =========================================================
 
-        public TPOLoginResult LoginTPO(string collegeMailID)
+
+        // =========================================================
+        // TPO LOGIN
+        // =========================================================
+
+
+        public TPOLoginResult? LoginTPO(string collegeMailID)
         {
             using (SqlConnection cn = _db.GetConnection())
             {
@@ -2155,69 +2161,59 @@ public OrganizationLogin? GetOrganizationLoginDetails(string email)
                 OTPVerified,
                 Status,
                 IsApproved,
-                IsActive
+                IsActive,
+                subtopbit
             FROM tblTPORegistration
             WHERE CollegeMailID = @CollegeMailID";
 
                 using (SqlCommand cmd = new SqlCommand(query, cn))
                 {
                     cmd.Parameters.Add("@CollegeMailID", SqlDbType.NVarChar, 200)
-                                  .Value = collegeMailID.Trim();
+                        .Value = collegeMailID.Trim();
 
                     cn.Open();
 
                     using (SqlDataReader reader = cmd.ExecuteReader())
                     {
-                        if (reader.Read())
+                        if (!reader.Read())
+                            return null;
+
+                        return new TPOLoginResult
                         {
-                            return new TPOLoginResult
-                            {
-                                TPOID = Convert.ToInt32(reader["TPOID"]),
+                            TPOID = Convert.ToInt32(reader["TPOID"]),
+                            FullName = reader["FullName"]?.ToString() ?? "",
+                            CollegeMailID = reader["CollegeMailID"]?.ToString() ?? "",
+                            MobileNo = reader["MobileNo"]?.ToString() ?? "",
+                            PasswordHash = reader["PasswordHash"]?.ToString() ?? "",
+                            CollegeName = reader["CollegeName"]?.ToString() ?? "",
 
-                                FullName = reader["FullName"].ToString(),
+                            CollegeCode = reader["CollegeCode"] == DBNull.Value
+                                ? null
+                                : reader["CollegeCode"].ToString(),
 
-                                CollegeMailID =
-                                    reader["CollegeMailID"].ToString(),
+                            Designation = reader["Designation"]?.ToString() ?? "",
+                            DepartmentName = reader["DepartmentName"]?.ToString() ?? "",
 
-                                MobileNo =
-                                    reader["MobileNo"].ToString(),
+                            OTPVerified = reader["OTPVerified"] != DBNull.Value
+                                && Convert.ToBoolean(reader["OTPVerified"]),
 
-                                PasswordHash =
-                                    reader["PasswordHash"].ToString(),
+                            Status = reader["Status"]?.ToString() ?? "",
 
-                                CollegeName =
-                                    reader["CollegeName"].ToString(),
+                            IsApproved = reader["IsApproved"] != DBNull.Value
+                                && Convert.ToBoolean(reader["IsApproved"]),
 
-                                CollegeCode =
-                                    reader["CollegeCode"] == DBNull.Value
-                                        ? null
-                                        : reader["CollegeCode"].ToString(),
+                            IsActive = reader["IsActive"] != DBNull.Value
+                                && Convert.ToBoolean(reader["IsActive"]),
 
-                                Designation =
-                                    reader["Designation"].ToString(),
-
-                                DepartmentName =
-                                    reader["DepartmentName"].ToString(),
-
-                                OTPVerified =
-                                    Convert.ToBoolean(reader["OTPVerified"]),
-
-                                Status =
-                                    reader["Status"].ToString(),
-
-                                IsApproved =
-                                    Convert.ToBoolean(reader["IsApproved"]),
-
-                                IsActive =
-                                    Convert.ToBoolean(reader["IsActive"])
-                            };
-                        }
+                            SubTpoBit = reader["subtopbit"] != DBNull.Value
+                                && Convert.ToBoolean(reader["subtopbit"])
+                        };
                     }
                 }
             }
-
-            return null;
         }
+
+
 
 
         public bool TPOEmailExists(string collegeMailID)
@@ -2493,10 +2489,49 @@ public OrganizationLogin? GetOrganizationLoginDetails(string email)
         // INSERT SUB TPO
         // =========================================================
 
+
         public bool InsertSubTPO(TPORegistration model)
         {
+            if (model == null)
+                throw new ArgumentNullException(nameof(model));
+
+            // CollegeName now receives the selected numeric college ID
+            // from the College dropdown.
+            if (!int.TryParse(model.CollegeName, out int collegeId) ||
+                collegeId <= 0)
+            {
+                throw new InvalidOperationException(
+                    "Please select a valid college.");
+            }
+
             using (SqlConnection cn = _db.GetConnection())
             {
+                cn.Open();
+
+                // Validate the selected college.
+                // Change tblCollege if your actual college table has another name.
+                using (SqlCommand checkCmd = new SqlCommand(@"
+            SELECT COUNT(1)
+            FROM tblCollege
+            WHERE nID = @CollegeID
+              AND ISNULL(nBit, 0) = 1;", cn))
+                {
+                    checkCmd.Parameters.Add("@CollegeID", SqlDbType.Int)
+                        .Value = collegeId;
+
+                    int collegeExists =
+                        Convert.ToInt32(checkCmd.ExecuteScalar());
+
+                    if (collegeExists == 0)
+                    {
+                        throw new InvalidOperationException(
+                            "The selected college does not exist or is inactive.");
+                    }
+                }
+
+                // Insert Sub-TPO.
+                // ParentTPOID must be populated by the controller
+                // from the logged-in main TPO's session.
                 string query = @"
             INSERT INTO tblTPORegistration
             (
@@ -2521,7 +2556,8 @@ public OrganizationLogin? GetOrganizationLoginDetails(string email)
                 IsActive,
                 CreatedDate,
                 UpdatedDate,
-                subtopbit
+                subtopbit,
+                ParentTPOID
             )
             VALUES
             (
@@ -2546,138 +2582,100 @@ public OrganizationLogin? GetOrganizationLoginDetails(string email)
                 @IsActive,
                 GETDATE(),
                 GETDATE(),
-                1
-            )";
+                1,
+                @ParentTPOID
+            );";
 
-                using (SqlCommand cmd =
-                       new SqlCommand(query, cn))
+                using (SqlCommand cmd = new SqlCommand(query, cn))
                 {
-                    cmd.Parameters.AddWithValue(
-                        "@FullName",
-                        model.FullName ?? "");
+                    cmd.Parameters.Add("@FullName", SqlDbType.NVarChar, 150)
+                        .Value = (object?)model.FullName ?? DBNull.Value;
 
-                    cmd.Parameters.AddWithValue(
-                        "@CollegeMailID",
-                        model.CollegeMailID ?? "");
+                    cmd.Parameters.Add("@CollegeMailID", SqlDbType.NVarChar, 150)
+                        .Value = (object?)model.CollegeMailID ?? DBNull.Value;
 
-                    cmd.Parameters.AddWithValue(
-                        "@MobileNo",
-                        model.MobileNo ?? "");
+                    cmd.Parameters.Add("@MobileNo", SqlDbType.NVarChar, 20)
+                        .Value = (object?)model.MobileNo ?? DBNull.Value;
 
-                    // =====================================================
-                    // PASSWORD
-                    // =====================================================
+                    // IMPORTANT:
+                    // Store a password hash here, not the raw password.
+                    // Use the same hashing mechanism as your TPO login.
+                    cmd.Parameters.Add("@PasswordHash", SqlDbType.NVarChar, 500)
+                        .Value = (object?)model.Password ?? DBNull.Value;
 
-                    cmd.Parameters.AddWithValue(
-                        "@PasswordHash",
-                        model.Password ?? "");
+                    // Store numeric college ID as text in the existing
+                    // CollegeName column, without changing the schema.
+                    cmd.Parameters.Add("@CollegeName", SqlDbType.NVarChar, 250)
+                        .Value = collegeId.ToString();
 
-                    // =====================================================
-                    // COLLEGE
-                    // =====================================================
+                    cmd.Parameters.Add("@CollegeCode", SqlDbType.NVarChar, 50)
+                        .Value = (object?)model.CollegeCode ?? DBNull.Value;
 
-                    cmd.Parameters.AddWithValue(
-                        "@CollegeName",
-                        model.CollegeName ?? "");
+                    cmd.Parameters.Add("@CollegeAddress", SqlDbType.NVarChar, 500)
+                        .Value = (object?)model.CollegeAddress ?? DBNull.Value;
 
-                    cmd.Parameters.AddWithValue(
-                        "@CollegeCode",
-                        model.CollegeCode ?? "");
+                    cmd.Parameters.Add("@OrganizationWebsiteURL", SqlDbType.NVarChar, 250)
+                        .Value = string.IsNullOrWhiteSpace(model.OrganizationWebsiteURL)
+                            ? DBNull.Value
+                            : (object)model.OrganizationWebsiteURL.Trim();
 
-                    cmd.Parameters.AddWithValue(
-                        "@CollegeAddress",
-                        model.CollegeAddress ?? "");
+                    cmd.Parameters.Add("@Designation", SqlDbType.NVarChar, 150)
+                        .Value = (object?)model.Designation ?? DBNull.Value;
 
-                    cmd.Parameters.AddWithValue(
-                        "@OrganizationWebsiteURL",
-                        string.IsNullOrWhiteSpace(
-                            model.OrganizationWebsiteURL)
-                            ? (object)DBNull.Value
-                            : model.OrganizationWebsiteURL);
+                    cmd.Parameters.Add("@DepartmentName", SqlDbType.NVarChar, 150)
+                        .Value = (object?)model.DepartmentName ?? DBNull.Value;
 
-                    // =====================================================
-                    // PROFESSIONAL
-                    // =====================================================
+                    cmd.Parameters.Add("@CollegeEmployeeID", SqlDbType.NVarChar, 100)
+                        .Value = (object?)model.CollegeEmployeeID ?? DBNull.Value;
 
-                    cmd.Parameters.AddWithValue(
-                        "@Designation",
-                        model.Designation ?? "");
+                    cmd.Parameters.Add("@SupportingDocument1", SqlDbType.NVarChar, 500)
+                        .Value = string.IsNullOrWhiteSpace(model.SupportingDocument1)
+                            ? DBNull.Value
+                            : (object)model.SupportingDocument1;
 
-                    cmd.Parameters.AddWithValue(
-                        "@DepartmentName",
-                        model.DepartmentName ?? "");
+                    cmd.Parameters.Add("@SupportingDocument2", SqlDbType.NVarChar, 500)
+                        .Value = string.IsNullOrWhiteSpace(model.SupportingDocument2)
+                            ? DBNull.Value
+                            : (object)model.SupportingDocument2;
 
-                    cmd.Parameters.AddWithValue(
-                        "@CollegeEmployeeID",
-                        model.CollegeEmployeeID ?? "");
+                    cmd.Parameters.Add("@ProfilePhoto", SqlDbType.NVarChar, 500)
+                        .Value = string.IsNullOrWhiteSpace(model.ProfilePhoto)
+                            ? DBNull.Value
+                            : (object)model.ProfilePhoto;
 
-                    // =====================================================
-                    // DOCUMENTS
-                    // =====================================================
+                    cmd.Parameters.Add("@OTP", SqlDbType.NVarChar, 10)
+                        .Value = string.IsNullOrWhiteSpace(model.OTP)
+                            ? DBNull.Value
+                            : (object)model.OTP;
 
-                    cmd.Parameters.AddWithValue(
-                        "@SupportingDocument1",
-                        string.IsNullOrWhiteSpace(
-                            model.SupportingDocument1)
-                            ? (object)DBNull.Value
-                            : model.SupportingDocument1);
+                    cmd.Parameters.Add("@OTPVerified", SqlDbType.Bit)
+                        .Value = model.OTPVerified;
 
-                    cmd.Parameters.AddWithValue(
-                        "@SupportingDocument2",
-                        string.IsNullOrWhiteSpace(
-                            model.SupportingDocument2)
-                            ? (object)DBNull.Value
-                            : model.SupportingDocument2);
+                    // New Sub-TPO registration awaits approval.
+                    cmd.Parameters.Add("@Status", SqlDbType.NVarChar, 50)
+                        .Value = "Pending";
 
-                    cmd.Parameters.AddWithValue(
-                        "@ProfilePhoto",
-                        string.IsNullOrWhiteSpace(
-                            model.ProfilePhoto)
-                            ? (object)DBNull.Value
-                            : model.ProfilePhoto);
+                    cmd.Parameters.Add("@IsApproved", SqlDbType.Bit)
+                        .Value = false;
 
-                    // =====================================================
-                    // OTP
-                    // =====================================================
+                    cmd.Parameters.Add("@IsActive", SqlDbType.Bit)
+                        .Value = false;
 
-                    cmd.Parameters.AddWithValue(
-                        "@OTP",
-                        string.IsNullOrWhiteSpace(model.OTP)
-                            ? (object)DBNull.Value
-                            : model.OTP);
+                    // ParentTPOID must be set by the controller.
+                    if (model.ParentTPOID <= 0)
+                    {
+                        throw new InvalidOperationException(
+                            "The parent TPO could not be identified.");
+                    }
 
-                    cmd.Parameters.AddWithValue(
-                        "@OTPVerified",
-                        model.OTPVerified);
-
-                    // =====================================================
-                    // APPROVAL
-                    // =====================================================
-
-                    cmd.Parameters.AddWithValue(
-                        "@Status",
-                        string.IsNullOrWhiteSpace(model.Status)
-                            ? "Pending"
-                            : model.Status);
-
-                    cmd.Parameters.AddWithValue(
-                        "@IsApproved",
-                        model.IsApproved);
-
-                    cmd.Parameters.AddWithValue(
-                        "@IsActive",
-                        model.IsActive);
-
-                    // =====================================================
-                    // EXECUTE
-                    // =====================================================
-
-                    cn.Open();
+                    cmd.Parameters.Add("@ParentTPOID", SqlDbType.Int)
+                        .Value = model.ParentTPOID;
 
                     return cmd.ExecuteNonQuery() > 0;
                 }
             }
         }
+
 
 
 
@@ -2917,6 +2915,10 @@ public OrganizationLogin? GetOrganizationLoginDetails(string email)
                                     reader["CreatedDate"] == DBNull.Value
                                         ? null
                                         : Convert.ToDateTime(reader["CreatedDate"]),
+
+                                SubTpoBit = reader["subtopbit"] == DBNull.Value
+                                        ? null
+                                        : Convert.ToBoolean(reader["subtopbit"]),
 
                                 UpdatedDate =
                                     reader["UpdatedDate"] == DBNull.Value
@@ -4091,13 +4093,13 @@ ORDER BY CreatedDate DESC,
         // TPO SEND NOTIFICATION
         // GET TPO NOTIFICATIONS
         // =====================================================
+
+        //shrirang 12/10/26
         #region "Get TPO Notifications For Send"
 
-        public List<TPONotificationListM> GetTPONotificationsForSend(
-            int tpoId)
+        public List<TPONotificationListM> GetTPONotificationsForSend(int tpoId)
         {
-            List<TPONotificationListM> list =
-                new List<TPONotificationListM>();
+            List<TPONotificationListM> list = new List<TPONotificationListM>();
 
             using (SqlConnection cn = _db.GetConnection())
             {
@@ -4114,330 +4116,172 @@ SELECT
 
     N.Attachment1OriginalName,
     N.Attachment1Path,
-
     N.Attachment2OriginalName,
     N.Attachment2Path,
 
     N.CreatedBy,
     N.CreatedByName,
-
     N.IsActive,
     N.IsDeleted,
     N.CreatedDate,
 
-    -- =====================================================
-    -- NOTIFICATION TRACKING
-    -- =====================================================
+    ISNULL(N.ApprovalStatus, 'Pending') AS ApprovalStatus,
 
     ISNULL(T.TotalSent, 0) AS TotalSent,
-
     ISNULL(T.TotalRead, 0) AS TotalRead,
-
     ISNULL(T.TotalUnread, 0) AS TotalUnread
 
-FROM tblTPONotification N
-
--- =========================================================
--- CALCULATE STUDENT NOTIFICATION TRACKING
--- =========================================================
+FROM dbo.tblTPONotification N
 
 OUTER APPLY
 (
     SELECT
         COUNT(1) AS TotalSent,
-
-        SUM(
-    CASE
-        WHEN ISNULL(R.IsRead, 0) = 1
-        THEN 1
-        ELSE 0
-    END
-) AS TotalRead,
-
-SUM(
-    CASE
-        WHEN ISNULL(R.IsRead, 0) = 0
-        THEN 1
-        ELSE 0
-    END
-) AS TotalUnread
-
-    FROM tblTPONotificationRecipient R
-
-    WHERE
-        R.NotificationID = N.NotificationID
-        AND R.IsActive = 1
-
+        SUM(CASE WHEN ISNULL(R.IsRead, 0) = 1 THEN 1 ELSE 0 END) AS TotalRead,
+        SUM(CASE WHEN ISNULL(R.IsRead, 0) = 0 THEN 1 ELSE 0 END) AS TotalUnread
+    FROM dbo.tblTPONotificationRecipient R
+    WHERE R.NotificationID = N.NotificationID
+      AND R.IsActive = 1
 ) T
 
-WHERE
-    N.CreatedBy = @CreatedBy
+INNER JOIN dbo.tblTPORegistration LoggedTPO
+    ON LoggedTPO.TPOID = @TPOID
 
-    AND N.IsDeleted = 0
+LEFT JOIN dbo.tblTPORegistration CreatorTPO
+    ON CreatorTPO.TPOID = N.CreatedBy
+
+WHERE
+    ISNULL(N.IsDeleted, 0) = 0
+    AND
+    (
+        -- Main TPO: its own notifications
+        (
+            N.CreatedBy = @TPOID
+            AND ISNULL(LoggedTPO.subtopbit, 0) = 0
+        )
+
+        OR
+
+        -- Sub TPO: only its own approved notifications
+        (
+            N.CreatedBy = @TPOID
+            AND ISNULL(LoggedTPO.subtopbit, 0) = 1
+            AND N.ApprovalStatus = 'Approved'
+        )
+
+        OR
+
+        -- Main TPO: approved notifications created by its own Sub TPOs
+        (
+            ISNULL(LoggedTPO.subtopbit, 0) = 0
+            AND ISNULL(CreatorTPO.subtopbit, 0) = 1
+            AND CreatorTPO.ParentTPOID = @TPOID
+            AND N.ApprovalStatus = 'Approved'
+        )
+    )
 
 ORDER BY
     N.CreatedDate DESC,
     N.NotificationID DESC;
 ";
 
-                using (SqlCommand cmd =
-                       new SqlCommand(query, cn))
+                using (SqlCommand cmd = new SqlCommand(query, cn))
                 {
-                    cmd.Parameters.Add(
-                        "@CreatedBy",
-                        SqlDbType.Int).Value = tpoId;
+                    cmd.Parameters.Add("@TPOID", SqlDbType.Int).Value = tpoId;
 
                     cn.Open();
 
-                    using (SqlDataReader reader =
-                           cmd.ExecuteReader())
+                    using (SqlDataReader reader = cmd.ExecuteReader())
                     {
                         while (reader.Read())
                         {
-                            TPONotificationListM item =
-                                new TPONotificationListM();
+                            TPONotificationListM item = new TPONotificationListM();
 
+                            item.NotificationID = Convert.ToInt32(reader["NotificationID"]);
+                            item.Title = reader["Title"]?.ToString() ?? string.Empty;
+                            item.Type = reader["Type"]?.ToString() ?? string.Empty;
+                            item.Audience = reader["Audience"]?.ToString() ?? string.Empty;
 
-                            // =================================================
-                            // BASIC INFORMATION
-                            // =================================================
+                            if (reader["NotificationDate"] != DBNull.Value)
+                                item.NotificationDate = Convert.ToDateTime(reader["NotificationDate"]);
 
-                            item.NotificationID =
-                                Convert.ToInt32(
-                                    reader["NotificationID"]);
+                            if (reader["NotificationTime"] != DBNull.Value)
+                                item.NotificationTime = (TimeSpan)reader["NotificationTime"];
 
-                            item.Title =
-                                reader["Title"]?.ToString()
-                                ?? string.Empty;
-
-                            item.Type =
-                                reader["Type"]?.ToString()
-                                ?? string.Empty;
-
-                            item.Audience =
-                                reader["Audience"]?.ToString()
-                                ?? string.Empty;
-
-
-                            // =================================================
-                            // DATE
-                            // =================================================
-
-                            if (reader["NotificationDate"]
-                                != DBNull.Value)
-                            {
-                                item.NotificationDate =
-                                    Convert.ToDateTime(
-                                        reader["NotificationDate"]);
-                            }
-
-
-                            // =================================================
-                            // TIME
-                            // =================================================
-
-                            if (reader["NotificationTime"]
-                                != DBNull.Value)
-                            {
-                                item.NotificationTime =
-                                    (TimeSpan)
-                                    reader["NotificationTime"];
-                            }
-
-
-                            // =================================================
-                            // CONTENT
-                            // =================================================
-
-                            item.Content =
-                                reader["Content"]?.ToString()
-                                ?? string.Empty;
-
-
-                            // =================================================
-                            // EMAIL
-                            // =================================================
+                            item.Content = reader["Content"]?.ToString() ?? string.Empty;
 
                             item.SendEmailNotification =
-                                reader["SendEmailNotification"]
-                                != DBNull.Value
-                                &&
-                                Convert.ToBoolean(
-                                    reader[
-                                        "SendEmailNotification"]);
-
-
-                            // =================================================
-                            // ATTACHMENT 1
-                            // =================================================
+                                reader["SendEmailNotification"] != DBNull.Value &&
+                                Convert.ToBoolean(reader["SendEmailNotification"]);
 
                             item.Attachment1OriginalName =
-                                reader[
-                                    "Attachment1OriginalName"]
-                                != DBNull.Value
-                                ?
-                                reader[
-                                    "Attachment1OriginalName"]
-                                    .ToString()
-                                :
-                                null;
+                                reader["Attachment1OriginalName"] == DBNull.Value
+                                    ? null : reader["Attachment1OriginalName"].ToString();
 
                             item.Attachment1Path =
-                                reader[
-                                    "Attachment1Path"]
-                                != DBNull.Value
-                                ?
-                                reader[
-                                    "Attachment1Path"]
-                                    .ToString()
-                                :
-                                null;
-
-
-                            // =================================================
-                            // ATTACHMENT 2
-                            // =================================================
+                                reader["Attachment1Path"] == DBNull.Value
+                                    ? null : reader["Attachment1Path"].ToString();
 
                             item.Attachment2OriginalName =
-                                reader[
-                                    "Attachment2OriginalName"]
-                                != DBNull.Value
-                                ?
-                                reader[
-                                    "Attachment2OriginalName"]
-                                    .ToString()
-                                :
-                                null;
+                                reader["Attachment2OriginalName"] == DBNull.Value
+                                    ? null : reader["Attachment2OriginalName"].ToString();
 
                             item.Attachment2Path =
-                                reader[
-                                    "Attachment2Path"]
-                                != DBNull.Value
-                                ?
-                                reader[
-                                    "Attachment2Path"]
-                                    .ToString()
-                                :
-                                null;
+                                reader["Attachment2Path"] == DBNull.Value
+                                    ? null : reader["Attachment2Path"].ToString();
 
-
-                            // =================================================
-                            // CREATED BY
-                            // =================================================
-
-                            if (reader["CreatedBy"]
-                                != DBNull.Value)
-                            {
-                                item.CreatedBy =
-                                    Convert.ToInt32(
-                                        reader["CreatedBy"]);
-                            }
+                            if (reader["CreatedBy"] != DBNull.Value)
+                                item.CreatedBy = Convert.ToInt32(reader["CreatedBy"]);
 
                             item.CreatedByName =
-                                reader["CreatedByName"]
-                                != DBNull.Value
-                                ?
-                                reader["CreatedByName"]
-                                    .ToString()
-                                :
-                                null;
-
-
-                            // =================================================
-                            // ACTIVE / DELETED
-                            // =================================================
+                                reader["CreatedByName"] == DBNull.Value
+                                    ? null : reader["CreatedByName"].ToString();
 
                             item.IsActive =
-                                reader["IsActive"]
-                                != DBNull.Value
-                                &&
-                                Convert.ToBoolean(
-                                    reader["IsActive"]);
+                                reader["IsActive"] != DBNull.Value &&
+                                Convert.ToBoolean(reader["IsActive"]);
 
                             item.IsDeleted =
-                                reader["IsDeleted"]
-                                != DBNull.Value
-                                &&
-                                Convert.ToBoolean(
-                                    reader["IsDeleted"]);
+                                reader["IsDeleted"] != DBNull.Value &&
+                                Convert.ToBoolean(reader["IsDeleted"]);
 
+                            item.CreatedDate = Convert.ToDateTime(reader["CreatedDate"]);
 
-                            // =================================================
-                            // CREATED DATE
-                            // =================================================
+                            item.ApprovalStatus =
+    reader["ApprovalStatus"] == DBNull.Value
+        ? "Pending"
+        : reader["ApprovalStatus"]?.ToString() ?? "Pending";
 
-                            item.CreatedDate =
-                                Convert.ToDateTime(
-                                    reader["CreatedDate"]);
+                            item.TotalSent = Convert.ToInt32(reader["TotalSent"]);
+                            item.TotalRead = Convert.ToInt32(reader["TotalRead"]);
+                            item.TotalUnread = Convert.ToInt32(reader["TotalUnread"]);
 
-                            // =================================================
-                            // NOTIFICATION TRACKING
-                            // =================================================
-
-                            item.TotalSent =
-                                reader["TotalSent"] != DBNull.Value
-                                ? Convert.ToInt32(reader["TotalSent"])
-                                : 0;
-
-                            item.TotalRead =
-                                reader["TotalRead"] != DBNull.Value
-                                ? Convert.ToInt32(reader["TotalRead"])
-                                : 0;
-
-                            item.TotalUnread =
-                                reader["TotalUnread"] != DBNull.Value
-                                ? Convert.ToInt32(reader["TotalUnread"])
-                                : 0;
-
-
-                            // =================================================
-                            // DISPLAY DATE / TIME
-                            // =================================================
-
-                            DateTime? notificationDateTime =
-                                null;
+                            DateTime? notificationDateTime = null;
 
                             if (item.NotificationDate.HasValue)
                             {
-                                notificationDateTime =
-                                    item.NotificationDate.Value.Date;
+                                notificationDateTime = item.NotificationDate.Value.Date;
 
                                 if (item.NotificationTime.HasValue)
                                 {
                                     notificationDateTime =
-                                        notificationDateTime.Value.Add(
-                                            item.NotificationTime.Value);
+                                        notificationDateTime.Value.Add(item.NotificationTime.Value);
                                 }
                             }
-
 
                             if (notificationDateTime.HasValue)
                             {
                                 item.DisplayDateTime =
-                                    notificationDateTime.Value.ToString(
-                                        "dd/MM/yyyy hh:mm tt");
+                                    notificationDateTime.Value.ToString("dd/MM/yyyy hh:mm tt");
 
-
-                                if (notificationDateTime.Value
-                                    < DateTime.Now)
-                                {
-                                    item.Status =
-                                        "Completed";
-                                }
-                                else
-                                {
-                                    item.Status =
-                                        "Active";
-                                }
+                                item.Status = notificationDateTime.Value < DateTime.Now
+                                    ? "Completed"
+                                    : "Active";
                             }
                             else
                             {
-                                item.Status =
-                                    item.IsActive
-                                    ? "Active"
-                                    : "Inactive";
+                                item.Status = item.IsActive ? "Active" : "Inactive";
                             }
-
 
                             list.Add(item);
                         }
@@ -4490,40 +4334,72 @@ ORDER BY
                         // VERIFY NOTIFICATION BELONGS TO THIS TPO
                         // =====================================================
 
+                        // =====================================================
+                        // STEP 1
+                        // VERIFY NOTIFICATION OWNERSHIP AND APPROVAL
+                        // =====================================================
+
                         string notificationQuery = @"
 SELECT COUNT(1)
-FROM tblTPONotification
+FROM dbo.tblTPONotification N
+
+INNER JOIN dbo.tblTPORegistration LoggedTPO
+    ON LoggedTPO.TPOID = @TPOID
+
+LEFT JOIN dbo.tblTPORegistration CreatorTPO
+    ON CreatorTPO.TPOID = N.CreatedBy
+
 WHERE
-    NotificationID = @NotificationID
-    AND CreatedBy = @TPOID
-    AND ISNULL(IsDeleted, 0) = 0;
+    N.NotificationID = @NotificationID
+    AND ISNULL(N.IsDeleted, 0) = 0
+
+    AND
+    (
+        -- Main TPO sending its own notification
+        (
+            N.CreatedBy = @TPOID
+            AND ISNULL(LoggedTPO.subtopbit, 0) = 0
+        )
+
+        OR
+
+        -- Sub TPO sending its own approved notification
+        (
+            N.CreatedBy = @TPOID
+            AND ISNULL(LoggedTPO.subtopbit, 0) = 1
+            AND N.ApprovalStatus = 'Approved'
+        )
+
+        OR
+
+        -- Main TPO sending an approved notification
+        -- created by its own Sub TPO
+        (
+            ISNULL(LoggedTPO.subtopbit, 0) = 0
+            AND ISNULL(CreatorTPO.subtopbit, 0) = 1
+            AND CreatorTPO.ParentTPOID = @TPOID
+            AND N.ApprovalStatus = 'Approved'
+        )
+    );
 ";
 
-                        using (SqlCommand notificationCmd =
-                               new SqlCommand(
-                                   notificationQuery,
-                                   cn,
-                                   transaction))
+                        using (SqlCommand notificationCmd = new SqlCommand(
+                            notificationQuery, cn, transaction))
                         {
                             notificationCmd.Parameters.Add(
-                                "@NotificationID",
-                                SqlDbType.Int).Value =
-                                    notificationId;
+                                "@NotificationID", SqlDbType.Int).Value = notificationId;
 
                             notificationCmd.Parameters.Add(
-                                "@TPOID",
-                                SqlDbType.Int).Value =
-                                    tpoId;
+                                "@TPOID", SqlDbType.Int).Value = tpoId;
 
-                            int notificationExists =
-                                Convert.ToInt32(
-                                    notificationCmd.ExecuteScalar());
+                            int notificationExists = Convert.ToInt32(
+                                notificationCmd.ExecuteScalar());
 
                             if (notificationExists == 0)
                             {
                                 throw new InvalidOperationException(
-                                    "The selected notification does not belong to the logged-in TPO."
-                                );
+                                    "This notification is not available for sending. " +
+                                    "Check its ownership and approval status.");
                             }
                         }
 
@@ -5578,6 +5454,415 @@ WHERE
             return posts;
         }
 
+        // khushi 09-10-26
+        public List<OrgPostM> GetOrgPostsWithMatchingTraineeCount(int orgID)
+        {
+            List<OrgPostM> posts = new List<OrgPostM>();
 
+            using (SqlConnection con = _db.GetConnection())
+            using (SqlCommand cmd = new SqlCommand(
+                "SP_GetOrgPostsWithMatchingTraineeCount", con))
+            {
+                cmd.CommandType = CommandType.StoredProcedure;
+                cmd.Parameters.Add("@nOrgID", SqlDbType.Int).Value = orgID;
+
+                con.Open();
+
+                using (SqlDataReader dr = cmd.ExecuteReader())
+                {
+                    while (dr.Read())
+                    {
+                        OrgPostM item = new OrgPostM();
+
+                        item.nID = Convert.ToInt32(dr["nID"]);
+
+                        posts.Add(item);
+                    }
+                }
+            }
+
+            return posts;
+        }
+
+        // khushi 09-10-26
+        public List<int> GetAppliedTraineePostIds(int orgID)
+        {
+            List<int> postIds = new List<int>();
+
+            using (SqlConnection con = _db.GetConnection())
+            using (SqlCommand cmd = new SqlCommand(
+                "SP_BrowseTRApplyForAllPost", con))
+            {
+                cmd.CommandType = CommandType.StoredProcedure;
+
+                cmd.Parameters.Add("@OrganizationID", SqlDbType.Int)
+                              .Value = orgID;
+
+                con.Open();
+
+                using (SqlDataReader dr = cmd.ExecuteReader())
+                {
+                    while (dr.Read())
+                    {
+                        if (dr["PostId"] != DBNull.Value)
+                        {
+                            int postId = Convert.ToInt32(dr["PostId"]);
+
+                            if (postId > 0 && !postIds.Contains(postId))
+                            {
+                                postIds.Add(postId);
+                            }
+                        }
+                    }
+                }
+            }
+
+            return postIds;
+        }
+
+
+        // khushi 09-10-26
+        public List<int> GetOrganizationPreviousPostIds(int orgID)
+        {
+            List<int> postIds = new List<int>();
+
+            using (SqlConnection con = _db.GetConnection())
+            using (SqlCommand cmd = new SqlCommand(
+                "SP_GetOrganizationRepostList", con))
+            {
+                cmd.CommandType = CommandType.StoredProcedure;
+
+                cmd.Parameters.Add("@nOrgID", SqlDbType.Int).Value = orgID;
+
+                con.Open();
+
+                using (SqlDataReader dr = cmd.ExecuteReader())
+                {
+                    while (dr.Read())
+                    {
+                        if (dr["nID"] != DBNull.Value)
+                        {
+                            int postId = Convert.ToInt32(dr["nID"]);
+
+                            if (postId > 0 && !postIds.Contains(postId))
+                            {
+                                postIds.Add(postId);
+                            }
+                        }
+                    }
+                }
+            }
+
+            return postIds;
+        }
+
+
+        public OrgProfile? GetOrganizationProfileByCode(string id)
+        {
+            if (string.IsNullOrWhiteSpace(id))
+                return null;
+
+            id = id.Trim();
+
+            int orgId;
+
+            // Numeric ID: 2
+            if (int.TryParse(id, out int numericId))
+            {
+                orgId = numericId;
+            }
+            // Organization code: OR26072602
+            else if (id.Length == 10 &&
+                     id.StartsWith("OR", StringComparison.OrdinalIgnoreCase) &&
+                     int.TryParse(id.Substring(8, 2), out int codeId))
+            {
+                orgId = codeId;
+            }
+            else
+            {
+                return null;
+            }
+
+            if (orgId <= 0)
+                return null;
+
+            using SqlConnection cn = _db.GetConnection();
+            using SqlCommand cmd = new SqlCommand("SP_GetOrganizationProfile", cn);
+
+            cmd.CommandType = CommandType.StoredProcedure;
+            cmd.Parameters.Add("@nOrgID", SqlDbType.Int).Value = orgId;
+
+            if (cn.State != ConnectionState.Open)
+                cn.Open();
+
+            using SqlDataReader dr = cmd.ExecuteReader();
+
+            if (!dr.Read())
+                return null;
+
+            string GetString(string column)
+            {
+                int index = dr.GetOrdinal(column);
+                return dr.IsDBNull(index)
+                    ? string.Empty
+                    : Convert.ToString(dr.GetValue(index)) ?? string.Empty;
+            }
+
+            int GetInt(string column)
+            {
+                int index = dr.GetOrdinal(column);
+                return dr.IsDBNull(index) ? 0 : Convert.ToInt32(dr.GetValue(index));
+            }
+
+            DateTime? GetDate(string column)
+            {
+                int index = dr.GetOrdinal(column);
+                return dr.IsDBNull(index) ? null : Convert.ToDateTime(dr.GetValue(index));
+            }
+
+            bool GetBool(string column)
+            {
+                int index = dr.GetOrdinal(column);
+                return !dr.IsDBNull(index) && Convert.ToBoolean(dr.GetValue(index));
+            }
+
+            return new OrgProfile
+            {
+                nID = GetInt("nID"),
+                nOrgID = GetInt("nOrgID"),
+                sOrganizationName = GetString("sName"),
+                sOrganizationEmail = GetString("sEmail"),
+                sMobile = GetString("sMobile"),
+                sDesignation = GetString("sDesignation"),
+                dDateOfBirth = GetDate("dDateOfBirth"),
+                sCompanyLogo = GetString("sCompanyLogo"),
+                sCompanyAddress = GetString("sCompanyAddress"),
+                nEstablishmentYear = GetInt("nEstablishmentYear"),
+                sGSTNo = GetString("sGSTNo"),
+                sCINNo = GetString("sCINNo"),
+                nEmployeeStrength = GetString("nEmployeeStrength"),
+                dCreatedDate = GetDate("dCreatedDate") ?? DateTime.MinValue,
+                dModifiedDate = GetDate("dModifiedDate"),
+                nBit = GetBool("nBit"),
+                nSABit = GetBool("nSABit")
+            };
+        }
+
+
+        // shrirang 13/10/26
+        // tpo vrification through superadmin 
+
+
+        public bool ApproveTPORegistration(int tpoId, int superAdminId)
+        {
+            using (SqlConnection cn = _db.GetConnection())
+            {
+                string query = @"
+            UPDATE tblTPORegistration
+            SET IsApproved = 1,
+                IsActive = 1,
+                Status = 'Approved',
+                ApprovedBy = @ApprovedBy,
+                ApprovedDate = GETDATE(),
+                RejectionReason = NULL,
+                UpdatedDate = GETDATE()
+            WHERE TPOID = @TPOID
+              AND ISNULL(OTPVerified, 0) = 1
+              AND ISNULL(IsApproved, 0) = 0
+              AND ISNULL(IsActive, 0) = 0
+              AND ISNULL(Status, '') = 'Pending';";
+
+                using (SqlCommand cmd = new SqlCommand(query, cn))
+                {
+                    cmd.Parameters.Add("@TPOID", SqlDbType.Int).Value = tpoId;
+                    cmd.Parameters.Add("@ApprovedBy", SqlDbType.Int).Value =
+                        superAdminId;
+
+                    cn.Open();
+                    return cmd.ExecuteNonQuery() > 0;
+                }
+            }
+        }
+
+        public bool RejectTPORegistration(
+            int tpoId,
+            int superAdminId,
+            string rejectionReason)
+        {
+            using (SqlConnection cn = _db.GetConnection())
+            {
+                string query = @"
+            UPDATE tblTPORegistration
+            SET IsApproved = 0,
+                IsActive = 0,
+                Status = 'Rejected',
+                ApprovedBy = @ApprovedBy,
+                ApprovedDate = GETDATE(),
+                RejectionReason = @RejectionReason,
+                UpdatedDate = GETDATE()
+            WHERE TPOID = @TPOID
+              AND ISNULL(IsApproved, 0) = 0
+              AND ISNULL(IsActive, 0) = 0
+              AND ISNULL(Status, '') = 'Pending';";
+
+                using (SqlCommand cmd = new SqlCommand(query, cn))
+                {
+                    cmd.Parameters.Add("@TPOID", SqlDbType.Int).Value = tpoId;
+                    cmd.Parameters.Add("@ApprovedBy", SqlDbType.Int).Value =
+                        superAdminId;
+                    cmd.Parameters.Add("@RejectionReason", SqlDbType.NVarChar, 1000)
+                        .Value = rejectionReason.Trim();
+
+                    cn.Open();
+                    return cmd.ExecuteNonQuery() > 0;
+                }
+            }
+        }
+
+        // shrirang 13/10/26
+
+       
+        // Rollback an accidentally rejected TPO/Sub-TPO
+        public bool RollbackTPORejection(int tpoId)
+        {
+            using (SqlConnection cn = _db.GetConnection())
+            {
+                const string query = @"
+            UPDATE dbo.tblTPORegistration
+            SET Status = 'Pending',
+                IsApproved = 0,
+                RejectionReason = NULL,
+                UpdatedDate = GETDATE()
+            WHERE TPOID = @TPOID
+              AND Status = 'Rejected';";
+
+                using (SqlCommand cmd = new SqlCommand(query, cn))
+                {
+                    cmd.Parameters.Add("@TPOID", SqlDbType.Int).Value = tpoId;
+
+                    cn.Open();
+                    return cmd.ExecuteNonQuery() > 0;
+                }
+            }
+        }
+
+        public (string Email, string Name, bool IsEnabled)?
+    GetCandidateStatusEmailDetails(int id)
+        {
+            using (SqlConnection cn = _db.GetConnection())
+            {
+                string query = @"
+      SELECT sEmail, sFName, sLName, nSABit
+      FROM tblCandidateRegister
+      WHERE nID = @nID";
+
+                using (SqlCommand cmd = new SqlCommand(query, cn))
+                {
+                    cmd.Parameters.AddWithValue("@nID", id);
+
+                    cn.Open();
+
+                    using (SqlDataReader reader = cmd.ExecuteReader())
+                    {
+                        if (!reader.Read())
+                            return null;
+
+                        string email = reader["sEmail"] == DBNull.Value
+                            ? ""
+                            : reader["sEmail"].ToString() ?? "";
+
+                        string firstName = reader["sFName"] == DBNull.Value
+                            ? ""
+                            : reader["sFName"].ToString() ?? "";
+
+                        string lastName = reader["sLName"] == DBNull.Value
+                            ? ""
+                            : reader["sLName"].ToString() ?? "";
+
+                        bool isEnabled =
+                            reader["nSABit"] != DBNull.Value &&
+                            Convert.ToInt32(reader["nSABit"]) == 1;
+
+                        return (
+                            email,
+                            (firstName + " " + lastName).Trim(),
+                            isEnabled
+                        );
+                    }
+                }
+            }
+        }
+
+        //khushi 15-10
+        public (string Email, string Name)? GetOrganizationStatusEmailDetails(int id)
+        {
+            using (SqlConnection cn = _db.GetConnection())
+            {
+                string query = @"
+    SELECT sEmail, sName
+    FROM tblOrgRegistration
+    WHERE nID = @nID";
+
+                using (SqlCommand cmd = new SqlCommand(query, cn))
+                {
+                    cmd.Parameters.AddWithValue("@nID", id);
+
+                    cn.Open();
+
+                    using (SqlDataReader reader = cmd.ExecuteReader())
+                    {
+                        if (reader.Read())
+                        {
+                            string email = reader["sEmail"]?.ToString() ?? "";
+                            string name = reader["sName"]?.ToString() ?? "";
+
+                            return (email, name);
+                        }
+                    }
+                }
+            }
+
+            return null;
+        }
+
+
+
+        //khushi 15-10
+        public bool ToggleOrganizationProfileStatus(int id, bool status)
+        {
+            try
+            {
+                using (var connection = _db.GetConnection())
+                {
+                    using (var command = connection.CreateCommand())
+                    {
+                        command.CommandText = "UPDATE tblOrgProfile SET nSABit = @Status WHERE nID = @ID";
+                        command.CommandType = System.Data.CommandType.Text;
+
+                        var statusParameter = command.CreateParameter();
+                        statusParameter.ParameterName = "@Status";
+                        statusParameter.Value = status;
+                        command.Parameters.Add(statusParameter);
+
+                        var idParameter = command.CreateParameter();
+                        idParameter.ParameterName = "@ID";
+                        idParameter.Value = id;
+                        command.Parameters.Add(idParameter);
+
+                        if (connection.State != System.Data.ConnectionState.Open)
+                        {
+                            connection.Open();
+                        }
+
+                        return command.ExecuteNonQuery() > 0;
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"ToggleOrganizationProfileStatus failed: {ex}");
+                return false;
+            }
+        }
     }
 }

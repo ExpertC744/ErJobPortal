@@ -61,6 +61,8 @@ namespace ErJobPortal.Models
         public DateTime? ModifiedDate { get; set; }
 
         public bool IsActive { get; set; } = true;
+
+        public bool IsCancelled { get; set; } = false;
     }
 
     // =========================================
@@ -153,6 +155,8 @@ namespace ErJobPortal.Models
         public DateTime? ModifiedDate { get; set; }
 
         public bool IsActive { get; set; } = true;
+
+        public bool IsCancelled { get; set; } = false;
     }
 
     public class TPOSchedulerPageM
@@ -164,6 +168,8 @@ namespace ErJobPortal.Models
 
         public TPOSchedulerPlacementDriveM Placement { get; set; }
             = new TPOSchedulerPlacementDriveM();
+
+     
     }
 }
 

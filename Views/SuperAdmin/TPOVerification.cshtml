@@ -1,0 +1,160 @@
+﻿
+@model List<ErJobPortal.Models.TPORegistration>
+
+@{
+    Layout = "~/Views/Shared/_DashboardLayout.cshtml";
+    ViewData["Title"] = "TPO Verification";
+    ViewData["Panel"] = "SuperAdmin";
+}
+
+<div class="container-fluid py-4">
+    @if (TempData["SuccessMessage"] != null)
+{
+    <div class="alert alert-success alert-dismissible fade show">
+        @TempData["SuccessMessage"]
+        <button type="button" class="btn-close"
+                data-bs-dismiss="alert"></button>
+    </div>
+}
+
+@if (TempData["ErrorMessage"] != null)
+{
+    <div class="alert alert-danger alert-dismissible fade show">
+        @TempData["ErrorMessage"]
+        <button type="button" class="btn-close"
+                data-bs-dismiss="alert"></button>
+    </div>
+}
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h2>TPO Verification</h2>
+            <p class="text-muted mb-0">
+                Review pending TPO and Sub-TPO registrations.
+            </p>
+        </div>
+
+        <span class="badge bg-warning text-dark fs-6">
+            Pending: @(ViewBag.PendingCount ?? 0)
+        </span>
+    </div>
+
+    @if (Model == null || !Model.Any())
+    {
+        <div class="alert alert-info">
+            No pending TPO or Sub-TPO registrations found.
+        </div>
+    }
+    else
+    {
+        <div class="table-responsive">
+            <table class="table table-bordered table-hover align-middle">
+                <thead class="table-light">
+                    <tr>
+                        <th>ID</th>
+                        <th>Type</th>
+                        <th>Name</th>
+                        <th>College</th>
+                        <th>Email</th>
+                        <th>Mobile</th>
+                        <th>Registered</th>
+                        <th>Documents</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var tpo in Model)
+                    {
+                        <tr>
+                            <td>@tpo.TPOID</td>
+                            <td>
+                                @if (tpo.SubTpoBit == true)
+                                {
+                                    <span class="badge bg-info">Sub-TPO</span>
+                                }
+                                else
+                                {
+                                    <span class="badge bg-primary">Main TPO</span>
+                                }
+                            </td>
+                            <td>@tpo.FullName</td>
+                            <td>
+                                @tpo.CollegeName
+                                <br />
+                                <small class="text-muted">
+                                    Code: @tpo.CollegeCode
+                                </small>
+                            </td>
+                            <td>@tpo.CollegeMailID</td>
+                            <td>@tpo.MobileNo</td>
+                            <td>
+                                @(tpo.CreatedDate?.ToString("dd-MMM-yyyy") ?? "-")
+                            </td>
+                            <td>
+                                @if (!string.IsNullOrWhiteSpace(tpo.SupportingDocument1))
+                                {
+                                    <a href="@Url.Content(tpo.SupportingDocument1)"
+                                       target="_blank"
+                                       rel="noopener noreferrer">Document 1</a>
+                                }
+
+                                @if (!string.IsNullOrWhiteSpace(tpo.SupportingDocument2))
+                                {
+                                    <br />
+                                    <a href="@Url.Content(tpo.SupportingDocument2)"
+                                       target="_blank"
+                                       rel="noopener noreferrer">Document 2</a>
+                                }
+
+                                @if (!string.IsNullOrWhiteSpace(tpo.ProfilePhoto))
+                                {
+                                    <br />
+                                    <a href="@Url.Content(tpo.ProfilePhoto)"
+                                       target="_blank"
+                                       rel="noopener noreferrer">Photo</a>
+                                }
+                            </td>
+
+                            <td style="min-width: 230px;">
+    <form asp-controller="SuperAdmin"
+          asp-action="ApproveTPO"
+          asp-route-id="1"
+          method="post"
+          class="d-inline">
+        @Html.AntiForgeryToken()
+        <input type="hidden" name="id" value="@tpo.TPOID" />
+        <button type="submit"
+                class="btn btn-success btn-sm"
+                onclick="return confirm('Approve this registration?');">
+            Approve
+        </button>
+    </form>
+
+    <form asp-controller="SuperAdmin"
+          asp-action="RejectTPO"
+          asp-route-id="1"
+          method="post"
+          class="mt-2">
+        @Html.AntiForgeryToken()
+        <input type="hidden" name="id" value="@tpo.TPOID" />
+
+        <input type="text"
+               name="rejectionReason"
+               class="form-control form-control-sm mb-2"
+               maxlength="1000"
+               placeholder="Reason for rejection"
+               required />
+
+        <button type="submit"
+                class="btn btn-danger btn-sm"
+                onclick="return confirm('Reject this registration?');">
+            Reject
+        </button>
+    </form>
+</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
+</div>

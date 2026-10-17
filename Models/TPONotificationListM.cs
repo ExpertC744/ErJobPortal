@@ -93,5 +93,7 @@
         public int TotalRead { get; set; }
 
         public int TotalUnread { get; set; }
+
+        public string ApprovalStatus { get; set; } = "Pending";
     }
 }

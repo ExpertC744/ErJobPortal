@@ -1,5 +1,6 @@
 ﻿using ErJobPortal.Models;
 using ErJobPortal.Repositories;
+using ErJobPortal.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Data.SqlClient;
 using System.Data;
@@ -10,11 +11,13 @@ namespace ErJobPortal.Controllers
     {
         private readonly IConfiguration _configuration;
         private readonly AccountRepository _repository;
+        private readonly EmailService _emailService;
 
-        public SuperAdminController(IConfiguration configuration, AccountRepository repository)
+        public SuperAdminController(IConfiguration configuration, AccountRepository repository, EmailService emailService)
         {
             _configuration = configuration;
             _repository = repository;
+            _emailService = emailService;
         }
         //sanidhya 08/10/26
         [HttpGet]
@@ -175,33 +178,92 @@ namespace ErJobPortal.Controllers
 
 
         [HttpPost]
-        public IActionResult ToggleCandidateStatus(int id)
+        public async Task<IActionResult> ToggleCandidateStatus(int id)
         {
             try
             {
-                bool result = _repository.ToggleCandidateStatus(id);
+                // 1. Update candidate status in the database
+                bool updated = _repository.ToggleCandidateStatus(id);
 
-                if (result)
+                if (!updated)
+                {
+                    return Json(new
+                    {
+                        success = false,
+                        message = "Candidate not found or status could not be updated."
+                    });
+                }
+
+                // 2. Retrieve candidate details and new status
+                var candidate =
+                    _repository.GetCandidateStatusEmailDetails(id);
+
+                if (candidate == null)
                 {
                     return Json(new
                     {
                         success = true,
-                        status = _repository.GetCandidateStatus(id)
+                        emailSent = false,
+                        message = "Status updated, but candidate details could not be retrieved. Please refresh the page."
                     });
                 }
+
+                // 3. Validate candidate email
+                if (string.IsNullOrWhiteSpace(candidate.Value.Email))
+                {
+                    return Json(new
+                    {
+                        success = true,
+                        status = candidate.Value.IsEnabled,
+                        emailSent = false,
+                        message = "Status updated, but the candidate email address is empty."
+                    });
+                }
+
+                // 4. Send status notification email
+                try
+                {
+                    await _emailService.SendCandidateStatusEmailAsync(
+                        candidate.Value.Email,
+                        candidate.Value.Name,
+                        candidate.Value.IsEnabled
+                    );
+
+                    return Json(new
+                    {
+                        success = true,
+                        status = candidate.Value.IsEnabled,
+                        emailSent = true,
+                        message = candidate.Value.IsEnabled
+                            ? "Candidate enabled and notification email sent successfully."
+                            : "Candidate disabled and notification email sent successfully."
+                    });
+                }
+                catch (Exception emailEx)
+                {
+                    // Log the actual email error for debugging
+                    Console.WriteLine(
+                        $"Candidate status email failed for ID {id}: {emailEx}");
+
+                    return Json(new
+                    {
+                        success = true,
+                        status = candidate.Value.IsEnabled,
+                        emailSent = false,
+                        message = "Candidate status updated, but email failed: "
+                                  + emailEx.Message
+                    });
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(
+                    $"ToggleCandidateStatus failed for ID {id}: {ex}");
 
                 return Json(new
                 {
                     success = false,
-                    message = "Candidate status could not be updated."
-                });
-            }
-            catch (Exception ex)
-            {
-                return Json(new
-                {
-                    success = false,
-                    message = ex.Message
+                    message = "Unable to update candidate status. Check the application logs."
                 });
             }
         }
@@ -582,38 +644,38 @@ namespace ErJobPortal.Controllers
         }
 
 
-        [HttpPost]
-        [Route("SuperAdmin/ToggleOrganizationSABit")]
-        public IActionResult ToggleOrganizationSABit(int id, bool status)
-        {
-            try
-            {
-                bool result = _repository.ToggleOrganizationSABit(id, status);
+        //[HttpPost]
+        //[Route("SuperAdmin/ToggleOrganizationSABit")]
+        //public IActionResult ToggleOrganizationSABit(int id, bool status)
+        //{
+        //    try
+        //    {
+        //        bool result = _repository.ToggleOrganizationSABit(id, status);
 
-                if (result)
-                {
-                    return Json(new
-                    {
-                        success = true,
-                        status = status
-                    });
-                }
+        //        if (result)
+        //        {
+        //            return Json(new
+        //            {
+        //                success = true,
+        //                status = status
+        //            });
+        //        }
 
-                return Json(new
-                {
-                    success = false,
-                    message = "Organization status could not be updated."
-                });
-            }
-            catch (Exception ex)
-            {
-                return Json(new
-                {
-                    success = false,
-                    message = ex.Message
-                });
-            }
-        }
+        //        return Json(new
+        //        {
+        //            success = false,
+        //            message = "Organization status could not be updated."
+        //        });
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        return Json(new
+        //        {
+        //            success = false,
+        //            message = ex.Message
+        //        });
+        //    }
+        //}
 
 
         public IActionResult SAOrgProfileList(int? id, bool? status)
@@ -4420,5 +4482,410 @@ ORDER BY SAF.nID DESC, OFB.nID DESC;
         {
             return View();
         }
+
+        // View Organization Profile - Master
+        [HttpGet]
+        [Route("SuperAdmin/ViewOrgProfile/{id}")]
+        public IActionResult ViewOrgProfile(string id)
+        {
+            OrgProfile? model = _repository.GetOrganizationProfileByCode(id);
+
+            if (model == null)
+            {
+                return Content(
+                    $"No organization found for ID: {id}. " +
+                    "Check whether this ID matches nOrgID in the database.");
+            }
+
+            ViewData["Title"] = "View Organization Profile";
+            ViewData["Panel"] = "SuperAdmin";
+            ViewData["UserName"] = "ItNetworkZ";
+
+            return View("~/Views/Organization/ViewOrgProfile.cshtml", model);
+        }
+
+        // shrirang 13/10/26
+        // tpo and subtpo verification code 
+        [HttpGet]
+        [Route("SuperAdmin/TPOVerification/{id:int}")]
+        public IActionResult TPOVerification(int id)
+        {
+            // Validate Super Admin session
+            string? saId = HttpContext.Session.GetString("SAID");
+            string? saRole = HttpContext.Session.GetString("SARole");
+
+            if (string.IsNullOrEmpty(saId) ||
+                !int.TryParse(saId, out int sessionId) ||
+                sessionId != id ||
+                id != 1 ||
+                !string.Equals(saRole, "SuperAdmin",
+                    StringComparison.OrdinalIgnoreCase))
+            {
+                return RedirectToAction("Index", "SALogin");
+            }
+
+            var allTpos = _repository.GetAllTPODetails();
+
+            var pendingTpos = allTpos
+                .Where(t => string.Equals(
+                    t.Status, "Pending",
+                    StringComparison.OrdinalIgnoreCase))
+                .OrderBy(t => t.CreatedDate)
+                .ToList();
+
+            ViewData["Panel"] = "SuperAdmin";
+            ViewBag.PendingCount = pendingTpos.Count;
+
+            return View(pendingTpos);
+        }
+
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        [Route("SuperAdmin/ApproveTPO/{id:int}")]
+        public IActionResult ApproveTPO(int id)
+        {
+            string? saId = HttpContext.Session.GetString("SAID");
+            string? saRole = HttpContext.Session.GetString("SARole");
+
+            if (string.IsNullOrEmpty(saId) ||
+                !int.TryParse(saId, out int superAdminId) ||
+                superAdminId != 1 ||
+                !string.Equals(
+                    saRole, "SuperAdmin",
+                    StringComparison.OrdinalIgnoreCase))
+            {
+                return RedirectToAction("Index", "SALogin");
+            }
+
+            bool approved =
+                _repository.ApproveTPORegistration(id, superAdminId);
+
+            TempData[approved ? "SuccessMessage" : "ErrorMessage"] =
+                approved
+                    ? "TPO registration approved successfully."
+                    : "Approval failed. The registration may no longer be pending.";
+
+            return RedirectToAction(
+                nameof(TPOVerification),
+                new { id = superAdminId });
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        [Route("SuperAdmin/RejectTPO/{id:int}")]
+        public IActionResult RejectTPO(int id, string rejectionReason)
+        {
+            string? saId = HttpContext.Session.GetString("SAID");
+            string? saRole = HttpContext.Session.GetString("SARole");
+
+            if (string.IsNullOrEmpty(saId) ||
+                !int.TryParse(saId, out int superAdminId) ||
+                superAdminId != 1 ||
+                !string.Equals(
+                    saRole, "SuperAdmin",
+                    StringComparison.OrdinalIgnoreCase))
+            {
+                return RedirectToAction("Index", "SALogin");
+            }
+
+            if (string.IsNullOrWhiteSpace(rejectionReason))
+            {
+                TempData["ErrorMessage"] =
+                    "Please enter a reason for rejection.";
+
+                return RedirectToAction(
+                    nameof(TPOVerification),
+                    new { id = superAdminId });
+            }
+
+            if (rejectionReason.Trim().Length > 1000)
+            {
+                TempData["ErrorMessage"] =
+                    "The rejection reason cannot exceed 1000 characters.";
+
+                return RedirectToAction(
+                    nameof(TPOVerification),
+                    new { id = superAdminId });
+            }
+
+            bool rejected = _repository.RejectTPORegistration(
+                id, superAdminId, rejectionReason);
+
+            TempData[rejected ? "SuccessMessage" : "ErrorMessage"] =
+                rejected
+                    ? "TPO registration rejected."
+                    : "Rejection failed. The registration may no longer be pending.";
+
+            return RedirectToAction(
+                nameof(TPOVerification),
+                new { id = superAdminId });
+        }
+
+
+       
+        // =====================================================
+        // TPO AND SUB-TPO APPROVED / REJECTED LIST
+        // =====================================================
+        [HttpGet]
+        [Route("SuperAdmin/TPOStatusList/{id:int}")]
+        public IActionResult TPOStatusList(int id)
+        {
+            // Validate Super Admin session
+            string? saId = HttpContext.Session.GetString("SAID");
+            string? saRole = HttpContext.Session.GetString("SARole");
+
+            if (string.IsNullOrEmpty(saId) ||
+                !int.TryParse(saId, out int sessionId) ||
+                sessionId != id ||
+                id != 1 ||
+                !string.Equals(
+                    saRole,
+                    "SuperAdmin",
+                    StringComparison.OrdinalIgnoreCase))
+            {
+                return RedirectToAction("Index", "SALogin");
+            }
+
+            // Fetch all TPO and Sub-TPO records
+            var allTpos = _repository.GetAllTPODetails();
+
+            // Show only Approved and Rejected records
+            var statusList = allTpos
+                .Where(t =>
+                    string.Equals(t.Status, "Approved",
+                        StringComparison.OrdinalIgnoreCase)
+                    ||
+                    string.Equals(t.Status, "Rejected",
+                        StringComparison.OrdinalIgnoreCase))
+                .OrderByDescending(t => t.CreatedDate)
+                .ToList();
+
+            ViewData["Panel"] = "SuperAdmin";
+            ViewBag.ApprovedCount = statusList.Count(
+                t => string.Equals(t.Status, "Approved",
+                    StringComparison.OrdinalIgnoreCase));
+
+            ViewBag.RejectedCount = statusList.Count(
+                t => string.Equals(t.Status, "Rejected",
+                    StringComparison.OrdinalIgnoreCase));
+
+            return View(statusList);
+        }
+
+       
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        [Route("SuperAdmin/RollbackTPORejection")]
+        public IActionResult RollbackTPORejection(int tpoId)
+        {
+            string? saId = HttpContext.Session.GetString("SAID");
+            string? saRole = HttpContext.Session.GetString("SARole");
+
+            if (!int.TryParse(saId, out int sessionId) ||
+                sessionId != 1 ||
+                !string.Equals(
+                    saRole,
+                    "SuperAdmin",
+                    StringComparison.OrdinalIgnoreCase))
+            {
+                return RedirectToAction("Index", "SALogin");
+            }
+
+            bool restored = _repository.RollbackTPORejection(tpoId);
+
+            TempData[restored ? "SuccessMessage" : "ErrorMessage"] =
+                restored
+                    ? "Registration restored to Pending successfully."
+                    : "Rollback failed. The record may not be Rejected.";
+
+            return RedirectToAction("TPOStatusList", new { id = 1 });
+        }
+
+
+        // sanidhya 14/10/26
+
+        [HttpGet]
+        [Route("SuperAdmin/ViewOrgProfile/{id:int}")]
+        public IActionResult ViewOrgProfile(int id)
+        {
+            string connectionString =
+                _configuration.GetConnectionString("DefaultConnection")
+                ?? throw new InvalidOperationException(
+                    "DefaultConnection is not configured.");
+
+            // Get organization IDs in the same order as SAOrgProfileList.
+            List<int> organizationIds = new List<int>();
+
+            using (SqlConnection con = new SqlConnection(connectionString))
+            {
+                string query = @"
+            SELECT OP.nOrgID
+            FROM tblOrgProfile OP
+            INNER JOIN tblOrgRegistration ORG
+                ON OP.nOrgID = ORG.nID
+            WHERE ORG.nSABit = 1
+            ORDER BY OP.nID DESC;";
+
+                using (SqlCommand cmd = new SqlCommand(query, con))
+                {
+                    con.Open();
+
+                    using (SqlDataReader reader = cmd.ExecuteReader())
+                    {
+                        while (reader.Read())
+                        {
+                            if (reader["nOrgID"] != DBNull.Value)
+                            {
+                                organizationIds.Add(
+                                    Convert.ToInt32(reader["nOrgID"]));
+                            }
+                        }
+                    }
+                }
+            }
+
+            // Find the current organization in the ordered list.
+            int currentIndex = organizationIds.IndexOf(id);
+
+            if (currentIndex == -1)
+            {
+                return NotFound("Organization not found in the profile list.");
+            }
+
+            // Previous and Next IDs follow the list order.
+            int? previousId = currentIndex > 0
+                ? organizationIds[currentIndex - 1]
+                : null;
+
+            int? nextId = currentIndex < organizationIds.Count - 1
+                ? organizationIds[currentIndex + 1]
+                : null;
+
+            // Get the current organization profile.
+            OrgProfile? model =
+                _repository.GetOrganizationProfileByCode(id.ToString());
+
+            if (model == null)
+            {
+                return NotFound("Organization profile not found.");
+            }
+
+            ViewBag.PreviousId = previousId;
+            ViewBag.NextId = nextId;
+            ViewBag.CurrentRecord = currentIndex + 1;
+            ViewBag.TotalRecords = organizationIds.Count;
+
+            ViewData["Title"] = "View Organization Profile";
+            ViewData["Panel"] = "SuperAdmin";
+            ViewData["UserName"] = "ItNetworkZ";
+
+            return View("~/Views/Organization/ViewOrgProfile.cshtml", model);
+        }
+
+
+        // khushi 15-10
+        [HttpPost]
+        [Route("SuperAdmin/ToggleOrganizationSABit")]
+        public async Task<IActionResult> ToggleOrganizationSABit(int id, bool status)
+        {
+            try
+            {
+                if (id <= 0)
+                {
+                    return Json(new
+                    {
+                        success = false,
+                        message = "Invalid organization ID."
+                    });
+                }
+
+                // 1. Update organization status without deleting the record.
+                bool result = _repository.ToggleOrganizationProfileStatus(id, status);
+
+                if (!result)
+                {
+                    return Json(new
+                    {
+                        success = false,
+                        message = "Organization not found or status could not be updated."
+                    });
+                }
+
+                // 2. Retrieve organization email details.
+                var organization = _repository.GetOrganizationStatusEmailDetails(id);
+
+                if (organization == null)
+                {
+                    return Json(new
+                    {
+                        success = true,
+                        status,
+                        emailSent = false,
+                        message = "Status updated, but organization email details were not found."
+                    });
+                }
+
+                // 3. Validate organization email.
+                if (string.IsNullOrWhiteSpace(organization.Value.Email))
+                {
+                    return Json(new
+                    {
+                        success = true,
+                        status,
+                        emailSent = false,
+                        message = "Status updated, but the organization email address is missing."
+                    });
+                }
+
+                // 4. Send profile status email.
+                try
+                {
+                    await _emailService.SendOrganizationProfileStatusEmailAsync(
+                        organization.Value.Email,
+                        organization.Value.Name,
+                        status
+                    );
+
+                    return Json(new
+                    {
+                        success = true,
+                        status,
+                        emailSent = true,
+                        message = status
+                            ? "Organization profile enabled and notification email sent successfully."
+                            : "Organization profile disabled and notification email sent successfully."
+                    });
+                }
+                catch (Exception emailEx)
+                {
+                    Console.WriteLine(
+                        $"Organization profile status email failed for ID {id}: {emailEx}");
+
+                    // Database update succeeded even though the email failed.
+                    return Json(new
+                    {
+                        success = true,
+                        status,
+                        emailSent = false,
+                        message = status
+                            ? "Profile enabled, but the notification email failed to send."
+                            : "Profile disabled, but the notification email failed to send."
+                    });
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(
+                    $"ToggleOrganizationSABit failed for ID {id}: {ex}");
+
+                return Json(new
+                {
+                    success = false,
+                    message = "Unable to update organization status. Check the application logs."
+                });
+            }
+        }
+
     }
 }

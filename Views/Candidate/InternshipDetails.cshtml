@@ -100,12 +100,14 @@
 
                             <!-- Organization -->
                             <td>
-                                <a asp-controller="Account"
-                                   asp-action="ViewOrgPost"
-                                   asp-route-id="@post.nID" asp-route-nOrgID="@post.nOrgID"
-       class="text-primary fw-semibold text-decoration-underline">
-        @post.sName
-    </a>
+                               <a asp-controller="Account"
+   asp-action="ViewOrgPost"
+   asp-route-id="@post.nID"
+   asp-route-nOrgID="@post.nOrgID"
+   asp-route-matchingPostIds="@string.Join(",", internshipPosts.Select(p => p.nID))"
+   class="text-primary fw-semibold text-decoration-underline">
+    @post.sName
+</a>
 </td>
 
                             <!-- Position -->

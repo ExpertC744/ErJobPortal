@@ -809,7 +809,43 @@
 
             </div>
 
-        </div>
+            </div>
+
+            <div class="post-navigation">
+
+                @if (ViewBag.PreviousPostId != null)
+                {
+                    <a asp-controller="Organization"
+                       asp-action="ViewOrgPost"
+                       asp-route-id="@ViewBag.PreviousPostId"
+                       asp-route-source="@ViewBag.PostSource"
+                       class="post-nav-btn previous-btn"
+                       title="Previous Post">
+
+                        <i class="fa-solid fa-chevron-left"></i>
+                        <span>Previous</span>
+
+                    </a>
+                }
+
+                @if (ViewBag.NextPostId != null)
+                {
+                    <a asp-controller="Organization"
+                       asp-action="ViewOrgPost"
+                       asp-route-id="@ViewBag.NextPostId"
+                       asp-route-source="@ViewBag.PostSource"
+                       class="post-nav-btn next-btn"
+                       title="Next Post">
+
+                        <span>Next</span>
+                        <i class="fa-solid fa-chevron-right"></i>
+
+                    </a>
+                }
+
+            </div>
+
+        
 
 
         <!-- =================================================
@@ -825,39 +861,7 @@
 
     </div>
 
-    <div class="post-navigation">
-
-        @if (ViewBag.PreviousPostId != null)
-        {
-            <a asp-controller="Organization"
-               asp-action="ViewOrgPost"
-               asp-route-id="@ViewBag.PreviousPostId"
-               class="post-nav-btn previous-btn"
-               title="Previous Post">
-
-                <i class="fa-solid fa-chevron-left"></i>
-                <span>Previous</span>
-
-            </a>
-        }
-
-        @if (ViewBag.NextPostId != null)
-        {
-            <a asp-controller="Organization"
-               asp-action="ViewOrgPost"
-               asp-route-id="@ViewBag.NextPostId"
-               class="post-nav-btn next-btn"
-               title="Next Post">
-
-                <span>Next</span>
-                <i class="fa-solid fa-chevron-right"></i>
-
-            </a>
-        }
-
-    </div>
-
-
+  
     <!-- =====================================================
      RIGHT BUTTONS
      ===================================================== -->
