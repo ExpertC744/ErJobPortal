@@ -1073,6 +1073,7 @@ bool isEnabled)
                     "SMTP error while sending candidate OTP to {Email}.",
                     email);
 
+
                 throw;
             }
             catch (Exception ex)
