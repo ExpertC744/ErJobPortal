@@ -817,19 +817,63 @@
                     .toLowerCase() === "published";
             }
 
-            function normalizeStatus(status) {
-                const value = String(status || "").trim().toLowerCase();
+            function getTodayKey() {
+    const now = new Date();
 
-                if (value === "completed") return "Completed";
-                if (value === "cancelled" || value === "canceled") {
-                    return "Cancelled";
-                }
-                if (value === "pending" || value === "draft") {
-                    return "Save as Draft";
-                }
-                if (value === "published") return "Published";
-                return status || "Upcoming";
-            }
+    return now.getFullYear() + "-" +
+        String(now.getMonth() + 1).padStart(2, "0") + "-" +
+        String(now.getDate()).padStart(2, "0");
+}
+
+function getEffectiveStatus(record, isPlacement = false) {
+    // Cancelled records must remain cancelled.
+    if (isCancelled(record)) {
+        return "Cancelled";
+    }
+
+    const savedStatus = String(
+        isPlacement
+            ? record?.PublicationStatus
+            : record?.Status
+    ).trim().toLowerCase();
+
+    // Drafts must remain drafts.
+    if (savedStatus === "draft" || savedStatus === "pending") {
+        return "Save as Draft";
+    }
+
+    // Only published placement drives participate in completion.
+    if (isPlacement && savedStatus !== "published") {
+        return "Save as Draft";
+    }
+
+    const endDate = String(
+        record?.EndDate || record?.StartDate || ""
+    ).substring(0, 10);
+
+    // Automatically complete activities whose end date has passed.
+    if (endDate && endDate < getTodayKey()) {
+        return "Completed";
+    }
+
+    // Retain an explicitly completed status.
+    if (savedStatus === "completed") {
+        return "Completed";
+    }
+
+    return isPlacement ? "Upcoming" : "Upcoming";
+}
+
+function normalizeStatus(status) {
+    const value = String(status || "").trim().toLowerCase();
+
+    if (value === "completed") return "Completed";
+    if (value === "cancelled" || value === "canceled") return "Cancelled";
+    if (value === "pending" || value === "draft") return "Save as Draft";
+    if (value === "published") return "Published";
+
+    return "Upcoming";
+}
 
             function escapeSelectorValue(value) {
                 if (window.CSS && typeof window.CSS.escape === "function") {
@@ -915,7 +959,7 @@
                     time: a.StartTime
                         ? String(a.StartTime).substring(0, 5) : "",
                     location: a.Location || "",
-                    status: normalizeStatus(a.Status),
+                    status: getEffectiveStatus(a, false),
                     isPlacement: false
                 }));
 
@@ -931,7 +975,7 @@
                     time: p.StartTime
                         ? String(p.StartTime).substring(0, 5) : "",
                     location: p.Venue || p.JobLocation || "",
-                    status: "Upcoming",
+                  status: getEffectiveStatus(p, true),
                     isPlacement: true
                 }));
 
@@ -1581,48 +1625,43 @@
             // SUMMARY CARDS
             // Counts use all records, including cancelled and draft records.
             // =========================================================
-            function updateSummaryCards() {
-                const allGeneral = generalActivitiesFromDb;
-                const allPlacements = placementDrivesFromDb;
+            
+function updateSummaryCards() {
+    const allGeneral = generalActivitiesFromDb;
+    const allPlacements = placementDrivesFromDb;
 
-                const activeGeneral = allGeneral.filter(a => !isCancelled(a));
-                const activePlacements = allPlacements.filter(p => !isCancelled(p));
+    const allRecords = [
+        ...allGeneral.map(a => ({
+            record: a,
+            isPlacement: false
+        })),
+        ...allPlacements.map(p => ({
+            record: p,
+            isPlacement: true
+        }))
+    ];
 
-                const cancelledCount =
-                    allGeneral.filter(isCancelled).length +
-                    allPlacements.filter(isCancelled).length;
+    const totalCount = allRecords.length;
 
-                const completedCount = activeGeneral.filter(a =>
-                    String(a.Status || "").toLowerCase() === "completed"
-                ).length;
+    const cancelledCount = allRecords.filter(x =>
+        isCancelled(x.record)
+    ).length;
 
-                const upcomingGeneralCount = activeGeneral.filter(a =>
-                    String(a.Status || "").toLowerCase() === "upcoming"
-                ).length;
+    // Use the same date-based status logic as the calendar
+    const completedCount = allRecords.filter(x =>
+        getEffectiveStatus(x.record, x.isPlacement) === "Completed"
+    ).length;
 
-                const upcomingPlacementCount = activePlacements.filter(p =>
-                    isPublished(p)
-                ).length;
+    const upcomingCount = allRecords.filter(x =>
+        getEffectiveStatus(x.record, x.isPlacement) === "Upcoming"
+    ).length;
 
-                const totalCount = allGeneral.length + allPlacements.length;
+    document.getElementById("totalActivities").textContent = totalCount;
+    document.getElementById("upcomingActivities").textContent = upcomingCount;
+    document.getElementById("completedActivities").textContent = completedCount;
+    document.getElementById("cancelledActivities").textContent = cancelledCount;
+}
 
-                const totalElement = document.getElementById("totalActivities");
-                const upcomingElement = document.getElementById("upcomingActivities");
-                const completedElement = document.getElementById("completedActivities");
-                const cancelledElement = document.getElementById("cancelledActivities");
-
-                if (totalElement) totalElement.textContent = totalCount;
-                if (upcomingElement) {
-                    upcomingElement.textContent =
-                        upcomingGeneralCount + upcomingPlacementCount;
-                }
-                if (completedElement) {
-                    completedElement.textContent = completedCount;
-                }
-                if (cancelledElement) {
-                    cancelledElement.textContent = cancelledCount;
-                }
-            }
 
             // =========================================================
             // CALENDAR NAVIGATION

@@ -1,5 +1,6 @@
 ﻿using System.Net;
 using System.Net.Mail;
+using ErJobPortal.Services;
 
 namespace ErJobPortal.Services
 {
@@ -637,6 +638,90 @@ Er Job Portal Team
         }
 
 
+        // shrirang 15/10/26
+        // send email to candidate and org for applied post 
+        
+// =========================================================
+// INTERNSHIP APPLICATION EMAILS
+// =========================================================
+
+public async Task SendCandidateApplicationConfirmationAsync(
+    string candidateEmail,
+    string candidateName,
+    string organizationName,
+    string positionName)
+        {
+            string body = $@"
+<html>
+<body style='font-family:Arial,sans-serif;'>
+    <h2>Application Submitted Successfully</h2>
+    <p>Dear {WebUtility.HtmlEncode(candidateName)},</p>
+    <p>You have successfully applied for this internship.</p>
+    <p><b>Organization:</b>
+       {WebUtility.HtmlEncode(organizationName)}</p>
+    <p><b>Position:</b>
+       {WebUtility.HtmlEncode(positionName)}</p>
+    <p>Your application has been recorded successfully.</p>
+    <p>Regards,<br/>Er Job Portal Team</p>
+</body>
+</html>";
+
+            await SendApplicationEmailAsync(
+                candidateEmail,
+                "Internship Application Submitted Successfully",
+                body);
+        }
+
+
+        public async Task SendOrganizationApplicationNotificationAsync(
+            string organizationEmail,
+            string organizationName,
+            string candidateName,
+            string candidateEmail,
+            string positionName)
+        {
+            string body = $@"
+<html>
+<body style='font-family:Arial,sans-serif;'>
+    <h2>New Internship Application Received</h2>
+    <p>Dear {WebUtility.HtmlEncode(organizationName)},</p>
+    <p>A candidate has applied for your internship.</p>
+    <p><b>Candidate Name:</b>
+       {WebUtility.HtmlEncode(candidateName)}</p>
+    <p><b>Candidate Email:</b>
+       {WebUtility.HtmlEncode(candidateEmail)}</p>
+    <p><b>Internship Position:</b>
+       {WebUtility.HtmlEncode(positionName)}</p>
+    <p>Please log in to ErJobPortal to review the application.</p>
+    <p>Regards,<br/>Er Job Portal Team</p>
+</body>
+</html>";
+
+            await SendApplicationEmailAsync(
+                organizationEmail,
+                "New Candidate Applied for Your Internship",
+                body);
+        }
+
+
+        // =========================================================
+        // COMMON EMAIL SENDER — USES YOUR EXISTING CONFIGURATION
+        // =========================================================
+
+
+        private async Task SendApplicationEmailAsync(
+            string recipientEmail,
+            string subject,
+            string htmlBody)
+        {
+            if (string.IsNullOrWhiteSpace(recipientEmail))
+                throw new ArgumentException("Recipient email is required.");
+
+            string smtpServer =
+                _configuration["EmailSettings:SmtpServer"] ?? "";
+
+            int port = Convert.ToInt32(
+                _configuration["EmailSettings:Port"] ?? "587");
         public async Task SendCandidateStatusEmailAsync(string email, string candidateName, bool isEnabled)
         {
             if (string.IsNullOrWhiteSpace(email))
@@ -852,6 +937,54 @@ bool isEnabled)
             string username =
                 _configuration["EmailSettings:Username"] ?? "";
 
+            string smtpPassword =
+                _configuration["EmailSettings:Password"] ?? "";
+
+            string fromEmail =
+                _configuration["EmailSettings:FromEmail"] ?? username;
+
+            string fromName =
+                _configuration["EmailSettings:FromName"] ?? "Er Job Portal";
+
+            if (string.IsNullOrWhiteSpace(smtpServer) ||
+                string.IsNullOrWhiteSpace(username) ||
+                string.IsNullOrWhiteSpace(smtpPassword) ||
+                string.IsNullOrWhiteSpace(fromEmail))
+            {
+                throw new InvalidOperationException(
+                    "EmailSettings are incomplete. Check SMTP server, " +
+                    "username, password, and sender email.");
+            }
+
+            try
+            {
+                using var message = new MailMessage();
+
+                message.From = new MailAddress(fromEmail, fromName);
+                message.To.Add(new MailAddress(recipientEmail.Trim()));
+                message.Subject = subject;
+                message.Body = htmlBody;
+                message.IsBodyHtml = true;
+
+                using var smtp = new SmtpClient(smtpServer, port)
+                {
+                    EnableSsl = true,
+                    Credentials = new NetworkCredential(username, smtpPassword),
+                    DeliveryMethod = SmtpDeliveryMethod.Network,
+                    Timeout = 30000
+                };
+
+                await smtp.SendMailAsync(message);
+
+                System.Diagnostics.Debug.WriteLine(
+                    $"SMTP accepted email to {recipientEmail.Trim()} " +
+                    $"with subject: {subject}");
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine(
+                    $"Email failed. Recipient: {recipientEmail}; " +
+                    $"Subject: {subject}; Error: {ex}");
             string password =
                 _configuration["EmailSettings:Password"] ?? "";
 
@@ -920,6 +1053,8 @@ $"Your OTP for verifying your email address during candidate registration is: {o
                 throw;
             }
         }
+
+
 
 
         // khushi 16-10-26

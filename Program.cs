@@ -15,6 +15,8 @@ builder.Services.AddScoped<DbConnection>();
 //Repository
 builder.Services.AddScoped<AccountRepository>();
 builder.Services.AddScoped<CandidateProfileRepository>();
+//shrirang 15/10/26
+builder.Services.AddScoped<OrgQuestionBankRepository>();
 
 // shrirang 09/10/26
 builder.Services.AddScoped<ErJobPortal.Data.DbConnection>();

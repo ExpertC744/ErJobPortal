@@ -1,12 +1,14 @@
 ﻿using ErJobPortal.Models;
 using ErJobPortal.Repositories;
+using ErJobPortal.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Configuration;
-using System.Data;
-using System.Reflection;
 using System;
 using System.Collections.Generic;
+using System.Data;
+using System.Reflection;
+using Microsoft.Extensions.Logging;
 
 namespace ErJobPortal.Controllers
 {
@@ -15,12 +17,21 @@ namespace ErJobPortal.Controllers
         private readonly CandidateProfileRepository _repo;
         private readonly IConfiguration _configuration;
         private readonly AccountRepository _repository;
+        private readonly EmailService _emailService;
+        private readonly ILogger<CandidateController> _logger;
 
-        public CandidateController(IConfiguration configuration, AccountRepository repository, CandidateProfileRepository repo)
+        public CandidateController(
+            IConfiguration configuration,
+            AccountRepository repository,
+            CandidateProfileRepository repo,
+            EmailService emailService,
+            ILogger<CandidateController> logger)
         {
             _configuration = configuration;
             _repository = repository;
             _repo = repo;
+            _emailService = emailService;
+            _logger = logger;
         }
 
 
@@ -3890,86 +3901,132 @@ namespace ErJobPortal.Controllers
         //}
 
 
+ 
         #region "Apply for the Post"
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult ApplyToPost(int postId, int orgId)
+        public async Task<IActionResult> ApplyToPost(int postId, int orgId)
         {
-            // ==========================================
-            // CHECK CANDIDATE LOGIN
-            // ==========================================
-
-            int? candidateId =
-                HttpContext.Session.GetInt32("CandidateID");
+            // 1. Check candidate login
+            int? candidateId = HttpContext.Session.GetInt32("CandidateID");
 
             if (candidateId == null)
             {
-                return RedirectToAction(
-                    "CandidateLogin",
-                    "Account");
+                return RedirectToAction("CandidateLogin", "Account");
             }
 
-            // ==========================================
-            // GET CANDIDATE REGISTRATION DETAILS
-            // ==========================================
+            // 2. Get candidate registration details
+            var candidateRegistration =
+                _repository.GetCandidateRegistrationDetails(candidateId.Value);
 
+            if (candidateRegistration == null ||
+                candidateRegistration.Value.DOB == null ||
+                candidateRegistration.Value.RegDate == null)
+            {
+                return BadRequest("Candidate information is missing.");
+            }
+
+            // 3. Generate candidate code
+            string candidateCode = "CD" +
+            candidateRegistration.Value.DOB.Value.ToString("ddMMyy") +
+            candidateRegistration.Value.CandidateID.ToString("D2");
+
+            // 4. Get candidate contact details
             var candidate =
-                _repository.GetCandidateRegistrationDetails(
-                    candidateId.Value);
+                _repository.GetCandidateContactDetails(candidateId.Value);
 
             if (candidate == null ||
-                candidate.Value.DOB == null ||
-                candidate.Value.RegDate == null)
+                string.IsNullOrWhiteSpace(candidate.Value.Email))
             {
-                return BadRequest(
-                    "Candidate information is missing.");
+                TempData["ApplyMessage"] =
+                    "Candidate email address could not be found.";
+
+                TempData["ApplyMessageType"] = "danger";
+
+                return RedirectToAction(
+                    "Dashboard", "Candidate", new { id = candidateCode });
             }
 
-            // ==========================================
-            // CREATE CANDIDATE CODE
-            // ==========================================
+            // 5. Get organization contact details
+            var organization =
+                _repository.GetOrganizationContactDetails(orgId);
 
-            string candidateCode = "CD" +
-                candidate.Value.DOB.Value.ToString("ddMMyy") +
-                candidate.Value.RegDate.Value.ToString("MMdd") +
-                candidate.Value.CandidateID.ToString("D2");
+            if (organization == null)
+            {
+                TempData["ApplyMessage"] =
+                    "Organization details could not be found.";
 
-            // ==========================================
-            // APPLY
-            // ==========================================
+                TempData["ApplyMessageType"] = "danger";
 
-            int result =
-                _repo.ApplyForPost(
-                    orgId,
-                    candidateId.Value,
-                    postId);
+                return RedirectToAction(
+                    "Dashboard", "Candidate", new { id = candidateCode });
+            }
 
-            // ==========================================
-            // SUCCESS
-            // ==========================================
+            // 6. Save the application using your existing method
+            int result = _repo.ApplyForPost(
+                orgId,
+                candidateId.Value,
+                postId);
+
+            // 7. Send emails only for a newly successful application
 
             if (result == 1)
             {
                 TempData["ApplyMessage"] =
                     "Application submitted successfully.";
 
-                TempData["ApplyMessageType"] =
-                    "success";
+                TempData["ApplyMessageType"] = "success";
+
+                try
+                {
+                    await _emailService.SendCandidateApplicationConfirmationAsync(
+                        candidate.Value.Email,
+                        candidate.Value.CandidateName,
+                        organization.Value.OrganizationName,
+                        "Internship");
+
+                    System.Diagnostics.Debug.WriteLine(
+                        "Candidate confirmation email sent successfully.");
+                }
+                catch (Exception ex)
+                {
+                    System.Diagnostics.Debug.WriteLine(
+                        "Candidate email failed: " + ex.ToString());
+
+                    TempData["CandidateEmailError"] = ex.Message;
+                }
+
+                try
+                {
+                    await _emailService.SendOrganizationApplicationNotificationAsync(
+                        organization.Value.Email,
+                        organization.Value.OrganizationName,
+                        candidate.Value.CandidateName,
+                        candidate.Value.Email,
+                        "Internship");
+
+                    System.Diagnostics.Debug.WriteLine(
+                        "Organization notification email sent successfully.");
+                }
+                catch (Exception ex)
+                {
+                    System.Diagnostics.Debug.WriteLine(
+                        "Organization email failed: " + ex.ToString());
+
+                    TempData["OrganizationEmailError"] = ex.Message;
+                }
             }
             else
             {
                 TempData["ApplyMessage"] =
                     "You have already applied for this post.";
 
-                TempData["ApplyMessageType"] =
-                    "info";
+                TempData["ApplyMessageType"] = "info";
             }
 
-            // ==========================================
-            // REDIRECT SAME DASHBOARD PAGE
-            // ==========================================
 
+            // 8. Preserve your existing dashboard redirect
             return RedirectToAction(
                 "Dashboard",
                 "Candidate",
@@ -3977,6 +4034,7 @@ namespace ErJobPortal.Controllers
         }
 
         #endregion
+
 
         #region "TR Apply to Post List Called"
 
