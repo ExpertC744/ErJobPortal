@@ -1168,359 +1168,359 @@ IFormFile? CompanyLogo)
         }
 
 
-//        [HttpGet]
-//        [Route("Organization/ViewOrgPost/{id}")]
-//        public IActionResult ViewOrgPost(int id)
-//        {
-//            int? sessionOrgID = HttpContext.Session.GetInt32("OrgID");
+        //        [HttpGet]
+        //        [Route("Organization/ViewOrgPost/{id}")]
+        //        public IActionResult ViewOrgPost(int id)
+        //        {
+        //            int? sessionOrgID = HttpContext.Session.GetInt32("OrgID");
 
-//            if (sessionOrgID == null)
-//            {
-//                return RedirectToAction("OrganizationLogin", "Account");
-//            }
+        //            if (sessionOrgID == null)
+        //            {
+        //                return RedirectToAction("OrganizationLogin", "Account");
+        //            }
 
-//            int orgID = sessionOrgID.Value;
+        //            int orgID = sessionOrgID.Value;
 
-//            OrgPostM? model = null;
+        //            OrgPostM? model = null;
 
-//            string connectionString = _configuration.GetConnectionString("DefaultConnection");
+        //            string connectionString = _configuration.GetConnectionString("DefaultConnection");
 
-//            using (SqlConnection con = new SqlConnection(connectionString))
-//            {
-//                using (SqlCommand cmd = new SqlCommand("SP_GetOrganizationPostList", con))
-//                {
-//                    cmd.CommandType = CommandType.StoredProcedure;
+        //            using (SqlConnection con = new SqlConnection(connectionString))
+        //            {
+        //                using (SqlCommand cmd = new SqlCommand("SP_GetOrganizationPostList", con))
+        //                {
+        //                    cmd.CommandType = CommandType.StoredProcedure;
 
-//                    // Same parameter used in your PostDetails
-//                    cmd.Parameters.Add("@nOrgID", SqlDbType.Int).Value = orgID;
+        //                    // Same parameter used in your PostDetails
+        //                    cmd.Parameters.Add("@nOrgID", SqlDbType.Int).Value = orgID;
 
-//                    con.Open();
+        //                    con.Open();
 
-//                    using (SqlDataReader dr = cmd.ExecuteReader())
-//                    {
-//                        while (dr.Read())
-//                        {
-//                            int postID = Convert.ToInt32(dr["nID"]);
+        //                    using (SqlDataReader dr = cmd.ExecuteReader())
+        //                    {
+        //                        while (dr.Read())
+        //                        {
+        //                            int postID = Convert.ToInt32(dr["nID"]);
 
-//                            // Find only the requested post
-//                            if (postID != id)
-//                            {
-//                                continue;
-//                            }
+        //                            // Find only the requested post
+        //                            if (postID != id)
+        //                            {
+        //                                continue;
+        //                            }
 
-//                            model = new OrgPostM();
+        //                            model = new OrgPostM();
 
-//                            // =====================================================
-//                            // BASIC
-//                            // =====================================================
+        //                            // =====================================================
+        //                            // BASIC
+        //                            // =====================================================
 
-//                            model.nID =
-//                                Convert.ToInt32(dr["nID"]);
+        //                            model.nID =
+        //                                Convert.ToInt32(dr["nID"]);
 
-//                            // =====================================================
-//                            // POSITION
-//                            // =====================================================
+        //                            // =====================================================
+        //                            // POSITION
+        //                            // =====================================================
 
-//                            model.nPositionID =
-//                                Convert.ToInt32(dr["nPositionID"]);
+        //                            model.nPositionID =
+        //                                Convert.ToInt32(dr["nPositionID"]);
 
-//                            model.sPositionName =
-//                                dr["sPositionName"]?.ToString() ?? "";
+        //                            model.sPositionName =
+        //                                dr["sPositionName"]?.ToString() ?? "";
 
-//                            // =====================================================
-//                            // REQUIRED TRAINEES
-//                            // =====================================================
+        //                            // =====================================================
+        //                            // REQUIRED TRAINEES
+        //                            // =====================================================
 
-//                            model.nRequiredTrainees =
-//                                Convert.ToInt32(dr["nRequiredTrainees"]);
+        //                            model.nRequiredTrainees =
+        //                                Convert.ToInt32(dr["nRequiredTrainees"]);
 
-//                            // =====================================================
-//                            // GENDER
-//                            // =====================================================
+        //                            // =====================================================
+        //                            // GENDER
+        //                            // =====================================================
 
-//                            model.nGenderID =
-//                                Convert.ToInt32(dr["nGenderID"]);
+        //                            model.nGenderID =
+        //                                Convert.ToInt32(dr["nGenderID"]);
 
-//                            model.sGenderName =
-//                                dr["sGenderName"]?.ToString() ?? "";
+        //                            model.sGenderName =
+        //                                dr["sGenderName"]?.ToString() ?? "";
 
-//                            // =====================================================
-//                            // MINIMUM QUALIFICATION
-//                            // =====================================================
+        //                            // =====================================================
+        //                            // MINIMUM QUALIFICATION
+        //                            // =====================================================
 
-//                            model.nMinimumQualificationID =
-//                                Convert.ToInt32(
-//                                    dr["nMinimumQualificationID"]);
+        //                            model.nMinimumQualificationID =
+        //                                Convert.ToInt32(
+        //                                    dr["nMinimumQualificationID"]);
 
-//                            model.sMinimumQualificationName =
-//                                dr["sMinimumQualificationName"]?.ToString() ?? "";
+        //                            model.sMinimumQualificationName =
+        //                                dr["sMinimumQualificationName"]?.ToString() ?? "";
 
-//                            // =====================================================
-//                            // LOCATION
-//                            // =====================================================
+        //                            // =====================================================
+        //                            // LOCATION
+        //                            // =====================================================
 
-//                            model.sCountryName =
-//     dr["sCountryName"]?.ToString() ?? "";
+        //                            model.sCountryName =
+        //     dr["sCountryName"]?.ToString() ?? "";
 
-//                            model.sStateName =
-//                                dr["sStateName"]?.ToString() ?? "";
+        //                            model.sStateName =
+        //                                dr["sStateName"]?.ToString() ?? "";
 
-//                            model.nCityName =
-//                                dr["nCityName"]?.ToString() ?? "";
+        //                            model.nCityName =
+        //                                dr["nCityName"]?.ToString() ?? "";
 
-//                            // =====================================================
-//                            // WORKING HOURS
-//                            // =====================================================
+        //                            // =====================================================
+        //                            // WORKING HOURS
+        //                            // =====================================================
 
-//                            model.sWorkingHours =
-//                                dr["sWorkingHours"]?.ToString() ?? "";
+        //                            model.sWorkingHours =
+        //                                dr["sWorkingHours"]?.ToString() ?? "";
 
-//                            // =====================================================
-//                            // INTERNSHIP TYPE
-//                            // =====================================================
+        //                            // =====================================================
+        //                            // INTERNSHIP TYPE
+        //                            // =====================================================
 
-//                            model.nInternshipTypeID =
-//                                Convert.ToInt32(
-//                                    dr["nInternshipTypeID"]);
+        //                            model.nInternshipTypeID =
+        //                                Convert.ToInt32(
+        //                                    dr["nInternshipTypeID"]);
 
-//                            model.sInternshipTypeName =
-//                                dr["sInternshipTypeName"]?.ToString() ?? "";
+        //                            model.sInternshipTypeName =
+        //                                dr["sInternshipTypeName"]?.ToString() ?? "";
 
-//                            // =====================================================
-//                            // WORKING SHIFT
-//                            // =====================================================
+        //                            // =====================================================
+        //                            // WORKING SHIFT
+        //                            // =====================================================
 
-//                            model.sWorkingShift =
-//                                dr["sWorkingShift"]?.ToString() ?? "";
+        //                            model.sWorkingShift =
+        //                                dr["sWorkingShift"]?.ToString() ?? "";
 
-//                            // =====================================================
-//                            // FELLOWSHIP TYPE
-//                            // =====================================================
+        //                            // =====================================================
+        //                            // FELLOWSHIP TYPE
+        //                            // =====================================================
 
-//                            model.nInternshipFellowshipTypeID =
-//                                Convert.ToInt32(
-//                                    dr["nInternshipFellowshipTypeID"]);
+        //                            model.nInternshipFellowshipTypeID =
+        //                                Convert.ToInt32(
+        //                                    dr["nInternshipFellowshipTypeID"]);
 
-//                            model.sInternshipFellowshipTypeName =
-//                                dr["sInternshipFellowshipTypeName"]?.ToString() ?? "";
+        //                            model.sInternshipFellowshipTypeName =
+        //                                dr["sInternshipFellowshipTypeName"]?.ToString() ?? "";
 
-//                            // =====================================================
-//                            // TOTAL CHARGES
-//                            // =====================================================
+        //                            // =====================================================
+        //                            // TOTAL CHARGES
+        //                            // =====================================================
 
-//                            model.sTotalCharges =
-//                                dr["sTotalCharges"] == DBNull.Value
-//                                    ? null
-//                                    : Convert.ToDecimal(
-//                                        dr["sTotalCharges"]);
+        //                            model.sTotalCharges =
+        //                                dr["sTotalCharges"] == DBNull.Value
+        //                                    ? null
+        //                                    : Convert.ToDecimal(
+        //                                        dr["sTotalCharges"]);
 
-//                            model.sCurrency =
-//                                dr["sCurrency"]?.ToString() ?? "";
+        //                            model.sCurrency =
+        //                                dr["sCurrency"]?.ToString() ?? "";
 
-//                            // =====================================================
-//                            // TRAINING
-//                            // =====================================================
+        //                            // =====================================================
+        //                            // TRAINING
+        //                            // =====================================================
 
-//                            model.nTrainingInvolvedID =
-//                                Convert.ToInt32(
-//                                    dr["nTrainingInvolvedID"]);
+        //                            model.nTrainingInvolvedID =
+        //                                Convert.ToInt32(
+        //                                    dr["nTrainingInvolvedID"]);
 
-//                            model.sTrainingInvolvedName =
-//                                dr["sTrainingInvolvedName"]?.ToString() ?? "";
+        //                            model.sTrainingInvolvedName =
+        //                                dr["sTrainingInvolvedName"]?.ToString() ?? "";
 
-//                            // =====================================================
-//                            // DURATION
-//                            // =====================================================
+        //                            // =====================================================
+        //                            // DURATION
+        //                            // =====================================================
 
-//                            model.nInternshipDurationID =
-//                                Convert.ToInt32(
-//                                    dr["nInternshipDurationID"]);
-
-//                            model.sInternshipDurationName =
-//                                dr["sInternshipDurationName"]?.ToString() ?? "";
-
-//                            // =====================================================
-//                            // DATES
-//                            // =====================================================
-
-//                            model.dStartDate =
-//                                Convert.ToDateTime(
-//                                    dr["dStartDate"]);
-
-//                            model.dCompletionDate =
-//                                Convert.ToDateTime(
-//                                    dr["dCompletionDate"]);
-
-//                            // =====================================================
-//                            // INTERNSHIP MODE
-//                            // =====================================================
-
-//                            model.nInternshipModeID =
-//                                Convert.ToInt32(
-//                                    dr["nInternshipModeID"]);
-
-//                            model.sInternshipModeName =
-//                                dr["sInternshipModeName"]?.ToString() ?? "";
-
-//                            // =====================================================
-//                            // DIVYANG
-//                            // =====================================================
-
-//                            model.sDivyang =
-//                                dr["sDivyang"]?.ToString() ?? "";
-
-//                            // =====================================================
-//                            // LANGUAGE
-//                            // =====================================================
-
-//                            model.sLanguageKnown =
-//                                dr["sLanguageKnown"]?.ToString() ?? "";
-
-//                            // =====================================================
-//                            // WORKING DAYS
-//                            // =====================================================
-
-//                            model.sWorkingDays =
-//                                dr["sWorkingDays"] == DBNull.Value
-//                                    ? ""
-//                                    : dr["sWorkingDays"]?.ToString() ?? "";
-
-//                            // =====================================================
-//                            // FACILITIES
-//                            // =====================================================
-
-//                            model.sFacilities =
-//                                dr["sFacilities"] == DBNull.Value
-//                                    ? ""
-//                                    : dr["sFacilities"]?.ToString() ?? "";
-
-//                            // =====================================================
-//                            // MEDICAL SKILLS
-//                            // =====================================================
-
-//                            model.sMedicalSkills =
-//                                dr["sMedicalSkills"] == DBNull.Value
-//                                    ? null
-//                                    : dr["sMedicalSkills"]?.ToString();
-
-//                            // =====================================================
-//                            // TECHNICAL SKILLS
-//                            // =====================================================
-
-//                            model.sTechnicalSkills =
-//                                dr["sTechnicalSkills"] == DBNull.Value
-//                                    ? null
-//                                    : dr["sTechnicalSkills"]?.ToString();
-
-//                            // =====================================================
-//                            // NON-TECHNICAL SKILLS
-//                            // =====================================================
-
-//                            model.sNonTechnicalSkills =
-//                                dr["sNonTechnicalSkills"] == DBNull.Value
-//                                    ? null
-//                                    : dr["sNonTechnicalSkills"]?.ToString();
-
-//                            // =====================================================
-//                            // SYSTEM
-//                            // =====================================================
-
-//                            model.dRegisterDate =
-//                                dr["dRegisterDate"] == DBNull.Value
-//                                    ? null
-//                                    : Convert.ToDateTime(
-//                                        dr["dRegisterDate"]);
-
-//                            model.dModDate =
-//                                dr["dModDate"] == DBNull.Value
-//                                    ? null
-//                                    : Convert.ToDateTime(
-//                                        dr["dModDate"]);
-
-//                            model.nBit =
-//                                dr["nBit"] != DBNull.Value &&
-//                                Convert.ToBoolean(dr["nBit"]);
-
-//                            model.nSABit =
-//                                dr["nSABit"] != DBNull.Value &&
-//                                Convert.ToBoolean(dr["nSABit"]);
-
-//                            model.nOrgID =
-//                                Convert.ToInt32(dr["nOrgID"]);
-
-//                            break;
-//                        }
-//                    }
-//                }
-//            }
-
-//            // =====================================================
-//            // POST NOT FOUND
-//            // =====================================================
-
-//            if (model == null)
-//            {
-//                return NotFound();
-//            }
-
-//            model.sMedicalSkills = GetSkillNames(
-//    model.sMedicalSkills,
-//    "tblMedicalSkills",
-//    "nMedicalSkillID",
-//    "sMedicalSkillName"
-//);
-
-//            model.sTechnicalSkills = GetSkillNames(
-//                model.sTechnicalSkills,
-//                "tblTechnicalSkills",
-//                "nTechnicalSkillID",
-//                "sTechnicalSkillName"
-//            );
-
-//            model.sNonTechnicalSkills = GetSkillNames(
-//                model.sNonTechnicalSkills,
-//                "tblNonTechnicalSkills",
-//                "nNonTechnicalSkillID",
-//                "sNonTechnicalSkillName"
-//            );
-//            // =====================================================
-//            // GET ORGANIZATION LOGO FROM PROFILE
-//            // =====================================================
-
-//            string? companyLogo = null;
-
-//            using (SqlConnection cn = new SqlConnection(connectionString))
-//            {
-//                using (SqlCommand cmd = new SqlCommand(
-//                    "SP_GetOrganizationProfile", cn))
-//                {
-//                    cmd.CommandType = CommandType.StoredProcedure;
-
-//                    cmd.Parameters.Add("@nOrgID", SqlDbType.Int).Value = orgID;
-
-//                    cn.Open();
-
-//                    using (SqlDataReader dr = cmd.ExecuteReader())
-//                    {
-//                        if (dr.Read())
-//                        {
-//                            companyLogo =
-//                                dr["sCompanyLogo"] != DBNull.Value
-//                                    ? dr["sCompanyLogo"].ToString()
-//                                    : null;
-//                        }
-//                    }
-//                }
-//            }
-
-//            ViewBag.CompanyLogo = companyLogo;
-//            ViewBag.OrgID = orgID;
-//            ViewBag.OrgName = HttpContext.Session.GetString("OrgName");
-//            ViewBag.OrgEmail = HttpContext.Session.GetString("OrgEmail");
-
-//            return View(model);
-
-//        }
+        //                            model.nInternshipDurationID =
+        //                                Convert.ToInt32(
+        //                                    dr["nInternshipDurationID"]);
+
+        //                            model.sInternshipDurationName =
+        //                                dr["sInternshipDurationName"]?.ToString() ?? "";
+
+        //                            // =====================================================
+        //                            // DATES
+        //                            // =====================================================
+
+        //                            model.dStartDate =
+        //                                Convert.ToDateTime(
+        //                                    dr["dStartDate"]);
+
+        //                            model.dCompletionDate =
+        //                                Convert.ToDateTime(
+        //                                    dr["dCompletionDate"]);
+
+        //                            // =====================================================
+        //                            // INTERNSHIP MODE
+        //                            // =====================================================
+
+        //                            model.nInternshipModeID =
+        //                                Convert.ToInt32(
+        //                                    dr["nInternshipModeID"]);
+
+        //                            model.sInternshipModeName =
+        //                                dr["sInternshipModeName"]?.ToString() ?? "";
+
+        //                            // =====================================================
+        //                            // DIVYANG
+        //                            // =====================================================
+
+        //                            model.sDivyang =
+        //                                dr["sDivyang"]?.ToString() ?? "";
+
+        //                            // =====================================================
+        //                            // LANGUAGE
+        //                            // =====================================================
+
+        //                            model.sLanguageKnown =
+        //                                dr["sLanguageKnown"]?.ToString() ?? "";
+
+        //                            // =====================================================
+        //                            // WORKING DAYS
+        //                            // =====================================================
+
+        //                            model.sWorkingDays =
+        //                                dr["sWorkingDays"] == DBNull.Value
+        //                                    ? ""
+        //                                    : dr["sWorkingDays"]?.ToString() ?? "";
+
+        //                            // =====================================================
+        //                            // FACILITIES
+        //                            // =====================================================
+
+        //                            model.sFacilities =
+        //                                dr["sFacilities"] == DBNull.Value
+        //                                    ? ""
+        //                                    : dr["sFacilities"]?.ToString() ?? "";
+
+        //                            // =====================================================
+        //                            // MEDICAL SKILLS
+        //                            // =====================================================
+
+        //                            model.sMedicalSkills =
+        //                                dr["sMedicalSkills"] == DBNull.Value
+        //                                    ? null
+        //                                    : dr["sMedicalSkills"]?.ToString();
+
+        //                            // =====================================================
+        //                            // TECHNICAL SKILLS
+        //                            // =====================================================
+
+        //                            model.sTechnicalSkills =
+        //                                dr["sTechnicalSkills"] == DBNull.Value
+        //                                    ? null
+        //                                    : dr["sTechnicalSkills"]?.ToString();
+
+        //                            // =====================================================
+        //                            // NON-TECHNICAL SKILLS
+        //                            // =====================================================
+
+        //                            model.sNonTechnicalSkills =
+        //                                dr["sNonTechnicalSkills"] == DBNull.Value
+        //                                    ? null
+        //                                    : dr["sNonTechnicalSkills"]?.ToString();
+
+        //                            // =====================================================
+        //                            // SYSTEM
+        //                            // =====================================================
+
+        //                            model.dRegisterDate =
+        //                                dr["dRegisterDate"] == DBNull.Value
+        //                                    ? null
+        //                                    : Convert.ToDateTime(
+        //                                        dr["dRegisterDate"]);
+
+        //                            model.dModDate =
+        //                                dr["dModDate"] == DBNull.Value
+        //                                    ? null
+        //                                    : Convert.ToDateTime(
+        //                                        dr["dModDate"]);
+
+        //                            model.nBit =
+        //                                dr["nBit"] != DBNull.Value &&
+        //                                Convert.ToBoolean(dr["nBit"]);
+
+        //                            model.nSABit =
+        //                                dr["nSABit"] != DBNull.Value &&
+        //                                Convert.ToBoolean(dr["nSABit"]);
+
+        //                            model.nOrgID =
+        //                                Convert.ToInt32(dr["nOrgID"]);
+
+        //                            break;
+        //                        }
+        //                    }
+        //                }
+        //            }
+
+        //            // =====================================================
+        //            // POST NOT FOUND
+        //            // =====================================================
+
+        //            if (model == null)
+        //            {
+        //                return NotFound();
+        //            }
+
+        //            model.sMedicalSkills = GetSkillNames(
+        //    model.sMedicalSkills,
+        //    "tblMedicalSkills",
+        //    "nMedicalSkillID",
+        //    "sMedicalSkillName"
+        //);
+
+        //            model.sTechnicalSkills = GetSkillNames(
+        //                model.sTechnicalSkills,
+        //                "tblTechnicalSkills",
+        //                "nTechnicalSkillID",
+        //                "sTechnicalSkillName"
+        //            );
+
+        //            model.sNonTechnicalSkills = GetSkillNames(
+        //                model.sNonTechnicalSkills,
+        //                "tblNonTechnicalSkills",
+        //                "nNonTechnicalSkillID",
+        //                "sNonTechnicalSkillName"
+        //            );
+        //            // =====================================================
+        //            // GET ORGANIZATION LOGO FROM PROFILE
+        //            // =====================================================
+
+        //            string? companyLogo = null;
+
+        //            using (SqlConnection cn = new SqlConnection(connectionString))
+        //            {
+        //                using (SqlCommand cmd = new SqlCommand(
+        //                    "SP_GetOrganizationProfile", cn))
+        //                {
+        //                    cmd.CommandType = CommandType.StoredProcedure;
+
+        //                    cmd.Parameters.Add("@nOrgID", SqlDbType.Int).Value = orgID;
+
+        //                    cn.Open();
+
+        //                    using (SqlDataReader dr = cmd.ExecuteReader())
+        //                    {
+        //                        if (dr.Read())
+        //                        {
+        //                            companyLogo =
+        //                                dr["sCompanyLogo"] != DBNull.Value
+        //                                    ? dr["sCompanyLogo"].ToString()
+        //                                    : null;
+        //                        }
+        //                    }
+        //                }
+        //            }
+
+        //            ViewBag.CompanyLogo = companyLogo;
+        //            ViewBag.OrgID = orgID;
+        //            ViewBag.OrgName = HttpContext.Session.GetString("OrgName");
+        //            ViewBag.OrgEmail = HttpContext.Session.GetString("OrgEmail");
+
+        //            return View(model);
+
+        //        }
 
 
         [Route("Organization/CheckPostColumns")]
@@ -3592,7 +3592,7 @@ WHERE nID = @nID
                     }
                 }
                 TempData["Success"] = "Post updated successfully.";
-                return RedirectToAction("PostDetails", new { id = orgID } );
+                return RedirectToAction("PostDetails", new { id = orgID });
             }
             catch (Exception ex)
             {
@@ -3615,7 +3615,7 @@ WHERE nID = @nID
             return View();
         }
 
-   
+
 
         [HttpGet]
         public IActionResult OrgTopSearch()
@@ -5798,6 +5798,10 @@ WHERE nID = @nID
             }
 
             return View(new OrgQuestionBank());
+
+        public IActionResult CreateDrive()
+        {
+            return View();
         }
 
         [HttpPost]
@@ -6061,6 +6065,93 @@ WHERE nID = @nID
         }
 
 
+        public IActionResult CreateDrive(IFormCollection form)
+        {
+            // Temporary test: verify that the form submits successfully.
+            ViewBag.Message = "Recruitment drive form submitted successfully.";
+
+            return View();
+        }
+        public IActionResult OrgAlumni()
+        {
+            return View();
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public IActionResult OrgAlumni(IFormCollection form)
+        {
+            // Validate required fields on the server.
+            string[] requiredFields =
+            {
+        "AlumniName",
+        "GraduationYear",
+        "Email",
+        "Company",
+        "Designation"
+    };
+
+            foreach (string field in requiredFields)
+            {
+                if (!form.ContainsKey(field) ||
+                    string.IsNullOrWhiteSpace(form[field].ToString()))
+                {
+                    ViewBag.ErrorMessage =
+                        $"Please provide the required field: {field}.";
+
+                    return View();
+                }
+            }
+
+            // Validate email format.
+            string email = form["Email"].ToString();
+
+            try
+            {
+                var address = new System.Net.Mail.MailAddress(email);
+
+                if (address.Address != email.Trim())
+                {
+                    ViewBag.ErrorMessage = "Please enter a valid email address.";
+                    return View();
+                }
+            }
+            catch (FormatException)
+            {
+                ViewBag.ErrorMessage = "Please enter a valid email address.";
+                return View();
+            }
+
+            // Temporary prototype: no database operation is performed.
+            ViewBag.Message =
+                "Alumni profile submitted successfully. Database saving is not configured yet.";
+
+            return View();
+        }
+
+
+        //new 16-10
+
+        public IActionResult PhasesIndex() => View();
+        public IActionResult Drives() => View();
+        public IActionResult Assessments() => View();
+        public IActionResult QuestionBank() => View();
+        public IActionResult Results() => View();
+        public IActionResult InterviewSchedule() => View();
+        public IActionResult InterviewPanels() => View();
+        public IActionResult InterviewFeedback() => View();
+        public IActionResult InterviewRounds() => View();
+        public IActionResult Pipeline() => View();
+        public IActionResult Offers() => View();
+        public IActionResult Notifications() => View();
+        public IActionResult TpoAnalytics() => View();
+        public IActionResult Alumni() => View();
+        public IActionResult Community() => View();
+        public IActionResult GradeNormalization() => View();
+        public IActionResult Sourcing() => View();
+        public IActionResult DriveTracking() => View();
+        public IActionResult SharedData() => View();
+        public IActionResult History() => View();
 
     }
 }

@@ -1,5 +1,6 @@
 ﻿using ErJobPortal.Models;
 using ErJobPortal.Repositories;
+using ErJobPortal.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Data.SqlClient;
 using System.Data;
@@ -10,11 +11,13 @@ namespace ErJobPortal.Controllers
     {
         private readonly IConfiguration _configuration;
         private readonly AccountRepository _repository;
+        private readonly EmailService _emailService;
 
-        public SuperAdminController(IConfiguration configuration, AccountRepository repository)
+        public SuperAdminController(IConfiguration configuration, AccountRepository repository, EmailService emailService)
         {
             _configuration = configuration;
             _repository = repository;
+            _emailService = emailService;
         }
         //sanidhya 08/10/26
         [HttpGet]
@@ -175,33 +178,92 @@ namespace ErJobPortal.Controllers
 
 
         [HttpPost]
-        public IActionResult ToggleCandidateStatus(int id)
+        public async Task<IActionResult> ToggleCandidateStatus(int id)
         {
             try
             {
-                bool result = _repository.ToggleCandidateStatus(id);
+                // 1. Update candidate status in the database
+                bool updated = _repository.ToggleCandidateStatus(id);
 
-                if (result)
+                if (!updated)
+                {
+                    return Json(new
+                    {
+                        success = false,
+                        message = "Candidate not found or status could not be updated."
+                    });
+                }
+
+                // 2. Retrieve candidate details and new status
+                var candidate =
+                    _repository.GetCandidateStatusEmailDetails(id);
+
+                if (candidate == null)
                 {
                     return Json(new
                     {
                         success = true,
-                        status = _repository.GetCandidateStatus(id)
+                        emailSent = false,
+                        message = "Status updated, but candidate details could not be retrieved. Please refresh the page."
                     });
                 }
+
+                // 3. Validate candidate email
+                if (string.IsNullOrWhiteSpace(candidate.Value.Email))
+                {
+                    return Json(new
+                    {
+                        success = true,
+                        status = candidate.Value.IsEnabled,
+                        emailSent = false,
+                        message = "Status updated, but the candidate email address is empty."
+                    });
+                }
+
+                // 4. Send status notification email
+                try
+                {
+                    await _emailService.SendCandidateStatusEmailAsync(
+                        candidate.Value.Email,
+                        candidate.Value.Name,
+                        candidate.Value.IsEnabled
+                    );
+
+                    return Json(new
+                    {
+                        success = true,
+                        status = candidate.Value.IsEnabled,
+                        emailSent = true,
+                        message = candidate.Value.IsEnabled
+                            ? "Candidate enabled and notification email sent successfully."
+                            : "Candidate disabled and notification email sent successfully."
+                    });
+                }
+                catch (Exception emailEx)
+                {
+                    // Log the actual email error for debugging
+                    Console.WriteLine(
+                        $"Candidate status email failed for ID {id}: {emailEx}");
+
+                    return Json(new
+                    {
+                        success = true,
+                        status = candidate.Value.IsEnabled,
+                        emailSent = false,
+                        message = "Candidate status updated, but email failed: "
+                                  + emailEx.Message
+                    });
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(
+                    $"ToggleCandidateStatus failed for ID {id}: {ex}");
 
                 return Json(new
                 {
                     success = false,
-                    message = "Candidate status could not be updated."
-                });
-            }
-            catch (Exception ex)
-            {
-                return Json(new
-                {
-                    success = false,
-                    message = ex.Message
+                    message = "Unable to update candidate status. Check the application logs."
                 });
             }
         }
@@ -582,38 +644,38 @@ namespace ErJobPortal.Controllers
         }
 
 
-        [HttpPost]
-        [Route("SuperAdmin/ToggleOrganizationSABit")]
-        public IActionResult ToggleOrganizationSABit(int id, bool status)
-        {
-            try
-            {
-                bool result = _repository.ToggleOrganizationSABit(id, status);
+        //[HttpPost]
+        //[Route("SuperAdmin/ToggleOrganizationSABit")]
+        //public IActionResult ToggleOrganizationSABit(int id, bool status)
+        //{
+        //    try
+        //    {
+        //        bool result = _repository.ToggleOrganizationSABit(id, status);
 
-                if (result)
-                {
-                    return Json(new
-                    {
-                        success = true,
-                        status = status
-                    });
-                }
+        //        if (result)
+        //        {
+        //            return Json(new
+        //            {
+        //                success = true,
+        //                status = status
+        //            });
+        //        }
 
-                return Json(new
-                {
-                    success = false,
-                    message = "Organization status could not be updated."
-                });
-            }
-            catch (Exception ex)
-            {
-                return Json(new
-                {
-                    success = false,
-                    message = ex.Message
-                });
-            }
-        }
+        //        return Json(new
+        //        {
+        //            success = false,
+        //            message = "Organization status could not be updated."
+        //        });
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        return Json(new
+        //        {
+        //            success = false,
+        //            message = ex.Message
+        //        });
+        //    }
+        //}
 
 
         public IActionResult SAOrgProfileList(int? id, bool? status)
@@ -4722,7 +4784,108 @@ ORDER BY SAF.nID DESC, OFB.nID DESC;
         }
 
 
+        // khushi 15-10
+        [HttpPost]
+        [Route("SuperAdmin/ToggleOrganizationSABit")]
+        public async Task<IActionResult> ToggleOrganizationSABit(int id, bool status)
+        {
+            try
+            {
+                if (id <= 0)
+                {
+                    return Json(new
+                    {
+                        success = false,
+                        message = "Invalid organization ID."
+                    });
+                }
 
+                // 1. Update organization status without deleting the record.
+                bool result = _repository.ToggleOrganizationProfileStatus(id, status);
+
+                if (!result)
+                {
+                    return Json(new
+                    {
+                        success = false,
+                        message = "Organization not found or status could not be updated."
+                    });
+                }
+
+                // 2. Retrieve organization email details.
+                var organization = _repository.GetOrganizationStatusEmailDetails(id);
+
+                if (organization == null)
+                {
+                    return Json(new
+                    {
+                        success = true,
+                        status,
+                        emailSent = false,
+                        message = "Status updated, but organization email details were not found."
+                    });
+                }
+
+                // 3. Validate organization email.
+                if (string.IsNullOrWhiteSpace(organization.Value.Email))
+                {
+                    return Json(new
+                    {
+                        success = true,
+                        status,
+                        emailSent = false,
+                        message = "Status updated, but the organization email address is missing."
+                    });
+                }
+
+                // 4. Send profile status email.
+                try
+                {
+                    await _emailService.SendOrganizationProfileStatusEmailAsync(
+                        organization.Value.Email,
+                        organization.Value.Name,
+                        status
+                    );
+
+                    return Json(new
+                    {
+                        success = true,
+                        status,
+                        emailSent = true,
+                        message = status
+                            ? "Organization profile enabled and notification email sent successfully."
+                            : "Organization profile disabled and notification email sent successfully."
+                    });
+                }
+                catch (Exception emailEx)
+                {
+                    Console.WriteLine(
+                        $"Organization profile status email failed for ID {id}: {emailEx}");
+
+                    // Database update succeeded even though the email failed.
+                    return Json(new
+                    {
+                        success = true,
+                        status,
+                        emailSent = false,
+                        message = status
+                            ? "Profile enabled, but the notification email failed to send."
+                            : "Profile disabled, but the notification email failed to send."
+                    });
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(
+                    $"ToggleOrganizationSABit failed for ID {id}: {ex}");
+
+                return Json(new
+                {
+                    success = false,
+                    message = "Unable to update organization status. Check the application logs."
+                });
+            }
+        }
 
     }
 }

@@ -1,0 +1,206 @@
+@{
+    ViewData["Title"] = "TPO Placement Analytics";
+    ViewData["Panel"] = "Organization";
+    Layout = "~/Views/Shared/_DashboardLayout.cshtml";
+}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>TPO Placement Analytics - ErJobPortal</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@@400;500;600&family=Sora:wght@@600;700&display=swap" rel="stylesheet" />
+<style>
+:root{--navy:#152A4A;--navy-deep:#0E1E38;--teal:#0E8C82;--teal-light:#E4F5F3;--amber:#D98A2B;--bg:#F5F7FA;--card:#FFFFFF;--line:#E3E8EF;--text:#1F2937;--muted:#6B7686;--danger:#D64545;--radius:12px;--shadow:0 8px 24px -12px rgba(21,42,74,.18)}
+*{box-sizing:border-box}html{scroll-behavior:smooth}
+body{margin:0;background:var(--bg);color:var(--text);font-family:'Inter',sans-serif}
+h1,h2,h3,.brand{font-family:'Sora',sans-serif}
+.topbar{background:var(--navy-deep);color:#fff;padding:16px 32px;display:flex;align-items:center;justify-content:space-between}
+.brand{display:flex;align-items:center;gap:10px;font-weight:700;font-size:17px}
+.brand-mark{width:34px;height:34px;border-radius:9px;background:linear-gradient(135deg,var(--teal),#0BB8AB);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:#04211E}
+.org-chip{font-size:12px;color:#C7D0E0;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);padding:7px 13px;border-radius:50px}
+.page-header{background:linear-gradient(180deg,var(--navy) 0%,var(--navy-deep) 100%);color:#fff;padding:40px 32px 65px}
+.page-header-inner{max-width:1180px;margin:auto}
+.eyebrow{text-transform:uppercase;font-size:11px;letter-spacing:1.5px;color:#8FE0D6;font-weight:600;margin-bottom:10px}
+.page-header h1{margin:0 0 8px;font-size:30px}
+.page-header p{margin:0;max-width:620px;color:#B9C4D6;font-size:14px;line-height:1.6}
+.layout{max-width:1180px;margin:-40px auto 60px;padding:0 32px;display:grid;grid-template-columns:245px 1fr;gap:28px;align-items:start}
+.layout>*{min-width:0}
+.side-nav{position:sticky;top:20px;background:#fff;border:1px solid var(--line);border-radius:var(--radius);padding:10px;box-shadow:var(--shadow)}
+.side-nav a{display:flex;align-items:center;gap:10px;text-decoration:none;color:var(--muted);font-size:13px;font-weight:500;padding:11px 12px;border-radius:8px}
+.side-nav a:hover,.side-nav a.active{background:var(--teal-light);color:var(--teal)}
+.dot{width:7px;height:7px;border-radius:50%;background:var(--line);flex:0 0 7px}
+.side-nav a.active .dot{background:var(--teal)}
+.side-note{margin-top:14px;padding:14px;background:#FBF6EC;border:1px solid #F0E1BE;border-radius:10px;color:#8A6416;font-size:12px;line-height:1.5}
+form{display:flex;flex-direction:column;gap:22px}
+.section{background:#fff;border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow);padding:26px 28px;scroll-margin-top:20px}
+.section-head{display:flex;align-items:center;gap:12px;margin-bottom:20px}
+.section-icon{width:35px;height:35px;border-radius:9px;background:var(--teal-light);color:var(--teal);display:flex;align-items:center;justify-content:center;font-weight:700}
+.section-head h2{margin:0;font-size:16px;color:var(--navy)}
+.sub{margin:3px 0 0;font-size:12px;color:var(--muted)}
+.grid{display:grid;grid-template-columns:repeat(4,1fr);gap:18px}
+.field label{display:block;font-size:13px;font-weight:600;margin-bottom:7px}
+.req{color:var(--danger)}
+.field select,.field input,.field textarea{width:100%;padding:10px 12px;font-size:13px;font-family:'Inter',sans-serif;color:var(--text);background:#fff;border:1.5px solid var(--line);border-radius:8px;outline:none}
+.field select,.field input{min-height:42px}
+.field textarea{resize:vertical}
+.field select:focus,.field input:focus,.field textarea:focus{border-color:var(--teal);box-shadow:0 0 0 3px rgba(14,140,130,.13)}
+.field input[type=date]{-webkit-appearance:none;appearance:none}
+.hint{display:block;margin-top:5px;font-size:11px;color:var(--muted)}
+.checkbox-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+.check-item{display:flex;align-items:center;gap:9px;border:1px solid var(--line);border-radius:8px;padding:10px;font-size:12.5px;cursor:pointer;background:#fff}
+.check-item:hover{border-color:var(--teal);background:var(--teal-light)}
+.check-item input{width:16px;height:16px;accent-color:var(--teal)}
+.skill-box{border:1px solid var(--line);border-radius:10px;overflow:hidden;margin:14px 0 12px}
+.skill-title{padding:13px 16px;background:#FAFBFC;display:flex;align-items:center;justify-content:space-between;cursor:pointer;font-size:13px;font-weight:600;color:var(--navy)}
+.skill-count{font-size:11px;color:var(--teal);background:var(--teal-light);padding:3px 8px;border-radius:20px;margin-left:auto}
+.skill-body{padding:15px;display:grid;grid-template-columns:repeat(4,1fr);gap:10px;border-top:1px solid var(--line)}
+.skill-box.collapsed .skill-body{display:none}
+.skill-title::after{content:"\25BE";color:var(--muted);font-size:12px;margin-left:10px}
+.skill-box.collapsed .skill-title::after{content:"\25B8"}
+.submit-bar{position:sticky;bottom:0;z-index:20;background:#fff;border:1px solid var(--line);border-radius:12px;box-shadow:var(--shadow);padding:18px 24px;display:flex;align-items:center;justify-content:space-between;gap:15px}
+.submit-bar p{margin:0;font-size:12px;color:var(--muted)}
+.btn-row{display:flex;gap:10px}
+.btn{border:0;border-radius:9px;padding:12px 22px;font-size:13px;font-weight:600;cursor:pointer;font-family:'Inter',sans-serif}
+.btn-primary{background:var(--teal);color:#fff}.btn-primary:hover{background:#0B786F}
+.btn-secondary{background:#fff;border:1px solid var(--line);color:var(--navy)}
+.btn-danger{background:var(--danger);color:#fff}
+.btn-sm{padding:9px 16px;font-size:12px}
+footer{text-align:center;padding:25px;color:var(--muted);font-size:12px}
+#messageBox{display:none;padding:13px 16px;border-radius:8px;margin-bottom:10px;font-size:13px;font-weight:500}
+#messageBox.success{display:block;background:#E7F7F3;border:1px solid #B8E8DF;color:#08766D}
+#messageBox.error{display:block;background:#FDECEC;border:1px solid #F4C3C3;color:#B42318}
+
+/* ---------- extra components for phase pages ---------- */
+.span2{grid-column:span 2}.span3{grid-column:span 3}.span4{grid-column:1/-1}
+.block-title{font-size:13px;font-weight:700;color:var(--navy);margin:22px 0 10px}
+.section .grid+.table-wrap,.section .stat-grid+.table-wrap,.section .table-wrap+.grid,.section .grid+.checkbox-grid,.section .checkbox-grid+.grid,.section .stat-grid+.pipeline,.section .grid+.pipeline,.section .grid+.stat-grid{margin-top:18px}
+.table-wrap{overflow-x:auto;border:1px solid var(--line);border-radius:10px}
+table.data{width:100%;border-collapse:collapse;font-size:12.5px}
+table.data th{background:#FAFBFC;text-align:left;padding:11px 14px;color:var(--navy);font-weight:600;white-space:nowrap;border-bottom:1px solid var(--line)}
+table.data td{padding:11px 14px;border-bottom:1px solid var(--line);white-space:nowrap}
+table.data tr:last-child td{border-bottom:0}
+table.data select,table.data input[type=number]{padding:6px 8px;font-size:12px;border:1.5px solid var(--line);border-radius:6px;font-family:'Inter',sans-serif}
+table.data input[type=checkbox]{accent-color:var(--teal);width:16px;height:16px}
+.badge{display:inline-block;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:600}
+.b-g{background:#E7F7F3;color:#08766D}.b-a{background:#FDF3E1;color:#9A6212}.b-r{background:#FDECEC;color:#B42318}.b-b{background:#E8EEF9;color:#1F4B99}.b-n{background:#EEF1F5;color:#4A5565}
+.link-btn{color:var(--teal);font-weight:600;font-size:12px;text-decoration:none;margin-right:12px}.link-btn:hover{text-decoration:underline}
+.stat-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
+.stat{border:1px solid var(--line);border-radius:10px;padding:16px;background:#FAFBFC}
+.stat b{display:block;font-family:'Sora',sans-serif;font-size:24px;color:var(--navy);margin-bottom:2px}
+.stat span{font-size:12px;color:var(--muted)}
+.pipeline{display:flex;gap:10px;flex-wrap:wrap}
+.stage{flex:1 1 120px;border:1px solid var(--line);border-top:3px solid var(--teal);border-radius:10px;padding:12px;text-align:center;background:#fff}
+.stage b{display:block;font-family:'Sora',sans-serif;font-size:20px;color:var(--navy)}
+.stage span{font-size:12px;color:var(--muted)}
+.bar-row{display:grid;grid-template-columns:180px 1fr 70px;gap:12px;align-items:center;margin-bottom:10px;font-size:12.5px}
+.bar{height:10px;background:var(--line);border-radius:20px;overflow:hidden}
+.bar i{display:block;height:100%;background:linear-gradient(90deg,var(--teal),#0BB8AB)}
+.timeline{border-left:2px solid var(--line);margin-left:6px;padding-left:20px}
+.tl-item{position:relative;margin-bottom:16px;font-size:13px}
+.tl-item::before{content:"";position:absolute;left:-27px;top:4px;width:10px;height:10px;border-radius:50%;background:var(--teal)}
+.tl-item small{display:block;color:var(--muted);font-size:11.5px;margin-top:2px}
+.feed-item{border:1px solid var(--line);border-radius:10px;padding:14px 16px;margin-bottom:10px}
+.feed-item .who{font-weight:600;font-size:13px;color:var(--navy)}
+.feed-item p{margin:6px 0;font-size:13px;line-height:1.5}
+.feed-item small{color:var(--muted);font-size:11.5px}
+.q-card{border:1px solid var(--line);border-radius:10px;padding:16px;margin-bottom:12px;font-size:13px}
+.q-card label.opt{display:flex;align-items:center;gap:9px;padding:9px 12px;border:1px solid var(--line);border-radius:8px;margin-top:8px;cursor:pointer}
+.q-card label.opt:hover{border-color:var(--teal);background:var(--teal-light)}
+.timer{display:inline-block;background:#FBF6EC;border:1px solid #F0E1BE;color:#8A6416;border-radius:8px;padding:9px 14px;font-size:12.5px;margin-bottom:14px}
+.note-box{margin-top:16px;padding:13px 15px;background:var(--teal-light);border:1px solid #BFE6E1;border-radius:10px;color:#0A5F58;font-size:12.5px;line-height:1.5}
+.btn-row-inline{display:flex;gap:10px;flex-wrap:wrap;margin-top:16px}
+.page-foot-nav{display:flex;justify-content:space-between;margin-top:20px}
+.phase-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+.phase-card{display:block;text-decoration:none;color:inherit;border:1px solid var(--line);border-radius:10px;padding:16px;background:#fff}
+.phase-card:hover{border-color:var(--teal);background:var(--teal-light)}
+.phase-card h3{margin:10px 0 6px;font-size:14px;color:var(--navy)}
+
+/* ---------- responsive ---------- */
+@@media(max-width:1100px){.layout{grid-template-columns:220px 1fr;padding:0 24px;gap:20px}.grid,.checkbox-grid,.skill-body{grid-template-columns:repeat(3,1fr)}}
+@@media(max-width:900px){
+.page-header{padding:32px 20px 60px}
+.layout{grid-template-columns:1fr;margin-top:-30px;padding:0 20px;gap:16px}
+.side-nav{position:sticky;top:0;z-index:30;display:flex;gap:6px;padding:8px;overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none}
+.side-nav::-webkit-scrollbar{display:none}
+.side-nav a{flex:0 0 auto;white-space:nowrap;padding:9px 14px;border-radius:50px}
+.side-note{display:none}.section{scroll-margin-top:70px}
+.grid,.checkbox-grid,.skill-body,.stat-grid,.phase-grid{grid-template-columns:repeat(2,1fr)}
+.span3,.span4{grid-column:1/-1}}
+@@media(max-width:600px){
+.topbar{padding:12px 16px}.org-chip{display:none}
+.page-header{padding:26px 16px 52px}.page-header h1{font-size:22px}.page-header p{font-size:13px}
+.layout{padding:0 12px;margin-bottom:30px}.section{padding:18px 14px}.section-head{margin-bottom:16px}
+.grid,.stat-grid,.phase-grid{grid-template-columns:1fr;gap:14px}.span2{grid-column:auto}
+.checkbox-grid{grid-template-columns:repeat(2,1fr);gap:8px}.skill-body{grid-template-columns:1fr;padding:12px}
+.field select,.field input,.field textarea{font-size:16px}
+.check-item{min-height:44px;padding:12px 10px}.skill-title{padding:14px}
+.submit-bar{flex-direction:column;align-items:stretch;gap:10px;padding:12px;border-radius:12px 12px 0 0}.submit-bar p{display:none}
+.btn-row{width:100%}.btn{flex:1;min-height:44px}.btn-sm{min-height:40px}
+.bar-row{grid-template-columns:1fr 70px}.bar-row .bar{grid-column:1/-1;order:3}}
+@@media(max-width:380px){.checkbox-grid{grid-template-columns:1fr}}
+
+</style>
+</head>
+<body>
+<div class="topbar"><a class="brand" href="/Organization/PhasesIndex" style="text-decoration:none;color:white"><div class="brand-mark">ER</div>ErJobPortal</a><div class="org-chip">TPO</div></div>
+<div class="page-header"><div class="page-header-inner"><div class="eyebrow">Phase 12 &middot; TPO</div><h1>TPO Placement Analytics</h1><p>Monitor participation, selections, offers, packages and placement performance.</p></div></div>
+<div class="layout">
+<nav class="side-nav" id="sideNav">
+<a href="#filters" class="active"><span class="dot"></span>Report Filters</a><a href="#stats" class=""><span class="dot"></span>Placement Summary</a><a href="#pkg" class=""><span class="dot"></span>Package Analysis</a><a href="#company" class=""><span class="dot"></span>Company-wise Report</a>
+<div class="side-note"><b>Outcome</b><br />TPOs can monitor and report college placement performance.</div>
+</nav>
+<main>
+<div id="messageBox"></div>
+<form id="phaseForm" novalidate>
+<section class="section" id="filters"><div class="section-head"><div class="section-icon">1</div><div><h2>Report Filters</h2><p class="sub"></p></div></div>
+<div class="grid"><div class="field"><label>Academic Year</label><select><option value="">Select</option><option>2025-26</option><option>2026-27</option><option>2027-28</option></select></div><div class="field"><label>Department</label><select><option value="">Select</option><option>All</option><option>Engineering</option><option>Management</option><option>Science</option></select></div><div class="field"><label>Branch</label><select><option value="">Select</option><option>All</option><option>CSE</option><option>IT</option><option>ECE</option><option>Mechanical</option></select></div><div class="field"><label>Company</label><select><option value="">Select</option><option>All</option><option>TechNova Solutions</option><option>Infracore Systems</option></select></div></div>
+<div class="btn-row-inline"><button type="button" class="btn btn-sm btn-primary">Apply Filters</button><button type="button" class="btn btn-sm btn-secondary">Export Report</button></div>
+</section>
+<section class="section" id="stats"><div class="section-head"><div class="section-icon">2</div><div><h2>Placement Summary</h2><p class="sub"></p></div></div>
+<div class="stat-grid"><div class="stat"><b>42</b><span>Participating Companies</span></div><div class="stat"><b>64</b><span>Recruitment Drives</span></div><div class="stat"><b>820</b><span>Eligible Students</span></div><div class="stat"><b>690</b><span>Registered</span></div><div class="stat"><b>310</b><span>Selected</span></div><div class="stat"><b>268</b><span>Offers Accepted</span></div><div class="stat"><b>241</b><span>Joined</span></div><div class="stat"><b>86%</b><span>Placement Rate</span></div></div>
+</section>
+<section class="section" id="pkg"><div class="section-head"><div class="section-icon">3</div><div><h2>Package Analysis</h2><p class="sub"></p></div></div>
+<div class="stat-grid"><div class="stat"><b>18.0</b><span>Highest (LPA)</span></div><div class="stat"><b>5.2</b><span>Average (LPA)</span></div><div class="stat"><b>4.5</b><span>Median (LPA)</span></div><div class="stat"><b>3.0</b><span>Lowest (LPA)</span></div></div>
+<div class="block-title">Branch-wise Placement %</div><div class="bar-row"><span>CSE</span><div class="bar"><i style="width:92%"></i></div><b>92%</b></div><div class="bar-row"><span>IT</span><div class="bar"><i style="width:88%"></i></div><b>88%</b></div><div class="bar-row"><span>ECE</span><div class="bar"><i style="width:74%"></i></div><b>74%</b></div><div class="bar-row"><span>Mechanical</span><div class="bar"><i style="width:58%"></i></div><b>58%</b></div>
+</section>
+<section class="section" id="company"><div class="section-head"><div class="section-icon">4</div><div><h2>Company-wise Report</h2><p class="sub"></p></div></div>
+<div class="table-wrap"><table class="data"><thead><tr><th>Company</th><th>Drives</th><th>Registered</th><th>Selected</th><th>Accepted</th><th>Avg Package</th></tr></thead><tbody><tr><td>TechNova Solutions</td><td>3</td><td>120</td><td>25</td><td>22</td><td>4.5 LPA</td></tr><tr><td>Infracore Systems</td><td>2</td><td>90</td><td>14</td><td>12</td><td>3.8 LPA</td></tr><tr><td>CloudSpark</td><td>1</td><td>60</td><td>8</td><td>8</td><td>6.0 LPA</td></tr></tbody></table></div>
+</section>
+
+<div class="submit-bar"><p>Static prototype &ndash; no data is saved.</p><div class="btn-row"><button type="reset" class="btn btn-secondary">Reset</button><button type="submit" class="btn btn-primary">Save View</button></div></div>
+</form>
+<div class="page-foot-nav"><a class="link-btn" href="/Organization/Notifications">&larr; Placement Notifications</a><a class="link-btn" href="/Organization/Alumni">Alumni Module &rarr;</a></div>
+</main>
+</div>
+<footer>&copy; ErJobPortal</footer>
+<script>
+(function () {
+    // collapsible skill boxes
+    document.querySelectorAll('.skill-title').forEach(function (t) {
+        t.addEventListener('click', function () { t.parentElement.classList.toggle('collapsed'); });
+    });
+    // scroll-spy for side nav
+    var links = document.querySelectorAll('.side-nav a[href^="#"]');
+    function spy() {
+        var pos = window.scrollY + 140, cur = null;
+        links.forEach(function (a) {
+            var s = document.querySelector(a.getAttribute('href'));
+            if (s && s.offsetTop <= pos) cur = a;
+        });
+        links.forEach(function (a) { a.classList.toggle('active', a === cur); });
+    }
+    window.addEventListener('scroll', spy); spy();
+    // static form: show a message instead of posting
+    var form = document.getElementById('phaseForm'), box = document.getElementById('messageBox');
+    if (form) form.addEventListener('submit', function (e) {
+        e.preventDefault();
+        box.className = 'success'; box.textContent = 'Saved successfully (static demo).';
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+        setTimeout(function () { box.className = ''; }, 3500);
+    });
+})();
+
+</script>
+</body>
+</html>
