@@ -784,5 +784,42 @@ namespace ErJobPortal.Controllers
         {
             return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
         }
+
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> TestEmail(string recipientEmail)
+        {
+            if (string.IsNullOrWhiteSpace(recipientEmail))
+                return BadRequest("Recipient email is required.");
+
+            try
+            {
+                await _emailService.SendContactThankYouEmailAsync(
+                    "ErJobPortal Test",
+                    recipientEmail.Trim(),
+                    "SMTP Delivery Test",
+                    "This is a test email from ErJobPortal.");
+
+                _logger.LogInformation(
+                    "SMTP accepted test email for {RecipientEmail}",
+                    recipientEmail);
+
+                return Ok(
+                    "SMTP accepted the test email. " +
+                    "Please verify delivery in the recipient mailbox.");
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(
+                    ex,
+                    "SMTP test failed for {RecipientEmail}",
+                    recipientEmail);
+
+                return StatusCode(
+                    500,
+                    "Email sending failed. Check application logs.");
+            }
+        }
     }
 }

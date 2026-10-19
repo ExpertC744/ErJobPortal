@@ -3873,6 +3873,7 @@
 					</div>
 
 
+
 					<!-- ================= CHARTS ================= -->
 
 					<div class="sidebar-dropdown">
@@ -3941,6 +3942,47 @@
 						</div>
 
 					</div>
+
+					
+<!-- ================= QUESTION BANK ================= -->
+
+<div class="sidebar-dropdown">
+
+    <div class="sidebar-link"
+         onclick="toggleSidebarMenu('questionBankSubmenu', 'questionBankArrow')">
+
+        <span class="menu-icon">
+            <i class="fas fa-file-upload"></i>
+        </span>
+
+        <span class="menu-text">
+            Question Bank
+        </span>
+
+        <span class="profile-arrow" id="questionBankArrow">
+            <i class="fas fa-chevron-right"></i>
+        </span>
+
+    </div>
+
+    <div class="profile-submenu" id="questionBankSubmenu">
+
+        <a asp-controller="Organization"
+           asp-action="UploadQuestionBank"
+           class="profile-submenu-link">
+            Upload Question Bank
+        </a>
+
+		<a asp-controller="Organization"
+		   asp-action="ViewQuestionBank"
+		   class="profile-submenu-link">
+			View Question Bank
+		</a>
+
+    </div>
+
+</div>
+
 
 
 					<!-- ================= FEEDBACK ================= -->
@@ -4121,19 +4163,22 @@
 
 					<!-- ================= CREATE USER ================= -->
 
-					<a asp-controller="TPO"
-					   asp-action="CreateUser"
-					   class="sidebar-link">
+@if (Context.Session.GetString("SubTpoBit") != "1")
+{
+    <a asp-controller="TPO"
+       asp-action="CreateUser"
+       class="sidebar-link">
 
-						<span class="menu-icon">
-							<i class="fas fa-user-plus"></i>
-						</span>
+        <span class="menu-icon">
+            <i class="fas fa-user-plus"></i>
+        </span>
 
-						<span class="menu-text">
-							Create User
-						</span>
+        <span class="menu-text">
+            Create User
+        </span>
 
-					</a>
+    </a>
+}
 
 				
 					

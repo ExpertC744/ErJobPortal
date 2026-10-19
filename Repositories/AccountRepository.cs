@@ -461,6 +461,99 @@ GetOrganizationRegistrationDetails(int orgId)
             return null;
         }
 
+        public (string CandidateName, string Email)? GetCandidateContactDetails(
+    int candidateId)
+        {
+            using (SqlConnection cn = _db.GetConnection())
+            {
+                string query = @"
+            SELECT sPrefix, sFName, sLName, sEmail
+            FROM tblCandidateRegister
+            WHERE nID = @nID";
+
+                using (SqlCommand cmd = new SqlCommand(query, cn))
+                {
+                    cmd.Parameters.AddWithValue("@nID", candidateId);
+
+                    cn.Open();
+
+                    using (SqlDataReader dr = cmd.ExecuteReader())
+                    {
+                        if (dr.Read())
+                        {
+                            string prefix = dr["sPrefix"] == DBNull.Value
+                                ? ""
+                                : dr["sPrefix"].ToString() ?? "";
+
+                            string firstName = dr["sFName"] == DBNull.Value
+                                ? ""
+                                : dr["sFName"].ToString() ?? "";
+
+                            string lastName = dr["sLName"] == DBNull.Value
+                                ? ""
+                                : dr["sLName"].ToString() ?? "";
+
+                            string email = dr["sEmail"] == DBNull.Value
+                                ? ""
+                                : dr["sEmail"].ToString() ?? "";
+
+                            string fullName = string.Join(" ",
+                                new[] { prefix, firstName, lastName }
+                                    .Where(x => !string.IsNullOrWhiteSpace(x)));
+
+                            return (fullName, email);
+                        }
+                    }
+                }
+            }
+
+            return null;
+        }
+
+        public (string OrganizationName, string ContactName, string Email)?
+    GetOrganizationContactDetails(int orgId)
+        {
+            using (SqlConnection cn = _db.GetConnection())
+            {
+                string query = @"
+            SELECT sOrgName, sName, sEmail
+            FROM tblOrgRegistration
+            WHERE nID = @nID";
+
+                using (SqlCommand cmd = new SqlCommand(query, cn))
+                {
+                    cmd.Parameters.AddWithValue("@nID", orgId);
+
+                    cn.Open();
+
+                    using (SqlDataReader dr = cmd.ExecuteReader())
+                    {
+                        if (dr.Read())
+                        {
+                            string organizationName =
+                                dr["sOrgName"] == DBNull.Value
+                                    ? ""
+                                    : dr["sOrgName"].ToString() ?? "";
+
+                            string contactName =
+                                dr["sName"] == DBNull.Value
+                                    ? ""
+                                    : dr["sName"].ToString() ?? "";
+
+                            string email =
+                                dr["sEmail"] == DBNull.Value
+                                    ? ""
+                                    : dr["sEmail"].ToString() ?? "";
+
+                            return (organizationName, contactName, email);
+                        }
+                    }
+                }
+            }
+
+            return null;
+        }
+
         public List<DepartmentM> GetDepartments()
         {
             List<DepartmentM> departments = new List<DepartmentM>();

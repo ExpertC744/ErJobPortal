@@ -14,11 +14,18 @@ namespace ErJobPortal.Controllers
         private readonly IConfiguration _configuration;
         private readonly AccountRepository _repository;
         private readonly IWebHostEnvironment _environment;
+        private readonly OrgQuestionBankRepository _questionBankRepository;
 
-        public OrganizationController(IConfiguration configuration, AccountRepository repository)
+        public OrganizationController(
+            IConfiguration configuration,
+            AccountRepository repository,
+            IWebHostEnvironment environment,
+            OrgQuestionBankRepository questionBankRepository)
         {
             _configuration = configuration;
             _repository = repository;
+            _environment = environment;
+            _questionBankRepository = questionBankRepository;
         }
 
         // =========================================================
@@ -5776,5 +5783,284 @@ WHERE nID = @nID
 
             return View("~/Views/Organization/ViewOrgProfile.cshtml", model);
         }
+
+        // Shrirang 15/10/26
+        // org question bank code 
+
+        [HttpGet]
+        public IActionResult UploadQuestionBank()
+        {
+            int? orgId = HttpContext.Session.GetInt32("OrgID");
+
+            if (orgId == null || orgId <= 0)
+            {
+                return RedirectToAction("OrganizationLogin", "Account");
+            }
+
+            return View(new OrgQuestionBank());
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> UploadQuestionBank(
+    OrgQuestionBank model,
+    bool publish = false)
+        {
+            int? orgId = HttpContext.Session.GetInt32("OrgID");
+
+            if (orgId == null || orgId <= 0)
+                return RedirectToAction("OrganizationLogin", "Account");
+
+            model.OrgID = orgId.Value;
+            model.AudienceType = "AllCandidates";
+
+            if (model.QuestionFile == null || model.QuestionFile.Length == 0)
+            {
+                ModelState.AddModelError(
+                    nameof(model.QuestionFile),
+                    "Please select a question paper file.");
+            }
+            else
+            {
+                string extension = Path.GetExtension(
+                    model.QuestionFile.FileName).ToLowerInvariant();
+
+                string[] allowedExtensions =
+                {
+            ".pdf", ".doc", ".docx", ".txt", ".xls", ".xlsx"
+        };
+
+                if (!allowedExtensions.Contains(extension))
+                {
+                    ModelState.AddModelError(
+                        nameof(model.QuestionFile),
+                        "Unsupported file type.");
+                }
+
+                if (model.QuestionFile.Length > 10 * 1024 * 1024)
+                {
+                    ModelState.AddModelError(
+                        nameof(model.QuestionFile),
+                        "Maximum file size is 10 MB.");
+                }
+            }
+
+            if (!ModelState.IsValid)
+                return View(model);
+
+            string storagePath = _configuration["QuestionBankStoragePath"]
+                ?? Path.Combine(
+                    _environment.ContentRootPath,
+                    "App_Data",
+                    "QuestionBank");
+
+            Directory.CreateDirectory(storagePath);
+
+            string fileExtension = Path.GetExtension(
+                model.QuestionFile!.FileName).ToLowerInvariant();
+
+            string storedFileName =
+                $"{Guid.NewGuid():N}{fileExtension}";
+
+            string fullPath = Path.Combine(storagePath, storedFileName);
+
+            try
+            {
+                await using (var stream = new FileStream(
+                    fullPath,
+                    FileMode.CreateNew,
+                    FileAccess.Write,
+                    FileShare.None))
+                {
+                    await model.QuestionFile.CopyToAsync(stream);
+                }
+
+                model.OriginalFileName =
+                    Path.GetFileName(model.QuestionFile.FileName);
+
+                model.StoredFileName = storedFileName;
+                model.FileExtension = fileExtension;
+                model.ContentType = model.QuestionFile.ContentType;
+                model.FileSizeBytes = model.QuestionFile.Length;
+                model.FilePath = fullPath;
+
+                // IMPORTANT: Use the submitted button value.
+                model.IsPublished = publish;
+
+                model.IsDeleted = false;
+                model.CreatedDate = DateTime.Now;
+
+                int questionBankId =
+                    await _questionBankRepository.InsertAsync(model);
+
+                if (questionBankId <= 0)
+                    throw new InvalidOperationException(
+                        "Question bank was not saved.");
+
+                TempData["SuccessMessage"] = publish
+                    ? "Question bank uploaded and published successfully."
+                    : "Question bank saved as draft successfully.";
+
+                return RedirectToAction(nameof(ViewQuestionBank));
+            }
+            catch (Exception)
+            {
+                if (System.IO.File.Exists(fullPath))
+                    System.IO.File.Delete(fullPath);
+
+                ModelState.AddModelError(
+                    string.Empty,
+                    "Unable to save the question bank. Please try again.");
+
+                return View(model);
+            }
+        }
+
+
+        [HttpGet]
+        public async Task<IActionResult> ViewQuestionBank(
+            string? searchText,
+            string? category,
+            string? streamDomain,
+            string? status)
+        {
+            int? orgId = HttpContext.Session.GetInt32("OrgID");
+
+            if (orgId == null || orgId <= 0)
+            {
+                return RedirectToAction("OrganizationLogin", "Account");
+            }
+
+            var questionBanks =
+                await _questionBankRepository.GetQuestionBanksAsync(
+                    orgId.Value,
+                    searchText,
+                    category,
+                    streamDomain,
+                    status);
+
+            ViewBag.SearchText = searchText;
+            ViewBag.SelectedCategory = category;
+            ViewBag.SelectedStreamDomain = streamDomain;
+            ViewBag.SelectedStatus = status ?? "All";
+
+            ViewBag.TotalCount = questionBanks.Count;
+            ViewBag.PublishedCount = questionBanks.Count(q => q.IsPublished);
+            ViewBag.DraftCount = questionBanks.Count(q => !q.IsPublished);
+
+            return View(questionBanks);
+        }
+
+
+        [HttpGet]
+        public async Task<IActionResult> ViewQuestionFile(int id)
+        {
+            int? orgId = HttpContext.Session.GetInt32("OrgID");
+
+            if (orgId == null || orgId <= 0)
+                return RedirectToAction("OrganizationLogin", "Account");
+
+            var questionBank =
+                await _questionBankRepository.GetQuestionBankByIdAsync(id, orgId.Value);
+
+            if (questionBank == null)
+                return NotFound("Question paper not found.");
+
+            // Do not expose unpublished question papers through the view action.
+            if (!questionBank.IsPublished)
+                return NotFound("Published question paper not found.");
+
+            if (!TryGetSafeQuestionFilePath(questionBank, out string fullPath))
+                return NotFound("Question paper file not found.");
+
+            string contentType = questionBank.FileExtension.ToLowerInvariant() switch
+            {
+                ".pdf" => "application/pdf",
+                ".txt" => "text/plain",
+                _ => "application/octet-stream"
+            };
+
+            Response.Headers["X-Content-Type-Options"] = "nosniff";
+
+            // PDF and text can be displayed inline; other formats are downloaded.
+            if (contentType == "application/octet-stream")
+                return PhysicalFile(fullPath, contentType, questionBank.OriginalFileName);
+
+            return PhysicalFile(fullPath, contentType);
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> DownloadQuestionFile(int id)
+        {
+            int? orgId = HttpContext.Session.GetInt32("OrgID");
+
+            if (orgId == null || orgId <= 0)
+                return RedirectToAction("OrganizationLogin", "Account");
+
+            var questionBank =
+                await _questionBankRepository.GetQuestionBankByIdAsync(id, orgId.Value);
+
+            if (questionBank == null)
+                return NotFound("Question paper not found.");
+
+            if (!TryGetSafeQuestionFilePath(questionBank, out string fullPath))
+                return NotFound("Question paper file not found.");
+
+            Response.Headers["X-Content-Type-Options"] = "nosniff";
+
+            return PhysicalFile(
+                fullPath,
+                "application/octet-stream",
+                Path.GetFileName(questionBank.OriginalFileName));
+        }
+
+        private bool TryGetSafeQuestionFilePath(
+            OrgQuestionBank questionBank,
+            out string fullPath)
+        {
+            fullPath = string.Empty;
+
+            string storagePath = _configuration["QuestionBankStoragePath"]
+                ?? Path.Combine(_environment.ContentRootPath, "App_Data", "QuestionBank");
+
+            string storageRoot = Path.GetFullPath(storagePath);
+            string expectedFilePath = Path.GetFullPath(
+                Path.Combine(storageRoot, questionBank.StoredFileName));
+
+            // Files must be directly inside the configured storage folder.
+            string? expectedDirectory = Path.GetDirectoryName(expectedFilePath);
+
+            if (!string.Equals(
+                expectedDirectory,
+                storageRoot.TrimEnd(Path.DirectorySeparatorChar),
+                OperatingSystem.IsWindows()
+                    ? StringComparison.OrdinalIgnoreCase
+                    : StringComparison.Ordinal))
+            {
+                return false;
+            }
+
+            // The stored path must match the generated stored filename.
+            string databasePath = Path.GetFullPath(questionBank.FilePath);
+
+            if (!string.Equals(
+                databasePath,
+                expectedFilePath,
+                OperatingSystem.IsWindows()
+                    ? StringComparison.OrdinalIgnoreCase
+                    : StringComparison.Ordinal))
+            {
+                return false;
+            }
+
+            if (!System.IO.File.Exists(expectedFilePath))
+                return false;
+
+            fullPath = expectedFilePath;
+            return true;
+        }
+
+
+
     }
 }
