@@ -8,18 +8,20 @@
     ViewData["UserName"] = "Organization";
 }
 
+<link rel="stylesheet" href="~/css/TraineeProfilesList.css" />
+
 <div class="container-fluid trainee-profiles-page">
 
     <!-- MASTER TABLE -->
     <div class="master-table-container">
 
-        <div class="table-responsive">
+        <!-- PAGE HEADER -->
+        <div class="page-header mb-4">
+            <h1>Trainee Profiles List</h1>
+            <p>Total Trainees : @Model.Count</p>
+        </div>
 
-            <!-- PAGE HEADER -->
-            <div class="page-header mb-4">
-                <h1>Trainee Profiles List</h1>
-                <p>Total Trainees : @Model.Count</p>
-            </div>
+        <div class="table-responsive">
 
             <!-- TABLE -->
             <table id="traineeProfilesTable"
@@ -75,8 +77,8 @@
                                 <!-- NAME -->
                                 <td>
                                     @(string.IsNullOrWhiteSpace(trainee.CandidateName)
-                                                                ? "NA"
-                                                                : trainee.CandidateName)
+                                        ? "NA"
+                                        : trainee.CandidateName)
                                 </td>
 
                                 <!-- PHOTO -->
@@ -97,32 +99,35 @@
                                         }
                                     }
 
-                            <img src="@photoPath"
-                                 alt="Trainee Image"
-                                 class="trainee-profile-image"
-                                 onerror="this.onerror=null;this.src='@Url.Content("~/images/default-profile.png")';" />
+                                    <img src="@photoPath"
+                                         alt="Trainee Image"
+                                         class="trainee-profile-image"
+                                         width="100"
+                                         height="120"
+                                         style="width:100px;height:120px;max-width:100px;max-height:120px;object-fit:cover;object-position:center top;border-radius:10px;"
+                                         onerror="this.onerror=null;this.src='@Url.Content("~/images/default-profile.png")';" />
 
-                        </td>
+                                </td>
 
-                        <!-- TECHNICAL SKILL -->
-                        <td>
-                            @(string.IsNullOrWhiteSpace(trainee.TechnicalSkill)
-                                                        ? "NA"
-                                                        : trainee.TechnicalSkill)
+                                <!-- TECHNICAL SKILL -->
+                                <td>
+                                    @(string.IsNullOrWhiteSpace(trainee.TechnicalSkill)
+                                        ? "NA"
+                                        : trainee.TechnicalSkill)
                                 </td>
 
                                 <!-- NON TECHNICAL SKILL -->
                                 <td>
                                     @(string.IsNullOrWhiteSpace(trainee.NonTechnicalSkill)
-                                                                ? "NA"
-                                                                : trainee.NonTechnicalSkill)
+                                        ? "NA"
+                                        : trainee.NonTechnicalSkill)
                                 </td>
 
                                 <!-- MEDICAL SKILL -->
                                 <td>
                                     @(string.IsNullOrWhiteSpace(trainee.MedicalSkill)
-                                                                ? "NA"
-                                                                : trainee.MedicalSkill)
+                                        ? "NA"
+                                        : trainee.MedicalSkill)
                                 </td>
 
                                 <!-- LOCATION -->
@@ -146,8 +151,8 @@
                                     }
 
                                     @if (string.IsNullOrWhiteSpace(trainee.Country)
-                                                                && string.IsNullOrWhiteSpace(trainee.State)
-                                                                && string.IsNullOrWhiteSpace(trainee.City))
+                                   && string.IsNullOrWhiteSpace(trainee.State)
+                                   && string.IsNullOrWhiteSpace(trainee.City))
                                     {
                                         @:NA
                                     }
@@ -157,14 +162,9 @@
                             </tr>
                         }
                     }
-                    else
-                    {
-                        <tr>
-                            <td colspan="7" class="text-center">
-                                No trainee profiles found.
-                            </td>
-                        </tr>
-                    }
+
+                    @* No colspan "empty" row here: DataTables shows its own
+                       "No entries found" message and breaks on colspan rows. *@
 
                 </tbody>
 
@@ -230,7 +230,7 @@
 
                 lengthMenu: "_MENU_ entries per page",
 
-                emptyTable: "No entries found",
+                emptyTable: "No trainee profiles found.",
 
                 zeroRecords: "No matching records found",
 
@@ -245,4 +245,3 @@
     });
 
 </script>
-

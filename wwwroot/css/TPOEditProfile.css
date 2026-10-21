@@ -183,10 +183,6 @@
 
 .tpo-form-grid {
     display: grid;
-    /*
-       Compact balanced columns.
-       The form itself is only 920px wide.
-    */
     grid-template-columns: 1fr 1fr;
     gap: 14px 20px;
     width: 100%;
@@ -331,6 +327,10 @@ textarea.form-control {
     transition: border-color .2s ease, box-shadow .2s ease;
 }
 
+    .file-wrapper:hover {
+        border-color: #b8cacc;
+    }
+
     .file-wrapper:focus-within {
         border-color: var(--primary);
         box-shadow: 0 0 0 3px rgba(13, 148, 136, 0.08);
@@ -345,18 +345,44 @@ textarea.form-control {
     }
 
 .file-input {
+    flex: 1 1 auto;
+    min-width: 0;
     width: calc(100% - 34px);
     height: 100%;
-    padding: 7px 7px 7px 0;
+    padding: 0;
     box-sizing: border-box;
     border: 0;
     outline: 0;
     background: transparent;
     color: var(--text-secondary);
     font-family: inherit;
-    font-size: 10.5px;
+    font-size: 11px;
+    line-height: 37px;
     cursor: pointer;
 }
+
+    /* ---------- Choose file button ---------- */
+
+    .file-input::file-selector-button,
+    .file-input::-webkit-file-upload-button {
+        height: 37px;
+        margin: 0 10px 0 0;
+        padding: 0 16px;
+        border: 0;
+        border-radius: 0;
+        background: var(--primary);
+        color: #ffffff;
+        font-family: inherit;
+        font-size: 11.5px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: background .2s ease;
+    }
+
+    .file-input:hover::file-selector-button,
+    .file-input:hover::-webkit-file-upload-button {
+        background: var(--primary-dark);
+    }
 
 .field-note {
     margin-top: 3px;
@@ -544,6 +570,11 @@ textarea.form-control {
 
     textarea.form-control {
         height: 76px;
+    }
+
+    .file-input::file-selector-button,
+    .file-input::-webkit-file-upload-button {
+        padding: 0 12px;
     }
 
     .tpo-form-footer {
