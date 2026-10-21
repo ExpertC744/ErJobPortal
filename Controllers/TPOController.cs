@@ -5798,5 +5798,18 @@ ORDER BY
                 new { notificationId = model.NotificationID });
         }
 
+        // shrirang 19/10/26
+        [HttpGet]
+        public IActionResult UploadQuestionBank()
+        {
+            return View();
+        }
+
+        [HttpGet]
+        public IActionResult ViewQuestionBank()
+        {
+            return View();
+        }
+              
     }
 }

@@ -301,5 +301,19 @@ namespace ErJobPortal.Models
         public int? ResumeProfile { get; set; }
 
         public int ResumeType { get; set; }
+
+        // =========================================================
+        // EDUCATION PERCENTAGES
+        // =========================================================
+
+        public decimal? SSCPercentage { get; set; }
+
+        public decimal? HSCPercentage { get; set; }
+
+        public decimal? GraduationPercentage { get; set; }
+
+        public decimal? PGPercentage { get; set; }
+
+        public decimal? PhDPercentage { get; set; }
     }
 }

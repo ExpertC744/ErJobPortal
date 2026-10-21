@@ -217,6 +217,21 @@
                                 </select>
                                 <span asp-validation-for="Profile.SSC_DIVISION" class="text-danger"></span>
                             </div>
+
+                           <div class="col-md-3 mb-3">
+    <label asp-for="Profile.dSSC" class="form-label">
+        SSC Percentage (%)
+    </label>
+    <input asp-for="Profile.dSSC"
+           type="number"
+           class="form-control"
+           min="0"
+           max="100"
+           step="0.01"
+           placeholder="Enter percentage" />
+    <span asp-validation-for="Profile.dSSC"
+          class="text-danger"></span>
+</div>
                         </div>
 
                         <hr />
@@ -239,6 +254,21 @@
                                 </select>
                                 <span asp-validation-for="Profile.HSC_DIPLOMA_DIVISION" class="text-danger"></span>
                             </div>
+
+                            <div class="col-md-3 mb-3">
+    <label asp-for="Profile.dHSC" class="form-label">
+        HSC / Diploma Percentage (%)
+    </label>
+    <input asp-for="Profile.dHSC"
+           type="number"
+           class="form-control"
+           min="0"
+           max="100"
+           step="0.01"
+           placeholder="Enter percentage" />
+    <span asp-validation-for="Profile.dHSC"
+          class="text-danger"></span>
+</div>
                         </div>
 
                         <hr />
@@ -276,6 +306,20 @@
                                 <input asp-for="Profile.Other_Stream" class="form-control" maxlength="100" />
                                 <span asp-validation-for="Profile.Other_Stream" class="text-danger"></span>
                             </div>
+                            <div class="col-md-3 mb-3">
+    <label asp-for="Profile.dGraduation" class="form-label">
+        Graduation Percentage (%)
+    </label>
+    <input asp-for="Profile.dGraduation"
+           type="number"
+           class="form-control"
+           min="0"
+           max="100"
+           step="0.01"
+           placeholder="Enter percentage" />
+    <span asp-validation-for="Profile.dGraduation"
+          class="text-danger"></span>
+</div>
                         </div>
 
                         <hr />
@@ -313,6 +357,21 @@
                                 <input asp-for="Profile.Other_Specialization" class="form-control" maxlength="150" />
                                 <span asp-validation-for="Profile.Other_Specialization" class="text-danger"></span>
                             </div>
+
+                            <div class="col-md-3 mb-3">
+    <label asp-for="Profile.dPG" class="form-label">
+        Post Graduation Percentage (%)
+    </label>
+    <input asp-for="Profile.dPG"
+           type="number"
+           class="form-control"
+           min="0"
+           max="100"
+           step="0.01"
+           placeholder="Enter percentage" />
+    <span asp-validation-for="Profile.dPG"
+          class="text-danger"></span>
+</div>
                         </div>
 
                         <hr />
@@ -347,6 +406,21 @@
                                 <input asp-for="Profile.Previous_PhD_Topic_Year" class="form-control" maxlength="200" />
                                 <span asp-validation-for="Profile.Previous_PhD_Topic_Year" class="text-danger"></span>
                             </div>
+
+                            <div class="col-md-3 mb-3">
+    <label asp-for="Profile.dPhD" class="form-label">
+        PhD Percentage (%)
+    </label>
+    <input asp-for="Profile.dPhD"
+           type="number"
+           class="form-control"
+           min="0"
+           max="100"
+           step="0.01"
+           placeholder="If applicable" />
+    <span asp-validation-for="Profile.dPhD"
+          class="text-danger"></span>
+</div>
                         </div>
 
                         <div class="text-end">

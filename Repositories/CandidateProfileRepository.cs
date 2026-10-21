@@ -63,6 +63,10 @@ namespace ErJobPortal.Repositories
         // GET PROFILE
         // =========================================================
 
+        // =========================================================
+        // GET PROFILE
+        // =========================================================
+
         public CandidateProfileModel? GetProfile(int candidateId)
         {
             CandidateProfileModel? profile = null;
@@ -70,119 +74,142 @@ namespace ErJobPortal.Repositories
             using SqlConnection con = _db.GetConnection();
 
             string query = @"
-        SELECT TOP (1)
-            CandidateID,
+SELECT TOP (1)
+    CandidateID,
 
-            CountryID,
-            StateID,
-            CityID,
-            Pincode,
+    CountryID,
+    StateID,
+    CityID,
+    Pincode,
 
-            Internship_FellowshipType,
-            Preferred_Country,
-            Preferred_State,
-            Preferred_City,
+    Internship_FellowshipType,
+    Preferred_Country,
+    Preferred_State,
+    Preferred_City,
 
-            SSC_YEAR,
-            SSC_DIVISION,
-            HSC_DIPLOMA_YEAR,
-            HSC_DIPLOMA_DIVISION,
+    -- SSC
+    SSC_YEAR,
+    SSC_DIVISION,
+    dSSC,
 
-            Graduation_Year,
-            Graduation_Stream,
-            Graduation_Division,
-            Other_Stream,
+    -- HSC / Diploma
+    HSC_DIPLOMA_YEAR,
+    HSC_DIPLOMA_DIVISION,
+    dHSC,
 
-            PG_Year,
-            PG_Stream,
-            PG_Division,
-            Other_Specialization,
+    -- Graduation
+    Graduation_Year,
+    Graduation_Stream,
+    Graduation_Division,
+    Other_Stream,
+    dGraduation,
 
-            PhD_Year,
-            PhD_Status,
-            PhD_Topic,
-            Previous_PhD_Topic_Year,
+    -- Post Graduation
+    PG_Year,
+    PG_Stream,
+    PG_Division,
+    Other_Specialization,
+    dPG,
 
-            sMedicalSkillIDs,
-            sMedicalSkillStarIDs,
-            sTechnicalSkillIDs,
-            sTechnicalSkillStarIDs,
-            sNonTechnicalSkillIDs,
-            sNonTechnicalSkillStarIDs,
+    -- PhD
+    PhD_Year,
+    PhD_Status,
+    PhD_Topic,
+    Previous_PhD_Topic_Year,
+    dPhD,
 
-            sLanguage1,
-            sLanguageStar1,
-            sLanguage2,
-            sLanguageStar2,
-            sLanguage3,
-            sLanguageStar3,
-            sLanguage4,
-            sLanguageStar4,
-            sLanguage5,
-            sLanguageStar5,
-            sLanguage6,
-            sLanguageStar6,
-            sLanguage7,
-            sLanguageStar7,
-            sLanguage8,
-            sLanguageStar8,
+    -- Skills
+    sMedicalSkillIDs,
+    sMedicalSkillStarIDs,
+    sTechnicalSkillIDs,
+    sTechnicalSkillStarIDs,
+    sNonTechnicalSkillIDs,
+    sNonTechnicalSkillStarIDs,
 
-            sRefName1,
-            sRefRelationName1,
-            sLocation1,
-            sMobile1,
+    -- Languages
+    sLanguage1,
+    sLanguageStar1,
+    sLanguage2,
+    sLanguageStar2,
+    sLanguage3,
+    sLanguageStar3,
+    sLanguage4,
+    sLanguageStar4,
+    sLanguage5,
+    sLanguageStar5,
+    sLanguage6,
+    sLanguageStar6,
+    sLanguage7,
+    sLanguageStar7,
+    sLanguage8,
+    sLanguageStar8,
 
-            sRefName2,
-            sRefRelationName2,
-            sLocation2,
-            sMobile2,
+    -- Reference 1
+    sRefName1,
+    sRefRelationName1,
+    sLocation1,
+    sMobile1,
 
-            GitHub,
-            Linkedin,
+    -- Reference 2
+    sRefName2,
+    sRefRelationName2,
+    sLocation2,
+    sMobile2,
 
-            sOrgName1,
-            sOrgIntTitle1,
-            sOrgIntDuration1,
-            sOrgIntStatus1,
+    -- Social Links
+    GitHub,
+    Linkedin,
 
-            sOrgName2,
-            sOrgIntTitle2,
-            sOrgIntDuration2,
-            sOrgIntStatus2,
+    -- Internship / Work Experience 1
+    sOrgName1,
+    sOrgIntTitle1,
+    sOrgIntDuration1,
+    sOrgIntStatus1,
 
-            sOrgName3,
-            sOrgIntTitle3,
-            sOrgIntDuration3,
-            sOrgIntStatus3,
+    -- Internship / Work Experience 2
+    sOrgName2,
+    sOrgIntTitle2,
+    sOrgIntDuration2,
+    sOrgIntStatus2,
 
-            sOrgName4,
-            sOrgIntTitle4,
-            sOrgIntDuration4,
-            sOrgIntStatus4,
+    -- Internship / Work Experience 3
+    sOrgName3,
+    sOrgIntTitle3,
+    sOrgIntDuration3,
+    sOrgIntStatus3,
 
-            sResume,
-            sPhoto,
-            sSignature,
-            sDivyang,
-            sHobbies,
+    -- Internship / Work Experience 4
+    sOrgName4,
+    sOrgIntTitle4,
+    sOrgIntDuration4,
+    sOrgIntStatus4,
 
-            Objective,
-            Resume_Profile,
+    -- Documents
+    sResume,
+    sPhoto,
+    sSignature,
+    sDivyang,
+    sHobbies,
 
-            Achievements_Certification1,
-            Achievements_Certification2,
-            Achievements_Certification3
+    -- Objective and Resume
+    Objective,
+    Resume_Profile,
 
-        FROM tblCandidateProfile
-        WHERE CandidateID = @CandidateID
-          AND (nBit = 1 OR nBit IS NULL);";
+    -- Achievements and Certifications
+    Achievements_Certification1,
+    Achievements_Certification2,
+    Achievements_Certification3
+
+FROM tblCandidateProfile
+
+WHERE CandidateID = @CandidateID
+  AND (nBit = 1 OR nBit IS NULL);";
 
             using SqlCommand cmd = new SqlCommand(query, con);
 
             cmd.Parameters.Add("@CandidateID", SqlDbType.Int)
                 .Value = candidateId;
 
-            // Keep normal timeout initially.
             cmd.CommandTimeout = 30;
 
             con.Open();
@@ -215,17 +242,35 @@ namespace ErJobPortal.Repositories
                 Preferred_City =
                     GetString(dr, "Preferred_City"),
 
+                // =====================================================
+                // SSC
+                // =====================================================
+
                 SSC_YEAR =
                     GetNullableInt(dr, "SSC_YEAR"),
 
                 SSC_DIVISION =
                     GetNullableInt(dr, "SSC_DIVISION"),
 
+                dSSC =
+                    GetNullableDecimal(dr, "dSSC"),
+
+                // =====================================================
+                // HSC / DIPLOMA
+                // =====================================================
+
                 HSC_DIPLOMA_YEAR =
                     GetNullableInt(dr, "HSC_DIPLOMA_YEAR"),
 
                 HSC_DIPLOMA_DIVISION =
                     GetNullableInt(dr, "HSC_DIPLOMA_DIVISION"),
+
+                dHSC =
+                    GetNullableDecimal(dr, "dHSC"),
+
+                // =====================================================
+                // GRADUATION
+                // =====================================================
 
                 Graduation_Year =
                     GetNullableInt(dr, "Graduation_Year"),
@@ -239,6 +284,13 @@ namespace ErJobPortal.Repositories
                 Other_Stream =
                     GetString(dr, "Other_Stream"),
 
+                dGraduation =
+                    GetNullableDecimal(dr, "dGraduation"),
+
+                // =====================================================
+                // POST GRADUATION
+                // =====================================================
+
                 PG_Year =
                     GetNullableInt(dr, "PG_Year"),
 
@@ -251,6 +303,13 @@ namespace ErJobPortal.Repositories
                 Other_Specialization =
                     GetString(dr, "Other_Specialization"),
 
+                dPG =
+                    GetNullableDecimal(dr, "dPG"),
+
+                // =====================================================
+                // PhD
+                // =====================================================
+
                 PhD_Year =
                     GetNullableInt(dr, "PhD_Year"),
 
@@ -262,6 +321,13 @@ namespace ErJobPortal.Repositories
 
                 Previous_PhD_Topic_Year =
                     GetString(dr, "Previous_PhD_Topic_Year"),
+
+                dPhD =
+                    GetNullableDecimal(dr, "dPhD"),
+
+                // =====================================================
+                // SKILLS
+                // =====================================================
 
                 sMedicalSkillIDs =
                     GetString(dr, "sMedicalSkillIDs"),
@@ -280,6 +346,10 @@ namespace ErJobPortal.Repositories
 
                 sNonTechnicalSkillStarIDs =
                     GetString(dr, "sNonTechnicalSkillStarIDs"),
+
+                // =====================================================
+                // LANGUAGES
+                // =====================================================
 
                 sLanguage1 = GetString(dr, "sLanguage1"),
                 sLanguageStar1 = GetNullableInt(dr, "sLanguageStar1"),
@@ -305,52 +375,100 @@ namespace ErJobPortal.Repositories
                 sLanguage8 = GetString(dr, "sLanguage8"),
                 sLanguageStar8 = GetNullableInt(dr, "sLanguageStar8"),
 
+                // =====================================================
+                // REFERENCE 1
+                // =====================================================
+
                 sRefName1 = GetString(dr, "sRefName1"),
+
                 sRefRelationName1 =
                     GetNullableInt(dr, "sRefRelationName1"),
+
                 sLocation1 = GetString(dr, "sLocation1"),
                 sMobile1 = GetString(dr, "sMobile1"),
 
+                // =====================================================
+                // REFERENCE 2
+                // =====================================================
+
                 sRefName2 = GetString(dr, "sRefName2"),
+
                 sRefRelationName2 =
                     GetNullableInt(dr, "sRefRelationName2"),
+
                 sLocation2 = GetString(dr, "sLocation2"),
                 sMobile2 = GetString(dr, "sMobile2"),
+
+                // =====================================================
+                // SOCIAL LINKS
+                // =====================================================
 
                 GitHub = GetString(dr, "GitHub"),
                 Linkedin = GetString(dr, "Linkedin"),
 
+                // =====================================================
+                // WORK EXPERIENCE 1
+                // =====================================================
+
                 sOrgName1 = GetString(dr, "sOrgName1"),
+
                 sOrgIntTitle1 =
                     GetNullableInt(dr, "sOrgIntTitle1"),
+
                 sOrgIntDuration1 =
                     GetNullableInt(dr, "sOrgIntDuration1"),
+
                 sOrgIntStatus1 =
                     GetNullableInt(dr, "sOrgIntStatus1"),
 
+                // =====================================================
+                // WORK EXPERIENCE 2
+                // =====================================================
+
                 sOrgName2 = GetString(dr, "sOrgName2"),
+
                 sOrgIntTitle2 =
                     GetNullableInt(dr, "sOrgIntTitle2"),
+
                 sOrgIntDuration2 =
                     GetNullableInt(dr, "sOrgIntDuration2"),
+
                 sOrgIntStatus2 =
                     GetNullableInt(dr, "sOrgIntStatus2"),
 
+                // =====================================================
+                // WORK EXPERIENCE 3
+                // =====================================================
+
                 sOrgName3 = GetString(dr, "sOrgName3"),
+
                 sOrgIntTitle3 =
                     GetNullableInt(dr, "sOrgIntTitle3"),
+
                 sOrgIntDuration3 =
                     GetNullableInt(dr, "sOrgIntDuration3"),
+
                 sOrgIntStatus3 =
                     GetNullableInt(dr, "sOrgIntStatus3"),
 
+                // =====================================================
+                // WORK EXPERIENCE 4
+                // =====================================================
+
                 sOrgName4 = GetString(dr, "sOrgName4"),
+
                 sOrgIntTitle4 =
                     GetNullableInt(dr, "sOrgIntTitle4"),
+
                 sOrgIntDuration4 =
                     GetNullableInt(dr, "sOrgIntDuration4"),
+
                 sOrgIntStatus4 =
                     GetNullableInt(dr, "sOrgIntStatus4"),
+
+                // =====================================================
+                // DOCUMENTS
+                // =====================================================
 
                 sResume = GetString(dr, "sResume"),
                 sPhoto = GetString(dr, "sPhoto"),
@@ -358,10 +476,18 @@ namespace ErJobPortal.Repositories
                 sDivyang = GetString(dr, "sDivyang"),
                 sHobbies = GetString(dr, "sHobbies"),
 
+                // =====================================================
+                // OBJECTIVE AND RESUME
+                // =====================================================
+
                 Objective = GetString(dr, "Objective"),
 
                 Resume_Profile =
                     GetNullableInt(dr, "Resume_Profile"),
+
+                // =====================================================
+                // ACHIEVEMENTS AND CERTIFICATIONS
+                // =====================================================
 
                 Achievements_Certification1 =
                     GetString(dr, "Achievements_Certification1"),
@@ -374,6 +500,21 @@ namespace ErJobPortal.Repositories
             };
 
             return profile;
+        }
+
+
+        private decimal? GetNullableDecimal(
+    SqlDataReader reader,
+    string column)
+        {
+            int index = reader.GetOrdinal(column);
+
+            if (reader.IsDBNull(index))
+            {
+                return null;
+            }
+
+            return Convert.ToDecimal(reader.GetValue(index));
         }
 
 
@@ -447,43 +588,69 @@ namespace ErJobPortal.Repositories
         // UPDATE EDUCATION
         // =========================================================
 
+        // =========================================================
+        // UPDATE EDUCATION
+        // =========================================================
+        // =========================================================
+        // ADD NULLABLE DECIMAL PARAMETER
+        // =========================================================
+
+        private void AddNullableDecimal(
+            SqlCommand cmd,
+            string parameterName,
+            decimal? value)
+        {
+            SqlParameter parameter = cmd.Parameters.Add(
+                parameterName,
+                SqlDbType.Decimal);
+
+            parameter.Precision = 5;
+            parameter.Scale = 2;
+
+            parameter.Value = (object?)value ?? DBNull.Value;
+        }
+
         public void UpdateEducation(CandidateProfileModel model)
         {
-            using SqlConnection con = _db.GetConnection();
+            if (model == null)
+                throw new ArgumentNullException(nameof(model));
 
+            using SqlConnection con = _db.GetConnection();
             con.Open();
 
             EnsureProfileExists(con, model.CandidateID);
 
             string sql = @"
+UPDATE tblCandidateProfile
+SET
+    SSC_YEAR = @SSC_YEAR,
+    SSC_DIVISION = @SSC_DIVISION,
+    dSSC = @dSSC,
 
-        UPDATE tblCandidateProfile
-        SET
+    HSC_DIPLOMA_YEAR = @HSC_DIPLOMA_YEAR,
+    HSC_DIPLOMA_DIVISION = @HSC_DIPLOMA_DIVISION,
+    dHSC = @dHSC,
 
-            SSC_YEAR = @SSC_YEAR,
-            SSC_DIVISION = @SSC_DIVISION,
+    Graduation_Year = @Graduation_Year,
+    Graduation_Division = @Graduation_Division,
+    Graduation_Stream = @Graduation_Stream,
+    Other_Stream = @Other_Stream,
+    dGraduation = @dGraduation,
 
-            HSC_DIPLOMA_YEAR = @HSC_DIPLOMA_YEAR,
-            HSC_DIPLOMA_DIVISION = @HSC_DIPLOMA_DIVISION,
+    PG_Year = @PG_Year,
+    PG_Division = @PG_Division,
+    PG_Stream = @PG_Stream,
+    Other_Specialization = @Other_Specialization,
+    dPG = @dPG,
 
-            Graduation_Year = @Graduation_Year,
-            Graduation_Division = @Graduation_Division,
-            Graduation_Stream = @Graduation_Stream,
-            Other_Stream = @Other_Stream,
+    PhD_Year = @PhD_Year,
+    PhD_Status = @PhD_Status,
+    PhD_Topic = @PhD_Topic,
+    Previous_PhD_Topic_Year = @Previous_PhD_Topic_Year,
+    dPhD = @dPhD,
 
-            PG_Year = @PG_Year,
-            PG_Division = @PG_Division,
-            PG_Stream = @PG_Stream,
-            Other_Specialization = @Other_Specialization,
-
-            PhD_Year = @PhD_Year,
-            PhD_Status = @PhD_Status,
-            PhD_Topic = @PhD_Topic,
-            Previous_PhD_Topic_Year = @Previous_PhD_Topic_Year,
-
-            ModDate = GETDATE()
-
-        WHERE CandidateID = @CandidateID";
+    ModDate = GETDATE()
+WHERE CandidateID = @CandidateID;";
 
             using SqlCommand cmd = new SqlCommand(sql, con);
 
@@ -496,11 +663,15 @@ namespace ErJobPortal.Repositories
             cmd.Parameters.Add("@SSC_DIVISION", SqlDbType.Int)
                 .Value = (object?)model.SSC_DIVISION ?? DBNull.Value;
 
+            AddNullableDecimal(cmd, "@dSSC", model.dSSC);
+
             cmd.Parameters.Add("@HSC_DIPLOMA_YEAR", SqlDbType.Int)
                 .Value = (object?)model.HSC_DIPLOMA_YEAR ?? DBNull.Value;
 
             cmd.Parameters.Add("@HSC_DIPLOMA_DIVISION", SqlDbType.Int)
                 .Value = (object?)model.HSC_DIPLOMA_DIVISION ?? DBNull.Value;
+
+            AddNullableDecimal(cmd, "@dHSC", model.dHSC);
 
             cmd.Parameters.Add("@Graduation_Year", SqlDbType.Int)
                 .Value = (object?)model.Graduation_Year ?? DBNull.Value;
@@ -511,8 +682,9 @@ namespace ErJobPortal.Repositories
             cmd.Parameters.Add("@Graduation_Stream", SqlDbType.Int)
                 .Value = (object?)model.Graduation_Stream ?? DBNull.Value;
 
-            cmd.Parameters.Add("@Other_Stream", SqlDbType.NVarChar, 100)
-                .Value = (object?)model.Other_Stream ?? DBNull.Value;
+            AddNullableString(cmd, "@Other_Stream", model.Other_Stream, 100);
+
+            AddNullableDecimal(cmd, "@dGraduation", model.dGraduation);
 
             cmd.Parameters.Add("@PG_Year", SqlDbType.Int)
                 .Value = (object?)model.PG_Year ?? DBNull.Value;
@@ -523,8 +695,10 @@ namespace ErJobPortal.Repositories
             cmd.Parameters.Add("@PG_Stream", SqlDbType.Int)
                 .Value = (object?)model.PG_Stream ?? DBNull.Value;
 
-            cmd.Parameters.Add("@Other_Specialization", SqlDbType.NVarChar, 100)
-                .Value = (object?)model.Other_Specialization ?? DBNull.Value;
+            AddNullableString(
+                cmd, "@Other_Specialization", model.Other_Specialization, 100);
+
+            AddNullableDecimal(cmd, "@dPG", model.dPG);
 
             cmd.Parameters.Add("@PhD_Year", SqlDbType.Int)
                 .Value = (object?)model.PhD_Year ?? DBNull.Value;
@@ -532,14 +706,23 @@ namespace ErJobPortal.Repositories
             cmd.Parameters.Add("@PhD_Status", SqlDbType.Int)
                 .Value = (object?)model.PhD_Status ?? DBNull.Value;
 
-            cmd.Parameters.Add("@PhD_Topic", SqlDbType.NVarChar, 300)
-                .Value = (object?)model.PhD_Topic ?? DBNull.Value;
+            AddNullableString(cmd, "@PhD_Topic", model.PhD_Topic, 300);
 
-            cmd.Parameters.Add("@Previous_PhD_Topic_Year", SqlDbType.NVarChar, 300)
-                .Value = (object?)model.Previous_PhD_Topic_Year ?? DBNull.Value;
+            AddNullableString(
+                cmd, "@Previous_PhD_Topic_Year",
+                model.Previous_PhD_Topic_Year, 300);
 
-            cmd.ExecuteNonQuery();
+            AddNullableDecimal(cmd, "@dPhD", model.dPhD);
+
+            int rowsAffected = cmd.ExecuteNonQuery();
+
+            if (rowsAffected == 0)
+            {
+                throw new InvalidOperationException(
+                    $"No profile was updated for CandidateID {model.CandidateID}.");
+            }
         }
+
 
 
         // =========================================================
