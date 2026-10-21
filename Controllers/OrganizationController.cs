@@ -6146,9 +6146,8 @@ WHERE nID = @nID
         public IActionResult Pipeline() => View();
         public IActionResult Offers() => View();
         public IActionResult Notifications() => View();
-        public IActionResult TpoAnalytics() => View();
-        public IActionResult Alumni() => View();
-        public IActionResult Community() => View();
+      
+     
         public IActionResult GradeNormalization() => View();
         public IActionResult Sourcing() => View();
         public IActionResult DriveTracking() => View();
