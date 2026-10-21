@@ -48,7 +48,7 @@
     color: #667085;
     text-align: center;
     text-decoration: none;
-    font-size: 13px; /* 11px + 2 */
+    font-size: 13px;
     font-weight: 600;
     border-radius: 6px;
     transition: 0.2s ease;
@@ -78,7 +78,7 @@
     border-radius: 11px;
     background: #e6f6f3;
     color: #0d9488;
-    font-size: 20px; /* 18px + 2 */
+    font-size: 20px;
 }
 
 
@@ -94,14 +94,14 @@
     .register-heading h2 {
         margin: 0;
         color: #172033;
-        font-size: 23px; /* 21px + 2 */
+        font-size: 23px;
         font-weight: 700;
     }
 
     .register-heading p {
         margin: 4px 0 0;
         color: #98a2b3;
-        font-size: 13px; /* 11px + 2 */
+        font-size: 13px;
     }
 
 
@@ -134,7 +134,7 @@
     display: block;
     margin-bottom: 4px;
     color: #344054;
-    font-size: 13px; /* 11px + 2 */
+    font-size: 13px;
     font-weight: 600;
 }
 
@@ -154,7 +154,7 @@
         top: 50%;
         transform: translateY(-50%);
         color: #98a2b3;
-        font-size: 13px; /* 11px + 2 */
+        font-size: 13px;
         pointer-events: none;
     }
 
@@ -167,12 +167,12 @@
 .register-select {
     width: 100%;
     height: 38px;
-    padding: 0 10px 0 10px;
+    padding: 0 10px;
     border: 1px solid #dfe6e5;
     border-radius: 7px;
     background: #fbfdfd;
     color: #344054;
-    font-size: 13px; /* 11px + 2 */
+    font-size: 13px;
     outline: none;
     transition: 0.2s ease;
 }
@@ -199,23 +199,52 @@ input[type="date"] {
 
 
 /* =========================================================
-   FILE
+   FILE UPLOADER
 ========================================================= */
 
-.register-file {
-    padding: 7px 8px 7px 9px;
+.register-input.register-file {
+    height: fit-content;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    line-height: 36px;
+    color: #667085;
+    font-size: 12.5px;
+    background: #fbfdfd;
+    border: 1px solid #dfe6e5;
+    border-radius: 7px;
     cursor: pointer;
+    overflow: hidden;
 }
 
-    .register-file::file-selector-button {
+    .register-input.register-file:hover {
+        border-color: #0d9488;
+    }
+
+    .register-input.register-file:focus {
+        background: #ffffff;
+        border-color: #0d9488;
+        box-shadow: 0 0 0 3px rgba(13, 148, 136, 0.07);
+    }
+
+    .register-input.register-file::file-selector-button,
+    .register-input.register-file::-webkit-file-upload-button {
+        height: 36px;
+        margin: 0 10px 0 0;
+        padding: 0 16px;
         border: 0;
-        padding: 4px 8px;
-        margin-right: 6px;
-        border-radius: 5px;
-        background: #e6f6f3;
-        color: #0d9488;
-        font-size: 12px; /* 10px + 2 */
+        border-radius: 0;
+        background: #0d9488;
+        color: #ffffff;
+        font-size: 12px;
+        font-weight: 600;
         cursor: pointer;
+        transition: 0.2s ease;
+    }
+
+    .register-input.register-file:hover::file-selector-button,
+    .register-input.register-file:hover::-webkit-file-upload-button {
+        background: #0f766e;
     }
 
 
@@ -235,7 +264,7 @@ input[type="date"] {
     display: block;
     margin-bottom: 7px;
     color: #344054;
-    font-size: 13px; /* 11px + 2 */
+    font-size: 13px;
     font-weight: 600;
 }
 
@@ -269,7 +298,7 @@ input[type="date"] {
     gap: 4px;
     margin: 0;
     color: #667085;
-    font-size: 12px; /* 10px + 2 */
+    font-size: 12px;
     white-space: nowrap;
     cursor: pointer;
 }
@@ -297,7 +326,7 @@ input[type="date"] {
     border-radius: 6px;
     background: #0d9488;
     color: #ffffff;
-    font-size: 12px; /* 10px + 2 */
+    font-size: 12px;
     font-weight: 600;
     cursor: pointer;
     white-space: nowrap;
@@ -305,7 +334,7 @@ input[type="date"] {
 }
 
     .send-otp-btn i {
-        font-size: 11px; /* 9px + 2 */
+        font-size: 11px;
     }
 
     .send-otp-btn:hover {
@@ -330,7 +359,7 @@ input[type="date"] {
     border-radius: 6px;
     background: #ffffff;
     color: #344054;
-    font-size: 12px; /* 10px + 2 */
+    font-size: 12px;
     outline: none;
 }
 
@@ -347,13 +376,13 @@ input[type="date"] {
 .register-validation {
     display: block;
     margin-top: 3px;
-    font-size: 11px; /* 9px + 2 */
+    font-size: 11px;
     line-height: 1.2;
 }
 
 .register-summary {
     margin-bottom: 8px;
-    font-size: 12px; /* 10px + 2 */
+    font-size: 12px;
 }
 
 
@@ -370,7 +399,7 @@ input[type="date"] {
     border-radius: 7px;
     background: #0d9488;
     color: #ffffff;
-    font-size: 13px; /* 11px + 2 */
+    font-size: 13px;
     font-weight: 600;
     cursor: pointer;
     box-shadow: 0 4px 10px rgba(13, 148, 136, 0.18);
@@ -393,7 +422,7 @@ input[type="date"] {
     border-top: 1px solid #edf1f0;
     text-align: center;
     color: #98a2b3;
-    font-size: 12px; /* 10px + 2 */
+    font-size: 12px;
 }
 
     .register-bottom-text a {
@@ -511,7 +540,6 @@ input[type="date"] {
     }
 
     .send-otp-btn {
-        width: 100%;
         margin-left: 0;
     }
 
