@@ -1,0 +1,334 @@
+﻿@model ErJobPortal.Models.OrgQuestionBank
+
+@{
+    ViewData["Title"] = "Upload Question Bank";
+    Layout = "~/Views/Shared/_DashboardLayout.cshtml";
+    ViewData["Panel"] = "Organization";
+}
+
+<link rel="stylesheet" href="~/css/UploadQuestionBank.css" asp-append-version="true" />
+
+<div class="qb-page">
+
+    <div class="qb-hero">
+        <div class="qb-eyebrow">Organization Panel</div>
+        <h2>Upload Question Bank</h2>
+        <p>Add a question paper and save it as a draft or publish it.</p>
+    </div>
+
+    <div class="qb-form-wrap">
+
+        <form asp-controller="Organization"
+              asp-action="UploadQuestionBank"
+              method="post"
+              enctype="multipart/form-data"
+              id="questionBankForm">
+
+            @Html.AntiForgeryToken()
+
+            @if (TempData["SuccessMessage"] != null)
+            {
+                <div class="qb-alert qb-success">
+                    @TempData["SuccessMessage"]
+                </div>
+            }
+
+            @if (TempData["ErrorMessage"] != null)
+            {
+                <div class="qb-alert qb-error">
+                    @TempData["ErrorMessage"]
+                </div>
+            }
+
+            <div asp-validation-summary="ModelOnly"
+                 class="qb-validation-summary"></div>
+
+            <!-- ============ Section 1: Basic details ============ -->
+            <div class="qb-section">
+                <div class="qb-section-head">
+                    <div class="qb-section-icon">1</div>
+                    <div>
+                        <h3>Basic Details</h3>
+                        <p class="qb-sub">Title, category and stream of the question bank.</p>
+                    </div>
+                </div>
+
+                <div class="qb-grid">
+
+                    <div class="qb-field">
+                        <label asp-for="Title">Question Bank Title *</label>
+                        <input asp-for="Title"
+                               placeholder="e.g. Java Programming Assessment" />
+                        <span asp-validation-for="Title"
+                              class="field-validation-error"></span>
+                    </div>
+
+                    <div class="qb-field">
+                        <label asp-for="Category">Category *</label>
+                        <select asp-for="Category">
+                            <option value="">-- Select Category --</option>
+                            <option value="1">Technical</option>
+                            <option value="2">Non-Technical</option>
+                            <option value="3">Aptitude</option>
+                            <option value="4">Reasoning</option>
+                            <option value="5">Programming</option>
+                            <option value="6">Communication</option>
+                            <option value="7">Other</option>
+                        </select>
+                        <span asp-validation-for="Category"
+                              class="field-validation-error"></span>
+                    </div>
+
+                    <div class="qb-field">
+                        <label asp-for="StreamDomain">Stream / Domain *</label>
+                        <select asp-for="StreamDomain">
+                            <option value="">-- Select Stream / Domain --</option>
+                            <option value="1">Computer Science / IT</option>
+                            <option value="2">Mechanical</option>
+                            <option value="3">Civil</option>
+                            <option value="4">Electrical</option>
+                            <option value="5">Electronics / E&amp;TC</option>
+                            <option value="6">Management</option>
+                            <option value="7">Commerce</option>
+                            <option value="8">Science</option>
+                            <option value="9">Arts</option>
+                            <option value="10">General</option>
+                            <option value="11">Other</option>
+                        </select>
+                        <span asp-validation-for="StreamDomain"
+                              class="field-validation-error"></span>
+                    </div>
+
+                    <div class="qb-field">
+                        <label asp-for="Course">Course</label>
+                        <input asp-for="Course"
+                               placeholder="e.g. B.E., B.Tech, MBA" />
+                        <span asp-validation-for="Course"
+                              class="field-validation-error"></span>
+                    </div>
+
+                </div>
+            </div>
+
+            <!-- ============ Section 2: Subject & content ============ -->
+            <div class="qb-section">
+                <div class="qb-section-head">
+                    <div class="qb-section-icon">2</div>
+                    <div>
+                        <h3>Subject &amp; Content</h3>
+                        <p class="qb-sub">What the question paper covers.</p>
+                    </div>
+                </div>
+
+                <div class="qb-grid">
+
+                    <div class="qb-field">
+                        <label asp-for="Subject">Subject *</label>
+                        <input asp-for="Subject"
+                               placeholder="e.g. Data Structures" />
+                        <span asp-validation-for="Subject"
+                              class="field-validation-error"></span>
+                    </div>
+
+                    <div class="qb-field">
+                        <label asp-for="Topics">Topics *</label>
+                        <input asp-for="Topics"
+                               placeholder="e.g. Arrays, Trees, Sorting" />
+                        <span asp-validation-for="Topics"
+                              class="field-validation-error"></span>
+                    </div>
+
+                    <div class="qb-field full">
+                        <label asp-for="Description">Description *</label>
+                        <textarea asp-for="Description"
+                                  rows="4"
+                                  placeholder="Describe the question paper, difficulty level and instructions."></textarea>
+                        <span asp-validation-for="Description"
+                              class="field-validation-error"></span>
+                    </div>
+
+                </div>
+            </div>
+
+            <!-- ============ Section 3: File upload ============ -->
+            <div class="qb-section">
+                <div class="qb-section-head">
+                    <div class="qb-section-icon">3</div>
+                    <div>
+                        <h3>Question Paper File</h3>
+                        <p class="qb-sub">Attach the document candidates will be assessed on.</p>
+                    </div>
+                </div>
+
+                <div class="qb-grid">
+
+                    <div class="qb-field full">
+                        <label asp-for="QuestionFile">Question Paper File *</label>
+                        <input asp-for="QuestionFile"
+                               type="file"
+                               accept=".pdf,.doc,.docx,.txt,.xls,.xlsx"
+                               id="questionFile" />
+
+                        <small class="qb-help">
+                            Allowed formats: PDF, DOC, DOCX, TXT, XLS and XLSX.
+                            Maximum file size: 10 MB.
+                        </small>
+
+                        <span asp-validation-for="QuestionFile"
+                              class="field-validation-error"></span>
+
+                        <div id="fileError"
+                             class="field-validation-error"
+                             role="alert"></div>
+                    </div>
+
+                </div>
+            </div>
+
+            <!-- ============ Action bar ============ -->
+            <div class="qb-actions">
+                <p class="qb-actions-note">Drafts stay private until you publish them.</p>
+
+                <div class="qb-btn-row">
+                    <button type="submit"
+                            name="publish"
+                            value="false"
+                            class="qb-btn qb-btn-secondary"
+                            id="qbDraftButton">
+                        Save Draft
+                    </button>
+
+                    <button type="submit"
+                            name="publish"
+                            value="true"
+                            class="qb-btn qb-btn-primary"
+                            id="qbPublishButton">
+                        Upload &amp; Publish
+                    </button>
+                </div>
+            </div>
+
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+
+    <script>
+        (function () {
+            const form = document.getElementById("questionBankForm");
+            const fileInput = document.getElementById("questionFile");
+            const fileError = document.getElementById("fileError");
+            const draftButton = document.getElementById("qbDraftButton");
+            const publishButton = document.getElementById("qbPublishButton");
+
+            const allowedExtensions = [
+                ".pdf", ".doc", ".docx", ".txt", ".xls", ".xlsx"
+            ];
+
+            const maxFileSize = 10 * 1024 * 1024;
+
+            let submissionStarted = false;
+
+            form.addEventListener("submit", function (event) {
+                if (submissionStarted) {
+                    event.preventDefault();
+                    return;
+                }
+
+                fileError.textContent = "";
+
+                const file = fileInput.files[0];
+
+                if (!file) {
+                    event.preventDefault();
+                    fileError.textContent =
+                        "Please select a question paper file.";
+                    fileInput.focus();
+                    return;
+                }
+
+                const dotIndex = file.name.lastIndexOf(".");
+                const extension = dotIndex >= 0
+                    ? file.name.substring(dotIndex).toLowerCase()
+                    : "";
+
+                if (!allowedExtensions.includes(extension)) {
+                    event.preventDefault();
+                    fileError.textContent =
+                        "Unsupported file type. Please select PDF, DOC, DOCX, TXT, XLS or XLSX.";
+                    fileInput.focus();
+                    return;
+                }
+
+                if (file.size > maxFileSize) {
+                    event.preventDefault();
+                    fileError.textContent =
+                        "The maximum permitted file size is 10 MB.";
+                    fileInput.focus();
+                    return;
+                }
+
+                const submitter = event.submitter;
+
+                if (submitter !== draftButton &&
+                    submitter !== publishButton) {
+                    event.preventDefault();
+                    fileError.textContent =
+                        "Please choose Save Draft or Upload & Publish.";
+                    return;
+                }
+
+                // IMPORTANT:
+                // Copy the clicked button's name/value into a hidden input
+                // BEFORE disabling the button. Disabled buttons are not
+                // submitted with the form.
+                const hiddenInput = document.createElement("input");
+                hiddenInput.type = "hidden";
+                hiddenInput.name = submitter.name;
+                hiddenInput.value = submitter.value;
+                form.appendChild(hiddenInput);
+
+                submissionStarted = true;
+
+                draftButton.disabled = true;
+                publishButton.disabled = true;
+
+                if (submitter === draftButton) {
+                    draftButton.textContent = "Saving Draft...";
+                } else {
+                    publishButton.textContent = "Publishing...";
+                }
+            });
+
+            fileInput.addEventListener("change", function () {
+                fileError.textContent = "";
+
+                const file = fileInput.files[0];
+
+                if (!file) {
+                    return;
+                }
+
+                const dotIndex = file.name.lastIndexOf(".");
+                const extension = dotIndex >= 0
+                    ? file.name.substring(dotIndex).toLowerCase()
+                    : "";
+
+                if (!allowedExtensions.includes(extension)) {
+                    fileError.textContent =
+                        "Unsupported file type.";
+                    fileInput.value = "";
+                    return;
+                }
+
+                if (file.size > maxFileSize) {
+                    fileError.textContent =
+                        "The maximum permitted file size is 10 MB.";
+                    fileInput.value = "";
+                }
+            });
+        })();
+    </script>
+}

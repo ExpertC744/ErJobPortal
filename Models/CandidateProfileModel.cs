@@ -549,6 +549,26 @@ namespace ErJobPortal.Models
 
         public string? sNonTechnicalSkillStarIDs { get; set; }
 
+        // SSC Percentage
+        [Range(typeof(decimal), "0", "100",
+    ErrorMessage = "SSC percentage must be between 0 and 100.")]
+        public decimal? dSSC { get; set; }
+
+        [Range(typeof(decimal), "0", "100",
+            ErrorMessage = "HSC percentage must be between 0 and 100.")]
+        public decimal? dHSC { get; set; }
+
+        [Range(typeof(decimal), "0", "100",
+            ErrorMessage = "Graduation percentage must be between 0 and 100.")]
+        public decimal? dGraduation { get; set; }
+
+        [Range(typeof(decimal), "0", "100",
+            ErrorMessage = "PG percentage must be between 0 and 100.")]
+        public decimal? dPG { get; set; }
+
+        [Range(typeof(decimal), "0", "100",
+            ErrorMessage = "PhD percentage must be between 0 and 100.")]
+        public decimal? dPhD { get; set; }
 
 
     }

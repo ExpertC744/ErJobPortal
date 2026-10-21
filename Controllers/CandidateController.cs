@@ -1,12 +1,14 @@
 ﻿using ErJobPortal.Models;
 using ErJobPortal.Repositories;
+using ErJobPortal.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Configuration;
-using System.Data;
-using System.Reflection;
 using System;
 using System.Collections.Generic;
+using System.Data;
+using System.Reflection;
+using Microsoft.Extensions.Logging;
 
 namespace ErJobPortal.Controllers
 {
@@ -15,12 +17,21 @@ namespace ErJobPortal.Controllers
         private readonly CandidateProfileRepository _repo;
         private readonly IConfiguration _configuration;
         private readonly AccountRepository _repository;
+        private readonly EmailService _emailService;
+        private readonly ILogger<CandidateController> _logger;
 
-        public CandidateController(IConfiguration configuration, AccountRepository repository, CandidateProfileRepository repo)
+        public CandidateController(
+            IConfiguration configuration,
+            AccountRepository repository,
+            CandidateProfileRepository repo,
+            EmailService emailService,
+            ILogger<CandidateController> logger)
         {
             _configuration = configuration;
             _repository = repository;
             _repo = repo;
+            _emailService = emailService;
+            _logger = logger;
         }
 
 
@@ -841,25 +852,91 @@ namespace ErJobPortal.Controllers
         // UPDATE EDUCATION
         // =====================================================
 
+        // =====================================================
+        // UPDATE EDUCATION
+        // =====================================================
+
+
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult UpdateEducation([Bind(Prefix = "Profile")] CandidateProfileModel model)
+        public IActionResult UpdateEducation(
+     [Bind(Prefix = "Profile")] CandidateProfileModel model)
         {
             int? candidateId = HttpContext.Session.GetInt32("CandidateID");
 
-            if (candidateId == null)
-            {
+            if (candidateId == null || candidateId <= 0)
                 return RedirectToAction("CandidateLogin", "Account");
-            }
 
             model.CandidateID = candidateId.Value;
 
+            // Remove validation errors for fields not submitted by the education form.
+            string[] educationFields =
+            {
+        "SSC_YEAR", "SSC_DIVISION", "dSSC",
+        "HSC_DIPLOMA_YEAR", "HSC_DIPLOMA_DIVISION", "dHSC",
+        "Graduation_Year", "Graduation_Division",
+        "Graduation_Stream", "Other_Stream", "dGraduation",
+        "PG_Year", "PG_Division", "PG_Stream",
+        "Other_Specialization", "dPG",
+        "PhD_Year", "PhD_Status", "PhD_Topic",
+        "Previous_PhD_Topic_Year", "dPhD"
+    };
+
+            var educationKeys = new HashSet<string>(
+                educationFields,
+                StringComparer.OrdinalIgnoreCase);
+
+            // Keep only ModelState entries for education properties.
+            // The Prefix="Profile" binding may use either prefixed or unprefixed keys.
+            foreach (var key in ModelState.Keys.ToList())
+            {
+                string propertyName = key.StartsWith(
+                    "Profile.", StringComparison.OrdinalIgnoreCase)
+                        ? key.Substring("Profile.".Length)
+                        : key;
+
+                if (!educationKeys.Contains(propertyName))
+                {
+                    ModelState.Remove(key);
+                }
+            }
+
+            // Validate percentage ranges.
+            ValidatePercentage(model.dSSC, "Profile.dSSC", "SSC");
+            ValidatePercentage(model.dHSC, "Profile.dHSC", "HSC / Diploma");
+            ValidatePercentage(model.dGraduation, "Profile.dGraduation", "Graduation");
+            ValidatePercentage(model.dPG, "Profile.dPG", "Post Graduation");
+            ValidatePercentage(model.dPhD, "Profile.dPhD", "PhD");
+
+            if (!ModelState.IsValid)
+            {
+                CandidateProfileViewModel viewModel = LoadProfileDropdowns(model);
+                ViewBag.CandidateCode = GetCandidateCode();
+                return View("Profile", viewModel);
+            }
+
+            // TEMPORARY DEBUGGING: verify values before saving.
+            System.Diagnostics.Debug.WriteLine(
+                $"CandidateID={model.CandidateID}, " +
+                $"SSC={model.dSSC}, HSC={model.dHSC}, " +
+                $"Graduation={model.dGraduation}, PG={model.dPG}, PhD={model.dPhD}");
+
             _repo.UpdateEducation(model);
 
-            TempData["Success"] = "Education updated successfully.";
-
+            TempData["Success"] = "Education details updated successfully.";
             return RedirectToAction("Profile");
         }
+
+        private void ValidatePercentage(decimal? value, string key, string label)
+        {
+            if (value.HasValue && (value.Value < 0 || value.Value > 100))
+            {
+                ModelState.AddModelError(
+                    key,
+                    $"{label} percentage must be between 0 and 100.");
+            }
+        }
+
 
         // =====================================================
         // UPDATE INTERNSHIP / FELLOWSHIP PREFERENCE
@@ -3890,86 +3967,132 @@ namespace ErJobPortal.Controllers
         //}
 
 
+ 
         #region "Apply for the Post"
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult ApplyToPost(int postId, int orgId)
+        public async Task<IActionResult> ApplyToPost(int postId, int orgId)
         {
-            // ==========================================
-            // CHECK CANDIDATE LOGIN
-            // ==========================================
-
-            int? candidateId =
-                HttpContext.Session.GetInt32("CandidateID");
+            // 1. Check candidate login
+            int? candidateId = HttpContext.Session.GetInt32("CandidateID");
 
             if (candidateId == null)
             {
-                return RedirectToAction(
-                    "CandidateLogin",
-                    "Account");
+                return RedirectToAction("CandidateLogin", "Account");
             }
 
-            // ==========================================
-            // GET CANDIDATE REGISTRATION DETAILS
-            // ==========================================
+            // 2. Get candidate registration details
+            var candidateRegistration =
+                _repository.GetCandidateRegistrationDetails(candidateId.Value);
 
+            if (candidateRegistration == null ||
+                candidateRegistration.Value.DOB == null ||
+                candidateRegistration.Value.RegDate == null)
+            {
+                return BadRequest("Candidate information is missing.");
+            }
+
+            // 3. Generate candidate code
+            string candidateCode = "CD" +
+            candidateRegistration.Value.DOB.Value.ToString("ddMMyy") +
+            candidateRegistration.Value.CandidateID.ToString("D2");
+
+            // 4. Get candidate contact details
             var candidate =
-                _repository.GetCandidateRegistrationDetails(
-                    candidateId.Value);
+                _repository.GetCandidateContactDetails(candidateId.Value);
 
             if (candidate == null ||
-                candidate.Value.DOB == null ||
-                candidate.Value.RegDate == null)
+                string.IsNullOrWhiteSpace(candidate.Value.Email))
             {
-                return BadRequest(
-                    "Candidate information is missing.");
+                TempData["ApplyMessage"] =
+                    "Candidate email address could not be found.";
+
+                TempData["ApplyMessageType"] = "danger";
+
+                return RedirectToAction(
+                    "Dashboard", "Candidate", new { id = candidateCode });
             }
 
-            // ==========================================
-            // CREATE CANDIDATE CODE
-            // ==========================================
+            // 5. Get organization contact details
+            var organization =
+                _repository.GetOrganizationContactDetails(orgId);
 
-            string candidateCode = "CD" +
-                candidate.Value.DOB.Value.ToString("ddMMyy") +
-                candidate.Value.RegDate.Value.ToString("MMdd") +
-                candidate.Value.CandidateID.ToString("D2");
+            if (organization == null)
+            {
+                TempData["ApplyMessage"] =
+                    "Organization details could not be found.";
 
-            // ==========================================
-            // APPLY
-            // ==========================================
+                TempData["ApplyMessageType"] = "danger";
 
-            int result =
-                _repo.ApplyForPost(
-                    orgId,
-                    candidateId.Value,
-                    postId);
+                return RedirectToAction(
+                    "Dashboard", "Candidate", new { id = candidateCode });
+            }
 
-            // ==========================================
-            // SUCCESS
-            // ==========================================
+            // 6. Save the application using your existing method
+            int result = _repo.ApplyForPost(
+                orgId,
+                candidateId.Value,
+                postId);
+
+            // 7. Send emails only for a newly successful application
 
             if (result == 1)
             {
                 TempData["ApplyMessage"] =
                     "Application submitted successfully.";
 
-                TempData["ApplyMessageType"] =
-                    "success";
+                TempData["ApplyMessageType"] = "success";
+
+                try
+                {
+                    await _emailService.SendCandidateApplicationConfirmationAsync(
+                        candidate.Value.Email,
+                        candidate.Value.CandidateName,
+                        organization.Value.OrganizationName,
+                        "Internship");
+
+                    System.Diagnostics.Debug.WriteLine(
+                        "Candidate confirmation email sent successfully.");
+                }
+                catch (Exception ex)
+                {
+                    System.Diagnostics.Debug.WriteLine(
+                        "Candidate email failed: " + ex.ToString());
+
+                    TempData["CandidateEmailError"] = ex.Message;
+                }
+
+                try
+                {
+                    await _emailService.SendOrganizationApplicationNotificationAsync(
+                        organization.Value.Email,
+                        organization.Value.OrganizationName,
+                        candidate.Value.CandidateName,
+                        candidate.Value.Email,
+                        "Internship");
+
+                    System.Diagnostics.Debug.WriteLine(
+                        "Organization notification email sent successfully.");
+                }
+                catch (Exception ex)
+                {
+                    System.Diagnostics.Debug.WriteLine(
+                        "Organization email failed: " + ex.ToString());
+
+                    TempData["OrganizationEmailError"] = ex.Message;
+                }
             }
             else
             {
                 TempData["ApplyMessage"] =
                     "You have already applied for this post.";
 
-                TempData["ApplyMessageType"] =
-                    "info";
+                TempData["ApplyMessageType"] = "info";
             }
 
-            // ==========================================
-            // REDIRECT SAME DASHBOARD PAGE
-            // ==========================================
 
+            // 8. Preserve your existing dashboard redirect
             return RedirectToAction(
                 "Dashboard",
                 "Candidate",
@@ -3977,6 +4100,7 @@ namespace ErJobPortal.Controllers
         }
 
         #endregion
+
 
         #region "TR Apply to Post List Called"
 
@@ -6006,6 +6130,122 @@ ORDER BY
 
             return View("~/Views/Organization/ViewOrgProfile.cshtml", model);
         }
+
+
+        [HttpGet]
+        public IActionResult CandidateViewQuestionBank()
+        {
+            return View();
+        }
+
+
+
+       [HttpGet]
+public async Task<IActionResult> ActivityLog()
+{
+    int candidateId =
+        HttpContext.Session.GetInt32("CandidateID") ?? 0;
+
+    if (candidateId <= 0)
+    {
+        return RedirectToAction("CandidateLogin", "Account");
+    }
+
+    var activities = new List<CandidateActivityLogViewModel>();
+
+    string connectionString =
+        _configuration.GetConnectionString("DefaultConnection")
+        ?? throw new InvalidOperationException(
+            "DefaultConnection is missing.");
+
+    const string sql = @"
+        SELECT TOP (500)
+            VisitID,
+            IPAddress,
+            ISP,
+            Country,
+            Region,
+            City,
+            TimeZone,
+            BrowserName,
+            BrowserVersion,
+            OperatingSystem,
+            DeviceType,
+            RequestPath,
+            PageName,
+            ReferrerUrl,
+            VisitDateTime,
+            IsLoggedIn
+        FROM dbo.tblLoginPageVisits
+        WHERE UserID = @CandidateID
+          AND PanelType = @PanelType
+        ORDER BY VisitDateTime DESC;";
+
+    await using var connection =
+        new SqlConnection(connectionString);
+
+    await using var command =
+        new SqlCommand(sql, connection);
+
+    command.Parameters.Add("@CandidateID", SqlDbType.Int)
+        .Value = candidateId;
+
+    command.Parameters.Add("@PanelType", SqlDbType.NVarChar, 30)
+        .Value = "Candidate";
+
+    await connection.OpenAsync();
+
+    await using var reader =
+        await command.ExecuteReaderAsync();
+
+    while (await reader.ReadAsync())
+    {
+        activities.Add(new CandidateActivityLogViewModel
+        {
+            VisitID = Convert.ToInt64(reader["VisitID"]),
+
+            IPAddress = GetNullableString(reader, "IPAddress"),
+            ISP = GetNullableString(reader, "ISP"),
+            Country = GetNullableString(reader, "Country"),
+            Region = GetNullableString(reader, "Region"),
+            City = GetNullableString(reader, "City"),
+            TimeZone = GetNullableString(reader, "TimeZone"),
+
+            BrowserName = GetNullableString(reader, "BrowserName"),
+            BrowserVersion = GetNullableString(reader, "BrowserVersion"),
+            OperatingSystem = GetNullableString(reader, "OperatingSystem"),
+            DeviceType = GetNullableString(reader, "DeviceType"),
+
+            RequestPath = GetNullableString(reader, "RequestPath"),
+            PageName = GetNullableString(reader, "PageName"),
+            ReferrerUrl = GetNullableString(reader, "ReferrerUrl"),
+
+            VisitDateTime = Convert.ToDateTime(
+                reader["VisitDateTime"]),
+
+            IsLoggedIn = !reader.IsDBNull(
+                reader.GetOrdinal("IsLoggedIn"))
+                && Convert.ToBoolean(reader["IsLoggedIn"])
+        });
+    }
+
+    return View(activities);
+}
+
+        private static string? GetNullableString(
+            SqlDataReader reader,
+            string columnName)
+        {
+            int ordinal = reader.GetOrdinal(columnName);
+
+            return reader.IsDBNull(ordinal)
+                ? null
+                : reader.GetString(ordinal);
+        }
+
+        public IActionResult Pipeline() => View();
+        public IActionResult Community() => View();
+        public IActionResult SharedData() => View();
     }
 }
 

@@ -615,68 +615,100 @@ namespace ErJobPortal.Repositories
         }
 
 
+        // shrirang 15/10/26
 
         public List<TPOSchedulerReminderM> GetDueGeneralActivityReminders()
         {
             var reminders = new List<TPOSchedulerReminderM>();
 
             const string query = @"
-        SELECT
-            a.ActivityID,
-            a.TPOID,
-            a.Title,
-            a.Description,
-            a.Location,
-            a.StartDate,
-            a.StartTime,
-            a.Reminder,
-            a.ReminderChannel,
-            t.FullName AS TPOName,
-            t.CollegeMailID AS TPOEmail,
+    SELECT
+        a.ActivityID,
+        a.TPOID,
+        a.Title,
+        a.Description,
+        a.Location,
+        a.StartDate,
+        a.StartTime,
+        a.Reminder,
+        a.ReminderChannel,
+        t.FullName AS TPOName,
+        t.CollegeMailID AS TPOEmail,
 
+        dates.ActivityStart,
+
+        DATEADD(MINUTE, -r.ReminderMinutes,
+            dates.ActivityStart) AS ReminderDueAt
+
+    FROM dbo.tblTPOSchedulerActivity a
+    INNER JOIN dbo.tblTPORegistration t
+        ON t.TPOID = a.TPOID
+
+    CROSS APPLY
+    (
+        SELECT
             DATEADD(SECOND,
                 DATEDIFF(SECOND, CAST('00:00:00' AS TIME), a.StartTime),
                 CAST(a.StartDate AS DATETIME2)
-            ) AS ActivityStart,
+            ) AS ActivityStart
+    ) dates
 
-            DATEADD(MINUTE,
-                -TRY_CONVERT(INT, a.Reminder),
-                DATEADD(SECOND,
-                    DATEDIFF(SECOND, CAST('00:00:00' AS TIME), a.StartTime),
-                    CAST(a.StartDate AS DATETIME2)
-                )
-            ) AS ReminderDueAt
+    CROSS APPLY
+    (
+        SELECT CASE
+            WHEN LTRIM(RTRIM(a.Reminder)) IN ('15', '15min', '15 minutes') THEN 15
+            WHEN LTRIM(RTRIM(a.Reminder)) IN ('30', '30min', '30 minutes') THEN 30
+            WHEN LTRIM(RTRIM(a.Reminder)) IN ('60', '1hr', '1 hour', '1 hour before') THEN 60
+            WHEN LTRIM(RTRIM(a.Reminder)) IN ('1440', '1day', '1 day', '1 day before') THEN 1440
+            WHEN LTRIM(RTRIM(a.Reminder)) IN ('10080', '1week', '1 week', '1 week before') THEN 10080
+            ELSE TRY_CONVERT(INT, a.Reminder)
+        END AS ReminderMinutes
+    ) r
 
-        FROM dbo.tblTPOSchedulerActivity a
-        INNER JOIN dbo.tblTPORegistration t
-            ON t.TPOID = a.TPOID
+    WHERE
+        a.IsActive = 1
+        AND ISNULL(a.IsCancelled, 0) = 0
+        AND ISNULL(a.Status, '') <> 'Cancelled'
+        AND r.ReminderMinutes IN (15, 30, 60, 1440, 10080)
 
-        WHERE
-            a.IsActive = 1
-            AND ISNULL(a.IsCancelled, 0) = 0
-            AND ISNULL(a.Status, '') <> 'Cancelled'
-            AND TRY_CONVERT(INT, a.Reminder) IN (15, 30, 60, 1440, 10080)
-            AND UPPER(ISNULL(a.ReminderChannel, '')) IN
-                ('INAPP', 'EMAIL', 'BOTH')
-            AND a.StartDate IS NOT NULL
-            AND a.StartTime IS NOT NULL
+        AND UPPER(REPLACE(REPLACE(
+            LTRIM(RTRIM(ISNULL(a.ReminderChannel, ''))),
+            '-', ''), ' ', ''))
+            IN ('INAPP', 'EMAIL', 'BOTH')
 
-            -- Activity must still be in the future.
-            AND DATEADD(SECOND,
-                DATEDIFF(SECOND, CAST('00:00:00' AS TIME), a.StartTime),
-                CAST(a.StartDate AS DATETIME2)
-            ) > SYSDATETIME()
+        AND dates.ActivityStart > SYSDATETIME()
 
-            -- Reminder is due now or overdue, but activity is upcoming.
-            AND DATEADD(MINUTE,
-                -TRY_CONVERT(INT, a.Reminder),
-                DATEADD(SECOND,
-                    DATEDIFF(SECOND, CAST('00:00:00' AS TIME), a.StartTime),
-                    CAST(a.StartDate AS DATETIME2)
-                )
-            ) <= SYSDATETIME()
+        AND DATEADD(MINUTE, -r.ReminderMinutes,
+            dates.ActivityStart) <= SYSDATETIME()
 
-        ORDER BY ReminderDueAt, a.ActivityID;";
+        AND NOT EXISTS
+        (
+            SELECT 1
+            FROM dbo.tblTPOSchedulerReminderLog log
+            WHERE log.ActivityID = a.ActivityID
+              AND log.ReminderDueAt =
+                  DATEADD(MINUTE, -r.ReminderMinutes, dates.ActivityStart)
+              AND log.Channel IN ('InApp', 'Email')
+              AND log.DeliveryStatus IN ('Sent', 'Processing')
+              AND
+              (
+                  (UPPER(REPLACE(REPLACE(
+                      LTRIM(RTRIM(ISNULL(a.ReminderChannel, ''))),
+                      '-', ''), ' ', '')) = 'EMAIL'
+                      AND log.Channel = 'Email')
+                  OR
+                  (UPPER(REPLACE(REPLACE(
+                      LTRIM(RTRIM(ISNULL(a.ReminderChannel, ''))),
+                      '-', ''), ' ', '')) = 'INAPP'
+                      AND log.Channel = 'InApp')
+                  OR
+                  (UPPER(REPLACE(REPLACE(
+                      LTRIM(RTRIM(ISNULL(a.ReminderChannel, ''))),
+                      '-', ''), ' ', '')) = 'BOTH')
+              )
+        )
+
+    ORDER BY ReminderDueAt, a.ActivityID;";
 
             using (SqlConnection cn = _db.GetConnection())
             using (SqlCommand cmd = new SqlCommand(query, cn))
@@ -717,6 +749,7 @@ namespace ErJobPortal.Repositories
 
             return reminders;
         }
+
 
     }
 

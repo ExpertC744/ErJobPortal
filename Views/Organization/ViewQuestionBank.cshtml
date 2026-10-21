@@ -1,0 +1,247 @@
+﻿@model List<ErJobPortal.Models.OrgQuestionBank>
+
+@{
+    Layout = "~/Views/Shared/_DashboardLayout.cshtml";
+    ViewData["Title"] = "View Question Bank";
+    ViewData["Panel"] = "Organization";
+
+    string searchText = ViewBag.SearchText as string ?? "";
+    string selectedCategory = ViewBag.SelectedCategory as string ?? "";
+    string selectedStreamDomain = ViewBag.SelectedStreamDomain as string ?? "";
+    string selectedStatus = ViewBag.SelectedStatus as string ?? "All";
+}
+
+<link rel="stylesheet" href="~/css/ViewQuestionBank.css" asp-append-version="true" />
+
+<div class="qbl-page">
+
+    <div class="qbl-hero">
+        <div>
+            <div class="qbl-eyebrow">Organization Panel</div>
+            <h2><i class="fas fa-file-alt"></i> View Question Bank</h2>
+            <p>Manage your uploaded question papers and publication status.</p>
+        </div>
+
+        <a asp-controller="Organization"
+           asp-action="UploadQuestionBank"
+           class="qbl-add-btn">
+            <i class="fas fa-plus"></i> Upload Question Bank
+        </a>
+    </div>
+
+    <div class="qbl-body">
+
+        <div class="qbl-stats">
+            <div class="qbl-stat qbl-stat-navy">
+                <div class="qbl-stat-icon"><i class="fas fa-layer-group"></i></div>
+                <div>
+                    <span>Total Question Banks</span>
+                    <h3>@ViewBag.TotalCount</h3>
+                </div>
+            </div>
+
+            <div class="qbl-stat">
+                <div class="qbl-stat-icon"><i class="fas fa-check-circle"></i></div>
+                <div>
+                    <span>Published</span>
+                    <h3>@ViewBag.PublishedCount</h3>
+                </div>
+            </div>
+
+            <div class="qbl-stat qbl-stat-amber">
+                <div class="qbl-stat-icon"><i class="fas fa-pencil-alt"></i></div>
+                <div>
+                    <span>Drafts</span>
+                    <h3>@ViewBag.DraftCount</h3>
+                </div>
+            </div>
+        </div>
+
+        <div class="qbl-filter-card">
+            <div class="qbl-filter-title">
+                <i class="fas fa-filter"></i> Search &amp; Filter
+            </div>
+
+            <form asp-controller="Organization"
+                  asp-action="ViewQuestionBank"
+                  method="get">
+
+                <div class="qbl-filters">
+
+                    <div class="qbl-field qbl-search-field">
+                        <label for="searchText">Search</label>
+                        <input type="text"
+                               id="searchText"
+                               name="searchText"
+                               value="@searchText"
+                               placeholder="Search title, subject or topics..." />
+                    </div>
+
+                    <div class="qbl-field">
+                        <label for="category">Category</label>
+                        <select id="category" name="category">
+                            <option value="">All Categories</option>
+                            <option value="1" selected="@(selectedCategory == "1")">Interview Preparation</option>
+                            <option value="2" selected="@(selectedCategory == "2")">Competitive Exams</option>
+                            <option value="3" selected="@(selectedCategory == "3")">Academic Questions</option>
+                            <option value="4" selected="@(selectedCategory == "4")">Aptitude &amp; Reasoning</option>
+                            <option value="5" selected="@(selectedCategory == "5")">Technical Skills</option>
+                            <option value="6" selected="@(selectedCategory == "6")">Placement Preparation</option>
+                            <option value="7" selected="@(selectedCategory == "7")">Other</option>
+                        </select>
+                    </div>
+
+                    <div class="qbl-field">
+                        <label for="streamDomain">Stream / Domain</label>
+                        <select id="streamDomain" name="streamDomain">
+                            <option value="">All Streams</option>
+                            <option value="1" selected="@(selectedStreamDomain == "1")">Engineering</option>
+                            <option value="2" selected="@(selectedStreamDomain == "2")">IT &amp; Computer Science</option>
+                            <option value="3" selected="@(selectedStreamDomain == "3")">Commerce &amp; Finance</option>
+                            <option value="4" selected="@(selectedStreamDomain == "4")">Management</option>
+                            <option value="5" selected="@(selectedStreamDomain == "5")">Science</option>
+                            <option value="6" selected="@(selectedStreamDomain == "6")">Medical &amp; Healthcare</option>
+                            <option value="7" selected="@(selectedStreamDomain == "7")">Arts &amp; Humanities</option>
+                            <option value="8" selected="@(selectedStreamDomain == "8")">Law</option>
+                            <option value="9" selected="@(selectedStreamDomain == "9")">Polytechnic / ITI</option>
+                            <option value="10" selected="@(selectedStreamDomain == "10")">Hospitality</option>
+                            <option value="11" selected="@(selectedStreamDomain == "11")">Other</option>
+                        </select>
+                    </div>
+
+                    <div class="qbl-field">
+                        <label for="status">Status</label>
+                        <select id="status" name="status">
+                            <option value="All" selected="@(selectedStatus == "All")">All Statuses</option>
+                            <option value="Published" selected="@(selectedStatus == "Published")">Published</option>
+                            <option value="Draft" selected="@(selectedStatus == "Draft")">Draft</option>
+                        </select>
+                    </div>
+
+                    <div>
+                        <button type="submit" class="qbl-filter-btn">
+                            <i class="fas fa-search"></i> Search
+                        </button>
+                    </div>
+
+                </div>
+
+                <a asp-controller="Organization"
+                   asp-action="ViewQuestionBank"
+                   class="qbl-reset-btn">
+                    <i class="fas fa-undo"></i> Clear Filters
+                </a>
+            </form>
+        </div>
+
+        <div class="qbl-list-header">
+            <h3>My Question Banks</h3>
+            <span class="qbl-count">@Model.Count record(s)</span>
+        </div>
+
+        <div class="qbl-table-wrap">
+            <table class="qbl-table">
+                <thead>
+                    <tr>
+                        <th>Question Bank</th>
+                        <th>Category</th>
+                        <th>Stream / Domain</th>
+                        <th>File</th>
+                        <th>Created Date</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    @if (Model != null && Model.Any())
+                    {
+                        foreach (var item in Model)
+                        {
+                            <tr>
+                                <td>
+                                    <div class="qbl-title">@item.Title</div>
+                                    <div class="qbl-subtitle">
+                                        Subject: @item.Subject
+                                    </div>
+                                    <div class="qbl-subtitle">
+                                        Topics: @item.Topics
+                                    </div>
+                                </td>
+
+                                <td>@item.Category</td>
+                                <td>@item.StreamDomain</td>
+
+                                <td>
+                                    <div>@item.OriginalFileName</div>
+                                    <div class="qbl-subtitle">
+                                        @item.FileExtension.ToUpperInvariant()
+                                        · @(item.FileSizeBytes / 1024) KB
+                                    </div>
+                                </td>
+
+                                <td>
+                                    @item.CreatedDate.ToString("dd MMM yyyy")
+                                </td>
+
+                                <td>
+                                    @if (item.IsPublished)
+                                    {
+                                        <span class="qbl-badge qbl-published">Published</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="qbl-badge qbl-draft">Draft</span>
+                                    }
+                                </td>
+
+                                <td>
+                                    <div class="qbl-actions">
+
+                                        <a asp-controller="Organization"
+                                           asp-action="ViewQuestionFile"
+                                           asp-route-id="@item.QuestionBankID"
+                                           class="qbl-action"
+                                           title="View question paper"
+                                           aria-label="View question paper">
+                                            <i class="fas fa-eye"></i>
+                                        </a>
+
+                                        <a asp-controller="Organization"
+                                           asp-action="DownloadQuestionFile"
+                                           asp-route-id="@item.QuestionBankID"
+                                           class="qbl-action"
+                                           title="Download question paper"
+                                           aria-label="Download question paper">
+                                            <i class="fas fa-download"></i>
+                                        </a>
+
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    }
+                    else
+                    {
+                        <tr>
+                            <td colspan="7">
+                                <div class="qbl-empty">
+                                    <i class="fas fa-folder-open"></i>
+                                    <h4>No question banks found</h4>
+                                    <p>Upload a question paper or change your search filters.</p>
+
+                                    <a asp-controller="Organization"
+                                       asp-action="UploadQuestionBank"
+                                       class="qbl-add-btn">
+                                        Upload Question Bank
+                                    </a>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+
+    </div>
+</div>
