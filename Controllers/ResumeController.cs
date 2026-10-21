@@ -25,6 +25,18 @@ namespace ErJobPortal.Controllers
 
             var profile = _repository.GetProfile(id);
 
+           
+
+            if (profile == null)
+            {
+                return null;
+            }
+
+            System.Diagnostics.Debug.WriteLine(
+                $"Candidate ID: {id}, " +
+                $"SSC: {profile.dSSC?.ToString() ?? "NULL"}, " +
+                $"HSC: {profile.dHSC?.ToString() ?? "NULL"}");
+
             if (profile == null)
             {
                 return null;
@@ -135,6 +147,9 @@ int? orgID)
             }
 
             var profile = _repository.GetProfile(id);
+
+
+
 
             if (profile == null)
             {

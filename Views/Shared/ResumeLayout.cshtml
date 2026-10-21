@@ -2285,60 +2285,72 @@
                     }
 
 <!-- =========================================================
-     EDUCATION  (order: PhD > PG > Graduation > HSC > SSC)
-========================================================= -->
+     EDUCATION
+     Order: PhD > PG > Graduation > HSC / Diploma > SSC
+     ========================================================= -->
 
 @{
     // SSC
     var sscYear = p.SSC_YEAR;
     var sscDivision = p.SSC_DIVISION;
+    var sscPercentage = p.dSSC;
 
-    // HSC / DIPLOMA
+    // HSC / Diploma
     var hscDiplomaYear = p.HSC_DIPLOMA_YEAR;
     var hscDiplomaDivision = p.HSC_DIPLOMA_DIVISION;
+    var hscPercentage = p.dHSC;
 
-    // GRADUATION
+    // Graduation
     var graduationYear = p.Graduation_Year;
     var graduationDivision = p.Graduation_Division;
     var graduationStream = p.Graduation_Stream;
     var otherGraduationStream = p.Other_Stream;
+    var graduationPercentage = p.dGraduation;
 
-    // POST GRADUATION
+    // Post Graduation
     var pgYear = p.PG_Year;
     var pgDivision = p.PG_Division;
     var pgStream = p.PG_Stream;
     var otherPGSpecialization = p.Other_Specialization;
+    var pgPercentage = p.dPG;
 
     // PhD
     var phdYear = p.PhD_Year;
     var phdStatus = p.PhD_Status;
     var phdTopic = p.PhD_Topic;
     var previousPhdTopicYear = p.Previous_PhD_Topic_Year;
+    var phdPercentage = p.dPhD;
+
+    // Check whether any education information exists.
+    bool hasEducation =
+        sscYear.HasValue ||
+        sscDivision.HasValue ||
+        sscPercentage.HasValue ||
+        hscDiplomaYear.HasValue ||
+        hscDiplomaDivision.HasValue ||
+        hscPercentage.HasValue ||
+        graduationYear.HasValue ||
+        graduationDivision.HasValue ||
+        graduationStream.HasValue ||
+        !string.IsNullOrWhiteSpace(otherGraduationStream) ||
+        graduationPercentage.HasValue ||
+        pgYear.HasValue ||
+        pgDivision.HasValue ||
+        pgStream.HasValue ||
+        !string.IsNullOrWhiteSpace(otherPGSpecialization) ||
+        pgPercentage.HasValue ||
+        phdYear.HasValue ||
+        phdStatus.HasValue ||
+        !string.IsNullOrWhiteSpace(phdTopic) ||
+        !string.IsNullOrWhiteSpace(previousPhdTopicYear) ||
+        phdPercentage.HasValue;
 }
 
-@if (
-    sscYear.HasValue ||
-    sscDivision.HasValue ||
-    hscDiplomaYear.HasValue ||
-    hscDiplomaDivision.HasValue ||
-    graduationYear.HasValue ||
-    graduationDivision.HasValue ||
-    graduationStream.HasValue ||
-    !string.IsNullOrWhiteSpace(otherGraduationStream) ||
-    pgYear.HasValue ||
-    pgDivision.HasValue ||
-    pgStream.HasValue ||
-    !string.IsNullOrWhiteSpace(otherPGSpecialization) ||
-    phdYear.HasValue ||
-    phdStatus.HasValue ||
-    !string.IsNullOrWhiteSpace(phdTopic) ||
-    !string.IsNullOrWhiteSpace(previousPhdTopicYear)
-)
+@if (hasEducation)
 {
-    <div class="resume-section education-section">
+    <section class="resume-section education-section">
 
         <div class="section-heading">
-
             <div class="section-icon">
                 <i class="fa fa-graduation-cap"></i>
             </div>
@@ -2348,25 +2360,23 @@
             </div>
 
             <div class="section-title-line"></div>
-
         </div>
 
         <!-- =====================================================
              PhD
-        ====================================================== -->
+             ===================================================== -->
 
         @if (
             phdYear.HasValue ||
             phdStatus.HasValue ||
             !string.IsNullOrWhiteSpace(phdTopic) ||
-            !string.IsNullOrWhiteSpace(previousPhdTopicYear)
+            !string.IsNullOrWhiteSpace(previousPhdTopicYear) ||
+            phdPercentage.HasValue
         )
         {
             <div class="education-item">
 
-                <div class="education-title">
-                    PhD
-                </div>
+                <div class="education-title">PhD</div>
 
                 @if (phdYear.HasValue)
                 {
@@ -2405,26 +2415,32 @@
                     </div>
                 }
 
+                @if (phdPercentage.HasValue)
+                {
+                    <div class="education-row">
+                        <strong>Percentage:</strong>
+                        <span>@phdPercentage.Value.ToString("0.##")%</span>
+                    </div>
+                }
+
             </div>
         }
 
-
         <!-- =====================================================
              POST GRADUATION
-        ====================================================== -->
+             ===================================================== -->
 
         @if (
             pgYear.HasValue ||
             pgDivision.HasValue ||
             pgStream.HasValue ||
-            !string.IsNullOrWhiteSpace(otherPGSpecialization)
+            !string.IsNullOrWhiteSpace(otherPGSpecialization) ||
+            pgPercentage.HasValue
         )
         {
             <div class="education-item">
 
-                <div class="education-title">
-                    Post Graduation
-                </div>
+                <div class="education-title">Post Graduation</div>
 
                 @if (pgYear.HasValue)
                 {
@@ -2462,29 +2478,32 @@
                     </div>
                 }
 
+                @if (pgPercentage.HasValue)
+                {
+                    <div class="education-row">
+                        <strong>Percentage:</strong>
+                        <span>@pgPercentage.Value.ToString("0.##")%</span>
+                    </div>
+                }
+
             </div>
         }
 
         <!-- =====================================================
              GRADUATION
-        ====================================================== -->
-
-        <!-- =====================================================
-             GRADUATION
-        ====================================================== -->
+             ===================================================== -->
 
         @if (
             graduationYear.HasValue ||
             graduationDivision.HasValue ||
             graduationStream.HasValue ||
-            !string.IsNullOrWhiteSpace(otherGraduationStream)
+            !string.IsNullOrWhiteSpace(otherGraduationStream) ||
+            graduationPercentage.HasValue
         )
         {
             <div class="education-item">
 
-                <div class="education-title">
-                    Graduation
-                </div>
+                <div class="education-title">Graduation</div>
 
                 @if (graduationYear.HasValue)
                 {
@@ -2509,7 +2528,10 @@
                     <div class="education-row">
                         <strong>Division:</strong>
                         <span>
-                            @GetLookupName(Model.Divisions, graduationDivision)
+                            @GetLookupName(
+                                Model.Divisions,
+                                graduationDivision
+                            )
                         </span>
                     </div>
                 }
@@ -2522,24 +2544,30 @@
                     </div>
                 }
 
+                @if (graduationPercentage.HasValue)
+                {
+                    <div class="education-row">
+                        <strong>Percentage:</strong>
+                        <span>@graduationPercentage.Value.ToString("0.##")%</span>
+                    </div>
+                }
+
             </div>
         }
 
-
         <!-- =====================================================
              HSC / DIPLOMA
-        ====================================================== -->
+             ===================================================== -->
 
         @if (
             hscDiplomaYear.HasValue ||
-            hscDiplomaDivision.HasValue
+            hscDiplomaDivision.HasValue ||
+            hscPercentage.HasValue
         )
         {
             <div class="education-item">
 
-                <div class="education-title">
-                    HSC / Diploma
-                </div>
+                <div class="education-title">HSC / Diploma</div>
 
                 @if (hscDiplomaYear.HasValue)
                 {
@@ -2562,28 +2590,30 @@
                     </div>
                 }
 
+                @if (hscPercentage.HasValue)
+                {
+                    <div class="education-row">
+                        <strong>Percentage:</strong>
+                        <span>@hscPercentage.Value.ToString("0.##")%</span>
+                    </div>
+                }
+
             </div>
         }
 
-
         <!-- =====================================================
              SSC
-        ====================================================== -->
-
-        <!-- =====================================================
-             SSC
-        ====================================================== -->
+             ===================================================== -->
 
         @if (
             sscYear.HasValue ||
-            sscDivision.HasValue
+            sscDivision.HasValue ||
+            sscPercentage.HasValue
         )
         {
             <div class="education-item">
 
-                <div class="education-title">
-                    SSC
-                </div>
+                <div class="education-title">SSC</div>
 
                 @if (sscYear.HasValue)
                 {
@@ -2606,11 +2636,20 @@
                     </div>
                 }
 
+                @if (sscPercentage.HasValue)
+                {
+                    <div class="education-row">
+                        <strong>Percentage:</strong>
+                        <span>@sscPercentage.Value.ToString("0.##")%</span>
+                    </div>
+                }
+
             </div>
         }
 
-    </div>
+    </section>
 }
+
 
 
 
