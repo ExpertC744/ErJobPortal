@@ -26,8 +26,8 @@
 <style>
 
     /* =========================================================
-               PAGE
-               ========================================================= */
+                   PAGE
+                   ========================================================= */
 
     .org-register-page {
         width: 100%;
@@ -54,8 +54,8 @@
 
 
     /* =========================================================
-               ALERT
-               ========================================================= */
+                   ALERT
+                   ========================================================= */
 
     .org-alert {
         width: calc(100% - 40px);
@@ -84,8 +84,8 @@
 
 
     /* =========================================================
-               TOP BAR
-               ========================================================= */
+                   TOP BAR
+                   ========================================================= */
 
     .org-register-topbar {
         display: flex;
@@ -128,8 +128,8 @@
 
 
     /* =========================================================
-               ACCOUNT SWITCH
-               ========================================================= */
+                   ACCOUNT SWITCH
+                   ========================================================= */
 
     .org-account-switch {
         display: flex;
@@ -165,8 +165,8 @@
 
 
     /* =========================================================
-               CARD
-               ========================================================= */
+                   CARD
+                   ========================================================= */
 
     .org-register-layout {
         width: 100%;
@@ -202,8 +202,8 @@
 
 
     /* =========================================================
-               SECTION
-               ========================================================= */
+                   SECTION
+                   ========================================================= */
 
     .org-form-section {
         width: 100%;
@@ -244,8 +244,8 @@
 
 
     /* =========================================================
-               GRID
-               ========================================================= */
+                   GRID
+                   ========================================================= */
 
     .org-form-grid {
         width: 100%;
@@ -261,8 +261,8 @@
 
 
     /* =========================================================
-               LABEL
-               ========================================================= */
+                   LABEL
+                   ========================================================= */
 
     .org-form-label {
         display: block;
@@ -278,8 +278,8 @@
 
 
     /* =========================================================
-               INPUT
-               ========================================================= */
+                   INPUT
+                   ========================================================= */
 
     .org-input-box {
         position: relative;
@@ -320,8 +320,8 @@
 
 
     /* =========================================================
-               VALIDATION
-               ========================================================= */
+                   VALIDATION
+                   ========================================================= */
 
     .org-validation {
         display: block;
@@ -332,8 +332,8 @@
 
 
     /* =========================================================
-               OTP
-               ========================================================= */
+                   OTP
+                   ========================================================= */
 
     .org-otp-section {
         margin-top: 8px;
@@ -419,8 +419,8 @@
 
 
     /* =========================================================
-               FOOTER
-               ========================================================= */
+                   FOOTER
+                   ========================================================= */
 
     .org-form-footer {
         display: flex;
@@ -466,8 +466,8 @@
 
 
     /* =========================================================
-               MOBILE
-               ========================================================= */
+                   MOBILE
+                   ========================================================= */
 
     @@media (max-width: 700px) {
 
@@ -992,6 +992,13 @@
 
                             </div>
 
+                            <button type="button"
+                                    id="sendOrgOtp"
+                                    class="org-otp-verify"
+                                    style="margin:8px 0 0 0;">
+                                Send OTP
+                            </button>
+
                             <span asp-validation-for="sEmail"
                                   class="org-validation">
                             </span>
@@ -1064,89 +1071,51 @@
                     <!-- =================================================
                          OTP
                     ================================================== -->
-
+                    <!-- EMAIL OTP VERIFICATION -->
                     <div class="org-otp-section">
 
                         <div class="org-otp-header">
-
                             <div>
-
-                                <h4 class="org-otp-title">
-                                    Email Verification
-                                </h4>
-
+                                <h4 class="org-otp-title">Email Verification</h4>
                                 <p class="org-otp-description">
-                                    For testing, enter OTP: 123456
+                                    Click Send OTP to receive a verification code in your email.
                                 </p>
-
                             </div>
 
-                            <div class="org-otp-timer">
-                                Dummy OTP: 123456
-                            </div>
-
+                            <div class="org-otp-timer" id="orgOtpTimer"></div>
                         </div>
 
-
-                        <input asp-for="sOTP"
-                               type="hidden"
-                               id="sOTP" />
-
+                        <input asp-for="sOTP" type="hidden" id="sOTP" />
 
                         <div class="org-otp-row">
-
-                            <input type="text"
-                                   maxlength="1"
-                                   class="org-otp-input"
-                                   inputmode="numeric"
-                                   autocomplete="one-time-code" />
-
-                            <input type="text"
-                                   maxlength="1"
-                                   class="org-otp-input"
+                            <input type="text" maxlength="1" class="org-otp-input"
+                                   inputmode="numeric" autocomplete="one-time-code" />
+                            <input type="text" maxlength="1" class="org-otp-input"
                                    inputmode="numeric" />
-
-                            <input type="text"
-                                   maxlength="1"
-                                   class="org-otp-input"
+                            <input type="text" maxlength="1" class="org-otp-input"
                                    inputmode="numeric" />
-
-                            <input type="text"
-                                   maxlength="1"
-                                   class="org-otp-input"
+                            <input type="text" maxlength="1" class="org-otp-input"
                                    inputmode="numeric" />
-
-                            <input type="text"
-                                   maxlength="1"
-                                   class="org-otp-input"
+                            <input type="text" maxlength="1" class="org-otp-input"
                                    inputmode="numeric" />
-
-                            <input type="text"
-                                   maxlength="1"
-                                   class="org-otp-input"
+                            <input type="text" maxlength="1" class="org-otp-input"
                                    inputmode="numeric" />
 
                             <button type="button"
+                                    id="verifyOrgOtp"
                                     class="org-otp-verify">
-
                                 <i class="fa-solid fa-check"></i>
-
                                 Verify
-
                             </button>
-
                         </div>
 
-
-                        <div class="org-otp-status">
-                            Enter the 6-digit OTP and click Verify.
+                        <div class="org-otp-status" id="orgOtpStatus">
+                            Your email must be verified before creating an account.
                         </div>
 
-                        <span asp-validation-for="sOTP"
-                              class="org-validation">
-                        </span>
-
+                        <span asp-validation-for="sOTP" class="org-validation"></span>
                     </div>
+
 
                 </section>
 
@@ -1191,7 +1160,6 @@
 
 </div>
 
-
 @section Scripts
 {
     @{
@@ -1201,546 +1169,609 @@
     <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
 
     <script>
-
         $(document).ready(function () {
 
         // =====================================================
-        // DEPARTMENT
+        // DEPARTMENT DROPDOWN
         // =====================================================
 
         const departmentSelect = $("#departmentSelect");
         const branchSelect = $("#branchSelect");
 
-
         $.ajax({
-
         url: '@Url.Action("GetDepartments", "Account")',
-
-        type: 'GET',
-
+        type: "GET",
         success: function (data) {
-
-        console.log("Departments:", data);
-
-        departmentSelect.empty();
-
-        departmentSelect.append(
-        $('<option>', {
-        value: '0',
-        text: 'Select Department'
+        departmentSelect.empty().append(
+        $("<option>", {
+        value: "0",
+        text: "Select Department"
         })
         );
 
-        $.each(data, function (index, item) {
-
+        $.each(data || [], function (index, item) {
         departmentSelect.append(
-        $('<option>', {
+        $("<option>", {
         value: item.nID,
         text: item.sDepartment
         })
         );
-
         });
-
         },
-
         error: function (xhr, status, error) {
-
-        console.error(
-        "Department loading failed:",
-        error
-        );
-
+        console.error("Department loading failed:", error);
         }
-
         });
 
 
         // =====================================================
-        // DEPARTMENT CHANGE
+        // DEPARTMENT CHANGE - LOAD BRANCHES
         // =====================================================
 
         departmentSelect.on("change", function () {
-
         const departmentId = $(this).val();
 
-        branchSelect.empty();
-
-        branchSelect.append(
-        $('<option>', {
-        value: '0',
-        text: 'Select Branch'
+        branchSelect.empty().append(
+        $("<option>", {
+        value: "0",
+        text: "Select Branch"
         })
         );
 
-
-        if (!departmentId ||
-        departmentId === "0") {
-
+        if (!departmentId || departmentId === "0") {
         return;
-
         }
-
-
-        // =================================================
-        // LOAD BRANCHES
-        // =================================================
 
         $.ajax({
-
         url: '@Url.Action("GetBranches", "Account")',
-
-        type: 'GET',
-
-        data: {
-        departmentId: departmentId
-        },
-
+        type: "GET",
+        data: { departmentId: departmentId },
         success: function (data) {
-
-        console.log(
-        "Branches:",
-        data
-        );
-
-
-        if (!data ||
-        data.length === 0) {
-
+        if (!data || data.length === 0) {
         branchSelect.append(
-        $('<option>', {
-        value: '0',
-        text: 'No Branch Available'
+        $("<option>", {
+        value: "0",
+        text: "No Branch Available"
         })
         );
-
         return;
-
         }
 
-
         $.each(data, function (index, item) {
-
         branchSelect.append(
-        $('<option>', {
+        $("<option>", {
         value: item.nID,
         text: item.sBranch
         })
         );
-
         });
-
         },
-
         error: function (xhr, status, error) {
-
-        console.error(
-        "Branch loading failed:",
-        error
-        );
-
+        console.error("Branch loading failed:", error);
         }
-
         });
-
         });
 
 
         // =====================================================
-        // COLLEGE NAME
+        // COLLEGE NAME DROPDOWN
         // =====================================================
+
+        const collegeDropdown = $("#nCollegeName");
+        const collegeCodeDropdown = $("#nCollegeCode");
 
         $.ajax({
-
         url: '@Url.Action("GetColleges", "Account")',
-
-        type: 'GET',
-
+        type: "GET",
         success: function (data) {
-
-        const collegeDropdown =
-        $('#nCollegeName');
-
-        collegeDropdown.empty();
-
-        collegeDropdown.append(
-        $('<option>', {
-        value: '0',
-        text: '-- Select College Name --'
+        collegeDropdown.empty().append(
+        $("<option>", {
+        value: "0",
+        text: "-- Select College Name --"
         })
         );
 
-
-        $.each(data, function (index, college) {
-
+        $.each(data || [], function (index, college) {
         collegeDropdown.append(
-        $('<option>', {
+        $("<option>", {
         value: college.nID,
         text: college.sCollegeName
         })
         );
-
         });
-
         },
-
-        error: function () {
-
-        console.error(
-        "Error loading colleges."
-        );
-
+        error: function (xhr, status, error) {
+        console.error("College loading failed:", error);
         }
-
         });
 
 
         // =====================================================
-        // COLLEGE CHANGE
+        // COLLEGE CHANGE - LOAD COLLEGE CODES
         // =====================================================
 
-        $('#nCollegeName').on('change', function () {
-
+        collegeDropdown.on("change", function () {
         const collegeId = $(this).val();
 
-        const collegeCodeDropdown =
-        $('#nCollegeCode');
-
-
-        collegeCodeDropdown.empty();
-
-        collegeCodeDropdown.append(
-        $('<option>', {
-        value: '0',
-        text: '-- Select College Code --'
+        collegeCodeDropdown.empty().append(
+        $("<option>", {
+        value: "0",
+        text: "-- Select College Code --"
         })
         );
 
-
-        if (!collegeId ||
-        collegeId === "0") {
-
+        if (!collegeId || collegeId === "0") {
         return;
-
         }
 
-
-        // =================================================
-        // LOAD COLLEGE CODE
-        // =================================================
-
         $.ajax({
-
         url: '@Url.Action("GetCollegeCodes", "Account")',
-
-        type: 'GET',
-
-        data: {
-        collegeId: collegeId
-        },
-
+        type: "GET",
+        data: { collegeId: collegeId },
         success: function (data) {
-
-        console.log(
-        "College Codes:",
-        data
-        );
-
-
-        $.each(data, function (index, code) {
-
+        $.each(data || [], function (index, code) {
         collegeCodeDropdown.append(
-        $('<option>', {
+        $("<option>", {
         value: code.nCode,
         text: code.nCode
         })
         );
-
         });
-
         },
-
-        error: function () {
-
-        console.error(
-        "Error loading college codes."
-        );
-
+        error: function (xhr, status, error) {
+        console.error("College codes loading failed:", error);
         }
-
         });
-
         });
 
 
         // =====================================================
-        // MOBILE NUMBER
+        // MOBILE NUMBER - DIGITS ONLY
         // =====================================================
 
-        $('input[name="sMobile"]').on(
-        'input',
-        function () {
+        $('input[name="sMobile"]').on("input", function () {
+        this.value = this.value.replace(/\D/g, "").slice(0, 10);
+        });
 
-        this.value =
-        this.value
-        .replace(/\D/g, '')
-        .substring(0, 10);
 
+        // =====================================================
+        // EMAIL OTP ELEMENTS
+        // =====================================================
+
+        const emailInput = document.getElementById("sEmail");
+        const sendOtpButton = document.getElementById("sendOrgOtp");
+        const verifyOtpButton = document.getElementById("verifyOrgOtp");
+        const otpInputs = Array.from(
+        document.querySelectorAll(".org-otp-input")
+        );
+        const otpHidden = document.getElementById("sOTP");
+        const otpStatus = document.getElementById("orgOtpStatus");
+        const otpTimer = document.getElementById("orgOtpTimer");
+        const orgForm = document.querySelector(".org-form-content");
+
+        const antiForgeryToken = document.querySelector(
+        'input[name="__RequestVerificationToken"]'
+        )?.value;
+
+        let otpVerified = false;
+        let timerInterval = null;
+        let otpExpiryTime = 0;
+        let otpRequestInProgress = false;
+
+        function showOtpStatus(message, type = "") {
+        if (!otpStatus) return;
+
+        otpStatus.textContent = message;
+        otpStatus.classList.remove("success", "error");
+
+        if (type) {
+        otpStatus.classList.add(type);
         }
+        }
+
+        function clearOtpTimer() {
+        if (timerInterval !== null) {
+        clearInterval(timerInterval);
+        timerInterval = null;
+        }
+
+        otpExpiryTime = 0;
+
+        if (otpTimer) {
+        otpTimer.textContent = "";
+        }
+        }
+
+        function clearOtpInputs() {
+        otpInputs.forEach(function (input) {
+        input.value = "";
+        });
+        }
+
+        function invalidateVerification(message) {
+        otpVerified = false;
+
+        if (otpHidden) {
+        otpHidden.value = "";
+        }
+
+        showOtpStatus(
+        message || "Please verify your email address."
+        );
+        }
+
+        function getOtpValue() {
+        return otpInputs.map(function (input) {
+        return input.value;
+        }).join("");
+        }
+
+        function updateOtpTimer() {
+        if (!otpExpiryTime) return;
+
+        const remaining = Math.max(
+        0,
+        Math.ceil((otpExpiryTime - Date.now()) / 1000)
         );
 
+        if (remaining <= 0) {
+        clearOtpTimer();
+        invalidateVerification(
+        "OTP expired. Please request a new OTP."
+        );
+        showOtpStatus(
+        "OTP expired. Please request a new OTP.",
+        "error"
+        );
+        return;
+        }
+
+        const minutes = Math.floor(remaining / 60);
+        const seconds = remaining % 60;
+
+        if (otpTimer) {
+        otpTimer.textContent =
+        "OTP expires in " +
+        minutes + ":" +
+        String(seconds).padStart(2, "0");
+        }
+        }
+
+        function startOtpTimer() {
+        clearOtpTimer();
+
+        otpExpiryTime = Date.now() + (10 * 60 * 1000);
+
+        updateOtpTimer();
+        timerInterval = setInterval(updateOtpTimer, 1000);
+        }
+
+        async function postOtpRequest(url, values) {
+        if (!antiForgeryToken) {
+        throw new Error(
+        "Security token missing. Refresh the page and try again."
+        );
+        }
+
+        const body = new URLSearchParams(values);
+
+        const response = await fetch(url, {
+        method: "POST",
+        headers: {
+        "Content-Type": "application/x-www-form-urlencoded",
+        "RequestVerificationToken": antiForgeryToken
+        },
+        body: body.toString(),
+        credentials: "same-origin"
+        });
+
+        let result;
+
+        try {
+        result = await response.json();
+        } catch {
+        throw new Error(
+        "The server returned an unexpected response. Please try again."
+        );
+        }
+
+        if (!response.ok || !result.success) {
+        throw new Error(
+        result.message || "Request failed. Please try again."
+        );
+        }
+
+        return result;
+        }
+
 
         // =====================================================
-        // OTP
-        // =====================================================
-
-        const otpInputs =
-        document.querySelectorAll(".org-otp-input");
-
-        const otpHidden =
-        document.getElementById("sOTP");
-
-        const verifyButton =
-        document.querySelector(".org-otp-verify");
-
-        const otpStatus =
-        document.querySelector(".org-otp-status");
-
-
-        // =====================================================
-        // OTP INPUT
+        // OTP INPUT - DIGITS, NEXT BOX, BACKSPACE AND PASTE
         // =====================================================
 
         otpInputs.forEach(function (input, index) {
 
-        input.addEventListener(
-        "input",
-        function () {
+        input.addEventListener("input", function () {
+        this.value = this.value.replace(/\D/g, "").slice(0, 1);
 
-        this.value =
-        this.value
-        .replace(/\D/g, '')
-        .substring(0, 1);
-
-
-        if (
-        this.value.length === 1 &&
-        index < otpInputs.length - 1
-        ) {
-
-        otpInputs[index + 1].focus();
-
-        }
-
-        }
+        invalidateVerification(
+        "OTP changed. Click Verify to confirm it."
         );
 
+        if (this.value && index < otpInputs.length - 1) {
+        otpInputs[index + 1].focus();
+        }
+        });
 
-        // BACKSPACE
-
-        input.addEventListener(
-        "keydown",
-        function (e) {
-
+        input.addEventListener("keydown", function (event) {
         if (
-        e.key === "Backspace" &&
-        this.value === "" &&
+        event.key === "Backspace" &&
+        !this.value &&
         index > 0
         ) {
-
         otpInputs[index - 1].focus();
-
         }
 
+        if (event.key === "ArrowLeft" && index > 0) {
+        otpInputs[index - 1].focus();
         }
-        );
 
+        if (
+        event.key === "ArrowRight" &&
+        index < otpInputs.length - 1
+        ) {
+        otpInputs[index + 1].focus();
+        }
+        });
 
-        // PASTE
+        input.addEventListener("paste", function (event) {
+        event.preventDefault();
 
-        input.addEventListener(
-        "paste",
-        function (e) {
+        const clipboard = event.clipboardData ||
+        window.clipboardData;
 
-        e.preventDefault();
-
-        const pasted =
-        (e.clipboardData ||
-        window.clipboardData)
+        const pasted = clipboard
         .getData("text")
-        .replace(/\D/g, '')
-        .substring(0, 6);
+        .replace(/\D/g, "")
+        .slice(0, 6);
 
+        clearOtpInputs();
 
-        pasted.split("").forEach(
-        function (digit, i) {
-
+        pasted.split("").forEach(function (digit, i) {
         if (otpInputs[i]) {
-
-        otpInputs[i].value =
-        digit;
-
+        otpInputs[i].value = digit;
         }
+        });
 
-        }
+        invalidateVerification(
+        "OTP entered. Click Verify to confirm it."
         );
-
 
         if (pasted.length > 0) {
-
-        const focusIndex =
-        Math.min(
-        pasted.length,
-        otpInputs.length
-        ) - 1;
-
-        otpInputs[focusIndex].focus();
-
+        otpInputs[
+        Math.min(pasted.length, otpInputs.length) - 1
+        ].focus();
         }
-
-        }
-        );
-
+        });
         });
 
 
         // =====================================================
-        // VERIFY OTP
+        // EMAIL CHANGE - REQUIRE NEW OTP
         // =====================================================
 
-        if (verifyButton) {
+        if (emailInput) {
+        emailInput.addEventListener("input", function () {
+        invalidateVerification(
+        "Email changed. Send a new OTP and verify it."
+        );
 
-        verifyButton.addEventListener(
-        "click",
-        function () {
+        clearOtpInputs();
+        clearOtpTimer();
 
-        let otp = "";
-
-        otpInputs.forEach(
-        function (input) {
-
-        otp += input.value;
-
+        if (otpTimer) {
+        otpTimer.textContent = "";
         }
-        );
+        });
+        }
 
 
-        if (otp.length !== 6) {
+        // =====================================================
+        // SEND ORGANIZATION OTP
+        // =====================================================
 
-        otpHidden.value = "";
+        if (sendOtpButton) {
+        sendOtpButton.addEventListener("click", async function () {
 
-        otpStatus.textContent =
-        "Please enter the complete 6-digit OTP.";
+        if (otpRequestInProgress) return;
 
-        otpStatus.classList.remove(
-        "success"
-        );
+        const email = emailInput.value.trim();
 
-        otpStatus.classList.add(
+        if (!email) {
+        emailInput.focus();
+        showOtpStatus(
+        "Please enter your email address.",
         "error"
         );
-
         return;
+        }
 
+        if (!emailInput.checkValidity()) {
+        emailInput.reportValidity();
+        return;
+        }
+
+        otpRequestInProgress = true;
+        sendOtpButton.disabled = true;
+        verifyOtpButton.disabled = true;
+
+        invalidateVerification("Sending OTP to your email...");
+        clearOtpInputs();
+        clearOtpTimer();
+
+        try {
+        const result = await postOtpRequest(
+        '@Url.Action("SendOrganizationOtp", "Account")',
+        { email: email }
+        );
+
+        showOtpStatus(
+        result.message ||
+        "OTP sent successfully. Check your email.",
+        "success"
+        );
+
+        startOtpTimer();
+
+        if (otpInputs.length > 0) {
+        otpInputs[0].focus();
+        }
+        }
+        catch (error) {
+        showOtpStatus(
+        error.message || "Failed to send OTP.",
+        "error"
+        );
+        }
+        finally {
+        otpRequestInProgress = false;
+        sendOtpButton.disabled = false;
+        verifyOtpButton.disabled = false;
+        }
+        });
         }
 
 
-        if (otp === "123456") {
+        // =====================================================
+        // VERIFY ORGANIZATION OTP
+        // =====================================================
 
+        if (verifyOtpButton) {
+        verifyOtpButton.addEventListener("click", async function () {
+
+        if (otpRequestInProgress) return;
+
+        const email = emailInput.value.trim();
+        const otp = getOtpValue();
+
+        if (!email || !emailInput.checkValidity()) {
+        emailInput.reportValidity();
+
+        showOtpStatus(
+        "Enter a valid email address.",
+        "error"
+        );
+        return;
+        }
+
+        if (otp.length !== 6 || !/^\d{6}$/.test(otp)) {
+        invalidateVerification(
+        "Please enter the complete 6-digit OTP."
+        );
+
+        showOtpStatus(
+        "Please enter the complete 6-digit OTP.",
+        "error"
+        );
+        return;
+        }
+
+        if (
+        otpExpiryTime === 0 ||
+        Date.now() >= otpExpiryTime
+        ) {
+        invalidateVerification(
+        "OTP expired. Please request a new OTP."
+        );
+
+        showOtpStatus(
+        "OTP expired. Please request a new OTP.",
+        "error"
+        );
+        return;
+        }
+
+        otpRequestInProgress = true;
+        verifyOtpButton.disabled = true;
+
+        showOtpStatus("Verifying OTP...");
+
+        try {
+        const result = await postOtpRequest(
+        '@Url.Action("VerifyOrganizationOtp", "Account")',
+        {
+        email: email,
+        otp: otp
+        }
+        );
+
+        otpVerified = true;
+
+        if (otpHidden) {
         otpHidden.value = otp;
+        }
 
-        otpStatus.textContent =
-        "OTP verified successfully.";
+        clearOtpTimer();
 
-        otpStatus.classList.remove(
-        "error"
-        );
+        if (otpTimer) {
+        otpTimer.textContent = "Verified";
+        }
 
-        otpStatus.classList.add(
+        showOtpStatus(
+        result.message ||
+        "Email verified successfully.",
         "success"
         );
-
         }
-        else {
+        catch (error) {
+        otpVerified = false;
 
+        if (otpHidden) {
         otpHidden.value = "";
+        }
 
-        otpStatus.textContent =
-        "Invalid OTP. Please enter 123456.";
-
-        otpStatus.classList.remove(
-        "success"
-        );
-
-        otpStatus.classList.add(
+        showOtpStatus(
+        error.message || "OTP verification failed.",
         "error"
         );
-
         }
-
+        finally {
+        otpRequestInProgress = false;
+        verifyOtpButton.disabled = false;
         }
-        );
-
+        });
         }
 
 
         // =====================================================
-        // FORM SUBMIT
+        // PREVENT REGISTRATION WITHOUT VERIFIED EMAIL
         // =====================================================
-
-        const orgForm =
-        document.querySelector(".org-form-content");
-
 
         if (orgForm) {
+        orgForm.addEventListener("submit", function (event) {
+        const email = emailInput.value.trim();
 
-        orgForm.addEventListener(
-        "submit",
-        function (e) {
-
-        let otp = "";
-
-        otpInputs.forEach(
-        function (input) {
-
-        otp += input.value;
-
+        if (!email || !emailInput.checkValidity()) {
+        event.preventDefault();
+        emailInput.reportValidity();
+        return;
         }
-        );
 
+        if (!otpVerified) {
+        event.preventDefault();
 
-        if (otp !== "123456") {
-
-        e.preventDefault();
-
-        otpHidden.value = "";
-
-        otpStatus.textContent =
-        "Invalid OTP. Please enter 123456.";
-
-        otpStatus.classList.remove(
-        "success"
-        );
-
-        otpStatus.classList.add(
+        showOtpStatus(
+        "Please send and verify the email OTP before creating your account.",
         "error"
         );
 
+        if (otpInputs.length > 0) {
         otpInputs[0].focus();
-
-        return false;
-
         }
-
-
-        otpHidden.value = "123456";
-
         }
-        );
-
+        });
         }
 
         });
-
     </script>
 }

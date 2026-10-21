@@ -1,0 +1,1097 @@
+﻿
+/* =========================================
+   TPO SCHEDULER
+========================================= */
+
+.tpo-scheduler {
+    padding: 24px;
+    color: #263449;
+    font-family: inherit;
+    min-width: 0;
+}
+
+.tpo-scheduler,
+.tpo-scheduler * {
+    box-sizing: border-box;
+}
+
+.tpo-scheduler .scheduler-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 18px;
+    margin-bottom: 22px;
+}
+
+.tpo-scheduler .scheduler-header h2 {
+    margin: 0 0 6px;
+    font-size: 25px;
+    font-weight: 700;
+    color: #1d2b42;
+}
+
+.tpo-scheduler .scheduler-header p {
+    margin: 0;
+    color: #778399;
+    font-size: 13px;
+}
+
+.tpo-scheduler .btn-add-activity {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 10px 16px;
+    border: 1px solid #1769e0;
+    border-radius: 7px;
+    background: #1769e0;
+    color: #fff;
+    font-size: 12px;
+    font-weight: 600;
+    text-decoration: none;
+    cursor: pointer;
+    transition: background .2s ease, box-shadow .2s ease;
+}
+
+.tpo-scheduler .btn-add-activity:hover {
+    background: #1058c4;
+    color: #fff;
+    box-shadow: 0 4px 12px rgba(23, 105, 224, .2);
+}
+
+/* =========================================
+   SUMMARY CARDS
+========================================= */
+
+.tpo-scheduler .scheduler-stats {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 15px;
+    margin-bottom: 22px;
+}
+
+.tpo-scheduler .scheduler-stat {
+    display: flex;
+    align-items: center;
+    gap: 13px;
+    min-width: 0;
+    min-height: 78px;
+    padding: 15px;
+    border: 1px solid #e8edf5;
+    border-radius: 9px;
+    background: #fff;
+    box-shadow: 0 2px 7px rgba(26, 45, 78, .035);
+}
+
+.tpo-scheduler .stat-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    width: 42px;
+    height: 42px;
+    border-radius: 9px;
+    font-size: 18px;
+}
+
+.tpo-scheduler .scheduler-stat span {
+    display: block;
+    margin-bottom: 4px;
+    color: #68758a;
+    font-size: 11px;
+}
+
+.tpo-scheduler .scheduler-stat h3 {
+    margin: 0;
+    color: #25344b;
+    font-size: 23px;
+    font-weight: 700;
+}
+
+.tpo-scheduler .stat-blue {
+    background: #f0f6ff;
+}
+
+.tpo-scheduler .stat-blue .stat-icon {
+    color: #2474e8;
+    background: #dceaff;
+}
+
+.tpo-scheduler .stat-green {
+    background: #effbf4;
+}
+
+.tpo-scheduler .stat-green .stat-icon {
+    color: #20a665;
+    background: #d9f6e5;
+}
+
+.tpo-scheduler .stat-yellow {
+    background: #fff9e9;
+}
+
+.tpo-scheduler .stat-yellow .stat-icon {
+    color: #d99b17;
+    background: #fff0c4;
+}
+
+.tpo-scheduler .stat-red {
+    background: #fff1f2;
+}
+
+.tpo-scheduler .stat-red .stat-icon {
+    color: #e34e5d;
+    background: #ffdee2;
+}
+
+/* =========================================
+   MAIN CONTENT LAYOUT
+========================================= */
+
+.tpo-scheduler .scheduler-content {
+    display: grid;
+    grid-template-columns: minmax(0, 1.05fr) minmax(0, 1fr);
+    align-items: stretch;
+    gap: 20px;
+}
+
+.tpo-scheduler .scheduler-panel {
+    min-width: 0;
+    padding: 18px;
+    border: 1px solid #e8edf4;
+    border-radius: 10px;
+    background: #fff;
+    box-shadow: 0 3px 12px rgba(26, 45, 78, .04);
+}
+
+.tpo-scheduler .scheduler-panel h4 {
+    margin: 0;
+    color: #26354b;
+    font-size: 15px;
+    font-weight: 700;
+}
+
+/* =========================================
+   CALENDAR HEADER
+========================================= */
+
+.tpo-scheduler .calendar-header {
+    margin-bottom: 17px;
+}
+
+.tpo-scheduler .calendar-month-heading {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 16px;
+}
+
+.tpo-scheduler .calendar-month-heading h4 {
+    font-size: 16px;
+}
+
+.tpo-scheduler .calendar-navigation {
+    display: flex;
+    gap: 5px;
+}
+
+.tpo-scheduler .calendar-navigation button {
+    width: 30px;
+    height: 30px;
+    border: 1px solid #e7ecf4;
+    border-radius: 6px;
+    background: #fff;
+    color: #65748a;
+    cursor: pointer;
+}
+
+.tpo-scheduler .calendar-navigation button:hover {
+    color: #1769e0;
+    border-color: #b7d1fb;
+    background: #f2f7ff;
+}
+
+.tpo-scheduler .calendar-toolbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+}
+
+.tpo-scheduler .calendar-today,
+.tpo-scheduler .calendar-view-btn {
+    padding: 7px 11px;
+    border: 1px solid #e3e9f1;
+    border-radius: 5px;
+    background: #fff;
+    color: #66758a;
+    font-size: 11px;
+    cursor: pointer;
+}
+
+.tpo-scheduler .calendar-today:hover {
+    background: #f3f7ff;
+    color: #1769e0;
+}
+
+.tpo-scheduler .calendar-view-switch {
+    display: flex;
+    gap: 3px;
+    padding: 3px;
+    border-radius: 7px;
+    background: #f0f3f8;
+}
+
+.tpo-scheduler .calendar-view-btn {
+    padding: 6px 10px;
+    border-color: transparent;
+    background: transparent;
+}
+
+.tpo-scheduler .calendar-view-btn.active {
+    border-color: #e2e8f2;
+    background: #fff;
+    color: #1769e0;
+    font-weight: 700;
+    box-shadow: 0 1px 4px rgba(20, 40, 70, .08);
+}
+
+/* =========================================
+   CALENDAR GRID
+========================================= */
+
+.tpo-scheduler .calendar-grid-wrapper {
+    overflow: hidden;
+}
+
+.tpo-scheduler .calendar-weekdays,
+.tpo-scheduler .calendar-grid {
+    display: grid;
+    grid-template-columns: repeat(7, minmax(0, 1fr));
+}
+
+.tpo-scheduler .calendar-weekdays > div {
+    padding: 10px 0;
+    border-bottom: 1px solid #e9eef5;
+    color: #7b879a;
+    font-size: 10px;
+    font-weight: 600;
+    text-align: center;
+}
+
+.tpo-scheduler .calendar-day {
+    position: relative;
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    min-width: 0;
+    min-height: 47px;
+    padding: 8px 2px 12px;
+    border-right: 1px solid #edf1f6;
+    border-bottom: 1px solid #edf1f6;
+    background: #fff;
+    color: #445168;
+    font-size: 11px;
+    cursor: pointer;
+    transition: background .15s ease;
+}
+
+.tpo-scheduler .calendar-day:nth-child(7n) {
+    border-right: 0;
+}
+
+.tpo-scheduler .calendar-day:hover {
+    background: #f3f7ff;
+}
+
+.tpo-scheduler .calendar-day.other-month {
+    color: #bdc5d1;
+    background: #fafbfd;
+}
+
+.tpo-scheduler .calendar-day.today .day-number {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 25px;
+    height: 25px;
+    margin-top: -4px;
+    border-radius: 50%;
+    background: #1769e0;
+    color: #fff;
+    font-weight: 700;
+}
+
+.tpo-scheduler .calendar-day.selected {
+    background: #edf5ff;
+    box-shadow: inset 0 0 0 1px #a8cbff;
+}
+
+.tpo-scheduler .calendar-day.selected.today {
+    background: #edf5ff;
+}
+
+.tpo-scheduler .day-number {
+    line-height: 19px;
+}
+
+.tpo-scheduler .day-markers {
+    position: absolute;
+    bottom: 5px;
+    left: 0;
+    right: 0;
+    display: flex;
+    justify-content: center;
+    gap: 3px;
+}
+
+.tpo-scheduler .day-marker {
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+}
+
+.tpo-scheduler .marker-blue {
+    background: #3984ef;
+}
+
+.tpo-scheduler .marker-green {
+    background: #25b875;
+}
+
+.tpo-scheduler .marker-orange {
+    background: #f0a536;
+}
+
+.tpo-scheduler .calendar-legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 14px;
+    margin-top: 15px;
+    color: #748196;
+    font-size: 10px;
+}
+
+.tpo-scheduler .calendar-legend span {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.tpo-scheduler .legend-dot {
+    display: inline-block;
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+}
+
+.tpo-scheduler .legend-blue {
+    background: #3984ef;
+}
+
+.tpo-scheduler .legend-green {
+    background: #25b875;
+}
+
+.tpo-scheduler .legend-orange {
+    background: #f0a536;
+}
+
+.tpo-scheduler .selected-date-info {
+    margin-top: 14px;
+    padding: 10px 12px;
+    border-radius: 6px;
+    background: #f5f8fd;
+    color: #65748a;
+    font-size: 11px;
+}
+
+/* Week and day calendar modes */
+
+.tpo-scheduler .calendar-grid.week-mode {
+    grid-template-columns: repeat(7, minmax(0, 1fr));
+}
+
+.tpo-scheduler .calendar-grid.day-mode {
+    grid-template-columns: minmax(0, 1fr);
+}
+
+.tpo-scheduler .calendar-grid.day-mode .calendar-day {
+    min-height: 100px;
+    justify-content: flex-start;
+    padding: 16px;
+    font-size: 14px;
+}
+
+.tpo-scheduler .calendar-grid.day-mode .day-markers {
+    justify-content: flex-start;
+    left: 16px;
+    bottom: 12px;
+}
+
+.tpo-scheduler .calendar-grid.week-mode .calendar-day {
+    min-height: 75px;
+}
+
+/* =========================================
+   ACTIVITIES PANEL
+========================================= */
+
+.tpo-scheduler .activities-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 10px;
+    margin-bottom: 8px;
+}
+
+.tpo-scheduler .activities-header p {
+    margin: 5px 0 0;
+    color: #8a95a7;
+    font-size: 10px;
+}
+
+.tpo-scheduler .view-all-link {
+    flex-shrink: 0;
+    color: #1769e0;
+    font-size: 11px;
+    font-weight: 600;
+    text-decoration: none;
+}
+
+.tpo-scheduler .view-all-link:hover {
+    text-decoration: underline;
+}
+
+.tpo-scheduler .activity-list {
+    display: flex;
+    flex-direction: column;
+}
+
+.tpo-scheduler .activity-item {
+    display: grid;
+    grid-template-columns: 83px minmax(0, 1fr) auto;
+    align-items: start;
+    gap: 11px;
+    padding: 16px 0;
+    border-bottom: 1px solid #edf1f6;
+}
+
+.tpo-scheduler .activity-item:last-child {
+    border-bottom: 0;
+}
+
+.tpo-scheduler .activity-category {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 26px;
+    padding: 5px 7px;
+    border-radius: 5px;
+    font-size: 9px;
+    font-weight: 600;
+    text-align: center;
+    overflow-wrap: anywhere;
+}
+
+.tpo-scheduler .category-blue {
+    color: #2771d8;
+    background: #e8f1ff;
+}
+
+.tpo-scheduler .category-purple {
+    color: #8250c7;
+    background: #f1e8ff;
+}
+
+.tpo-scheduler .category-orange {
+    color: #d98418;
+    background: #fff0d9;
+}
+
+.tpo-scheduler .category-pink {
+    color: #d34b8c;
+    background: #ffe8f2;
+}
+
+.tpo-scheduler .category-green {
+    color: #198b5a;
+    background: #e1f8eb;
+}
+
+.tpo-scheduler .activity-details {
+    min-width: 0;
+}
+
+.tpo-scheduler .activity-details h5 {
+    margin: 2px 0 8px;
+    color: #344258;
+    font-size: 11px;
+    font-weight: 700;
+    line-height: 1.4;
+    overflow-wrap: anywhere;
+}
+
+.tpo-scheduler .activity-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 5px 10px;
+    color: #8a95a6;
+    font-size: 9px;
+}
+
+.tpo-scheduler .activity-meta span {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.tpo-scheduler .activity-meta i {
+    font-size: 9px;
+}
+
+.tpo-scheduler .activity-status {
+    display: inline-block;
+    padding: 5px 7px;
+    border-radius: 5px;
+    font-size: 9px;
+    font-weight: 600;
+    text-align: center;
+    white-space: nowrap;
+}
+
+.tpo-scheduler .status-upcoming {
+    color: #1b9b62;
+    background: #e3f8ec;
+}
+
+.tpo-scheduler .status-pending {
+    color: #c88412;
+    background: #fff2d9;
+}
+
+.tpo-scheduler .status-completed {
+    color: #2369d8;
+    background: #e7f0ff;
+}
+
+.tpo-scheduler .status-cancelled {
+    color: #d94354;
+    background: #ffeaed;
+}
+
+.tpo-scheduler .empty-activities {
+    padding: 30px 10px;
+    color: #8a95a7;
+    text-align: center;
+}
+
+.tpo-scheduler .empty-activities i {
+    margin-bottom: 10px;
+    font-size: 28px;
+}
+
+.tpo-scheduler .empty-activities p {
+    margin: 0;
+    font-size: 12px;
+}
+
+
+/* =====================================
+   ADD ACTIVITY MODAL
+===================================== */
+.scheduler-modal {
+    border: 0;
+    border-radius: 16px;
+    overflow: hidden;
+}
+
+.scheduler-modal-header {
+    padding: 22px 26px;
+    color: #fff;
+    background: linear-gradient(120deg, #1558c0, #287cf0);
+    border: 0;
+}
+
+    .scheduler-modal-header .modal-title {
+        font-size: 21px;
+        font-weight: 700;
+    }
+
+    .scheduler-modal-header p {
+        margin-top: 6px;
+        color: rgba(255,255,255,.82);
+        font-size: 13px;
+    }
+
+.scheduler-modal-body {
+    padding: 26px;
+    background: #fff;
+}
+
+.activity-type-selector {
+    padding: 18px;
+    margin-bottom: 25px;
+    border: 1px solid #e5ecf5;
+    background: #f8faff;
+    border-radius: 12px;
+}
+
+.activity-type-options {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 14px;
+    margin-top: 10px;
+}
+
+.activity-type-option {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 13px;
+    padding: 17px;
+    min-width: 0;
+    border: 1px solid #e0e7f1;
+    border-radius: 12px;
+    background: #fff;
+    cursor: pointer;
+    transition: border-color .2s, background .2s, box-shadow .2s;
+}
+
+    .activity-type-option:hover {
+        border-color: #9dbcf2;
+        box-shadow: 0 4px 14px rgba(23, 105, 232, .07);
+    }
+
+    .activity-type-option.active {
+        border-color: #2877ee;
+        background: #f1f6ff;
+        box-shadow: 0 0 0 2px rgba(40, 119, 238, .08);
+    }
+
+    .activity-type-option input {
+        position: absolute;
+        opacity: 0;
+        pointer-events: none;
+    }
+
+    .activity-type-option > span:nth-of-type(2) {
+        display: flex;
+        flex-direction: column;
+        gap: 5px;
+        min-width: 0;
+    }
+
+    .activity-type-option strong {
+        color: #193452;
+        font-size: 14px;
+    }
+
+    .activity-type-option small {
+        color: #74869e;
+        font-size: 12px;
+        line-height: 1.5;
+    }
+
+.activity-type-icon,
+.section-heading-icon {
+    display: inline-flex;
+    flex-shrink: 0;
+    justify-content: center;
+    align-items: center;
+    width: 46px;
+    height: 46px;
+    border-radius: 11px;
+    font-size: 20px;
+}
+
+.general-icon {
+    color: #216be0;
+    background: #e4eeff;
+}
+
+.placement-icon {
+    color: #8a4bda;
+    background: #f0e5ff;
+}
+
+.type-check {
+    margin-left: auto;
+    color: #2877ee;
+    opacity: 0;
+}
+
+.activity-type-option.active .type-check {
+    opacity: 1;
+}
+
+.activity-section-heading {
+    display: flex;
+    align-items: center;
+    gap: 13px;
+    margin-bottom: 24px;
+    padding-bottom: 17px;
+    border-bottom: 1px solid #e9eef5;
+}
+
+    .activity-section-heading h6 {
+        margin: 0 0 5px;
+        color: #193452;
+        font-size: 17px;
+        font-weight: 700;
+    }
+
+    .activity-section-heading p {
+        margin: 0;
+        color: #7889a0;
+        font-size: 12px;
+    }
+
+.form-section-label {
+    margin: 8px 0 0;
+    padding-bottom: 10px;
+    border-bottom: 1px solid #edf1f7;
+    color: #254b7a;
+    font-size: 13px;
+    font-weight: 700;
+}
+
+.scheduler-modal .form-label {
+    margin-bottom: 7px;
+    color: #344b67;
+    font-size: 13px;
+    font-weight: 600;
+}
+
+.scheduler-modal .form-control,
+.scheduler-modal .form-select {
+    min-height: 44px;
+    border-color: #dce5f0;
+    border-radius: 8px;
+    color: #243d5b;
+    font-size: 13px;
+    box-shadow: none;
+}
+
+.scheduler-modal textarea.form-control {
+    min-height: 85px;
+    resize: vertical;
+}
+
+.scheduler-modal .form-control:focus,
+.scheduler-modal .form-select:focus {
+    border-color: #4387f5;
+    box-shadow: 0 0 0 3px rgba(40, 119, 238, .10);
+}
+
+.scheduler-modal-footer {
+    padding: 17px 26px;
+    background: #f8faff;
+    border-top: 1px solid #e8edf5;
+}
+
+    .scheduler-modal-footer .btn {
+        min-height: 42px;
+        border-radius: 8px;
+        font-size: 13px;
+        font-weight: 600;
+    }
+
+    .scheduler-modal-footer .btn-primary {
+        background: #1769e8;
+        border-color: #1769e8;
+    }
+
+@media (max-width: 650px) {
+    .scheduler-modal-body {
+        padding: 17px;
+    }
+
+    .activity-type-options {
+        grid-template-columns: 1fr;
+    }
+
+    .scheduler-modal-header {
+        padding: 18px;
+    }
+
+    .scheduler-modal-footer {
+        padding: 14px 17px;
+    }
+}
+
+
+/* =========================================
+   RESPONSIVE
+========================================= */
+@media (max-width: 1200px) {
+    .tpo-scheduler .scheduler-content {
+        grid-template-columns: minmax(0, 1fr);
+    }
+
+    .tpo-scheduler .scheduler-stats {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
+
+@media (max-width: 768px) {
+    .tpo-scheduler {
+        padding: 15px;
+    }
+
+    .tpo-scheduler .scheduler-header {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+
+    .tpo-scheduler .scheduler-header h2 {
+        font-size: 21px;
+    }
+
+    .tpo-scheduler .scheduler-stats {
+        gap: 10px;
+    }
+
+    .tpo-scheduler .scheduler-stat {
+        padding: 12px;
+    }
+
+    .tpo-scheduler .scheduler-panel {
+        padding: 14px;
+    }
+
+    .tpo-scheduler .activity-item {
+        grid-template-columns: 75px minmax(0, 1fr);
+        gap: 10px;
+    }
+
+    .tpo-scheduler .activity-status {
+        grid-column: 2;
+        justify-self: start;
+    }
+
+    .tpo-scheduler .activity-meta {
+        flex-direction: column;
+        gap: 5px;
+    }
+}
+
+@media (max-width: 480px) {
+    .tpo-scheduler .scheduler-stats {
+        grid-template-columns: minmax(0, 1fr);
+    }
+
+    .tpo-scheduler .calendar-toolbar {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+
+    .tpo-scheduler .calendar-day {
+        min-height: 39px;
+        padding-top: 6px;
+    }
+
+    .tpo-scheduler .calendar-legend {
+        gap: 8px;
+    }
+
+    .tpo-scheduler .activity-item {
+        grid-template-columns: minmax(0, 1fr);
+    }
+
+    .tpo-scheduler .activity-status {
+        grid-column: 1;
+    }
+
+    .tpo-scheduler .activity-category {
+        justify-self: start;
+    }
+}
+
+
+/* =========================================
+   SCHEDULER ACTIVITY MODAL
+========================================= */
+
+#addActivityModal .modal-dialog {
+    max-width: 1100px;
+    width: calc(100% - 2rem);
+    margin: 1rem auto;
+}
+
+#addActivityModal .modal-content {
+    max-height: calc(100vh - 2rem);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    border: 0;
+    border-radius: 18px;
+}
+
+#addActivityModal .scheduler-modal-header,
+#addActivityModal .scheduler-modal-footer {
+    flex-shrink: 0;
+}
+
+#addActivityModal .scheduler-modal-body {
+    flex: 1 1 auto;
+    min-height: 0;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    padding: 1.5rem;
+}
+
+#addActivityModal .activity-form-section[hidden] {
+    display: none !important;
+}
+
+#addActivityModal fieldset:disabled {
+    display: none;
+}
+
+#addActivityModal .activity-type-options {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 1rem;
+}
+
+#addActivityModal .activity-type-option {
+    display: flex;
+    align-items: center;
+    gap: 0.9rem;
+    padding: 1rem;
+    border: 1px solid #dbe3ef;
+    border-radius: 14px;
+    background: #fff;
+    cursor: pointer;
+    transition: border-color .2s, background .2s, box-shadow .2s;
+}
+
+    #addActivityModal .activity-type-option:hover {
+        border-color: #93b4f7;
+        box-shadow: 0 4px 14px rgba(31, 79, 150, .08);
+    }
+
+    #addActivityModal .activity-type-option.active {
+        border-color: #2563eb;
+        background: #eff6ff;
+        box-shadow: 0 0 0 2px rgba(37, 99, 235, .08);
+    }
+
+    #addActivityModal .activity-type-option input[type="radio"] {
+        flex-shrink: 0;
+        width: 18px;
+        height: 18px;
+        accent-color: #2563eb;
+    }
+
+    #addActivityModal .activity-type-option strong,
+    #addActivityModal .activity-type-option small {
+        display: block;
+    }
+
+    #addActivityModal .activity-type-option small {
+        margin-top: 4px;
+        color: #64748b;
+        line-height: 1.4;
+    }
+
+#addActivityModal .type-check {
+    margin-left: auto;
+    color: #2563eb;
+    opacity: 0;
+}
+
+#addActivityModal .activity-type-option.active .type-check {
+    opacity: 1;
+}
+
+#addActivityModal .activity-section-heading {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin: 1.5rem 0 1.25rem;
+}
+
+    #addActivityModal .activity-section-heading h6 {
+        margin: 0 0 4px;
+        font-weight: 700;
+    }
+
+    #addActivityModal .activity-section-heading p {
+        margin: 0;
+        color: #64748b;
+        font-size: .875rem;
+    }
+
+#addActivityModal .activity-type-icon,
+#addActivityModal .section-heading-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    width: 42px;
+    height: 42px;
+    border-radius: 12px;
+}
+
+#addActivityModal .general-icon {
+    color: #2563eb;
+    background: #dbeafe;
+}
+
+#addActivityModal .placement-icon {
+    color: #047857;
+    background: #d1fae5;
+}
+
+#addActivityModal .form-section-label {
+    padding-bottom: .5rem;
+    border-bottom: 1px solid #e5eaf2;
+    color: #334155;
+    font-weight: 700;
+}
+
+#addActivityModal .form-control,
+#addActivityModal .form-select {
+    min-height: 43px;
+    border-color: #dbe3ef;
+    border-radius: 9px;
+}
+
+#addActivityModal textarea.form-control {
+    min-height: auto;
+}
+
+#addActivityModal .form-control:focus,
+#addActivityModal .form-select:focus {
+    border-color: #80a8f8;
+    box-shadow: 0 0 0 .2rem rgba(37, 99, 235, .12);
+}
+
+#addActivityModal .scheduler-modal-footer {
+    background: #fff;
+    border-top: 1px solid #e9edf4;
+    padding: 1rem 1.5rem;
+}
+
+@media (max-width: 767px) {
+    #addActivityModal .modal-dialog {
+        width: calc(100% - 1rem);
+        margin: .5rem auto;
+    }
+
+    #addActivityModal .modal-content {
+        max-height: calc(100vh - 1rem);
+        border-radius: 12px;
+    }
+
+    #addActivityModal .scheduler-modal-body {
+        padding: 1rem;
+    }
+
+    #addActivityModal .activity-type-options {
+        grid-template-columns: 1fr;
+    }
+}

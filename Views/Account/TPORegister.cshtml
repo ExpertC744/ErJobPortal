@@ -222,56 +222,74 @@
             </div>
 
 
+            @*shrirang 07/10/26*@
             <!-- =================================================
-                 COLLEGE NAME + COLLEGE CODE
-            ================================================== -->
+     COLLEGE NAME + COLLEGE CODE
+================================================== -->
 
-            <div class="register-form-row">
+<div class="register-form-row">
 
-                <!-- College Name -->
+    <!-- College Name -->
 
-                <div class="register-form-group">
+    <div class="register-form-group">
 
-                    <label asp-for="CollegeName"
-                           class="register-label">
-                        College Name
-                    </label>
+        <label asp-for="CollegeName"
+               class="register-label">
+            College Name
+        </label>
 
-                    <input asp-for="CollegeName"
-                           type="text"
-                           class="register-input"
-                           placeholder="Enter college name"
-                           autocomplete="organization" />
+        <div class="register-input-box">
 
-                    <span asp-validation-for="CollegeName"
-                          class="text-danger register-validation">
-                    </span>
+            <select asp-for="CollegeName"
+                    id="CollegeName"
+                    class="register-select">
 
-                </div>
+                <option value="0">
+                    -- Select College Name --
+                </option>
+
+            </select>
+
+        </div>
+
+        <span asp-validation-for="CollegeName"
+              class="text-danger register-validation">
+        </span>
+
+    </div>
 
 
-                <!-- College Code -->
+    <!-- College Code -->
 
-                <div class="register-form-group">
+    <div class="register-form-group">
 
-                    <label asp-for="CollegeCode"
-                           class="register-label">
-                        College Code
-                    </label>
+        <label asp-for="CollegeCode"
+               class="register-label">
+            College Code
+        </label>
 
-                    <input asp-for="CollegeCode"
-                           type="text"
-                           class="register-input"
-                           placeholder="Enter college code"
-                           autocomplete="off" />
+        <div class="register-input-box">
 
-                    <span asp-validation-for="CollegeCode"
-                          class="text-danger register-validation">
-                    </span>
+            <select asp-for="CollegeCode"
+                    id="CollegeCode"
+                    class="register-select">
 
-                </div>
+                <option value="0">
+                    -- Select College Code --
+                </option>
 
-            </div>
+            </select>
+
+        </div>
+
+        <span asp-validation-for="CollegeCode"
+              class="text-danger register-validation">
+        </span>
+
+    </div>
+
+</div>
+            @*end*@
 
 
             <!-- =================================================
@@ -373,23 +391,34 @@
 
                 <!-- Department -->
 
-                <div class="register-form-group">
+                <!-- Department -->
 
-                    <label asp-for="DepartmentName"
-                           class="register-label">
-                        Department Name
-                    </label>
+<div class="register-form-group">
 
-                    <input asp-for="DepartmentName"
-                           type="text"
-                           class="register-input"
-                           placeholder="e.g. Training & Placement" />
+    <label asp-for="nDepartment"
+           class="register-label">
+        Department
+    </label>
 
-                    <span asp-validation-for="DepartmentName"
-                          class="text-danger register-validation">
-                    </span>
+    <div class="register-input-box">
 
-                </div>
+        <select asp-for="nDepartment"
+                id="departmentSelect"
+                class="register-select">
+
+            <option value="0">
+                -- Select Department --
+            </option>
+
+        </select>
+
+    </div>
+
+    <span asp-validation-for="nDepartment"
+          class="text-danger register-validation">
+    </span>
+
+</div>
 
             </div>
 
@@ -746,6 +775,226 @@
                 }
 
             });
+
+            // =====================================================
+// COLLEGE DROPDOWNS
+// =====================================================
+
+const collegeNameSelect =
+    $('#CollegeName');
+
+const collegeCodeSelect =
+    $('#CollegeCode');
+
+    const departmentSelect =
+    $('#departmentSelect');
+
+
+// =====================================================
+// LOAD COLLEGES
+// SAME API USED BY CANDIDATE REGISTRATION
+// =====================================================
+
+$.ajax({
+
+    url: '@Url.Action("GetColleges", "Account")',
+
+    type: 'GET',
+
+    success: function (data) {
+
+        console.log("Colleges:", data);
+
+        collegeNameSelect.empty();
+
+        collegeNameSelect.append(
+            $('<option>', {
+                value: '0',
+                text: '-- Select College Name --'
+            })
+        );
+
+        $.each(data, function (index, college) {
+
+            collegeNameSelect.append(
+                $('<option>', {
+
+                    value: college.nID,
+
+                    text: college.sCollegeName
+
+                })
+            );
+
+        });
+
+    },
+
+    error: function (xhr, status, error) {
+
+        console.error(
+            "College loading failed:",
+            error
+        );
+
+    }
+
+});
+
+// =====================================================
+// LOAD DEPARTMENTS
+// SAME API USED BY CANDIDATE REGISTRATION
+// =====================================================
+
+$.ajax({
+
+    url: '@Url.Action("GetDepartments", "Account")',
+
+    type: 'GET',
+
+    success: function (data) {
+
+        console.log(
+            "Departments:",
+            data
+        );
+
+        departmentSelect.empty();
+
+        departmentSelect.append(
+            $('<option>', {
+
+                value: '0',
+
+                text: '-- Select Department --'
+
+            })
+        );
+
+        $.each(data, function (index, item) {
+
+            departmentSelect.append(
+                $('<option>', {
+
+                    value: item.nID,
+
+                    text: item.sDepartment
+
+                })
+            );
+
+        });
+
+    },
+
+    error: function (xhr, status, error) {
+
+        console.error(
+            "Department loading failed:",
+            error
+        );
+
+    }
+
+});
+
+
+// =====================================================
+// COLLEGE NAME CHANGE
+// LOAD COLLEGE CODE
+// =====================================================
+
+collegeNameSelect.on('change', function () {
+
+    const collegeId = $(this).val();
+
+    collegeCodeSelect.empty();
+
+    collegeCodeSelect.append(
+        $('<option>', {
+
+            value: '0',
+
+            text: '-- Select College Code --'
+
+        })
+    );
+
+
+    if (!collegeId ||
+        collegeId === '0') {
+
+        return;
+
+    }
+
+
+    $.ajax({
+
+        url: '@Url.Action("GetCollegeCodes", "Account")',
+
+        type: 'GET',
+
+        data: {
+
+            collegeId: collegeId
+
+        },
+
+        success: function (data) {
+
+            console.log(
+                "College Codes:",
+                data
+            );
+
+
+            if (!data ||
+                data.length === 0) {
+
+                collegeCodeSelect.append(
+                    $('<option>', {
+
+                        value: '0',
+
+                        text: 'No College Code Available'
+
+                    })
+                );
+
+                return;
+
+            }
+
+
+            $.each(data, function (index, code) {
+
+                collegeCodeSelect.append(
+                    $('<option>', {
+
+                        value: code.nCode,
+
+                        text: code.nCode
+
+                    })
+                );
+
+            });
+
+        },
+
+        error: function (xhr, status, error) {
+
+            console.error(
+                "College code loading failed:",
+                error
+            );
+
+        }
+
+    });
+
+});
 
 
             // =====================================================

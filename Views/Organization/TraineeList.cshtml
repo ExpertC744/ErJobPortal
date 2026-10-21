@@ -7,15 +7,49 @@
     ViewData["UserName"] = "Organization";
 }
 
+<style>
+
+    .status {
+        border: none;
+        padding: 6px 14px;
+        border-radius: 20px;
+        font-size: 13px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        min-width: 90px;
+    }
+
+    .status.enabled {
+        background: #d1e7dd;
+        color: #0f5132;
+    }
+
+    .status.enabled:hover {
+        background: #198754;
+        color: #fff;
+    }
+
+    .status.disabled {
+        background: #f8d7da;
+        color: #842029;
+    }
+
+    .status.disabled:hover {
+        background: #dc3545;
+        color: #fff;
+    }
+
+</style>
+
+
 
 <div class="container-fluid">
 
-    <!-- MASTER TABLE CARD -->
-
+    <!-- MASTER TABLE -->
     <div class="master-table-container">
 
-        <!-- MASTER TABLE HEADER -->
-
+        <!-- TABLE HEADER -->
         <div class="master-table-title">
 
             <div>
@@ -29,19 +63,20 @@
                 </p>
 
             </div>
-                    @* radhika30-09 *@
+
             <a asp-controller="SuperAdmin"
-   asp-action="Dashboard"
-   class="master-back-btn"
-   title="Back to Dashboard">
-    <i class="fas fa-arrow-left"></i>
-</a>
+               asp-action="Dashboard"
+               class="master-back-btn"
+               title="Back to Dashboard">
+
+                <i class="fas fa-arrow-left"></i>
+
+            </a>
 
         </div>
 
 
-        <!-- MASTER TABLE -->
-
+        <!-- TABLE -->
         <div class="table-responsive">
 
             <table id="candidateTable"
@@ -51,17 +86,65 @@
 
                     <tr>
 
-                        <th>ID</th>
+                        <th>
+                            ID
+                        </th>
 
-                        <th>First Name</th>
+                        <th>
+                            First Name
+                        </th>
 
-                        <th>Last Name</th>
+                        <th>
+                            Last Name
+                        </th>
 
-                        <th>Mobile</th>
+                        <th>
+                            Mobile
+                        </th>
 
-                        <th>Email</th>
+                        <th>
+                            Email
+                        </th>
 
-                        <th>Action</th>
+                        <th>
+                            Date of Birth
+                        </th>
+
+                        <th>
+                            Gender
+                        </th>
+
+                        <th>
+                            College Code
+                        </th>
+
+                        <th>
+                            College Name
+                        </th>
+
+                        <th>
+                            Branch
+                        </th>
+
+                        <th>
+                            Passout Year
+                        </th>
+
+                        <th>
+                            Department
+                        </th>
+
+                        <th>
+                            Registration Date
+                        </th>
+
+                        <th>
+                            Status
+                        </th>
+
+                        <th>
+                            Action
+                        </th>
 
                     </tr>
 
@@ -76,35 +159,132 @@
                         {
                             <tr>
 
+                                <!-- ID -->
                                 <td class="master-id">
                                     @item.nID
                                 </td>
 
+
+                                <!-- FIRST NAME -->
                                 <td>
                                     @item.sFName
                                 </td>
 
+
+                                <!-- LAST NAME -->
                                 <td>
                                     @item.sLName
                                 </td>
 
+
+                                <!-- MOBILE -->
                                 <td>
                                     @item.sMobile
                                 </td>
 
+
+                                <!-- EMAIL -->
                                 <td>
                                     @item.sEmail
                                 </td>
 
+
+                                <!-- DOB -->
+                                <td>
+                                    @(item.DOB.HasValue
+                                        ? item.DOB.Value.ToString("dd-MM-yyyy")
+                                        : "-")
+                                </td>
+
+
+                                <!-- GENDER -->
+                                <td>
+                                    @if (item.nGender == 1)
+                                    {
+                                        <span>Male</span>
+                                    }
+                                    else if (item.nGender == 2)
+                                    {
+                                        <span>Female</span>
+                                    }
+                                    else
+                                    {
+                                        <span>Other</span>
+                                    }
+                                </td>
+
+
+                                <!-- COLLEGE CODE -->
+                                <td>
+                                    @item.nCollegeCode
+                                </td>
+
+
+                                <!-- COLLEGE NAME -->
+                                <td>
+                                    @item.sCollegeName
+                                </td>
+
+
+                                <!-- BRANCH -->
+                                <td>
+                                    @(item.nBranch.HasValue
+                                        ? item.nBranch.Value.ToString()
+                                        : "-")
+                                </td>
+
+
+                                <!-- PASSOUT YEAR -->
+                                <td>
+                                    @(item.nPassoutYear.HasValue
+                                        ? item.nPassoutYear.Value.ToString()
+                                        : "-")
+                                </td>
+
+
+                                <!-- DEPARTMENT -->
+                                <td>
+                                    @(item.nDepartment.HasValue
+                                        ? item.nDepartment.Value.ToString()
+                                        : "-")
+                                </td>
+
+
+                                <!-- REGISTRATION DATE -->
+                                <td>
+                                    @(item.RegDate.HasValue
+                                        ? item.RegDate.Value.ToString("dd-MM-yyyy HH:mm")
+                                        : "-")
+                                </td>
+
+
+                               <!-- STATUS -->
                                 <td>
 
                                     <button type="button"
-                                            class="master-view-btn"
-                                            data-id="@item.nID">
+                                            class="status @(item.nBit ? "enabled" : "disabled")"
+                                            data-id="@item.nID"
+                                            onclick="toggleCandidateStatus(this)">
 
-                                        View
+                                        @(item.nSABit ? "Enabled" : "Disabled")
 
                                     </button>
+
+                                </td>
+
+
+                                <!-- ACTION -->
+                                <td>
+
+                                    <a asp-controller="SuperAdmin"
+                                   asp-action="ViewTraineeResume"
+                                   asp-route-id="@item.nID"
+                                   class="resume-view-btn"
+                                   title="View Resume">
+
+                                    <i class="fas fa-eye"></i>
+
+                                </a>
 
                                 </td>
 
@@ -115,7 +295,7 @@
                     {
                         <tr>
 
-                            <td colspan="6"
+                            <td colspan="15"
                                 class="text-center">
 
                                 No candidate registrations found.
@@ -132,12 +312,86 @@
         </div>
 
 
-        <!-- MASTER PAGE INFO -->
-
+        <!-- PAGE INFORMATION -->
         <div id="candidatePageInfo"
-             class="master-page-info text-center">
+             class="master-page-info text-center d-none">
+
         </div>
 
     </div>
 
 </div>
+
+
+
+<script>
+
+    function toggleCandidateStatus(button) {
+
+        const candidateId = button.getAttribute("data-id");
+
+        if (!candidateId) {
+            return;
+        }
+
+        const currentStatus = button.classList.contains("enabled");
+
+        const message = currentStatus
+            ? "Are you sure you want to disable this candidate?"
+            : "Are you sure you want to enable this candidate?";
+
+        if (!confirm(message)) {
+            return;
+        }
+
+        $.ajax({
+
+            url: '@Url.Action("ToggleCandidateStatus", "SuperAdmin")',
+
+            type: 'POST',
+
+            data: {
+                id: candidateId
+            },
+
+            success: function (response) {
+
+                if (response.success) {
+
+                    if (response.status) {
+
+                        button.classList.remove("disabled");
+                        button.classList.add("enabled");
+
+                        button.innerText = "Enabled";
+
+                    }
+                    else {
+
+                        button.classList.remove("enabled");
+                        button.classList.add("disabled");
+
+                        button.innerText = "Disabled";
+
+                    }
+
+                }
+                else {
+
+                    alert(response.message || "Unable to update candidate status.");
+
+                }
+
+            },
+
+            error: function () {
+
+                alert("Something went wrong while updating candidate status.");
+
+            }
+
+        });
+
+    }
+
+</script>

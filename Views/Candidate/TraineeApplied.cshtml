@@ -92,12 +92,16 @@
                             <!-- ORGANIZATION -->
 
                             <td>
-                                <a href="javascript:void(0);"
-                                   class="organization-link">
+                               
+<a asp-controller="Account"
+   asp-action="ViewOrgPost"
+   asp-route-id="@post.nID"
+   asp-route-nOrgID="@post.nOrgID"
+   asp-route-matchingPostIds="@string.Join(",", traineeAppliedPosts.Select(p => p.nID).Distinct())"
+   class="organization-link">
+    @post.sName
+</a>
 
-                                    @post.sName
-
-                                </a>
                             </td>
 
 
@@ -185,9 +189,9 @@
 <style>
 
     /*
-           Only responsive behavior.
-           Master 1Trainee CSS remains untouched.
-        */
+               Only responsive behavior.
+               Master 1Trainee CSS remains untouched.
+            */
 
     .trainee-applied-responsive {
         width: 100%;

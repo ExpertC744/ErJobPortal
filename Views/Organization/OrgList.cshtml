@@ -12,76 +12,47 @@
 <div class="container-fluid">
 
     <!-- MASTER TABLE CARD -->
-
     <div class="master-table-container">
-
         <!-- MASTER TABLE HEADER -->
-
         <div class="master-table-title">
-
             <div>
-
                 <h2>
                     Organization Registration List
                 </h2>
-
                 <p>
                     View and manage registered organizations
                 </p>
-
             </div>
-
                     @* radhika30-09 *@
-                     <a asp-controller="SuperAdmin"
+                     <a asp-controller="Organization"
    asp-action="Dashboard"
    class="master-back-btn"
    title="Back to Dashboard">
     <i class="fas fa-arrow-left"></i>
 </a>
-
         </div>
-
 
         <!-- MASTER TABLE -->
 
         <div class="table-responsive">
-
             <table id="organizationTable"
                    class="master-data-table">
-
                 <thead>
-
                     <tr>
-
                         <th>ID</th>
-
                         <th>Organization</th>
-
                         <th>URL</th>
-
                         <th>Name</th>
-
                         <th>Designation</th>
-
                         <th>Mobile</th>
-
                         <th>Email</th>
-
                         <th>College Code</th>
-
                         <th>College Name</th>
-
                         <th>Registration Date</th>
-
                         <th>Action</th>
-
                     </tr>
-
                 </thead>
-
-
                 <tbody>
-
                     @if (Model != null && Model.Count > 0)
                     {
                         foreach (var item in Model)
@@ -167,8 +138,7 @@
 
 
                                 <td>
-
-                                    <button type="button"
+                                    <button type="button" asp-controller="Organization" asp-action="ViewOrgProfile" asp-route-id="@item.orgCode"
                                             class="master-view-btn"
                                             data-id="@item.nID">
 

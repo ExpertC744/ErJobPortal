@@ -1,0 +1,231 @@
+﻿@using ErJobPortal.Models
+@model TPOViewNotificationM
+
+<link rel="stylesheet"
+      href="~/css/TPOViewNotificationDetails.css"
+      asp-append-version="true" />
+
+<div class="notification-details">
+
+    <!-- HEADER -->
+    <div class="notification-detail-header">
+
+        <div class="notification-detail-icon">
+            <i class="fas fa-bell"></i>
+        </div>
+
+        <div class="notification-detail-heading">
+
+            <h4 class="notification-detail-title">
+                @Model.Title
+            </h4>
+
+            <div class="notification-detail-created">
+                <span>
+                    <i class="fas fa-user-edit"></i>
+                    @(string.IsNullOrWhiteSpace(Model.CreatedByName)
+                        ? "TPO"
+                        : Model.CreatedByName)
+                </span>
+
+                <span class="detail-created-date">
+                    <i class="far fa-calendar-alt"></i>
+                    @Model.CreatedDate.ToString("dd MMM yyyy, hh:mm tt")
+                </span>
+            </div>
+
+        </div>
+
+    </div>
+
+    <!-- BASIC INFORMATION -->
+    <div class="notification-summary-grid">
+
+        <div class="notification-summary-item">
+            <span class="detail-label">Type</span>
+            <div class="detail-value">
+                <span class="detail-badge badge-type">
+                    <i class="fas fa-bell"></i>
+                    @(string.IsNullOrWhiteSpace(Model.Type)
+                        ? "Not specified"
+                        : Model.Type)
+                </span>
+            </div>
+        </div>
+
+        <div class="notification-summary-item">
+            <span class="detail-label">Audience</span>
+            <div class="detail-value">
+                <span class="detail-badge badge-audience">
+                    <i class="fas fa-users"></i>
+                    @(Model.Audience == "AllStudents"
+                        ? "All Students"
+                        : Model.Audience ?? "Not specified")
+                </span>
+            </div>
+        </div>
+
+        <div class="notification-summary-item">
+            <span class="detail-label">Status</span>
+            <div class="detail-value">
+                @if (Model.Status == "Active")
+                {
+                    <span class="detail-badge badge-active">Active</span>
+                }
+                else if (Model.Status == "Completed")
+                {
+                    <span class="detail-badge badge-completed">Completed</span>
+                }
+                else
+                {
+                    <span class="detail-badge badge-inactive">
+                        @(string.IsNullOrWhiteSpace(Model.Status)
+                            ? "Inactive"
+                            : Model.Status)
+                    </span>
+                }
+            </div>
+        </div>
+
+    </div>
+
+    <!-- EVENT DETAILS -->
+    <div class="notification-event-grid">
+
+        <div class="detail-box">
+            <div class="detail-label">
+                <i class="far fa-calendar-alt"></i>
+                Event Date
+            </div>
+
+            <div class="detail-value">
+                @if (Model.NotificationDate.HasValue)
+                {
+                    @Model.NotificationDate.Value.ToString("dd MMM yyyy")
+                }
+                else
+                {
+                    <span class="detail-muted">Not specified</span>
+                }
+            </div>
+        </div>
+
+        <div class="detail-box">
+            <div class="detail-label">
+                <i class="far fa-clock"></i>
+                Event Time
+            </div>
+
+            <div class="detail-value">
+                @if (Model.NotificationTime.HasValue)
+                {
+                    @DateTime.Today.Add(Model.NotificationTime.Value).ToString("hh:mm tt")
+                }
+                else
+                {
+                    <span class="detail-muted">Not specified</span>
+                }
+            </div>
+        </div>
+
+        <div class="detail-box">
+            <div class="detail-label">
+                <i class="fas fa-envelope"></i>
+                Email Notification
+            </div>
+
+            <div class="detail-value">
+                @if (Model.SendEmailNotification)
+                {
+                    <span class="detail-badge badge-active">
+                        <i class="fas fa-check"></i> Enabled
+                    </span>
+                }
+                else
+                {
+                    <span class="detail-badge badge-disabled">
+                        Disabled
+                    </span>
+                }
+            </div>
+        </div>
+
+    </div>
+
+    <!-- NOTIFICATION CONTENT -->
+    <section class="notification-detail-section">
+
+        <h5 class="detail-section-title">
+            <i class="fas fa-align-left"></i>
+            Notification Content
+        </h5>
+
+        <div class="notification-content-box">
+            @Html.Raw(Model.Content)
+        </div>
+
+    </section>
+
+    <!-- ATTACHMENTS -->
+    @if (!string.IsNullOrWhiteSpace(Model.Attachment1Path) ||
+    !string.IsNullOrWhiteSpace(Model.Attachment2Path))
+    {
+        <section class="notification-detail-section">
+
+            <h5 class="detail-section-title">
+                <i class="fas fa-paperclip"></i>
+                Attachments
+            </h5>
+
+            <div class="attachment-list">
+
+                @if (!string.IsNullOrWhiteSpace(Model.Attachment1Path))
+                {
+                    <a href="@Model.Attachment1Path"
+                       target="_blank"
+                       rel="noopener noreferrer"
+                       class="attachment-item">
+
+                        <span class="attachment-file-icon">
+                            <i class="fas fa-file-alt"></i>
+                        </span>
+
+                        <span class="attachment-name">
+                            @(Model.Attachment1OriginalName ?? "Attachment 1")
+                        </span>
+
+                        <i class="fas fa-external-link-alt attachment-link-icon"></i>
+                    </a>
+                }
+
+                @if (!string.IsNullOrWhiteSpace(Model.Attachment2Path))
+                {
+                    <a href="@Model.Attachment2Path"
+                       target="_blank"
+                       rel="noopener noreferrer"
+                       class="attachment-item">
+
+                        <span class="attachment-file-icon">
+                            <i class="fas fa-file-alt"></i>
+                        </span>
+
+                        <span class="attachment-name">
+                            @(Model.Attachment2OriginalName ?? "Attachment 2")
+                        </span>
+
+                        <i class="fas fa-external-link-alt attachment-link-icon"></i>
+                    </a>
+                }
+
+            </div>
+
+        </section>
+    }
+
+    <!-- FOOTER -->
+    <div class="notification-detail-footer">
+        <span>Notification ID</span>
+        <strong>#@Model.NotificationID</strong>
+    </div>
+
+</div>

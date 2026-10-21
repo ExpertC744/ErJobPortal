@@ -1,5 +1,6 @@
 ﻿using ErJobPortal.Models;
 using ErJobPortal.Repositories;
+using ErJobPortal.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Data.SqlClient;
 using System.Data;
@@ -10,13 +11,15 @@ namespace ErJobPortal.Controllers
     {
         private readonly IConfiguration _configuration;
         private readonly AccountRepository _repository;
+        private readonly EmailService _emailService;
 
-        public SuperAdminController(IConfiguration configuration, AccountRepository repository)
+        public SuperAdminController(IConfiguration configuration, AccountRepository repository, EmailService emailService)
         {
             _configuration = configuration;
             _repository = repository;
+            _emailService = emailService;
         }
-
+        //sanidhya 08/10/26
         [HttpGet]
         [Route("SuperAdmin/Dashboard/{id:int}")]
         public IActionResult Dashboard(int id)
@@ -29,6 +32,10 @@ namespace ErJobPortal.Controllers
             int traineeRegistrationCount = 0;
             int organizationRegistrationCount = 0;
 
+            int traineeProfileCount = 0;
+            int organizationProfileCount = 0;
+
+
             string connectionString =
                 _configuration.GetConnectionString("DefaultConnection");
 
@@ -37,12 +44,23 @@ namespace ErJobPortal.Controllers
                 con.Open();
 
                 string query = @"
- SELECT
-     (SELECT COUNT(nID)
-      FROM tblCandidateRegister) AS CandidateCount,
+   SELECT
 
-     (SELECT COUNT(nID)
-      FROM tblOrgRegistration) AS OrganizationCount;";
+      -- TRAINEE REGISTRATION COUNT
+      (SELECT COUNT(nID)
+       FROM tblCandidateRegister) AS CandidateCount,
+
+      -- ORGANIZATION REGISTRATION COUNT
+      (SELECT COUNT(nID)
+       FROM tblOrgRegistration) AS OrganizationCount,
+
+      -- TRAINEE PROFILE COUNT
+      (SELECT COUNT(nID)
+       FROM tblCandidateProfile) AS TraineeProfileCount,
+
+      -- ORGANIZATION PROFILE COUNT
+      (SELECT COUNT(nID)
+       FROM tblOrgProfile) AS OrganizationProfileCount;";
 
                 using (SqlCommand cmd = new SqlCommand(query, con))
                 using (SqlDataReader dr = cmd.ExecuteReader())
@@ -54,6 +72,13 @@ namespace ErJobPortal.Controllers
 
                         organizationRegistrationCount =
                             Convert.ToInt32(dr["OrganizationCount"]);
+
+                        traineeProfileCount =
+                            Convert.ToInt32(dr["TraineeProfileCount"]);
+
+                        organizationProfileCount =
+                            Convert.ToInt32(dr["OrganizationProfileCount"]);
+
                     }
                 }
             }
@@ -71,6 +96,12 @@ namespace ErJobPortal.Controllers
 
             ViewBag.OrganizationRegistrationCount =
                 organizationRegistrationCount;
+
+            ViewBag.TraineeProfileCount =
+    traineeProfileCount;
+
+            ViewBag.OrganizationProfileCount =
+                organizationProfileCount;
 
             ViewBag.Trainees = trainees;
 
@@ -147,33 +178,92 @@ namespace ErJobPortal.Controllers
 
 
         [HttpPost]
-        public IActionResult ToggleCandidateStatus(int id)
+        public async Task<IActionResult> ToggleCandidateStatus(int id)
         {
             try
             {
-                bool result = _repository.ToggleCandidateStatus(id);
+                // 1. Update candidate status in the database
+                bool updated = _repository.ToggleCandidateStatus(id);
 
-                if (result)
+                if (!updated)
+                {
+                    return Json(new
+                    {
+                        success = false,
+                        message = "Candidate not found or status could not be updated."
+                    });
+                }
+
+                // 2. Retrieve candidate details and new status
+                var candidate =
+                    _repository.GetCandidateStatusEmailDetails(id);
+
+                if (candidate == null)
                 {
                     return Json(new
                     {
                         success = true,
-                        status = _repository.GetCandidateStatus(id)
+                        emailSent = false,
+                        message = "Status updated, but candidate details could not be retrieved. Please refresh the page."
                     });
                 }
+
+                // 3. Validate candidate email
+                if (string.IsNullOrWhiteSpace(candidate.Value.Email))
+                {
+                    return Json(new
+                    {
+                        success = true,
+                        status = candidate.Value.IsEnabled,
+                        emailSent = false,
+                        message = "Status updated, but the candidate email address is empty."
+                    });
+                }
+
+                // 4. Send status notification email
+                try
+                {
+                    await _emailService.SendCandidateStatusEmailAsync(
+                        candidate.Value.Email,
+                        candidate.Value.Name,
+                        candidate.Value.IsEnabled
+                    );
+
+                    return Json(new
+                    {
+                        success = true,
+                        status = candidate.Value.IsEnabled,
+                        emailSent = true,
+                        message = candidate.Value.IsEnabled
+                            ? "Candidate enabled and notification email sent successfully."
+                            : "Candidate disabled and notification email sent successfully."
+                    });
+                }
+                catch (Exception emailEx)
+                {
+                    // Log the actual email error for debugging
+                    Console.WriteLine(
+                        $"Candidate status email failed for ID {id}: {emailEx}");
+
+                    return Json(new
+                    {
+                        success = true,
+                        status = candidate.Value.IsEnabled,
+                        emailSent = false,
+                        message = "Candidate status updated, but email failed: "
+                                  + emailEx.Message
+                    });
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(
+                    $"ToggleCandidateStatus failed for ID {id}: {ex}");
 
                 return Json(new
                 {
                     success = false,
-                    message = "Candidate status could not be updated."
-                });
-            }
-            catch (Exception ex)
-            {
-                return Json(new
-                {
-                    success = false,
-                    message = ex.Message
+                    message = "Unable to update candidate status. Check the application logs."
                 });
             }
         }
@@ -554,38 +644,38 @@ namespace ErJobPortal.Controllers
         }
 
 
-        [HttpPost]
-        [Route("SuperAdmin/ToggleOrganizationSABit")]
-        public IActionResult ToggleOrganizationSABit(int id, bool status)
-        {
-            try
-            {
-                bool result = _repository.ToggleOrganizationSABit(id, status);
+        //[HttpPost]
+        //[Route("SuperAdmin/ToggleOrganizationSABit")]
+        //public IActionResult ToggleOrganizationSABit(int id, bool status)
+        //{
+        //    try
+        //    {
+        //        bool result = _repository.ToggleOrganizationSABit(id, status);
 
-                if (result)
-                {
-                    return Json(new
-                    {
-                        success = true,
-                        status = status
-                    });
-                }
+        //        if (result)
+        //        {
+        //            return Json(new
+        //            {
+        //                success = true,
+        //                status = status
+        //            });
+        //        }
 
-                return Json(new
-                {
-                    success = false,
-                    message = "Organization status could not be updated."
-                });
-            }
-            catch (Exception ex)
-            {
-                return Json(new
-                {
-                    success = false,
-                    message = ex.Message
-                });
-            }
-        }
+        //        return Json(new
+        //        {
+        //            success = false,
+        //            message = "Organization status could not be updated."
+        //        });
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        return Json(new
+        //        {
+        //            success = false,
+        //            message = ex.Message
+        //        });
+        //    }
+        //}
 
 
         public IActionResult SAOrgProfileList(int? id, bool? status)
@@ -3356,14 +3446,22 @@ ORDER BY SAF.nID DESC, OFB.nID DESC;
         {
             return View();
         }
+        // sanidhya 08/10/26
         [HttpGet]
         [Route("SuperAdmin/SAAllOrganizationPost")]
         public IActionResult SAAllOrganizationPost()
         {
             List<OrgPostM> posts = new List<OrgPostM>();
 
-            string connectionString =
+            string? connectionString =
                 _configuration.GetConnectionString("DefaultConnection");
+
+            // Check whether DefaultConnection is available
+            if (string.IsNullOrWhiteSpace(connectionString))
+            {
+                throw new InvalidOperationException(
+                    "DefaultConnection is missing or empty in appsettings.json.");
+            }
 
             using (SqlConnection con = new SqlConnection(connectionString))
             {
@@ -3380,13 +3478,15 @@ ORDER BY SAF.nID DESC, OFB.nID DESC;
                         {
                             OrgPostM item = new OrgPostM();
 
-                            item.nID = dr["nID"] == DBNull.Value
-                                ? 0
-                                : Convert.ToInt32(dr["nID"]);
+                            item.nID =
+                                dr["nID"] == DBNull.Value
+                                    ? 0
+                                    : Convert.ToInt32(dr["nID"]);
 
-                            item.nPositionID = dr["nPositionID"] == DBNull.Value
-                                ? 0
-                                : Convert.ToInt32(dr["nPositionID"]);
+                            item.nPositionID =
+                                dr["nPositionID"] == DBNull.Value
+                                    ? 0
+                                    : Convert.ToInt32(dr["nPositionID"]);
 
                             item.sPositionName =
                                 dr["sPositionName"]?.ToString() ?? "";
@@ -3412,7 +3512,8 @@ ORDER BY SAF.nID DESC, OFB.nID DESC;
                             item.nMinimumQualificationID =
                                 dr["nMinimumQualificationID"] == DBNull.Value
                                     ? 0
-                                    : Convert.ToInt32(dr["nMinimumQualificationID"]);
+                                    : Convert.ToInt32(
+                                        dr["nMinimumQualificationID"]);
 
                             item.sMinimumQualificationName =
                                 dr["sMinimumQualificationName"]?.ToString() ?? "";
@@ -3432,7 +3533,8 @@ ORDER BY SAF.nID DESC, OFB.nID DESC;
                             item.nInternshipTypeID =
                                 dr["nInternshipTypeID"] == DBNull.Value
                                     ? 0
-                                    : Convert.ToInt32(dr["nInternshipTypeID"]);
+                                    : Convert.ToInt32(
+                                        dr["nInternshipTypeID"]);
 
                             item.sInternshipTypeName =
                                 dr["sInternshipTypeName"]?.ToString() ?? "";
@@ -3443,7 +3545,8 @@ ORDER BY SAF.nID DESC, OFB.nID DESC;
                             item.nInternshipFellowshipTypeID =
                                 dr["nInternshipFellowshipTypeID"] == DBNull.Value
                                     ? 0
-                                    : Convert.ToInt32(dr["nInternshipFellowshipTypeID"]);
+                                    : Convert.ToInt32(
+                                        dr["nInternshipFellowshipTypeID"]);
 
                             item.sInternshipFellowshipTypeName =
                                 dr["sInternshipFellowshipTypeName"]?.ToString() ?? "";
@@ -3451,7 +3554,8 @@ ORDER BY SAF.nID DESC, OFB.nID DESC;
                             item.nTrainingInvolvedID =
                                 dr["nTrainingInvolvedID"] == DBNull.Value
                                     ? 0
-                                    : Convert.ToInt32(dr["nTrainingInvolvedID"]);
+                                    : Convert.ToInt32(
+                                        dr["nTrainingInvolvedID"]);
 
                             item.sTrainingInvolvedName =
                                 dr["sTrainingInvolvedName"]?.ToString() ?? "";
@@ -3459,7 +3563,8 @@ ORDER BY SAF.nID DESC, OFB.nID DESC;
                             item.nInternshipDurationID =
                                 dr["nInternshipDurationID"] == DBNull.Value
                                     ? 0
-                                    : Convert.ToInt32(dr["nInternshipDurationID"]);
+                                    : Convert.ToInt32(
+                                        dr["nInternshipDurationID"]);
 
                             item.sInternshipDurationName =
                                 dr["sInternshipDurationName"]?.ToString() ?? "";
@@ -3467,7 +3572,8 @@ ORDER BY SAF.nID DESC, OFB.nID DESC;
                             item.nInternshipModeID =
                                 dr["nInternshipModeID"] == DBNull.Value
                                     ? 0
-                                    : Convert.ToInt32(dr["nInternshipModeID"]);
+                                    : Convert.ToInt32(
+                                        dr["nInternshipModeID"]);
 
                             item.sInternshipModeName =
                                 dr["sInternshipModeName"]?.ToString() ?? "";
@@ -3484,12 +3590,14 @@ ORDER BY SAF.nID DESC, OFB.nID DESC;
                             item.dRegisterDate =
                                 dr["dRegisterDate"] == DBNull.Value
                                     ? DateTime.MinValue
-                                    : Convert.ToDateTime(dr["dRegisterDate"]);
+                                    : Convert.ToDateTime(
+                                        dr["dRegisterDate"]);
 
-                                                        item.dModDate =
+                            item.dModDate =
                                 dr["dModDate"] == DBNull.Value
-                                ? DateTime.MinValue
-                                : Convert.ToDateTime(dr["dModDate"]);
+                                    ? DateTime.MinValue
+                                    : Convert.ToDateTime(
+                                        dr["dModDate"]);
 
                             item.nBit =
                                 dr["nBit"] != DBNull.Value &&
@@ -3512,6 +3620,7 @@ ORDER BY SAF.nID DESC, OFB.nID DESC;
 
             return View(posts);
         }
+        //end
 
         // khushi 03-10-26
         [HttpPost]
@@ -3859,10 +3968,71 @@ ORDER BY SAF.nID DESC, OFB.nID DESC;
 
         }
 
+        //khushi 6-10-26
         [HttpGet]
         public IActionResult SAFinalSelection()
         {
-            return View();
+            List<SAFinalSelectionViewModel> model =
+                new List<SAFinalSelectionViewModel>();
+
+            string connectionString =
+                _configuration.GetConnectionString("DefaultConnection");
+
+            using (SqlConnection con = new SqlConnection(connectionString))
+            {
+                using (SqlCommand cmd = new SqlCommand(
+                    "SP_GetSAFinalSelection", con))
+                {
+                    cmd.CommandType = CommandType.StoredProcedure;
+
+                    con.Open();
+
+                    using (SqlDataReader reader = cmd.ExecuteReader())
+                    {
+                        while (reader.Read())
+                        {
+                            model.Add(new SAFinalSelectionViewModel
+                            {
+                                nID = Convert.ToInt32(
+                                    reader["FinalSelectionID"]),
+
+                                OrgID = Convert.ToInt32(
+                                    reader["OrganizationID"]),
+
+                                CandidateID = Convert.ToInt32(
+                                    reader["CandidateID"]),
+
+                                PostID = Convert.ToInt32(
+                                    reader["PostID"]),
+
+                                PostDate =
+                                    reader["PostDate"] == DBNull.Value
+                                        ? null
+                                        : Convert.ToDateTime(
+                                            reader["PostDate"]),
+
+                                PositionName =
+                                    reader["PositionName"]?.ToString()
+                                    ?? "",
+
+                                CandidateName =
+                                    reader["CandidateName"]?.ToString()
+                                    ?? "",
+
+                                EmailID =
+                                    reader["EmailID"]?.ToString()
+                                    ?? "",
+
+                                Skills =
+                                    reader["Skills"]?.ToString()
+                                    ?? ""
+                            });
+                        }
+                    }
+                }
+            }
+
+            return View(model);
         }
 
         //khushi 01-10-26
@@ -4188,5 +4358,534 @@ ORDER BY SAF.nID DESC, OFB.nID DESC;
             return View(trainees);
         }
         #endregion
+
+        // sanidhya 06/10/26
+        // =========================================================
+        // SUPER ADMIN - VIEW TRAINEE SELECTED RESUME
+        // =========================================================
+
+        // ============================================================
+        // VIEW TRAINEE RESUME
+        // Opens the SAME resume template selected by the candidate
+        // ============================================================
+
+        // ============================================================
+        // VIEW TRAINEE RESUME
+        // Opens EXACTLY the same resume selected by the candidate
+        // ============================================================
+        //sanidhya 08/10/26
+        [HttpGet]
+        [Route("SuperAdmin/ViewTraineeResume/{id:int}")]
+        public IActionResult ViewTraineeResume(int id)
+        {
+            if (id <= 0)
+            {
+                return BadRequest("Invalid Candidate ID.");
+            }
+
+            string connectionString =
+                _configuration.GetConnectionString("DefaultConnection")
+                ?? throw new InvalidOperationException(
+                    "DefaultConnection is not configured."
+                );
+
+            var candidateIds = new List<int>();
+
+            using (SqlConnection con = new SqlConnection(connectionString))
+            {
+                string query = @"
+     SELECT CP.CandidateID
+     FROM tblCandidateProfile CP
+     INNER JOIN tblCandidateRegister CR
+         ON CP.CandidateID = CR.nID
+     WHERE CP.nBit = 1
+       AND CP.nSABit = 1
+       AND CR.nSABit = 1
+     ORDER BY CP.nID DESC;
+ ";
+
+                using (SqlCommand cmd = new SqlCommand(query, con))
+                {
+                    con.Open();
+
+                    using (SqlDataReader reader = cmd.ExecuteReader())
+                    {
+                        while (reader.Read())
+                        {
+                            if (reader["CandidateID"] != DBNull.Value)
+                            {
+                                candidateIds.Add(
+                                    Convert.ToInt32(reader["CandidateID"])
+                                );
+                            }
+                        }
+                    }
+                }
+            }
+
+            // ============================================================
+            // FIND CURRENT CANDIDATE
+            // ============================================================
+
+            int currentIndex = candidateIds.IndexOf(id);
+
+            if (currentIndex == -1)
+            {
+                return NotFound("Candidate profile not found.");
+            }
+
+            // ============================================================
+            // PREVIOUS CANDIDATE
+            // ============================================================
+
+            int? previousCandidateId = null;
+
+            if (currentIndex > 0)
+            {
+                previousCandidateId =
+                    candidateIds[currentIndex - 1];
+            }
+
+            // ============================================================
+            // NEXT CANDIDATE
+            // ============================================================
+
+            int? nextCandidateId = null;
+
+            if (currentIndex < candidateIds.Count - 1)
+            {
+                nextCandidateId =
+                    candidateIds[currentIndex + 1];
+            }
+
+            // ============================================================
+            // OPEN RESUME CONTROLLER
+            // ============================================================
+
+            return RedirectToAction(
+                "Resume",
+                "Resume",
+                new
+                {
+                    id = id,
+                    previousCandidateId = previousCandidateId,
+                    nextCandidateId = nextCandidateId,
+                    resumeSource = "superadmin"
+                }
+            );
+        }
+
+
+        //radhika07
+        [HttpGet]
+        public IActionResult SuperAdminTopSkills()
+        {
+            return View();
+        }
+
+        // View Organization Profile - Master
+        [HttpGet]
+        [Route("SuperAdmin/ViewOrgProfile/{id}")]
+        public IActionResult ViewOrgProfile(string id)
+        {
+            OrgProfile? model = _repository.GetOrganizationProfileByCode(id);
+
+            if (model == null)
+            {
+                return Content(
+                    $"No organization found for ID: {id}. " +
+                    "Check whether this ID matches nOrgID in the database.");
+            }
+
+            ViewData["Title"] = "View Organization Profile";
+            ViewData["Panel"] = "SuperAdmin";
+            ViewData["UserName"] = "ItNetworkZ";
+
+            return View("~/Views/Organization/ViewOrgProfile.cshtml", model);
+        }
+
+        // shrirang 13/10/26
+        // tpo and subtpo verification code 
+        [HttpGet]
+        [Route("SuperAdmin/TPOVerification/{id:int}")]
+        public IActionResult TPOVerification(int id)
+        {
+            // Validate Super Admin session
+            string? saId = HttpContext.Session.GetString("SAID");
+            string? saRole = HttpContext.Session.GetString("SARole");
+
+            if (string.IsNullOrEmpty(saId) ||
+                !int.TryParse(saId, out int sessionId) ||
+                sessionId != id ||
+                id != 1 ||
+                !string.Equals(saRole, "SuperAdmin",
+                    StringComparison.OrdinalIgnoreCase))
+            {
+                return RedirectToAction("Index", "SALogin");
+            }
+
+            var allTpos = _repository.GetAllTPODetails();
+
+            var pendingTpos = allTpos
+                .Where(t => string.Equals(
+                    t.Status, "Pending",
+                    StringComparison.OrdinalIgnoreCase))
+                .OrderBy(t => t.CreatedDate)
+                .ToList();
+
+            ViewData["Panel"] = "SuperAdmin";
+            ViewBag.PendingCount = pendingTpos.Count;
+
+            return View(pendingTpos);
+        }
+
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        [Route("SuperAdmin/ApproveTPO/{id:int}")]
+        public IActionResult ApproveTPO(int id)
+        {
+            string? saId = HttpContext.Session.GetString("SAID");
+            string? saRole = HttpContext.Session.GetString("SARole");
+
+            if (string.IsNullOrEmpty(saId) ||
+                !int.TryParse(saId, out int superAdminId) ||
+                superAdminId != 1 ||
+                !string.Equals(
+                    saRole, "SuperAdmin",
+                    StringComparison.OrdinalIgnoreCase))
+            {
+                return RedirectToAction("Index", "SALogin");
+            }
+
+            bool approved =
+                _repository.ApproveTPORegistration(id, superAdminId);
+
+            TempData[approved ? "SuccessMessage" : "ErrorMessage"] =
+                approved
+                    ? "TPO registration approved successfully."
+                    : "Approval failed. The registration may no longer be pending.";
+
+            return RedirectToAction(
+                nameof(TPOVerification),
+                new { id = superAdminId });
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        [Route("SuperAdmin/RejectTPO/{id:int}")]
+        public IActionResult RejectTPO(int id, string rejectionReason)
+        {
+            string? saId = HttpContext.Session.GetString("SAID");
+            string? saRole = HttpContext.Session.GetString("SARole");
+
+            if (string.IsNullOrEmpty(saId) ||
+                !int.TryParse(saId, out int superAdminId) ||
+                superAdminId != 1 ||
+                !string.Equals(
+                    saRole, "SuperAdmin",
+                    StringComparison.OrdinalIgnoreCase))
+            {
+                return RedirectToAction("Index", "SALogin");
+            }
+
+            if (string.IsNullOrWhiteSpace(rejectionReason))
+            {
+                TempData["ErrorMessage"] =
+                    "Please enter a reason for rejection.";
+
+                return RedirectToAction(
+                    nameof(TPOVerification),
+                    new { id = superAdminId });
+            }
+
+            if (rejectionReason.Trim().Length > 1000)
+            {
+                TempData["ErrorMessage"] =
+                    "The rejection reason cannot exceed 1000 characters.";
+
+                return RedirectToAction(
+                    nameof(TPOVerification),
+                    new { id = superAdminId });
+            }
+
+            bool rejected = _repository.RejectTPORegistration(
+                id, superAdminId, rejectionReason);
+
+            TempData[rejected ? "SuccessMessage" : "ErrorMessage"] =
+                rejected
+                    ? "TPO registration rejected."
+                    : "Rejection failed. The registration may no longer be pending.";
+
+            return RedirectToAction(
+                nameof(TPOVerification),
+                new { id = superAdminId });
+        }
+
+
+       
+        // =====================================================
+        // TPO AND SUB-TPO APPROVED / REJECTED LIST
+        // =====================================================
+        [HttpGet]
+        [Route("SuperAdmin/TPOStatusList/{id:int}")]
+        public IActionResult TPOStatusList(int id)
+        {
+            // Validate Super Admin session
+            string? saId = HttpContext.Session.GetString("SAID");
+            string? saRole = HttpContext.Session.GetString("SARole");
+
+            if (string.IsNullOrEmpty(saId) ||
+                !int.TryParse(saId, out int sessionId) ||
+                sessionId != id ||
+                id != 1 ||
+                !string.Equals(
+                    saRole,
+                    "SuperAdmin",
+                    StringComparison.OrdinalIgnoreCase))
+            {
+                return RedirectToAction("Index", "SALogin");
+            }
+
+            // Fetch all TPO and Sub-TPO records
+            var allTpos = _repository.GetAllTPODetails();
+
+            // Show only Approved and Rejected records
+            var statusList = allTpos
+                .Where(t =>
+                    string.Equals(t.Status, "Approved",
+                        StringComparison.OrdinalIgnoreCase)
+                    ||
+                    string.Equals(t.Status, "Rejected",
+                        StringComparison.OrdinalIgnoreCase))
+                .OrderByDescending(t => t.CreatedDate)
+                .ToList();
+
+            ViewData["Panel"] = "SuperAdmin";
+            ViewBag.ApprovedCount = statusList.Count(
+                t => string.Equals(t.Status, "Approved",
+                    StringComparison.OrdinalIgnoreCase));
+
+            ViewBag.RejectedCount = statusList.Count(
+                t => string.Equals(t.Status, "Rejected",
+                    StringComparison.OrdinalIgnoreCase));
+
+            return View(statusList);
+        }
+
+       
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        [Route("SuperAdmin/RollbackTPORejection")]
+        public IActionResult RollbackTPORejection(int tpoId)
+        {
+            string? saId = HttpContext.Session.GetString("SAID");
+            string? saRole = HttpContext.Session.GetString("SARole");
+
+            if (!int.TryParse(saId, out int sessionId) ||
+                sessionId != 1 ||
+                !string.Equals(
+                    saRole,
+                    "SuperAdmin",
+                    StringComparison.OrdinalIgnoreCase))
+            {
+                return RedirectToAction("Index", "SALogin");
+            }
+
+            bool restored = _repository.RollbackTPORejection(tpoId);
+
+            TempData[restored ? "SuccessMessage" : "ErrorMessage"] =
+                restored
+                    ? "Registration restored to Pending successfully."
+                    : "Rollback failed. The record may not be Rejected.";
+
+            return RedirectToAction("TPOStatusList", new { id = 1 });
+        }
+
+
+        // sanidhya 14/10/26
+
+        [HttpGet]
+        [Route("SuperAdmin/ViewOrgProfile/{id:int}")]
+        public IActionResult ViewOrgProfile(int id)
+        {
+            string connectionString =
+                _configuration.GetConnectionString("DefaultConnection")
+                ?? throw new InvalidOperationException(
+                    "DefaultConnection is not configured.");
+
+            // Get organization IDs in the same order as SAOrgProfileList.
+            List<int> organizationIds = new List<int>();
+
+            using (SqlConnection con = new SqlConnection(connectionString))
+            {
+                string query = @"
+            SELECT OP.nOrgID
+            FROM tblOrgProfile OP
+            INNER JOIN tblOrgRegistration ORG
+                ON OP.nOrgID = ORG.nID
+            WHERE ORG.nSABit = 1
+            ORDER BY OP.nID DESC;";
+
+                using (SqlCommand cmd = new SqlCommand(query, con))
+                {
+                    con.Open();
+
+                    using (SqlDataReader reader = cmd.ExecuteReader())
+                    {
+                        while (reader.Read())
+                        {
+                            if (reader["nOrgID"] != DBNull.Value)
+                            {
+                                organizationIds.Add(
+                                    Convert.ToInt32(reader["nOrgID"]));
+                            }
+                        }
+                    }
+                }
+            }
+
+            // Find the current organization in the ordered list.
+            int currentIndex = organizationIds.IndexOf(id);
+
+            if (currentIndex == -1)
+            {
+                return NotFound("Organization not found in the profile list.");
+            }
+
+            // Previous and Next IDs follow the list order.
+            int? previousId = currentIndex > 0
+                ? organizationIds[currentIndex - 1]
+                : null;
+
+            int? nextId = currentIndex < organizationIds.Count - 1
+                ? organizationIds[currentIndex + 1]
+                : null;
+
+            // Get the current organization profile.
+            OrgProfile? model =
+                _repository.GetOrganizationProfileByCode(id.ToString());
+
+            if (model == null)
+            {
+                return NotFound("Organization profile not found.");
+            }
+
+            ViewBag.PreviousId = previousId;
+            ViewBag.NextId = nextId;
+            ViewBag.CurrentRecord = currentIndex + 1;
+            ViewBag.TotalRecords = organizationIds.Count;
+
+            ViewData["Title"] = "View Organization Profile";
+            ViewData["Panel"] = "SuperAdmin";
+            ViewData["UserName"] = "ItNetworkZ";
+
+            return View("~/Views/Organization/ViewOrgProfile.cshtml", model);
+        }
+
+
+        // khushi 15-10
+        [HttpPost]
+        [Route("SuperAdmin/ToggleOrganizationSABit")]
+        public async Task<IActionResult> ToggleOrganizationSABit(int id, bool status)
+        {
+            try
+            {
+                if (id <= 0)
+                {
+                    return Json(new
+                    {
+                        success = false,
+                        message = "Invalid organization ID."
+                    });
+                }
+
+                // 1. Update organization status without deleting the record.
+                bool result = _repository.ToggleOrganizationProfileStatus(id, status);
+
+                if (!result)
+                {
+                    return Json(new
+                    {
+                        success = false,
+                        message = "Organization not found or status could not be updated."
+                    });
+                }
+
+                // 2. Retrieve organization email details.
+                var organization = _repository.GetOrganizationStatusEmailDetails(id);
+
+                if (organization == null)
+                {
+                    return Json(new
+                    {
+                        success = true,
+                        status,
+                        emailSent = false,
+                        message = "Status updated, but organization email details were not found."
+                    });
+                }
+
+                // 3. Validate organization email.
+                if (string.IsNullOrWhiteSpace(organization.Value.Email))
+                {
+                    return Json(new
+                    {
+                        success = true,
+                        status,
+                        emailSent = false,
+                        message = "Status updated, but the organization email address is missing."
+                    });
+                }
+
+                // 4. Send profile status email.
+                try
+                {
+                    await _emailService.SendOrganizationProfileStatusEmailAsync(
+                        organization.Value.Email,
+                        organization.Value.Name,
+                        status
+                    );
+
+                    return Json(new
+                    {
+                        success = true,
+                        status,
+                        emailSent = true,
+                        message = status
+                            ? "Organization profile enabled and notification email sent successfully."
+                            : "Organization profile disabled and notification email sent successfully."
+                    });
+                }
+                catch (Exception emailEx)
+                {
+                    Console.WriteLine(
+                        $"Organization profile status email failed for ID {id}: {emailEx}");
+
+                    // Database update succeeded even though the email failed.
+                    return Json(new
+                    {
+                        success = true,
+                        status,
+                        emailSent = false,
+                        message = status
+                            ? "Profile enabled, but the notification email failed to send."
+                            : "Profile disabled, but the notification email failed to send."
+                    });
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(
+                    $"ToggleOrganizationSABit failed for ID {id}: {ex}");
+
+                return Json(new
+                {
+                    success = false,
+                    message = "Unable to update organization status. Check the application logs."
+                });
+            }
+        }
+
     }
 }

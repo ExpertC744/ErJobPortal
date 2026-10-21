@@ -1,0 +1,591 @@
+﻿/* =========================================================
+       SEND NOTIFICATION - TPO - 1TRAINEE
+       Same theme as Create Notification. Standalone form only.
+       ========================================================= */
+.notification-page {
+    --brand: #0d9488;
+    --brand-dark: #0f766e;
+    --brand-deep: #115e59;
+    --brand-light: #14b8a6;
+    --brand-soft: #ccfbf1;
+    --brand-bg: #f0fdfa;
+    --ink: #0f172a;
+    --text: #334155;
+    --muted: #64748b;
+    --border: #dce4eb;
+    --border-light: #edf2f5;
+    --white: #ffffff;
+    --page-bg: #f7faf9;
+    --danger: #dc2626;
+    --shadow: 0 12px 35px rgba(15, 23, 42, 0.07);
+    width: 100%;
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    padding: 3px 20px 50px;
+    background: var(--page-bg);
+    color: var(--ink);
+    font-family: Inter, "Segoe UI", Arial, sans-serif;
+    margin-top: 120px;
+}
+
+.notification-page *,
+.notification-page *::before,
+.notification-page *::after {
+    box-sizing: border-box;
+}
+
+/* ---------- Card ---------- */
+.notification-page .notification-card {
+    width: 100%;
+    max-width: 680px;
+    background: var(--white);
+    border: 1px solid var(--border);
+    border-radius: 18px;
+    box-shadow: var(--shadow);
+    overflow: hidden;
+}
+
+/* ---------- Header ---------- */
+.notification-page .notification-header {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    padding: 22px 28px;
+    border-bottom: 1px solid var(--border-light);
+    background: #ffffff;
+}
+
+.notification-page .notification-header-icon {
+    width: 44px;
+    height: 44px;
+    flex: 0 0 44px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--brand);
+    background: var(--brand-bg);
+    border: 1px solid #c7eee8;
+    border-radius: 13px;
+    font-size: 19px;
+}
+
+.notification-page .notification-header h1 {
+    margin: 0;
+    color: var(--ink);
+    font-size: 21px;
+    font-weight: 750;
+    line-height: 1.25;
+}
+
+.notification-page .notification-header p {
+    margin: 5px 0 0;
+    color: var(--muted);
+    font-size: 13px;
+}
+
+/* ---------- Form ---------- */
+.notification-page #sendNotificationForm {
+    padding: 26px 28px 28px;
+}
+
+.notification-page .form-group {
+    width: 100%;
+    margin-bottom: 20px;
+}
+
+    .notification-page .form-group > label,
+    .notification-page .field-label {
+        display: block;
+        margin-bottom: 8px;
+        color: var(--text);
+        font-size: 12.5px;
+        font-weight: 650;
+        letter-spacing: .1px;
+    }
+
+        .notification-page .form-group > label > span,
+        .notification-page .field-label > span {
+            color: var(--danger);
+            margin-left: 2px;
+        }
+
+/* ---------- Input box ---------- */
+.notification-page .input-box {
+    position: relative;
+    width: 100%;
+}
+
+    .notification-page .input-box > i {
+        position: absolute;
+        left: 14px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: #94a3b8;
+        font-size: 13px;
+        pointer-events: none;
+        z-index: 2;
+    }
+
+    .notification-page .input-box input,
+    .notification-page .input-box select {
+        width: 100%;
+        height: 42px;
+        padding: 0 40px;
+        margin: 0;
+        border: 1px solid var(--border);
+        border-radius: 9px;
+        outline: none;
+        background-color: #ffffff;
+        color: var(--ink);
+        font-family: inherit;
+        font-size: 13px;
+        transition: border-color .2s ease, box-shadow .2s ease;
+    }
+
+        .notification-page .input-box input:hover,
+        .notification-page .input-box select:hover {
+            border-color: #b9c7d2;
+        }
+
+        .notification-page .input-box input:focus,
+        .notification-page .input-box select:focus {
+            border-color: var(--brand);
+            box-shadow: 0 0 0 3px rgba(13, 148, 136, .09);
+        }
+
+    .notification-page .input-box:focus-within > i {
+        color: var(--brand);
+    }
+
+    .notification-page .input-box select {
+        appearance: none;
+        -webkit-appearance: none;
+        cursor: pointer;
+        padding-right: 38px;
+        text-overflow: ellipsis;
+        background-image: linear-gradient(45deg, transparent 50%, #64748b 50%), linear-gradient(135deg, #64748b 50%, transparent 50%);
+        background-position: calc(100% - 17px) 17px, calc(100% - 12px) 17px;
+        background-size: 5px 5px, 5px 5px;
+        background-repeat: no-repeat;
+    }
+
+/* ---------- Errors ---------- */
+.notification-page .error {
+    border-color: var(--danger) !important;
+    box-shadow: 0 0 0 3px rgba(220, 38, 38, .07) !important;
+}
+
+.notification-page .validation-message {
+    display: block;
+    margin-top: 5px;
+    color: var(--danger);
+    font-size: 11px;
+}
+
+/* ---------- Select + Create New ---------- */
+.notification-page .select-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+    .notification-page .select-row .input-box {
+        flex: 1;
+        min-width: 0;
+    }
+
+.notification-page .btn-outline {
+    height: 42px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 7px;
+    padding: 0 18px;
+    border: 1px solid var(--brand);
+    border-radius: 9px;
+    background: #ffffff;
+    color: var(--brand-dark);
+    font-family: inherit;
+    font-size: 13px;
+    font-weight: 650;
+    text-decoration: none;
+    white-space: nowrap;
+    cursor: pointer;
+    transition: background .2s ease, box-shadow .2s ease;
+}
+
+    .notification-page .btn-outline:hover {
+        background: var(--brand-bg);
+        box-shadow: 0 0 0 3px rgba(13, 148, 136, .09);
+        color: var(--brand-dark);
+    }
+
+/* ---------- Send Via (checkbox cards, same style as Create page) ---------- */
+.notification-page .via-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 12px;
+}
+
+.notification-page .checkbox-label {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 11px;
+    width: 100%;
+    margin: 0;
+    padding: 11px 13px;
+    border: 1px solid var(--border);
+    border-radius: 9px;
+    background: #fbfdfd;
+    cursor: pointer;
+    transition: border-color .2s ease, background .2s ease;
+}
+
+    .notification-page .checkbox-label:hover {
+        border-color: var(--brand-light);
+        background: var(--brand-bg);
+    }
+
+    .notification-page .checkbox-label > input[type="checkbox"] {
+        position: absolute;
+        opacity: 0;
+        pointer-events: none;
+    }
+
+.notification-page .checkmark {
+    width: 20px;
+    height: 20px;
+    flex: 0 0 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 1.5px solid #cbd5e1;
+    border-radius: 5px;
+    background: #ffffff;
+    color: #ffffff;
+    font-size: 9px;
+    transition: .2s ease;
+}
+
+.notification-page .checkbox-label input[type="checkbox"]:checked ~ .checkmark {
+    background: var(--brand);
+    border-color: var(--brand);
+}
+
+.notification-page .checkbox-label input[type="checkbox"]:focus-visible ~ .checkmark {
+    box-shadow: 0 0 0 3px rgba(13, 148, 136, .2);
+}
+
+.notification-page .checkbox-text strong {
+    color: var(--text);
+    font-size: 12.5px;
+    font-weight: 650;
+    white-space: nowrap;
+}
+
+/* ---------- Preview ---------- */
+.notification-page .preview-box {
+    border: 1px solid #c7eee8;
+    border-radius: 12px;
+    background: var(--brand-bg);
+    padding: 16px 18px;
+}
+
+.notification-page .preview-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 12px;
+}
+
+    .notification-page .preview-top h3 {
+        margin: 0;
+        color: var(--ink);
+        font-size: 15px;
+        font-weight: 700;
+        overflow-wrap: anywhere;
+    }
+
+.notification-page .preview-edit {
+    flex: 0 0 auto;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 11px;
+    border: 1px solid #c6e9e4;
+    border-radius: 7px;
+    background: #ffffff;
+    color: var(--brand-dark);
+    font-family: inherit;
+    font-size: 12px;
+    font-weight: 650;
+    cursor: pointer;
+    transition: background .2s ease;
+}
+
+    .notification-page .preview-edit:hover {
+        background: var(--brand-soft);
+    }
+
+.notification-page .preview-body {
+    color: var(--text);
+    font-size: 13px;
+    line-height: 1.6;
+    outline: none;
+    border-radius: 8px;
+    overflow-wrap: anywhere;
+}
+
+    .notification-page .preview-body p {
+        margin: 0 0 12px;
+    }
+
+        .notification-page .preview-body p:last-child {
+            margin-bottom: 0;
+        }
+
+    .notification-page .preview-body.editing {
+        padding: 10px 12px;
+        background: #ffffff;
+        border: 1px solid var(--brand);
+        box-shadow: 0 0 0 3px rgba(13, 148, 136, .09);
+    }
+
+/* ---------- Info bar ---------- */
+.notification-page .info-bar {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 22px;
+    padding: 12px 15px;
+    border: 1px solid #c7eee8;
+    border-radius: 10px;
+    background: var(--brand-bg);
+    color: var(--brand-deep);
+    font-size: 12.5px;
+}
+
+    .notification-page .info-bar i {
+        color: var(--brand);
+        font-size: 14px;
+    }
+
+/* ---------- Buttons ---------- */
+.notification-page .form-actions {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 10px;
+    margin-top: 7px;
+    padding-top: 22px;
+    border-top: 1px solid var(--border-light);
+}
+
+.notification-page .btn-reset,
+.notification-page .btn-save {
+    height: 41px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 7px;
+    padding: 0 20px;
+    border-radius: 9px;
+    font-family: inherit;
+    font-size: 13px;
+    font-weight: 650;
+    cursor: pointer;
+    transition: background .2s ease, border-color .2s ease, box-shadow .2s ease, transform .15s ease;
+}
+
+.notification-page .btn-reset {
+    border: 1px solid #d5dee6;
+    background: #ffffff;
+    color: #475569;
+}
+
+    .notification-page .btn-reset:hover {
+        background: #f8fafc;
+        border-color: #bac6d0;
+    }
+
+.notification-page .btn-save {
+    border: 1px solid var(--brand);
+    background: var(--brand);
+    color: #ffffff;
+    box-shadow: 0 5px 12px rgba(13, 148, 136, .16);
+}
+
+    .notification-page .btn-save:hover {
+        background: var(--brand-dark);
+        border-color: var(--brand-dark);
+        box-shadow: 0 7px 16px rgba(13, 148, 136, .20);
+        transform: translateY(-1px);
+    }
+
+/* ---------- Schedule popup (opens only on "Schedule Later") ---------- */
+.notification-page .schedule-modal {
+    position: fixed;
+    inset: 0;
+    z-index: 1050;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: 16px;
+    background: rgba(15, 23, 42, .45);
+}
+
+    .notification-page .schedule-modal.open {
+        display: flex;
+    }
+
+.notification-page .schedule-dialog {
+    width: 100%;
+    max-width: 420px;
+    padding: 24px;
+    background: #ffffff;
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    box-shadow: 0 25px 60px rgba(15, 23, 42, .25);
+}
+
+    .notification-page .schedule-dialog h3 {
+        margin: 0 0 4px;
+        font-size: 17px;
+        font-weight: 750;
+        color: var(--ink);
+    }
+
+    .notification-page .schedule-dialog p {
+        margin: 0 0 18px;
+        color: var(--muted);
+        font-size: 12.5px;
+    }
+
+    .notification-page .schedule-dialog .form-group {
+        margin-bottom: 14px;
+    }
+
+    .notification-page .schedule-dialog .form-actions {
+        justify-content: flex-end;
+        margin-top: 18px;
+    }
+
+/* ---------- Tablet ---------- */
+@@media (max-width: 768px) {
+    .notification-page {
+        padding: 25px 16px 40px;
+    }
+
+        .notification-page .notification-card {
+            max-width: 640px;
+        }
+}
+
+@@media (max-width: 600px) {
+    .notification-page .via-grid {
+        grid-template-columns: 1fr;
+        gap: 10px;
+    }
+}
+
+/* ---------- Mobile ---------- */
+@@media (max-width: 520px) {
+    .notification-page {
+        padding: 15px 10px 25px;
+    }
+
+        .notification-page .notification-card {
+            border-radius: 13px;
+        }
+
+        .notification-page .notification-header {
+            padding: 18px 17px;
+            gap: 11px;
+        }
+
+        .notification-page .notification-header-icon {
+            width: 42px;
+            height: 42px;
+            flex-basis: 42px;
+            border-radius: 10px;
+            font-size: 16px;
+        }
+
+        .notification-page .notification-header h1 {
+            font-size: 19px;
+        }
+
+        .notification-page .notification-header p {
+            font-size: 11.5px;
+        }
+
+        .notification-page #sendNotificationForm {
+            padding: 19px 17px;
+        }
+
+        .notification-page .form-group {
+            margin-bottom: 18px;
+        }
+
+        .notification-page .input-box input,
+        .notification-page .input-box select {
+            height: 42px;
+            font-size: 12.5px;
+        }
+
+        .notification-page .select-row {
+            flex-direction: row;
+            align-items: stretch;
+        }
+
+        .notification-page .btn-outline {
+            width: 100%;
+        }
+
+        .notification-page .preview-box {
+            padding: 15px;
+        }
+
+        .notification-page .preview-top {
+            align-items: flex-start;
+        }
+
+        .notification-page .form-actions {
+            flex-direction: row;
+            gap: 8px;
+        }
+
+        .notification-page .btn-reset,
+        .notification-page .btn-save {
+            width: fit;
+        }
+
+        .notification-page .schedule-dialog {
+            padding: 20px 17px;
+        }
+
+            .notification-page .schedule-dialog .form-actions {
+                flex-direction: column-reverse;
+            }
+}
+
+@@media (max-width: 360px) {
+    .notification-page {
+        padding-left: 6px;
+        padding-right: 6px;
+    }
+
+        .notification-page #sendNotificationForm {
+            padding: 17px 13px;
+        }
+
+        .notification-page .notification-header {
+            padding-left: 13px;
+            padding-right: 13px;
+        }
+}
+

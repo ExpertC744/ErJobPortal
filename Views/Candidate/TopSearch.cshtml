@@ -1,0 +1,481 @@
+﻿@* Radhika30-09 *@
+<link rel="stylesheet"
+      href="~/css/OrgTopSearch.css"
+      asp-append-version="true" />
+
+@{
+    Layout = "~/Views/Shared/_DashboardLayout.cshtml";
+
+    ViewData["Title"] = "Charts";
+    ViewData["Panel"] = "Candidate";
+    ViewData["UserName"] = "Candidate";
+}
+
+
+<div class="organization-charts-page">
+
+
+    <!-- =====================================================
+         PAGE HEADER
+    ====================================================== -->
+
+    <div class="charts-header">
+
+        <div>
+
+            <h1>
+                Charts &amp; Statistics
+            </h1>
+
+            <p>
+                Candidate Statistics
+            </p>
+
+        </div>
+
+    </div>
+
+
+
+    <!-- =====================================================
+         TOP ROW
+    ====================================================== -->
+
+    <div class="charts-grid">
+
+
+        <!-- =================================================
+             TOP SKILLS
+        ================================================== -->
+
+        <div class="chart-card">
+
+
+            <div class="chart-card-header">
+
+                <div class="chart-icon">
+
+                    <i class="fas fa-code"></i>
+
+                </div>
+
+
+                <div>
+
+                    <h3>
+                        Top Skills
+                    </h3>
+
+                    <p>
+                        Most preferred trainee skills
+                    </p>
+
+                </div>
+
+            </div>
+
+
+
+            <div class="chart-list">
+
+
+                <!-- SKILL 1 -->
+
+                <div class="chart-item">
+
+                    <div class="chart-item-top">
+
+                        <span class="rank">
+                            01
+                        </span>
+
+                        <span class="item-name">
+                            C / C++
+                        </span>
+
+                        <span class="percentage">
+                            39.24%
+                        </span>
+
+                    </div>
+
+
+                    <div class="progress-track">
+
+                        <div class="progress-fill"
+                             style="width:39.24%;">
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+
+                <!-- SKILL 2 -->
+
+                <div class="chart-item">
+
+                    <div class="chart-item-top">
+
+                        <span class="rank">
+                            02
+                        </span>
+
+                        <span class="item-name">
+                            HTML
+                        </span>
+
+                        <span class="percentage">
+                            33.84%
+                        </span>
+
+                    </div>
+
+
+                    <div class="progress-track">
+
+                        <div class="progress-fill"
+                             style="width:33.84%;">
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+
+                <!-- SKILL 3 -->
+
+                <div class="chart-item">
+
+                    <div class="chart-item-top">
+
+                        <span class="rank">
+                            03
+                        </span>
+
+                        <span class="item-name">
+                            JAVA
+                        </span>
+
+                        <span class="percentage">
+                            26.92%
+                        </span>
+
+                    </div>
+
+
+                    <div class="progress-track">
+
+                        <div class="progress-fill"
+                             style="width:26.92%;">
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+            </div>
+
+        </div>
+
+
+
+        <!-- =================================================
+             TOP CITIES
+        ================================================== -->
+
+        <div class="chart-card">
+
+
+            <div class="chart-card-header">
+
+                <div class="chart-icon">
+
+                    <i class="fas fa-location-dot"></i>
+
+                </div>
+
+
+                <div>
+
+                    <h3>
+                        Top Cities
+                    </h3>
+
+                    <p>
+                        Locations with maximum trainees
+                    </p>
+
+                </div>
+
+            </div>
+
+
+
+            <div class="chart-list">
+
+
+                <!-- CITY 1 -->
+
+                <div class="chart-item">
+
+                    <div class="chart-item-top">
+
+                        <span class="rank">
+                            01
+                        </span>
+
+                        <span class="item-name">
+                            Nagpur
+                        </span>
+
+                        <span class="percentage">
+                            64%
+                        </span>
+
+                    </div>
+
+
+                    <div class="progress-track">
+
+                        <div class="progress-fill"
+                             style="width:64%;">
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+
+                <!-- CITY 2 -->
+
+                <div class="chart-item">
+
+                    <div class="chart-item-top">
+
+                        <span class="rank">
+                            02
+                        </span>
+
+                        <span class="item-name">
+                            Bhusawal
+                        </span>
+
+                        <span class="percentage">
+                            1%
+                        </span>
+
+                    </div>
+
+
+                    <div class="progress-track">
+
+                        <div class="progress-fill"
+                             style="width:1%;">
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+
+                <!-- CITY 3 -->
+
+                <div class="chart-item">
+
+                    <div class="chart-item-top">
+
+                        <span class="rank">
+                            03
+                        </span>
+
+                        <span class="item-name">
+                            Dhule
+                        </span>
+
+                        <span class="percentage">
+                            1%
+                        </span>
+
+                    </div>
+
+
+                    <div class="progress-track">
+
+                        <div class="progress-fill"
+                             style="width:1%;">
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+            </div>
+
+        </div>
+
+
+    </div>
+
+
+
+    <!-- =====================================================
+         BOTTOM CARD
+    ====================================================== -->
+
+    <div class="fields-wrapper">
+
+
+        <div class="chart-card fields-card">
+
+
+            <div class="chart-card-header">
+
+                <div class="chart-icon">
+
+                    <i class="fas fa-layer-group"></i>
+
+                </div>
+
+
+                <div>
+
+                    <h3>
+                        Top Fields
+                    </h3>
+
+                    <p>
+                        Most selected candidate skill categories
+                    </p>
+
+                </div>
+
+            </div>
+
+
+
+            <div class="chart-list">
+
+
+                <!-- FIELD 1 -->
+
+                <div class="chart-item">
+
+                    <div class="chart-item-top">
+
+                        <span class="rank">
+                            01
+                        </span>
+
+                        <span class="item-name">
+                            Technical Skill
+                        </span>
+
+                        <span class="percentage">
+                            71.68%
+                        </span>
+
+                    </div>
+
+
+                    <div class="progress-track">
+
+                        <div class="progress-fill"
+                             style="width:71.68%;">
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+
+                <!-- FIELD 2 -->
+
+                <div class="chart-item">
+
+                    <div class="chart-item-top">
+
+                        <span class="rank">
+                            02
+                        </span>
+
+                        <span class="item-name">
+                            Non-Technical Skill
+                        </span>
+
+                        <span class="percentage">
+                            14.61%
+                        </span>
+
+                    </div>
+
+
+                    <div class="progress-track">
+
+                        <div class="progress-fill"
+                             style="width:14.61%;">
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+
+                <!-- FIELD 3 -->
+
+                <div class="chart-item">
+
+                    <div class="chart-item-top">
+
+                        <span class="rank">
+                            03
+                        </span>
+
+                        <span class="item-name">
+                            Medical Skill
+                        </span>
+
+                        <span class="percentage">
+                            13.71%
+                        </span>
+
+                    </div>
+
+
+                    <div class="progress-track">
+
+                        <div class="progress-fill"
+                             style="width:13.71%;">
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+            </div>
+
+        </div>
+
+
+    </div>
+
+
+</div>

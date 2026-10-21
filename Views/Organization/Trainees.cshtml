@@ -1,4 +1,6 @@
-﻿@{
+﻿@model List<ErJobPortal.Models.TraineeProfileListM>
+
+@{
     Layout = "~/Views/Shared/_DashboardLayout.cshtml";
 
     ViewData["Title"] = "Trainee Profiles List";
@@ -8,22 +10,18 @@
 
 <div class="container-fluid trainee-profiles-page">
 
-    <!-- PAGE HEADER -->
-   
-
-
     <!-- MASTER TABLE -->
     <div class="master-table-container">
 
-        <!-- TABLE HEADER -->
-        
-
-        <!-- TABLE -->
         <div class="table-responsive">
-             <div class="page-header mb-4">
-        <h1>Trainee Profiles List</h1>
-        <p>At738034692839</p>
-    </div>
+
+            <!-- PAGE HEADER -->
+            <div class="page-header mb-4">
+                <h1>Trainee Profiles List</h1>
+                <p>Total Trainees : @Model.Count</p>
+            </div>
+
+            <!-- TABLE -->
             <table id="traineeProfilesTable"
                    class="master-data-table">
 
@@ -61,134 +59,118 @@
                     </tr>
                 </thead>
 
-
                 <tbody>
 
-                    <!-- ROW 1 -->
-                    <tr>
+                    @if (Model != null && Model.Any())
+                    {
+                        foreach (var trainee in Model)
+                        {
+                            <tr>
 
-                        <td class="master-id">
-                            1
-                        </td>
+                                <!-- SR NO -->
+                                <td class="master-id text-center">
+                                    @trainee.SrNo
+                                </td>
 
-                        <td>
-                            Anam Khan
-                        </td>
+                                <!-- NAME -->
+                                <td>
+                                    @(string.IsNullOrWhiteSpace(trainee.CandidateName)
+                                                                ? "NA"
+                                                                : trainee.CandidateName)
+                                </td>
 
-                        <td>
-                            <img src="~/images/default-profile.png"
+                                <!-- PHOTO -->
+                                <td class="text-center">
+
+                                    @{
+                                        string photoPath;
+
+                                        if (string.IsNullOrWhiteSpace(trainee.Photo))
+                                        {
+                                            photoPath =
+                                            Url.Content("~/images/default-profile.png");
+                                        }
+                                        else
+                                        {
+                                            photoPath =
+                                            Url.Content(trainee.Photo);
+                                        }
+                                    }
+
+                            <img src="@photoPath"
                                  alt="Trainee Image"
-                                 class="trainee-profile-image" />
+                                 class="trainee-profile-image"
+                                 onerror="this.onerror=null;this.src='@Url.Content("~/images/default-profile.png")';" />
+
                         </td>
 
+                        <!-- TECHNICAL SKILL -->
                         <td>
-                            App Development, Basic Computer Knowledge,
-                            Basic Python, Blockchain, Business Analyst,
-                            C# / .Net
-                        </td>
+                            @(string.IsNullOrWhiteSpace(trainee.TechnicalSkill)
+                                                        ? "NA"
+                                                        : trainee.TechnicalSkill)
+                                </td>
 
-                        <td>
-                            NA
-                        </td>
+                                <!-- NON TECHNICAL SKILL -->
+                                <td>
+                                    @(string.IsNullOrWhiteSpace(trainee.NonTechnicalSkill)
+                                                                ? "NA"
+                                                                : trainee.NonTechnicalSkill)
+                                </td>
 
-                        <td>
-                            NA
-                        </td>
+                                <!-- MEDICAL SKILL -->
+                                <td>
+                                    @(string.IsNullOrWhiteSpace(trainee.MedicalSkill)
+                                                                ? "NA"
+                                                                : trainee.MedicalSkill)
+                                </td>
 
-                        <td>
-                            Guadeloupe<br />
-                            Pointe-à-Pitre<br />
-                            Saint-John<br />
-                            Perse
-                        </td>
+                                <!-- LOCATION -->
+                                <td>
 
-                    </tr>
+                                    @if (!string.IsNullOrWhiteSpace(trainee.Country))
+                                    {
+                                        @trainee.Country
+                                    }
 
+                                    @if (!string.IsNullOrWhiteSpace(trainee.State))
+                                    {
+                                        <br />
+                                        @trainee.State
+                                    }
 
-                    <!-- ROW 2 -->
-                    <tr>
+                                    @if (!string.IsNullOrWhiteSpace(trainee.City))
+                                    {
+                                        <br />
+                                        @trainee.City
+                                    }
 
-                        <td class="master-id">
-                            2
-                        </td>
+                                    @if (string.IsNullOrWhiteSpace(trainee.Country)
+                                                                && string.IsNullOrWhiteSpace(trainee.State)
+                                                                && string.IsNullOrWhiteSpace(trainee.City))
+                                    {
+                                        @:NA
+                                    }
 
-                        <td>
-                            Saumya<br />
-                            Turaskar
-                        </td>
+                                </td>
 
-                        <td>
-                            <img src="~/images/default-profile.png"
-                                 alt="Trainee Image"
-                                 class="trainee-profile-image" />
-                        </td>
-
-                        <td>
-                            CSS, Express JS, Github, HTML, JAVA,
-                            Java Script, Programming, React JS,
-                            Software Testing, SQL
-                        </td>
-
-                        <td>
-                            NA
-                        </td>
-
-                        <td>
-                            NA
-                        </td>
-
-                        <td>
-                            India<br />
-                            Maharashtra<br />
-                            Bhandara
-                        </td>
-
-                    </tr>
-
-
-                    <!-- ROW 3 -->
-                    <tr>
-
-                        <td class="master-id">
-                            3
-                        </td>
-
-                        <td>
-                            Shilpa Singh
-                        </td>
-
-                        <td>
-                            <img src="~/images/default-profile.png"
-                                 alt="Trainee Image"
-                                 class="trainee-profile-image" />
-                        </td>
-
-                        <td>
-                            Apex, CRM
-                        </td>
-
-                        <td>
-                            NA
-                        </td>
-
-                        <td>
-                            NA
-                        </td>
-
-                        <td>
-                            India<br />
-                            Maharashtra<br />
-                            Nagpur
-                        </td>
-
-                    </tr>
+                            </tr>
+                        }
+                    }
+                    else
+                    {
+                        <tr>
+                            <td colspan="7" class="text-center">
+                                No trainee profiles found.
+                            </td>
+                        </tr>
+                    }
 
                 </tbody>
 
             </table>
 
         </div>
-
 
         <!-- PAGE INFORMATION -->
         <div id="traineeProfilesPageInfo"
@@ -263,3 +245,4 @@
     });
 
 </script>
+

@@ -1,0 +1,392 @@
+﻿@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Sora:wght@600;700&display=swap');
+
+/* =========================================================
+   Upload Question Bank - external stylesheet
+   Place at: wwwroot/css/question-bank.css
+   All rules are scoped under .qb-page so the shared
+   dashboard layout is not affected.
+   ========================================================= */
+
+.qb-page {
+    --navy: #152A4A;
+    --navy-deep: #0E1E38;
+    --teal: #0E8C82;
+    --teal-dark: #0B786F;
+    --teal-light: #E4F5F3;
+    --amber: #D98A2B;
+    --bg: #F5F7FA;
+    --card: #FFFFFF;
+    --line: #E3E8EF;
+    --text: #1F2937;
+    --muted: #6B7686;
+    --danger: #D64545;
+    --radius: 12px;
+    --shadow: 0 8px 24px -12px rgba(21, 42, 74, .18);
+    font-family: 'Inter', sans-serif;
+    color: var(--text);
+}
+
+    .qb-page *,
+    .qb-page *::before,
+    .qb-page *::after {
+        box-sizing: border-box;
+    }
+
+    .qb-page h1,
+    .qb-page h2,
+    .qb-page h3 {
+        font-family: 'Sora', sans-serif;
+    }
+
+/* ---------- Page header banner ---------- */
+.qb-hero {
+    background: linear-gradient(180deg, var(--navy) 0%, var(--navy-deep) 100%);
+    color: #fff;
+    padding: 36px 32px 70px;
+    border-radius: var(--radius);
+}
+
+.qb-eyebrow {
+    text-transform: uppercase;
+    font-size: 11px;
+    letter-spacing: 1.5px;
+    color: #8FE0D6;
+    font-weight: 600;
+    margin-bottom: 10px;
+}
+
+.qb-hero h2 {
+    margin: 0 0 8px;
+    font-size: 28px;
+    font-weight: 700;
+    color: #fff;
+}
+
+.qb-hero p {
+    margin: 0;
+    max-width: 620px;
+    color: #B9C4D6;
+    font-size: 14px;
+    line-height: 1.6;
+}
+
+/* ---------- Form wrapper ---------- */
+.qb-form-wrap {
+    margin: -40px 24px 0;
+    position: relative;
+}
+
+    .qb-form-wrap form {
+        display: flex;
+        flex-direction: column;
+        gap: 22px;
+    }
+
+/* ---------- Alerts ---------- */
+.qb-alert {
+    padding: 13px 16px;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 500;
+}
+
+.qb-success {
+    background: #E7F7F3;
+    border: 1px solid #B8E8DF;
+    color: #08766D;
+}
+
+.qb-error {
+    background: #FDECEC;
+    border: 1px solid #F4C3C3;
+    color: #B42318;
+}
+
+.qb-validation-summary {
+    color: #B42318;
+    font-size: 13px;
+}
+
+    .qb-validation-summary ul {
+        margin: 0;
+        padding-left: 18px;
+    }
+
+/* ---------- Section cards ---------- */
+.qb-section {
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    padding: 26px 28px;
+}
+
+.qb-section-head {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 20px;
+}
+
+.qb-section-icon {
+    width: 35px;
+    height: 35px;
+    flex: 0 0 35px;
+    border-radius: 9px;
+    background: var(--teal-light);
+    color: var(--teal);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-family: 'Sora', sans-serif;
+}
+
+.qb-section-head h3 {
+    margin: 0;
+    font-size: 16px;
+    color: var(--navy);
+}
+
+.qb-sub {
+    margin: 3px 0 0;
+    font-size: 12px;
+    color: var(--muted);
+}
+
+/* ---------- Grid & fields ---------- */
+.qb-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 18px 20px;
+}
+
+.qb-field {
+    min-width: 0;
+}
+
+    .qb-field.full {
+        grid-column: 1 / -1;
+    }
+
+    .qb-field label {
+        display: block;
+        margin-bottom: 7px;
+        font-size: 13px;
+        font-weight: 600;
+        color: var(--text);
+    }
+
+    .qb-field input,
+    .qb-field select,
+    .qb-field textarea {
+        width: 100%;
+        min-height: 42px;
+        padding: 10px 12px;
+        font-size: 13px;
+        font-family: 'Inter', sans-serif;
+        color: var(--text);
+        background: #fff;
+        border: 1.5px solid var(--line);
+        border-radius: 8px;
+        outline: none;
+        transition: border-color .15s, box-shadow .15s;
+    }
+
+    .qb-field textarea {
+        resize: vertical;
+        line-height: 1.5;
+    }
+
+        .qb-field input::placeholder,
+        .qb-field textarea::placeholder {
+            color: #9AA5B4;
+        }
+
+        .qb-field input:focus,
+        .qb-field select:focus,
+        .qb-field textarea:focus {
+            border-color: var(--teal);
+            box-shadow: 0 0 0 3px rgba(14, 140, 130, .13);
+        }
+
+    .qb-field .input-validation-error {
+        border-color: var(--danger);
+    }
+
+.qb-help {
+    display: block;
+    margin-top: 6px;
+    font-size: 12px;
+    color: var(--muted);
+    line-height: 1.5;
+}
+
+.field-validation-error {
+    display: block;
+    margin-top: 5px;
+    font-size: 12px;
+    color: var(--danger);
+}
+
+    .field-validation-error:empty {
+        display: none;
+    }
+
+/* ---------- File input ---------- */
+.qb-field input[type="file"] {
+    padding: 10px;
+    background: #FAFBFC;
+    border: 1.5px dashed #B9C4D6;
+    cursor: pointer;
+}
+
+    .qb-field input[type="file"]:hover {
+        border-color: var(--teal);
+        background: var(--teal-light);
+    }
+
+    .qb-field input[type="file"]::file-selector-button {
+        border: 0;
+        border-radius: 7px;
+        padding: 8px 14px;
+        margin-right: 12px;
+        background: var(--teal);
+        color: #fff;
+        font-family: 'Inter', sans-serif;
+        font-size: 12.5px;
+        font-weight: 600;
+        cursor: pointer;
+    }
+
+        .qb-field input[type="file"]::file-selector-button:hover {
+            background: var(--teal-dark);
+        }
+
+/* ---------- Action bar ---------- */
+.qb-actions {
+    position: sticky;
+    bottom: 0;
+    z-index: 20;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 15px;
+    padding: 18px 24px;
+    background: #fff;
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+}
+
+.qb-actions-note {
+    margin: 0;
+    font-size: 12px;
+    color: var(--muted);
+}
+
+.qb-btn-row {
+    display: flex;
+    gap: 10px;
+}
+
+.qb-btn {
+    border: 0;
+    border-radius: 9px;
+    padding: 12px 22px;
+    font-size: 13px;
+    font-weight: 600;
+    font-family: 'Inter', sans-serif;
+    cursor: pointer;
+    transition: background .15s;
+}
+
+    .qb-btn:disabled {
+        opacity: .65;
+        cursor: wait;
+    }
+
+.qb-btn-secondary {
+    background: #fff;
+    border: 1px solid var(--line);
+    color: var(--navy);
+}
+
+    .qb-btn-secondary:hover:not(:disabled) {
+        background: #F5F7FA;
+    }
+
+.qb-btn-primary {
+    background: var(--teal);
+    color: #fff;
+}
+
+    .qb-btn-primary:hover:not(:disabled) {
+        background: var(--teal-dark);
+    }
+
+/* ---------- Tablet ---------- */
+@media (max-width: 900px) {
+    .qb-hero {
+        padding: 30px 20px 60px;
+    }
+
+    .qb-form-wrap {
+        margin: -34px 12px 0;
+    }
+}
+
+/* ---------- Phones ---------- */
+@media (max-width: 700px) {
+    .qb-hero h2 {
+        font-size: 22px;
+    }
+
+    .qb-hero p {
+        font-size: 13px;
+    }
+
+    .qb-form-wrap {
+        margin: -34px 0 0;
+    }
+
+    .qb-section {
+        padding: 18px 14px;
+    }
+
+    .qb-grid {
+        grid-template-columns: 1fr;
+        gap: 14px;
+    }
+
+    .qb-field.full {
+        grid-column: auto;
+    }
+
+    /* 16px stops iPhones zooming in when a field is tapped */
+    .qb-field input,
+    .qb-field select,
+    .qb-field textarea {
+        font-size: 16px;
+    }
+
+    .qb-actions {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 10px;
+        padding: 12px;
+    }
+
+    .qb-actions-note {
+        display: none;
+    }
+
+    .qb-btn-row {
+        width: 100%;
+    }
+
+    .qb-btn {
+        flex: 1;
+        min-height: 44px;
+    }
+}

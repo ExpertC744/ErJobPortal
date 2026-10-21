@@ -3,481 +3,341 @@
 @{
 	ViewData["Title"] = "Home";
 	ViewData["BodyClass"] = "home-page";
+
+	var feedbacks = ViewBag.Feedbacks as List<HomeFeedbackCardM> ?? new List<HomeFeedbackCardM>();
+	bool hasTrainees = Model != null && Model.Any();
+
+	int traineeCount = Convert.ToInt32(ViewBag.TraineeCount ?? 0);
+	int organizationCount = Convert.ToInt32(ViewBag.OrganizationCount ?? 0);
+	int postCount = Convert.ToInt32(ViewBag.PostCount ?? 0);
+	int stateCount = Convert.ToInt32(ViewBag.StateCount ?? 0);
+	int countryCount = Convert.ToInt32(ViewBag.CountryCount ?? 0);
+
+	// Hero slides (data-driven so the markup is written once)
+	// Set CtaUrl to your registration / apply route.
+	var slides = new[]
+	{
+		new {
+			Image = "background.jpg", Alt = "Interns working together at a desk",
+			Title = "Discover Your Next Big Opportunity with 1 Trainee.com!",
+			Text = "Are you ready to take the next step in your career journey? 1trainee.com is here to connect you with exciting internships that match your skills, interests, and career goals.",
+			Cta = "Apply now", CtaUrl = "#"
+		},
+		new {
+			Image = "background2.jpg", Alt = "Colleagues discussing at a laptop",
+			Title = "Not sure where to start?",
+			Text = "1trainee.com offers helpful resources such as resume tips, interview advice, and networking opportunities to help you secure your dream internship.",
+			Cta = (string)null, CtaUrl = (string)null
+		},
+		new {
+			Image = "background3.jpg", Alt = "Company recruiter reviewing candidates",
+			Title = "Company Recruiter",
+			Text = "1trainee.com is the perfect platform to find the next generation of innovators and leaders who are eager to contribute & learn. Recruiters (Org) can connect with the brightest, most driven students & recent graduates.",
+			Cta = (string)null, CtaUrl = (string)null
+		}
+	};
+
+	var categories = new[]
+	{
+		("e1.png", "Digital Marketing"), ("e2.png", "UI/UX Design"), ("e3.png", "3D Visual Design"),
+		("e4.png", "Content Marketing"), ("e5.png", "Photography"), ("e6.png", "Photo Lifestyle"),
+		("e7.png", "Art & Design"), ("e8.png", "Finance & Banking"), ("e9.png", "Graphic Design"),
+		("e2.png", "Interior Design"), ("e3.png", "3D Visual Design"), ("e7.png", "Art & Design")
+	};
+
+	var partnerLogos = new[] { "1", "2", "3", "4", "5", "2", "1", "3", "4" };
+
+	var steps = new[]
+	{
+		("01", "sc_one", "Expert <br />Teacher"),
+		("02", "sc_two", "Quality <br />Education"),
+		("03", "sc_three", "Remote <br />Learning"),
+		("04", "sc_four", "Life Time <br />Support")
+	};
+
+	var platformStats = new[]
+	{
+		("platform-orange", "fa-venus-mars", "Trainees", traineeCount),
+		("platform-green", "fa-building", "Organizations", organizationCount),
+		("platform-blue", "fa-briefcase", "No. Of Posts", postCount),
+		("platform-purple", "fa-map-marker-alt", "States", stateCount),
+		("platform-pink", "fa-plane", "Countries", countryCount)
+	};
 }
 
-
-@{
-    var feedbacks = ViewBag.Feedbacks as List<HomeFeedbackCardM>
-                     ?? new List<HomeFeedbackCardM>();
-}
-<link rel="stylesheet" href="~/css/home-modern.css" asp-append-version="true">
+<link rel="stylesheet" href="~/css/home-modern.css" asp-append-version="true" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;700&family=Oswald:wght@500;600&display=swap" />
 
 <!-- START PRELOADER -->
 <div class="preloaders">
 	<div class="trainee-loader">
-
 		<div class="trainee-orbit orbit-one"></div>
 		<div class="trainee-orbit orbit-two"></div>
 
 		<!-- CENTER BRAND NAME -->
-		<div class="trainee-core">
-			<span>1Trainee</span>
-		</div>
+		<div class="trainee-core"><span>1Trainee</span></div>
 
 		<div class="trainee-dot dot-one"></div>
 		<div class="trainee-dot dot-two"></div>
 		<div class="trainee-dot dot-three"></div>
 		<div class="trainee-dot dot-four"></div>
-
 	</div>
 </div>
-
 <!-- END PRELOADER -->
 <!-- START HOME -->
-<section class="home_bg hb_height">
-	<div class="container p-5">
-		<div class="row">
-			<div class="col-lg-6 col-sm-12 col-xs-12">
-				<div class="hero-text ht_top">
-					<h1><span>Smart Study</span> Where Knowledge Meets the Web</h1>
-					<p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, consectetur adipiscing elit tempor ut labore</p>
+<section class="modern-hero-slider" id="home" aria-roledescription="carousel" aria-label="Featured highlights">
+
+	<div class="hero-slides">
+		@for (int s = 0; s < slides.Length; s++)
+		{
+			var slide = slides[s];
+
+			<div class="hero-slide@(s == 0 ? " active" : "")" aria-hidden="@(s == 0 ? "false" : "true")">
+
+				<div class="hero-slide-image">
+					<img src="~/images/@slide.Image"
+						 alt="@slide.Alt"
+						 loading="@(s == 0 ? "eager" : "lazy")" fetchpriority="@(s == 0 ? "high" : "auto")"
+						 decoding="async" />
 				</div>
-				<div class="home_sb">
-					<form action="#" class="banner_subs">
-						<input type="text" class="form-control home_si" placeholder="Search  course here" required="required">
-						<button type="button" class="subscribe__btn">Search <i class="fa fa-paper-plane-o"></i></button>
-					</form>
-				</div>
-			</div><!--- END COL -->
-			<div class="col-lg-6 col-sm-12 col-xs-12">
-				<div class="hero-text-img">
-					<img src="assets/img/home-img2.png" class="img-fluid" alt="" />
-					<div class="home_ps">
-						<span class="ti-user"></span>
-						<h2>4500+</h2>
-						<p>Active student</p>
+
+				<div class="hero-overlay"></div>
+
+				<div class="hero-content-wrap">
+					<div class="container">
+						<div class="hero-content">
+							<div class="hero-card">
+
+								@if (s == 0)
+								{
+									<h1 class="hero-title">@slide.Title</h1>
+								}
+								else
+								{
+									<h2 class="hero-title">@slide.Title</h2>
+								}
+
+								<p>@slide.Text</p>
+
+								@if (!string.IsNullOrEmpty(slide.Cta))
+								{
+									<a class="hero-cta" href="@slide.CtaUrl">
+										@slide.Cta
+										<i class="fa fa-arrow-right" aria-hidden="true"></i>
+									</a>
+								}
+
+							</div>
+						</div>
 					</div>
 				</div>
-			</div><!--- END COL -->
-		</div><!--- END ROW -->
-	</div><!--- END CONTAINER -->
+			</div>
+		}
+	</div>
+
+	<!-- SLIDER CONTROLS -->
+	<button class="hero-arrow hero-prev" type="button" aria-label="Previous slide">
+		<i class="fa fa-angle-left" aria-hidden="true"></i>
+	</button>
+	<button class="hero-arrow hero-next" type="button" aria-label="Next slide">
+		<i class="fa fa-angle-right" aria-hidden="true"></i>
+	</button>
+
+	<!-- DOTS -->
+	<div class="hero-dots">
+		@for (int d = 0; d < slides.Length; d++)
+		{
+			<button class="hero-dot@(d == 0 ? " active" : "")" type="button" data-slide="@d" aria-label="Go to slide @(d + 1)">
+				<span></span>
+			</button>
+		}
+	</div>
+
+	<!-- SLIDE NUMBER -->
+	<div class="hero-counter" aria-hidden="true">
+		<span class="hero-current">01</span>
+		<div class="hero-counter-line"></div>
+		<span>@slides.Length.ToString("00")</span>
+	</div>
 </section>
-<!-- END  HOME -->
+<!-- END HOME -->
 <!-- START COUNTER -->
 <section class="count_area counter_feature">
 	<div class="container">
-		<div class="row">
-			<div class="col-lg-3 col-sm-6 col-xs-12">
-				<div class="single-counter">
-					<span class="ti-folder sc_one"></span>
-					<h2 class="counter-num">134</h2>
-					<p>Our Online Course</p>
+		<div class="modern-about-wrapper">
+
+			<!-- LEFT EXPERIENCE PANEL -->
+			<div class="experience-panel reveal" data-reveal="left">
+				<div class="experience-icon" aria-hidden="true"><i class="ti-medall-alt"></i></div>
+				<h2>18<sup>+</sup></h2>
+				<h3>Years Experience</h3>
+			</div>
+
+			<!-- RIGHT CONTENT -->
+			<div class="about-content">
+
+				<span class="about-label reveal" data-reveal="up">LEARN ABOUT US</span>
+
+				<p class="about-description reveal" data-reveal="up" style="--d:.1s">
+					www.1trainee.com is designed to bridge the gap between
+					internship seekers and organizations, fostering a more
+					efficient, user-friendly experience for both parties.
+					By addressing the unique needs of each user group, we aim
+					to create a more dynamic and effective internship
+					ecosystem. We are committed to supporting your career
+					growth and organizational goals through this innovative
+					platform.
+				</p>
+
+				<!-- FEATURES -->
+				<div class="about-features">
+					<div class="about-feature reveal" data-reveal="up" style="--d:.2s">
+						<span class="feature-icon"><i class="ti-home" aria-hidden="true"></i></span>
+						<h4>Internship Seekers</h4>
+					</div>
+
+					<div class="about-feature reveal" data-reveal="up" style="--d:.3s">
+						<span class="feature-icon"><i class="ti-briefcase" aria-hidden="true"></i></span>
+						<h4>Org / Companies</h4>
+					</div>
 				</div>
 			</div>
-			<div class="col-lg-3 col-sm-6 col-xs-12">
-				<div class="single-counter">
-					<span class="ti-medall-alt sc_two"></span>
-					<h2 class="counter-num">299</h2>
-					<p>Academic Programs</p>
-				</div>
-			</div><!-- END COL -->
-			<div class="col-lg-3 col-sm-6 col-xs-12">
-				<div class="single-counter">
-					<span class="ti-id-badge sc_three"></span>
-					<h2 class="counter-num">684</h2>
-					<p>Certified Students</p>
-				</div>
-			</div><!-- END COL -->
-			<div class="col-lg-3 col-sm-6 col-xs-12">
-				<div class="single-counter">
-					<span class="ti-user sc_four"></span>
-					<h2 class="counter-num">941</h2>
-					<p>Enrolled Students</p>
-				</div>
-			</div><!-- END COL -->
-		</div><!--- END ROW -->
-	</div><!--- END CONTAINER -->
+		</div>
+	</div>
 </section>
 <!-- END COUNTER -->
-<!-- START CATEGORY -->
-<section class="top_cat__area section-padding" style="background-image: url(assets/img/bg/shape-1.png);  background-size:cover; background-position: center center;">
+<!-- START CATEGORY (journey) -->
+<section class="top_cat__area section-padding section-bg-shape">
 	<div class="container">
-		<div class="section-title text-center">
+		<div class="section-title text-center reveal" data-reveal="up">
 			<h2>Start  journey With us</h2>
 			<p>We offer a brand new approach to the most basic learning paradigms. Choose from a wide range of learning options and gain new skills! Our school is know.</p>
 		</div>
 		<div class="row">
-			<div class="col-lg-3 col-sm-6 col-xs-12 wow fadeInUp" data-wow-duration="1s" data-wow-delay="0.2s" data-wow-offset="0">
-				<div class="single_tp">
-					<span class="sc_one">01</span>
-					<h3>Expert <br />Teacher</h3>
-					<p>Lorem ipsum dolor sit amet, consectetur notted adipisicing elit ut labore.</p>
+			@for (int i = 0; i < steps.Length; i++)
+			{
+				<div class="col-lg-3 col-sm-6 col-xs-12 reveal" data-reveal="up" style="--d:@((0.1 * (i + 1)).ToString("0.0", System.Globalization.CultureInfo.InvariantCulture))s">
+					<div class="single_tp">
+						<span class="@steps[i].Item2">@steps[i].Item1</span>
+						<h3>@Html.Raw(steps[i].Item3)</h3>
+						<p>Lorem ipsum dolor sit amet, consectetur notted adipisicing elit ut labore.</p>
+					</div>
 				</div>
-			</div><!-- END COL -->
-			<div class="col-lg-3 col-sm-6 col-xs-12 wow fadeInUp" data-wow-duration="1s" data-wow-delay="0.3s" data-wow-offset="0">
-				<div class="single_tp">
-					<span class="sc_two">02</span>
-					<h3>Quality <br />Education</h3>
-					<p>Lorem ipsum dolor sit amet, consectetur notted adipisicing elit ut labore.</p>
-				</div>
-			</div><!-- END COL -->
-			<div class="col-lg-3 col-sm-6 col-xs-12 wow fadeInUp" data-wow-duration="1s" data-wow-delay="0.4s" data-wow-offset="0">
-				<div class="single_tp">
-					<span class="sc_three">03</span>
-					<h3>Remote <br />Learning</h3>
-					<p>Lorem ipsum dolor sit amet, consectetur notted adipisicing elit ut labore.</p>
-				</div>
-			</div><!-- END COL -->
-			<div class="col-lg-3 col-sm-6 col-xs-12 wow fadeInUp" data-wow-duration="1s" data-wow-delay="0.4s" data-wow-offset="0">
-				<div class="single_tp">
-					<span class="sc_four">04</span>
-					<h3>Life Time <br />Support</h3>
-					<p>Lorem ipsum dolor sit amet, consectetur notted adipisicing elit ut labore.</p>
-				</div>
-			</div><!-- END COL -->
+
+				<!-- END COL -->
+			}
 		</div><!-- END ROW -->
-	</div><!--- END CONTAINER -->
+	</div><!-- END CONTAINER -->
 </section>
 <!-- END CATEGORY -->
 <!-- START ABOUT US -->
-<section class="ab_area section-padding">
+<section class="ab_area section-padding trainee-about">
 	<div class="container">
-		<div class="row">
-			<div class="col-lg-6 col-sm-12 col-xs-12 wow fadeInUp" data-wow-duration="1s" data-wow-delay="0.2s" data-wow-offset="0">
-				<div class="ab_img">
-					<img src="assets/img/about1.png" class="img-fluid" alt="image">
-				</div>
-			</div><!--- END COL -->
-			<div class="col-lg-6 col-sm-12 col-xs-12 wow fadeInUp" data-wow-duration="1s" data-wow-delay="0.1s" data-wow-offset="0">
+		<div class="row align-items-center">
+
+			<!-- LEFT CONTENT -->
+			<div class="col-lg-7 col-md-7 col-sm-12 reveal" data-reveal="left">
 				<div class="ab_content">
-					<h2>We Are Providing The Online Course In Global World</h2>
-					<p>We offer a brand new approach to the most basic learning paradigms. Choose from a wide range of learning options and gain new skills! Our school is know.</p>
-					<p>We offer a brand new approach to the most basic learning paradigms. Choose from a wide range of learning options and gain new skills! Our school is know.</p>
-					<ul>
-						<li><span class="ti-check"></span> Get access to <b>12,000+</b> of our top courses</li>
-						<li><span class="ti-check"></span> Popular topic to learn now in our online courses for student</li>
-						<li><span class="ti-check"></span> Find the right instructor for you</li>
-					</ul>
-					<a class="btn_one" href="course.html">View All Courses <i class="ti-arrow-top-right"></i></a>
+
+					<span class="about-kicker">TRANSFORMATION</span>
+
+					<h2 class="about-title">
+						<span class="title-line" aria-hidden="true"></span>
+						Trainee
+					</h2>
+
+					<p>
+						At 1trainee.com, Trainees (Interns / Research Fellows)
+						play an important role with an academic and professional
+						POV, it is imperative for every individual to match the
+						industry requirements to be in competition. Internship
+						has immense value for Trainees because of its assistance
+						in practical skill enhancement.
+					</p>
+
+					<p>
+						Internship helps Trainees to learn and understand new
+						industry based problem definitions. New technologies
+						and related practical work at internship increases the
+						knowledge and help Trainees to prove their metal. At
+						1trainee.com by updating their profile info, Trainees
+						can simply download and view resumes in different
+						formats.
+					</p>
+
+					<p>
+						As per their choice they can change the resume format
+						which has been provided on a single click. Internship
+						posts from Organizations are shown as per the Trainees
+						skill set; Trainees can apply to multiple internships
+						and can join the best suitable option.
+					</p>
+
+					<p>
+						Here at 1trainee.com, registration, resume building and
+						internship view facility is kept free i.e. without any
+						charge. If Organizations charging for their respective
+						internships and Trainees are comfortable with the same
+						then it’s up to them whether to opt in or opt out.
+					</p>
+
+					<p>
+						We suggest Trainees to attend a single internship as
+						per their choice at one time and also to complete in
+						proper manner, kindly proper cross check all the
+						facilities and details of Organization before you
+						finalize it. 1trainee.com will always assist Trainees
+						to fulfill their internship related search in a quick
+						time and less effort.
+					</p>
 				</div>
-			</div><!--- END COL -->
-		</div><!--- END ROW -->
-	</div><!--- END CONTAINER -->
+			</div>
+
+			<!-- RIGHT IMAGE -->
+			<div class="col-lg-5 col-md-5 col-sm-12 reveal" data-reveal="right" style="--d:.15s">
+				<div class="ab_img trainee-about-image">
+					<div class="image-decoration" aria-hidden="true"></div>
+					<img src="~/assets/img/about1.png" class="img-fluid" alt="Trainee" loading="lazy" decoding="async" />
+				</div>
+			</div>
+
+		</div>
+	</div>
 </section>
 <!-- END ABOUT US -->
-<!-- START CATEGORY -->
-<section class="top_cat__area section-padding" style="background-image: url(assets/img/bg/section-2.jpg);  background-size:cover; background-position: center center;">
+<!-- START CATEGORY (popular) -->
+<section class="top_cat__area section-padding section-bg-cover">
 	<div class="container">
-		<div class="section-title text-center">
+		<div class="section-title text-center reveal" data-reveal="up">
 			<h2>Find out by popular Categories</h2>
 			<p>We offer a brand new approach to the most basic learning paradigms. Choose from a wide range of learning options and gain new skills! Our school is know.</p>
 		</div>
 		<div class="row">
-			<div class="col-lg-12 col-sm-12 col-xs-12 wow fadeInUp" data-wow-duration="1s" data-wow-delay="0.1s" data-wow-offset="0">
+			<div class="col-lg-12 col-sm-12 col-xs-12">
 				<div class="cat_list">
 					<ul>
-						<li><a href="#"><img src="assets/img/e1.png" alt="category-image" /> Digital Marketing</a></li>
-						<li><a href="#"><img src="assets/img/e2.png" alt="category-image" /> UI/UX Design</a></li>
-						<li><a href="#"><img src="assets/img/e3.png" alt="category-image" /> 3D Visual Design</a></li>
-						<li><a href="#"><img src="assets/img/e4.png" alt="category-image" /> Content Marketing</a></li>
-						<li><a href="#"><img src="assets/img/e5.png" alt="category-image" /> Photography</a></li>
-						<li><a href="#"><img src="assets/img/e6.png" alt="category-image" /> Photo Lifestyle</a></li>
-						<li><a href="#"><img src="assets/img/e7.png" alt="category-image" /> Art & Design</a></li>
-						<li><a href="#"><img src="assets/img/e8.png" alt="category-image" /> Finance & Banking</a></li>
-						<li><a href="#"><img src="assets/img/e9.png" alt="category-image" /> Graphic Design</a></li>
-						<li><a href="#"><img src="assets/img/e2.png" alt="category-image" /> Interior Design</a></li>
-						<li><a href="#"><img src="assets/img/e3.png" alt="category-image" /> 3D Visual Design</a></li>
-						<li><a href="#"><img src="assets/img/e7.png" alt="category-image" /> Art & Design</a></li>
+						@for (int i = 0; i < categories.Length; i++)
+						{
+							<li class="reveal" data-reveal="zoom" style="--d:@((0.05 * i).ToString("0.00", System.Globalization.CultureInfo.InvariantCulture))s">
+								<a href="#">
+									<img src="~/assets/img/@categories[i].Item1" alt="@categories[i].Item2" loading="lazy" />
+									@categories[i].Item2
+								</a>
+							</li>
+						}
 					</ul>
 				</div>
-			</div><!--- END COL -->
-		</div><!--- END ROW -->
-	</div><!--- END CONTAINER -->
+			</div><!-- END COL -->
+		</div><!-- END ROW -->
+	</div><!-- END CONTAINER -->
 </section>
 <!-- END CATEGORY -->
-<!-- START COURSE -->
-<section class="home_course section-padding">
-	<div class="container">
-		<div class="row">
-			<div class="col-lg-8 col-sm-6 col-xs-12">
-				<div class="section-title">
-					<h2>Join with more than <b>80,000+ </b> <br />Courses & Learning creators.</h2>
-				</div>
-			</div><!--- END COL -->
-			<div class="col-lg-4 col-sm-6 col-xs-12">
-				<div class="cour_btn">
-					<a href="course.html" class="btn_one">View all Courses <i class="ti-arrow-top-right"></i></a>
-				</div>
-			</div><!--- END COL -->
-		</div><!--- END ROW -->
-		<div class="row">
-
-			<!-- COURSE 1 -->
-			<div class="col-lg-4 col-sm-6 col-xs-12">
-				<div class="single_course">
-
-					<div class="single_c_img">
-						<img src="assets/img/course/1.png"
-							 class="img-fluid"
-							 alt="course-image" />
-						<span>Education</span>
-					</div>
-
-					<div class="course-rating">
-						<i class="fa fa-star"></i>
-						<i class="fa fa-star"></i>
-						<i class="fa fa-star"></i>
-						<i class="fa fa-star"></i>
-						<i class="fa fa-star"></i>
-					</div>
-
-					<h4>
-						<a href="course.html">
-							Complete User fundamentals beginners to advanced
-						</a>
-					</h4>
-
-					<p>
-						<span class="ti-book"></span>
-						12 Course
-					</p>
-
-					<p>
-						<span class="ti-alarm-clock"></span>
-						2 Hrs 32 Min
-					</p>
-
-					<div class="price">
-						Course Fee - 99$
-					</div>
-
-				</div>
-			</div>
-
-
-			<!-- COURSE 2 -->
-			<div class="col-lg-4 col-sm-6 col-xs-12">
-				<div class="single_course">
-
-					<div class="single_c_img">
-						<img src="assets/img/course/2.png"
-							 class="img-fluid"
-							 alt="course-image" />
-						<span>UI/UX</span>
-					</div>
-
-					<div class="course-rating">
-						<i class="fa fa-star"></i>
-						<i class="fa fa-star"></i>
-						<i class="fa fa-star"></i>
-						<i class="fa fa-star"></i>
-						<i class="fa fa-star"></i>
-					</div>
-
-					<h4>
-						<a href="course.html">
-							Advanced Android 12 &amp; Kotlin Development Course
-						</a>
-					</h4>
-
-					<p>
-						<span class="ti-book"></span>
-						41 Course
-					</p>
-
-					<p>
-						<span class="ti-alarm-clock"></span>
-						3 Hrs 32 Min
-					</p>
-
-					<div class="price">
-						Course Fee - 49$
-					</div>
-
-				</div>
-			</div>
-
-
-			<!-- COURSE 3 -->
-			<div class="col-lg-4 col-sm-6 col-xs-12">
-				<div class="single_course">
-
-					<div class="single_c_img">
-						<img src="assets/img/course/3.png"
-							 class="img-fluid"
-							 alt="course-image" />
-						<span>Lifestyle</span>
-					</div>
-
-					<div class="course-rating">
-						<i class="fa fa-star"></i>
-						<i class="fa fa-star"></i>
-						<i class="fa fa-star"></i>
-						<i class="fa fa-star"></i>
-						<i class="fa fa-star"></i>
-					</div>
-
-					<h4>
-						<a href="course.html">
-							Complete HTML, CSS and Javascript Course
-						</a>
-					</h4>
-
-					<p>
-						<span class="ti-book"></span>
-						32 Course
-					</p>
-
-					<p>
-						<span class="ti-alarm-clock"></span>
-						2 Hrs 32 Min
-					</p>
-
-					<div class="price">
-						Course Fee - Free
-					</div>
-
-				</div>
-			</div>
-
-
-			<!-- COURSE 4 -->
-			<div class="col-lg-4 col-sm-6 col-xs-12">
-				<div class="single_course">
-
-					<div class="single_c_img">
-						<img src="assets/img/course/4.png"
-							 class="img-fluid"
-							 alt="course-image" />
-						<span>Science</span>
-					</div>
-
-					<div class="course-rating">
-						<i class="fa fa-star"></i>
-						<i class="fa fa-star"></i>
-						<i class="fa fa-star"></i>
-						<i class="fa fa-star"></i>
-						<i class="fa fa-star"></i>
-					</div>
-
-					<h4>
-						<a href="course.html">
-							IOS and Swift Complete iOS Application Development
-						</a>
-					</h4>
-
-					<p>
-						<span class="ti-book"></span>
-						19 Course
-					</p>
-
-					<p>
-						<span class="ti-alarm-clock"></span>
-						2 Hrs 32 Min
-					</p>
-
-					<div class="price">
-						Course Fee - 59$
-					</div>
-
-				</div>
-			</div>
-
-
-			<!-- COURSE 5 -->
-			<div class="col-lg-4 col-sm-6 col-xs-12">
-				<div class="single_course">
-
-					<div class="single_c_img">
-						<img src="assets/img/course/5.png"
-							 class="img-fluid"
-							 alt="course-image" />
-						<span>Modern</span>
-					</div>
-
-					<div class="course-rating">
-						<i class="fa fa-star"></i>
-						<i class="fa fa-star"></i>
-						<i class="fa fa-star"></i>
-						<i class="fa fa-star"></i>
-						<i class="fa fa-star"></i>
-					</div>
-
-					<h4>
-						<a href="course.html">
-							Learn graphics design with a best IT Trainer
-						</a>
-					</h4>
-
-					<p>
-						<span class="ti-book"></span>
-						22 Course
-					</p>
-
-					<p>
-						<span class="ti-alarm-clock"></span>
-						2 Hrs 32 Min
-					</p>
-
-					<div class="price">
-						Course Fee - 79$
-					</div>
-
-				</div>
-			</div>
-
-
-			<!-- COURSE 6 -->
-			<div class="col-lg-4 col-sm-6 col-xs-12">
-				<div class="single_course">
-
-					<div class="single_c_img">
-						<img src="assets/img/course/6.png"
-							 class="img-fluid"
-							 alt="course-image" />
-						<span>Marketing</span>
-					</div>
-
-					<div class="course-rating">
-						<i class="fa fa-star"></i>
-						<i class="fa fa-star"></i>
-						<i class="fa fa-star"></i>
-						<i class="fa fa-star"></i>
-						<i class="fa fa-star"></i>
-					</div>
-
-					<h4>
-						<a href="course.html">
-							Complete data science for  next business
-						</a>
-					</h4>
-
-					<p>
-						<span class="ti-book"></span>
-						11 Course
-					</p>
-
-					<p>
-						<span class="ti-alarm-clock"></span>
-						2 Hrs 32 Min
-					</p>
-
-					<div class="price">
-						Course Fee - 39$
-					</div>
-
-				</div>
-			</div>
-
-		</div>
-		<!--- END ROW -->
-	</div><!--- END CONTAINER -->
-</section>
-<!-- END COURSE -->
 <!-- START COMPANY PARTNER LOGO  -->
 <div class="partner-logo section-padding">
 	<div class="container">
-		<div class="row part_bg">
+		<div class="row part_bg reveal" data-reveal="up">
 			<div class="col-lg-4 col-sm-4 col-xs-12">
 				<div class="partner_title">
 					<h3>Helping <span>86,000+</span> global companies take the gloves off </h3>
@@ -485,641 +345,186 @@
 			</div><!-- END COL  -->
 			<div class="col-lg-8 col-sm-8 col-xs-12 text-center">
 				<div class="partner">
-					<a href="#"><img src="assets/img/clients/1.png" alt="image"></a>
-					<a href="#"><img src="assets/img/clients/2.png" alt="image"></a>
-					<a href="#"><img src="assets/img/clients/3.png" alt="image"></a>
-					<a href="#"><img src="assets/img/clients/4.png" alt="image"></a>
-					<a href="#"><img src="assets/img/clients/5.png" alt="image"></a>
-					<a href="#"><img src="assets/img/clients/2.png" alt="image"></a>
-					<a href="#"><img src="assets/img/clients/1.png" alt="image"></a>
-					<a href="#"><img src="assets/img/clients/3.png" alt="image"></a>
-					<a href="#"><img src="assets/img/clients/4.png" alt="image"></a>
+					@foreach (var logo in partnerLogos)
+					{
+						<a href="#"><img src="~/assets/img/clients/@(logo).png" alt="Partner logo" loading="lazy" /></a>
+					}
 				</div>
 			</div><!-- END COL  -->
-		</div><!--END  ROW  -->
+		</div><!--END ROW -->
 	</div><!-- END CONTAINER  -->
 </div>
-<!-- END COMPANY PARTNER LOGO -->
-<!-- START VIDEO -->
-<section class="vid_area section-padding">
-	<div class="container">
-		<div class="row">
-			<div class="col-lg-12 vp_top wow fadeInUDown" data-wow-duration="1s" data-wow-delay="0.2s" data-wow-offset="0">
-				<div class="video-area" style="background-image: url(assets/img/bg/video.jpg);  background-size:cover; background-position: center center;">
-					<a href="https://www.youtube.com/watch?v=RXv_uIN6e-Y" class="magnific_popup video-button"><i class="fa fa-play"></i></a>
-				</div>
-			</div><!--- END COL -->
-		</div><!--- END ROW -->
-	</div><!--- END CONTAINER -->
-</section>
-<!-- END VIDEO -->
 
-
-@* <!-- START TEAM -->
-<section class="team_area section-padding">
+<!-- START TRAINEE SECTION -->
+<section class="team_area" id="trainees">
 	<div class="container">
-		<div class="section-title text-center">
-			<h2>Meet our Instructors</h2>
-			<p>We offer a brand new approach to the most basic learning paradigms. Choose from a wide range of learning options and gain new skills! Our school is know.</p>
+
+		<div class="section-title text-center reveal" data-reveal="up">
+			<span class="team-subtitle">OUR TRAINEES</span>
+			<h2>Meet Our Trainees</h2>
+			<p>
+				Meet our talented trainees who are developing their skills,
+				gaining experience and building their careers.
+			</p>
 		</div>
-		<div class="row">
-			<div class="col-lg-3 col-sm-6 col-xs-12 wow fadeInUp" data-wow-duration="1s" data-wow-delay="0.1s" data-wow-offset="0">
-				<div class="our-team">
-					<div class="team-content">
-						<a href="#"><img src="assets/img/team/team1.jpg" alt=""></a>
-						<ul class="social-links">
-							<li><a href="#"><i class="fa-solid fa-x"></i></a></li>
-							<li><a href="#"><i class="fa-brands fa-facebook-f"></i></a></li>
-							<li><a href="#"><i class="fa-brands fa-linkedin-in"></i></a></li>
-						</ul>
+
+		<div class="trainee-slider-wrapper reveal" data-reveal="fade">
+			<div class="trainee-slider-track@(hasTrainees ? "" : " is-empty")">
+
+				@if (hasTrainees)
+				{
+					@* Rendered twice: the second pass is required for the seamless infinite loop *@
+					@for (int pass = 0; pass < 2; pass++)
+					{
+						foreach (var trainee in Model)
+						{
+							<div class="trainee-slide" aria-hidden="@(pass == 1 ? "true" : null)">
+								<div class="our-team">
+
+									<div class="team-content">
+										<a href="javascript:void(0);" tabindex="-1">
+											@if (!string.IsNullOrWhiteSpace(trainee.ProfileImage))
+											{
+												<img src="~/uploads/candidates/@trainee.ProfileImage"
+													 alt="@trainee.TraineeName"
+													 class="trainee-profile-image" loading="lazy" decoding="async" />
+											}
+											else
+											{
+												<img src="~/assets/img/team/default-profile.png"
+													 alt="Profile"
+													 class="trainee-profile-image" loading="lazy" decoding="async" />
+											}
+										</a>
+									</div>
+
+									<div class="team-prof">
+										<h3>@trainee.TraineeName</h3>
+										<span>@(string.IsNullOrWhiteSpace(trainee.Designation) ? "Trainee" : trainee.Designation)</span>
+									</div>
+
+									<div class="sth_det2">
+										<span class="ti-location-pin" aria-hidden="true"></span>
+										<u>@(string.IsNullOrWhiteSpace(trainee.Location) ? "Location not available" : trainee.Location)</u>
+									</div>
+
+								</div>
+							</div>
+						}
+					}
+				}
+				else
+				{
+					<div class="no-trainee">
+						<div class="no-trainee-icon"><i class="ti-user" aria-hidden="true"></i></div>
+						<h4>No Trainees Available</h4>
+						<p>Trainee profiles will appear here once available.</p>
 					</div>
-					<div class="team-prof">
-						<h3>Bilkis Vabi</h3>
-						<span>Web designer</span>
-					</div>
-					<div class="sth_det2">
-						<span class="ti-file"> <u>04 Course</u></span>
-						<span class="ti-user"> <u>27 Student</u></span>
-					</div>
-				</div>
-			</div><!--- END COL -->
-			<div class="col-lg-3 col-sm-6 col-xs-12 wow fadeInUp" data-wow-duration="1s" data-wow-delay="0.1s" data-wow-offset="0">
-				<div class="our-team">
-					<div class="team-content">
-						<a href="#"><img src="assets/img/team/team2.jpg" alt=""></a>
-						<ul class="social-links">
-							<li><a href="#"><i class="fa-solid fa-x"></i></a></li>
-							<li><a href="#"><i class="fa-brands fa-facebook-f"></i></a></li>
-							<li><a href="#"><i class="fa-brands fa-linkedin-in"></i></a></li>
-						</ul>
-					</div>
-					<div class="team-prof">
-						<h3>Mood Wasim</h3>
-						<span>TemplateMonster company</span>
-					</div>
-					<div class="sth_det2">
-						<span class="ti-file"> <u>06 Course</u></span>
-						<span class="ti-user"> <u>41 Student</u></span>
-					</div>
-				</div>
-			</div><!--- END COL -->
-			<div class="col-lg-3 col-sm-6 col-xs-12 wow fadeInUp" data-wow-duration="1s" data-wow-delay="0.1s" data-wow-offset="0">
-				<div class="our-team">
-					<div class="team-content">
-						<a href="#"><img src="assets/img/team/team3.jpg" alt=""></a>
-						<ul class="social-links">
-							<li><a href="#"><i class="fa-solid fa-x"></i></a></li>
-							<li><a href="#"><i class="fa-brands fa-facebook-f"></i></a></li>
-							<li><a href="#"><i class="fa-brands fa-linkedin-in"></i></a></li>
-						</ul>
-					</div>
-					<div class="team-prof">
-						<h3>Shyinn tim</h3>
-						<span>Codecanyou</span>
-					</div>
-					<div class="sth_det2">
-						<span class="ti-file"> <u>13 Course</u></span>
-						<span class="ti-user"> <u>31 Student</u></span>
-					</div>
-				</div>
-			</div><!--- END COL -->
-			<div class="col-lg-3 col-sm-6 col-xs-12 wow fadeInUp" data-wow-duration="1s" data-wow-delay="0.1s" data-wow-offset="0">
-				<div class="our-team">
-					<div class="team-content">
-						<a href="#"><img src="assets/img/team/team4.jpg" alt=""></a>
-						<ul class="social-links">
-							<li><a href="#"><i class="fa-solid fa-x"></i></a></li>
-							<li><a href="#"><i class="fa-brands fa-facebook-f"></i></a></li>
-							<li><a href="#"><i class="fa-brands fa-linkedin-in"></i></a></li>
-						</ul>
-					</div>
-					<div class="team-prof">
-						<h3>Shorif shorifa</h3>
-						<span>Tsc chottor</span>
-					</div>
-					<div class="sth_det2">
-						<span class="ti-file"> <u>07 Course</u></span>
-						<span class="ti-user"> <u>24 Student</u></span>
-					</div>
-				</div>
-			</div><!--- END COL -->
-		</div><!--- END ROW -->
-	</div><!--- END CONTAINER -->
+				}
+
+			</div>
+		</div>
+
+	</div>
 </section>
-<!-- END TEAM --> *@
-<!-- START TEAM -->
-<!-- =========================================================
-     START TRAINEE SECTION
-========================================================= -->
-
-<section class="team_area">
-
-    <div class="container">
-
-        <!-- SECTION TITLE -->
-        <div class="section-title text-center">
-
-            <span class="team-subtitle">
-                OUR TRAINEES
-            </span>
-
-            <h2>
-                Meet Our Trainees
-            </h2>
-
-            <p>
-                Meet our talented trainees who are developing their skills,
-                gaining experience and building their careers.
-            </p>
-
-        </div>
-
-
-        <!-- =================================================
-             SLIDER
-        ================================================== -->
-
-        <div class="trainee-slider-wrapper">
-
-            <div class="trainee-slider-track">
-
-                @if (Model != null && Model.Any())
-                {
-
-                    <!-- =====================================
-                         FIRST SET OF CARDS
-                    ====================================== -->
-
-                    foreach (var trainee in Model)
-                    {
-
-                        <div class="trainee-slide">
-
-                            <div class="our-team">
-
-                                <!-- IMAGE -->
-                                <div class="team-content">
-
-                                    <a href="javascript:void(0);">
-
-                                        @if (!string.IsNullOrWhiteSpace(trainee.ProfileImage))
-                                        {
-                                            <img src="~/uploads/candidates/@trainee.ProfileImage"
-                                                 alt="@trainee.TraineeName"
-                                                 class="trainee-profile-image" />
-                                        }
-                                        else
-                                        {
-                                            <img src="~/assets/img/team/default-profile.png"
-                                                 alt="Profile"
-                                                 class="trainee-profile-image" />
-                                        }
-
-                                    </a>
-
-                                </div>
-
-
-                                <!-- NAME + DESIGNATION -->
-                                <div class="team-prof">
-
-                                    <h3>
-                                        @trainee.TraineeName
-                                    </h3>
-
-                                    <span>
-                                        @(string.IsNullOrWhiteSpace(trainee.Designation)
-                                            ? "Trainee"
-                                            : trainee.Designation)
-                                    </span>
-
-                                </div>
-
-
-                                <!-- LOCATION -->
-                                <div class="sth_det2">
-
-                                    <span class="ti-location-pin"></span>
-
-                                    <u>
-                                        @(string.IsNullOrWhiteSpace(trainee.Location)
-                                            ? "Location not available"
-                                            : trainee.Location)
-                                    </u>
-
-                                </div>
-
-                            </div>
-
-                        </div>
-
-                    }
-
-
-                    <!-- =====================================
-                         SECOND SET
-                         Required for infinite animation
-                    ====================================== -->
-
-                    foreach (var trainee in Model)
-                    {
-
-                        <div class="trainee-slide">
-
-                            <div class="our-team">
-
-                                <!-- IMAGE -->
-                                <div class="team-content">
-
-                                    <a href="javascript:void(0);">
-
-                                        @if (!string.IsNullOrWhiteSpace(trainee.ProfileImage))
-                                        {
-                                            <img src="~/uploads/candidates/@trainee.ProfileImage"
-                                                 alt="@trainee.TraineeName"
-                                                 class="trainee-profile-image" />
-                                        }
-                                        else
-                                        {
-                                            <img src="~/assets/img/team/default-profile.png"
-                                                 alt="Profile"
-                                                 class="trainee-profile-image" />
-                                        }
-
-                                    </a>
-
-                                </div>
-
-
-                                <!-- NAME + DESIGNATION -->
-                                <div class="team-prof">
-
-                                    <h3>
-                                        @trainee.TraineeName
-                                    </h3>
-
-                                    <span>
-                                        @(string.IsNullOrWhiteSpace(trainee.Designation)
-                                            ? "Trainee"
-                                            : trainee.Designation)
-                                    </span>
-
-                                </div>
-
-
-                                <!-- LOCATION -->
-                                <div class="sth_det2">
-
-                                    <span class="ti-location-pin"></span>
-
-                                    <u>
-                                        @(string.IsNullOrWhiteSpace(trainee.Location)
-                                            ? "Location not available"
-                                            : trainee.Location)
-                                    </u>
-
-                                </div>
-
-                            </div>
-
-                        </div>
-
-                    }
-
-                }
-                else
-                {
-
-                    <!-- NO DATA -->
-
-                    <div class="no-trainee">
-
-                        <div class="no-trainee-icon">
-                            <i class="ti-user"></i>
-                        </div>
-
-                        <h4>
-                            No Trainees Available
-                        </h4>
-
-                        <p>
-                            Trainee profiles will appear here once available.
-                        </p>
-
-                    </div>
-
-                }
-
-            </div>
-
-        </div>
-
-    </div>
-
+<!-- END TRAINEE SECTION -->
+<!-- START CANDIDATE FEEDBACK SECTION -->
+<section class="team_area feedback_area" id="feedback">
+	<div class="container">
+
+		<div class="section-title text-center reveal" data-reveal="up">
+			<span class="team-subtitle">CANDIDATE FEEDBACK</span>
+			<h2>What Our Trainees Say</h2>
+			<p>
+				Hear from our trainees about their learning experience,
+				career journey and experience with us.
+			</p>
+		</div>
+
+		<div class="trainee-slider-wrapper feedback-slider-wrapper reveal" data-reveal="fade">
+			<div class="trainee-slider-track feedback-slider-track@(feedbacks.Any() ? "" : " is-empty")">
+
+				@if (feedbacks.Any())
+				{
+					@for (int pass = 0; pass < 2; pass++)
+					{
+						foreach (var feedback in feedbacks)
+						{
+							<div class="trainee-slide feedback-slide" aria-hidden="@(pass == 1 ? "true" : null)">
+								<div class="our-team feedback-card">
+
+									<div class="feedback-quote-icon" aria-hidden="true">
+										<i class="fa-solid fa-quote-left"></i>
+									</div>
+
+									<div class="feedback-rating" role="img" aria-label="Rated @feedback.Rating out of 5">
+										@for (int i = 1; i <= 5; i++)
+										{
+											if (i <= feedback.Rating)
+											{
+												<i class="fa-solid fa-star"></i>
+											}
+											else
+											{
+												<i class="fa-regular fa-star"></i>
+											}
+										}
+									</div>
+
+									<div class="feedback-content">
+										<p>"@feedback.Feedback"</p>
+									</div>
+
+									<div class="feedback-profile">
+										@if (!string.IsNullOrWhiteSpace(feedback.ProfileImage))
+										{
+											<img src="~/uploads/candidates/@feedback.ProfileImage"
+												 alt="@feedback.TraineeName"
+												 class="trainee-profile-image" loading="lazy" decoding="async" />
+										}
+										else
+										{
+											<img src="~/assets/img/team/default-profile.png"
+												 alt="Profile"
+												 class="trainee-profile-image" loading="lazy" decoding="async" />
+										}
+									</div>
+
+									<div class="team-prof feedback-team-prof">
+										<h3>@feedback.TraineeName</h3>
+										<span>@(string.IsNullOrWhiteSpace(feedback.Designation) ? "Trainee" : feedback.Designation)</span>
+									</div>
+
+									<div class="sth_det2">
+										<span class="ti-location-pin" aria-hidden="true"></span>
+										<u>@(string.IsNullOrWhiteSpace(feedback.Location) ? "Location not available" : feedback.Location)</u>
+									</div>
+
+								</div>
+							</div>
+						}
+					}
+				}
+				else
+				{
+					<div class="no-trainee">
+						<div class="no-trainee-icon"><i class="ti-comment-alt" aria-hidden="true"></i></div>
+						<h4>No Feedback Available</h4>
+						<p>Candidate feedback will appear here once available.</p>
+					</div>
+				}
+
+			</div>
+		</div>
+
+	</div>
 </section>
-
-<!-- =========================================================
-     END TRAINEE SECTION
-========================================================= -->
-<!-- END TEAM -->
-
-<!-- =========================================================
-     Start CANDIDATE FEEDBACK SECTION
-========================================================= -->
-
-<section class="team_area feedback_area">
-
-    <div class="container">
-
-        <!-- SECTION TITLE -->
-        <div class="section-title text-center">
-
-            <span class="team-subtitle">
-                CANDIDATE FEEDBACK
-            </span>
-
-            <h2>
-                What Our Trainees Say
-            </h2>
-
-            <p>
-                Hear from our trainees about their learning experience,
-                career journey and experience with us.
-            </p>
-
-        </div>
-
-
-        <!-- =================================================
-             SLIDER
-        ================================================== -->
-
-        <div class="trainee-slider-wrapper feedback-slider-wrapper">
-
-            <div class="trainee-slider-track feedback-slider-track">
-
-                @if (feedbacks.Any())
-                {
-
-                    <!-- =====================================
-                         FIRST SET OF FEEDBACK CARDS
-                    ====================================== -->
-
-                    foreach (var feedback in feedbacks)
-                    {
-
-                        <div class="trainee-slide feedback-slide">
-
-                            <div class="our-team feedback-card">
-
-                                <!-- QUOTE ICON -->
-
-                                <div class="feedback-quote-icon">
-
-                                    <i class="fa-solid fa-quote-left"></i>
-
-                                </div>
-
-
-                                <!-- RATING -->
-
-                                <div class="feedback-rating">
-
-                                    @for (int i = 1; i <= 5; i++)
-                                    {
-                                        if (i <= feedback.Rating)
-                                        {
-                                            <i class="fa-solid fa-star"></i>
-                                        }
-                                        else
-                                        {
-                                            <i class="fa-regular fa-star"></i>
-                                        }
-                                    }
-
-                                </div>
-
-
-                                <!-- FEEDBACK -->
-
-                                <div class="feedback-content">
-
-                                    <p>
-                                        "@feedback.Feedback"
-                                    </p>
-
-                                </div>
-
-
-                                <!-- PROFILE -->
-
-                                <div class="feedback-profile">
-
-                                    @if (!string.IsNullOrWhiteSpace(feedback.ProfileImage))
-                                    {
-                                        <img src="~/uploads/candidates/@feedback.ProfileImage"
-                                             alt="@feedback.TraineeName"
-                                             class="trainee-profile-image" />
-                                    }
-                                    else
-                                    {
-                                        <img src="~/assets/img/team/default-profile.png"
-                                             alt="Profile"
-                                             class="trainee-profile-image" />
-                                    }
-
-                                </div>
-
-
-                                <!-- NAME + DESIGNATION -->
-
-                                <div class="team-prof feedback-team-prof">
-
-                                    <h3>
-                                        @feedback.TraineeName
-                                    </h3>
-
-                                    <span>
-                                        @(string.IsNullOrWhiteSpace(feedback.Designation)
-                                            ? "Trainee"
-                                            : feedback.Designation)
-                                    </span>
-
-                                </div>
-
-
-                                <!-- LOCATION -->
-
-                                <div class="sth_det2">
-
-                                    <span class="ti-location-pin"></span>
-
-                                    <u>
-                                        @(string.IsNullOrWhiteSpace(feedback.Location)
-                                            ? "Location not available"
-                                            : feedback.Location)
-                                    </u>
-
-                                </div>
-
-                            </div>
-
-                        </div>
-
-                    }
-
-
-                    <!-- =====================================
-                         SECOND SET
-                         Required for infinite animation
-                    ====================================== -->
-
-                    foreach (var feedback in feedbacks)
-                    {
-
-                        <div class="trainee-slide feedback-slide">
-
-                            <div class="our-team feedback-card">
-
-                                <!-- QUOTE ICON -->
-
-                                <div class="feedback-quote-icon">
-
-                                    <i class="fa-solid fa-quote-left"></i>
-
-                                </div>
-
-
-                                <!-- RATING -->
-
-                                <div class="feedback-rating">
-
-                                    @for (int i = 1; i <= 5; i++)
-                                    {
-                                        if (i <= feedback.Rating)
-                                        {
-                                            <i class="fa-solid fa-star"></i>
-                                        }
-                                        else
-                                        {
-                                            <i class="fa-regular fa-star"></i>
-                                        }
-                                    }
-
-                                </div>
-
-
-                                <!-- FEEDBACK -->
-
-                                <div class="feedback-content">
-
-                                    <p>
-                                        "@feedback.Feedback"
-                                    </p>
-
-                                </div>
-
-
-                                <!-- PROFILE -->
-
-                                <div class="feedback-profile">
-
-                                    @if (!string.IsNullOrWhiteSpace(feedback.ProfileImage))
-                                    {
-                                        <img src="~/uploads/candidates/@feedback.ProfileImage"
-                                             alt="@feedback.TraineeName"
-                                             class="trainee-profile-image" />
-                                    }
-                                    else
-                                    {
-                                        <img src="~/assets/img/team/default-profile.png"
-                                             alt="Profile"
-                                             class="trainee-profile-image" />
-                                    }
-
-                                </div>
-
-
-                                <!-- NAME + DESIGNATION -->
-
-                                <div class="team-prof feedback-team-prof">
-
-                                    <h3>
-                                        @feedback.TraineeName
-                                    </h3>
-
-                                    <span>
-                                        @(string.IsNullOrWhiteSpace(feedback.Designation)
-                                            ? "Trainee"
-                                            : feedback.Designation)
-                                    </span>
-
-                                </div>
-
-
-                                <!-- LOCATION -->
-
-                                <div class="sth_det2">
-
-                                    <span class="ti-location-pin"></span>
-
-                                    <u>
-                                        @(string.IsNullOrWhiteSpace(feedback.Location)
-                                            ? "Location not available"
-                                            : feedback.Location)
-                                    </u>
-
-                                </div>
-
-                            </div>
-
-                        </div>
-
-                    }
-
-                }
-                else
-                {
-
-                    <!-- NO FEEDBACK -->
-
-                    <div class="no-trainee">
-
-                        <div class="no-trainee-icon">
-                            <i class="ti-comment-alt"></i>
-                        </div>
-
-                        <h4>
-                            No Feedback Available
-                        </h4>
-
-                        <p>
-                            Candidate feedback will appear here once available.
-                        </p>
-
-                    </div>
-
-                }
-
-            </div>
-
-        </div>
-
-    </div>
-
-</section>
-
-<!-- =========================================================
-     END CANDIDATE FEEDBACK SECTION
-========================================================= -->
-
-
-
+<!-- END CANDIDATE FEEDBACK SECTION -->
 <!-- START PROMO -->
 <section class="ab_area section-padding">
 	<div class="container">
 		<div class="row">
-			<div class="col-lg-6 col-sm-12 col-xs-12 wow fadeInUp" data-wow-duration="1s" data-wow-delay="0.1s" data-wow-offset="0">
+			<div class="col-lg-6 col-sm-12 col-xs-12 reveal" data-reveal="left">
 				<div class="ab_content">
 					<h2>Why Choose Us For Your Online Education Courses</h2>
 					<p>We offer a brand new approach to the most basic learning paradigms. Choose from a wide range of learning options and gain new skills! Our school is know.</p>
@@ -1131,409 +536,39 @@
 					</ul>
 					<a class="btn_one" href="course.html">View All Courses <i class="ti-arrow-top-right"></i></a>
 				</div>
-			</div><!--- END COL -->
-			<div class="col-lg-6 col-sm-12 col-xs-12 wow fadeInUp" data-wow-duration="1s" data-wow-delay="0.2s" data-wow-offset="0">
+			</div><!-- END COL -->
+			<div class="col-lg-6 col-sm-12 col-xs-12 reveal" data-reveal="right" style="--d:.15s">
 				<div class="ab_img">
-					<img src="assets/img/about3.png" class="img-fluid" alt="image">
+					<img src="~/assets/img/about3.png" class="img-fluid" alt="Online courses" loading="lazy" decoding="async" />
 					<div class="home_ps2">
 						<span class="ti-book"></span>
 						<h2>3300+</h2>
 						<p>Online Course</p>
 					</div>
 				</div>
-			</div><!--- END COL -->
-		</div><!--- END ROW -->
-	</div><!--- END CONTAINER -->
+			</div><!-- END COL -->
+		</div><!-- END ROW -->
+	</div><!-- END CONTAINER -->
 </section>
 <!-- END PROMO -->
-<!-- START TESTIMONIALS -->
-<section class="testi_area section-padding">
-	<div class="container">
-		<div class="section-title">
-			<h2>What Student’s Say To Do <br />Their Online Course</h2>
-		</div>
-		<div class="row">
-			<div class="col-lg-6 col-sm-12 col-xs-12">
-				<div class="ab_img">
-					<img src="assets/img/review.png" class="img-fluid" alt="image">
-				</div>
-			</div><!-- END COL -->
-			<div class="col-lg-6 col-sm-12 col-xs-12">
-				<div id="testimonial-slider" class="owl-carousel">
-					<div class="testimonial">
-						<img src="assets/img/quote.png" alt="" />
-						<div class="testimonial_content">
-							<i class="ti-star"></i>
-							<i class="ti-star"></i>
-							<i class="ti-star"></i>
-							<i class="ti-star"></i>
-							<i class="ti-star"></i>
-							<p>Aqestic optio amet a ququam saepe aliquid voluate dicta fuga dolor saerror sed earum a magni soluta quam minus dolor dolor sed earum a magni soluta autem dolor error error sit quam minus sint rem a rerum dolobus veritatis delectus.</p>
-						</div>
-						<div class="testi_pic_title">
-							<img src="assets/img/testimonial/1.png" alt="">
-							<h4>Ajmain Adil</h4>
-							<p>Groton Inc</p>
-						</div>
-					</div><!-- END TESTIMONIAL -->
-					<div class="testimonial">
-						<img src="assets/img/quote.png" alt="" />
-						<div class="testimonial_content">
-							<i class="ti-star"></i>
-							<i class="ti-star"></i>
-							<i class="ti-star"></i>
-							<i class="ti-star"></i>
-							<i class="ti-star"></i>
-							<p>Aqestic optio amet a ququam saepe aliquid voluate dicta fuga dolor saerror sed earum a magni soluta quam minus dolor dolor sed earum a magni soluta autem dolor error error sit quam minus sint rem a rerum dolobus veritatis delectus.</p>
-						</div>
-						<div class="testi_pic_title">
-							<img src="assets/img/testimonial/2.png" alt="">
-							<h4>Sharukh Khan</h4>
-							<p>Red Chili Inc</p>
-						</div>
-					</div><!-- END TESTIMONIAL -->
-					<div class="testimonial">
-						<img src="assets/img/quote.png" alt="" />
-						<div class="testimonial_content">
-							<i class="ti-star"></i>
-							<i class="ti-star"></i>
-							<i class="ti-star"></i>
-							<i class="ti-star"></i>
-							<i class="ti-star"></i>
-							<p>Aqestic optio amet a ququam saepe aliquid voluate dicta fuga dolor saerror sed earum a magni soluta quam minus dolor dolor sed earum a magni soluta autem dolor error error sit quam minus sint rem a rerum dolobus veritatis delectus.</p>
-						</div>
-						<div class="testi_pic_title">
-							<img src="assets/img/testimonial/3.png" alt="">
-							<h4>Anushka sharma</h4>
-							<p>Naika Company</p>
-						</div>
-					</div><!-- END TESTIMONIAL -->
-					<div class="testimonial">
-						<img src="assets/img/quote.png" alt="" />
-						<div class="testimonial_content">
-							<i class="ti-star"></i>
-							<i class="ti-star"></i>
-							<i class="ti-star"></i>
-							<i class="ti-star"></i>
-							<i class="ti-star"></i>
-							<p>Aqestic optio amet a ququam saepe aliquid voluate dicta fuga dolor saerror sed earum a magni soluta quam minus dolor dolor sed earum a magni soluta autem dolor error error sit quam minus sint rem a rerum dolobus veritatis delectus.</p>
-						</div>
-						<div class="testi_pic_title">
-							<img src="assets/img/testimonial/4.png" alt="">
-							<h4>Ajmain Adil</h4>
-							<p>Groton Inc</p>
-						</div>
-					</div><!-- END TESTIMONIAL -->
-					<div class="testimonial">
-						<img src="assets/img/quote.png" alt="" />
-						<div class="testimonial_content">
-							<i class="ti-star"></i>
-							<i class="ti-star"></i>
-							<i class="ti-star"></i>
-							<i class="ti-star"></i>
-							<i class="ti-star"></i>
-							<p>Aqestic optio amet a ququam saepe aliquid voluate dicta fuga dolor saerror sed earum a magni soluta quam minus dolor dolor sed earum a magni soluta autem dolor error error sit quam minus sint rem a rerum dolobus veritatis delectus.</p>
-						</div>
-						<div class="testi_pic_title">
-							<img src="assets/img/testimonial/5.png" alt="">
-							<h4>Ajmain Adil</h4>
-							<p>Groton Inc</p>
-						</div>
-					</div><!-- END TESTIMONIAL -->
-				</div><!-- END TESTIMONIAL SLIDER -->
-			</div><!-- END COL -->
-		</div><!--- END ROW -->
-	</div><!--- END CONTAINER -->
-</section>
-<!-- END TESTINUNIALS -->
-<!-- START BLOG -->
-<section id="blog" class="blog_area section-padding">
-	<div class="container">
-		<div class="section-title text-center">
-			<h2>Latest Blog & news</h2>
-			<p>We offer a brand new approach to the most basic learning paradigms. Choose from a wide range of learning options and gain new skills! Our school is know.</p>
-		</div>
-		<div class="row">
-			<div class="col-lg-4 col-sm-4 col-xs-12 wow fadeInUp" data-wow-duration="1s" data-wow-delay="0.1s" data-wow-offset="0">
-				<div class="single_blog">
-					<img src="assets/img/blog/1.jpg" class="img-fluid" alt="image" />
-					<div class="content_box">
-						<span>May 10, 2024 | <a href="blog.html">Education</a></span>
-						<h2><a href="blog.html">Professional Mobile Painting and Sculpting</a></h2>
-						<a class="btn_one" href="blog.html">Read More <i class="ti-arrow-top-right"></i></a>
-					</div>
-				</div>
-			</div><!-- END COL-->
-			<div class="col-lg-4 col-sm-4 col-xs-12 wow fadeInUp" data-wow-duration="1s" data-wow-delay="0.1s" data-wow-offset="0">
-				<div class="single_blog">
-					<img src="assets/img/blog/2.jpg" class="img-fluid" alt="image" />
-					<div class="content_box">
-						<span>May 16, 2024 | <a href="blog.html">Education</a></span>
-						<h2><a href="blog.html">Professional Ceramic Moulding for Beginner</a></h2>
-						<a class="btn_one" href="blog.html">Read More <i class="ti-arrow-top-right"></i></a>
-					</div>
-				</div>
-			</div><!-- END COL-->
-			<div class="col-lg-4 col-sm-4 col-xs-12 wow fadeInUp" data-wow-duration="1s" data-wow-delay="0.3s" data-wow-offset="0">
-				<div class="single_blog">
-					<img src="assets/img/blog/3.jpg" class="img-fluid" alt="image" />
-					<div class="content_box">
-						<span>May 18, 2024 | <a href="blog.html">Programing</a></span>
-						<h2><a href="blog.html">Education Is About Create Leaders For Tomorrow </a></h2>
-						<a class="btn_one" href="blog.html">Read More <i class="ti-arrow-top-right"></i></a>
-					</div>
-				</div>
-			</div><!-- END COL-->
-		</div><!-- / END ROW -->
-	</div><!-- END CONTAINER  -->
-</section>
-<!-- END BLOG -->	
-
-@{
-	int traineeCount = Convert.ToInt32(ViewBag.TraineeCount ?? 0);
-	int organizationCount = Convert.ToInt32(ViewBag.OrganizationCount ?? 0);
-	int postCount = Convert.ToInt32(ViewBag.PostCount ?? 0);
-	int stateCount = Convert.ToInt32(ViewBag.StateCount ?? 0);
-	int countryCount = Convert.ToInt32(ViewBag.CountryCount ?? 0);
-}
-
-<section class="platform-dashboard">
-
+<!-- START PLATFORM STATS -->
+<section class="platform-dashboard reveal" data-reveal="up" aria-label="Platform statistics">
 	<div class="platform-stats">
+		@for (int i = 0; i < platformStats.Length; i++)
+		{
+			var stat = platformStats[i];
 
-		<!-- TRAINEES -->
-		<div class="platform-stat-card platform-orange">
-
-			<div class="platform-stat-icon">
-				<i class="fas fa-venus-mars"></i>
+			<div class="platform-stat reveal" data-reveal="up" style="--d:@((0.12 * i).ToString("0.00", System.Globalization.CultureInfo.InvariantCulture))s">
+				<div class="platform-stat-card @stat.Item1">
+					<div class="platform-stat-icon" aria-hidden="true"><i class="fas @stat.Item2"></i></div>
+					<div class="platform-stat-label">@stat.Item3</div>
+					<div class="platform-stat-value counter" data-target="@stat.Item4">0</div>
+					<div class="platform-stat-progress"><span></span></div>
+				</div>
 			</div>
-
-			<div class="platform-stat-label">
-				Trainees
-			</div>
-
-			<div class="platform-stat-value counter"
-				 data-target="@traineeCount">
-				0
-			</div>
-
-			<div class="platform-stat-progress">
-				<span></span>
-			</div>
-
-		</div>
-
-
-		<!-- ORGANIZATIONS -->
-		<div class="platform-stat-card platform-green">
-
-			<div class="platform-stat-icon">
-				<i class="fas fa-building"></i>
-			</div>
-
-			<div class="platform-stat-label">
-				Organizations
-			</div>
-
-			<div class="platform-stat-value counter"
-				 data-target="@organizationCount">
-				0
-			</div>
-
-			<div class="platform-stat-progress">
-				<span></span>
-			</div>
-
-		</div>
-
-
-		<!-- POSTS -->
-		<div class="platform-stat-card platform-blue">
-
-			<div class="platform-stat-icon">
-				<i class="fas fa-briefcase"></i>
-			</div>
-
-			<div class="platform-stat-label">
-				No. Of Posts
-			</div>
-
-			<div class="platform-stat-value counter"
-				 data-target="@postCount">
-				0
-			</div>
-
-			<div class="platform-stat-progress">
-				<span></span>
-			</div>
-
-		</div>
-
-
-		<!-- STATES -->
-		<div class="platform-stat-card platform-purple">
-
-			<div class="platform-stat-icon">
-				<i class="fas fa-map-marker-alt"></i>
-			</div>
-
-			<div class="platform-stat-label">
-				States
-			</div>
-
-			<div class="platform-stat-value counter"
-				 data-target="@stateCount">
-				0
-			</div>
-
-			<div class="platform-stat-progress">
-				<span></span>
-			</div>
-
-		</div>
-
-
-		<!-- COUNTRIES -->
-		<div class="platform-stat-card platform-pink">
-
-			<div class="platform-stat-icon">
-				<i class="fas fa-plane"></i>
-			</div>
-
-			<div class="platform-stat-label">
-				Countries
-			</div>
-
-			<div class="platform-stat-value counter"
-				 data-target="@countryCount">
-				0
-			</div>
-
-			<div class="platform-stat-progress">
-				<span></span>
-			</div>
-
-		</div>
-
-	</div>
-
-</section>
-
-<script>
-	document.addEventListener("DOMContentLoaded", function () {
-
-		const counters = document.querySelectorAll(".counter");
-
-
-		/* =========================================================
-		   NUMBER COUNTER
-		   ========================================================= */
-
-		function animateCounter(counter, delay = 0) {
-
-			const target = Number(counter.getAttribute("data-target")) || 0;
-
-			// Always start from zero
-			counter.textContent = "0";
-
-			// If target is zero
-			if (target <= 0) {
-				counter.textContent = "0";
-				return;
-			}
-
-
-			setTimeout(function () {
-
-				const duration = 2200;
-				const startTime = performance.now();
-
-
-				function updateCounter(currentTime) {
-
-					const elapsed = currentTime - startTime;
-
-					const progress = Math.min(
-						elapsed / duration,
-						1
-					);
-
-
-					/*
-					 * Ease-out effect
-					 *
-					 * Starts quickly
-					 * Slows down near final number
-					 */
-					const eased =
-						1 - Math.pow(1 - progress, 4);
-
-
-					const currentValue =
-						Math.floor(target * eased);
-
-
-					counter.textContent =
-						currentValue.toLocaleString();
-
-
-					if (progress < 1) {
-
-						requestAnimationFrame(updateCounter);
-
-					} else {
-
-						// Make absolutely sure final number is correct
-						counter.textContent =
-							target.toLocaleString();
-
-
-						/*
-						 * FINISHING SCALE EFFECT
-						 */
-						counter.animate(
-							[
-								{
-									transform: "scale(1)"
-								},
-								{
-									transform: "scale(1.15)"
-								},
-								{
-									transform: "scale(1)"
-								}
-							],
-							{
-								duration: 450,
-								easing: "ease-out"
-							}
-						);
-
-					}
-				}
-
-
-				requestAnimationFrame(updateCounter);
-
-			}, delay);
 		}
+	</div>
+</section>
+<!-- END PLATFORM STATS -->
 
-
-		/* =========================================================
-		   START ALL COUNTERS
-		   ========================================================= */
-
-		counters.forEach(function (counter, index) {
-
-			/*
-			 * Each card starts slightly after the previous card
-			 */
-			animateCounter(
-				counter,
-				index * 180
-			);
-
-		});
-
-	});
-</script>
+<script src="~/js/home.js" asp-append-version="true" defer></script>

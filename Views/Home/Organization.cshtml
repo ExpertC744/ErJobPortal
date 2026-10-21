@@ -1,684 +1,578 @@
-﻿
-@*
+﻿@*
     Organization / Companies Page
+    Design: Emerging Technologies inspired teal & white UI
 *@
 @{
-	ViewData["Title"] = "Organizations & Companies";
+    ViewData["Title"] = "Organizations & Companies";
+
+    var clients = new[]
+    {
+        new { Name = "Kavin India Pvt Ltd", Location = "Laxmi Nagar", Logo = "~/images/clients/kavin-india.png" },
+        new { Name = "IT-NetworkZ Infosystems Pvt Ltd", Location = "Laxmi Nagar, Nagpur", Logo = "~/images/clients/it-networkz.png" }
+    };
+
+    var feedbacks = new List<(string Name, string Role, string Message)>();
 }
 
 <link rel="stylesheet"
-	  href="~/css/Organization.css"
-	  asp-append-version="true">
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
 <link rel="stylesheet"
-	  href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+      href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" />
+<link rel="stylesheet"
+      href="~/css/Organization.css"
+      asp-append-version="true" />
 
 <section class="organization-page">
 
-	<!-- ================= HERO ================= -->
-	<section class="org-hero">
-		<div class="container">
-			<div class="row align-items-center g-5">
-
-				<div class="col-lg-7">
-					<div class="org-badge">
-						<i class="bi bi-buildings"></i>
-						For Organizations & Companies
-					</div>
-
-					<h1>
-						Connect With the
-						<span>Right Trainees</span>
-						Faster
-					</h1>
-
-					<p class="org-hero-text">
-						1trainee.com is an open platform for Trainees and
-						Organizations such as Recruiters, Companies and
-						Institutions to fulfill their academic and professional
-						requirements.
-					</p>
-
-					<div class="org-hero-actions">
-						<a href="#" class="org-btn-primary">
-							<i class="bi bi-person-plus"></i>
-							Create Organization Profile
-						</a>
-
-						<a href="#" class="org-btn-outline">
-							<i class="bi bi-box-arrow-in-right"></i>
-							Sign In
-						</a>
-					</div>
-				</div>
-
-				<div class="col-lg-5">
-					<div class="org-hero-visual">
-
-						<div class="org-floating-card org-card-top">
-							<div class="org-floating-icon">
-								<i class="bi bi-people"></i>
-							</div>
-							<div>
-								<strong>Find Trainees</strong>
-								<small>Based on required skills</small>
-							</div>
-						</div>
-
-						<div class="org-main-visual">
-							<div class="org-visual-icon">
-								<i class="bi bi-buildings"></i>
-							</div>
-
-							<h3>Organization Hub</h3>
-
-							<p>
-								Post requirements, find eligible trainees
-								and manage  internship opportunities.
-							</p>
-
-							<div class="org-visual-stats">
-								<div>
-									<strong>90</strong>
-									<span>Days Post</span>
-								</div>
-
-								<div>
-									<strong>Free</strong>
-									<span>Posting</span>
-								</div>
-
-								<div>
-									<strong>Easy</strong>
-									<span>Repost</span>
-								</div>
-							</div>
-						</div>
-
-						<div class="org-floating-card org-card-bottom">
-							<div class="org-floating-icon">
-								<i class="bi bi-file-earmark-person"></i>
-							</div>
-							<div>
-								<strong>View Resumes</strong>
-								<small>Check eligible candidates</small>
-							</div>
-						</div>
-
-					</div>
-				</div>
-
-			</div>
-		</div>
-	</section>
-
-
-	<!-- ================= INTRODUCTION ================= -->
-	<section class="org-intro section-padding">
-		<div class="container">
-
-			<div class="section-heading text-center">
-				<span>ESTEEMED CLIENTS</span>
-				<h2>Built for Organizations That Hire & Train</h2>
-				<p>
-					A simple platform to help organizations discover,
-					connect and work with the right trainees.
-				</p>
-			</div>
-
-			<div class="row justify-content-center">
-				<div class="col-lg-10">
-
-					<div class="org-content-card">
-
-						<div class="org-content-icon">
-							<i class="bi bi-buildings"></i>
-						</div>
-
-						<div>
-							<h3>Organizations / Companies</h3>
-
-							<p>
-								1trainee.com is an open platform for Trainees
-								and Organizations (Recruiters / Company /
-								Institution) to fulfill their academic and
-								professional search.
-							</p>
-
-							<p>
-								Organizations are an important part of the
-								platform and have free access to post their
-								Internship, Fellowship and Trainee requirements
-								in multiple numbers.
-							</p>
-
-							<p>
-								Internship posts from Organizations collect
-								relevant trainee data based on the required
-								skill sets. Every post remains open for
-								<strong>90 days</strong>, allowing
-								Organizations enough time to fulfill their
-								requirements.
-							</p>
-						</div>
-
-					</div>
-
-				</div>
-			</div>
-
-		</div>
-	</section>
-
-
-	<!-- ================= BENEFITS ================= -->
-	<section class="org-benefits">
-		<div class="container">
-
-			<div class="section-heading text-center">
-				<span>WHY ORGANIZATIONS CHOOSE US</span>
-				<h2>Everything You Need to Find the Right Trainee</h2>
-				<p>
-					Manage  internship requirements with less effort
-					and better visibility.
-				</p>
-			</div>
-
-			<div class="row g-4">
-
-				<div class="col-lg-4 col-md-6">
-					<div class="org-benefit-card">
-						<div class="benefit-icon">
-							<i class="bi bi-megaphone"></i>
-						</div>
-
-						<h3>Post Requirements</h3>
-
-						<p>
-							Publish Internship, Fellowship and Trainee
-							requirements based on  organization's
-							requirements.
-						</p>
-
-						<div class="benefit-number">01</div>
-					</div>
-				</div>
-
-				<div class="col-lg-4 col-md-6">
-					<div class="org-benefit-card">
-						<div class="benefit-icon">
-							<i class="bi bi-person-check"></i>
-						</div>
-
-						<h3>Find Eligible Trainees</h3>
-
-						<p>
-							View trainee information based on the skills
-							and eligibility criteria mentioned in  post.
-						</p>
-
-						<div class="benefit-number">02</div>
-					</div>
-				</div>
-
-				<div class="col-lg-4 col-md-6">
-					<div class="org-benefit-card">
-						<div class="benefit-icon">
-							<i class="bi bi-file-earmark-text"></i>
-						</div>
-
-						<h3>Access Resumes</h3>
-
-						<p>
-							Review trainee resumes and history and download
-							the required resumes for  selection process.
-						</p>
-
-						<div class="benefit-number">03</div>
-					</div>
-				</div>
-
-				<div class="col-lg-4 col-md-6">
-					<div class="org-benefit-card">
-						<div class="benefit-icon">
-							<i class="bi bi-arrow-repeat"></i>
-						</div>
-
-						<h3>Easy Reposting</h3>
-
-						<p>
-							If  requirement is not fulfilled within
-							90 days, repost the same requirement with
-							a single click.
-						</p>
-
-						<div class="benefit-number">04</div>
-					</div>
-				</div>
-
-				<div class="col-lg-4 col-md-6">
-					<div class="org-benefit-card">
-						<div class="benefit-icon">
-							<i class="bi bi-bar-chart"></i>
-						</div>
-
-						<h3>Manage Posts</h3>
-
-						<p>
-							View and manage  internship records and
-							keep  posts enabled or disabled according
-							to  requirements.
-						</p>
-
-						<div class="benefit-number">05</div>
-					</div>
-				</div>
-
-				<div class="col-lg-4 col-md-6">
-					<div class="org-benefit-card">
-						<div class="benefit-icon">
-							<i class="bi bi-lightning-charge"></i>
-						</div>
-
-						<h3>Save Time & Effort</h3>
-
-						<p>
-							Connect with relevant trainees quickly and
-							simplify  internship recruitment process.
-						</p>
-
-						<div class="benefit-number">06</div>
-					</div>
-				</div>
-
-			</div>
-
-		</div>
-	</section>
-
-
-	<!-- ================= 90 DAYS ================= -->
-	<section class="org-highlight">
-		<div class="container">
-
-			<div class="org-highlight-box">
-
-				<div class="row align-items-center g-4">
-
-					<div class="col-lg-8">
-
-						<div class="highlight-label">
-							<i class="bi bi-clock-history"></i>
-							FLEXIBLE REQUIREMENT MANAGEMENT
-						</div>
-
-						<h2>
-							Your Internship Post Stays Open for
-							<span>90 Days</span>
-						</h2>
-
-						<p>
-							Every internship requirement remains active
-							for 90 days. If the requirement is not fulfilled
-							during this period, organizations can repost
-							the same requirement with a single click.
-						</p>
-
-					</div>
-
-					<div class="col-lg-4">
-						<div class="days-card">
-							<strong>90</strong>
-							<span>Days</span>
-							<small>Post Availability</small>
-						</div>
-					</div>
-
-				</div>
-
-			</div>
-
-		</div>
-	</section>
-
-
-	<!-- ================= ORGANIZATION RESPONSIBILITY ================= -->
-	<section class="org-responsibility section-padding">
-		<div class="container">
-
-			<div class="section-heading text-center">
-				<span>OUR ORGANIZATION GUIDELINES</span>
-				<h2>A Transparent & Responsible Hiring Environment</h2>
-				<p>
-					We encourage organizations to provide clear and
-					transparent internship opportunities.
-				</p>
-			</div>
-
-			<div class="row g-4">
-
-				<div class="col-lg-6">
-					<div class="org-guideline-card">
-						<div class="guideline-icon">
-							<i class="bi bi-cash-coin"></i>
-						</div>
-
-						<div>
-							<h3>Stipend-Friendly Opportunities</h3>
-							<p>
-								1trainee.com prefers organizations that
-								provide a monthly stipend to trainees or
-								offer internships without any cost.
-							</p>
-						</div>
-					</div>
-				</div>
-
-				<div class="col-lg-6">
-					<div class="org-guideline-card">
-						<div class="guideline-icon">
-							<i class="bi bi-info-circle"></i>
-						</div>
-
-						<div>
-							<h3>Clear Internship Charges</h3>
-							<p>
-								Organizations charging any cost for their
-								internship must clearly highlight and
-								mention the charges in their requirement.
-							</p>
-						</div>
-					</div>
-				</div>
-
-				<div class="col-lg-6">
-					<div class="org-guideline-card">
-						<div class="guideline-icon">
-							<i class="bi bi-briefcase"></i>
-						</div>
-
-						<div>
-							<h3>Full-Time / Part-Time Opportunities</h3>
-							<p>
-								Organizations can offer full-time or
-								part-time employment to trainees after
-								successful completion of their internship.
-							</p>
-						</div>
-					</div>
-				</div>
-
-				<div class="col-lg-6">
-					<div class="org-guideline-card">
-						<div class="guideline-icon">
-							<i class="bi bi-handshake"></i>
-						</div>
-
-						<div>
-							<h3>Mutual Agreement</h3>
-							<p>
-								Any employment offer and joining after
-								internship completion should be carried
-								out mutually between the Organization
-								and the Trainee.
-							</p>
-						</div>
-					</div>
-				</div>
-
-			</div>
-
-		</div>
-	</section>
-
-
-	<!-- ================= HOW TO USE ================= -->
-	<section class="org-how section-padding">
-		<div class="container">
-
-			<div class="section-heading text-center">
-				<span>HOW TO USE</span>
-				<h2>Start Recruiting in Simple Steps</h2>
-				<p>
-					Follow a simple process to create  organization
-					profile and connect with eligible trainees.
-				</p>
-			</div>
-
-			<div class="org-process">
-
-				<div class="process-item">
-					<div class="process-number">01</div>
-					<div class="process-content">
-						<h3>Register</h3>
-						<p>
-							New organizations can register and create
-							their organization account.
-						</p>
-					</div>
-				</div>
-
-				<div class="process-item">
-					<div class="process-number">02</div>
-					<div class="process-content">
-						<h3>Create Profile</h3>
-						<p>
-							Add  organization details and create
-							professional profile.
-						</p>
-					</div>
-				</div>
-
-				<div class="process-item">
-					<div class="process-number">03</div>
-					<div class="process-content">
-						<h3>Create Post</h3>
-						<p>
-							Publish  Internship, Fellowship or
-							Trainee requirement.
-						</p>
-					</div>
-				</div>
-
-				<div class="process-item">
-					<div class="process-number">04</div>
-					<div class="process-content">
-						<h3>Check Eligible Trainees</h3>
-						<p>
-							Review trainee details, applications,
-							eligibility and available resumes.
-						</p>
-					</div>
-				</div>
-
-				<div class="process-item">
-					<div class="process-number">05</div>
-					<div class="process-content">
-						<h3>Download Resumes</h3>
-						<p>
-							Download required resumes and shortlist
-							suitable trainees.
-						</p>
-					</div>
-				</div>
-
-				<div class="process-item">
-					<div class="process-number">06</div>
-					<div class="process-content">
-						<h3>Complete Selection</h3>
-						<p>
-							Contact trainees directly and complete
-							selection process.
-						</p>
-					</div>
-				</div>
-
-				<div class="process-item">
-					<div class="process-number">07</div>
-					<div class="process-content">
-						<h3>Manage Your Post</h3>
-						<p>
-							Keep  post enabled or disabled according
-							to  organization's requirement.
-						</p>
-					</div>
-				</div>
-
-			</div>
-
-		</div>
-	</section>
-
-
-	<!-- ================= CTA ================= -->
-	<section class="org-cta">
-		<div class="container">
-
-			<div class="org-cta-box">
-
-				<div class="org-cta-content">
-
-					<span>
-						<i class="bi bi-stars"></i>
-						FOR RECRUITERS & ORGANIZATIONS
-					</span>
-
-					<h2>
-						Find the Right Trainees
-						With Less Effort
-					</h2>
-
-					<p>
-						1trainee.com will always assist organizations
-						in fulfilling their internship-related search
-						quickly and efficiently.
-					</p>
-
-					<div class="org-hero-actions">
-
-						<a href="#" class="org-btn-white">
-							<i class="bi bi-person-plus"></i>
-							Register Your Organization
-						</a>
-
-						<a href="#" class="org-btn-transparent">
-							Sign In
-							<i class="bi bi-arrow-right"></i>
-						</a>
-
-					</div>
-
-				</div>
-
-				<div class="org-cta-icon">
-					<i class="bi bi-buildings"></i>
-				</div>
-
-			</div>
-
-		</div>
-	</section>
-
-
-	<!-- ================= FEEDBACK ================= -->
-	<section class="org-feedback section-padding">
-		<div class="container">
-
-			<div class="section-heading text-center">
-				<span>ORGANIZATION FEEDBACK</span>
-				<h2>What Our Organizations Say</h2>
-				<p>
-					We value the organizations that use our platform
-					to connect with the next generation of talent.
-				</p>
-			</div>
-
-			<div class="row justify-content-center g-4">
-
-				<div class="col-lg-4 col-md-6">
-					<div class="feedback-card">
-
-						<div class="quote-icon">
-							<i class="bi bi-quote"></i>
-						</div>
-
-						<p>
-							"1trainee.com makes it easier for us to
-							connect with trainees based on the skills
-							we actually need."
-						</p>
-
-						<div class="feedback-user">
-							<div class="feedback-avatar">
-								O
-							</div>
-
-							<div>
-								<strong>Organization Partner</strong>
-								<span>Recruitment Team</span>
-							</div>
-						</div>
-
-					</div>
-				</div>
-
-				<div class="col-lg-4 col-md-6">
-					<div class="feedback-card">
-
-						<div class="quote-icon">
-							<i class="bi bi-quote"></i>
-						</div>
-
-						<p>
-							"The ability to manage internship posts and
-							review eligible trainee profiles helps us
-							save considerable time."
-						</p>
-
-						<div class="feedback-user">
-							<div class="feedback-avatar">
-								C
-							</div>
-
-							<div>
-								<strong>Company Partner</strong>
-								<span>HR Department</span>
-							</div>
-						</div>
-
-					</div>
-				</div>
-
-				<div class="col-lg-4 col-md-6">
-					<div class="feedback-card">
-
-						<div class="quote-icon">
-							<i class="bi bi-quote"></i>
-						</div>
-
-						<p>
-							"A simple and useful platform for organizations
-							looking to find interns and trainees with
-							relevant skills."
-						</p>
-
-						<div class="feedback-user">
-							<div class="feedback-avatar">
-								I
-							</div>
-
-							<div>
-								<strong>Institution Partner</strong>
-								<span>Placement Team</span>
-							</div>
-						</div>
-
-					</div>
-				</div>
-
-			</div>
-
-		</div>
-	</section>
+    <!-- HERO -->
+    <section class="org-hero">
+        <div class="org-hero-glow org-hero-glow-one"></div>
+        <div class="org-hero-glow org-hero-glow-two"></div>
+        <div class="org-hero-particles"></div>
+
+        <div class="org-hero-inner">
+            <div class="org-hero-copy org-reveal">
+                <span class="org-eyebrow">
+                    <span class="org-eyebrow-dot"></span>
+                    OUR ORGANIZATION NETWORK
+                </span>
+
+                <h1>
+                    Connecting Organizations
+                    <span>With Future Talent</span>
+                </h1>
+
+                <p>
+                    1trainee.com connects organizations, companies, recruiters
+                    and institutions with aspiring trainees through a simple
+                    platform for internship, fellowship and trainee opportunities.
+                </p>
+
+                <div class="org-hero-highlights">
+                    <div>
+                        <i class="fa-solid fa-circle-check"></i>
+                        Free Opportunity Posting
+                    </div>
+                    <div>
+                        <i class="fa-solid fa-calendar-check"></i>
+                        90-Day Posting Period
+                    </div>
+                    <div>
+                        <i class="fa-solid fa-users"></i>
+                        Trainee Connections
+                    </div>
+                </div>
+            </div>
+
+            <div class="org-hero-visual org-reveal">
+                <div class="org-hero-image-frame">
+                    <div class="org-hero-art">
+                        <div class="org-art-circle org-art-circle-one"></div>
+                        <div class="org-art-circle org-art-circle-two"></div>
+
+                        <div class="org-art-main-icon">
+                            <i class="fa-solid fa-building-user"></i>
+                        </div>
+
+                        <div class="org-art-connection org-art-connection-one">
+                            <i class="fa-solid fa-user-graduate"></i>
+                        </div>
+                        <div class="org-art-connection org-art-connection-two">
+                            <i class="fa-solid fa-handshake"></i>
+                        </div>
+                        <div class="org-art-connection org-art-connection-three">
+                            <i class="fa-solid fa-briefcase"></i>
+                        </div>
+
+                        <div class="org-art-caption">
+                            <strong>Grow Together</strong>
+                            <span>Organizations + Trainees</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="org-hero-float org-hero-float-top">
+                    <i class="fa-solid fa-users"></i>
+                    <span>Connect with talent</span>
+                </div>
+
+                <div class="org-hero-float org-hero-float-bottom">
+                    <i class="fa-solid fa-check-double"></i>
+                    <span>Streamlined hiring</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="org-hero-bottom"></div>
+    </section>
+
+    <!-- ESTEEMED CLIENTS -->
+    <section class="org-clients org-section">
+        <div class="org-container">
+            <div class="org-section-heading org-reveal">
+                <span class="org-section-label">ESTEEMED CLIENTS</span>
+                <h2>Our <span>Organization Network</span></h2>
+                <div class="org-heading-line"></div>
+                <p>
+                    Meet the organizations associated with our professional
+                    and learning ecosystem.
+                </p>
+            </div>
+
+            <div class="org-clients-layout">
+                <div class="org-clients-copy org-reveal">
+                    <div class="org-icon-tile">
+                        <i class="fa-solid fa-building"></i>
+                    </div>
+
+                    <h3>Building Meaningful Connections</h3>
+
+                    <p>
+                        1trainee.com is an open platform for trainees and
+                        organizations—including recruiters, companies and
+                        institutions—to fulfill their academic and professional
+                        search needs.
+                    </p>
+
+                    <p>
+                        Organizations can post multiple internship, fellowship
+                        and trainee requirements free of charge. Each post can
+                        collect applications from trainees whose skills match
+                        the listed requirements and remains open for
+                        <strong>90 days</strong>.
+                    </p>
+
+                    <div class="org-inline-note">
+                        <i class="fa-solid fa-circle-info"></i>
+                        <span>
+                            Organizations can repost an opportunity when
+                            additional recruitment is required.
+                        </span>
+                    </div>
+                </div>
+
+                <div class="org-client-slider-wrap org-reveal">
+                    <div class="org-slider-heading">
+                        <div>
+                            <span class="org-mini-label">OUR NETWORK</span>
+                            <h3>Esteemed Organizations</h3>
+                        </div>
+
+                        <div class="org-slider-controls">
+                            <button type="button"
+                                    class="org-slider-arrow"
+                                    id="clientsPrev"
+                                    aria-label="Previous organizations">
+                                <i class="bi bi-chevron-left"></i>
+                            </button>
+                            <button type="button"
+                                    class="org-slider-arrow"
+                                    id="clientsNext"
+                                    aria-label="Next organizations">
+                                <i class="bi bi-chevron-right"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="org-clients-slider" id="clientsTrack">
+                        @foreach (var c in clients)
+                        {
+                            <article class="org-client-card">
+                                <div class="org-client-logo">
+                                    <img src="@Url.Content(c.Logo)"
+                                         alt="@c.Name logo"
+                                         loading="lazy" />
+                                </div>
+
+                                <div class="org-client-card-content">
+                                    <span class="org-client-type">
+                                        <i class="fa-solid fa-circle-check"></i>
+                                        ESTEEMED CLIENT
+                                    </span>
+                                    <h4>@c.Name</h4>
+                                    <p>
+                                        <i class="bi bi-geo-alt-fill"></i>
+                                        @c.Location
+                                    </p>
+                                </div>
+                            </article>
+                        }
+                    </div>
+
+                    <div class="org-slider-footer">
+                        <i class="fa-solid fa-arrow-left-long"></i>
+                        <span>Use the arrows to explore our organizations</span>
+                        <i class="fa-solid fa-arrow-right-long"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- INFORMATION FOR ORGANIZATIONS -->
+    <section class="org-about org-section">
+        <div class="org-container">
+            <div class="org-about-layout">
+                <div class="org-about-main org-reveal">
+                    <span class="org-section-label">TO OUR ESTEEMED CLIENTS</span>
+                    <h2 class="org-section-title">
+                        A Simpler Way to <span>Find Trainees</span>
+                    </h2>
+                    <div class="org-title-accent"></div>
+
+                    <div class="org-about-text">
+                        <p>
+                            1trainee.com is an open platform for trainees and
+                            organizations (recruiters, companies and institutions)
+                            to fulfill their academic and professional search.
+                            Organizations have free access to post multiple
+                            internship, fellowship and trainee requirements.
+                        </p>
+
+                        <p>
+                            Internship posts collect information from trainees
+                            based on the required skill sets. Each post remains
+                            open for <strong>90 days</strong>, helping organizations
+                            fulfill their requirements. If a requirement is not
+                            fulfilled during this period, the same post can be
+                            reposted with a single click and remain open for
+                            the same duration.
+                        </p>
+
+                        <p>
+                            Organizations can view internship records, trainee
+                            resumes and history related to their posts. Trainees
+                            who have applied and meet the eligibility criteria
+                            can be reviewed by the organization.
+                        </p>
+
+                        <p>
+                            Organizations looking for interns or trainees can
+                            benefit by posting their requirements. 1trainee.com
+                            encourages organizations that provide a monthly
+                            stipend or offer internships without a fee.
+                            Organizations charging any cost for internships
+                            must clearly highlight and disclose those charges.
+                        </p>
+
+                        <p>
+                            After successful completion of an internship,
+                            an organization may offer a full-time or part-time
+                            role to a trainee. Any offer and joining arrangement
+                            should be mutually agreed upon by the organization
+                            and the trainee.
+                        </p>
+
+                        <p>
+                            1trainee.com aims to help organizations fulfill
+                            their internship-related recruitment needs quickly
+                            and with less effort.
+                        </p>
+                    </div>
+
+                    <div class="org-benefit-strip">
+                        <div>
+                            <i class="fa-solid fa-file-circle-plus"></i>
+                            <span>Multiple Posts</span>
+                        </div>
+                        <div>
+                            <i class="fa-solid fa-calendar-days"></i>
+                            <span>90-Day Duration</span>
+                        </div>
+                        <div>
+                            <i class="fa-solid fa-file-arrow-down"></i>
+                            <span>Resume Access</span>
+                        </div>
+                    </div>
+                </div>
+
+                <aside class="org-about-aside org-reveal">
+                    <div class="org-image-card org-main-image-card">
+                        <div class="org-image-art">
+                            <div class="org-image-art-circle"></div>
+                            <i class="fa-solid fa-people-group"></i>
+                            <span>People. Skills. Opportunities.</span>
+                        </div>
+                        <div class="org-image-caption">
+                            <span>YOUR RECRUITMENT PARTNER</span>
+                            <h3>Discover Potential. Build Futures.</h3>
+                        </div>
+                    </div>
+
+                    <div class="org-aside-info">
+                        <div class="org-aside-info-icon">
+                            <i class="fa-solid fa-lightbulb"></i>
+                        </div>
+                        <div>
+                            <h4>Make Every Opportunity Count</h4>
+                            <p>
+                                Provide clear requirements, relevant skills
+                                and transparent internship conditions to help
+                                trainees understand your opportunity.
+                            </p>
+                        </div>
+                    </div>
+                </aside>
+            </div>
+        </div>
+    </section>
+
+    <!-- HOW TO USE -->
+    <section class="org-how-to org-section">
+        <div class="org-container">
+            <div class="org-section-heading org-reveal">
+                <span class="org-section-label">HOW TO USE</span>
+                <h2>Get Started in <span>Simple Steps</span></h2>
+                <div class="org-heading-line"></div>
+                <p>
+                    Follow this process to create your organization profile,
+                    publish requirements and review eligible trainees.
+                </p>
+            </div>
+
+            <div class="org-steps-grid">
+                <article class="org-step-card org-reveal">
+                    <span class="org-step-number">01</span>
+                    <div class="org-step-icon">
+                        <i class="fa-solid fa-user-plus"></i>
+                    </div>
+                    <h3>Register or Sign In</h3>
+                    <p>Create an account or sign in to your existing organization account.</p>
+                </article>
+
+                <article class="org-step-card org-reveal">
+                    <span class="org-step-number">02</span>
+                    <div class="org-step-icon">
+                        <i class="fa-solid fa-address-card"></i>
+                    </div>
+                    <h3>Create Your Profile</h3>
+                    <p>Add your organization details and review your profile information.</p>
+                </article>
+
+                <article class="org-step-card org-reveal">
+                    <span class="org-step-number">03</span>
+                    <div class="org-step-icon">
+                        <i class="fa-solid fa-file-circle-plus"></i>
+                    </div>
+                    <h3>Create a Post</h3>
+                    <p>Publish your internship, fellowship or trainee requirements.</p>
+                </article>
+
+                <article class="org-step-card org-reveal">
+                    <span class="org-step-number">04</span>
+                    <div class="org-step-icon">
+                        <i class="fa-solid fa-pen-to-square"></i>
+                    </div>
+                    <h3>Manage Your Post</h3>
+                    <p>View and edit your post whenever requirement details change.</p>
+                </article>
+
+                <article class="org-step-card org-reveal">
+                    <span class="org-step-number">05</span>
+                    <div class="org-step-icon">
+                        <i class="fa-solid fa-user-check"></i>
+                    </div>
+                    <h3>Review Eligible Trainees</h3>
+                    <p>Check applicant details and identify suitable candidates.</p>
+                </article>
+
+                <article class="org-step-card org-reveal">
+                    <span class="org-step-number">06</span>
+                    <div class="org-step-icon">
+                        <i class="fa-solid fa-file-arrow-down"></i>
+                    </div>
+                    <h3>Review Resumes</h3>
+                    <p>Access and download the required trainee resumes.</p>
+                </article>
+
+                <article class="org-step-card org-reveal">
+                    <span class="org-step-number">07</span>
+                    <div class="org-step-icon">
+                        <i class="fa-solid fa-handshake"></i>
+                    </div>
+                    <h3>Complete Selection</h3>
+                    <p>Contact trainees and complete your selection process.</p>
+                </article>
+
+                <article class="org-step-card org-reveal">
+                    <span class="org-step-number">08</span>
+                    <div class="org-step-icon">
+                        <i class="fa-solid fa-toggle-on"></i>
+                    </div>
+                    <h3>Manage Post Status</h3>
+                    <p>Enable or disable your post according to your recruitment needs.</p>
+                </article>
+            </div>
+
+            <div class="org-steps-note org-reveal">
+                <i class="fa-solid fa-circle-info"></i>
+                <p>
+                    <strong>Helpful reminder:</strong>
+                    Keep your organization profile, eligibility requirements,
+                    internship duration and any applicable charges accurate
+                    and up to date.
+                </p>
+            </div>
+        </div>
+    </section>
+
+    <!-- ORGANIZATION FEEDBACK -->
+    <section class="org-feedback org-section">
+        <div class="org-container">
+            <div class="org-feedback-layout">
+                <div class="org-feedback-main org-reveal">
+                    <span class="org-section-label">ORGANIZATION FEEDBACK</span>
+                    <h2 class="org-section-title">
+                        What Our Organizations <span>Say</span>
+                    </h2>
+                    <div class="org-title-accent"></div>
+
+                    @if (feedbacks.Count == 0)
+                    {
+                        <div class="org-empty-state">
+                            <div class="org-empty-icon">
+                                <i class="fa-regular fa-comments"></i>
+                            </div>
+                            <h3>Feedback Coming Soon</h3>
+                            <p>
+                                Organization feedback and experiences will
+                                appear here when they become available.
+                            </p>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="org-feedback-list">
+                            @foreach (var f in feedbacks)
+                            {
+                                <article class="org-feedback-card">
+                                    <i class="fa-solid fa-quote-left org-quote-icon"></i>
+                                    <p>@f.Message</p>
+                                    <div class="org-feedback-user">
+                                        <div class="org-feedback-avatar">
+                                            @(string.IsNullOrWhiteSpace(f.Name) ? "O" : f.Name.Substring(0, 1).ToUpper())
+                                        </div>
+                                        <div>
+                                            <strong>@f.Name</strong>
+                                            <span>@f.Role</span>
+                                        </div>
+                                    </div>
+                                </article>
+                            }
+                        </div>
+                    }
+                </div>
+
+                <aside class="org-feedback-aside org-reveal">
+                    <div class="org-feedback-art">
+                        <div class="org-feedback-art-circle"></div>
+                        <i class="fa-solid fa-comments"></i>
+                        <i class="fa-solid fa-star org-feedback-star"></i>
+                    </div>
+                    <div class="org-feedback-aside-copy">
+                        <span class="org-mini-label">BETTER TOGETHER</span>
+                        <h3>Strong Partnerships Start With Good Communication</h3>
+                        <p>
+                            Clear expectations and timely communication help
+                            organizations and trainees build a positive
+                            internship experience.
+                        </p>
+                    </div>
+                </aside>
+            </div>
+        </div>
+    </section>
+
+    <!-- CLOSING BANNER -->
+    <section class="org-closing">
+        <div class="org-container">
+            <div class="org-closing-card org-reveal">
+                <div class="org-closing-icon">
+                    <i class="fa-solid fa-people-arrows-left-right"></i>
+                </div>
+                <div class="org-closing-copy">
+                    <span>BUILD YOUR TALENT PIPELINE</span>
+                    <h2>Every Great Career Begins With an Opportunity</h2>
+                    <p>
+                        Help trainees discover meaningful experience while
+                        connecting your organization with emerging talent.
+                    </p>
+                </div>
+                <div class="org-closing-decoration">
+                    <i class="fa-solid fa-arrow-trend-up"></i>
+                </div>
+            </div>
+        </div>
+    </section>
 
 </section>
 
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const page = document.querySelector(".organization-page");
+
+        if (!page) {
+            return;
+        }
+
+        /* Enable reveal animation only when JavaScript is available. */
+        page.classList.add("org-js-reveal");
+
+        const revealItems = page.querySelectorAll(".org-reveal");
+
+        if ("IntersectionObserver" in window) {
+            const observer = new IntersectionObserver(function (entries) {
+                entries.forEach(function (entry) {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add("org-visible");
+                        observer.unobserve(entry.target);
+                    }
+                });
+            }, {
+                threshold: 0.12,
+                rootMargin: "0px 0px -30px 0px"
+            });
+
+            revealItems.forEach(function (item) {
+                observer.observe(item);
+            });
+        } else {
+            revealItems.forEach(function (item) {
+                item.classList.add("org-visible");
+            });
+        }
+
+        /* Organization slider */
+        const track = document.getElementById("clientsTrack");
+        const prev = document.getElementById("clientsPrev");
+        const next = document.getElementById("clientsNext");
+
+        if (track && prev && next) {
+            function getStep() {
+                const card = track.querySelector(".org-client-card");
+                if (!card) {
+                    return 280;
+                }
+
+                const styles = window.getComputedStyle(track);
+                const gap = parseFloat(styles.columnGap || styles.gap) || 16;
+
+                return card.getBoundingClientRect().width + gap;
+            }
+
+            prev.addEventListener("click", function () {
+                track.scrollBy({
+                    left: -getStep(),
+                    behavior: "smooth"
+                });
+            });
+
+            next.addEventListener("click", function () {
+                track.scrollBy({
+                    left: getStep(),
+                    behavior: "smooth"
+                });
+            });
+        }
+    });
+</script>
