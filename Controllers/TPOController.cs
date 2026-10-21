@@ -5810,6 +5810,17 @@ ORDER BY
         {
             return View();
         }
-              
+
+        public IActionResult Pipeline() => View();
+
+        public IActionResult TpoAnalytics() => View();
+
+        public IActionResult Alumni() => View();
+        public IActionResult Community() => View();
+
+        public IActionResult GradeNormalization() => View();
+        public IActionResult DriveTracking() => View();
+        public IActionResult SharedData() => View();
+
     }
 }

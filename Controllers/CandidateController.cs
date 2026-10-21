@@ -6232,16 +6232,20 @@ public async Task<IActionResult> ActivityLog()
     return View(activities);
 }
 
-private static string? GetNullableString(
-    SqlDataReader reader,
-    string columnName)
-{
-    int ordinal = reader.GetOrdinal(columnName);
+        private static string? GetNullableString(
+            SqlDataReader reader,
+            string columnName)
+        {
+            int ordinal = reader.GetOrdinal(columnName);
 
-    return reader.IsDBNull(ordinal)
-        ? null
-        : reader.GetString(ordinal);
-}
+            return reader.IsDBNull(ordinal)
+                ? null
+                : reader.GetString(ordinal);
+        }
+
+        public IActionResult Pipeline() => View();
+        public IActionResult Community() => View();
+        public IActionResult SharedData() => View();
     }
 }
 
