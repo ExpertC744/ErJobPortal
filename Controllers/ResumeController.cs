@@ -35,6 +35,13 @@ namespace ErJobPortal.Controllers
                 CandidateID = id,
                 Profile = profile,
 
+                // Education percentages
+                SSCPercentage = profile.dSSC,
+                HSCPercentage = profile.dHSC,
+                GraduationPercentage = profile.dGraduation,
+                PGPercentage = profile.dPG,
+                PhDPercentage = profile.dPhD,
+
                 Relationships = _repository.GetRelationships(),
                 Streams = _repository.GetStreams(),
                 Divisions = _repository.GetDivisions(),
@@ -61,9 +68,7 @@ namespace ErJobPortal.Controllers
                     _repository.GetNonTechnicalSkills()
             };
 
-            // ========================================================
-            // GET REAL CANDIDATE NAME, EMAIL AND PHONE
-            // ========================================================
+            // Get candidate name, email and phone
             var candidateAccount =
                 _repository.GetCandidateBasicInfo(id);
 
@@ -99,23 +104,15 @@ namespace ErJobPortal.Controllers
         private IActionResult RenderProfile(int id, string viewName)
         {
             if (id <= 0)
-            {
                 return BadRequest("Invalid Candidate ID.");
-            }
 
             var model = BuildResumeModel(id);
 
             if (model == null)
-            {
                 return NotFound(
-                    $"Candidate profile not found for CandidateID: {id}"
-                );
-            }
+                    $"Candidate profile not found for CandidateID: {id}");
 
-            return View(
-                $"~/Views/Resume/{viewName}.cshtml",
-                model
-            );
+            return View($"~/Views/Resume/{viewName}.cshtml", model);
         }
 
         //shrirang 02/10/26

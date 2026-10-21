@@ -9,6 +9,8 @@ using System.Data;
 using System.Net;
 using System.Net.Mail;
 using System.Security.Cryptography;
+using ErJobPortal.Services;
+
 
 
 namespace ErJobPortal.Controllers
@@ -19,13 +21,15 @@ namespace ErJobPortal.Controllers
         private readonly AccountRepository _accountRepository;
         private readonly EmailService _emailService;
         private readonly ILogger<AccountController> _logger;
+        private readonly VisitorTrackingService _visitorTrackingService;
 
-        public AccountController(AccountRepository accountRepository, EmailService emailService, IConfiguration configuration, ILogger<AccountController> logger)
+        public AccountController(AccountRepository accountRepository, EmailService emailService, IConfiguration configuration, ILogger<AccountController> logger, VisitorTrackingService visitorTrackingService)
         {
             _accountRepository = accountRepository;
             _emailService = emailService;
             _configuration = configuration;
             _logger = logger;
+            _visitorTrackingService = visitorTrackingService;
         }
 
         // Candidate Registration
@@ -884,9 +888,10 @@ namespace ErJobPortal.Controllers
         }
 
 
+
+
         [HttpPost]
-        [HttpPost]
-        public IActionResult CandidateLogin(CandidateLogin model)
+        public async Task<IActionResult> CandidateLogin(CandidateLogin model)
         {
             if (!ModelState.IsValid)
             {
@@ -898,10 +903,7 @@ namespace ErJobPortal.Controllers
 
             if (user != null)
             {
-                // =====================================================
                 // SUPER ADMIN DISABLED CANDIDATE
-                // =====================================================
-
                 if (!user.nSABit)
                 {
                     TempData["Error"] =
@@ -910,10 +912,7 @@ namespace ErJobPortal.Controllers
                     return View(model);
                 }
 
-                // =====================================================
-                // CANDIDATE ENABLED
-                // =====================================================
-
+                // SET CANDIDATE SESSION
                 HttpContext.Session.SetInt32(
                     "CandidateID",
                     user.nID
@@ -929,21 +928,36 @@ namespace ErJobPortal.Controllers
                     user.sEmail ?? ""
                 );
 
+                // RECORD SUCCESSFUL CANDIDATE LOGIN
+                try
+                {
+                    await _visitorTrackingService.TrackVisitAsync(
+                        HttpContext,
+                        "Candidate",
+                        "CandidateLogin",
+                        user.nID,
+                        "Candidate",
+                        true
+                    );
+                }
+                catch (Exception ex)
+                {
+                    // Tracking errors should not prevent a successful login.
+                    // Log ex using ILogger if available.
+                }
+
                 return RedirectToAction(
                     "Dashboard",
                     "Candidate"
                 );
             }
 
-            // =====================================================
             // INVALID LOGIN
-            // =====================================================
-
-            TempData["Error"] =
-                "Invalid Email or Password";
+            TempData["Error"] = "Invalid Email or Password";
 
             return View(model);
         }
+
 
         // ================= LOGOUT =================
         [HttpGet]
@@ -2854,6 +2868,94 @@ public IActionResult OrganizationResetPassword()
                 message = "Email verified successfully."
             });
         }
+
+
+        [HttpGet]
+        [ResponseCache(NoStore = true, Location = ResponseCacheLocation.None)]
+        public async Task<IActionResult> CandidateActivityLog()
+        {
+            // Get the ID of the currently logged-in candidate.
+            int? candidateId = HttpContext.Session.GetInt32("CandidateID");
+
+            if (candidateId == null)
+            {
+                return RedirectToAction("CandidateLogin", "Account");
+            }
+
+            var activities = new List<CandidateActivityLogViewModel>();
+
+            string connectionString =
+                _configuration.GetConnectionString("DefaultConnection")
+                ?? throw new InvalidOperationException(
+                    "DefaultConnection is missing from configuration.");
+
+            const string query = @"
+        SELECT
+            VisitID,
+            IPAddress,
+            ISP,
+            Country,
+            Region,
+            City,
+            TimeZone,
+            BrowserName,
+            BrowserVersion,
+            OperatingSystem,
+            DeviceType,
+            RequestPath,
+            PageName,
+            ReferrerUrl,
+            VisitDateTime,
+            IsLoggedIn
+        FROM dbo.tblLoginPageVisits
+        WHERE UserID = @CandidateID
+          AND UserType = @UserType
+          AND PanelType = @PanelType
+        ORDER BY VisitDateTime DESC;";
+
+            await using var connection = new SqlConnection(connectionString);
+            await using var command = new SqlCommand(query, connection);
+
+            command.Parameters.Add("@CandidateID", SqlDbType.Int)
+                .Value = candidateId.Value;
+
+            command.Parameters.Add("@UserType", SqlDbType.NVarChar, 30)
+                .Value = "Candidate";
+
+            command.Parameters.Add("@PanelType", SqlDbType.NVarChar, 30)
+                .Value = "Candidate";
+
+            await connection.OpenAsync();
+
+            await using (var reader = await command.ExecuteReaderAsync())
+            {
+                while (await reader.ReadAsync())
+                {
+                    activities.Add(new CandidateActivityLogViewModel
+                    {
+                        VisitID = Convert.ToInt64(reader["VisitID"]),
+                        IPAddress = reader["IPAddress"] as string,
+                        ISP = reader["ISP"] as string,
+                        Country = reader["Country"] as string,
+                        Region = reader["Region"] as string,
+                        City = reader["City"] as string,
+                        TimeZone = reader["TimeZone"] as string,
+                        BrowserName = reader["BrowserName"] as string,
+                        BrowserVersion = reader["BrowserVersion"] as string,
+                        OperatingSystem = reader["OperatingSystem"] as string,
+                        DeviceType = reader["DeviceType"] as string,
+                        RequestPath = reader["RequestPath"] as string,
+                        PageName = reader["PageName"] as string,
+                        ReferrerUrl = reader["ReferrerUrl"] as string,
+                        VisitDateTime = Convert.ToDateTime(reader["VisitDateTime"]),
+                        IsLoggedIn = Convert.ToBoolean(reader["IsLoggedIn"])
+                    });
+                }
+            }
+
+            return View(activities);
+        }
+
 
     }
 }

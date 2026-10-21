@@ -1,5 +1,7 @@
 ﻿using System.Net;
 using System.Net.Mail;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
 using ErJobPortal.Services;
 
 namespace ErJobPortal.Services
@@ -640,16 +642,16 @@ Er Job Portal Team
 
         // shrirang 15/10/26
         // send email to candidate and org for applied post 
-        
-// =========================================================
-// INTERNSHIP APPLICATION EMAILS
-// =========================================================
 
-public async Task SendCandidateApplicationConfirmationAsync(
-    string candidateEmail,
-    string candidateName,
-    string organizationName,
-    string positionName)
+        // =========================================================
+        // INTERNSHIP APPLICATION EMAILS
+        // =========================================================
+
+        public async Task SendCandidateApplicationConfirmationAsync(
+            string candidateEmail,
+            string candidateName,
+            string organizationName,
+            string positionName)
         {
             string body = $@"
 <html>
@@ -715,13 +717,63 @@ public async Task SendCandidateApplicationConfirmationAsync(
             string htmlBody)
         {
             if (string.IsNullOrWhiteSpace(recipientEmail))
-                throw new ArgumentException("Recipient email is required.");
+            {
+                throw new ArgumentException(
+                    "Recipient email is required.",
+                    nameof(recipientEmail));
+            }
 
             string smtpServer =
                 _configuration["EmailSettings:SmtpServer"] ?? "";
 
             int port = Convert.ToInt32(
                 _configuration["EmailSettings:Port"] ?? "587");
+
+            string username =
+                _configuration["EmailSettings:Username"] ?? "";
+
+            string smtpPassword =
+                _configuration["EmailSettings:Password"] ?? "";
+
+            string fromEmail =
+                _configuration["EmailSettings:FromEmail"] ?? username;
+
+            string fromName =
+                _configuration["EmailSettings:FromName"] ?? "Er Job Portal";
+
+            if (string.IsNullOrWhiteSpace(smtpServer) ||
+                string.IsNullOrWhiteSpace(username) ||
+                string.IsNullOrWhiteSpace(smtpPassword) ||
+                string.IsNullOrWhiteSpace(fromEmail))
+            {
+                throw new InvalidOperationException(
+                    "Email SMTP settings are missing or incomplete.");
+            }
+
+            using var message = new MailMessage();
+            message.From = new MailAddress(fromEmail, fromName);
+            message.To.Add(new MailAddress(recipientEmail.Trim()));
+            message.Subject = subject;
+            message.Body = htmlBody;
+            message.IsBodyHtml = true;
+
+            using var smtp = new SmtpClient(smtpServer, port)
+            {
+                EnableSsl = true,
+                UseDefaultCredentials = false,
+                Credentials = new NetworkCredential(username, smtpPassword),
+                DeliveryMethod = SmtpDeliveryMethod.Network,
+                Timeout = 30000
+            };
+
+            await smtp.SendMailAsync(message);
+
+            _logger.LogInformation(
+                "Application email sent to {Email} with subject {Subject}.",
+                recipientEmail,
+                subject);
+        }
+
         public async Task SendCandidateStatusEmailAsync(string email, string candidateName, bool isEnabled)
         {
             if (string.IsNullOrWhiteSpace(email))
@@ -926,8 +978,23 @@ bool isEnabled)
         }
 
 
+
         public async Task SendOtpEmailAsync(string email, string otp)
         {
+            if (string.IsNullOrWhiteSpace(email))
+            {
+                throw new ArgumentException(
+                    "Recipient email is required.",
+                    nameof(email));
+            }
+
+            if (string.IsNullOrWhiteSpace(otp))
+            {
+                throw new ArgumentException(
+                    "OTP is required.",
+                    nameof(otp));
+            }
+
             string smtpServer =
                 _configuration["EmailSettings:SmtpServer"] ?? "";
 
@@ -952,59 +1019,10 @@ bool isEnabled)
                 string.IsNullOrWhiteSpace(fromEmail))
             {
                 throw new InvalidOperationException(
-                    "EmailSettings are incomplete. Check SMTP server, " +
-                    "username, password, and sender email.");
-            }
-
-            try
-            {
-                using var message = new MailMessage();
-
-                message.From = new MailAddress(fromEmail, fromName);
-                message.To.Add(new MailAddress(recipientEmail.Trim()));
-                message.Subject = subject;
-                message.Body = htmlBody;
-                message.IsBodyHtml = true;
-
-                using var smtp = new SmtpClient(smtpServer, port)
-                {
-                    EnableSsl = true,
-                    Credentials = new NetworkCredential(username, smtpPassword),
-                    DeliveryMethod = SmtpDeliveryMethod.Network,
-                    Timeout = 30000
-                };
-
-                await smtp.SendMailAsync(message);
-
-                System.Diagnostics.Debug.WriteLine(
-                    $"SMTP accepted email to {recipientEmail.Trim()} " +
-                    $"with subject: {subject}");
-            }
-            catch (Exception ex)
-            {
-                System.Diagnostics.Debug.WriteLine(
-                    $"Email failed. Recipient: {recipientEmail}; " +
-                    $"Subject: {subject}; Error: {ex}");
-            string password =
-                _configuration["EmailSettings:Password"] ?? "";
-
-            string fromEmail =
-                _configuration["EmailSettings:FromEmail"] ?? "";
-
-            string fromName =
-                _configuration["EmailSettings:FromName"]
-                ?? "Er Job Portal";
-
-            if (string.IsNullOrWhiteSpace(smtpServer) ||
-                string.IsNullOrWhiteSpace(username) ||
-                string.IsNullOrWhiteSpace(password) ||
-                string.IsNullOrWhiteSpace(fromEmail))
-            {
-                throw new InvalidOperationException(
                     "EmailSettings are missing or incomplete in configuration.");
             }
 
-            if (!int.TryParse(portValue, out int port))
+            if (!int.TryParse(portValue, out int smtpPort))
             {
                 throw new InvalidOperationException(
                     "EmailSettings:Port must be a valid number.");
@@ -1013,19 +1031,24 @@ bool isEnabled)
             using var message = new MailMessage();
 
             message.From = new MailAddress(fromEmail, fromName);
-            message.To.Add(new MailAddress(email));
+            message.To.Add(new MailAddress(email.Trim()));
             message.Subject = "Your Er Job Portal OTP";
-            message.Body =
-"Dear Candidate,\n\n" +
-$"Your OTP for verifying your email address during candidate registration is: {otp}\n\n" +
-"This OTP is valid for 10 minutes. Please do not share it with anyone.\n\n" +
-"Enter this OTP on the registration page to complete your email verification.\n\n" +
-"Regards,\n" +
-"Er Job Portal Team";
 
-            using var smtp = new SmtpClient(smtpServer, port)
+            // Use \r\n for line breaks inside a regular C# string.
+            message.Body =
+                "Dear Candidate,\r\n\r\n" +
+                $"Your OTP for verifying your email address during candidate registration is: {otp}\r\n\r\n" +
+                "This OTP is valid for 10 minutes. Please do not share it with anyone.\r\n\r\n" +
+                "Enter this OTP on the registration page to complete your email verification.\r\n\r\n" +
+                "Regards,\r\n" +
+                "Er Job Portal Team";
+
+            message.IsBodyHtml = false;
+
+            using var smtp = new SmtpClient(smtpServer, smtpPort)
             {
-                Credentials = new NetworkCredential(username, password),
+                UseDefaultCredentials = false,
+                Credentials = new NetworkCredential(username, smtpPassword),
                 EnableSsl = true,
                 DeliveryMethod = SmtpDeliveryMethod.Network,
                 Timeout = 20000
@@ -1034,26 +1057,35 @@ $"Your OTP for verifying your email address during candidate registration is: {o
             try
             {
                 _logger.LogInformation(
-                    "Sending OTP email. SMTP server: {Server}, Port: {Port}, From: {From}, To: {To}",
-                    smtpServer, port, fromEmail, email);
+                    "Sending candidate OTP email to {Email}.",
+                    email);
 
                 await smtp.SendMailAsync(message);
 
                 _logger.LogInformation(
-                    "SMTP send completed for recipient {Email}. Check sender delivery status.",
+                    "Candidate OTP email sent successfully to {Email}.",
                     email);
+            }
+            catch (SmtpException ex)
+            {
+                _logger.LogError(
+                    ex,
+                    "SMTP error while sending candidate OTP to {Email}.",
+                    email);
+
+
+                throw;
             }
             catch (Exception ex)
             {
                 _logger.LogError(
                     ex,
-                    "SMTP send failed. Server: {Server}, Recipient: {Email}",
-                    smtpServer, email);
+                    "Unexpected error while sending candidate OTP to {Email}.",
+                    email);
 
                 throw;
             }
         }
-
 
 
 
@@ -1134,6 +1166,6 @@ $"Your OTP for verifying your email address during candidate registration is: {o
 
                 throw;
             }
-        } 
+        }
     }
 }

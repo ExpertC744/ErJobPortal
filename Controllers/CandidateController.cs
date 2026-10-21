@@ -852,25 +852,91 @@ namespace ErJobPortal.Controllers
         // UPDATE EDUCATION
         // =====================================================
 
+        // =====================================================
+        // UPDATE EDUCATION
+        // =====================================================
+
+
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult UpdateEducation([Bind(Prefix = "Profile")] CandidateProfileModel model)
+        public IActionResult UpdateEducation(
+     [Bind(Prefix = "Profile")] CandidateProfileModel model)
         {
             int? candidateId = HttpContext.Session.GetInt32("CandidateID");
 
-            if (candidateId == null)
-            {
+            if (candidateId == null || candidateId <= 0)
                 return RedirectToAction("CandidateLogin", "Account");
-            }
 
             model.CandidateID = candidateId.Value;
 
+            // Remove validation errors for fields not submitted by the education form.
+            string[] educationFields =
+            {
+        "SSC_YEAR", "SSC_DIVISION", "dSSC",
+        "HSC_DIPLOMA_YEAR", "HSC_DIPLOMA_DIVISION", "dHSC",
+        "Graduation_Year", "Graduation_Division",
+        "Graduation_Stream", "Other_Stream", "dGraduation",
+        "PG_Year", "PG_Division", "PG_Stream",
+        "Other_Specialization", "dPG",
+        "PhD_Year", "PhD_Status", "PhD_Topic",
+        "Previous_PhD_Topic_Year", "dPhD"
+    };
+
+            var educationKeys = new HashSet<string>(
+                educationFields,
+                StringComparer.OrdinalIgnoreCase);
+
+            // Keep only ModelState entries for education properties.
+            // The Prefix="Profile" binding may use either prefixed or unprefixed keys.
+            foreach (var key in ModelState.Keys.ToList())
+            {
+                string propertyName = key.StartsWith(
+                    "Profile.", StringComparison.OrdinalIgnoreCase)
+                        ? key.Substring("Profile.".Length)
+                        : key;
+
+                if (!educationKeys.Contains(propertyName))
+                {
+                    ModelState.Remove(key);
+                }
+            }
+
+            // Validate percentage ranges.
+            ValidatePercentage(model.dSSC, "Profile.dSSC", "SSC");
+            ValidatePercentage(model.dHSC, "Profile.dHSC", "HSC / Diploma");
+            ValidatePercentage(model.dGraduation, "Profile.dGraduation", "Graduation");
+            ValidatePercentage(model.dPG, "Profile.dPG", "Post Graduation");
+            ValidatePercentage(model.dPhD, "Profile.dPhD", "PhD");
+
+            if (!ModelState.IsValid)
+            {
+                CandidateProfileViewModel viewModel = LoadProfileDropdowns(model);
+                ViewBag.CandidateCode = GetCandidateCode();
+                return View("Profile", viewModel);
+            }
+
+            // TEMPORARY DEBUGGING: verify values before saving.
+            System.Diagnostics.Debug.WriteLine(
+                $"CandidateID={model.CandidateID}, " +
+                $"SSC={model.dSSC}, HSC={model.dHSC}, " +
+                $"Graduation={model.dGraduation}, PG={model.dPG}, PhD={model.dPhD}");
+
             _repo.UpdateEducation(model);
 
-            TempData["Success"] = "Education updated successfully.";
-
+            TempData["Success"] = "Education details updated successfully.";
             return RedirectToAction("Profile");
         }
+
+        private void ValidatePercentage(decimal? value, string key, string label)
+        {
+            if (value.HasValue && (value.Value < 0 || value.Value > 100))
+            {
+                ModelState.AddModelError(
+                    key,
+                    $"{label} percentage must be between 0 and 100.");
+            }
+        }
+
 
         // =====================================================
         // UPDATE INTERNSHIP / FELLOWSHIP PREFERENCE
@@ -6064,6 +6130,118 @@ ORDER BY
 
             return View("~/Views/Organization/ViewOrgProfile.cshtml", model);
         }
+
+
+        [HttpGet]
+        public IActionResult CandidateViewQuestionBank()
+        {
+            return View();
+        }
+
+
+
+       [HttpGet]
+public async Task<IActionResult> ActivityLog()
+{
+    int candidateId =
+        HttpContext.Session.GetInt32("CandidateID") ?? 0;
+
+    if (candidateId <= 0)
+    {
+        return RedirectToAction("CandidateLogin", "Account");
+    }
+
+    var activities = new List<CandidateActivityLogViewModel>();
+
+    string connectionString =
+        _configuration.GetConnectionString("DefaultConnection")
+        ?? throw new InvalidOperationException(
+            "DefaultConnection is missing.");
+
+    const string sql = @"
+        SELECT TOP (500)
+            VisitID,
+            IPAddress,
+            ISP,
+            Country,
+            Region,
+            City,
+            TimeZone,
+            BrowserName,
+            BrowserVersion,
+            OperatingSystem,
+            DeviceType,
+            RequestPath,
+            PageName,
+            ReferrerUrl,
+            VisitDateTime,
+            IsLoggedIn
+        FROM dbo.tblLoginPageVisits
+        WHERE UserID = @CandidateID
+          AND PanelType = @PanelType
+        ORDER BY VisitDateTime DESC;";
+
+    await using var connection =
+        new SqlConnection(connectionString);
+
+    await using var command =
+        new SqlCommand(sql, connection);
+
+    command.Parameters.Add("@CandidateID", SqlDbType.Int)
+        .Value = candidateId;
+
+    command.Parameters.Add("@PanelType", SqlDbType.NVarChar, 30)
+        .Value = "Candidate";
+
+    await connection.OpenAsync();
+
+    await using var reader =
+        await command.ExecuteReaderAsync();
+
+    while (await reader.ReadAsync())
+    {
+        activities.Add(new CandidateActivityLogViewModel
+        {
+            VisitID = Convert.ToInt64(reader["VisitID"]),
+
+            IPAddress = GetNullableString(reader, "IPAddress"),
+            ISP = GetNullableString(reader, "ISP"),
+            Country = GetNullableString(reader, "Country"),
+            Region = GetNullableString(reader, "Region"),
+            City = GetNullableString(reader, "City"),
+            TimeZone = GetNullableString(reader, "TimeZone"),
+
+            BrowserName = GetNullableString(reader, "BrowserName"),
+            BrowserVersion = GetNullableString(reader, "BrowserVersion"),
+            OperatingSystem = GetNullableString(reader, "OperatingSystem"),
+            DeviceType = GetNullableString(reader, "DeviceType"),
+
+            RequestPath = GetNullableString(reader, "RequestPath"),
+            PageName = GetNullableString(reader, "PageName"),
+            ReferrerUrl = GetNullableString(reader, "ReferrerUrl"),
+
+            VisitDateTime = Convert.ToDateTime(
+                reader["VisitDateTime"]),
+
+            IsLoggedIn = !reader.IsDBNull(
+                reader.GetOrdinal("IsLoggedIn"))
+                && Convert.ToBoolean(reader["IsLoggedIn"])
+        });
+    }
+
+    return View(activities);
+}
+
+private static string? GetNullableString(
+    SqlDataReader reader,
+    string columnName)
+{
+    int ordinal = reader.GetOrdinal(columnName);
+
+    return reader.IsDBNull(ordinal)
+        ? null
+        : reader.GetString(ordinal);
+}
     }
 }
 
