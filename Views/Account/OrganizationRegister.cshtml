@@ -1,1185 +1,448 @@
-﻿@model ErJobPortal.Models.OrganizationRegister
+﻿    @model ErJobPortal.Models.OrganizationRegister
 
-@{
-    ViewData["Title"] = "Organization Registration";
-}
-
-<link rel="stylesheet"
-      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
-
-@if (TempData["Success"] != null)
-{
-    <div class="org-alert org-alert-success">
-        <i class="fa-solid fa-circle-check"></i>
-        <span>@TempData["Success"]</span>
-    </div>
-}
-
-@if (TempData["Error"] != null)
-{
-    <div class="org-alert org-alert-error">
-        <i class="fa-solid fa-circle-exclamation"></i>
-        <span>@TempData["Error"]</span>
-    </div>
-}
-
-<style>
-
-    /* =========================================================
-               PAGE
-               ========================================================= */
-
-    .org-register-page {
-        width: 100%;
-        min-height: calc(100vh - 60px);
-        padding: 30px 20px 50px;
-        margin-top: 100px;
-        background: #f6faf8;
-        color: #344054;
-        font-family: "Inter", "Segoe UI", Arial, sans-serif;
-        box-sizing: border-box;
+    @{
+        ViewData["Title"] = "Organization Registration";
     }
 
-        .org-register-page *,
-        .org-register-page *::before,
-        .org-register-page *::after {
-            box-sizing: border-box;
-        }
+    <link rel="stylesheet" href="~/css/OrganizationRegister.css" />
 
-    .org-register-container {
-        width: 100%;
-        max-width: 1100px;
-        margin: 0 auto;
-    }
+    <div class="candidate-register-page">
 
+        <div class="candidate-register-card">
 
-    /* =========================================================
-               ALERT
-               ========================================================= */
+            <!-- =====================================================
+                 REGISTRATION SWITCH
+            ====================================================== -->
 
-    .org-alert {
-        width: calc(100% - 40px);
-        max-width: 1100px;
-        margin: 100px auto 15px;
-        padding: 12px 15px;
-        border-radius: 8px;
-        display: flex;
-        align-items: center;
-        gap: 10px;
-        font-size: 13px;
-        font-weight: 600;
-    }
-
-    .org-alert-success {
-        background: #eff9f5;
-        border: 1px solid #b9dfd1;
-        color: #1e7b67;
-    }
-
-    .org-alert-error {
-        background: #fff5f5;
-        border: 1px solid #f0c7c7;
-        color: #d92d20;
-    }
-
-
-    /* =========================================================
-               TOP BAR
-               ========================================================= */
-
-    .org-register-topbar {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        gap: 20px;
-        margin-bottom: 18px;
-    }
-
-    .org-page-label {
-        display: flex;
-        align-items: center;
-        gap: 10px;
-    }
-
-    .org-page-label-icon {
-        width: 40px;
-        height: 40px;
-        min-width: 40px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        border-radius: 10px;
-        background: #1e7b67;
-        color: #fff;
-        font-size: 17px;
-    }
-
-    .org-page-label-title {
-        color: #1f2937;
-        font-size: 17px;
-        font-weight: 750;
-    }
-
-    .org-page-label-subtitle {
-        margin-top: 3px;
-        color: #98a2b3;
-        font-size: 13px;
-    }
-
-
-    /* =========================================================
-               ACCOUNT SWITCH
-               ========================================================= */
-
-    .org-account-switch {
-        display: flex;
-        padding: 3px;
-        background: #fff;
-        border: 1px solid #e1ebe7;
-        border-radius: 9px;
-    }
-
-    .org-switch-link {
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        gap: 7px;
-        min-width: 110px;
-        padding: 8px 13px;
-        border-radius: 7px;
-        color: #667085;
-        text-decoration: none;
-        font-size: 13px;
-        font-weight: 650;
-    }
-
-        .org-switch-link:hover {
-            color: #1e7b67;
-            background: #f0f8f5;
-        }
-
-        .org-switch-link.active {
-            color: #fff;
-            background: #1e7b67;
-        }
-
-
-    /* =========================================================
-               CARD
-               ========================================================= */
-
-    .org-register-layout {
-        width: 100%;
-        background: #fff;
-        border: 1px solid #e1ebe7;
-        border-radius: 18px;
-        overflow: hidden;
-        box-shadow: 0 15px 45px rgba(31,77,66,.07);
-    }
-
-    .org-form-header {
-        padding: 25px 32px 21px;
-        border-bottom: 1px solid #edf2f0;
-    }
-
-    .org-form-title {
-        margin: 0;
-        color: #1f2937;
-        font-size: 22px;
-        font-weight: 750;
-    }
-
-    .org-form-subtitle {
-        margin: 5px 0 0;
-        color: #98a2b3;
-        font-size: 13px;
-    }
-
-    .org-form-content {
-        width: 100%;
-        padding: 27px 32px 30px;
-    }
-
-
-    /* =========================================================
-               SECTION
-               ========================================================= */
-
-    .org-form-section {
-        width: 100%;
-        margin-bottom: 25px;
-    }
-
-    .org-section-heading {
-        display: flex;
-        align-items: center;
-        gap: 9px;
-        margin-bottom: 14px;
-    }
-
-    .org-section-icon {
-        width: 30px;
-        height: 30px;
-        min-width: 30px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        border-radius: 7px;
-        background: #eaf6f2;
-        color: #1e7b67;
-    }
-
-    .org-section-title {
-        margin: 0;
-        color: #344054;
-        font-size: 15px;
-        font-weight: 750;
-    }
-
-    .org-section-description {
-        margin: 2px 0 0;
-        color: #98a2b3;
-        font-size: 11px;
-    }
-
-
-    /* =========================================================
-               GRID
-               ========================================================= */
-
-    .org-form-grid {
-        width: 100%;
-        display: grid;
-        grid-template-columns: repeat(2, minmax(0, 1fr));
-        gap: 15px 18px;
-    }
-
-    .org-form-field {
-        width: 100%;
-        min-width: 0;
-    }
-
-
-    /* =========================================================
-               LABEL
-               ========================================================= */
-
-    .org-form-label {
-        display: block;
-        margin-bottom: 6px;
-        color: #475467;
-        font-size: 12px;
-        font-weight: 700;
-    }
-
-    .org-required {
-        color: #d92d20;
-    }
-
-
-    /* =========================================================
-               INPUT
-               ========================================================= */
-
-    .org-input-box {
-        position: relative;
-        width: 100%;
-    }
-
-    .org-input-icon {
-        position: absolute;
-        z-index: 2;
-        left: 12px;
-        top: 50%;
-        transform: translateY(-50%);
-        color: #98a2b3;
-        font-size: 13px;
-        pointer-events: none;
-    }
-
-    .org-form-input,
-    .org-form-select {
-        display: block;
-        width: 100%;
-        height: 42px;
-        padding: 0 11px 0 35px;
-        border: 1px solid #dfe7e4;
-        border-radius: 7px;
-        outline: none;
-        background: #fff;
-        color: #344054;
-        font-family: inherit;
-        font-size: 13px;
-    }
-
-        .org-form-input:focus,
-        .org-form-select:focus {
-            border-color: #1e7b67;
-            box-shadow: 0 0 0 3px rgba(30,123,103,.06);
-        }
-
-
-    /* =========================================================
-               VALIDATION
-               ========================================================= */
-
-    .org-validation {
-        display: block;
-        margin-top: 4px;
-        color: #d92d20 !important;
-        font-size: 11px;
-    }
-
-
-    /* =========================================================
-               OTP
-               ========================================================= */
-
-    .org-otp-section {
-        margin-top: 8px;
-        padding: 16px;
-        border: 1px solid #dcebe5;
-        border-radius: 10px;
-        background: #f8fcfa;
-    }
-
-    .org-otp-header {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        margin-bottom: 12px;
-    }
-
-    .org-otp-title {
-        margin: 0;
-        color: #344054;
-        font-size: 13px;
-        font-weight: 750;
-    }
-
-    .org-otp-description {
-        margin: 3px 0 0;
-        color: #98a2b3;
-        font-size: 11px;
-    }
-
-    .org-otp-timer {
-        color: #1e7b67;
-        font-size: 11px;
-        font-weight: 700;
-    }
-
-    .org-otp-row {
-        display: flex;
-        align-items: center;
-        flex-wrap: wrap;
-        gap: 8px;
-    }
-
-    .org-otp-input {
-        width: 40px;
-        height: 40px;
-        padding: 0;
-        border: 1px solid #d8e5e0;
-        border-radius: 7px;
-        text-align: center;
-        font-size: 16px;
-        font-weight: 750;
-        color: #1e7b67;
-    }
-
-    .org-otp-verify {
-        height: 40px;
-        margin-left: 5px;
-        padding: 0 16px;
-        border: 1px solid #1e7b67;
-        border-radius: 7px;
-        background: #1e7b67;
-        color: #fff;
-        font-size: 12px;
-        font-weight: 700;
-        cursor: pointer;
-    }
-
-    .org-otp-status {
-        margin-top: 8px;
-        color: #98a2b3;
-        font-size: 11px;
-    }
-
-        .org-otp-status.success {
-            color: #1e7b67;
-            font-weight: 650;
-        }
-
-        .org-otp-status.error {
-            color: #d92d20;
-            font-weight: 650;
-        }
-
-
-    /* =========================================================
-               FOOTER
-               ========================================================= */
-
-    .org-form-footer {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        gap: 20px;
-        margin-top: 22px;
-        padding-top: 18px;
-        border-top: 1px solid #edf2f0;
-    }
-
-    .org-login-text {
-        color: #98a2b3;
-        font-size: 12px;
-    }
-
-    .org-login-link {
-        color: #1e7b67;
-        text-decoration: none;
-        font-weight: 750;
-    }
-
-    .org-submit-button {
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        gap: 7px;
-        min-width: 190px;
-        height: 42px;
-        padding: 0 18px;
-        border: 0;
-        border-radius: 7px;
-        background: #1e7b67;
-        color: #fff;
-        font-size: 12px;
-        font-weight: 750;
-        cursor: pointer;
-    }
-
-        .org-submit-button:hover {
-            background: #176553;
-        }
-
-
-    /* =========================================================
-               MOBILE
-               ========================================================= */
-
-    @@media (max-width: 700px) {
-
-        .org-register-page {
-            padding: 18px 12px 35px;
-            margin-top: 85px;
-        }
-
-        .org-register-topbar {
-            flex-direction: column;
-            align-items: stretch;
-        }
-
-        .org-account-switch {
-            width: 100%;
-        }
-
-        .org-switch-link {
-            flex: 1;
-        }
-
-        .org-form-header {
-            padding: 20px;
-        }
-
-        .org-form-content {
-            padding: 20px;
-        }
-
-        .org-form-grid {
-            grid-template-columns: 1fr;
-        }
-
-        .org-form-footer {
-            flex-direction: column-reverse;
-            align-items: stretch;
-        }
-
-        .org-submit-button {
-            width: 100%;
-        }
-
-        .org-login-text {
-            text-align: center;
-        }
-    }
-</style>
-
-
-<div class="org-register-page">
-
-    <div class="org-register-container">
-
-        <!-- =====================================================
-             TOP BAR
-        ====================================================== -->
-
-        <div class="org-register-topbar">
-
-            <div class="org-page-label">
-
-                <div class="org-page-label-icon">
-                    <i class="fa-solid fa-building"></i>
-                </div>
-
-                <div>
-
-                    <div class="org-page-label-title">
-                        Organization Registration
-                    </div>
-
-                    <div class="org-page-label-subtitle">
-                        Create your organization account
-                    </div>
-
-                </div>
-
-            </div>
-
-
-            <div class="org-account-switch">
+            <div class="registration-switch">
 
                 <a asp-controller="Account"
-                   asp-action="Register"
-                   class="org-switch-link">
-
-                    <i class="fa-solid fa-user-graduate"></i>
-
+                   asp-action="CandidateRegister"
+                   class="switch-btn">
                     Trainee
-
                 </a>
-
 
                 <a asp-controller="Account"
                    asp-action="OrganizationRegister"
-                   class="org-switch-link active">
-
-                    <i class="fa-solid fa-building"></i>
-
+                   class="switch-btn active">
                     Organization
-
                 </a>
+
                 <a asp-controller="Account"
                    asp-action="TPORegister"
-                   class="org-switch-link active">
-
-                    <i class="fa-solid fa-building"></i>
-
+                   class="switch-btn">
                     TPO
-
                 </a>
 
             </div>
 
-        </div>
 
+            <!-- =====================================================
+                 HEADER
+            ====================================================== -->
 
-        <!-- =====================================================
-             MAIN CARD
-        ====================================================== -->
+            <div class="register-icon">
+                <i class="fa-solid fa-building"></i>
+            </div>
 
-        <div class="org-register-layout">
+            <div class="register-heading">
 
-            <div class="org-form-header">
+                <h2>Create Organization Account</h2>
 
-                <h1 class="org-form-title">
-                    Create Organization Account
-                </h1>
-
-                <p class="org-form-subtitle">
-                    Provide your organization details to get started.
+                <p>
+                    Provide your organization details to get started
                 </p>
 
             </div>
 
 
-            <!-- =================================================
+            <!-- =====================================================
+                 SUCCESS / ERROR MESSAGE
+            ====================================================== -->
+            @if (TempData["Success"] != null)
+            {
+                <div class="alert alert-success register-alert">
+                    @TempData["Success"]
+                </div>
+            }
+
+            @if (TempData["Error"] != null)
+            {
+                <div class="alert alert-danger register-alert">
+                    @TempData["Error"]
+                </div>
+            }
+
+
+            <!-- =====================================================
                  FORM
-            ================================================= -->
+            ====================================================== -->
 
             <form asp-controller="Account"
                   asp-action="OrganizationRegister"
                   method="post"
-                  class="org-form-content">
+                  id="orgRegistrationForm">
 
                 @Html.AntiForgeryToken()
 
 
                 <!-- =================================================
-                     ORGANIZATION INFORMATION
-                ================================================= -->
-
-                <section class="org-form-section">
-
-                    <div class="org-section-heading">
-
-                        <div class="org-section-icon">
-                            <i class="fa-solid fa-building"></i>
-                        </div>
-
-                        <div>
-
-                            <h3 class="org-section-title">
-                                Organization Information
-                            </h3>
-
-                            <p class="org-section-description">
-                                Basic information about your organization
-                            </p>
-
-                        </div>
-
-                    </div>
-
-
-                    <div class="org-form-grid">
-
-                        <!-- Organization Name -->
-
-                        <div class="org-form-field">
-
-                            <label class="org-form-label">
-                                Organization Name
-                                <span class="org-required">*</span>
-                            </label>
-
-                            <div class="org-input-box">
-
-                                <input asp-for="sOrgName"
-                                       type="text"
-                                       class="org-form-input"
-                                       placeholder="Organization name" />
-
-                                <i class="fa-solid fa-building org-input-icon"></i>
-
-                            </div>
-
-                            <span asp-validation-for="sOrgName"
-                                  class="org-validation">
-                            </span>
-
-                        </div>
-
-
-                        <!-- Website -->
-
-                        <div class="org-form-field">
-
-                            <label class="org-form-label">
-                                Organization Website
-                            </label>
-
-                            <div class="org-input-box">
-
-                                <input asp-for="sOrgUrl"
-                                       type="url"
-                                       class="org-form-input"
-                                       placeholder="https://example.com" />
-
-                                <i class="fa-solid fa-globe org-input-icon"></i>
-
-                            </div>
-
-                            <span asp-validation-for="sOrgUrl"
-                                  class="org-validation">
-                            </span>
-
-                        </div>
-
-
-                        <!-- College Name -->
-
-                        <div class="org-form-field">
-
-                            <label class="org-form-label">
-                                College Name
-                            </label>
-
-                            <div class="org-input-box">
-
-                                <select asp-for="nCollegeName"
-                                        id="nCollegeName"
-                                        class="org-form-select">
-
-                                    <option value="0">
-                                        -- Select College Name --
-                                    </option>
-
-                                </select>
-
-                                <i class="fa-solid fa-building-columns org-input-icon"></i>
-
-                            </div>
-
-                            <span asp-validation-for="nCollegeName"
-                                  class="org-validation">
-                            </span>
-
-                        </div>
-
-
-                        <!-- College Code -->
-
-                        <div class="org-form-field">
-
-                            <label class="org-form-label">
-                                College Code
-                            </label>
-
-                            <div class="org-input-box">
-
-                                <select asp-for="nCollegeCode"
-                                        id="nCollegeCode"
-                                        class="org-form-select">
-
-                                    <option value="0">
-                                        -- Select College Code --
-                                    </option>
-
-                                </select>
-
-                                <i class="fa-solid fa-hashtag org-input-icon"></i>
-
-                            </div>
-
-                            <span asp-validation-for="nCollegeCode"
-                                  class="org-validation">
-                            </span>
-
-                        </div>
-
-                    </div>
-
-                </section>
-
-
-                <!-- =================================================
-                     ACADEMIC INFORMATION
+                     ORGANIZATION NAME + WEBSITE
                 ================================================== -->
 
-                <section class="org-form-section">
+                <div class="register-form-row">
 
-                    <div class="org-section-heading">
+                    <div class="register-form-group">
 
-                        <div class="org-section-icon">
-                            <i class="fa-solid fa-graduation-cap"></i>
-                        </div>
+                        <label for="sOrgName" class="register-label">
+                            Organization Name
+                        </label>
 
-                        <div>
+                        <input asp-for="sOrgName"
+                               type="text"
+                               class="register-input"
+                               placeholder="Enter organization name" />
 
-                            <h3 class="org-section-title">
-                                Academic Information
-                            </h3>
-
-                            <p class="org-section-description">
-                                Academic details associated with your organization
-                            </p>
-
-                        </div>
-
-                    </div>
-
-
-                    <div class="org-form-grid">
-
-                        <!-- Department -->
-
-                        <div class="org-form-field">
-
-                            <label class="org-form-label">
-                                Department
-                                <span class="org-required">*</span>
-                            </label>
-
-                            <div class="org-input-box">
-
-                                <select asp-for="nDepartment"
-                                        id="departmentSelect"
-                                        class="org-form-select">
-
-                                    <option value="0">
-                                        Select Department
-                                    </option>
-
-                                </select>
-
-                                <i class="fa-solid fa-building-columns org-input-icon"></i>
-
-                            </div>
-
-                            <span asp-validation-for="nDepartment"
-                                  class="org-validation">
-                            </span>
-
-                        </div>
-
-
-                        <!-- Branch -->
-
-                        <div class="org-form-field">
-
-                            <label class="org-form-label">
-                                Branch
-                                <span class="org-required">*</span>
-                            </label>
-
-                            <div class="org-input-box">
-
-                                <select asp-for="nBranch"
-                                        id="branchSelect"
-                                        class="org-form-select">
-
-                                    <option value="0">
-                                        Select Branch
-                                    </option>
-
-                                </select>
-
-                                <i class="fa-solid fa-code-branch org-input-icon"></i>
-
-                            </div>
-
-                            <span asp-validation-for="nBranch"
-                                  class="org-validation">
-                            </span>
-
-                        </div>
-
-                    </div>
-
-                </section>
-
-
-                <!-- =================================================
-                     CONTACT INFORMATION
-                ================================================== -->
-
-                <section class="org-form-section">
-
-                    <div class="org-section-heading">
-
-                        <div class="org-section-icon">
-                            <i class="fa-solid fa-address-card"></i>
-                        </div>
-
-                        <div>
-
-                            <h3 class="org-section-title">
-                                Contact Information
-                            </h3>
-
-                            <p class="org-section-description">
-                                Primary contact details
-                            </p>
-
-                        </div>
-
-                    </div>
-
-
-                    <div class="org-form-grid">
-
-                        <!-- Contact Person -->
-
-                        <div class="org-form-field">
-
-                            <label class="org-form-label">
-                                Contact Person
-                                <span class="org-required">*</span>
-                            </label>
-
-                            <div class="org-input-box">
-
-                                <input asp-for="sName"
-                                       type="text"
-                                       class="org-form-input"
-                                       placeholder="Contact person name" />
-
-                                <i class="fa-solid fa-user org-input-icon"></i>
-
-                            </div>
-
-                            <span asp-validation-for="sName"
-                                  class="org-validation">
-                            </span>
-
-                        </div>
-
-
-                        <!-- Designation -->
-
-                        <div class="org-form-field">
-
-                            <label class="org-form-label">
-                                Designation
-                            </label>
-
-                            <div class="org-input-box">
-
-                                <input asp-for="sDesignation"
-                                       type="text"
-                                       class="org-form-input"
-                                       placeholder="HR Manager or similar role" />
-
-                                <i class="fa-solid fa-id-badge org-input-icon"></i>
-
-                            </div>
-
-                            <span asp-validation-for="sDesignation"
-                                  class="org-validation">
-                            </span>
-
-                        </div>
-
-
-                        <!-- Mobile -->
-
-                        <div class="org-form-field">
-
-                            <label class="org-form-label">
-                                Mobile Number
-                                <span class="org-required">*</span>
-                            </label>
-
-                            <div class="org-input-box">
-
-                                <input asp-for="sMobile"
-                                       type="tel"
-                                       class="org-form-input"
-                                       maxlength="10"
-                                       inputmode="numeric"
-                                       placeholder="10 digit mobile number" />
-
-                                <i class="fa-solid fa-mobile-screen-button org-input-icon"></i>
-
-                            </div>
-
-                            <span asp-validation-for="sMobile"
-                                  class="org-validation">
-                            </span>
-
-                        </div>
-
-
-                        <!-- Email -->
-
-                        <div class="org-form-field">
-
-                            <label class="org-form-label">
-                                Email Address
-                                <span class="org-required">*</span>
-                            </label>
-
-                            <div class="org-input-box">
-
-                                <input asp-for="sEmail"
-                                       type="email"
-                                       class="org-form-input"
-                                       placeholder="Organization email address" />
-
-                                <i class="fa-solid fa-envelope org-input-icon"></i>
-
-                            </div>
-
-                            <span asp-validation-for="sEmail"
-                                  class="org-validation">
-                            </span>
-
-                        </div>
-
-                    </div>
-
-                </section>
-
-
-                <!-- =================================================
-                     ACCOUNT SECURITY
-                ================================================== -->
-
-                <section class="org-form-section">
-
-                    <div class="org-section-heading">
-
-                        <div class="org-section-icon">
-                            <i class="fa-solid fa-lock"></i>
-                        </div>
-
-                        <div>
-
-                            <h3 class="org-section-title">
-                                Account Security
-                            </h3>
-
-                            <p class="org-section-description">
-                                Create secure login credentials
-                            </p>
-
-                        </div>
-
-                    </div>
-
-
-                    <div class="org-form-grid">
-
-                        <!-- Password -->
-
-                        <div class="org-form-field">
-
-                            <label class="org-form-label">
-                                Password
-                                <span class="org-required">*</span>
-                            </label>
-
-                            <div class="org-input-box">
-
-                                <input asp-for="sPassword"
-                                       type="password"
-                                       class="org-form-input"
-                                       placeholder="Create a secure password" />
-
-                                <i class="fa-solid fa-lock org-input-icon"></i>
-
-                            </div>
-
-                            <span asp-validation-for="sPassword"
-                                  class="org-validation">
-                            </span>
-
-                        </div>
-
-                    </div>
-
-
-                    <!-- =================================================
-                         OTP
-                    ================================================== -->
-
-                    <div class="org-otp-section">
-
-                        <div class="org-otp-header">
-
-                            <div>
-
-                                <h4 class="org-otp-title">
-                                    Email Verification
-                                </h4>
-
-                                <p class="org-otp-description">
-                                    For testing, enter OTP: 123456
-                                </p>
-
-                            </div>
-
-                            <div class="org-otp-timer">
-                                Dummy OTP: 123456
-                            </div>
-
-                        </div>
-
-
-                        <input asp-for="sOTP"
-                               type="hidden"
-                               id="sOTP" />
-
-
-                        <div class="org-otp-row">
-
-                            <input type="text"
-                                   maxlength="1"
-                                   class="org-otp-input"
-                                   inputmode="numeric"
-                                   autocomplete="one-time-code" />
-
-                            <input type="text"
-                                   maxlength="1"
-                                   class="org-otp-input"
-                                   inputmode="numeric" />
-
-                            <input type="text"
-                                   maxlength="1"
-                                   class="org-otp-input"
-                                   inputmode="numeric" />
-
-                            <input type="text"
-                                   maxlength="1"
-                                   class="org-otp-input"
-                                   inputmode="numeric" />
-
-                            <input type="text"
-                                   maxlength="1"
-                                   class="org-otp-input"
-                                   inputmode="numeric" />
-
-                            <input type="text"
-                                   maxlength="1"
-                                   class="org-otp-input"
-                                   inputmode="numeric" />
-
-                            <button type="button"
-                                    class="org-otp-verify">
-
-                                <i class="fa-solid fa-check"></i>
-
-                                Verify
-
-                            </button>
-
-                        </div>
-
-
-                        <div class="org-otp-status">
-                            Enter the 6-digit OTP and click Verify.
-                        </div>
-
-                        <span asp-validation-for="sOTP"
-                              class="org-validation">
+                        <span asp-validation-for="sOrgName"
+                              class="text-danger register-validation">
                         </span>
 
                     </div>
 
-                </section>
+
+                    <div class="register-form-group">
+
+                        <label for="sOrgUrl" class="register-label">
+                            Organization Website
+                        </label>
+
+                        <input asp-for="sOrgUrl"
+                               type="url"
+                               class="register-input"
+                               placeholder="https://example.com" />
+
+                        <span asp-validation-for="sOrgUrl"
+                              class="text-danger register-validation">
+                        </span>
+
+                    </div>
+
+                </div>
 
 
                 <!-- =================================================
-                     FOOTER
+                     COLLEGE NAME + COLLEGE CODE
                 ================================================== -->
 
-                <div class="org-form-footer">
+                <div class="register-form-row">
 
-                    <div class="org-login-text">
+                    <div class="register-form-group">
 
-                        Already registered?
+                        <label for="nCollegeName" class="register-label">
+                            College Name
+                        </label>
 
-                        <a asp-controller="Account"
-                           asp-action="OrganizationLogin"
-                           class="org-login-link">
+                        <div class="register-input-box">
 
-                            Sign in
+                            <select asp-for="nCollegeName"
+                                    id="nCollegeName"
+                                    class="register-select">
 
-                        </a>
+                                <option value="0">
+                                    -- Select College Name --
+                                </option>
+
+                            </select>
+
+                        </div>
+
+                        <span asp-validation-for="nCollegeName"
+                              class="text-danger register-validation">
+                        </span>
 
                     </div>
 
 
-                    <button type="submit"
-                            class="org-submit-button">
+                    <div class="register-form-group">
 
-                        <i class="fa-solid fa-user-plus"></i>
+                        <label for="nCollegeCode" class="register-label">
+                            College Code
+                        </label>
 
-                        Create Account
+                        <div class="register-input-box">
 
-                    </button>
+                            <select asp-for="nCollegeCode"
+                                    id="nCollegeCode"
+                                    class="register-select">
+
+                                <option value="0">
+                                    -- Select College Code --
+                                </option>
+
+                            </select>
+
+                        </div>
+
+                        <span asp-validation-for="nCollegeCode"
+                              class="text-danger register-validation">
+                        </span>
+
+                    </div>
+
+                </div>
+
+
+                <!-- =================================================
+                     DEPARTMENT + BRANCH
+                ================================================== -->
+
+                <div class="register-form-row">
+
+                    <div class="register-form-group">
+
+                        <label for="departmentSelect" class="register-label">
+                            Department
+                        </label>
+
+                        <div class="register-input-box">
+
+                            <select asp-for="nDepartment"
+                                    id="departmentSelect"
+                                    class="register-select">
+
+                                <option value="0">
+                                    -- Select Department --
+                                </option>
+
+                            </select>
+
+                        </div>
+
+                        <span asp-validation-for="nDepartment"
+                              class="text-danger register-validation">
+                        </span>
+
+                    </div>
+
+
+                    <div class="register-form-group">
+
+                        <label for="branchSelect" class="register-label">
+                            Branch
+                        </label>
+
+                        <div class="register-input-box">
+
+                            <select asp-for="nBranch"
+                                    id="branchSelect"
+                                    class="register-select">
+
+                                <option value="0">
+                                    -- Select Branch --
+                                </option>
+
+                            </select>
+
+                        </div>
+
+                        <span asp-validation-for="nBranch"
+                              class="text-danger register-validation">
+                        </span>
+
+                    </div>
+
+                </div>
+
+
+                <!-- =================================================
+                     CONTACT PERSON + DESIGNATION
+                ================================================== -->
+
+                <div class="register-form-row">
+
+                    <div class="register-form-group">
+
+                        <label for="sName" class="register-label">
+                            Contact Person
+                        </label>
+
+                        <input asp-for="sName"
+                               type="text"
+                               class="register-input"
+                               placeholder="Enter contact person name"
+                               autocomplete="name" />
+
+                        <span asp-validation-for="sName"
+                              class="text-danger register-validation">
+                        </span>
+
+                    </div>
+
+
+                    <div class="register-form-group">
+
+                        <label for="sDesignation" class="register-label">
+                            Designation
+                        </label>
+
+                        <input asp-for="sDesignation"
+                               type="text"
+                               class="register-input"
+                               placeholder="HR Manager or similar role"
+                               autocomplete="organization-title" />
+
+                        <span asp-validation-for="sDesignation"
+                              class="text-danger register-validation">
+                        </span>
+
+                    </div>
+
+                </div>
+
+
+                <!-- =================================================
+                     MOBILE + EMAIL
+                ================================================== -->
+
+                <div class="register-form-row">
+
+                    <div class="register-form-group">
+
+                        <label for="sMobile" class="register-label">
+                            Mobile Number
+                        </label>
+
+                        <input asp-for="sMobile"
+                               type="tel"
+                               class="register-input"
+                               placeholder="Enter 10 digit mobile number"
+                               maxlength="10"
+                               inputmode="numeric"
+                               autocomplete="tel" />
+
+                        <span asp-validation-for="sMobile"
+                              class="text-danger register-validation">
+                        </span>
+
+                    </div>
+
+
+                    <div class="register-form-group">
+
+                        <label for="sEmail" class="register-label">
+                            Email
+                        </label>
+
+                        <input asp-for="sEmail"
+                               type="email"
+                               class="register-input"
+                               placeholder="Enter organization email"
+                               autocomplete="email" />
+
+                        <span asp-validation-for="sEmail"
+                              class="text-danger register-validation">
+                        </span>
+
+                    </div>
+
+                </div>
+
+
+                <!-- =================================================
+                     PASSWORD
+                ================================================== -->
+
+                <div class="register-form-row">
+
+                    <div class="register-form-group">
+
+                        <label for="sPassword" class="register-label">
+                            Password
+                        </label>
+
+                        <input asp-for="sPassword"
+                               type="password"
+                               class="register-input"
+                               placeholder="Create password"
+                               autocomplete="new-password" />
+
+                        <span asp-validation-for="sPassword"
+                              class="text-danger register-validation">
+                        </span>
+
+                    </div>
+
+                </div>
+
+
+                <!-- =================================================
+                     OTP VERIFICATION
+                ================================================== -->
+
+                <div class="otp-section">
+
+                    <label class="otp-label">
+                        Email Verification
+                        <span class="otp-hint">(Testing OTP: 123456)</span>
+                    </label>
+
+                    <input asp-for="sOTP" type="hidden" id="sOTP" />
+
+                    <div class="otp-box-row">
+
+                        <input type="text" maxlength="1" class="org-otp-input" inputmode="numeric" autocomplete="one-time-code" />
+                        <input type="text" maxlength="1" class="org-otp-input" inputmode="numeric" />
+                        <input type="text" maxlength="1" class="org-otp-input" inputmode="numeric" />
+                        <input type="text" maxlength="1" class="org-otp-input" inputmode="numeric" />
+                        <input type="text" maxlength="1" class="org-otp-input" inputmode="numeric" />
+                        <input type="text" maxlength="1" class="org-otp-input" inputmode="numeric" />
+
+                        <button type="button"
+                                class="send-otp-btn org-otp-verify">
+                            Verify OTP
+                        </button>
+
+                    </div>
+
+                    <span class="register-validation org-otp-status"
+                          role="status"
+                          aria-live="polite">
+                        Enter the 6-digit OTP and click Verify.
+                    </span>
+
+                    <span asp-validation-for="sOTP"
+                          class="text-danger register-validation">
+                    </span>
+
+                </div>
+
+
+                <!-- =================================================
+                     REGISTER BUTTON
+                ================================================== -->
+
+                <button type="submit"
+                        class="register-main-btn">
+
+                    <i class="fa-solid fa-user-plus"></i>
+
+                    Create Account
+
+                </button>
+
+
+                <!-- =================================================
+                     LOGIN LINK
+                ================================================== -->
+
+                <div class="register-bottom-text">
+
+                    Already registered?
+
+                    <a asp-controller="Account"
+                       asp-action="OrganizationLogin">
+                        Sign In
+                    </a>
 
                 </div>
 
@@ -1189,558 +452,328 @@
 
     </div>
 
-</div>
+
+    @section Scripts
+    {
+        @{
+            await Html.RenderPartialAsync("_ValidationScriptsPartial");
+        }
+
+        <script>
+
+            $(document).ready(function () {
+
+                // =====================================================
+                // ELEMENTS
+                // =====================================================
+
+                const collegeNameSelect = $('#nCollegeName');
+                const collegeCodeSelect = $('#nCollegeCode');
+                const departmentSelect = $('#departmentSelect');
+                const branchSelect = $('#branchSelect');
 
 
-@section Scripts
-{
-    @{
-        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+                // =====================================================
+                // BASIC INPUT SPACE HANDLING
+                // =====================================================
+
+                $('input[type="text"], input[type="email"], input[type="url"], input[type="tel"], input[type="password"]')
+                    .not('.org-otp-input')
+                    .on('keydown', function (e) {
+                        if (e.key === " " && this.value.length === 0) {
+                            e.preventDefault();
+                        }
+                    })
+                    .on('input', function () {
+                        this.value = this.value.replace(/^\s+/, '');
+                    })
+                    .on('blur', function () {
+                        this.value = this.value.trim();
+                    });
+
+
+                // =====================================================
+                // MOBILE NUMBER - DIGITS ONLY
+                // =====================================================
+
+                $('input[name="sMobile"]').on('input', function () {
+                    this.value = this.value.replace(/\D/g, '').substring(0, 10);
+                });
+
+
+                // =====================================================
+                // LOAD COLLEGES
+                // =====================================================
+
+                $.ajax({
+                    url: '@Url.Action("GetColleges", "Account")',
+                    type: 'GET',
+
+                    success: function (data) {
+
+                        collegeNameSelect.empty();
+
+                        collegeNameSelect.append(
+                            $('<option>', { value: '0', text: '-- Select College Name --' })
+                        );
+
+                        $.each(data, function (index, college) {
+                            collegeNameSelect.append(
+                                $('<option>', {
+                                    value: college.nID,
+                                    text: college.sCollegeName
+                                })
+                            );
+                        });
+                    },
+
+                    error: function (xhr, status, error) {
+                        console.error("College loading failed:", error);
+                    }
+                });
+
+
+                // =====================================================
+                // COLLEGE CHANGE - LOAD COLLEGE CODE
+                // =====================================================
+
+                collegeNameSelect.on('change', function () {
+
+                    const collegeId = $(this).val();
+
+                    collegeCodeSelect.empty();
+
+                    collegeCodeSelect.append(
+                        $('<option>', { value: '0', text: '-- Select College Code --' })
+                    );
+
+                    if (!collegeId || collegeId === '0') {
+                        return;
+                    }
+
+                    $.ajax({
+                        url: '@Url.Action("GetCollegeCodes", "Account")',
+                        type: 'GET',
+                        data: { collegeId: collegeId },
+
+                        success: function (data) {
+
+                            if (!data || data.length === 0) {
+                                collegeCodeSelect.append(
+                                    $('<option>', { value: '0', text: 'No College Code Available' })
+                                );
+                                return;
+                            }
+
+                            $.each(data, function (index, code) {
+                                collegeCodeSelect.append(
+                                    $('<option>', {
+                                        value: code.nCode,
+                                        text: code.nCode
+                                    })
+                                );
+                            });
+                        },
+
+                        error: function (xhr, status, error) {
+                            console.error("College code loading failed:", error);
+                        }
+                    });
+                });
+
+
+                // =====================================================
+                // LOAD DEPARTMENTS
+                // =====================================================
+
+                $.ajax({
+                    url: '@Url.Action("GetDepartments", "Account")',
+                    type: 'GET',
+
+                    success: function (data) {
+
+                        departmentSelect.empty();
+
+                        departmentSelect.append(
+                            $('<option>', { value: '0', text: '-- Select Department --' })
+                        );
+
+                        $.each(data, function (index, item) {
+                            departmentSelect.append(
+                                $('<option>', {
+                                    value: item.nID,
+                                    text: item.sDepartment
+                                })
+                            );
+                        });
+                    },
+
+                    error: function (xhr, status, error) {
+                        console.error("Department loading failed:", error);
+                    }
+                });
+
+
+                // =====================================================
+                // DEPARTMENT CHANGE - LOAD BRANCHES
+                // =====================================================
+
+                departmentSelect.on('change', function () {
+
+                    const departmentId = $(this).val();
+
+                    branchSelect.empty();
+
+                    branchSelect.append(
+                        $('<option>', { value: '0', text: '-- Select Branch --' })
+                    );
+
+                    if (!departmentId || departmentId === '0') {
+                        return;
+                    }
+
+                    $.ajax({
+                        url: '@Url.Action("GetBranches", "Account")',
+                        type: 'GET',
+                        data: { departmentId: departmentId },
+
+                        success: function (data) {
+
+                            if (!data || data.length === 0) {
+                                branchSelect.append(
+                                    $('<option>', { value: '0', text: 'No Branch Available' })
+                                );
+                                return;
+                            }
+
+                            $.each(data, function (index, item) {
+                                branchSelect.append(
+                                    $('<option>', {
+                                        value: item.nID,
+                                        text: item.sBranch
+                                    })
+                                );
+                            });
+                        },
+
+                        error: function (xhr, status, error) {
+                            console.error("Branch loading failed:", error);
+                        }
+                    });
+                });
+
+
+                // =====================================================
+                // OTP (TESTING - DUMMY OTP 123456)
+                // =====================================================
+
+                const otpInputs = document.querySelectorAll(".org-otp-input");
+                const otpHidden = document.getElementById("sOTP");
+                const verifyButton = document.querySelector(".org-otp-verify");
+                const otpStatus = document.querySelector(".org-otp-status");
+                const orgForm = document.getElementById("orgRegistrationForm");
+
+                function getOtp() {
+                    let otp = "";
+                    otpInputs.forEach(function (input) {
+                        otp += input.value;
+                    });
+                    return otp;
+                }
+
+                function showOtpStatus(message, success) {
+                    otpStatus.textContent = message;
+                    otpStatus.classList.remove("success", "error");
+                    otpStatus.classList.add(success ? "success" : "error");
+                }
+
+                otpInputs.forEach(function (input, index) {
+
+                    // Digits only + auto move next
+                    input.addEventListener("input", function () {
+
+                        this.value = this.value.replace(/\D/g, '').substring(0, 1);
+
+                        if (this.value.length === 1 && index < otpInputs.length - 1) {
+                            otpInputs[index + 1].focus();
+                        }
+                    });
+
+                    // Backspace moves to previous box
+                    input.addEventListener("keydown", function (e) {
+
+                        if (e.key === "Backspace" && this.value === "" && index > 0) {
+                            otpInputs[index - 1].focus();
+                        }
+                    });
+
+                    // Paste full OTP
+                    input.addEventListener("paste", function (e) {
+
+                        e.preventDefault();
+
+                        const pasted = (e.clipboardData || window.clipboardData)
+                            .getData("text")
+                            .replace(/\D/g, '')
+                            .substring(0, 6);
+
+                        pasted.split("").forEach(function (digit, i) {
+                            if (otpInputs[i]) {
+                                otpInputs[i].value = digit;
+                            }
+                        });
+
+                        if (pasted.length > 0) {
+                            otpInputs[Math.min(pasted.length, otpInputs.length) - 1].focus();
+                        }
+                    });
+                });
+
+                // Verify OTP
+                if (verifyButton) {
+
+                    verifyButton.addEventListener("click", function () {
+
+                        const otp = getOtp();
+
+                        if (otp.length !== 6) {
+                            otpHidden.value = "";
+                            showOtpStatus("Please enter the complete 6-digit OTP.", false);
+                            return;
+                        }
+
+                        if (otp === "123456") {
+                            otpHidden.value = otp;
+                            showOtpStatus("OTP verified successfully.", true);
+                        }
+                        else {
+                            otpHidden.value = "";
+                            showOtpStatus("Invalid OTP. Please enter 123456.", false);
+                        }
+                    });
+                }
+
+                // Form submit guard
+                if (orgForm) {
+
+                    orgForm.addEventListener("submit", function (e) {
+
+                        if (getOtp() !== "123456") {
+
+                            e.preventDefault();
+
+                            otpHidden.value = "";
+                            showOtpStatus("Invalid OTP. Please enter 123456.", false);
+                            otpInputs[0].focus();
+
+                            return false;
+                        }
+
+                        otpHidden.value = "123456";
+                    });
+                }
+
+            });
+
+        </script>
     }
-
-    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
-
-    <script>
-
-        $(document).ready(function () {
-
-        // =====================================================
-        // DEPARTMENT
-        // =====================================================
-
-        const departmentSelect = $("#departmentSelect");
-        const branchSelect = $("#branchSelect");
-
-
-        $.ajax({
-
-        url: '@Url.Action("GetDepartments", "Account")',
-
-        type: 'GET',
-
-        success: function (data) {
-
-        console.log("Departments:", data);
-
-        departmentSelect.empty();
-
-        departmentSelect.append(
-        $('<option>', {
-        value: '0',
-        text: 'Select Department'
-        })
-        );
-
-        $.each(data, function (index, item) {
-
-        departmentSelect.append(
-        $('<option>', {
-        value: item.nID,
-        text: item.sDepartment
-        })
-        );
-
-        });
-
-        },
-
-        error: function (xhr, status, error) {
-
-        console.error(
-        "Department loading failed:",
-        error
-        );
-
-        }
-
-        });
-
-
-        // =====================================================
-        // DEPARTMENT CHANGE
-        // =====================================================
-
-        departmentSelect.on("change", function () {
-
-        const departmentId = $(this).val();
-
-        branchSelect.empty();
-
-        branchSelect.append(
-        $('<option>', {
-        value: '0',
-        text: 'Select Branch'
-        })
-        );
-
-
-        if (!departmentId ||
-        departmentId === "0") {
-
-        return;
-
-        }
-
-
-        // =================================================
-        // LOAD BRANCHES
-        // =================================================
-
-        $.ajax({
-
-        url: '@Url.Action("GetBranches", "Account")',
-
-        type: 'GET',
-
-        data: {
-        departmentId: departmentId
-        },
-
-        success: function (data) {
-
-        console.log(
-        "Branches:",
-        data
-        );
-
-
-        if (!data ||
-        data.length === 0) {
-
-        branchSelect.append(
-        $('<option>', {
-        value: '0',
-        text: 'No Branch Available'
-        })
-        );
-
-        return;
-
-        }
-
-
-        $.each(data, function (index, item) {
-
-        branchSelect.append(
-        $('<option>', {
-        value: item.nID,
-        text: item.sBranch
-        })
-        );
-
-        });
-
-        },
-
-        error: function (xhr, status, error) {
-
-        console.error(
-        "Branch loading failed:",
-        error
-        );
-
-        }
-
-        });
-
-        });
-
-
-        // =====================================================
-        // COLLEGE NAME
-        // =====================================================
-
-        $.ajax({
-
-        url: '@Url.Action("GetColleges", "Account")',
-
-        type: 'GET',
-
-        success: function (data) {
-
-        const collegeDropdown =
-        $('#nCollegeName');
-
-        collegeDropdown.empty();
-
-        collegeDropdown.append(
-        $('<option>', {
-        value: '0',
-        text: '-- Select College Name --'
-        })
-        );
-
-
-        $.each(data, function (index, college) {
-
-        collegeDropdown.append(
-        $('<option>', {
-        value: college.nID,
-        text: college.sCollegeName
-        })
-        );
-
-        });
-
-        },
-
-        error: function () {
-
-        console.error(
-        "Error loading colleges."
-        );
-
-        }
-
-        });
-
-
-        // =====================================================
-        // COLLEGE CHANGE
-        // =====================================================
-
-        $('#nCollegeName').on('change', function () {
-
-        const collegeId = $(this).val();
-
-        const collegeCodeDropdown =
-        $('#nCollegeCode');
-
-
-        collegeCodeDropdown.empty();
-
-        collegeCodeDropdown.append(
-        $('<option>', {
-        value: '0',
-        text: '-- Select College Code --'
-        })
-        );
-
-
-        if (!collegeId ||
-        collegeId === "0") {
-
-        return;
-
-        }
-
-
-        // =================================================
-        // LOAD COLLEGE CODE
-        // =================================================
-
-        $.ajax({
-
-        url: '@Url.Action("GetCollegeCodes", "Account")',
-
-        type: 'GET',
-
-        data: {
-        collegeId: collegeId
-        },
-
-        success: function (data) {
-
-        console.log(
-        "College Codes:",
-        data
-        );
-
-
-        $.each(data, function (index, code) {
-
-        collegeCodeDropdown.append(
-        $('<option>', {
-        value: code.nCode,
-        text: code.nCode
-        })
-        );
-
-        });
-
-        },
-
-        error: function () {
-
-        console.error(
-        "Error loading college codes."
-        );
-
-        }
-
-        });
-
-        });
-
-
-        // =====================================================
-        // MOBILE NUMBER
-        // =====================================================
-
-        $('input[name="sMobile"]').on(
-        'input',
-        function () {
-
-        this.value =
-        this.value
-        .replace(/\D/g, '')
-        .substring(0, 10);
-
-        }
-        );
-
-
-        // =====================================================
-        // OTP
-        // =====================================================
-
-        const otpInputs =
-        document.querySelectorAll(".org-otp-input");
-
-        const otpHidden =
-        document.getElementById("sOTP");
-
-        const verifyButton =
-        document.querySelector(".org-otp-verify");
-
-        const otpStatus =
-        document.querySelector(".org-otp-status");
-
-
-        // =====================================================
-        // OTP INPUT
-        // =====================================================
-
-        otpInputs.forEach(function (input, index) {
-
-        input.addEventListener(
-        "input",
-        function () {
-
-        this.value =
-        this.value
-        .replace(/\D/g, '')
-        .substring(0, 1);
-
-
-        if (
-        this.value.length === 1 &&
-        index < otpInputs.length - 1
-        ) {
-
-        otpInputs[index + 1].focus();
-
-        }
-
-        }
-        );
-
-
-        // BACKSPACE
-
-        input.addEventListener(
-        "keydown",
-        function (e) {
-
-        if (
-        e.key === "Backspace" &&
-        this.value === "" &&
-        index > 0
-        ) {
-
-        otpInputs[index - 1].focus();
-
-        }
-
-        }
-        );
-
-
-        // PASTE
-
-        input.addEventListener(
-        "paste",
-        function (e) {
-
-        e.preventDefault();
-
-        const pasted =
-        (e.clipboardData ||
-        window.clipboardData)
-        .getData("text")
-        .replace(/\D/g, '')
-        .substring(0, 6);
-
-
-        pasted.split("").forEach(
-        function (digit, i) {
-
-        if (otpInputs[i]) {
-
-        otpInputs[i].value =
-        digit;
-
-        }
-
-        }
-        );
-
-
-        if (pasted.length > 0) {
-
-        const focusIndex =
-        Math.min(
-        pasted.length,
-        otpInputs.length
-        ) - 1;
-
-        otpInputs[focusIndex].focus();
-
-        }
-
-        }
-        );
-
-        });
-
-
-        // =====================================================
-        // VERIFY OTP
-        // =====================================================
-
-        if (verifyButton) {
-
-        verifyButton.addEventListener(
-        "click",
-        function () {
-
-        let otp = "";
-
-        otpInputs.forEach(
-        function (input) {
-
-        otp += input.value;
-
-        }
-        );
-
-
-        if (otp.length !== 6) {
-
-        otpHidden.value = "";
-
-        otpStatus.textContent =
-        "Please enter the complete 6-digit OTP.";
-
-        otpStatus.classList.remove(
-        "success"
-        );
-
-        otpStatus.classList.add(
-        "error"
-        );
-
-        return;
-
-        }
-
-
-        if (otp === "123456") {
-
-        otpHidden.value = otp;
-
-        otpStatus.textContent =
-        "OTP verified successfully.";
-
-        otpStatus.classList.remove(
-        "error"
-        );
-
-        otpStatus.classList.add(
-        "success"
-        );
-
-        }
-        else {
-
-        otpHidden.value = "";
-
-        otpStatus.textContent =
-        "Invalid OTP. Please enter 123456.";
-
-        otpStatus.classList.remove(
-        "success"
-        );
-
-        otpStatus.classList.add(
-        "error"
-        );
-
-        }
-
-        }
-        );
-
-        }
-
-
-        // =====================================================
-        // FORM SUBMIT
-        // =====================================================
-
-        const orgForm =
-        document.querySelector(".org-form-content");
-
-
-        if (orgForm) {
-
-        orgForm.addEventListener(
-        "submit",
-        function (e) {
-
-        let otp = "";
-
-        otpInputs.forEach(
-        function (input) {
-
-        otp += input.value;
-
-        }
-        );
-
-
-        if (otp !== "123456") {
-
-        e.preventDefault();
-
-        otpHidden.value = "";
-
-        otpStatus.textContent =
-        "Invalid OTP. Please enter 123456.";
-
-        otpStatus.classList.remove(
-        "success"
-        );
-
-        otpStatus.classList.add(
-        "error"
-        );
-
-        otpInputs[0].focus();
-
-        return false;
-
-        }
-
-
-        otpHidden.value = "123456";
-
-        }
-        );
-
-        }
-
-        });
-
-    </script>
-}

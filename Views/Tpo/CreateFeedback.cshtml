@@ -10,42 +10,45 @@
         Context.Session.GetString("TPOName") ?? "TPO";
 }
 
-<div class="container-fluid">
+<link rel="stylesheet" href="~/css/TPOFeedback.css" />
 
-    <div class="master-table-container">
+<div class="container-fluid tpo-feedback-page">
+
+    <div class="tpo-feedback-wrap">
 
         <!-- =====================================================
              PAGE HEADER
         ====================================================== -->
 
-        <div class="mb-4">
+        <div class="fb-header">
 
-            <h2>
-                Create Feedback
-            </h2>
+            <div class="fb-header-icon">
+                <i class="fa-solid fa-comments"></i>
+            </div>
+
+            <div>
+                <h2>Create Feedback</h2>
+                <p>Share your experience with the platform</p>
+            </div>
 
         </div>
 
 
         <!-- =====================================================
-             SUCCESS MESSAGE
+             SUCCESS / ERROR MESSAGE
         ====================================================== -->
-
         @if (TempData["Success"] != null)
         {
             <div class="alert alert-success">
+                <i class="fa-solid fa-circle-check me-1"></i>
                 @TempData["Success"]
             </div>
         }
 
-
-        <!-- =====================================================
-             ERROR MESSAGE
-        ====================================================== -->
-
         @if (TempData["Error"] != null)
         {
             <div class="alert alert-danger">
+                <i class="fa-solid fa-circle-exclamation me-1"></i>
                 @TempData["Error"]
             </div>
         }
@@ -56,7 +59,7 @@
         ====================================================== -->
 
         <div asp-validation-summary="ModelOnly"
-             class="text-danger mb-3">
+             class="text-danger fb-summary">
         </div>
 
 
@@ -75,397 +78,179 @@
                  QUESTION 1
             ================================================== -->
 
-            <div class="mb-4">
+            <div class="fb-card">
 
-                <label class="form-label fw-bold">
+                <div class="fb-question">
+                    <span class="fb-number">1</span>
+                    <p class="fb-question-text">
+                        @(string.IsNullOrWhiteSpace(Model.Que1)
+                            ? "Question 1"
+                            : Model.Que1)
+                    </p>
+                </div>
 
-                    @(string.IsNullOrWhiteSpace(Model.Que1)
-                        ? "Question 1"
-                        : Model.Que1)
+                <div class="fb-options">
 
-                </label>
-
-
-                <div>
-
-                    <div class="form-check">
-
-                        <input type="radio"
-                               class="form-check-input"
-                               asp-for="sQue1"
-                               value="True"
-                               id="q1Yes" />
-
-                        <label class="form-check-label"
-                               for="q1Yes">
-
-                            Yes
-
-                        </label>
-
+                    <div class="fb-choice">
+                        <input type="radio" asp-for="sQue1" value="True" id="q1Yes" />
+                        <label for="q1Yes"><i class="fa-solid fa-circle-check"></i> Yes</label>
                     </div>
 
-
-                    <div class="form-check">
-
-                        <input type="radio"
-                               class="form-check-input"
-                               asp-for="sQue1"
-                               value="False"
-                               id="q1No" />
-
-                        <label class="form-check-label"
-                               for="q1No">
-
-                            No
-
-                        </label>
-
+                    <div class="fb-choice">
+                        <input type="radio" asp-for="sQue1" value="False" id="q1No" />
+                        <label for="q1No"><i class="fa-solid fa-circle-xmark"></i> No</label>
                     </div>
 
                 </div>
 
-
-                <span asp-validation-for="sQue1"
-                      class="text-danger">
-                </span>
+                <span asp-validation-for="sQue1" class="fb-validation"></span>
 
             </div>
-
 
             <!-- =================================================
                  QUESTION 2
             ================================================== -->
 
-            <div class="mb-4">
+            <div class="fb-card">
 
-                <label class="form-label fw-bold">
+                <div class="fb-question">
+                    <span class="fb-number">2</span>
+                    <p class="fb-question-text">
+                        @(string.IsNullOrWhiteSpace(Model.Que2)
+                            ? "Question 2"
+                            : Model.Que2)
+                    </p>
+                </div>
 
-                    @(string.IsNullOrWhiteSpace(Model.Que2)
-                        ? "Question 2"
-                        : Model.Que2)
+                <div class="fb-rating-box">
 
-                </label>
+                    <div class="fb-stars">
 
-
-                <div>
-
-                    <div class="form-check">
-
-                        <input type="radio"
-                               class="form-check-input"
-                               asp-for="sQue2"
-                               value="1"
-                               id="q2_1" />
-
-                        <label class="form-check-label"
-                               for="q2_1">
-
-                            ⭐ 1
-
-                        </label>
+                        @for (int i = 5; i >= 1; i--)
+                        {
+                            <input type="radio" asp-for="sQue2" value="@i" id="@("q2_" + i)" />
+                            <label for="@("q2_" + i)" title="@i / 5">
+                                <i class="fa-solid fa-star"></i>
+                            </label>
+                        }
 
                     </div>
 
-
-                    <div class="form-check">
-
-                        <input type="radio"
-                               class="form-check-input"
-                               asp-for="sQue2"
-                               value="2"
-                               id="q2_2" />
-
-                        <label class="form-check-label"
-                               for="q2_2">
-
-                            ⭐⭐ 2
-
-                        </label>
-
-                    </div>
-
-
-                    <div class="form-check">
-
-                        <input type="radio"
-                               class="form-check-input"
-                               asp-for="sQue2"
-                               value="3"
-                               id="q2_3" />
-
-                        <label class="form-check-label"
-                               for="q2_3">
-
-                            ⭐⭐⭐ 3
-
-                        </label>
-
-                    </div>
-
-
-                    <div class="form-check">
-
-                        <input type="radio"
-                               class="form-check-input"
-                               asp-for="sQue2"
-                               value="4"
-                               id="q2_4" />
-
-                        <label class="form-check-label"
-                               for="q2_4">
-
-                            ⭐⭐⭐⭐ 4
-
-                        </label>
-
-                    </div>
-
-
-                    <div class="form-check">
-
-                        <input type="radio"
-                               class="form-check-input"
-                               asp-for="sQue2"
-                               value="5"
-                               id="q2_5" />
-
-                        <label class="form-check-label"
-                               for="q2_5">
-
-                            ⭐⭐⭐⭐⭐ 5
-
-                        </label>
-
-                    </div>
+                    <span class="fb-rating-caption" id="q2Caption">Tap a star to rate</span>
 
                 </div>
 
-
-                <span asp-validation-for="sQue2"
-                      class="text-danger">
-                </span>
+                <span asp-validation-for="sQue2" class="fb-validation"></span>
 
             </div>
-
 
             <!-- =================================================
                  QUESTION 3
             ================================================== -->
 
-            <div class="mb-4">
+            <div class="fb-card">
 
-                <label class="form-label fw-bold">
+                <div class="fb-question">
+                    <span class="fb-number">3</span>
+                    <p class="fb-question-text">
+                        @(string.IsNullOrWhiteSpace(Model.Que3)
+                            ? "Question 3"
+                            : Model.Que3)
+                    </p>
+                </div>
 
-                    @(string.IsNullOrWhiteSpace(Model.Que3)
-                        ? "Question 3"
-                        : Model.Que3)
+                <div class="fb-options">
 
-                </label>
-
-
-                <div>
-
-                    <div class="form-check">
-
-                        <input type="radio"
-                               class="form-check-input"
-                               asp-for="sQue3"
-                               value="Yes"
-                               id="q3Yes" />
-
-                        <label class="form-check-label"
-                               for="q3Yes">
-
-                            Yes
-
-                        </label>
-
+                    <div class="fb-choice">
+                        <input type="radio" asp-for="sQue3" value="Yes" id="q3Yes" />
+                        <label for="q3Yes"><i class="fa-solid fa-circle-check"></i> Yes</label>
                     </div>
 
-
-                    <div class="form-check">
-
-                        <input type="radio"
-                               class="form-check-input"
-                               asp-for="sQue3"
-                               value="No"
-                               id="q3No" />
-
-                        <label class="form-check-label"
-                               for="q3No">
-
-                            No
-
-                        </label>
-
+                    <div class="fb-choice">
+                        <input type="radio" asp-for="sQue3" value="No" id="q3No" />
+                        <label for="q3No"><i class="fa-solid fa-circle-xmark"></i> No</label>
                     </div>
 
                 </div>
 
-
-                <span asp-validation-for="sQue3"
-                      class="text-danger">
-                </span>
+                <span asp-validation-for="sQue3" class="fb-validation"></span>
 
             </div>
-
 
             <!-- =================================================
                  QUESTION 4
             ================================================== -->
 
-            <div class="mb-4">
+            <div class="fb-card">
 
-                <label class="form-label fw-bold">
+                <div class="fb-question">
+                    <span class="fb-number">4</span>
+                    <p class="fb-question-text">
+                        @(string.IsNullOrWhiteSpace(Model.Que4)
+                            ? "Question 4"
+                            : Model.Que4)
+                    </p>
+                </div>
 
-                    @(string.IsNullOrWhiteSpace(Model.Que4)
-                        ? "Question 4"
-                        : Model.Que4)
+                @{
+                    var emojis = new[] { "😞", "🙁", "😐", "🙂", "😃" };
+                    var moodText = new[] { "Very Bad", "Bad", "Okay", "Good", "Great" };
+                }
 
-                </label>
+                <div class="fb-mood">
 
-
-                <div>
-
-                    <div class="form-check">
-
-                        <input type="radio"
-                               class="form-check-input"
-                               asp-for="sQue4"
-                               value="1"
-                               id="q4_1" />
-
-                        <label class="form-check-label"
-                               for="q4_1">
-
-                            😞 1
-
-                        </label>
-
-                    </div>
-
-
-                    <div class="form-check">
-
-                        <input type="radio"
-                               class="form-check-input"
-                               asp-for="sQue4"
-                               value="2"
-                               id="q4_2" />
-
-                        <label class="form-check-label"
-                               for="q4_2">
-
-                            🙁 2
-
-                        </label>
-
-                    </div>
-
-
-                    <div class="form-check">
-
-                        <input type="radio"
-                               class="form-check-input"
-                               asp-for="sQue4"
-                               value="3"
-                               id="q4_3" />
-
-                        <label class="form-check-label"
-                               for="q4_3">
-
-                            😐 3
-
-                        </label>
-
-                    </div>
-
-
-                    <div class="form-check">
-
-                        <input type="radio"
-                               class="form-check-input"
-                               asp-for="sQue4"
-                               value="4"
-                               id="q4_4" />
-
-                        <label class="form-check-label"
-                               for="q4_4">
-
-                            🙂 4
-
-                        </label>
-
-                    </div>
-
-
-                    <div class="form-check">
-
-                        <input type="radio"
-                               class="form-check-input"
-                               asp-for="sQue4"
-                               value="5"
-                               id="q4_5" />
-
-                        <label class="form-check-label"
-                               for="q4_5">
-
-                            😃 5
-
-                        </label>
-
-                    </div>
+                    @for (int i = 1; i <= 5; i++)
+                    {
+                        <div class="fb-mood-item">
+                            <input type="radio" asp-for="sQue4" value="@i" id="@("q4_" + i)" />
+                            <label for="@("q4_" + i)">
+                                <span class="fb-emoji">@emojis[i - 1]</span>
+                                <span class="fb-mood-text">@moodText[i - 1]</span>
+                            </label>
+                        </div>
+                    }
 
                 </div>
 
-
-                <span asp-validation-for="sQue4"
-                      class="text-danger">
-                </span>
+                <span asp-validation-for="sQue4" class="fb-validation"></span>
 
             </div>
-
 
             <!-- =================================================
                  QUESTION 5
             ================================================== -->
 
-            <div class="mb-4">
+            <div class="fb-card">
 
-                <label class="form-label fw-bold">
+                <div class="fb-question">
+                    <span class="fb-number">5</span>
+                    <p class="fb-question-text">
+                        @(string.IsNullOrWhiteSpace(Model.Que5)
+                            ? "Additional Feedback"
+                            : Model.Que5)
+                    </p>
+                </div>
 
-                    @(string.IsNullOrWhiteSpace(Model.Que5)
-                        ? "Additional Feedback"
-                        : Model.Que5)
+                <div class="fb-textarea-wrap">
+                    <textarea asp-for="sQue5"
+                              class="form-control"
+                              rows="5"
+                              placeholder="Enter your feedback"></textarea>
+                </div>
 
-                </label>
-
-
-                <textarea asp-for="sQue5"
-                          class="form-control"
-                          rows="5"
-                          placeholder="Enter your feedback"></textarea>
-
-
-                <span asp-validation-for="sQue5"
-                      class="text-danger">
-                </span>
+                <span asp-validation-for="sQue5" class="fb-validation"></span>
 
             </div>
-
 
             <!-- =================================================
                  SUBMIT BUTTON
             ================================================== -->
 
-            <div class="mt-4">
+            <div class="fb-footer">
 
-                <button type="submit"
-                        class="btn btn-primary">
-
+                <button type="submit" class="fb-submit-btn">
+                    <i class="fa-solid fa-paper-plane"></i>
                     Submit Feedback
-
                 </button>
 
             </div>
@@ -480,4 +265,40 @@
 @section Scripts
 {
     <partial name="_ValidationScriptsPartial" />
+
+    <script>
+
+        $(document).ready(function () {
+
+            const starText = {
+                1: "Poor",
+                2: "Fair",
+                3: "Good",
+                4: "Very Good",
+                5: "Excellent"
+            };
+
+            const caption = $('#q2Caption');
+
+            function updateCaption() {
+
+                const value = $('input[name="sQue2"]:checked').val();
+
+                if (value) {
+                    caption.text(value + " / 5 \u2022 " + starText[value])
+                           .addClass('selected');
+                }
+                else {
+                    caption.text("Tap a star to rate")
+                           .removeClass('selected');
+                }
+            }
+
+            $('input[name="sQue2"]').on('change', updateCaption);
+
+            updateCaption();
+
+        });
+
+    </script>
 }
