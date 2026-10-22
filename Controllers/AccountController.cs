@@ -2959,5 +2959,62 @@ public IActionResult OrganizationResetPassword()
         }
 
 
+        //khushi 22-10
+        // Check whether email already exists
+        [AcceptVerbs("GET", "POST")]
+        public IActionResult CheckCandidateEmail(string? sEmail)
+        {
+            if (string.IsNullOrWhiteSpace(sEmail))
+                return Json(true);
+
+            bool exists = _accountRepository
+                .IsCandidateEmailExists(sEmail.Trim());
+
+            return Json(!exists);
+        }
+
+        //khushi 22-10
+        // Check whether mobile number already exists
+        [AcceptVerbs("GET", "POST")]
+        public IActionResult CheckCandidateMobile(string? sMobile)
+        {
+            if (string.IsNullOrWhiteSpace(sMobile))
+                return Json(true);
+
+            bool exists = _accountRepository
+                .IsCandidateMobileExists(sMobile.Trim());
+
+            return Json(!exists);
+        }
+
+        //khushi 22-10
+        // Check organization email
+        [AcceptVerbs("GET", "POST")]
+        public IActionResult CheckOrganizationEmail(string? sEmail)
+        {
+            if (string.IsNullOrWhiteSpace(sEmail))
+                return Json(true);
+
+            bool exists = _accountRepository
+                .IsOrganizationEmailExists(sEmail.Trim());
+
+            return Json(!exists);
+        }
+
+        //khushi 22-10
+        // Check organization mobile
+        [AcceptVerbs("GET", "POST")]
+        public IActionResult CheckOrganizationMobile(string? sMobile)
+        {
+            if (string.IsNullOrWhiteSpace(sMobile))
+                return Json(true);
+
+            bool exists = _accountRepository
+                .IsOrganizationMobileExists(sMobile.Trim());
+
+            return Json(!exists);
+        }
+
+
     }
 }

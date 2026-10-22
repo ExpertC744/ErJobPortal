@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
 using System.ComponentModel.DataAnnotations;
 
 namespace ErJobPortal.Models
@@ -47,6 +48,12 @@ namespace ErJobPortal.Models
             @"^[0-9]{6,20}$",
             ErrorMessage = "Mobile number must contain 6 to 20 digits."
         )]
+
+        [Remote(
+    action: "CheckCandidateMobile",
+    controller: "Account",
+    ErrorMessage = "This mobile number is already registered."
+)]
         public string? sMobile { get; set; }
 
 
@@ -64,6 +71,13 @@ namespace ErJobPortal.Models
             150,
             ErrorMessage = "Email cannot exceed 150 characters."
         )]
+
+        [Remote(
+    action: "CheckCandidateEmail",
+    controller: "Account",
+    ErrorMessage = "This email address is already registered."
+)]
+
         public string? sEmail { get; set; }
 
 

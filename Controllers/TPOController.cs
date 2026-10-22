@@ -5822,5 +5822,1437 @@ ORDER BY
         public IActionResult DriveTracking() => View();
         public IActionResult SharedData() => View();
 
+        // khushi 21-10-26
+        public IActionResult TpoPostDetails(string? id)
+        {
+            // 1. Check TPO session
+            int? tpoId = HttpContext.Session.GetInt32("TPOID");
+
+            if (tpoId == null)
+            {
+                return RedirectToAction("TpoLogin", "Account");
+            }
+
+            // 2. Get TPO registration details
+            var tpo = _accountRepository.GetTpoRegistrationDetails(tpoId.Value);
+
+
+
+            if (tpo == null)
+            {
+                return NotFound("TPO registration not found.");
+            }
+            int parentTPOID = tpo.Value.ParentTPOID;
+
+            // 3. Check registration date
+            if (tpo.Value.RegDate == null)
+            {
+                return BadRequest("TPO registration date is missing.");
+            }
+
+            // 4. Generate TPO code
+            //string tpoCode =
+            //    "TP" +
+            //    tpo.Value.RegDate.Value.ToString("ddMMyy") +
+            //    tpo.Value.TpoID.ToString("D2");
+
+            //// 5. Redirect when URL ID is missing
+            //if (string.IsNullOrWhiteSpace(id))
+            //{
+            //    return RedirectToAction(
+            //        nameof(TpoPostDetails),
+            //        new { id = tpoCode });
+            //}
+
+            //// 6. Validate TPO code
+            //if (!string.Equals(
+            //    id,
+            //    tpoCode,
+            //    StringComparison.OrdinalIgnoreCase))
+            //{
+            //    return NotFound("Invalid TPO code.");
+            //}
+
+            //ViewBag.TpoCode = tpoCode;
+
+            // 7. Get organization posts using the same stored procedure
+            List<OrgPostM> posts = new List<OrgPostM>();
+
+            using (SqlConnection con = new SqlConnection(_configuration.GetConnectionString("DefaultConnection")))
+            {
+                using (SqlCommand cmd = new SqlCommand(@"WITH CandidateProfile AS
+(
+    SELECT
+        CP.CandidateID,
+        CP.nGenderID,
+        CP.Internship_FellowshipType,
+        CP.MaxQualification,
+
+        -- ACTUAL CANDIDATE SKILL COLUMNS
+        CP.sMedicalSkillIDs,
+        CP.sTechnicalSkillIDs,
+        CP.sNonTechnicalSkillIDs
+
+    FROM tblCandidateProfile CP
+
+    WHERE CP.nBit = 1
+      AND CP.nSABit = 1
+),
+
+GenderQualificationMatched AS
+(
+    SELECT DISTINCT
+        P.nID AS PostID,
+        CP.CandidateID
+
+    FROM tblPost P
+
+    CROSS JOIN CandidateProfile CP
+
+    WHERE P.nOrgID = @nOrgID
+  
+
+      -- =============================================
+      -- GENDER
+      -- 4 = ANY GENDER
+      -- =============================================
+      AND
+      (
+          P.nGenderID = 4
+          OR P.nGenderID = CP.nGenderID
+      )
+
+      -- =============================================
+      -- INTERNSHIP / FELLOWSHIP
+      -- 4 = ANY
+      -- =============================================
+      AND
+      (
+          P.nInternshipFellowshipTypeID = 4
+          OR CP.Internship_FellowshipType = 4
+          OR P.nInternshipFellowshipTypeID =
+             CP.Internship_FellowshipType
+      )
+
+      -- =============================================
+      -- QUALIFICATION
+      -- =============================================
+      AND
+      (
+          CP.MaxQualification IS NOT NULL
+          AND P.nMinimumQualificationID IS NOT NULL
+          AND CP.MaxQualification >=
+              P.nMinimumQualificationID
+      )
+),
+
+SkillMatchedCandidates AS
+(
+    -- =================================================
+    -- MEDICAL SKILL MATCH
+    -- =================================================
+
+    SELECT DISTINCT
+        GQM.PostID,
+        GQM.CandidateID
+
+    FROM GenderQualificationMatched GQM
+
+    INNER JOIN tblCandidateProfile CP
+        ON CP.CandidateID = GQM.CandidateID
+
+    INNER JOIN tblPost P
+        ON P.nID = GQM.PostID
+
+    WHERE EXISTS
+    (
+        SELECT 1
+
+        FROM STRING_SPLIT(
+            ISNULL(CP.sMedicalSkillIDs, ''),
+            ','
+        ) C
+
+        INNER JOIN STRING_SPLIT(
+            ISNULL(P.sMedicalSkills, ''),
+            ','
+        ) J
+            ON TRY_CAST(LTRIM(RTRIM(C.value)) AS INT)
+             =
+               TRY_CAST(LTRIM(RTRIM(J.value)) AS INT)
+
+        WHERE
+            LTRIM(RTRIM(C.value)) <> ''
+            AND LTRIM(RTRIM(J.value)) <> ''
+    )
+
+    UNION
+
+    -- =================================================
+    -- TECHNICAL SKILL MATCH
+    -- =================================================
+
+    SELECT DISTINCT
+        GQM.PostID,
+        GQM.CandidateID
+
+    FROM GenderQualificationMatched GQM
+
+    INNER JOIN tblCandidateProfile CP
+        ON CP.CandidateID = GQM.CandidateID
+
+    INNER JOIN tblPost P
+        ON P.nID = GQM.PostID
+
+    WHERE EXISTS
+    (
+        SELECT 1
+
+        FROM STRING_SPLIT(
+            ISNULL(CP.sTechnicalSkillIDs, ''),
+            ','
+        ) C
+
+        INNER JOIN STRING_SPLIT(
+            ISNULL(P.sTechnicalSkills, ''),
+            ','
+        ) J
+            ON TRY_CAST(LTRIM(RTRIM(C.value)) AS INT)
+             =
+               TRY_CAST(LTRIM(RTRIM(J.value)) AS INT)
+
+        WHERE
+            LTRIM(RTRIM(C.value)) <> ''
+            AND LTRIM(RTRIM(J.value)) <> ''
+    )
+
+    UNION
+
+    -- =================================================
+    -- NON-TECHNICAL SKILL MATCH
+    -- =================================================
+
+    SELECT DISTINCT
+        GQM.PostID,
+        GQM.CandidateID
+
+    FROM GenderQualificationMatched GQM
+
+    INNER JOIN tblCandidateProfile CP
+        ON CP.CandidateID = GQM.CandidateID
+
+    INNER JOIN tblPost P
+        ON P.nID = GQM.PostID
+
+    WHERE EXISTS
+    (
+        SELECT 1
+
+        FROM STRING_SPLIT(
+            ISNULL(CP.sNonTechnicalSkillIDs, ''),
+            ','
+        ) C
+
+        INNER JOIN STRING_SPLIT(
+            ISNULL(P.sNonTechnicalSkills, ''),
+            ','
+        ) J
+            ON TRY_CAST(LTRIM(RTRIM(C.value)) AS INT)
+             =
+               TRY_CAST(LTRIM(RTRIM(J.value)) AS INT)
+
+        WHERE
+            LTRIM(RTRIM(C.value)) <> ''
+            AND LTRIM(RTRIM(J.value)) <> ''
+    )
+),
+
+CandidateCounts AS
+(
+    SELECT
+        P.nID AS PostID,
+
+        COUNT(DISTINCT SMC.CandidateID)
+            AS MatchingTraineeCount
+
+    FROM tblPost P
+
+    LEFT JOIN SkillMatchedCandidates SMC
+        ON P.nID = SMC.PostID
+
+    WHERE P.nOrgID = @nOrgID
+
+
+    GROUP BY
+        P.nID
+)
+
+SELECT
+
+    -- =============================================
+    -- POST
+    -- =============================================
+
+    P.nID,
+
+    P.nPositionID,
+    POS.sName AS sPositionName,
+
+    P.nRequiredTrainees,
+
+    -- =============================================
+    -- MATCHING TRAINEE COUNT
+    -- =============================================
+
+    ISNULL(CC.MatchingTraineeCount, 0)
+        AS MatchingTraineeCount,
+
+    -- =============================================
+    -- GENDER
+    -- =============================================
+
+    P.nGenderID,
+    G.sName AS sGenderName,
+
+    -- =============================================
+    -- QUALIFICATION
+    -- =============================================
+
+    P.nMinimumQualificationID,
+    Q.sName AS sMinimumQualificationName,
+
+    -- =============================================
+    -- LOCATION
+    -- =============================================
+
+    P.sCountryName,
+    P.sStateName,
+    P.nCityName,
+
+    -- =============================================
+    -- WORKING DETAILS
+    -- =============================================
+
+    P.sWorkingHours,
+
+    P.nInternshipTypeID,
+    IT.sName AS sInternshipTypeName,
+
+    P.sWorkingShift,
+
+    P.nInternshipFellowshipTypeID,
+    IFT.sName AS sInternshipFellowshipTypeName,
+
+    -- =============================================
+    -- CHARGES
+    -- =============================================
+
+    P.sTotalCharges,
+    P.sCurrency,
+
+    -- =============================================
+    -- TRAINING
+    -- =============================================
+
+    P.nTrainingInvolvedID,
+    TI.sName AS sTrainingInvolvedName,
+
+    -- =============================================
+    -- DURATION
+    -- =============================================
+
+    P.nInternshipDurationID,
+    D.sName AS sInternshipDurationName,
+
+    P.dStartDate,
+    P.dCompletionDate,
+
+    -- =============================================
+    -- MODE
+    -- =============================================
+
+    P.nInternshipModeID,
+    IM.sName AS sInternshipModeName,
+
+    -- =============================================
+    -- OTHER DETAILS
+    -- =============================================
+
+    P.sDivyang,
+    P.sLanguageKnown,
+    P.sWorkingDays,
+    P.sFacilities,
+
+    -- =============================================
+    -- SKILLS
+    -- =============================================
+
+    P.sTechnicalSkills,
+    P.sMedicalSkills,
+    P.sNonTechnicalSkills,
+
+    -- =============================================
+    -- STATUS
+    -- =============================================
+
+    P.dRegisterDate,
+    P.dModDate,
+
+ 
+    P.nOrgID
+
+FROM tblPost P
+
+LEFT JOIN CandidateCounts CC
+    ON P.nID = CC.PostID
+
+LEFT JOIN tblPositions POS
+    ON P.nPositionID = POS.nID
+
+LEFT JOIN tblGender G
+    ON P.nGenderID = G.nID
+
+LEFT JOIN tblMinimumQualification Q
+    ON P.nMinimumQualificationID = Q.nID
+
+LEFT JOIN tblInternshipType IT
+    ON P.nInternshipTypeID = IT.nID
+
+LEFT JOIN tblInternshipFellowshipType IFT
+    ON P.nInternshipFellowshipTypeID = IFT.nID
+
+LEFT JOIN tblTrainingInvolved TI
+    ON P.nTrainingInvolvedID = TI.nID
+
+LEFT JOIN tblInternshipDuration D
+    ON P.nInternshipDurationID = D.nID
+
+LEFT JOIN tblInternshipMode IM
+    ON P.nInternshipModeID = IM.nID
+
+WHERE P.nOrgID = @nOrgID
+  
+
+ORDER BY
+    P.nID DESC;", con))
+                {
+                    //cmd.CommandType = CommandType.StoredProcedure;
+
+                    // IMPORTANT:
+                    // This procedure expects an organization ID.
+                    // Use the correct organization ID if TPO posts must be
+                    // associated with a particular organization.
+                    cmd.Parameters.Add("@nOrgID", SqlDbType.Int).Value = parentTPOID;
+
+                    con.Open();
+
+                    using (SqlDataReader dr = cmd.ExecuteReader())
+                    {
+                        while (dr.Read())
+                        {
+                            OrgPostM item = new OrgPostM();
+
+                            item.nID = Convert.ToInt32(dr["nID"]);
+                            item.nPositionID = Convert.ToInt32(dr["nPositionID"]);
+                            item.sPositionName = dr["sPositionName"]?.ToString() ?? "";
+
+                            item.nRequiredTrainees =
+                                Convert.ToInt32(dr["nRequiredTrainees"]);
+
+                            item.MatchingTraineeCount =
+                                Convert.ToInt32(dr["MatchingTraineeCount"]);
+
+                            item.nGenderID = Convert.ToInt32(dr["nGenderID"]);
+                            item.sGenderName = dr["sGenderName"]?.ToString() ?? "";
+
+                            item.nMinimumQualificationID =
+                                Convert.ToInt32(dr["nMinimumQualificationID"]);
+
+                            item.sMinimumQualificationName =
+                                dr["sMinimumQualificationName"]?.ToString() ?? "";
+
+                            item.sCountryName = dr["sCountryName"]?.ToString() ?? "";
+                            item.sStateName = dr["sStateName"]?.ToString() ?? "";
+                            item.nCityName = dr["nCityName"]?.ToString() ?? "";
+                            item.sWorkingHours = dr["sWorkingHours"]?.ToString() ?? "";
+
+                            item.nInternshipTypeID =
+                                Convert.ToInt32(dr["nInternshipTypeID"]);
+
+                            item.sInternshipTypeName =
+                                dr["sInternshipTypeName"]?.ToString() ?? "";
+
+                            item.sWorkingShift = dr["sWorkingShift"]?.ToString() ?? "";
+
+                            item.nInternshipFellowshipTypeID =
+                                Convert.ToInt32(dr["nInternshipFellowshipTypeID"]);
+
+                            item.sInternshipFellowshipTypeName =
+                                dr["sInternshipFellowshipTypeName"]?.ToString() ?? "";
+
+                            item.nTrainingInvolvedID =
+                                Convert.ToInt32(dr["nTrainingInvolvedID"]);
+
+                            item.sTrainingInvolvedName =
+                                dr["sTrainingInvolvedName"]?.ToString() ?? "";
+
+                            item.nInternshipDurationID =
+                                Convert.ToInt32(dr["nInternshipDurationID"]);
+
+                            item.sInternshipDurationName =
+                                dr["sInternshipDurationName"]?.ToString() ?? "";
+
+                            item.nInternshipModeID =
+                                Convert.ToInt32(dr["nInternshipModeID"]);
+
+                            item.sInternshipModeName =
+                                dr["sInternshipModeName"]?.ToString() ?? "";
+
+                            item.sDivyang = dr["sDivyang"]?.ToString() ?? "";
+                            item.sWorkingDays = dr["sWorkingDays"]?.ToString() ?? "";
+                            item.sFacilities = dr["sFacilities"]?.ToString() ?? "";
+
+                            //item.dRegisterDate =
+                            //    dr["dRegisterDate"] == DBNull.Value
+                            //        ? null
+                            //        : Convert.ToDateTime(dr["dRegisterDate"]);
+
+                            //item.dModDate =
+                            //    dr["dModDate"] == DBNull.Value
+                            //        ? null
+                            //        : Convert.ToDateTime(dr["dModDate"]);
+
+                            //item.nBit =
+                            //    dr["nBit"] != DBNull.Value &&
+                            //    Convert.ToBoolean(dr["nBit"]);
+
+                            //item.nSABit =
+                            //    dr["nSABit"] != DBNull.Value &&
+                            //    Convert.ToBoolean(dr["nSABit"]);
+
+                            item.nOrgID = Convert.ToInt32(dr["nOrgID"]);
+
+                            posts.Add(item);
+                        }
+                    }
+                }
+            }
+
+            //ViewBag.TpoCode = tpoCode;
+
+            return View(posts);
+        }
+
+        // khushi 22-10-26
+        [HttpPost]
+        [Route("TPO/ToggleTpoPostStatus")]
+        public IActionResult ToggleTpoPostStatus(int id)
+        {
+            string? connectionString =
+                _configuration.GetConnectionString("DefaultConnection");
+
+            if (string.IsNullOrWhiteSpace(connectionString))
+            {
+                return Json(new
+                {
+                    success = false,
+                    message = "Database connection string not found."
+                });
+            }
+
+            if (id <= 0)
+            {
+                return Json(new
+                {
+                    success = false,
+                    message = "Invalid post ID."
+                });
+            }
+
+            try
+            {
+                using SqlConnection con = new SqlConnection(connectionString);
+
+                string query = @"
+            UPDATE tblPost
+            SET nBit = CASE
+                           WHEN nBit = 1 THEN 0
+                           ELSE 1
+                       END,
+                dModDate = GETDATE()
+            OUTPUT INSERTED.nBit
+            WHERE nID = @nID
+              AND nOrgID = @nOrgID;";
+
+                using SqlCommand cmd = new SqlCommand(query, con);
+
+                int? tpoId = HttpContext.Session.GetInt32("TPOID");
+
+                if (tpoId == null)
+                {
+                    return Json(new
+                    {
+                        success = false,
+                        message = "TPO session expired. Please log in again."
+                    });
+                }
+
+                var tpo = _accountRepository.GetTpoRegistrationDetails(tpoId.Value);
+
+                if (tpo == null)
+                {
+                    return Json(new
+                    {
+                        success = false,
+                        message = "TPO registration not found."
+                    });
+                }
+
+                int parentTPOID = tpo.Value.ParentTPOID;
+
+                cmd.Parameters.Add("@nID", SqlDbType.Int).Value = id;
+                cmd.Parameters.Add("@nOrgID", SqlDbType.Int).Value = parentTPOID;
+
+                con.Open();
+
+                object? result = cmd.ExecuteScalar();
+
+                if (result == null || result == DBNull.Value)
+                {
+                    return Json(new
+                    {
+                        success = false,
+                        message = "Post not found or you are not authorized to update it."
+                    });
+                }
+
+                bool newStatus = Convert.ToInt32(result) == 1;
+
+                return Json(new
+                {
+                    success = true,
+                    enabled = newStatus,
+                    message = newStatus
+                        ? "Post enabled successfully."
+                        : "Post disabled successfully."
+                });
+            }
+            catch (Exception)
+            {
+                return Json(new
+                {
+                    success = false,
+                    message = "An error occurred while updating post status."
+                });
+            }
+        }
+
+        #region "TPO Eligible Trainees"
+
+        //khushi 21-10-26
+        [HttpGet]
+        //[Route("TPO/TpoEligibleTrainees/{id:int}")]
+        public IActionResult TpoEligibleTrainees(int id, string? tpoCode)
+        {
+            // GET PARENT TPO ID FROM SESSION
+            int? tpoId = HttpContext.Session.GetInt32("TPOID");
+
+            if (tpoId == null)
+            {
+                return RedirectToAction("TpoLogin", "Account");
+            }
+
+            int tpoID = tpoId.Value;
+
+            List<EligibleTraineeM> trainees = new List<EligibleTraineeM>();
+
+            try
+            {
+                using (SqlConnection con = new SqlConnection(
+                    _configuration.GetConnectionString("DefaultConnection")))
+                {
+                    using (SqlCommand cmd = new SqlCommand(
+                        "SP_GetCandidatesByPost", con))
+                    {
+                        cmd.CommandType = CommandType.StoredProcedure;
+
+                        // POST ID
+                        cmd.Parameters.Add("@nID", SqlDbType.Int).Value = id;
+
+                        // PARENT TPO ID
+                        cmd.Parameters.Add("@OrganizationID", SqlDbType.Int).Value =
+                            tpoID;
+
+                        con.Open();
+
+                        using (SqlDataReader dr = cmd.ExecuteReader())
+                        {
+                            while (dr.Read())
+                            {
+                                EligibleTraineeM item = new EligibleTraineeM();
+
+                                item.CandidateID =
+                                    dr["CandidateID"] == DBNull.Value
+                                        ? 0
+                                        : Convert.ToInt32(dr["CandidateID"]);
+
+                                item.Name =
+                                    dr["Name"] == DBNull.Value
+                                        ? ""
+                                        : dr["Name"].ToString();
+
+                                item.EmailID =
+                                    dr["EmailID"] == DBNull.Value
+                                        ? ""
+                                        : dr["EmailID"].ToString();
+
+                                item.Gender =
+                                    dr["Gender"] == DBNull.Value
+                                        ? null
+                                        : Convert.ToInt32(dr["Gender"]);
+
+                                item.DateOfBirth =
+                                    dr["DateOfBirth"] == DBNull.Value
+                                        ? null
+                                        : Convert.ToDateTime(dr["DateOfBirth"]);
+
+                                item.PostID =
+                                    dr["PostID"] == DBNull.Value
+                                        ? 0
+                                        : Convert.ToInt32(dr["PostID"]);
+
+                                item.GenderRequired =
+                                    dr["GenderRequired"] == DBNull.Value
+                                        ? null
+                                        : Convert.ToInt32(dr["GenderRequired"]);
+
+                                item.InternshipType =
+                                    dr["InternshipType"] == DBNull.Value
+                                        ? null
+                                        : Convert.ToInt32(dr["InternshipType"]);
+
+                                item.MinQualification =
+                                    dr["MinQualification"] == DBNull.Value
+                                        ? null
+                                        : Convert.ToInt32(dr["MinQualification"]);
+
+                                item.MaxQualification =
+                                    dr["MaxQualification"] == DBNull.Value
+                                        ? null
+                                        : Convert.ToInt32(dr["MaxQualification"]);
+
+                                item.MedicalSkill =
+                                    dr["MedicalSkill"] == DBNull.Value
+                                        ? ""
+                                        : dr["MedicalSkill"].ToString();
+
+                                item.TechnicalSkill =
+                                    dr["TechnicalSkill"] == DBNull.Value
+                                        ? ""
+                                        : dr["TechnicalSkill"].ToString();
+
+                                item.NonTechnicalSkill =
+                                    dr["NonTechnicalSkill"] == DBNull.Value
+                                        ? ""
+                                        : dr["NonTechnicalSkill"].ToString();
+
+                                item.MedicalSkillNames =
+                                    dr["MedicalSkillNames"] == DBNull.Value
+                                        ? ""
+                                        : dr["MedicalSkillNames"].ToString();
+
+                                item.TechnicalSkillNames =
+                                    dr["TechnicalSkillNames"] == DBNull.Value
+                                        ? ""
+                                        : dr["TechnicalSkillNames"].ToString();
+
+                                item.NonTechnicalSkillNames =
+                                    dr["NonTechnicalSkillNames"] == DBNull.Value
+                                        ? ""
+                                        : dr["NonTechnicalSkillNames"].ToString();
+
+                                item.MatchedSkillType =
+                                    dr["MatchedSkillType"] == DBNull.Value
+                                        ? ""
+                                        : dr["MatchedSkillType"].ToString();
+
+                                item.CApply =
+                                    dr["CApply"] == DBNull.Value
+                                        ? null
+                                        : Convert.ToInt32(dr["CApply"]);
+
+                                item.Status =
+                                    dr["Status"] == DBNull.Value
+                                        ? ""
+                                        : dr["Status"].ToString();
+
+                                item.FinalStatus =
+                                    dr["FinalStatus"] == DBNull.Value
+                                        ? ""
+                                        : dr["FinalStatus"].ToString();
+
+                                item.Comment =
+                                    dr["Comment"] == DBNull.Value
+                                        ? ""
+                                        : dr["Comment"].ToString();
+
+                                trainees.Add(item);
+                            }
+                        }
+                    }
+                }
+
+                ViewBag.PostID = id;
+                ViewBag.TPOCode = string.IsNullOrWhiteSpace(tpoCode)
+                    ? tpoID.ToString()
+                    : tpoCode;
+
+                return View(trainees);
+            }
+            catch (Exception ex)
+            {
+                TempData["Error"] =
+                    "Unable to load eligible trainees: " + ex.Message;
+
+                return View(trainees);
+            }
+        }
+
+        #endregion
+
+        //khushi 21-10-26
+        [HttpGet]
+        //[Route("TPO/TpoPreviousPost/{id?}")]
+        public IActionResult TpoPreviousPost(string? id)
+        {
+            int? tpoId = HttpContext.Session.GetInt32("TPOID");
+
+            if (tpoId == null)
+            {
+                return RedirectToAction("TPOLogin", "Account");
+            }
+
+            OrgPostM item = null;
+
+            try
+            {
+                using (SqlConnection con = new SqlConnection(
+                    _configuration.GetConnectionString("DefaultConnection")))
+                {
+                    using (SqlCommand cmd = new SqlCommand(
+                        "SP_GetOrganizationRepostList", con))
+                    {
+                        cmd.CommandType = CommandType.StoredProcedure;
+
+                        cmd.Parameters.Add("@nOrgID", SqlDbType.Int).Value =
+                            tpoId.Value;
+
+                        // Pass the selected post ID if your procedure supports @nID.
+                        if (int.TryParse(id, out int postID))
+                        {
+                            cmd.Parameters.Add("@nID", SqlDbType.Int).Value =
+                                postID;
+                        }
+
+                        con.Open();
+
+                        using (SqlDataReader dr = cmd.ExecuteReader())
+                        {
+                            if (dr.Read())
+                            {
+                                item = new OrgPostM();
+
+                                item.nID = dr["nID"] == DBNull.Value
+                                    ? 0 : Convert.ToInt32(dr["nID"]);
+
+                                item.nPositionID = dr["nPositionID"] == DBNull.Value
+                                    ? 0 : Convert.ToInt32(dr["nPositionID"]);
+
+                                item.sPositionName =
+                                    dr["sPositionName"]?.ToString() ?? "";
+
+                                item.nRequiredTrainees =
+                                    dr["nRequiredTrainees"] == DBNull.Value
+                                    ? 0 : Convert.ToInt32(dr["nRequiredTrainees"]);
+
+                                item.sGenderName =
+                                    dr["sGenderName"]?.ToString() ?? "";
+
+                                item.sMinimumQualificationName =
+                                    dr["sMinimumQualificationName"]?.ToString() ?? "";
+
+                                item.sCountryName =
+                                    dr["sCountryName"]?.ToString() ?? "";
+
+                                item.sStateName =
+                                    dr["sStateName"]?.ToString() ?? "";
+
+                                item.nCityName =
+                                    dr["nCityName"]?.ToString() ?? "";
+
+                                item.sWorkingHours =
+                                    dr["sWorkingHours"]?.ToString() ?? "";
+
+                                item.sInternshipTypeName =
+                                    dr["sInternshipTypeName"]?.ToString() ?? "";
+
+                                item.sWorkingShift =
+                                    dr["sWorkingShift"]?.ToString() ?? "";
+
+                                item.sInternshipFellowshipTypeName =
+                                    dr["sInternshipFellowshipTypeName"]?.ToString() ?? "";
+
+                                item.sTotalCharges =
+                                    dr["sTotalCharges"] == DBNull.Value
+                                    ? null : Convert.ToDecimal(dr["sTotalCharges"]);
+
+                                item.sCurrency =
+                                    dr["sCurrency"]?.ToString() ?? "";
+
+                                item.sTrainingInvolvedName =
+                                    dr["sTrainingInvolvedName"]?.ToString() ?? "";
+
+                                item.sInternshipDurationName =
+                                    dr["sInternshipDurationName"]?.ToString() ?? "";
+
+                                item.dStartDate =
+                                    dr["dStartDate"] == DBNull.Value
+                                    ? DateTime.MinValue
+                                    : Convert.ToDateTime(dr["dStartDate"]);
+
+                                item.dCompletionDate =
+                                    dr["dCompletionDate"] == DBNull.Value
+                                    ? DateTime.MinValue
+                                    : Convert.ToDateTime(dr["dCompletionDate"]);
+
+                                item.sInternshipModeName =
+                                    dr["sInternshipModeName"]?.ToString() ?? "";
+
+                                item.sDivyang =
+                                    dr["sDivyang"]?.ToString() ?? "";
+
+                                item.sLanguageKnown =
+                                    dr["sLanguageKnown"]?.ToString() ?? "";
+
+                                item.sWorkingDays =
+                                    dr["sWorkingDays"]?.ToString() ?? "";
+
+                                item.sFacilities =
+                                    dr["sFacilities"]?.ToString() ?? "";
+
+                                item.sTechnicalSkills =
+                                    dr["sTechnicalSkills"]?.ToString() ?? "";
+
+                                item.sMedicalSkills =
+                                    dr["sMedicalSkills"]?.ToString() ?? "";
+
+                                item.sNonTechnicalSkills =
+                                    dr["sNonTechnicalSkills"]?.ToString() ?? "";
+
+                                item.dRegisterDate =
+                                    dr["dRegisterDate"] == DBNull.Value
+                                    ? null : Convert.ToDateTime(dr["dRegisterDate"]);
+
+                                item.dModDate =
+                                    dr["dModDate"] == DBNull.Value
+                                    ? null : Convert.ToDateTime(dr["dModDate"]);
+
+                                item.nBit =
+                                    dr["nBit"] != DBNull.Value &&
+                                    Convert.ToBoolean(dr["nBit"]);
+
+                                item.nSABit =
+                                    dr["nSABit"] != DBNull.Value &&
+                                    Convert.ToBoolean(dr["nSABit"]);
+
+                                item.nOrgID =
+                                    dr["nOrgID"] == DBNull.Value
+                                    ? 0 : Convert.ToInt32(dr["nOrgID"]);
+                            }
+                        }
+                    }
+                }
+
+                if (item == null)
+                {
+                    TempData["Error"] = "Previous post not found.";
+
+                    return RedirectToAction(nameof(TpoPreviousPost));
+                }
+
+                // Validate that the post belongs to the parent TPO.
+                if (item.nOrgID != tpoId.Value)
+                {
+                    TempData["Error"] = "You are not authorized to view this post.";
+
+                    return RedirectToAction(nameof(TpoPreviousPost));
+                }
+
+                ViewBag.RepostPostID = item.nID;
+
+                ViewBag.ExpiryDate = item.dRegisterDate.HasValue
+                    ? item.dRegisterDate.Value.AddMonths(3)
+                    : (DateTime?)null;
+
+                ViewBag.IsRepost = true;
+
+                return View(item);
+            }
+            catch (Exception ex)
+            {
+                TempData["Error"] = ex.Message;
+
+                return RedirectToAction(nameof(TpoPreviousPost));
+            }
+        }
+
+        //khushi 22-10
+        [HttpPost]
+        [Route("TPO/TogglePostStatus")]
+        public IActionResult TogglePostStatus(int id)
+        {
+            string? connectionString =
+                _configuration.GetConnectionString("DefaultConnection");
+
+            if (string.IsNullOrWhiteSpace(connectionString))
+            {
+                return Json(new
+                {
+                    success = false,
+                    message = "Database connection string not found."
+                });
+            }
+
+            if (id <= 0)
+            {
+                return Json(new
+                {
+                    success = false,
+                    message = "Invalid post ID."
+                });
+            }
+
+            try
+            {
+                using SqlConnection con = new SqlConnection(connectionString);
+
+                string query = @"
+            UPDATE tblPost
+            SET nBit = CASE
+                           WHEN nBit = 1 THEN 0
+                           ELSE 1
+                       END,
+                dModDate = GETDATE()
+            OUTPUT INSERTED.nBit
+            WHERE nID = @nID;";
+
+                using SqlCommand cmd = new SqlCommand(query, con);
+
+                cmd.Parameters.Add("@nID", SqlDbType.Int).Value = id;
+
+                con.Open();
+
+                object? result = cmd.ExecuteScalar();
+
+                if (result == null || result == DBNull.Value)
+                {
+                    return Json(new
+                    {
+                        success = false,
+                        message = "Post not found."
+                    });
+                }
+
+                bool newStatus = Convert.ToInt32(result) == 1;
+
+                return Json(new
+                {
+                    success = true,
+                    enabled = newStatus,
+                    message = newStatus
+                        ? "Post enabled successfully."
+                        : "Post disabled successfully."
+                });
+            }
+            catch (Exception)
+            {
+                return Json(new
+                {
+                    success = false,
+                    message = "An error occurred while updating post status."
+                });
+            }
+        }
+
+
+        //khushi 21-10-26
+        [HttpGet]
+        //[Route("TPO/TpoAppliedTrainees/{id?}")]
+        public IActionResult TpoAppliedTrainees(string? id)
+        {
+            int? tpoId = HttpContext.Session.GetInt32("TPOID");
+
+            if (tpoId == null)
+            {
+                return RedirectToAction("TPOLogin", "Account");
+            }
+
+            int tpoID = tpoId.Value;
+
+            List<OrgPostM> posts = new List<OrgPostM>();
+
+            string connectionString =
+                _configuration.GetConnectionString("DefaultConnection");
+
+            try
+            {
+                using (SqlConnection con = new SqlConnection(connectionString))
+                {
+                    using (SqlCommand cmd = new SqlCommand(
+                        "SP_BrowseTRApplyForAllPost", con))
+                    {
+                        cmd.CommandType = CommandType.StoredProcedure;
+
+                        cmd.Parameters.Add("@OrganizationID", SqlDbType.Int)
+                                      .Value = tpoID;
+
+                        con.Open();
+
+                        using (SqlDataReader dr = cmd.ExecuteReader())
+                        {
+                            while (dr.Read())
+                            {
+                                OrgPostM item = new OrgPostM();
+
+                                // Post ID
+                                item.nID = dr["PostId"] == DBNull.Value
+                                    ? 0
+                                    : Convert.ToInt32(dr["PostId"]);
+
+                                // Position Name
+                                item.sPositionName =
+                                    dr["PositionName"] == DBNull.Value
+                                        ? string.Empty
+                                        : dr["PositionName"].ToString();
+
+                                // Position ID
+                                item.nPositionID = dr["PositionId"] == DBNull.Value
+                                    ? 0
+                                    : Convert.ToInt32(dr["PositionId"]);
+
+                                // Number of applied trainees
+                                item.MatchingTraineeCount =
+                                    dr["CandidateCount"] == DBNull.Value
+                                        ? 0
+                                        : Convert.ToInt32(dr["CandidateCount"]);
+
+                                // Post creation date
+                                item.dStartDate =
+                                    dr["PostCreationDate"] == DBNull.Value
+                                        ? DateTime.MinValue
+                                        : Convert.ToDateTime(dr["PostCreationDate"]);
+
+                                // TPO ID
+                                item.nOrgID = tpoID;
+
+                                posts.Add(item);
+                            }
+                        }
+                    }
+                }
+
+                ViewBag.TPOCode = id;
+
+                return View(posts);
+            }
+            catch (Exception ex)
+            {
+                TempData["Error"] = "Unable to load applied trainees: " + ex.Message;
+
+                return View(posts);
+            }
+        }
+
+
+        [HttpGet]
+        public IActionResult TpoCharts()
+        {
+            int? tpoId = HttpContext.Session.GetInt32("TPOID");
+
+            if (tpoId == null)
+            {
+                return RedirectToAction("TPOLogin", "Account");
+            }
+
+
+            string organizationName =
+                HttpContext.Session.GetString("OrgName")
+                ?? "";
+
+            // =====================================================
+            // 1. ELIGIBLE TRAINEE CHART
+            //    USING OrgPostM.MatchingTraineeCount
+            // =====================================================
+
+            List<OrgPostM> posts =
+                new List<OrgPostM>();
+
+            using (SqlConnection con =
+                new SqlConnection(
+                    _configuration.GetConnectionString("DefaultConnection")))
+            {
+                using (SqlCommand cmd =
+                    new SqlCommand(
+                        "SP_GetOrgPostsWithMatchingTraineeCount",
+                        con))
+                {
+                    cmd.CommandType =
+                        CommandType.StoredProcedure;
+
+                    cmd.Parameters.AddWithValue(
+                        "@nOrgID",
+                        tpoId.Value);
+
+                    con.Open();
+
+                    using (SqlDataReader dr =
+                        cmd.ExecuteReader())
+                    {
+                        while (dr.Read())
+                        {
+                            OrgPostM item =
+                                new OrgPostM();
+
+                            item.nID =
+                                dr["nID"] == DBNull.Value
+                                ? 0
+                                : Convert.ToInt32(
+                                    dr["nID"]);
+
+                            item.MatchingTraineeCount =
+                                dr["MatchingTraineeCount"] == DBNull.Value
+                                ? 0
+                                : Convert.ToInt32(
+                                    dr["MatchingTraineeCount"]);
+
+                            item.dRegisterDate =
+                                dr["dRegisterDate"] == DBNull.Value
+                                ? null
+                                : Convert.ToDateTime(
+                                    dr["dRegisterDate"]);
+
+                            item.nOrgID =
+                                dr["nOrgID"] == DBNull.Value
+                                ? tpoId.Value
+                                : Convert.ToInt32(
+                                    dr["nOrgID"]);
+
+                            posts.Add(item);
+                        }
+                    }
+                }
+            }
+
+
+            // =====================================================
+            // CONVERT OrgPostM DATA TO CHART DATA
+            // =====================================================
+
+            List<OrganizationChartViewModel> areaChartData =
+                posts
+                    .Where(x =>
+                        x.dRegisterDate.HasValue)
+                    .GroupBy(x => new
+                    {
+                        Year =
+                            x.dRegisterDate.Value.Year,
+
+                        Month =
+                            x.dRegisterDate.Value.Month
+                    })
+                    .Select(g =>
+                        new OrganizationChartViewModel
+                        {
+                            PostYear =
+                                g.Key.Year,
+
+                            PostMonth =
+                                g.Key.Month,
+
+                            TotalEligibleTrainees =
+                                g.Sum(x =>
+                                    x.MatchingTraineeCount)
+                        })
+                    .OrderBy(x => x.PostYear)
+                    .ThenBy(x => x.PostMonth)
+                    .ToList();
+
+
+            // =====================================================
+            // 2. CANDIDATE REGISTRATION CHART
+            // =====================================================
+
+            List<OrganizationChartViewModel> barChartData =
+                GetBarChartData();
+
+
+            // =====================================================
+            // ORGANIZATION NAME
+            // =====================================================
+
+            ViewBag.OrganizationName =
+                organizationName;
+
+
+            // =====================================================
+            // VIEW MODEL
+            // =====================================================
+
+            var viewModel =
+                new OrganizationChartsViewModel
+                {
+                    AreaChartData =
+                        areaChartData,
+
+                    BarChartData =
+                        barChartData
+                };
+
+
+            return View(viewModel);
+        }
+
+        //khushi -- 29-09-2026
+        // =========================================================
+        // AREA CHART DATA
+        // =========================================================
+
+        private List<OrganizationChartViewModel> GetAreaChartData(int organizationId)
+        {
+            var areaChartDataList =
+                new List<OrganizationChartViewModel>();
+
+            string connectionString =
+                _configuration.GetConnectionString(
+                    "DefaultConnection")
+                ?? throw new InvalidOperationException(
+                    "DefaultConnection was not found.");
+
+            using (SqlConnection connection =
+                   new SqlConnection(connectionString))
+            {
+                using (SqlCommand command =
+                       new SqlCommand(
+                           "SP_BrowseOrgAreaChart",
+                           connection))
+                {
+                    command.CommandType =
+                        CommandType.StoredProcedure;
+
+                    command.Parameters.Add(
+                        "@OrganizationID",
+                        SqlDbType.Int).Value =
+                        organizationId;
+
+                    connection.Open();
+
+                    using (SqlDataReader reader =
+                           command.ExecuteReader())
+                    {
+                        while (reader.Read())
+                        {
+                            areaChartDataList.Add(
+                                new OrganizationChartViewModel
+                                {
+                                    PostYear = reader["PostYear"] != DBNull.Value
+                                            ? Convert.ToInt32(
+                                                reader["PostYear"])
+                                            : 0,
+
+                                    PostMonth =
+                                        reader["PostMonth"] != DBNull.Value
+                                            ? Convert.ToInt32(
+                                                reader["PostMonth"])
+                                            : 0,
+
+                                    TotalEligibleTrainees =
+                                        reader["TotalEligibleTrainees"]
+                                        != DBNull.Value
+                                            ? Convert.ToInt32(
+                                                reader[
+                                                    "TotalEligibleTrainees"])
+                                            : 0
+                                });
+                        }
+                    }
+                }
+            }
+
+            return areaChartDataList;
+        }
+
+        //khushi -- 29-09-2026
+        // =========================================================
+        // CANDIDATE MONTHLY REGISTRATION CHART
+        // tblcandidateRegister
+        // =========================================================
+
+        private List<OrganizationChartViewModel> GetBarChartData()
+        {
+            var candidateChartData =
+                new List<OrganizationChartViewModel>();
+
+            string connectionString =
+                _configuration.GetConnectionString("DefaultConnection")
+                ?? throw new InvalidOperationException(
+                    "DefaultConnection was not found.");
+
+            using (SqlConnection connection =
+                   new SqlConnection(connectionString))
+            {
+                using (SqlCommand command =
+                       new SqlCommand(
+                           "SP_BrowseCandidateMonthlyRegistration",
+                           connection))
+                {
+                    command.CommandType =
+                        CommandType.StoredProcedure;
+
+                    connection.Open();
+
+                    using (SqlDataReader reader =
+                           command.ExecuteReader())
+                    {
+                        while (reader.Read())
+                        {
+                            candidateChartData.Add(
+                                new OrganizationChartViewModel
+                                {
+                                    RegistrationYear =
+                                        reader["RegistrationYear"] != DBNull.Value
+                                            ? Convert.ToInt32(
+                                                reader["RegistrationYear"])
+                                            : 0,
+
+                                    RegistrationMonth =
+                                        reader["RegistrationMonth"] != DBNull.Value
+                                            ? Convert.ToInt32(
+                                                reader["RegistrationMonth"])
+                                            : 0,
+
+                                    TotalRegistrations =
+                                        reader["TotalRegistrations"] != DBNull.Value
+                                            ? Convert.ToInt32(
+                                                reader["TotalRegistrations"])
+                                            : 0
+                                });
+                        }
+                    }
+                }
+            }
+
+            return candidateChartData;
+        }
+
     }
 }
