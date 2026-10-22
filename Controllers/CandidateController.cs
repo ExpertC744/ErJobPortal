@@ -20,18 +20,21 @@ namespace ErJobPortal.Controllers
         private readonly EmailService _emailService;
         private readonly ILogger<CandidateController> _logger;
 
+        private readonly AccountRepository _accountRepository;
+
         public CandidateController(
             IConfiguration configuration,
             AccountRepository repository,
             CandidateProfileRepository repo,
             EmailService emailService,
-            ILogger<CandidateController> logger)
+            ILogger<CandidateController> logger, AccountRepository accountRepository)
         {
             _configuration = configuration;
             _repository = repository;
             _repo = repo;
             _emailService = emailService;
             _logger = logger;
+            _accountRepository = accountRepository;
         }
 
 
@@ -6141,96 +6144,96 @@ ORDER BY
 
 
        [HttpGet]
-public async Task<IActionResult> ActivityLog()
-{
-    int candidateId =
-        HttpContext.Session.GetInt32("CandidateID") ?? 0;
-
-    if (candidateId <= 0)
-    {
-        return RedirectToAction("CandidateLogin", "Account");
-    }
-
-    var activities = new List<CandidateActivityLogViewModel>();
-
-    string connectionString =
-        _configuration.GetConnectionString("DefaultConnection")
-        ?? throw new InvalidOperationException(
-            "DefaultConnection is missing.");
-
-    const string sql = @"
-        SELECT TOP (500)
-            VisitID,
-            IPAddress,
-            ISP,
-            Country,
-            Region,
-            City,
-            TimeZone,
-            BrowserName,
-            BrowserVersion,
-            OperatingSystem,
-            DeviceType,
-            RequestPath,
-            PageName,
-            ReferrerUrl,
-            VisitDateTime,
-            IsLoggedIn
-        FROM dbo.tblLoginPageVisits
-        WHERE UserID = @CandidateID
-          AND PanelType = @PanelType
-        ORDER BY VisitDateTime DESC;";
-
-    await using var connection =
-        new SqlConnection(connectionString);
-
-    await using var command =
-        new SqlCommand(sql, connection);
-
-    command.Parameters.Add("@CandidateID", SqlDbType.Int)
-        .Value = candidateId;
-
-    command.Parameters.Add("@PanelType", SqlDbType.NVarChar, 30)
-        .Value = "Candidate";
-
-    await connection.OpenAsync();
-
-    await using var reader =
-        await command.ExecuteReaderAsync();
-
-    while (await reader.ReadAsync())
-    {
-        activities.Add(new CandidateActivityLogViewModel
+        public async Task<IActionResult> ActivityLog()
         {
-            VisitID = Convert.ToInt64(reader["VisitID"]),
+            int candidateId =
+                HttpContext.Session.GetInt32("CandidateID") ?? 0;
 
-            IPAddress = GetNullableString(reader, "IPAddress"),
-            ISP = GetNullableString(reader, "ISP"),
-            Country = GetNullableString(reader, "Country"),
-            Region = GetNullableString(reader, "Region"),
-            City = GetNullableString(reader, "City"),
-            TimeZone = GetNullableString(reader, "TimeZone"),
+            if (candidateId <= 0)
+            {
+                return RedirectToAction("CandidateLogin", "Account");
+            }
 
-            BrowserName = GetNullableString(reader, "BrowserName"),
-            BrowserVersion = GetNullableString(reader, "BrowserVersion"),
-            OperatingSystem = GetNullableString(reader, "OperatingSystem"),
-            DeviceType = GetNullableString(reader, "DeviceType"),
+            var activities = new List<CandidateActivityLogViewModel>();
 
-            RequestPath = GetNullableString(reader, "RequestPath"),
-            PageName = GetNullableString(reader, "PageName"),
-            ReferrerUrl = GetNullableString(reader, "ReferrerUrl"),
+            string connectionString =
+                _configuration.GetConnectionString("DefaultConnection")
+                ?? throw new InvalidOperationException(
+                    "DefaultConnection is missing.");
 
-            VisitDateTime = Convert.ToDateTime(
-                reader["VisitDateTime"]),
+            const string sql = @"
+                SELECT TOP (500)
+                    VisitID,
+                    IPAddress,
+                    ISP,
+                    Country,
+                    Region,
+                    City,
+                    TimeZone,
+                    BrowserName,
+                    BrowserVersion,
+                    OperatingSystem,
+                    DeviceType,
+                    RequestPath,
+                    PageName,
+                    ReferrerUrl,
+                    VisitDateTime,
+                    IsLoggedIn
+                FROM dbo.tblLoginPageVisits
+                WHERE UserID = @CandidateID
+                  AND PanelType = @PanelType
+                ORDER BY VisitDateTime DESC;";
 
-            IsLoggedIn = !reader.IsDBNull(
-                reader.GetOrdinal("IsLoggedIn"))
-                && Convert.ToBoolean(reader["IsLoggedIn"])
-        });
-    }
+            await using var connection =
+                new SqlConnection(connectionString);
 
-    return View(activities);
-}
+            await using var command =
+                new SqlCommand(sql, connection);
+
+            command.Parameters.Add("@CandidateID", SqlDbType.Int)
+                .Value = candidateId;
+
+            command.Parameters.Add("@PanelType", SqlDbType.NVarChar, 30)
+                .Value = "Candidate";
+
+            await connection.OpenAsync();
+
+            await using var reader =
+                await command.ExecuteReaderAsync();
+
+            while (await reader.ReadAsync())
+            {
+                activities.Add(new CandidateActivityLogViewModel
+                {
+                    VisitID = Convert.ToInt64(reader["VisitID"]),
+
+                    IPAddress = GetNullableString(reader, "IPAddress"),
+                    ISP = GetNullableString(reader, "ISP"),
+                    Country = GetNullableString(reader, "Country"),
+                    Region = GetNullableString(reader, "Region"),
+                    City = GetNullableString(reader, "City"),
+                    TimeZone = GetNullableString(reader, "TimeZone"),
+
+                    BrowserName = GetNullableString(reader, "BrowserName"),
+                    BrowserVersion = GetNullableString(reader, "BrowserVersion"),
+                    OperatingSystem = GetNullableString(reader, "OperatingSystem"),
+                    DeviceType = GetNullableString(reader, "DeviceType"),
+
+                    RequestPath = GetNullableString(reader, "RequestPath"),
+                    PageName = GetNullableString(reader, "PageName"),
+                    ReferrerUrl = GetNullableString(reader, "ReferrerUrl"),
+
+                    VisitDateTime = Convert.ToDateTime(
+                        reader["VisitDateTime"]),
+
+                    IsLoggedIn = !reader.IsDBNull(
+                        reader.GetOrdinal("IsLoggedIn"))
+                        && Convert.ToBoolean(reader["IsLoggedIn"])
+                });
+            }
+
+            return View(activities);
+        }
 
         private static string? GetNullableString(
             SqlDataReader reader,
@@ -6246,6 +6249,28 @@ public async Task<IActionResult> ActivityLog()
         public IActionResult Pipeline() => View();
         public IActionResult Community() => View();
         public IActionResult SharedData() => View();
+
+
+        [HttpGet]
+        public IActionResult EditCandidateRegistration()
+        {
+            int? candidateId = HttpContext.Session.GetInt32("CandidateID");
+
+            if (candidateId == null)
+            {
+                return RedirectToAction("CandidateLogin", "Account");
+            }
+
+            var candidate = _accountRepository
+                .GetCandidateRegistrationForEdit(candidateId.Value);
+
+            if (candidate == null)
+            {
+                return NotFound("Candidate registration details not found.");
+            }
+
+            return View(candidate);
+        }
     }
 }
 
