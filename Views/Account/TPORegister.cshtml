@@ -393,32 +393,27 @@
 
                 <!-- Department -->
 
-<div class="register-form-group">
+                <div class="register-form-group">
 
-    <label asp-for="nDepartment"
-           class="register-label">
-        Department
-    </label>
+                    <label asp-for="nDepartment" class="register-label">
+                        Department
+                    </label>
 
-    <div class="register-input-box">
+                    <div class="register-input-box">
+                        <select asp-for="nDepartment"
+                                id="departmentSelect"
+                                class="register-select">
 
-        <select asp-for="nDepartment"
-                id="departmentSelect"
-                class="register-select">
+                            <option value="">-- Select Department --</option>
 
-            <option value="0">
-                -- Select Department --
-            </option>
+                        </select>
+                    </div>
 
-        </select>
+                    <span asp-validation-for="nDepartment"
+                          class="text-danger register-validation">
+                    </span>
 
-    </div>
-
-    <span asp-validation-for="nDepartment"
-          class="text-danger register-validation">
-    </span>
-
-</div>
+                </div>
 
             </div>
 
@@ -859,30 +854,22 @@ $.ajax({
             data
         );
 
-        departmentSelect.empty();
+                departmentSelect.empty();
 
         departmentSelect.append(
             $('<option>', {
-
-                value: '0',
-
+                value: '',
                 text: '-- Select Department --'
-
             })
         );
 
-        $.each(data, function (index, item) {
-
+                $.each(data, function (index, item) {
             departmentSelect.append(
                 $('<option>', {
-
                     value: item.nID,
-
                     text: item.sDepartment
-
                 })
             );
-
         });
 
     },

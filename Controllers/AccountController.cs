@@ -1309,6 +1309,7 @@ public IActionResult OrganizationResetPassword()
         // ==========================================================
         // TPO REGISTRATION - POST
         // ==========================================================
+        // shrirang 22/10/26
 
         [HttpPost]
         [ValidateAntiForgeryToken]
@@ -1317,27 +1318,53 @@ public IActionResult OrganizationResetPassword()
             try
             {
                 // ==========================================================
-                // STATIC OTP
+                // 1. CHECK DUPLICATE EMAIL
+                // ==========================================================
+
+                if (!string.IsNullOrWhiteSpace(model.CollegeMailID) &&
+                    _accountRepository.TPOEmailExists(model.CollegeMailID.Trim()))
+                {
+                    ModelState.AddModelError(
+                        nameof(model.CollegeMailID),
+                        "This email address is already registered."
+                    );
+                }
+
+                // ==========================================================
+                // 2. CHECK DUPLICATE PRIMARY MOBILE
+                // Alternate mobile is intentionally NOT checked.
+                // ==========================================================
+
+                if (!string.IsNullOrWhiteSpace(model.MobileNo) &&
+                    _accountRepository.TPOMobileExists(model.MobileNo.Trim()))
+                {
+                    ModelState.AddModelError(
+                        nameof(model.MobileNo),
+                        "This mobile number is already registered."
+                    );
+                }
+
+                // ==========================================================
+                // 3. STATIC OTP VALIDATION
                 // ==========================================================
 
                 if (model.OTP != "123456")
                 {
                     ModelState.AddModelError(
-                        "OTP",
+                        nameof(model.OTP),
                         "Invalid OTP. Please enter 123456."
                     );
                 }
 
-
                 // ==========================================================
-                // CHECK REQUIRED FILES
+                // 4. REQUIRED FILE VALIDATION
                 // ==========================================================
 
                 if (model.SupportingDocument1File == null ||
                     model.SupportingDocument1File.Length == 0)
                 {
                     ModelState.AddModelError(
-                        "SupportingDocument1File",
+                        nameof(model.SupportingDocument1File),
                         "Supporting Document 1 is required."
                     );
                 }
@@ -1346,7 +1373,7 @@ public IActionResult OrganizationResetPassword()
                     model.SupportingDocument2File.Length == 0)
                 {
                     ModelState.AddModelError(
-                        "SupportingDocument2File",
+                        nameof(model.SupportingDocument2File),
                         "Supporting Document 2 is required."
                     );
                 }
@@ -1355,14 +1382,13 @@ public IActionResult OrganizationResetPassword()
                     model.ProfilePhotoFile.Length == 0)
                 {
                     ModelState.AddModelError(
-                        "ProfilePhotoFile",
+                        nameof(model.ProfilePhotoFile),
                         "Profile Photo is required."
                     );
                 }
 
-
                 // ==========================================================
-                // NOW CHECK MODEL
+                // 5. STOP IF ANY MODEL OR DUPLICATE VALIDATION FAILED
                 // ==========================================================
 
                 if (!ModelState.IsValid)
@@ -1370,9 +1396,87 @@ public IActionResult OrganizationResetPassword()
                     return View(model);
                 }
 
+                // ==========================================================
+                // 6. VALIDATE FILE EXTENSIONS AND SIZES BEFORE UPLOAD
+                // ==========================================================
+
+                string[] allowedDocumentExtensions =
+                {
+            ".pdf", ".jpg", ".jpeg", ".png"
+        };
+
+                string[] allowedImageExtensions =
+                {
+            ".jpg", ".jpeg", ".png"
+        };
+
+                string extension1 =
+                    Path.GetExtension(model.SupportingDocument1File!.FileName)
+                        .ToLowerInvariant();
+
+                string extension2 =
+                    Path.GetExtension(model.SupportingDocument2File!.FileName)
+                        .ToLowerInvariant();
+
+                string profileExtension =
+                    Path.GetExtension(model.ProfilePhotoFile!.FileName)
+                        .ToLowerInvariant();
+
+                if (!allowedDocumentExtensions.Contains(extension1))
+                {
+                    ModelState.AddModelError(
+                        nameof(model.SupportingDocument1File),
+                        "Only PDF, JPG, JPEG and PNG files are allowed."
+                    );
+                }
+
+                if (model.SupportingDocument1File.Length > 10 * 1024 * 1024)
+                {
+                    ModelState.AddModelError(
+                        nameof(model.SupportingDocument1File),
+                        "Supporting Document 1 must be less than or equal to 10 MB."
+                    );
+                }
+
+                if (!allowedDocumentExtensions.Contains(extension2))
+                {
+                    ModelState.AddModelError(
+                        nameof(model.SupportingDocument2File),
+                        "Only PDF, JPG, JPEG and PNG files are allowed."
+                    );
+                }
+
+                if (model.SupportingDocument2File.Length > 10 * 1024 * 1024)
+                {
+                    ModelState.AddModelError(
+                        nameof(model.SupportingDocument2File),
+                        "Supporting Document 2 must be less than or equal to 10 MB."
+                    );
+                }
+
+                if (!allowedImageExtensions.Contains(profileExtension))
+                {
+                    ModelState.AddModelError(
+                        nameof(model.ProfilePhotoFile),
+                        "Only JPG, JPEG and PNG profile photos are allowed."
+                    );
+                }
+
+                if (model.ProfilePhotoFile.Length > 5 * 1024 * 1024)
+                {
+                    ModelState.AddModelError(
+                        nameof(model.ProfilePhotoFile),
+                        "Profile photo must be less than or equal to 5 MB."
+                    );
+                }
+
+                if (!ModelState.IsValid)
+                {
+                    return View(model);
+                }
 
                 // ==========================================================
-                // UPLOAD FOLDER
+                // 7. CREATE UPLOAD FOLDER
                 // ==========================================================
 
                 string uploadFolder = Path.Combine(
@@ -1382,203 +1486,77 @@ public IActionResult OrganizationResetPassword()
                     "tpo"
                 );
 
-                if (!Directory.Exists(uploadFolder))
-                {
-                    Directory.CreateDirectory(uploadFolder);
-                }
-
+                Directory.CreateDirectory(uploadFolder);
 
                 // ==========================================================
-                // DOCUMENT 1
+                // 8. SAVE SUPPORTING DOCUMENT 1
                 // ==========================================================
-
-                string[] allowedDocumentExtensions =
-                {
-            ".pdf",
-            ".jpg",
-            ".jpeg",
-            ".png"
-        };
-
-                string extension1 =
-                    Path.GetExtension(
-                        model.SupportingDocument1File.FileName
-                    ).ToLowerInvariant();
-
-                if (!allowedDocumentExtensions.Contains(extension1))
-                {
-                    ModelState.AddModelError(
-                        "SupportingDocument1File",
-                        "Only PDF, JPG, JPEG and PNG files are allowed."
-                    );
-
-                    return View(model);
-                }
-
-                if (model.SupportingDocument1File.Length >
-                    10 * 1024 * 1024)
-                {
-                    ModelState.AddModelError(
-                        "SupportingDocument1File",
-                        "Supporting Document 1 must be less than 10 MB."
-                    );
-
-                    return View(model);
-                }
 
                 string document1Name =
-                    "TPO_DOC1_" +
-                    Guid.NewGuid().ToString("N") +
-                    extension1;
+                    "TPO_DOC1_" + Guid.NewGuid().ToString("N") + extension1;
 
                 string document1Path =
-                    Path.Combine(
-                        uploadFolder,
-                        document1Name
-                    );
+                    Path.Combine(uploadFolder, document1Name);
 
-                using (FileStream stream =
-                       new FileStream(
-                           document1Path,
-                           FileMode.Create))
+                using (FileStream stream = new FileStream(
+                    document1Path, FileMode.Create, FileAccess.Write))
                 {
                     model.SupportingDocument1File.CopyTo(stream);
                 }
 
                 model.SupportingDocument1 = document1Name;
 
-
                 // ==========================================================
-                // DOCUMENT 2
+                // 9. SAVE SUPPORTING DOCUMENT 2
                 // ==========================================================
-
-                string extension2 =
-                    Path.GetExtension(
-                        model.SupportingDocument2File.FileName
-                    ).ToLowerInvariant();
-
-                if (!allowedDocumentExtensions.Contains(extension2))
-                {
-                    ModelState.AddModelError(
-                        "SupportingDocument2File",
-                        "Only PDF, JPG, JPEG and PNG files are allowed."
-                    );
-
-                    return View(model);
-                }
-
-                if (model.SupportingDocument2File.Length >
-                    10 * 1024 * 1024)
-                {
-                    ModelState.AddModelError(
-                        "SupportingDocument2File",
-                        "Supporting Document 2 must be less than 10 MB."
-                    );
-
-                    return View(model);
-                }
 
                 string document2Name =
-                    "TPO_DOC2_" +
-                    Guid.NewGuid().ToString("N") +
-                    extension2;
+                    "TPO_DOC2_" + Guid.NewGuid().ToString("N") + extension2;
 
                 string document2Path =
-                    Path.Combine(
-                        uploadFolder,
-                        document2Name
-                    );
+                    Path.Combine(uploadFolder, document2Name);
 
-                using (FileStream stream =
-                       new FileStream(
-                           document2Path,
-                           FileMode.Create))
+                using (FileStream stream = new FileStream(
+                    document2Path, FileMode.Create, FileAccess.Write))
                 {
                     model.SupportingDocument2File.CopyTo(stream);
                 }
 
                 model.SupportingDocument2 = document2Name;
 
-
                 // ==========================================================
-                // PROFILE PHOTO
+                // 10. SAVE PROFILE PHOTO
                 // ==========================================================
-
-                string[] allowedImageExtensions =
-                {
-            ".jpg",
-            ".jpeg",
-            ".png"
-        };
-
-                string profileExtension =
-                    Path.GetExtension(
-                        model.ProfilePhotoFile.FileName
-                    ).ToLowerInvariant();
-
-                if (!allowedImageExtensions.Contains(profileExtension))
-                {
-                    ModelState.AddModelError(
-                        "ProfilePhotoFile",
-                        "Only JPG, JPEG and PNG profile photos are allowed."
-                    );
-
-                    return View(model);
-                }
-
-                if (model.ProfilePhotoFile.Length >
-                    5 * 1024 * 1024)
-                {
-                    ModelState.AddModelError(
-                        "ProfilePhotoFile",
-                        "Profile photo must be less than 5 MB."
-                    );
-
-                    return View(model);
-                }
 
                 string profileName =
-                    "TPO_PROFILE_" +
-                    Guid.NewGuid().ToString("N") +
+                    "TPO_PROFILE_" + Guid.NewGuid().ToString("N") +
                     profileExtension;
 
                 string profilePath =
-                    Path.Combine(
-                        uploadFolder,
-                        profileName
-                    );
+                    Path.Combine(uploadFolder, profileName);
 
-                using (FileStream stream =
-                       new FileStream(
-                           profilePath,
-                           FileMode.Create))
+                using (FileStream stream = new FileStream(
+                    profilePath, FileMode.Create, FileAccess.Write))
                 {
                     model.ProfilePhotoFile.CopyTo(stream);
                 }
 
                 model.ProfilePhoto = profileName;
 
-
                 // ==========================================================
-                // TPO DEFAULT STATUS
+                // 11. SET DEFAULT TPO STATUS
                 // ==========================================================
 
                 model.OTPVerified = true;
-
                 model.Status = "Pending";
-
                 model.IsApproved = false;
-
                 model.IsActive = false;
 
-
                 // ==========================================================
-                // REGISTER
+                // 12. REGISTER TPO IN DATABASE
                 // ==========================================================
 
-                int result =
-                    _accountRepository.RegisterTPO(model);
-
+                int result = _accountRepository.RegisterTPO(model);
 
                 if (result > 0)
                 {
@@ -1589,9 +1567,13 @@ public IActionResult OrganizationResetPassword()
                     return RedirectToAction("TPOLogin");
                 }
 
+                // Remove files if registration failed.
+                DeleteUploadedFile(document1Path);
+                DeleteUploadedFile(document2Path);
+                DeleteUploadedFile(profilePath);
 
                 ModelState.AddModelError(
-                    "",
+                    string.Empty,
                     "TPO registration failed. Please try again."
                 );
 
@@ -1600,16 +1582,36 @@ public IActionResult OrganizationResetPassword()
             catch (Exception ex)
             {
                 Console.WriteLine("TPO Registration Error");
-                Console.WriteLine(ex.ToString());
+                Console.WriteLine(ex);
 
                 ModelState.AddModelError(
-                    "",
+                    string.Empty,
                     "Unable to complete TPO registration. Please try again later."
                 );
 
                 return View(model);
             }
         }
+
+        // ==========================================================
+        // HELPER: DELETE UPLOADED FILE IF REGISTRATION FAILS
+        // ==========================================================
+
+        private void DeleteUploadedFile(string filePath)
+        {
+            try
+            {
+                if (System.IO.File.Exists(filePath))
+                {
+                    System.IO.File.Delete(filePath);
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("Unable to delete uploaded file: " + ex.Message);
+            }
+        }
+
 
 
         // ==========================================================

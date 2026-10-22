@@ -20,18 +20,21 @@ namespace ErJobPortal.Controllers
         private readonly EmailService _emailService;
         private readonly ILogger<CandidateController> _logger;
 
+        private readonly AccountRepository _accountRepository;
+
         public CandidateController(
             IConfiguration configuration,
             AccountRepository repository,
             CandidateProfileRepository repo,
             EmailService emailService,
-            ILogger<CandidateController> logger)
+            ILogger<CandidateController> logger, AccountRepository accountRepository)
         {
             _configuration = configuration;
             _repository = repository;
             _repo = repo;
             _emailService = emailService;
             _logger = logger;
+            _accountRepository = accountRepository;
         }
 
 
@@ -6246,6 +6249,28 @@ ORDER BY
         public IActionResult Pipeline() => View();
         public IActionResult Community() => View();
         public IActionResult SharedData() => View();
+
+
+        [HttpGet]
+        public IActionResult EditCandidateRegistration()
+        {
+            int? candidateId = HttpContext.Session.GetInt32("CandidateID");
+
+            if (candidateId == null)
+            {
+                return RedirectToAction("CandidateLogin", "Account");
+            }
+
+            var candidate = _accountRepository
+                .GetCandidateRegistrationForEdit(candidateId.Value);
+
+            if (candidate == null)
+            {
+                return NotFound("Candidate registration details not found.");
+            }
+
+            return View(candidate);
+        }
     }
 }
 
