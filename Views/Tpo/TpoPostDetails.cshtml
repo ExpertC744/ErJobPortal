@@ -1,0 +1,367 @@
+﻿@{
+    Layout = "~/Views/Shared/_DashboardLayout.cshtml";
+    ViewData["Title"] = "TPO Post Details";
+    ViewData["Panel"] = "TPO";
+    ViewData["UserName"] = "TPO";
+}
+
+<link rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
+
+
+<div class="master-table-container">
+
+    <h2 class="page-title">
+
+        TPO Post Details
+    </h2>
+
+
+    <div class="table-responsive">
+
+        <table id="organizationJobsTable"
+               class="master-data-table">
+            <thead>
+
+                <tr>
+
+                    <th>Sr.<br />No</th>
+
+                    <th>Position</th>
+
+                    <th>Action</th>
+
+                    <th>No. of<br />Required<br />Trainee</th>
+
+                    <th>Eligible<br />Trainee</th>
+
+                    <th>Gender</th>
+
+                    <th>Minimum<br />Qualification</th>
+
+                    <th>Location</th>
+
+                    <th>Working<br />Hours Per<br />Day</th>
+
+                    <th>Weekly Working<br />Days</th>
+
+                    <th>Internship<br />Type</th>
+
+                    <th>Internship / Fellowship<br />Type</th>
+
+                    <th>Training<br />Involved</th>
+
+                    <th>Internship<br />Duration</th>
+
+                    <th>Facilities<br />Available</th>
+
+                    <th>Internship<br />Mode</th>
+
+                    <th>Divyang<br />Allowed</th>
+
+                </tr>
+
+            </thead>
+
+
+            <tbody>
+
+                @{
+                    int srNo = 1;
+                }
+
+                @foreach (var item in Model)
+                {
+                    <tr>
+
+                        <!-- Sr. No -->
+                        <td>
+                            @srNo
+                        </td>
+
+
+
+
+
+                        <!-- Position -->
+                        <td>
+                            @item.sPositionName
+                        </td>
+
+
+                        @*    <!-- Action radhika22-09--> *@
+                        <td>
+
+                            <div class="action">
+
+                                <a asp-controller="Organization" asp-action="ViewOrgPost"
+                                   asp-route-id="@item.nID"
+                                   title="View">
+
+                                    <i class="fa-solid fa-eye"></i>
+
+                                </a>
+
+                                <a asp-action="EditPost"
+                                   asp-route-id="@item.nID"
+                                   title="Edit">
+
+                                    <i class="fa-solid fa-pen-to-square"></i>
+
+                                </a>
+
+                            </div>
+
+                        </td>
+
+
+                        <!-- Required Trainees -->
+                        <td>
+                            @item.nRequiredTrainees
+                        </td>
+
+
+                        <!-- Eligible Trainee -->
+                        <td>
+                            <a asp-controller="TPO"
+                               asp-action="TpoEligibleTrainees"
+                               asp-route-id="@item.nID"
+                               asp-route-orgCode="@ViewBag.OrgCode"
+                               class="trainee">
+                                @item.MatchingTraineeCount
+                            </a>
+                            @* <a asp-controller="Organization"
+                                   asp-action="EligibleTrainees"
+                                   asp-route-id="@item.nID"
+                                   class="trainee">
+                                    @item.MatchingTraineeCount
+                                </a> *@
+
+                        </td>
+
+
+                        <!-- Gender -->
+                        <td>
+                            @item.sGenderName
+                        </td>
+
+
+                        <!-- Minimum Qualification -->
+                        <td>
+                            @item.sMinimumQualificationName
+                        </td>
+
+
+
+                        <!-- Location -->
+                        <td>
+                            <div class="location">
+
+                                @item.sCountryName
+                                <br />
+
+                                @item.sStateName
+                                <br />
+
+                                @item.nCityName
+
+                            </div>
+                        </td>
+
+                        <!-- Working Hours -->
+                        <td>
+                            @item.sWorkingHours
+                        </td>
+
+                        <!-- Working Days -->
+                        <td>
+
+                            <div class="days">
+                                @item.sWorkingDays
+                            </div>
+
+                        </td>
+
+                        <!-- Internship Type -->
+                        <td>
+                            @item.sInternshipTypeName
+                        </td>
+
+                        <!-- Internship Fellowship Type -->
+                        <td>
+                            @item.sInternshipFellowshipTypeName
+                        </td>
+
+                        <!-- Training Involved -->
+                        <td>
+                            @item.sTrainingInvolvedName
+                        </td>
+
+                        <!-- Internship Duration -->
+                        <td>
+                            @item.sInternshipDurationName
+                        </td>
+
+                        <!-- Facilities -->
+                        <td>
+                            @if (!string.IsNullOrWhiteSpace(item.sFacilities))
+                            {
+                                <i class="fa-solid fa-wifi wifi" title="@item.sFacilities"></i>
+                            }
+                            else
+                            {
+                                <span>-</span>
+                            }
+                        </td>
+
+                        <!-- Internship Mode -->
+                        <td>
+                            @item.sInternshipModeName
+                        </td>
+
+                        <!-- Divyang -->
+                        <td>
+
+                            @(string.IsNullOrWhiteSpace(item.sDivyang) ? "No" : item.sDivyang)
+                        </td>
+
+                        <!-- Status -->
+                        @* <td>
+                            <button type="button"
+                                    class="master-status @(item.nBit ? "enabled" : "disabled")"
+                                    data-id="@item.nID"
+                                    onclick="toggleTpoPostStatus(this)"
+                                    style="border:none; cursor:pointer;">
+                                @(item.nBit ? "Enabled" : "Disabled")
+                            </button>
+                        </td> *@
+
+                    </tr>
+
+                    srNo++;
+                }
+
+            </tbody>
+
+        </table>
+
+    </div>
+
+</div>
+
+
+<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+
+<script src="https://cdn.datatables.net/1.13.8/js/jquery.dataTables.min.js"></script>
+
+
+<script>
+
+    $(document).ready(function () {
+
+    $('#postTable').DataTable({
+
+    pageLength: 25,
+
+    searching: true,
+
+    ordering: true,
+
+    paging: true,
+
+    info: true,
+
+    autoWidth: false,
+
+    scrollX: true
+
+    });
+
+    });
+
+</script>
+
+<script>
+    function toggleTpoPostStatus(button) {
+    const postId = button.dataset.id;
+
+    if (!confirm("Are you sure you want to change this post status?")) {
+    return;
+    }
+
+    button.disabled = true;
+
+    fetch('@Url.Action("ToggleTpoPostStatus", "TPO")', {
+    method: 'POST',
+    headers: {
+    'Content-Type': 'application/x-www-form-urlencoded'
+    },
+    body: 'id=' + encodeURIComponent(postId)
+    })
+    .then(response => response.json())
+    .then(result => {
+    if (!result.success) {
+    alert(result.message || "Unable to update post status.");
+    return;
+    }
+
+    button.textContent = result.enabled ? "Enabled" : "Disabled";
+
+    button.classList.toggle("enabled", result.enabled);
+    button.classList.toggle("disabled", !result.enabled);
+
+    alert(result.message);
+    })
+    .catch(error => {
+    console.error(error);
+    alert("An error occurred while updating post status.");
+    })
+    .finally(() => {
+    button.disabled = false;
+    });
+    }
+</script>
+
+<script>
+
+    function togglePostStatus(button) {
+
+    const postId = button.dataset.id;
+
+    button.disabled = true;
+
+    fetch('@Url.Action("TogglePostStatus", "Organization")', {
+    method: 'POST',
+    headers: {
+    'Content-Type': 'application/x-www-form-urlencoded'
+    },
+    body: 'id=' + encodeURIComponent(postId)
+    })
+    .then(response => response.json())
+    .then(result => {
+
+    if (result.success) {
+
+    if (result.enabled) {
+
+    button.textContent = "Enabled";
+
+    button.classList.remove("disabled");
+    button.classList.add("enabled");
+
+    } else {
+
+    button.textContent = "Disabled";
+
+    button.classList.remove("enabled");
+    button.classList.add("disabled");
+    }
+    }
+
+    button.disabled = false;
+    });
+
+    }
+
+</script>
+

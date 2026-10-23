@@ -6123,5 +6123,151 @@ WHERE
             }
         }
 
+        // khushi 21-10-26
+        public (int TpoID, DateTime? RegDate, int ParentTPOID)?
+            GetTpoRegistrationDetails(int tpoId)
+        {
+            using (SqlConnection con = _db.GetConnection())
+            {
+                string query = @"
+      SELECT TPOID, CreatedDate, ParentTPOID
+      FROM tblTPORegistration
+      WHERE TPOID = @TpoID";
+
+                using (SqlCommand cmd = new SqlCommand(query, con))
+                {
+                    cmd.Parameters.Add("@TpoID", SqlDbType.Int).Value = tpoId;
+
+                    con.Open();
+
+                    using (SqlDataReader dr = cmd.ExecuteReader())
+                    {
+                        if (dr.Read())
+                        {
+                            int id = Convert.ToInt32(dr["TPOID"]);
+
+                            int parentTPOID = dr["ParentTPOID"] == DBNull.Value
+                                ? 0
+                                : Convert.ToInt32(dr["ParentTPOID"]);
+
+                            DateTime? regDate = dr["CreatedDate"] == DBNull.Value
+                                ? null
+                                : Convert.ToDateTime(dr["CreatedDate"]);
+
+                            return (id, regDate, parentTPOID);
+                        }
+                    }
+                }
+            }
+
+            return null;
+        }
+
+
+
+        //khushi 22-10
+        // Check whether candidate email already exists
+        public bool IsCandidateEmailExists(string email)
+        {
+            using var con = _db.GetConnection();
+
+            if (con.State != System.Data.ConnectionState.Open)
+                con.Open();
+
+            using var cmd = con.CreateCommand();
+
+            cmd.CommandText = @"
+ SELECT COUNT(1)
+ FROM dbo.tblCandidateRegister
+ WHERE LTRIM(RTRIM(sEmail)) = @sEmail";
+
+            var parameter = cmd.CreateParameter();
+            parameter.ParameterName = "@sEmail";
+            parameter.Value = email.Trim();
+            cmd.Parameters.Add(parameter);
+
+            int count = Convert.ToInt32(cmd.ExecuteScalar());
+
+            return count > 0;
+        }
+
+        //khushi 22-10
+        // Check whether candidate mobile number already exists
+        public bool IsCandidateMobileExists(string mobile)
+        {
+            using var con = _db.GetConnection();
+
+            if (con.State != System.Data.ConnectionState.Open)
+                con.Open();
+
+            using var cmd = con.CreateCommand();
+
+            cmd.CommandText = @"
+ SELECT COUNT(1)
+ FROM dbo.tblCandidateRegister
+ WHERE LTRIM(RTRIM(sMobile)) = @sMobile";
+
+            var parameter = cmd.CreateParameter();
+            parameter.ParameterName = "@sMobile";
+            parameter.Value = mobile.Trim();
+            cmd.Parameters.Add(parameter);
+
+            int count = Convert.ToInt32(cmd.ExecuteScalar());
+
+            return count > 0;
+        }
+
+        //khushi 22-10
+        // Check whether organization email already exists
+        public bool IsOrganizationEmailExists(string email)
+        {
+            using var con = _db.GetConnection();
+
+            if (con.State != System.Data.ConnectionState.Open)
+                con.Open();
+
+            using var cmd = con.CreateCommand();
+
+            cmd.CommandText = @"
+ SELECT COUNT(1)
+ FROM dbo.tblOrgRegistration
+ WHERE LTRIM(RTRIM(sEmail)) = @sEmail";
+
+            var parameter = cmd.CreateParameter();
+            parameter.ParameterName = "@sEmail";
+            parameter.Value = email.Trim();
+            cmd.Parameters.Add(parameter);
+
+            int count = Convert.ToInt32(cmd.ExecuteScalar());
+
+            return count > 0;
+        }
+
+        //khushi 22-10
+        // Check whether organization mobile number already exists
+        public bool IsOrganizationMobileExists(string mobile)
+        {
+            using var con = _db.GetConnection();
+
+            if (con.State != System.Data.ConnectionState.Open)
+                con.Open();
+
+            using var cmd = con.CreateCommand();
+
+            cmd.CommandText = @"
+ SELECT COUNT(1)
+ FROM dbo.tblOrgRegistration
+ WHERE LTRIM(RTRIM(sMobile)) = @sMobile";
+
+            var parameter = cmd.CreateParameter();
+            parameter.ParameterName = "@sMobile";
+            parameter.Value = mobile.Trim();
+            cmd.Parameters.Add(parameter);
+
+            int count = Convert.ToInt32(cmd.ExecuteScalar());
+
+            return count > 0;
+        }
+
     }
 }

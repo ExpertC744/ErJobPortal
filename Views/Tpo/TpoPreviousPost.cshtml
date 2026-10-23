@@ -1,0 +1,277 @@
+﻿@model ErJobPortal.Models.OrgPostM
+
+@{
+    Layout = "~/Views/Shared/_DashboardLayout.cshtml";
+    ViewData["Title"] = "TPO Previous Post";
+    ViewData["Panel"] = "TPO";
+    ViewData["UserName"] = "TPO";
+}
+
+<div class="container-fluid previous-post-page">
+
+    <!-- Page Header -->
+    <div class="previous-post-header">
+        <div class="previous-post-heading">
+            <div>
+                <h2>TPO Previous Post</h2>
+            </div>
+        </div>
+    </div>
+
+    <!-- Master Table -->
+    <div class="master-table-container previous-post-table-container">
+
+        <div class="table-responsive previous-post-table-scroll">
+            <table id="previousPostTable" class="master-data-table">
+
+                <thead>
+                    <tr>
+                        <th>Sr. No</th>
+                        <th>Position</th>
+                        <th>Action</th>
+                        <th>No. of Trainee</th>
+                        <th>Gender</th>
+                        <th>Minimum Qualification</th>
+                        <th>Location</th>
+                        <th>Working Hrs / Day</th>
+                        <th>Weekly Working Days</th>
+                        <th>Internship Type</th>
+                        <th>Internship / Fellowship Type</th>
+                        <th>Total Charges</th>
+                        <th>Training Involved</th>
+                        <th>Duration</th>
+                        <th>Facilities Available</th>
+                        <th>Internship Mode</th>
+                        <th>Divyang (Allowed)</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    @if (Model != null)
+                    {
+                        <tr>
+                            <td class="master-id">1</td>
+
+                            <td>
+                                <span class="previous-post-position">
+                                    @Model.sPositionName
+                                </span>
+                            </td>
+
+                            <td class="master-action previous-post-actions">
+
+                                <!-- View Post -->
+                                <a asp-controller="TPO"
+                                   asp-action="ViewTpoPost"
+                                   asp-route-id="@Model.nID"
+                                   class="resume-view-btn"
+                                   title="View Post"
+                                   aria-label="View Post">
+                                    <i class="fas fa-eye"></i>
+                                </a>
+
+                                <!-- Edit Post -->
+                                <a asp-controller="TPO"
+                                   asp-action="EditTpoPost"
+                                   asp-route-id="@Model.nID"
+                                   class="resume-edit-btn"
+                                   title="Edit Post"
+                                   aria-label="Edit Post">
+                                    <i class="fas fa-edit"></i>
+                                </a>
+
+                                <!-- Repost -->
+                                <a asp-controller="TPO"
+                                   asp-action="TpoPreviousPost"
+                                   asp-route-id="@Model.nID"
+                                   class="resume-repost-btn"
+                                   title="Repost"
+                                   aria-label="Repost">
+                                    <i class="fas fa-redo"></i>
+                                </a>
+
+                            </td>
+
+                            <td>@Model.nRequiredTrainees</td>
+
+                            <td>@Model.sGenderName</td>
+
+                            <td>@Model.sMinimumQualificationName</td>
+
+                            <td>
+                                @(string.IsNullOrWhiteSpace(Model.sCountryName)
+                                                            ? ""
+                                                            : Model.sCountryName)
+                                <br />
+                                @(string.IsNullOrWhiteSpace(Model.sStateName)
+                                                            ? ""
+                                                            : Model.sStateName)
+                                <br />
+                                @(string.IsNullOrWhiteSpace(Model.nCityName)
+                                                            ? ""
+                                                            : Model.nCityName)
+                            </td>
+
+                            <td>@Model.sWorkingHours</td>
+
+                            <td>@Model.sWorkingDays</td>
+
+                            <td>@Model.sInternshipTypeName</td>
+
+                            <td>@Model.sInternshipFellowshipTypeName</td>
+
+                            <td>
+                                @if (Model.sTotalCharges.HasValue &&
+                                                            Model.sTotalCharges.Value > 0)
+                                {
+                                    @Model.sCurrency
+                                    @Model.sTotalCharges.Value.ToString("0.##")
+                                }
+                                else
+                                {
+                                    @:NA
+                                }
+                            </td>
+
+                            <td>@Model.sTrainingInvolvedName</td>
+
+                            <td>@Model.sInternshipDurationName</td>
+
+                            <td>
+                                @if (!string.IsNullOrWhiteSpace(Model.sFacilities))
+                                {
+                                    <span class="previous-post-facility"
+                                          title="@Model.sFacilities">
+                                        @Model.sFacilities
+                                    </span>
+                                }
+                                else
+                                {
+                                    @:NA
+                                }
+                            </td>
+
+                            <td>@Model.sInternshipModeName</td>
+
+                            <td>@Model.sDivyang</td>
+
+                            <td>
+                                <button type="button"
+                                        class="master-status @(Model.nBit ? "enabled" : "disabled")"
+                                        id="postStatusBtn"
+                                        data-id="@Model.nID"
+                                        data-url="@Url.Action("TogglePostStatus", "TPO")"
+                                        style="border:none; cursor:pointer;"
+                                        onclick="toggleTpoPostStatus(this)">
+
+                                    @(Model.nBit ? "Enabled" : "Disabled")
+                                </button>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+
+            </table>
+        </div>
+
+        @if (Model == null)
+        {
+            <div class="text-center p-3">
+                No previous posts found.
+            </div>
+        }
+
+        <div id="previousPostPageInfo"
+             class="master-page-info text-center d-none">
+        </div>
+
+    </div>
+</div>
+
+<script>
+    function toggleTpoPostStatus(button) {
+        const id = button.dataset.id;
+        const url = button.dataset.url;
+
+        if (!confirm("Are you sure you want to change this post status?")) {
+            return;
+        }
+
+        button.disabled = true;
+
+        fetch(url, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/x-www-form-urlencoded"
+            },
+            body: new URLSearchParams({
+                id: id
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                button.textContent = data.enabled ? "Enabled" : "Disabled";
+
+                button.classList.toggle("enabled", data.enabled);
+                button.classList.toggle("disabled", !data.enabled);
+
+                alert(data.message);
+            } else {
+                alert(data.message || "Unable to update post status.");
+            }
+        })
+        .catch(error => {
+            console.error("Toggle post status error:", error);
+            alert("An error occurred while updating post status.");
+        })
+        .finally(() => {
+            button.disabled = false;
+        });
+    }
+</script>
+<!-- DataTable -->
+<script>
+    $(document).ready(function () {
+
+        if ($.fn.DataTable.isDataTable('#previousPostTable')) {
+            $('#previousPostTable').DataTable().destroy();
+        }
+
+        $('#previousPostTable').DataTable({
+            pageLength: 25,
+            lengthMenu: [
+                [10, 25, 50, 100],
+                [10, 25, 50, 100]
+            ],
+            searching: true,
+            ordering: true,
+            paging: true,
+            info: true,
+            autoWidth: false,
+            responsive: false,
+            scrollX: true,
+            language: {
+                search: "",
+                searchPlaceholder: "Search...",
+                lengthMenu: "_MENU_ entries per page",
+                emptyTable: "No entries found",
+                zeroRecords: "No matching records found",
+                info: "Showing _START_ to _END_ of _TOTAL_ entries",
+                infoEmpty: "Showing 0 to 0 of 0 entries"
+            },
+            columnDefs: [
+                {
+                    targets: [0, 2, 3, 4, 11, 12, 13, 14, 15, 16, 17],
+                    className: "text-center"
+                },
+                {
+                    targets: 2,
+                    orderable: false
+                }
+            ]
+        });
+
+    });
+</script>
