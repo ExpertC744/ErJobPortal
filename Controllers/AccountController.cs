@@ -827,9 +827,9 @@ namespace ErJobPortal.Controllers
             return View();
         }
 
+
         [HttpPost]
-        [HttpPost]
-        public IActionResult OrganizationLogin(OrganizationLogin model)
+        public async Task<IActionResult> OrganizationLogin(OrganizationLogin model)
         {
             if (!ModelState.IsValid)
             {
@@ -850,7 +850,7 @@ namespace ErJobPortal.Controllers
                     return View(model);
                 }
 
-                // Normal login
+                // Normal login: set organization session
                 HttpContext.Session.SetInt32("OrgID", user.nID);
 
                 HttpContext.Session.SetString(
@@ -868,6 +868,28 @@ namespace ErJobPortal.Controllers
                     user.orgCode ?? ""
                 );
 
+                // Record successful organization login
+                try
+                {
+                    await _visitorTrackingService.TrackVisitAsync(
+                        HttpContext,
+                        "Organization",
+                        "OrganizationLogin",
+                        user.nID,
+                        "Organization",
+                        true
+                    );
+                }
+                catch (Exception ex)
+                {
+                    // Tracking failure should not prevent login
+                    _logger.LogError(
+                        ex,
+                        "Failed to record organization login activity for OrgID {OrgID}",
+                        user.nID
+                    );
+                }
+
                 return RedirectToAction(
                     "Dashboard",
                     "Organization"
@@ -878,6 +900,7 @@ namespace ErJobPortal.Controllers
 
             return View(model);
         }
+
 
         // candidate login
 
@@ -1629,9 +1652,10 @@ public IActionResult OrganizationResetPassword()
         // TPO LOGIN - POST
         // =========================================================
 
+
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult TPOLogin(TPOLogin model)
+        public async Task<IActionResult> TPOLogin(TPOLogin model)
         {
             if (!ModelState.IsValid)
             {
@@ -1667,7 +1691,7 @@ public IActionResult OrganizationResetPassword()
                 }
 
                 // CHECK PASSWORD
-                // PasswordHash currently contains plain password
+                // Existing comparison retained from your code.
                 if (tpo.PasswordHash != model.Password)
                 {
                     ModelState.AddModelError(
@@ -1677,17 +1701,6 @@ public IActionResult OrganizationResetPassword()
 
                     return View(model);
                 }
-
-                // CHECK OTP
-                //if (!tpo.OTPVerified)
-                //{
-                //    ModelState.AddModelError(
-                //        "",
-                //        "Your OTP verification is not completed."
-                //    );
-
-                //    return View(model);
-                //}
 
                 // SET TPO SESSION
                 HttpContext.Session.SetInt32(
@@ -1715,13 +1728,33 @@ public IActionResult OrganizationResetPassword()
                     "TPO"
                 );
 
-                // IMPORTANT:
-                // 0 = Main TPO
-                // 1 = Sub-TPO
+                // 0 = Main TPO, 1 = Sub-TPO
                 HttpContext.Session.SetString(
                     "SubTpoBit",
                     tpo.SubTpoBit ? "1" : "0"
                 );
+
+                // RECORD SUCCESSFUL TPO LOGIN
+                try
+                {
+                    await _visitorTrackingService.TrackVisitAsync(
+                        HttpContext,
+                        "TPO",
+                        "TPOLogin",
+                        tpo.TPOID,
+                        "TPO",
+                        true
+                    );
+                }
+                catch (Exception trackingException)
+                {
+                    // Tracking failure must not prevent a valid login.
+                    _logger.LogError(
+                        trackingException,
+                        "Failed to record TPO login activity for TPOID {TPOID}",
+                        tpo.TPOID
+                    );
+                }
 
                 // REDIRECT TO TPO DASHBOARD
                 return RedirectToAction(
@@ -1731,10 +1764,7 @@ public IActionResult OrganizationResetPassword()
             }
             catch (Exception ex)
             {
-                Console.WriteLine("========================================");
-                Console.WriteLine("TPO Login Error");
-                Console.WriteLine(ex.ToString());
-                Console.WriteLine("========================================");
+                _logger.LogError(ex, "TPO login failed.");
 
                 ModelState.AddModelError(
                     "",
@@ -1744,6 +1774,7 @@ public IActionResult OrganizationResetPassword()
                 return View(model);
             }
         }
+
 
 
 

@@ -16,6 +16,7 @@ namespace ErJobPortal.Controllers
         private readonly IWebHostEnvironment _environment;
         private readonly OrgQuestionBankRepository _questionBankRepository;
 
+
         public OrganizationController(
             IConfiguration configuration,
             AccountRepository repository,
@@ -5801,10 +5802,7 @@ WHERE nID = @nID
             return View(new OrgQuestionBank());
         }
 
-        public IActionResult CreateDrive()
-        {
-            return View();
-        }
+        
 
         [HttpPost]
         [ValidateAntiForgeryToken]
@@ -6067,13 +6065,13 @@ WHERE nID = @nID
         }
 
 
-        public IActionResult CreateDrive(IFormCollection form)
-        {
-            // Temporary test: verify that the form submits successfully.
-            ViewBag.Message = "Recruitment drive form submitted successfully.";
+        //public IActionResult CreateDrive(IFormCollection form)
+        //{
+        //    // Temporary test: verify that the form submits successfully.
+        //    ViewBag.Message = "Recruitment drive form submitted successfully.";
 
-            return View();
-        }
+        //    return View();
+        //}
         public IActionResult OrgAlumni()
         {
             return View();
@@ -6153,6 +6151,107 @@ WHERE nID = @nID
         public IActionResult DriveTracking() => View();
         public IActionResult SharedData() => View();
         public IActionResult History() => View();
+        public IActionResult CreateDrive() => View();
+
+
+
+        [HttpGet]
+        [ResponseCache(
+            NoStore = true,
+            Location = ResponseCacheLocation.None)]
+        public async Task<IActionResult> ActivityLog()
+        {
+            // 1. Verify organization login
+            int? orgId = HttpContext.Session.GetInt32("OrgID");
+
+            if (orgId == null)
+            {
+                return RedirectToAction("OrganizationLogin", "Account");
+            }
+
+            // 2. Prepare activity records
+            var activities = new List<CandidateActivityLogViewModel>();
+
+            string connectionString =
+                _configuration.GetConnectionString("DefaultConnection")
+                ?? throw new InvalidOperationException(
+                    "DefaultConnection is missing from configuration.");
+
+            // 3. Fetch only the currently logged-in organization's records
+            const string query = @"
+        SELECT
+            VisitID,
+            IPAddress,
+            ISP,
+            Country,
+            Region,
+            City,
+            TimeZone,
+            BrowserName,
+            BrowserVersion,
+            OperatingSystem,
+            DeviceType,
+            RequestPath,
+            PageName,
+            ReferrerUrl,
+            VisitDateTime,
+            IsLoggedIn
+        FROM dbo.tblLoginPageVisits
+        WHERE UserID = @OrgID
+          AND UserType = @UserType
+          AND PanelType = @PanelType
+        ORDER BY VisitDateTime DESC;";
+
+            await using var connection =
+                new SqlConnection(connectionString);
+
+            await using var command =
+                new SqlCommand(query, connection);
+
+            command.Parameters.Add("@OrgID", SqlDbType.Int)
+                .Value = orgId.Value;
+
+            command.Parameters.Add("@UserType", SqlDbType.NVarChar, 30)
+                .Value = "Organization";
+
+            command.Parameters.Add("@PanelType", SqlDbType.NVarChar, 30)
+                .Value = "Organization";
+
+            await connection.OpenAsync();
+
+            await using (var reader = await command.ExecuteReaderAsync())
+            {
+                while (await reader.ReadAsync())
+                {
+                    activities.Add(new CandidateActivityLogViewModel
+                    {
+                        VisitID = Convert.ToInt64(reader["VisitID"]),
+                        IPAddress = reader["IPAddress"] as string,
+                        ISP = reader["ISP"] as string,
+                        Country = reader["Country"] as string,
+                        Region = reader["Region"] as string,
+                        City = reader["City"] as string,
+                        TimeZone = reader["TimeZone"] as string,
+                        BrowserName = reader["BrowserName"] as string,
+                        BrowserVersion = reader["BrowserVersion"] as string,
+                        OperatingSystem = reader["OperatingSystem"] as string,
+                        DeviceType = reader["DeviceType"] as string,
+                        RequestPath = reader["RequestPath"] as string,
+                        PageName = reader["PageName"] as string,
+                        ReferrerUrl = reader["ReferrerUrl"] as string,
+                        VisitDateTime = Convert.ToDateTime(
+                            reader["VisitDateTime"]),
+                        IsLoggedIn = Convert.ToBoolean(
+                            reader["IsLoggedIn"])
+                    });
+                }
+            }
+
+            // 4. Return the organization activity view
+            return View("ActivityLog", activities);
+        }
+
+
 
     }
 }

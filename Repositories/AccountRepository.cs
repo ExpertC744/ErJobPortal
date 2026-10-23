@@ -2063,7 +2063,7 @@ public OrganizationLogin? GetOrganizationLoginDetails(string email)
 
                 string departmentQuery = @"
             SELECT sDepartment
-            FROM DepartmentM
+            FROM tblDepartment
             WHERE nID = @DepartmentID";
 
                 using (SqlCommand departmentCmd =
@@ -6106,7 +6106,7 @@ WHERE
                 WHERE LTRIM(RTRIM(MobileNo)) = LTRIM(RTRIM(@MobileNo))
             )
             THEN 1 ELSE 0 END;";
-
+                
                 using (Microsoft.Data.SqlClient.SqlCommand cmd =
                        new Microsoft.Data.SqlClient.SqlCommand(query, cn))
                 {
