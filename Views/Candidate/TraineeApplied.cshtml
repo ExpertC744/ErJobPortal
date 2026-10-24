@@ -11,23 +11,27 @@
 }
 <div class="master-table-container">
 
-    <!-- HEADER -->
-
-    <div class="feedback-title-row">
+    <div class="master-table-title">
 
         <div>
-
             <h1 class="feedback-title">
                 Trainee Applied
             </h1>
 
-            <div class="feedback-subtitle">
+            <p class="feedback-subtitle">
                 @candidateCode
-            </div>
-
+            </p>
         </div>
 
+        <a asp-controller="Candidate"
+           asp-action="Dashboard"
+           class="master-back-btn"
+           title="Back to Dashboard">
+            <i class="fas fa-arrow-left"></i>
+        </a>
+
     </div>
+
 
 
     <!-- MASTER TABLE -->
