@@ -6,9 +6,7 @@
 
     ViewData["Title"] = "Send Notification";
     ViewData["Panel"] = "TPO";
-
-    ViewData["UserName"] =
-        Context.Session.GetString("TPOName") ?? "TPO";
+    ViewData["UserName"] = Context.Session.GetString("TPOName") ?? "TPO";
 
     List<TPONotificationListM> notifications =
         ViewBag.Notifications as List<TPONotificationListM>
@@ -22,955 +20,1653 @@
         ViewBag.Branches as List<BranchM>
         ?? new List<BranchM>();
 
-    int? selectedDepartment =
-        ViewBag.DepartmentId as int?;
+    int? selectedDepartment = ViewBag.DepartmentId as int?;
+    int? selectedBranch = ViewBag.BranchId as int?;
+    string searchText = ViewBag.SearchText?.ToString() ?? "";
 
-    int? selectedBranch =
-        ViewBag.BranchId as int?;
+    int traineeCount = ViewBag.TraineeCount != null
+        ? Convert.ToInt32(ViewBag.TraineeCount)
+        : 0;
 
-    string searchText =
-        ViewBag.SearchText?.ToString() ?? "";
-
-    int traineeCount =
-        ViewBag.TraineeCount != null
-            ? Convert.ToInt32(ViewBag.TraineeCount)
-            : 0;
+    int studentRows = Model?.Students?.Count ?? 0;
 }
 
 <style>
-
     /* =========================================================
-       MAIN
-    ========================================================= */
+           TPO SEND NOTIFICATION - SCOPED STYLES
+        ========================================================= */
 
-    .send-notification-wrapper {
-        padding: 20px 0 40px;
-    }
-
-    .notification-card {
-        background: #ffffff;
-        border-radius: 16px;
-        border: 1px solid #e5e7eb;
-        box-shadow: 0 8px 30px rgba(0,0,0,.06);
-        overflow: hidden;
-    }
-
-    .notification-card-header {
-        padding: 22px 25px;
-        border-bottom: 1px solid #e5e7eb;
-        background: #ffffff;
-    }
-
-    .notification-card-header h4 {
-        margin: 0;
-        font-weight: 700;
-        color: #1f2937;
-    }
-
-    .notification-card-header p {
-        margin: 5px 0 0;
-        color: #6b7280;
+    .tn-page {
+        --tn-primary: #0d9488;
+        --tn-primary-dark: #0f766e;
+        --tn-deep: #115e59;
+        --tn-mint: #f0fdfa;
+        --tn-soft: #ccfbf1;
+        --tn-border: #e2eeeb;
+        --tn-text: #16332f;
+        --tn-muted: #718580;
+        --tn-bg: #f6faf9;
+        padding: 20px 0 36px;
+        color: var(--tn-text);
         font-size: 14px;
     }
 
-    /* =========================================================
-       FORM
-    ========================================================= */
+        .tn-page,
+        .tn-page * {
+            box-sizing: border-box;
+        }
 
-    .form-section {
-        padding: 25px;
-    }
+            .tn-page .tn-card {
+                background: #fff;
+                border: 1px solid var(--tn-border);
+                border-radius: 18px;
+                overflow: hidden;
+                box-shadow: 0 8px 30px rgba(15, 65, 57, .055);
+            }
 
-    .form-label-custom {
-        font-weight: 600;
-        color: #374151;
-        margin-bottom: 7px;
-    }
+    /* Header */
 
-    .form-control,
-    .form-select {
-        min-height: 44px;
-        border-radius: 8px;
-        border: 1px solid #d1d5db;
-    }
-
-    .form-control:focus,
-    .form-select:focus {
-        border-color: #6366f1;
-        box-shadow: 0 0 0 3px rgba(99,102,241,.12);
-    }
-
-    .notification-select-row {
-        display: flex;
-        gap: 10px;
-        align-items: flex-end;
-    }
-
-    .notification-select-wrapper {
-        flex: 1;
-    }
-
-    .create-new-btn {
-        min-height: 44px;
-        white-space: nowrap;
-        border-radius: 8px;
-    }
-
-    /* =========================================================
-       COLLEGE
-    ========================================================= */
-
-    .college-info-box {
-        background: #f8fafc;
-        border: 1px solid #e2e8f0;
-        border-radius: 10px;
-        padding: 13px 16px;
-        margin-bottom: 20px;
-    }
-
-    .college-info-label {
-        font-size: 12px;
-        color: #64748b;
-        margin-bottom: 2px;
-    }
-
-    .college-info-value {
-        font-size: 15px;
-        font-weight: 600;
-        color: #1e293b;
-    }
-
-    /* =========================================================
-       STUDENTS
-    ========================================================= */
-
-    .student-section {
-        border-top: 1px solid #e5e7eb;
-        padding: 25px;
-    }
-
-    .student-section-header {
+    .tn-hero {
+        position: relative;
         display: flex;
         justify-content: space-between;
         align-items: center;
+        gap: 20px;
+        padding: 25px 28px;
+        color: #fff;
+        background: linear-gradient(115deg, #115e59 0%, #0d9488 65%, #20ad9b 100%);
+        overflow: hidden;
+    }
+
+        .tn-hero::after {
+            content: "";
+            position: absolute;
+            width: 220px;
+            height: 220px;
+            border: 35px solid rgba(255, 255, 255, .075);
+            border-radius: 50%;
+            right: -65px;
+            top: -105px;
+            pointer-events: none;
+        }
+
+    .tn-hero-content {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        min-width: 0;
+        position: relative;
+        z-index: 1;
+    }
+
+    .tn-hero-icon {
+        width: 54px;
+        height: 54px;
+        flex: 0 0 54px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: rgba(255,255,255,.16);
+        border: 1px solid rgba(255,255,255,.23);
+        border-radius: 15px;
+        font-size: 23px;
+    }
+
+    .tn-hero h2 {
+        margin: 0;
+        color: #fff;
+        font-size: 23px;
+        font-weight: 700;
+        letter-spacing: -.4px;
+        line-height: 1.35;
+    }
+
+    .tn-hero p {
+        margin: 5px 0 0;
+        color: rgba(255,255,255,.85);
+        font-size: 13.5px;
+        line-height: 1.6;
+    }
+
+    .tn-header-tag {
+        position: relative;
+        z-index: 1;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        flex-shrink: 0;
+        padding: 9px 13px;
+        border: 1px solid rgba(255,255,255,.24);
+        border-radius: 30px;
+        background: rgba(255,255,255,.12);
+        color: #fff;
+        font-size: 12px;
+        font-weight: 600;
+    }
+
+    .tn-status-dot {
+        width: 7px;
+        height: 7px;
+        border-radius: 50%;
+        background: #a7f3d0;
+        box-shadow: 0 0 0 4px rgba(167,243,208,.14);
+    }
+
+    /* Section layout */
+
+    .tn-section {
+        padding: 25px 28px;
+    }
+
+        .tn-section + .tn-section {
+            border-top: 1px solid var(--tn-border);
+        }
+
+    .tn-section-heading {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
         gap: 15px;
-        margin-bottom: 18px;
-        flex-wrap: wrap;
+        margin-bottom: 21px;
     }
 
-    .student-section-title {
-        font-size: 18px;
-        font-weight: 700;
-        color: #1f2937;
-        margin: 0;
+    .tn-heading-left {
+        display: flex;
+        align-items: flex-start;
+        gap: 12px;
     }
 
-    .student-count {
-        background: #eef2ff;
-        color: #4338ca;
-        padding: 7px 12px;
-        border-radius: 20px;
-        font-size: 13px;
-        font-weight: 600;
+    .tn-step-icon {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 39px;
+        height: 39px;
+        flex: 0 0 39px;
+        border-radius: 12px;
+        background: var(--tn-mint);
+        border: 1px solid #d7f3eb;
+        color: var(--tn-primary-dark);
+        font-size: 16px;
     }
 
-    .student-table-wrapper {
-        border: 1px solid #e5e7eb;
-        border-radius: 10px;
-        overflow-x: auto;
-    }
-
-    .student-table {
-        margin: 0;
-        min-width: 900px;
-    }
-
-    .student-table thead th {
-        background: #f8fafc;
-        color: #475569;
-        font-size: 13px;
-        font-weight: 700;
-        padding: 13px 12px;
-        border-bottom: 1px solid #e5e7eb;
-        white-space: nowrap;
-    }
-
-    .student-table tbody td {
-        padding: 13px 12px;
-        vertical-align: middle;
-        font-size: 14px;
-        color: #374151;
-    }
-
-    .student-table tbody tr:hover {
-        background: #f8fafc;
-    }
-
-    .student-name {
-        font-weight: 600;
-        color: #1f2937;
-    }
-
-    .student-email {
-        color: #64748b;
-        font-size: 13px;
-    }
-
-    .student-mobile {
-        white-space: nowrap;
-    }
-
-    .empty-student {
-        padding: 45px !important;
-        text-align: center;
-        color: #94a3b8;
-    }
-
-    /* =========================================================
-       CHECKBOX
-    ========================================================= */
-
-    .student-checkbox,
-    #selectAllStudents {
-        width: 17px;
-        height: 17px;
-        cursor: pointer;
-    }
-
-    /* =========================================================
-       PREVIEW
-    ========================================================= */
-
-    .preview-section {
-        border-top: 1px solid #e5e7eb;
-        padding: 25px;
-    }
-
-    .preview-box {
-        border: 1px solid #e5e7eb;
-        border-radius: 10px;
-        background: #f8fafc;
-        padding: 20px;
-    }
-
-    .preview-title {
+    .tn-section-heading h3 {
+        margin: 1px 0 4px;
+        color: var(--tn-text);
         font-size: 17px;
         font-weight: 700;
-        color: #1f2937;
-        margin-bottom: 12px;
+        line-height: 1.4;
     }
 
-    .preview-content {
-        background: #ffffff;
-        border: 1px solid #e5e7eb;
-        border-radius: 8px;
-        padding: 16px;
-        min-height: 100px;
-        color: #374151;
-        white-space: pre-wrap;
+    .tn-section-heading p {
+        margin: 0;
+        color: var(--tn-muted);
+        font-size: 13px;
+        line-height: 1.55;
     }
 
-    .attachment-item {
+    .tn-label {
+        display: block;
+        margin-bottom: 8px;
+        color: #354e48;
+        font-size: 13px;
+        font-weight: 600;
+    }
+
+    .tn-required {
+        color: #dc5656;
+        margin-left: 3px;
+    }
+
+    /* Form fields */
+
+    .tn-page .form-control,
+    .tn-page .form-select {
+        width: 100%;
+        min-height: 43px;
+        padding: 9px 12px;
+        border: 1px solid #d9e5e1;
+        border-radius: 9px;
+        background-color: #fff;
+        color: #29433d;
+        font-size: 13.5px;
+        box-shadow: none;
+        transition: border-color .18s ease, box-shadow .18s ease;
+    }
+
+        .tn-page .form-control::placeholder {
+            color: #9aa9a4;
+            opacity: 1;
+        }
+
+        .tn-page .form-control:focus,
+        .tn-page .form-select:focus {
+            border-color: var(--tn-primary);
+            box-shadow: 0 0 0 3px rgba(13,148,136,.11);
+            outline: none;
+        }
+
+    .tn-notification-row {
+        display: flex;
+        align-items: flex-end;
+        gap: 11px;
+    }
+
+    .tn-notification-field {
+        flex: 1;
+        min-width: 0;
+    }
+
+    .tn-create-btn {
+        min-height: 43px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 7px;
+        white-space: nowrap;
+        padding: 9px 15px;
+        border-radius: 9px;
+        border: 1px solid #b6e4db;
+        color: var(--tn-primary-dark);
+        background: #f3fcf9;
+        font-size: 13px;
+        font-weight: 600;
+        text-decoration: none;
+        transition: .2s ease;
+    }
+
+        .tn-create-btn:hover {
+            color: #fff;
+            background: var(--tn-primary-dark);
+            border-color: var(--tn-primary-dark);
+        }
+
+    /* College information */
+
+    .tn-college-box {
+        margin-top: 22px;
+        padding: 17px 19px;
+        border: 1px solid #d9eee7;
+        border-radius: 13px;
+        background: linear-gradient(110deg, #f0fdfa, #fbfefd);
+    }
+
+    .tn-college-heading {
+        display: flex;
+        align-items: center;
+        gap: 9px;
+        margin-bottom: 13px;
+        color: var(--tn-primary-dark);
+        font-size: 12px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: .6px;
+    }
+
+    .tn-college-item {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        min-width: 0;
+    }
+
+    .tn-college-icon {
+        width: 37px;
+        height: 37px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex: 0 0 37px;
+        border-radius: 10px;
+        background: #fff;
+        border: 1px solid #dcefe8;
+        color: var(--tn-primary-dark);
+        font-size: 15px;
+    }
+
+    .tn-college-label {
+        margin-bottom: 3px;
+        color: var(--tn-muted);
+        font-size: 12px;
+    }
+
+    .tn-college-value {
+        color: #24443c;
+        font-size: 14px;
+        font-weight: 700;
+        overflow-wrap: anywhere;
+    }
+
+    .tn-college-divider {
+        height: 35px;
+        width: 1px;
+        margin: 0 auto;
+        background: #dcebe6;
+    }
+
+    /* Buttons */
+
+    .tn-btn-primary,
+    .tn-btn-secondary {
+        min-height: 42px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        padding: 9px 16px;
+        border-radius: 9px;
+        font-size: 13px;
+        font-weight: 600;
+        text-decoration: none;
+        transition: background .2s ease, border-color .2s ease, transform .2s ease;
+    }
+
+    .tn-btn-primary {
+        border: 1px solid var(--tn-primary);
+        background: var(--tn-primary);
+        color: #fff;
+    }
+
+        .tn-btn-primary:hover {
+            background: var(--tn-primary-dark);
+            border-color: var(--tn-primary-dark);
+            color: #fff;
+            transform: translateY(-1px);
+        }
+
+    .tn-btn-secondary {
+        border: 1px solid #d9e5e1;
+        background: #fff;
+        color: #526760;
+    }
+
+        .tn-btn-secondary:hover {
+            border-color: #b7d8cf;
+            background: #f5fbf8;
+            color: var(--tn-primary-dark);
+        }
+
+    /* Student section */
+
+    .tn-student-section {
+        background: #fcfefd;
+    }
+
+    .tn-student-toolbar {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 16px;
+        margin-bottom: 18px;
+    }
+
+    .tn-count-group {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .tn-count-chip {
         display: inline-flex;
         align-items: center;
         gap: 7px;
-        padding: 6px 10px;
-        border-radius: 7px;
-        background: #f1f5f9;
-        color: #475569;
-        font-size: 13px;
-        margin: 3px;
+        padding: 8px 11px;
+        border: 1px solid #dfeae6;
+        border-radius: 9px;
+        background: #fff;
+        color: #61736d;
+        font-size: 12px;
+        font-weight: 600;
+        white-space: nowrap;
     }
 
-    /* =========================================================
-       ACTION
-    ========================================================= */
+        .tn-count-chip strong {
+            color: #29463e;
+            font-size: 14px;
+        }
 
-    .action-section {
-        border-top: 1px solid #e5e7eb;
-        padding: 20px 25px;
+        .tn-count-chip.tn-selected-chip {
+            border-color: #bde9df;
+            background: #f0fdfa;
+            color: var(--tn-primary-dark);
+        }
+
+            .tn-count-chip.tn-selected-chip strong {
+                color: var(--tn-primary-dark);
+            }
+
+    .tn-selection-bar {
         display: flex;
-        justify-content: flex-end;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        flex-wrap: wrap;
+        padding: 12px 14px;
+        margin-bottom: 13px;
+        border: 1px solid #e4eee9;
+        border-radius: 10px;
+        background: #fff;
+    }
+
+    .tn-select-all {
+        display: inline-flex;
+        align-items: center;
+        gap: 9px;
+        color: #354e47;
+        font-size: 13px;
+        font-weight: 600;
+        cursor: pointer;
+        margin: 0;
+    }
+
+    .tn-selection-hint {
+        color: #8a9a94;
+        font-size: 12px;
+    }
+
+    .tn-page .form-check-input {
+        width: 17px;
+        height: 17px;
+        margin-top: 0;
+        flex: 0 0 17px;
+        border-color: #bdcec7;
+        cursor: pointer;
+        box-shadow: none;
+    }
+
+        .tn-page .form-check-input:checked {
+            background-color: var(--tn-primary);
+            border-color: var(--tn-primary);
+        }
+
+        .tn-page .form-check-input:focus {
+            border-color: var(--tn-primary);
+            box-shadow: 0 0 0 3px rgba(13,148,136,.12);
+        }
+
+    /* Student table */
+
+    .tn-table-shell {
+        border: 1px solid #e0eae6;
+        border-radius: 12px;
+        overflow: hidden;
+        background: #fff;
+    }
+
+    .tn-table-scroll {
+        width: 100%;
+        overflow-x: auto;
+        scrollbar-width: thin;
+        scrollbar-color: #b8d6cc #f4f8f6;
+    }
+
+    .tn-table {
+        width: 100%;
+        min-width: 940px;
+        margin: 0;
+        border-collapse: separate;
+        border-spacing: 0;
+    }
+
+        .tn-table thead th {
+            padding: 14px 13px;
+            border: 0;
+            border-bottom: 1px solid #e0eae6;
+            background: #f3f9f6;
+            color: #526960;
+            font-size: 11.5px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: .35px;
+            white-space: nowrap;
+            vertical-align: middle;
+        }
+
+        .tn-table tbody td {
+            padding: 13px;
+            border-bottom: 1px solid #edf2ef;
+            background: #fff;
+            color: #43574f;
+            font-size: 13px;
+            vertical-align: middle;
+        }
+
+        .tn-table tbody tr:last-child td {
+            border-bottom: 0;
+        }
+
+        .tn-table tbody tr {
+            transition: background .15s ease;
+        }
+
+            .tn-table tbody tr:hover td {
+                background: #f6fcf9;
+            }
+
+            .tn-table tbody tr.tn-row-selected td {
+                background: #f0fdfa;
+            }
+
+    .tn-row-number {
+        color: #95a49e !important;
+        font-size: 12px !important;
+    }
+
+    .tn-student-identity {
+        display: flex;
         align-items: center;
         gap: 10px;
-        background: #fafafa;
+        min-width: 175px;
     }
 
-    .send-btn {
-        min-width: 150px;
-        min-height: 44px;
-        border-radius: 8px;
+    .tn-student-avatar {
+        width: 36px;
+        height: 36px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex: 0 0 36px;
+        border-radius: 11px;
+        background: #e7f7f1;
+        color: #0f766e;
+        font-size: 13px;
+        font-weight: 700;
+        text-transform: uppercase;
+    }
+
+    .tn-student-name {
+        color: #263f37;
+        font-size: 13px;
+        font-weight: 700;
+        line-height: 1.45;
+        overflow-wrap: anywhere;
+    }
+
+    .tn-candidate-code {
+        margin-top: 3px;
+        color: #85958e;
+        font-size: 11px;
+    }
+
+    .tn-email {
+        min-width: 165px;
+        overflow-wrap: anywhere;
+        color: #60736b;
+    }
+
+    .tn-mobile {
+        white-space: nowrap;
+    }
+
+    .tn-branch-badge {
+        display: inline-block;
+        max-width: 180px;
+        padding: 5px 9px;
+        border: 1px solid #e0eee8;
+        border-radius: 7px;
+        background: #f5faf7;
+        color: #4e6b5e;
+        font-size: 11.5px;
         font-weight: 600;
+        overflow-wrap: anywhere;
     }
 
-    .filter-btn {
-        min-height: 44px;
-        border-radius: 8px;
+    .tn-year {
+        color: #435a50;
         font-weight: 600;
+        white-space: nowrap;
     }
 
-    /* =========================================================
-       RESPONSIVE
-    ========================================================= */
+    .tn-empty-cell {
+        padding: 48px 20px !important;
+        text-align: center;
+    }
 
-    @@media (max-width: 768px) {
+    .tn-empty-icon {
+        width: 56px;
+        height: 56px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 13px;
+        border: 1px solid #dcefe7;
+        border-radius: 17px;
+        background: #f0fdfa;
+        color: var(--tn-primary-dark);
+        font-size: 22px;
+    }
 
-        .form-section,
-        .student-section,
-        .preview-section {
-            padding: 18px;
+    .tn-empty-title {
+        margin-bottom: 6px;
+        color: #304a40;
+        font-size: 15px;
+        font-weight: 700;
+    }
+
+    .tn-empty-description {
+        color: #8a9a93;
+        font-size: 12.5px;
+        line-height: 1.6;
+    }
+
+    /* Notification preview */
+
+    .tn-preview {
+        overflow: hidden;
+        border: 1px solid #dfece6;
+        border-radius: 13px;
+        background: #fff;
+    }
+
+    .tn-preview-top {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 16px 18px;
+        border-bottom: 1px solid #e8f0ec;
+        background: linear-gradient(100deg, #f0fdfa, #fbfefd);
+    }
+
+    .tn-preview-icon {
+        width: 40px;
+        height: 40px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex: 0 0 40px;
+        border: 1px solid #d6eee5;
+        border-radius: 12px;
+        background: #fff;
+        color: var(--tn-primary-dark);
+        font-size: 17px;
+    }
+
+    .tn-preview-title {
+        margin: 0;
+        color: #24443a;
+        font-size: 15px;
+        font-weight: 700;
+    }
+
+    .tn-preview-subtitle {
+        margin: 4px 0 0;
+        color: #81938a;
+        font-size: 12px;
+    }
+
+    .tn-preview-body {
+        padding: 19px;
+    }
+
+    .tn-preview-message-title {
+        margin-bottom: 9px;
+        color: #263f36;
+        font-size: 15px;
+        font-weight: 700;
+        line-height: 1.5;
+        overflow-wrap: anywhere;
+    }
+
+    .tn-type-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 5px 9px;
+        border: 1px solid #cbece2;
+        border-radius: 20px;
+        background: #f0fdfa;
+        color: #0f766e;
+        font-size: 11px;
+        font-weight: 700;
+    }
+
+    .tn-preview-content {
+        margin-top: 15px;
+        padding: 17px;
+        min-height: 100px;
+        border: 1px solid #e5ede9;
+        border-radius: 10px;
+        background: #fff;
+        color: #465c52;
+        font-size: 13.5px;
+        line-height: 1.8;
+        overflow-wrap: anywhere;
+        white-space: normal;
+    }
+
+        .tn-preview-content img {
+            max-width: 100%;
+            height: auto;
         }
 
-        .notification-card-header {
-            padding: 18px;
+        .tn-preview-content table {
+            max-width: 100%;
         }
 
-        .notification-select-row {
-            flex-direction: column;
+    .tn-attachments {
+        margin-top: 17px;
+        padding-top: 15px;
+        border-top: 1px dashed #e0eae5;
+    }
+
+    .tn-attachments-title {
+        margin-bottom: 9px;
+        color: #4c6359;
+        font-size: 12px;
+        font-weight: 700;
+    }
+
+    .tn-attachment {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        max-width: 100%;
+        margin: 3px 5px 3px 0;
+        padding: 8px 11px;
+        border: 1px solid #e0ece6;
+        border-radius: 8px;
+        background: #f8fbf9;
+        color: #4e6a5d;
+        font-size: 12px;
+        overflow-wrap: anywhere;
+    }
+
+        .tn-attachment i {
+            color: var(--tn-primary-dark);
+        }
+
+    .tn-preview-empty {
+        display: flex;
+        align-items: flex-start;
+        gap: 12px;
+        padding: 16px;
+        border: 1px dashed #cfe5dc;
+        border-radius: 10px;
+        background: #f8fcfa;
+        color: #71877b;
+        font-size: 13px;
+        line-height: 1.65;
+    }
+
+        .tn-preview-empty i {
+            margin-top: 3px;
+            color: var(--tn-primary);
+            font-size: 17px;
+        }
+
+    /* Bottom action bar */
+
+    .tn-footer {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 16px;
+        padding: 18px 28px;
+        border-top: 1px solid var(--tn-border);
+        background: #fbfdfc;
+    }
+
+    .tn-footer-status {
+        display: flex;
+        align-items: center;
+        gap: 11px;
+        color: #71847a;
+        font-size: 12.5px;
+        line-height: 1.6;
+    }
+
+    .tn-footer-status-icon {
+        width: 38px;
+        height: 38px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex: 0 0 38px;
+        border: 1px solid #dcebe4;
+        border-radius: 11px;
+        background: #fff;
+        color: var(--tn-primary-dark);
+        font-size: 15px;
+    }
+
+    .tn-footer-status strong {
+        display: block;
+        margin-bottom: 1px;
+        color: #385449;
+        font-size: 13px;
+    }
+
+    .tn-send-btn {
+        min-width: 155px;
+        min-height: 45px;
+        padding: 10px 18px;
+        border: 1px solid var(--tn-primary);
+        border-radius: 10px;
+        background: var(--tn-primary);
+        color: #fff;
+        font-size: 13.5px;
+        font-weight: 700;
+        box-shadow: 0 4px 10px rgba(13,148,136,.16);
+        transition: .2s ease;
+    }
+
+        .tn-send-btn:hover:not(:disabled) {
+            transform: translateY(-1px);
+            background: var(--tn-primary-dark);
+            border-color: var(--tn-primary-dark);
+            box-shadow: 0 6px 14px rgba(13,148,136,.2);
+        }
+
+        .tn-send-btn:disabled {
+            cursor: not-allowed;
+            border-color: #d7e2dd;
+            background: #e9efec;
+            color: #93a29a;
+            box-shadow: none;
+        }
+
+    /* Modal */
+
+    .tn-modal .modal-content {
+        overflow: hidden;
+        border: 1px solid #deebe5;
+        border-radius: 17px;
+        box-shadow: 0 20px 70px rgba(13, 50, 43, .18);
+    }
+
+    .tn-modal .modal-header {
+        padding: 19px 21px;
+        border-bottom: 1px solid #e7efeb;
+        background: #f5fbf8;
+    }
+
+    .tn-modal .modal-title {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        color: #23463a;
+        font-size: 17px;
+        font-weight: 700;
+    }
+
+    .tn-modal-icon {
+        width: 36px;
+        height: 36px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 11px;
+        background: #dff7ed;
+        color: #0f766e;
+    }
+
+    .tn-modal .modal-body {
+        padding: 23px 22px;
+        color: #61746a;
+        font-size: 13.5px;
+        line-height: 1.7;
+    }
+
+    .tn-modal-count {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin-top: 17px;
+        padding: 13px;
+        border: 1px solid #d6eee4;
+        border-radius: 11px;
+        background: #f0fdfa;
+    }
+
+    .tn-modal-count-icon {
+        width: 40px;
+        height: 40px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex: 0 0 40px;
+        border-radius: 11px;
+        background: #fff;
+        color: #0f766e;
+        font-size: 17px;
+    }
+
+    .tn-modal-count strong {
+        display: block;
+        color: #0f766e;
+        font-size: 19px;
+        line-height: 1.3;
+    }
+
+    .tn-modal-count span {
+        color: #6c8579;
+        font-size: 12px;
+    }
+
+    .tn-modal .modal-footer {
+        padding: 15px 21px;
+        border-top: 1px solid #e8efeb;
+        background: #fbfdfc;
+    }
+
+    /* Responsive */
+
+    @@media (max-width: 991.98px) {
+        .tn-page {
+            padding-top: 15px;
+        }
+
+        .tn-hero {
+            padding: 22px;
+        }
+
+        .tn-section {
+            padding: 22px;
+        }
+
+        .tn-footer {
+            padding: 17px 22px;
+        }
+    }
+
+    @@media (max-width: 767.98px) {
+        .tn-page {
+            padding: 12px 0 25px;
+        }
+
+            .tn-page .tn-card {
+                border-radius: 14px;
+            }
+
+        .tn-hero {
+            align-items: flex-start;
+            padding: 20px 17px;
+        }
+
+        .tn-hero-content {
+            align-items: flex-start;
+            gap: 12px;
+        }
+
+        .tn-hero-icon {
+            width: 45px;
+            height: 45px;
+            flex-basis: 45px;
+            border-radius: 12px;
+            font-size: 19px;
+        }
+
+        .tn-hero h2 {
+            font-size: 20px;
+        }
+
+        .tn-hero p {
+            font-size: 12.5px;
+        }
+
+        .tn-header-tag {
+            display: none;
+        }
+
+        .tn-section {
+            padding: 19px 16px;
+        }
+
+        .tn-section-heading {
+            margin-bottom: 17px;
+        }
+
+            .tn-section-heading h3 {
+                font-size: 16px;
+            }
+
+        .tn-notification-row {
             align-items: stretch;
         }
 
-        .create-new-btn {
-            width: 100%;
+        .tn-create-btn {
+            padding: 9px 11px;
         }
 
-        .action-section {
-            padding: 18px;
+        .tn-college-box {
+            padding: 15px;
+        }
+
+        .tn-college-divider {
+            display: none;
+        }
+
+        .tn-college-item {
+            margin-bottom: 13px;
+        }
+
+            .tn-college-item:last-child {
+                margin-bottom: 0;
+            }
+
+        .tn-student-toolbar {
+            align-items: flex-start;
             flex-direction: column;
         }
 
-        .send-btn,
-        .filter-btn {
+        .tn-count-group {
+            width: 100%;
+        }
+
+        .tn-selection-hint {
+            width: 100%;
+        }
+
+        .tn-preview-body {
+            padding: 14px;
+        }
+
+        .tn-preview-content {
+            padding: 13px;
+        }
+
+        .tn-footer {
+            align-items: stretch;
+            flex-direction: column;
+            padding: 17px 16px;
+        }
+
+        .tn-send-btn {
             width: 100%;
         }
     }
 
+    @@media (max-width: 480px) {
+        .tn-hero {
+            padding: 18px 14px;
+        }
+
+            .tn-hero h2 {
+                font-size: 18px;
+            }
+
+            .tn-hero p {
+                font-size: 12px;
+            }
+
+        .tn-section {
+            padding: 17px 13px;
+        }
+
+        .tn-section-heading {
+            gap: 10px;
+        }
+
+        .tn-step-icon {
+            width: 35px;
+            height: 35px;
+            flex-basis: 35px;
+            border-radius: 10px;
+        }
+
+        .tn-notification-row {
+            flex-direction: column;
+        }
+
+        .tn-create-btn {
+            width: 100%;
+        }
+
+        .tn-page .tn-filter-button,
+        .tn-page .tn-reset-button {
+            width: 100%;
+            margin: 0 !important;
+        }
+
+        .tn-filter-actions {
+            display: flex;
+            flex-direction: column;
+            gap: 9px;
+        }
+
+        .tn-count-chip {
+            padding: 7px 9px;
+            font-size: 11.5px;
+        }
+
+        .tn-selection-bar {
+            align-items: flex-start;
+            flex-direction: column;
+        }
+
+        .tn-preview-top {
+            padding: 13px;
+        }
+
+        .tn-preview-title {
+            font-size: 14px;
+        }
+
+        .tn-modal .modal-dialog {
+            margin: 12px;
+        }
+
+        .tn-modal .modal-footer {
+            gap: 8px;
+        }
+
+            .tn-modal .modal-footer .btn {
+                flex: 1;
+            }
+    }
+
+    @@media (prefers-reduced-motion: reduce) {
+        .tn-page *,
+        .tn-page *::before,
+        .tn-page *::after {
+            transition: none !important;
+            animation: none !important;
+            scroll-behavior: auto !important;
+        }
+    }
 </style>
 
+<div class="container-fluid tn-page">
 
-<div class="container-fluid send-notification-wrapper">
-
-    <div class="notification-card">
+    <div class="tn-card">
 
         @Html.AntiForgeryToken()
 
-        <!-- =====================================================
-             HEADER
-        ====================================================== -->
+        <!-- PAGE HEADER -->
+        <header class="tn-hero">
+            <div class="tn-hero-content">
+                <div class="tn-hero-icon">
+                    <i class="fas fa-paper-plane" aria-hidden="true"></i>
+                </div>
 
-        <div class="notification-card-header">
+                <div>
+                    <h2>Send Notification</h2>
+                    <p>Reach your trainees with important updates, announcements and opportunities.</p>
+                </div>
+            </div>
 
-            <h4>
-                <i class="fas fa-paper-plane me-2"></i>
-                Send Notification
-            </h4>
+            <div class="tn-header-tag">
+                <span class="tn-status-dot"></span>
+                TPO Communication
+            </div>
+        </header>
 
-            <p>
-                Select a notification and choose the students who
-                should receive it.
-            </p>
+        <!-- NOTIFICATION AND FILTERS -->
+        <section class="tn-section">
 
-        </div>
-
-
-        <!-- =====================================================
-             FORM SECTION
-        ====================================================== -->
-
-        <div class="form-section">
+            <div class="tn-section-heading">
+                <div class="tn-heading-left">
+                    <div class="tn-step-icon">
+                        <i class="fas fa-sliders-h" aria-hidden="true"></i>
+                    </div>
+                    <div>
+                        <h3>Notification & Recipients</h3>
+                        <p>Choose a notification and filter the students who should receive it.</p>
+                    </div>
+                </div>
+            </div>
 
             <form method="get"
                   asp-controller="TPO"
-                  asp-action="SendNotification">
-
-                <!-- =================================================
-                     NOTIFICATION
-                ================================================== -->
+                  asp-action="SendNotification"
+                  id="studentFilterForm">
 
                 <div class="mb-4">
-
-                    <label class="form-label-custom">
-                        Select Notification
-                        <span class="text-danger">*</span>
+                    <label for="notificationId" class="tn-label">
+                        Select Notification <span class="tn-required">*</span>
                     </label>
 
-                    <div class="notification-select-row">
-
-                        <div class="notification-select-wrapper">
-
+                    <div class="tn-notification-row">
+                        <div class="tn-notification-field">
                             <select name="notificationId"
                                     id="notificationId"
-                                    class="form-select">
-
-                                <option value="">
-                                    -- Select Notification --
-                                </option>
+                                    class="form-select"
+                                    required>
+                                <option value="">-- Select a notification --</option>
 
                                 @foreach (var notification in notifications)
                                 {
-                                    bool isSelected =
-                                        Model.NotificationID ==
-                                        notification.NotificationID;
-
                                     <option value="@notification.NotificationID"
-                                            selected="@isSelected">
-
+                                            selected="@(Model != null && Model.NotificationID == notification.NotificationID)">
                                         @notification.Title
-
                                         @if (!string.IsNullOrWhiteSpace(notification.Type))
                                         {
                                             @: (@notification.Type)
                                         }
-
                                     </option>
                                 }
-
                             </select>
-
                         </div>
 
                         <a asp-controller="TPO"
                            asp-action="CreateNotification"
-                           class="btn btn-outline-primary create-new-btn">
-
-                            <i class="fas fa-plus me-1"></i>
+                           class="tn-create-btn">
+                            <i class="fas fa-plus" aria-hidden="true"></i>
                             Create New
-
                         </a>
-
                     </div>
 
+                    <div class="form-text mt-2" style="color:#87978f;font-size:12px;">
+                        <i class="fas fa-info-circle me-1"></i>
+                        Select an existing notification or create a new one.
+                    </div>
                 </div>
 
+                <!-- COLLEGE INFORMATION -->
+                <div class="tn-college-box">
+                    <div class="tn-college-heading">
+                        <i class="fas fa-university" aria-hidden="true"></i>
+                        Institution Information
+                    </div>
 
-                <!-- =================================================
-                     COLLEGE INFORMATION
-                ================================================== -->
-
-                <div class="college-info-box">
-
-                    <div class="row">
-
-                        <div class="col-md-6 mb-2 mb-md-0">
-
-                            <div class="college-info-label">
-                                College
-                            </div>
-
-                            <div class="college-info-value">
-                                @ViewBag.CollegeName
-                            </div>
-
-                        </div>
-
+                    <div class="row align-items-center">
                         <div class="col-md-6">
-
-                            <div class="college-info-label">
-                                College Code
+                            <div class="tn-college-item">
+                                <div class="tn-college-icon">
+                                    <i class="fas fa-building" aria-hidden="true"></i>
+                                </div>
+                                <div class="flex-grow-1 min-w-0">
+                                    <div class="tn-college-label">College Name</div>
+                                    <div class="tn-college-value">
+                                        @(string.IsNullOrWhiteSpace(ViewBag.CollegeName?.ToString())
+                                            ? "Not available"
+                                            : ViewBag.CollegeName)
+                                    </div>
+                                </div>
                             </div>
-
-                            <div class="college-info-value">
-                                @ViewBag.CollegeCode
-                            </div>
-
                         </div>
 
-                    </div>
+                        <div class="col-md-1 d-none d-md-block">
+                            <div class="tn-college-divider"></div>
+                        </div>
 
+                        <div class="col-md-5">
+                            <div class="tn-college-item">
+                                <div class="tn-college-icon">
+                                    <i class="fas fa-id-card" aria-hidden="true"></i>
+                                </div>
+                                <div class="flex-grow-1 min-w-0">
+                                    <div class="tn-college-label">College Code</div>
+                                    <div class="tn-college-value">
+                                        @(string.IsNullOrWhiteSpace(ViewBag.CollegeCode?.ToString())
+                                            ? "Not available"
+                                            : ViewBag.CollegeCode)
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
 
-
-                <!-- =================================================
-                     FILTERS
-                ================================================== -->
-
-                <div class="row g-3">
-
-                    <!-- Department -->
-
-                    <div class="col-lg-4 col-md-6">
-
-                        <label class="form-label-custom">
-                            Department
-                        </label>
-
-                        <select id="departmentId"
-                                name="departmentId"
-                                class="form-select">
-
-                            <option value="">
-                                All Departments
-                            </option>
-
-                            @foreach (var department in departments)
-                            {
-                                <option value="@department.nID"
-                                        selected="@(selectedDepartment == department.nID)">
-
-                                    @department.sDepartment
-
-                                </option>
-                            }
-
-                        </select>
-
+                <!-- STUDENT FILTERS -->
+                <div class="mt-4">
+                    <div class="tn-label mb-3">
+                        <i class="fas fa-filter me-1" style="color:#0d9488;"></i>
+                        Filter Students
                     </div>
 
+                    <div class="row g-3">
+                        <div class="col-lg-4 col-md-6">
+                            <label for="departmentId" class="tn-label">Department</label>
+                            <select id="departmentId"
+                                    name="departmentId"
+                                    class="form-select">
+                                <option value="">All Departments</option>
 
-                    <!-- Branch -->
+                                @foreach (var department in departments)
+                                {
+                                    <option value="@department.nID"
+                                            selected="@(selectedDepartment == department.nID)">
+                                        @department.sDepartment
+                                    </option>
+                                }
+                            </select>
+                        </div>
 
-                    <div class="col-lg-4 col-md-6">
+                        <div class="col-lg-4 col-md-6">
+                            <label for="branchId" class="tn-label">Branch</label>
+                            <select id="branchId"
+                                    name="branchId"
+                                    class="form-select">
+                                <option value="">All Branches</option>
 
-                        <label class="form-label-custom">
-                            Branch
-                        </label>
+                                @foreach (var branch in branches)
+                                {
+                                    <option value="@branch.nID"
+                                            selected="@(selectedBranch == branch.nID)">
+                                        @branch.sBranch
+                                    </option>
+                                }
+                            </select>
+                        </div>
 
-                        <select id="branchId"
-                                name="branchId"
-                                class="form-select">
-
-                            <option value="">
-                                All Branches
-                            </option>
-
-                            @foreach (var branch in branches)
-                            {
-                                <option value="@branch.nID"
-                                        selected="@(selectedBranch == branch.nID)">
-
-                                    @branch.sBranch
-
-                                </option>
-                            }
-
-                        </select>
-
+                        <div class="col-lg-4 col-md-12">
+                            <label for="searchText" class="tn-label">Search Students</label>
+                            <input type="text"
+                                   name="searchText"
+                                   id="searchText"
+                                   class="form-control"
+                                   value="@searchText"
+                                   placeholder="Name, email, mobile or DOB" />
+                        </div>
                     </div>
 
-
-                    <!-- Search -->
-
-                    <div class="col-lg-4 col-md-12">
-
-                        <label class="form-label-custom">
+                    <div class="tn-filter-actions d-flex flex-wrap gap-2 mt-3">
+                        <button type="submit"
+                                class="tn-btn-primary tn-filter-button">
+                            <i class="fas fa-search" aria-hidden="true"></i>
                             Search Students
-                        </label>
+                        </button>
 
-                        <input type="text"
-                               name="searchText"
-                               id="searchText"
-                               class="form-control"
-                               value="@searchText"
-                               placeholder="Name / Email / Mobile / DOB" />
-
+                        <a asp-controller="TPO"
+                           asp-action="SendNotification"
+                           class="tn-btn-secondary tn-reset-button">
+                            <i class="fas fa-undo" aria-hidden="true"></i>
+                            Reset Filters
+                        </a>
                     </div>
-
                 </div>
-
-
-                <!-- =================================================
-                     FILTER BUTTON
-                ================================================== -->
-
-                <div class="mt-3">
-
-                    <button type="submit"
-                            class="btn btn-primary filter-btn">
-
-                        <i class="fas fa-search me-1"></i>
-                        Search Students
-
-                    </button>
-
-                    <a asp-controller="TPO"
-                       asp-action="SendNotification"
-                       class="btn btn-outline-secondary filter-btn ms-1">
-
-                        <i class="fas fa-sync-alt me-1"></i>
-                        Reset
-
-                    </a>
-
-                </div>
-
             </form>
+        </section>
 
-        </div>
+        <!-- STUDENT LIST -->
+        <section class="tn-section tn-student-section">
 
+            <div class="tn-student-toolbar">
+                <div class="tn-section-heading mb-0">
+                    <div class="tn-heading-left">
+                        <div class="tn-step-icon">
+                            <i class="fas fa-users" aria-hidden="true"></i>
+                        </div>
+                        <div>
+                            <h3>Select Students</h3>
+                            <p>Choose the trainees who should receive this notification.</p>
+                        </div>
+                    </div>
+                </div>
 
-        <!-- =====================================================
-             STUDENTS
-        ====================================================== -->
-
-        <div class="student-section">
-
-            <div class="student-section-header">
-
-                <div>
-
-                    <h5 class="student-section-title">
-                        Select Students
-                    </h5>
-
-                    <div class="text-muted small mt-1">
-                        Only students belonging to your college
-                        are displayed.
+                <div class="tn-count-group">
+                    <div class="tn-count-chip">
+                        <i class="fas fa-user-graduate" aria-hidden="true"></i>
+                        Total <strong id="totalStudentCount">@traineeCount</strong>
                     </div>
 
+                    <div class="tn-count-chip tn-selected-chip">
+                        <i class="fas fa-check-circle" aria-hidden="true"></i>
+                        Selected <strong id="selectedStudentCount">0</strong>
+                    </div>
                 </div>
-
-                <div class="student-count">
-
-                    Total Students:
-                    <span id="totalStudentCount">
-                        @traineeCount
-                    </span>
-
-                    &nbsp; | &nbsp;
-
-                    Selected:
-                    <span id="selectedStudentCount">
-                        0
-                    </span>
-
-                </div>
-
             </div>
 
-
-            <!-- =================================================
-                 SELECT ALL
-            ================================================== -->
-
-            <div class="mb-3">
-
-                <div class="form-check">
-
+            <div class="tn-selection-bar">
+                <label class="tn-select-all" for="selectAllStudents">
                     <input type="checkbox"
                            class="form-check-input"
                            id="selectAllStudents" />
+                    <span>Select all students on this page</span>
+                </label>
 
-                    <label class="form-check-label fw-semibold"
-                           for="selectAllStudents">
-
-                        Select All Students
-
-                    </label>
-
-                </div>
-
+            
             </div>
 
+            <div class="tn-table-shell">
+                <div class="tn-table-scroll">
+                    <table class="table tn-table">
+                        <thead>
+                            <tr>
+                                <th style="width:48px;">#</th>
+                                <th style="width:45px;">
+                                    <i class="fas fa-check" aria-label="Select"></i>
+                                </th>
+                                <th>Student</th>
+                                <th>Email</th>
+                                <th>Mobile</th>
+                                <th>Branch</th>
+                                <th>Current Year</th>
+                                <th>Passout Year</th>
+                            </tr>
+                        </thead>
 
-            <!-- =================================================
-                 STUDENT TABLE
-            ================================================== -->
+                        <tbody>
+                            @if (Model?.Students != null && Model.Students.Count > 0)
+                            {
+                                int rowNumber = 1;
 
-            <div class="student-table-wrapper">
+                                foreach (var student in Model.Students)
+                                {
+                                    var displayName =
+                                    $"{student.PrefixName} {student.FullName}".Trim();
 
-                <table class="table student-table">
+                                    var avatarText = !string.IsNullOrWhiteSpace(student.FullName)
+                                    ? student.FullName.Trim().Substring(0, 1)
+                                    : "T";
 
-                    <thead>
+                                    <tr>
+                                        <td class="tn-row-number">@rowNumber</td>
 
-                        <tr>
+                                        <td>
+                                            <input type="checkbox"
+                                                   class="form-check-input student-checkbox"
+                                                   name="selectedCandidateIds"
+                                                   value="@student.nID"
+                                                   aria-label="Select @displayName" />
+                                        </td>
 
-                            <th style="width:50px;">
-                                #
-                            </th>
+                                        <td>
+                                            <div class="tn-student-identity">
+                                                <div class="tn-student-avatar">
+                                                    @avatarText
+                                                </div>
+                                                <div>
+                                                    <div class="tn-student-name">
+                                                        @(string.IsNullOrWhiteSpace(displayName)
+                                                            ? "Unnamed Student"
+                                                            : displayName)
+                                                    </div>
 
-                            <th style="width:50px;">
-                                <i class="fas fa-check"></i>
-                            </th>
+                                                    @if (!string.IsNullOrWhiteSpace(student.CandidateCode))
+                                                    {
+                                                        <div class="tn-candidate-code">
+                                                            ID: @student.CandidateCode
+                                                        </div>
+                                                    }
+                                                </div>
+                                            </div>
+                                        </td>
 
-                            <th>
-                                Student
-                            </th>
+                                        <td>
+                                            <div class="tn-email">
+                                                @(string.IsNullOrWhiteSpace(student.sEmail)
+                                                    ? "—"
+                                                    : student.sEmail)
+                                            </div>
+                                        </td>
 
-                            <th>
-                                Email
-                            </th>
+                                        <td>
+                                            <div class="tn-mobile">
+                                                @(string.IsNullOrWhiteSpace(student.sMobile)
+                                                    ? "—"
+                                                    : student.sMobile)
+                                            </div>
+                                        </td>
 
-                            <th>
-                                Mobile
-                            </th>
+                                        <td>
+                                            @if (!string.IsNullOrWhiteSpace(student.BranchName))
+                                            {
+                                                <span class="tn-branch-badge">
+                                                    @student.BranchName
+                                                </span>
+                                            }
+                                            else
+                                            {
+                                                <span class="text-muted">—</span>
+                                            }
+                                        </td>
 
-                            <th>
-                                Branch
-                            </th>
+                                        <td>
+                                            <span class="tn-year">
+                                                @(student.nCurrentYear?.ToString() ?? "—")
+                                            </span>
+                                        </td>
 
-                            <th>
-                                Current Year
-                            </th>
+                                        <td>
+                                            <span class="tn-year">
+                                                @(student.nPassoutYear?.ToString() ?? "—")
+                                            </span>
+                                        </td>
+                                    </tr>
 
-                            <th>
-                                Passout Year
-                            </th>
-
-                        </tr>
-
-                    </thead>
-
-                    <tbody>
-
-                        @if (Model.Students != null &&
-                             Model.Students.Count > 0)
-                        {
-                            int rowNumber = 1;
-
-                            foreach (var student in Model.Students)
+                                    rowNumber++;
+                                }
+                            }
+                            else
                             {
                                 <tr>
-
-                                    <td>
-                                        @rowNumber
-                                    </td>
-
-                                    <td>
-
-                                        <input type="checkbox"
-                                               class="form-check-input student-checkbox"
-                                               name="selectedCandidateIds"
-                                               value="@student.nID" />
-
-                                    </td>
-
-                                    <td>
-
-                                        <div class="student-name">
-
-                                            @student.PrefixName
-                                            @student.FullName
-
+                                    <td colspan="8" class="tn-empty-cell">
+                                        <div class="tn-empty-icon">
+                                            <i class="fas fa-user-friends" aria-hidden="true"></i>
                                         </div>
 
-                                        @if (!string.IsNullOrWhiteSpace(student.CandidateCode))
-                                        {
-                                            <div class="text-muted small">
-                                                @student.CandidateCode
-                                            </div>
-                                        }
+                                        <div class="tn-empty-title">No students found</div>
 
-                                    </td>
-
-                                    <td>
-
-                                        <div class="student-email">
-
-                                            @(string.IsNullOrWhiteSpace(student.sEmail)
-                                                ? "-"
-                                                : student.sEmail)
-
+                                        <div class="tn-empty-description">
+                                            No trainees match your current filters.<br />
+                                            Try selecting another department or branch, or clear your search.
                                         </div>
-
                                     </td>
-
-                                    <td>
-
-                                        <div class="student-mobile">
-
-                                            @(string.IsNullOrWhiteSpace(student.sMobile)
-                                                ? "-"
-                                                : student.sMobile)
-
-                                        </div>
-
-                                    </td>
-
-                                    <td>
-
-                                        @if (!string.IsNullOrWhiteSpace(student.BranchName))
-                                        {
-                                            @student.BranchName
-                                        }
-                                        else
-                                        {
-                                            @:-
-                                        }
-
-                                    </td>
-
-                                    <td>
-
-                                        @(student.nCurrentYear?.ToString() ?? "-")
-
-                                    </td>
-
-                                    <td>
-
-                                        @(student.nPassoutYear?.ToString() ?? "-")
-
-                                    </td>
-
                                 </tr>
-
-                                rowNumber++;
                             }
-                        }
-                        else
-                        {
-                            <tr>
-
-                                <td colspan="8"
-                                    class="empty-student">
-
-                                    <i class="fas fa-users fa-2x mb-3"></i>
-
-                                    <div class="fw-semibold">
-                                        No students found
-                                    </div>
-
-                                    <div class="small mt-1">
-                                        Try changing the department,
-                                        branch or search criteria.
-                                    </div>
-
-                                </td>
-
-                            </tr>
-                        }
-
-                    </tbody>
-
-                </table>
-
+                        </tbody>
+                    </table>
+                </div>
             </div>
 
-        </div>
+            <div class="mt-3" style="color:#85958d;font-size:12px;">
+                <i class="fas fa-shield-alt me-1" style="color:#0d9488;" aria-hidden="true"></i>
+                Only students listed above can be selected for this notification.
+            </div>
+        </section>
 
+        <!-- NOTIFICATION PREVIEW -->
+        <section class="tn-section">
 
-        <!-- =====================================================
-             PREVIEW
-        ====================================================== -->
+            <div class="tn-section-heading">
+                <div class="tn-heading-left">
+                    <div class="tn-step-icon">
+                        <i class="fas fa-eye" aria-hidden="true"></i>
+                    </div>
+                    <div>
+                        <h3>Notification Preview</h3>
+                        <p>Review the notification content before sending it to your trainees.</p>
+                    </div>
+                </div>
+            </div>
 
-        <div class="preview-section">
-
-            <div class="preview-box">
-
-                <div class="preview-title">
-
-                    <i class="fas fa-eye me-2"></i>
-                    Notification Preview
-
+            <div class="tn-preview">
+                <div class="tn-preview-top">
+                    <div class="tn-preview-icon">
+                        <i class="fas fa-bell" aria-hidden="true"></i>
+                    </div>
+                    <div>
+                        <div class="tn-preview-title">Message Preview</div>
+                        <div class="tn-preview-subtitle">
+                            This is the notification currently selected for delivery.
+                        </div>
+                    </div>
                 </div>
 
-
-                @if (Model.NotificationID > 0)
-                {
-                    <div class="mb-3">
-
-                        <div class="fw-semibold text-dark">
+                <div class="tn-preview-body">
+                    @if (Model != null && Model.NotificationID > 0)
+                    {
+                        <div class="tn-preview-message-title">
                             @Model.Title
                         </div>
 
                         @if (!string.IsNullOrWhiteSpace(Model.Type))
                         {
-                            <span class="badge bg-primary mt-2">
-                                @Model.Type
-                            </span>
+                            <div class="mb-2">
+                                <span class="tn-type-badge">
+                                    <i class="fas fa-tag" aria-hidden="true"></i>
+                                    @Model.Type
+                                </span>
+                            </div>
                         }
 
-                    </div>
+                        <div class="tn-preview-content">
+                            @Html.Raw(Model.Content)
+                        </div>
 
+                        @if (!string.IsNullOrWhiteSpace(Model.Attachment1OriginalName)
+                       || !string.IsNullOrWhiteSpace(Model.Attachment2OriginalName))
+                        {
+                            <div class="tn-attachments">
+                                <div class="tn-attachments-title">
+                                    <i class="fas fa-paperclip me-1" aria-hidden="true"></i>
+                                    Attached Files
+                                </div>
 
-                    <div class="preview-content">
+                                @if (!string.IsNullOrWhiteSpace(Model.Attachment1OriginalName))
+                                {
+                                    <span class="tn-attachment">
+                                        <i class="fas fa-file-alt" aria-hidden="true"></i>
+                                        @Model.Attachment1OriginalName
+                                    </span>
+                                }
 
-                        @Html.Raw(Model.Content)
-
-                    </div>
-
-
-                    <!-- ATTACHMENTS -->
-
-                    @if (!string.IsNullOrWhiteSpace(Model.Attachment1OriginalName)
-                        ||
-                        !string.IsNullOrWhiteSpace(Model.Attachment2OriginalName))
-                    {
-                        <div class="mt-3">
-
-                            <div class="fw-semibold mb-2">
-                                Attachments
+                                @if (!string.IsNullOrWhiteSpace(Model.Attachment2OriginalName))
+                                {
+                                    <span class="tn-attachment">
+                                        <i class="fas fa-file-alt" aria-hidden="true"></i>
+                                        @Model.Attachment2OriginalName
+                                    </span>
+                                }
                             </div>
-
-                            @if (!string.IsNullOrWhiteSpace(Model.Attachment1OriginalName))
-                            {
-                                <span class="attachment-item">
-
-                                    <i class="fas fa-paperclip"></i>
-
-                                    @Model.Attachment1OriginalName
-
-                                </span>
-                            }
-
-                            @if (!string.IsNullOrWhiteSpace(Model.Attachment2OriginalName))
-                            {
-                                <span class="attachment-item">
-
-                                    <i class="fas fa-paperclip"></i>
-
-                                    @Model.Attachment2OriginalName
-
-                                </span>
-                            }
-
+                        }
+                    }
+                    else
+                    {
+                        <div class="tn-preview-empty">
+                            <i class="fas fa-info-circle" aria-hidden="true"></i>
+                            <div>
+                                <strong style="display:block;color:#456459;margin-bottom:3px;">
+                                    No notification selected
+                                </strong>
+                                Choose a notification from the dropdown above. If you change the
+                                selection, click <strong>Search Students</strong> to reload this
+                                page with the selected notification preview.
+                            </div>
                         </div>
                     }
-                }
-                else
-                {
-                    <div class="text-muted">
-
-                        <i class="fas fa-info-circle me-2"></i>
-
-                        Select a notification above to preview
-                        its content.
-
-                    </div>
-                }
-
+                </div>
             </div>
+        </section>
 
-        </div>
-
-
-        <!-- =====================================================
-             SEND ACTION
-        ====================================================== -->
-
-        <div class="action-section">
-
-            <div class="me-auto text-muted small"
-                 id="sendMessage">
-
-                Select students to enable Send Now.
-
+        <!-- SEND ACTION -->
+        <footer class="tn-footer">
+            <div class="tn-footer-status">
+                <div class="tn-footer-status-icon">
+                    <i class="fas fa-paper-plane" aria-hidden="true"></i>
+                </div>
+                <div>
+                    <strong id="sendMessage">Ready to notify your trainees?</strong>
+                    <span id="sendSubMessage">Select students to enable sending.</span>
+                </div>
             </div>
 
             <button type="button"
                     id="sendNowButton"
-                    class="btn btn-primary send-btn"
+                    class="tn-send-btn"
                     disabled>
-
-                <i class="fas fa-paper-plane me-2"></i>
-                Send Now
-
+                <i class="fas fa-paper-plane me-2" aria-hidden="true"></i>
+                Send Notification
             </button>
-
-        </div>
-
+        </footer>
     </div>
-
 </div>
 
-
-
-
-
-<!-- =========================================================
-     SEND CONFIRMATION MODAL
-========================================================== -->
-
-<div class="modal fade"
+<!-- SEND CONFIRMATION MODAL -->
+<div class="modal fade tn-modal"
      id="sendNotificationModal"
      tabindex="-1"
      aria-labelledby="sendNotificationModalLabel"
@@ -981,886 +1677,312 @@
 
             <div class="modal-header">
                 <h5 class="modal-title" id="sendNotificationModalLabel">
-                    <i class="fas fa-paper-plane me-2"></i>
-                    Confirm Send
+                    <span class="tn-modal-icon">
+                        <i class="fas fa-paper-plane" aria-hidden="true"></i>
+                    </span>
+                    Confirm Notification
                 </h5>
 
                 <button type="button"
                         class="btn-close"
                         data-bs-dismiss="modal"
-                        aria-label="Close">
-                </button>
+                        aria-label="Close"></button>
             </div>
 
             <div class="modal-body">
-                <p class="mb-2">
-                    Are you sure you want to send this notification
-                    to the selected students?
-                </p>
+                <div>
+                    You are about to send the selected notification to the trainees below.
+                    Please confirm the recipients before proceeding.
+                </div>
 
-                <div class="alert alert-info mb-0">
-                    <strong id="modalSelectedCount">0</strong>
-                    student(s) selected.
+                <div class="tn-modal-count">
+                    <div class="tn-modal-count-icon">
+                        <i class="fas fa-users" aria-hidden="true"></i>
+                    </div>
+                    <div>
+                        <strong id="modalSelectedCount">0</strong>
+                        <span>students will receive this notification</span>
+                    </div>
+                </div>
+
+                <div class="mt-3" style="font-size:12px;color:#8a9991;">
+                    <i class="fas fa-info-circle me-1"></i>
+                    This action will submit the notification to the server.
                 </div>
             </div>
 
             <div class="modal-footer">
                 <button type="button"
-                        class="btn btn-outline-secondary"
-                        data-bs-dismiss="modal">
+                        class="tn-btn-secondary"
+                        data-bs-dismiss="modal"
+                        id="cancelSendButton">
                     Cancel
                 </button>
 
                 <button type="button"
                         id="confirmSendButton"
-                        class="btn btn-primary">
-                    <i class="fas fa-paper-plane me-1"></i>
-                    Confirm Send
+                        class="tn-btn-primary">
+                    <i class="fas fa-check me-1" aria-hidden="true"></i>
+                    Confirm & Send
                 </button>
             </div>
-
         </div>
     </div>
 </div>
 
-<!-- Schedule popup -->
-
-
 <script>
-
-    // =========================================================
-    // SEND NOTIFICATION PAGE
-    // =========================================================
-
     document.addEventListener("DOMContentLoaded", function () {
+        "use strict";
 
-        // =====================================================
-        // ELEMENTS
-        // =====================================================
+        const selectAllCheckbox = document.getElementById("selectAllStudents");
+        const sendNowButton = document.getElementById("sendNowButton");
+        const confirmSendButton = document.getElementById("confirmSendButton");
+        const notificationDropdown = document.getElementById("notificationId");
+        const departmentDropdown = document.getElementById("departmentId");
+        const branchDropdown = document.getElementById("branchId");
+        const modalElement = document.getElementById("sendNotificationModal");
 
-        const selectAllCheckbox =
-            document.getElementById("selectAllStudents");
+        const selectedCountElement = document.getElementById("selectedStudentCount");
+        const totalCountElement = document.getElementById("totalStudentCount");
+        const modalSelectedCount = document.getElementById("modalSelectedCount");
+        const sendMessage = document.getElementById("sendMessage");
+        const sendSubMessage = document.getElementById("sendSubMessage");
 
-        const sendNowButton =
-            document.getElementById("sendNowButton");
-
-        const confirmSendButton =
-            document.getElementById("confirmSendButton");
-
-        const departmentDropdown =
-            document.getElementById("departmentId");
-
-        const branchDropdown =
-            document.getElementById("branchId");
-
-        // IMPORTANT:
-        // Always get notification from the actual dropdown.
-        // Do NOT use @Model.NotificationID for client-side
-        // validation because the page is not submitted yet.
-
-        const notificationDropdown =
-            document.getElementById("notificationId");
-
-
-        // =====================================================
-        // GET SELECTED STUDENTS
-        // =====================================================
-
-        function getSelectedStudents() {
-
-            return Array.from(
-                document.querySelectorAll(
-                    ".student-checkbox:checked"
-                )
-            );
-
+        if (!selectAllCheckbox || !sendNowButton || !notificationDropdown) {
+            return;
         }
 
+        const getCheckboxes = function () {
+            return Array.from(document.querySelectorAll(".student-checkbox"));
+        };
 
-        // =====================================================
-        // UPDATE SELECTED COUNT
-        // =====================================================
+        const getSelectedStudents = function () {
+            return getCheckboxes().filter(function (checkbox) {
+                return checkbox.checked;
+            });
+        };
 
         function updateSelectedCount() {
-
-            const selected =
-                getSelectedStudents();
-
-            const count =
-                selected.length;
-
-
-            // Selected count
-
-            const selectedCountElement =
-                document.getElementById(
-                    "selectedStudentCount"
-                );
+            const checkboxes = getCheckboxes();
+            const selected = getSelectedStudents();
+            const selectedCount = selected.length;
+            const total = checkboxes.length;
 
             if (selectedCountElement) {
-
-                selectedCountElement.innerText =
-                    count;
-
+                selectedCountElement.textContent = selectedCount;
             }
 
-
-            // Send button
-
-            if (sendNowButton) {
-
-                sendNowButton.disabled =
-                    count === 0;
-
+            if (totalCountElement) {
+                totalCountElement.textContent = total;
             }
 
+            sendNowButton.disabled = selectedCount === 0;
 
-            // Message
+            if (sendMessage) {
+                sendMessage.textContent = selectedCount > 0
+                    ? selectedCount + (selectedCount === 1
+                        ? " student selected"
+                        : " students selected")
+                    : "Ready to notify your trainees?";
+            }
 
-            const message =
-                document.getElementById(
-                    "sendMessage"
-                );
+            if (sendSubMessage) {
+                sendSubMessage.textContent = selectedCount > 0
+                    ? "Review your selection and click Send Notification."
+                    : "Select students to enable sending.";
+            }
 
-            if (message) {
+            if (selectedCount > 0) {
+                sendNowButton.innerHTML =
+                    '<i class="fas fa-paper-plane me-2" aria-hidden="true"></i>Send to ' +
+                    selectedCount + (selectedCount === 1 ? " Student" : " Students");
+            } else {
+                sendNowButton.innerHTML =
+                    '<i class="fas fa-paper-plane me-2" aria-hidden="true"></i>Send Notification';
+            }
 
-                if (count === 0) {
+            selectAllCheckbox.checked = total > 0 && selectedCount === total;
+            selectAllCheckbox.indeterminate = selectedCount > 0 && selectedCount < total;
 
-                    message.innerText =
-                        "Select students to enable Send Now.";
-
+            checkboxes.forEach(function (checkbox) {
+                const row = checkbox.closest("tr");
+                if (row) {
+                    row.classList.toggle("tn-row-selected", checkbox.checked);
                 }
-                else {
+            });
+        }
 
-                    message.innerText =
-                        count +
-                        " student(s) selected.";
+        selectAllCheckbox.addEventListener("change", function () {
+            getCheckboxes().forEach(function (checkbox) {
+                checkbox.checked = selectAllCheckbox.checked;
+            });
 
-                }
+            updateSelectedCount();
+        });
 
-            }
+        getCheckboxes().forEach(function (checkbox) {
+            checkbox.addEventListener("change", updateSelectedCount);
+        });
 
+        sendNowButton.addEventListener("click", function () {
+            const selected = getSelectedStudents();
 
-            // Select all state
-
-            const allCheckboxes =
-                document.querySelectorAll(
-                    ".student-checkbox"
-                );
-
-            if (!selectAllCheckbox) {
+            if (selected.length === 0) {
+                alert("Please select at least one student.");
                 return;
             }
 
+            if (!notificationDropdown.value) {
+                alert("Please select a notification first.");
+                notificationDropdown.focus();
+                return;
+            }
 
-            if (allCheckboxes.length === 0) {
+            if (modalSelectedCount) {
+                modalSelectedCount.textContent = selected.length;
+            }
 
-                selectAllCheckbox.checked =
-                    false;
+            if (!modalElement || typeof bootstrap === "undefined" || !bootstrap.Modal) {
+                const proceed = window.confirm(
+                    "Send this notification to " + selected.length + " selected student(s)?"
+                );
 
-                selectAllCheckbox.indeterminate =
-                    false;
+                if (proceed) {
+                    submitNotification(selected);
+                }
 
                 return;
             }
 
+            bootstrap.Modal.getOrCreateInstance(modalElement).show();
+        });
 
-            const checkedCount =
-                document.querySelectorAll(
-                    ".student-checkbox:checked"
-                ).length;
-
-
-            if (checkedCount === 0) {
-
-                selectAllCheckbox.checked =
-                    false;
-
-                selectAllCheckbox.indeterminate =
-                    false;
-
-            }
-            else if (
-                checkedCount ===
-                allCheckboxes.length
-            ) {
-
-                selectAllCheckbox.checked =
-                    true;
-
-                selectAllCheckbox.indeterminate =
-                    false;
-
-            }
-            else {
-
-                selectAllCheckbox.checked =
-                    false;
-
-                selectAllCheckbox.indeterminate =
-                    false;
-
+        function submitNotification(selected) {
+            if (confirmSendButton.disabled) {
+                return;
             }
 
-        }
-
-
-        // =====================================================
-        // SELECT ALL
-        // =====================================================
-
-        if (selectAllCheckbox) {
-
-            selectAllCheckbox.addEventListener(
-                "change",
-                function () {
-
-                    const checked =
-                        this.checked;
-
-                    document
-                        .querySelectorAll(
-                            ".student-checkbox"
-                        )
-                        .forEach(
-                            function (checkbox) {
-
-                                checkbox.checked =
-                                    checked;
-
-                            }
-                        );
-
-                    updateSelectedCount();
-
-                }
+            const token = document.querySelector(
+                'input[name="__RequestVerificationToken"]'
             );
 
+            if (!token || !token.value) {
+                alert("Security token is missing. Refresh the page and try again.");
+                return;
+            }
+
+            const notificationId = notificationDropdown.value;
+
+            if (!notificationId) {
+                alert("Please select a notification first.");
+                return;
+            }
+
+            const form = document.createElement("form");
+            form.method = "POST";
+            form.action = '@Url.Action("SendNotification", "TPO")';
+
+            const addHiddenInput = function (name, value) {
+                const input = document.createElement("input");
+                input.type = "hidden";
+                input.name = name;
+                input.value = value;
+                form.appendChild(input);
+            };
+
+            addHiddenInput("__RequestVerificationToken", token.value);
+            addHiddenInput("NotificationID", notificationId);
+
+            selected.forEach(function (checkbox) {
+                addHiddenInput("SelectedCandidateIDs", checkbox.value);
+            });
+
+            document.body.appendChild(form);
+
+            confirmSendButton.disabled = true;
+            confirmSendButton.innerHTML =
+                '<i class="fas fa-spinner fa-spin me-1" aria-hidden="true"></i> Sending...';
+
+            form.submit();
         }
-
-
-        // =====================================================
-        // INDIVIDUAL CHECKBOXES
-        // =====================================================
-
-        document
-            .querySelectorAll(
-                ".student-checkbox"
-            )
-            .forEach(
-                function (checkbox) {
-
-                    checkbox.addEventListener(
-                        "change",
-                        function () {
-
-                            updateSelectedCount();
-
-                        }
-                    );
-
-                }
-            );
-
-
-        // =====================================================
-        // SEND NOW
-        // =====================================================
-
-        if (sendNowButton) {
-
-            sendNowButton.addEventListener(
-                "click",
-                function () {
-
-                    const selected =
-                        getSelectedStudents();
-
-
-                    // -----------------------------------------
-                    // STUDENT VALIDATION
-                    // -----------------------------------------
-
-                    if (selected.length === 0) {
-
-                        alert(
-                            "Please select at least one student."
-                        );
-
-                        return;
-
-                    }
-
-
-                    // -----------------------------------------
-                    // GET NOTIFICATION FROM DROPDOWN
-                    // -----------------------------------------
-
-                    const notificationId =
-                        notificationDropdown
-                            ? notificationDropdown.value
-                            : "";
-
-
-                    // -----------------------------------------
-                    // NOTIFICATION VALIDATION
-                    // -----------------------------------------
-
-                    if (!notificationId) {
-
-                        alert(
-                            "Please select a notification first."
-                        );
-
-                        return;
-
-                    }
-
-
-                    // -----------------------------------------
-                    // MODAL COUNT
-                    // -----------------------------------------
-
-                    const modalSelectedCount =
-                        document.getElementById(
-                            "modalSelectedCount"
-                        );
-
-                    if (modalSelectedCount) {
-
-                        modalSelectedCount.innerText =
-                            selected.length;
-
-                    }
-
-
-                    // -----------------------------------------
-                    // MODAL
-                    // -----------------------------------------
-
-                    const modalElement =
-                        document.getElementById(
-                            "sendNotificationModal"
-                        );
-
-                    if (!modalElement) {
-
-                        alert(
-                            "Send notification confirmation modal was not found."
-                        );
-
-                        return;
-
-                    }
-
-
-                    const modal =
-                        bootstrap.Modal.getOrCreateInstance(
-                            modalElement
-                        );
-
-                    modal.show();
-
-                }
-            );
-
-        }
-
-
-        // =====================================================
-        // CONFIRM SEND
-        // =====================================================
 
         if (confirmSendButton) {
+            confirmSendButton.addEventListener("click", function () {
+                const selected = getSelectedStudents();
 
-            confirmSendButton.addEventListener(
-                "click",
-                function () {
-
-                    const selected =
-                        getSelectedStudents();
-
-
-                    // -----------------------------------------
-                    // STUDENT VALIDATION
-                    // -----------------------------------------
-
-                    if (selected.length === 0) {
-
-                        alert(
-                            "Please select at least one student."
-                        );
-
-                        return;
-
-                    }
-
-
-                    // -----------------------------------------
-                    // GET NOTIFICATION FROM DROPDOWN
-                    // -----------------------------------------
-
-                    const notificationId =
-                        notificationDropdown
-                            ? notificationDropdown.value
-                            : "";
-
-
-                    // -----------------------------------------
-                    // NOTIFICATION VALIDATION
-                    // -----------------------------------------
-
-                    if (!notificationId) {
-
-                        alert(
-                            "Please select a notification first."
-                        );
-
-                        return;
-
-                    }
-
-
-                    // =================================================
-                    // CREATE POST FORM
-                    // =================================================
-
-                    const form =
-                        document.createElement("form");
-
-                    form.method =
-                        "POST";
-
-                    form.action =
-                        "/TPO/SendNotification";
-
-
-                    // =================================================
-                    // ANTI FORGERY TOKEN
-                    // =================================================
-
-                    const token =
-                        document.querySelector(
-                            'input[name="__RequestVerificationToken"]'
-                        );
-
-                    if (token) {
-
-                        const tokenInput =
-                            document.createElement("input");
-
-                        tokenInput.type =
-                            "hidden";
-
-                        tokenInput.name =
-                            "__RequestVerificationToken";
-
-                        tokenInput.value =
-                            token.value;
-
-                        form.appendChild(
-                            tokenInput
-                        );
-
-                    }
-
-
-                    // =================================================
-                    // NOTIFICATION ID
-                    // =================================================
-
-                    const notificationInput =
-                        document.createElement("input");
-
-                    notificationInput.type =
-                        "hidden";
-
-                    notificationInput.name =
-                        "NotificationID";
-
-                    // IMPORTANT:
-                    // Send the selected dropdown value,
-                    // NOT @Model.NotificationID.
-
-                    notificationInput.value =
-                        notificationId;
-
-                    form.appendChild(
-                        notificationInput
-                    );
-
-
-                    // =================================================
-                    // SELECTED CANDIDATE IDS
-                    // =================================================
-
-                    selected.forEach(
-                        function (checkbox) {
-
-                            const input =
-                                document.createElement(
-                                    "input"
-                                );
-
-                            input.type =
-                                "hidden";
-
-                            input.name =
-                                "SelectedCandidateIDs";
-
-                            input.value =
-                                checkbox.value;
-
-                            form.appendChild(
-                                input
-                            );
-
-                        }
-                    );
-
-
-                    // =================================================
-                    // ADD FORM TO PAGE
-                    // =================================================
-
-                    document.body.appendChild(
-                        form
-                    );
-
-
-                    // =================================================
-                    // DISABLE BUTTON
-                    // =================================================
-
-                    confirmSendButton.disabled =
-                        true;
-
-                    confirmSendButton.innerHTML =
-                        '<i class="fas fa-spinner fa-spin me-2"></i>Sending...';
-
-
-                    // =================================================
-                    // SUBMIT
-                    // =================================================
-
-                    form.submit();
-
+                if (selected.length === 0) {
+                    alert("Please select at least one student.");
+                    return;
                 }
-            );
 
+                submitNotification(selected);
+            });
         }
 
+        /* Load branches when the department changes. */
+        if (departmentDropdown && branchDropdown) {
+            departmentDropdown.addEventListener("change", function () {
+                const departmentId = this.value;
 
-        // =========================================================
-        // LOAD BRANCHES WHEN DEPARTMENT CHANGES
-        // =========================================================
+                branchDropdown.innerHTML =
+                    '<option value="">All Branches</option>';
 
-        if (
-            departmentDropdown &&
-            branchDropdown
-        ) {
+                if (!departmentId) {
+                    return;
+                }
 
-            departmentDropdown.addEventListener(
-                "change",
-                function () {
+                branchDropdown.innerHTML =
+                    '<option value="">Loading branches...</option>';
+                branchDropdown.disabled = true;
 
-                    const departmentId =
-                        this.value;
+                fetch(
+                    '@Url.Action("GetBranchesByDepartment", "TPO")' +
+                    '?departmentId=' + encodeURIComponent(departmentId),
+                    {
+                        method: "GET",
+                        headers: { "X-Requested-With": "XMLHttpRequest" }
+                    }
+                )
+                .then(function (response) {
+                    if (!response.ok) {
+                        throw new Error("Unable to load branches.");
+                    }
 
-
-                    // ---------------------------------------------
-                    // RESET BRANCH
-                    // ---------------------------------------------
-
+                    return response.json();
+                })
+                .then(function (branches) {
                     branchDropdown.innerHTML =
                         '<option value="">All Branches</option>';
 
-
-                    // ---------------------------------------------
-                    // NO DEPARTMENT
-                    // ---------------------------------------------
-
-                    if (!departmentId) {
-
+                    if (!Array.isArray(branches) || branches.length === 0) {
+                        const option = document.createElement("option");
+                        option.value = "";
+                        option.textContent = "No branches found";
+                        branchDropdown.appendChild(option);
                         return;
-
                     }
 
+                    branches.forEach(function (branch) {
+                        const option = document.createElement("option");
 
-                    // ---------------------------------------------
-                    // LOADING
-                    // ---------------------------------------------
+                        // Supports the id/name JSON shape used by the existing endpoint.
+                        option.value = branch.id;
+                        option.textContent = branch.name;
 
+                        branchDropdown.appendChild(option);
+                    });
+                })
+                .catch(function (error) {
+                    console.error("Branch loading error:", error);
                     branchDropdown.innerHTML =
-                        '<option value="">Loading branches...</option>';
-
-
-                    // ---------------------------------------------
-                    // AJAX
-                    // ---------------------------------------------
-
-                    fetch(
-                        '/TPO/GetBranchesByDepartment?departmentId='
-                        + encodeURIComponent(
-                            departmentId
-                        )
-                    )
-                    .then(
-                        function (response) {
-
-                            if (!response.ok) {
-
-                                throw new Error(
-                                    "Unable to load branches."
-                                );
-
-                            }
-
-                            return response.json();
-
-                        }
-                    )
-                    .then(
-                        function (branches) {
-
-                            branchDropdown.innerHTML =
-                                '<option value="">All Branches</option>';
-
-
-                            if (
-                                !branches ||
-                                branches.length === 0
-                            ) {
-
-                                branchDropdown.innerHTML =
-                                    '<option value="">No branches found</option>';
-
-                                return;
-
-                            }
-
-
-                            branches.forEach(
-                                function (branch) {
-
-                                    const option =
-                                        document.createElement(
-                                            "option"
-                                        );
-
-                                    option.value =
-                                        branch.id;
-
-                                    option.textContent =
-                                        branch.name;
-
-                                    branchDropdown.appendChild(
-                                        option
-                                    );
-
-                                }
-                            );
-
-                        }
-                    )
-                    .catch(
-                        function (error) {
-
-                            console.error(
-                                "Branch loading error:",
-                                error
-                            );
-
-                            branchDropdown.innerHTML =
-                                '<option value="">Unable to load branches</option>';
-
-                        }
-                    );
-
-                }
-            );
-
+                        '<option value="">Unable to load branches</option>';
+                })
+                .finally(function () {
+                    branchDropdown.disabled = false;
+                });
+            });
         }
-
-
-        // =========================================================
-        // INITIAL COUNT
-        // =========================================================
 
         updateSelectedCount();
-
-    });
-
-
-    document.addEventListener("DOMContentLoaded", function () {
-
-        const form         = document.getElementById("sendNotificationForm");
-        const notif        = document.getElementById("NotificationId");
-        const audience     = document.getElementById("Audience");
-        const previewTitle = document.getElementById("previewTitle");
-        const previewText  = document.getElementById("previewText");
-        const previewBody  = document.getElementById("previewBody");
-        const messageField = document.getElementById("MessageContent");
-        const editBtn      = document.getElementById("editPreview");
-        const infoText     = document.getElementById("infoText");
-        const btnNow       = document.getElementById("btnSendNow");
-        const btnSchedule  = document.getElementById("btnSchedule");
-
-        const modal        = document.getElementById("scheduleModal");
-        const popupDate    = document.getElementById("PopupDate");
-        const popupTime    = document.getElementById("PopupTime");
-        const scheduleErr  = document.getElementById("scheduleError");
-
-        /* ---------- Preview ---------- */
-        function updatePreview() {
-            const opt = notif.options[notif.selectedIndex];
-
-            if (opt && opt.value) {
-                previewTitle.textContent = opt.dataset.title || opt.text;
-                previewText.textContent  = opt.dataset.content || "";
-            } else {
-                previewTitle.textContent = "Select a notification to preview";
-                previewText.textContent  = "Your notification message will appear here.";
-            }
-            messageField.value = previewBody.innerHTML;
-        }
-
-        notif.addEventListener("change", function () {
-            updatePreview();
-            this.classList.remove("error");
-            document.getElementById("notificationError").textContent = "";
-        });
-
-        /* ---------- Edit preview ---------- */
-        editBtn.addEventListener("click", function () {
-            const editing = previewBody.getAttribute("contenteditable") === "true";
-
-            previewBody.setAttribute("contenteditable", editing ? "false" : "true");
-            previewBody.classList.toggle("editing", !editing);
-
-            this.innerHTML = editing
-                ? '<i class="fas fa-pen"></i> Edit'
-                : '<i class="fas fa-check"></i> Done';
-
-            if (!editing) previewBody.focus();
-            messageField.value = previewBody.innerHTML;
-        });
-
-        previewBody.addEventListener("input", function () {
-            messageField.value = previewBody.innerHTML;
-        });
-
-        /* ---------- Audience count ---------- */
-        function updateAudience() {
-            const opt = audience.options[audience.selectedIndex];
-
-            if (opt && opt.value) {
-                infoText.textContent =
-                    "This notification will be sent to " + opt.dataset.count + " " +
-                    opt.text.toLowerCase() + ".";
-            } else {
-                infoText.textContent =
-                    "Select an audience to see how many will receive this notification.";
-            }
-        }
-
-        audience.addEventListener("change", function () {
-            updateAudience();
-            this.classList.remove("error");
-            document.getElementById("audienceError").textContent = "";
-        });
-
-        /* ---------- Send Via ---------- */
-        document.querySelectorAll(".via-check").forEach(function (c) {
-            c.addEventListener("change", function () {
-                document.getElementById("viaError").textContent = "";
-            });
-        });
-
-        /* ---------- Validation ---------- */
-        function validate() {
-            let valid = true;
-
-            if (!notif.value) {
-                notif.classList.add("error");
-                document.getElementById("notificationError").textContent = "Please select a notification.";
-                valid = false;
-            }
-
-            if (!audience.value) {
-                audience.classList.add("error");
-                document.getElementById("audienceError").textContent = "Please select an audience.";
-                valid = false;
-            }
-
-            if (!document.querySelector(".via-check:checked")) {
-                document.getElementById("viaError").textContent = "Select at least one delivery method.";
-                valid = false;
-            }
-
-            return valid;
-        }
-
-        /* ---------- Send Now ---------- */
-        btnNow.addEventListener("click", function (e) {
-            document.getElementById("ScheduleDate").value = "";
-            document.getElementById("ScheduleTime").value = "";
-            if (!validate()) e.preventDefault();
-        });
-
-        /* ---------- Schedule Later popup ---------- */
-        function closeModal() {
-            modal.classList.remove("open");
-            modal.setAttribute("aria-hidden", "true");
-        }
-
-        btnSchedule.addEventListener("click", function () {
-            if (!validate()) return;
-
-            // no past dates
-            popupDate.min = new Date().toISOString().split("T")[0];
-            scheduleErr.textContent = "";
-            modal.classList.add("open");
-            modal.setAttribute("aria-hidden", "false");
-        });
-
-        document.getElementById("cancelSchedule").addEventListener("click", closeModal);
-
-        modal.addEventListener("click", function (e) {
-            if (e.target === modal) closeModal();
-        });
-
-        document.addEventListener("keydown", function (e) {
-            if (e.key === "Escape") closeModal();
-        });
-
-        document.getElementById("confirmSchedule").addEventListener("click", function () {
-            if (!popupDate.value || !popupTime.value) {
-                popupDate.classList.toggle("error", !popupDate.value);
-                popupTime.classList.toggle("error", !popupTime.value);
-                scheduleErr.textContent = "Please choose a date and time.";
-                return;
-            }
-
-            document.getElementById("ScheduleDate").value = popupDate.value;
-            document.getElementById("ScheduleTime").value = popupTime.value;
-
-            // submit with SendMode = Schedule
-            const mode = document.createElement("input");
-            mode.type  = "hidden";
-            mode.name  = "SendMode";
-            mode.value = "Schedule";
-            form.appendChild(mode);
-
-            messageField.value = previewBody.innerHTML;
-            form.submit();
-        });
-
-        form.addEventListener("submit", function () {
-            messageField.value = previewBody.innerHTML;
-        });
-
-        updatePreview();
-        updateAudience();
     });
 </script>

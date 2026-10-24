@@ -42,13 +42,11 @@ namespace ErJobPortal.Models
         // MOBILE
         // 6 TO 20 DIGITS
         // =====================================================
-
         [Required(ErrorMessage = "Mobile number is required.")]
         [RegularExpression(
-            @"^[0-9]{6,20}$",
-            ErrorMessage = "Mobile number must contain 6 to 20 digits."
-        )]
-
+     @"^[0-9]{10}$",
+     ErrorMessage = "Mobile number must contain exactly 10 digits."
+ )]
         [Remote(
     action: "CheckCandidateMobile",
     controller: "Account",
@@ -64,20 +62,19 @@ namespace ErJobPortal.Models
 
         [Required(ErrorMessage = "Email address is required.")]
         [RegularExpression(
-            @"^[^@\s]+@[^@\s]+\.[^@\s]+$",
-            ErrorMessage = "Email must contain @ and ."
-        )]
+@"^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$",
+ErrorMessage = "Please enter a valid email address, e.g., example@gmail.com."
+)]
         [StringLength(
-            150,
-            ErrorMessage = "Email cannot exceed 150 characters."
-        )]
+      150,
+      ErrorMessage = "Email cannot exceed 150 characters."
+  )]
 
         [Remote(
-    action: "CheckCandidateEmail",
-    controller: "Account",
-    ErrorMessage = "This email address is already registered."
+action: "CheckCandidateEmail",
+controller: "Account",
+ErrorMessage = "This email address is already registered."
 )]
-
         public string? sEmail { get; set; }
 
 
@@ -249,6 +246,10 @@ namespace ErJobPortal.Models
         )]
         public string? sOTP { get; set; }
 
+
+        [Required(ErrorMessage = "Please select a prefix.")]
+        [RegularExpression(@"^(Mr\.|Ms\.|Mrs\.)$",
+ErrorMessage = "Please select a valid prefix.")]
         public string? sPrefix { get; set; }
 
         public string? sAlternateMobile { get; set; }
