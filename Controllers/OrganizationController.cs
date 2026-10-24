@@ -6144,13 +6144,14 @@ WHERE nID = @nID
         public IActionResult Pipeline() => View();
         public IActionResult Offers() => View();
         public IActionResult Notifications() => View();
-      
-     
+
+
         public IActionResult GradeNormalization() => View();
         public IActionResult Sourcing() => View();
         public IActionResult DriveTracking() => View();
         public IActionResult SharedData() => View();
         public IActionResult History() => View();
+        public IActionResult EditOrganizationRegistration() => View();
         public IActionResult CreateDrive() => View();
 
 
