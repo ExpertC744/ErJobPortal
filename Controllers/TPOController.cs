@@ -5821,6 +5821,7 @@ ORDER BY
         public IActionResult GradeNormalization() => View();
         public IActionResult DriveTracking() => View();
         public IActionResult SharedData() => View();
+        public IActionResult EditTPORegistration() => View();
 
     }
 }
