@@ -3460,6 +3460,19 @@
 
 							@* end *@
 
+							<!-- Edit Registration Details -->
+
+<a asp-controller="Candidate"
+   asp-action="EditCandidateRegistration"
+   class="profile-submenu-link">
+
+    <span>
+        <i class="fas fa-id-card me-1"></i>
+        Edit Registration Details
+    </span>
+
+</a>
+
 						</div>
 
 					</div>
@@ -5017,6 +5030,15 @@ else
 									</span>
 
 								</a>
+
+								<a asp-controller="Organization"
+								   asp-action="ActivityLog"
+								   class="user-dropdown-item">
+									<span class="dropdown-item-icon">
+										<i class="fas fa-history"></i>
+									</span>
+									<span>Activity Log</span>
+								</a>
 							}
 
 
@@ -5074,6 +5096,16 @@ else
 										Forgot Password
 									</span>
 
+								</a>
+
+
+								<a asp-controller="TPO"
+								   asp-action="ActivityLog"
+								   class="user-dropdown-item">
+									<span class="dropdown-item-icon">
+										<i class="fas fa-history"></i>
+									</span>
+									<span>Activity Log</span>
 								</a>
 							}
 

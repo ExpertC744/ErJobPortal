@@ -20,7 +20,11 @@
 
         public int nCollegeCode { get; set; }
 
-        public int sCollegeName { get; set; }
+        // FIX: College name must be a string.
+        public string? sCollegeName { get; set; }
+
+        // Stored password hash, if required by the login flow.
+        public string? sPassword { get; set; }
 
         // Super Admin Status
         public bool nSABit { get; set; }

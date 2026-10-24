@@ -82,9 +82,12 @@ namespace ErJobPortal.Models
         [StringLength(150)]
         public string Designation { get; set; }
 
-        [Required(ErrorMessage = "Department Name is required.")]
-        [StringLength(150)]
-        public string DepartmentName { get; set; }
+        public string? DepartmentName { get; set; }
+
+        [Required(ErrorMessage = "Please select a department.")]
+        [Range(1, int.MaxValue,
+            ErrorMessage = "Please select a valid department.")]
+        public int? nDepartment { get; set; }
 
         [Required(ErrorMessage = "College Employee ID is required.")]
         [StringLength(100)]
@@ -155,7 +158,7 @@ namespace ErJobPortal.Models
         public string? TPOType { get; set; }
 
 
-        public int? nDepartment { get; set; }
+        
 
 
         public bool? SubTpoBit { get; set; }

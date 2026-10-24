@@ -1,0 +1,167 @@
+﻿@model List<ErJobPortal.Models.OrgPostM>
+
+@{
+    Layout = "~/Views/Shared/_DashboardLayout.cshtml";
+
+    ViewData["Title"] = "Applied Trainees";
+    ViewData["Panel"] = "TPO";
+    ViewData["UserName"] = "TPO";
+
+    var traineeCode = ViewBag.TPOCode ?? "";
+}
+
+<div class="container-fluid applied-trainees-page">
+
+    <!-- PAGE HEADER -->
+    <div class="applied-page-header">
+        <div>
+            <h1>Applied Trainees</h1>
+            <p>@traineeCode</p>
+        </div>
+    </div>
+
+    <!-- MASTER TABLE -->
+    <div class="master-table-container previous-post-table-container">
+
+        <div class="table-responsive previous-post-table-scroll">
+
+            <table id="appliedTraineesTable"
+                   class="master-data-table">
+
+                <thead>
+                    <tr>
+                        <th>Sr. No.</th>
+                        <th>Date</th>
+                        <th>Position</th>
+                        <th>View Post</th>
+                        <th>Applied Trainees</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    @{
+                        int srNo = 1;
+                    }
+
+                    @if (Model != null && Model.Any())
+                    {
+                        foreach (var item in Model)
+                        {
+                            <tr>
+                                <!-- Sr. No. -->
+                                <td class="master-id">
+                                    @srNo
+                                </td>
+
+                                <!-- Date -->
+                                <td>
+                                    @(item.dStartDate.HasValue
+                                                                ? item.dStartDate.Value.ToString("dd-MM-yyyy")
+                                                                : "")
+                                </td>
+
+                                <!-- Position -->
+                                <td>
+                                    @item.sPositionName
+                                </td>
+
+                                <!-- View Post -->
+                                <td class="text-center">
+                                    <a asp-controller="TPO"
+                                       asp-action="ViewTpoPost"
+                                       asp-route-id="@item.nID"
+                                       class="resume-view-btn"
+                                       title="View Post"
+                                       aria-label="View Post">
+                                        <i class="fas fa-eye"></i>
+                                    </a>
+                                </td>
+
+                                <!-- Applied Trainees -->
+                                <td class="text-center">
+                                    <a asp-controller="TPO"
+                                       asp-action="TpoPositionTR"
+                                       asp-route-id="@item.nID"
+                                       class="resume-view-btn"
+                                       title="View Applied Trainees"
+                                       aria-label="View Applied Trainees">
+                                        <i class="fas fa-users"></i>
+                                        <span>
+                                            @item.MatchingTraineeCount
+                                        </span>
+                                    </a>
+                                </td>
+                            </tr>
+
+                            srNo++;
+                        }
+                    }
+                </tbody>
+
+            </table>
+
+        </div>
+
+        @if (Model == null || !Model.Any())
+        {
+            <div class="text-center p-3">
+                No applied trainees found.
+            </div>
+        }
+
+        <div id="appliedTraineesPageInfo"
+             class="master-page-info d-none">
+        </div>
+
+    </div>
+</div>
+
+<!-- DATATABLE -->
+<script>
+    $(document).ready(function () {
+
+        if ($.fn.DataTable.isDataTable('#appliedTraineesTable')) {
+            $('#appliedTraineesTable').DataTable().destroy();
+        }
+
+        $('#appliedTraineesTable').DataTable({
+            pageLength: 25,
+
+            lengthMenu: [
+                [10, 25, 50, 100],
+                [10, 25, 50, 100]
+            ],
+
+            searching: true,
+            ordering: true,
+            paging: true,
+            info: true,
+            autoWidth: false,
+            responsive: false,
+            scrollX: true,
+
+            columnDefs: [
+                {
+                    targets: 0,
+                    className: "text-center"
+                },
+                {
+                    targets: [3, 4],
+                    className: "text-center",
+                    orderable: false
+                }
+            ],
+
+            language: {
+                search: "",
+                searchPlaceholder: "Search...",
+                lengthMenu: "_MENU_ entries per page",
+                emptyTable: "No applied trainees found.",
+                zeroRecords: "No matching records found",
+                info: "Showing _START_ to _END_ of _TOTAL_ entries",
+                infoEmpty: "Showing 0 to 0 of 0 entries"
+            }
+        });
+
+    });
+</script>

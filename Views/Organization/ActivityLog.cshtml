@@ -1,0 +1,286 @@
+﻿@model List<ErJobPortal.Models.CandidateActivityLogViewModel>
+
+@{
+    ViewData["Title"] = "Organization Activity Log";
+    ViewData["Panel"] = "Organization";
+    ViewData["UserName"] =
+        Context.Session.GetString("OrgName") ?? "Organization";
+
+    Layout = "~/Views/Shared/_DashboardLayout.cshtml";
+
+    var records = Model ??
+        new List<ErJobPortal.Models.CandidateActivityLogViewModel>();
+
+    var totalVisits = records.Count;
+    var successfulLogins = records.Count(x => x.IsLoggedIn);
+
+    var distinctPages = records
+        .Where(x => !string.IsNullOrWhiteSpace(x.RequestPath))
+        .Select(x => x.RequestPath)
+        .Distinct(StringComparer.OrdinalIgnoreCase)
+        .Count();
+}
+
+<style>
+    .activity-page {
+        padding: 25px 0;
+    }
+
+    .activity-header {
+        margin-bottom: 25px;
+    }
+
+        .activity-header h2 {
+            font-weight: 700;
+            color: #243247;
+        }
+
+        .activity-header p {
+            color: #6b7280;
+        }
+
+    .activity-stat {
+        border: 1px solid #e5e7eb;
+        border-radius: 12px;
+        background: #fff;
+        padding: 22px;
+        height: 100%;
+        box-shadow: 0 3px 12px rgba(0, 0, 0, .04);
+    }
+
+        .activity-stat h3 {
+            font-size: 28px;
+            font-weight: 700;
+            margin: 8px 0 0;
+            color: #243247;
+        }
+
+    .stat-label {
+        font-size: 14px;
+        color: #6b7280;
+    }
+
+    .activity-card {
+        border: 1px solid #e5e7eb;
+        border-radius: 12px;
+        background: #fff;
+        overflow: hidden;
+        box-shadow: 0 3px 12px rgba(0, 0, 0, .04);
+    }
+
+    .activity-card-header {
+        padding: 18px 20px;
+        border-bottom: 1px solid #e5e7eb;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 10px;
+    }
+
+        .activity-card-header h5 {
+            margin: 0;
+            font-weight: 700;
+            color: #243247;
+        }
+
+    .activity-table {
+        margin-bottom: 0;
+        white-space: nowrap;
+    }
+
+        .activity-table thead th {
+            background: #f3f6fa;
+            color: #475569;
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: .4px;
+            padding: 14px;
+        }
+
+        .activity-table tbody td {
+            padding: 14px;
+            font-size: 13px;
+            vertical-align: middle;
+        }
+
+        .activity-table tbody tr:hover {
+            background: #f8fafc;
+        }
+
+    .status-badge {
+        display: inline-block;
+        border-radius: 20px;
+        padding: 5px 10px;
+        font-size: 12px;
+        font-weight: 600;
+    }
+
+    .status-success {
+        color: #166534;
+        background: #dcfce7;
+    }
+
+    .status-visit {
+        color: #475569;
+        background: #e2e8f0;
+    }
+
+    .empty-activity {
+        text-align: center;
+        padding: 45px 15px;
+        color: #64748b;
+    }
+
+        .empty-activity h5 {
+            margin: 12px 0 8px;
+            color: #334155;
+        }
+
+    .path-cell {
+        max-width: 260px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+</style>
+
+<div class="container-fluid activity-page">
+
+    <div class="activity-header">
+        <h2>Organization Activity Log</h2>
+        <p class="mb-0">
+            Review your organization's recorded visits, browser details
+            and device activity.
+        </p>
+    </div>
+
+    <div class="row g-3 mb-4">
+
+        <div class="col-sm-6 col-lg-4">
+            <div class="activity-stat">
+                <div class="stat-label">Total Recorded Visits</div>
+                <h3>@totalVisits</h3>
+            </div>
+        </div>
+
+        <div class="col-sm-6 col-lg-4">
+            <div class="activity-stat">
+                <div class="stat-label">Login Records</div>
+                <h3>@successfulLogins</h3>
+            </div>
+        </div>
+
+        <div class="col-sm-6 col-lg-4">
+            <div class="activity-stat">
+                <div class="stat-label">Distinct Pages Visited</div>
+                <h3>@distinctPages</h3>
+            </div>
+        </div>
+
+    </div>
+
+    <div class="activity-card">
+
+        <div class="activity-card-header">
+            <h5>Organization Visit History</h5>
+            <span class="text-muted small">
+                Latest @totalVisits record(s)
+            </span>
+        </div>
+
+        @if (totalVisits == 0)
+        {
+            <div class="empty-activity">
+                <h5>No Activity Records Found</h5>
+                <p class="mb-0">
+                    Your organization activity will appear here when
+                    records are stored for your account.
+                </p>
+            </div>
+        }
+        else
+        {
+            <div class="table-responsive">
+                <table class="table table-hover activity-table">
+
+                    <thead>
+                        <tr>
+                            <th>Visit ID</th>
+                            <th>Date &amp; Time (UTC)</th>
+                            <th>Page</th>
+                            <th>Request Path</th>
+                            <th>IP Address</th>
+                            <th>Location</th>
+                            <th>Browser</th>
+                            <th>Operating System</th>
+                            <th>Device</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                        @foreach (var item in records)
+                        {
+                            var location = string.Join(", ",
+                                new[]
+                                {
+                                    item.City,
+                                    item.Region,
+                                    item.Country
+                                }.Where(s =>
+                                    !string.IsNullOrWhiteSpace(s)));
+
+                            <tr>
+                                <td>@item.VisitID</td>
+
+                                <td>
+                                    @item.VisitDateTime.ToString(
+                                        "dd-MMM-yyyy hh:mm:ss tt")
+                                </td>
+
+                                <td>@(item.PageName ?? "-")</td>
+
+                                <td class="path-cell"
+                                    title="@item.RequestPath">
+                                    @(item.RequestPath ?? "-")
+                                </td>
+
+                                <td>@(item.IPAddress ?? "-")</td>
+
+                                <td>
+                                    @(string.IsNullOrWhiteSpace(location)
+                                        ? "-"
+                                        : location)
+                                </td>
+
+                                <td>
+                                    @($"{item.BrowserName ?? "-"} {item.BrowserVersion ?? ""}".Trim())
+                                </td>
+
+                                <td>@(item.OperatingSystem ?? "-")</td>
+
+                                <td>@(item.DeviceType ?? "-")</td>
+
+                                <td>
+                                    @if (item.IsLoggedIn)
+                                    {
+                                        <span class="status-badge status-success">
+                                            Logged In
+                                        </span>
+                                    }
+                                    else
+                                    {
+                                        <span class="status-badge status-visit">
+                                            Visit
+                                        </span>
+                                    }
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+
+                </table>
+            </div>
+        }
+    </div>
+</div>
