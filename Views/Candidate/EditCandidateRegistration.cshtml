@@ -111,11 +111,19 @@
                     <span asp-validation-for="sAlternateMobile" class="text-danger register-validation"></span>
                 </div>
 
-                <div class="register-form-group">
-                    <label asp-for="sEmail" class="register-label">Email</label>
-                    <input asp-for="sEmail" type="email" class="register-input" placeholder="Email address" autocomplete="email" />
-                    <span asp-validation-for="sEmail" class="text-danger register-validation"></span>
-                </div>
+             
+<div class="register-form-group">
+    <label asp-for="sEmail" class="register-label">Email</label>
+
+    <input asp-for="sEmail"
+           type="email"
+           class="register-input"
+           readonly />
+
+    <span asp-validation-for="sEmail"
+          class="text-danger register-validation"></span>
+</div>
+
 
             </div>
 
@@ -214,17 +222,11 @@
             </div>
 
             <!-- PASSWORD -->
-            <div class="register-form-row">
-                <div class="register-form-group">
-                    <label asp-for="sPassword" class="register-label">New Password (Optional)</label>
-                    <input asp-for="sPassword" type="password" class="register-input" placeholder="current password" autocomplete="new-password" />
-                    <span asp-validation-for="sPassword" class="text-danger register-validation"></span>
-                </div>
-            </div>
+            
 
             <div class="alert alert-info edit-candidate-notice">
                 <i class="fa-solid fa-circle-info"></i>
-                Leave the profile image empty to keep the current image. Leave the password blank if you do not want to change it.
+               Leave the profile image empty to keep your current image.
             </div>
 
             <!-- ACTIONS -->

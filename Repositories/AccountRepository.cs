@@ -6269,5 +6269,129 @@ WHERE
             return count > 0;
         }
 
+
+
+        #region "Update Candidate Registration For Edit"
+
+        public bool UpdateCandidateRegistrationForEdit(
+            int candidateId,
+            CandidateRegister model)
+        {
+            using (SqlConnection cn = _db.GetConnection())
+            {
+                string query = @"
+            UPDATE tblCandidateRegister
+            SET
+                sPrefix = @sPrefix,
+                sFName = @sFName,
+                sLName = @sLName,
+                sMobile = @sMobile,
+                sAlternateMobile = @sAlternateMobile,
+                sEmail = @sEmail,
+                DOB = @DOB,
+                nGender = @nGender,
+                sProfileImage = @sProfileImage,
+                nCollegeCode = @nCollegeCode,
+                sCollegeName = @sCollegeName,
+                nBranch = @nBranch,
+                nPassoutYear = @nPassoutYear,
+                nDepartment = @nDepartment,
+                nCurrentYear = @nCurrentYear,
+                nAdmissionYear = @nAdmissionYear
+            WHERE nID = @CandidateID";
+
+                using (SqlCommand cmd = new SqlCommand(query, cn))
+                {
+                    cmd.Parameters.Add("@CandidateID", SqlDbType.Int)
+                        .Value = candidateId;
+
+                    cmd.Parameters.Add("@sPrefix", SqlDbType.NVarChar, 20)
+                        .Value = (object?)model.sPrefix ?? DBNull.Value;
+
+                    cmd.Parameters.Add("@sFName", SqlDbType.NVarChar, 100)
+                        .Value = (object?)model.sFName ?? DBNull.Value;
+
+                    cmd.Parameters.Add("@sLName", SqlDbType.NVarChar, 100)
+                        .Value = (object?)model.sLName ?? DBNull.Value;
+
+                    cmd.Parameters.Add("@sMobile", SqlDbType.NVarChar, 20)
+                        .Value = (object?)model.sMobile ?? DBNull.Value;
+
+                    cmd.Parameters.Add("@sAlternateMobile", SqlDbType.NVarChar, 20)
+                        .Value = (object?)model.sAlternateMobile ?? DBNull.Value;
+
+                    cmd.Parameters.Add("@sEmail", SqlDbType.NVarChar, 256)
+                        .Value = (object?)model.sEmail ?? DBNull.Value;
+
+                    cmd.Parameters.Add("@DOB", SqlDbType.Date)
+                        .Value = (object?)model.DOB ?? DBNull.Value;
+
+                    cmd.Parameters.Add("@nGender", SqlDbType.Int)
+                        .Value = model.nGender;
+
+                    cmd.Parameters.Add("@sProfileImage", SqlDbType.NVarChar, 500)
+                        .Value = (object?)model.sProfileImage ?? DBNull.Value;
+
+                    cmd.Parameters.Add("@nCollegeCode", SqlDbType.Int)
+                        .Value = model.nCollegeCode;
+
+                    cmd.Parameters.Add("@sCollegeName", SqlDbType.Int)
+                        .Value = model.sCollegeName;
+
+                    cmd.Parameters.Add("@nBranch", SqlDbType.Int)
+                        .Value = model.nBranch;
+
+                    cmd.Parameters.Add("@nPassoutYear", SqlDbType.Int)
+                        .Value = (object?)model.nPassoutYear ?? DBNull.Value;
+
+                    cmd.Parameters.Add("@nDepartment", SqlDbType.Int)
+                        .Value = model.nDepartment;
+
+                    cmd.Parameters.Add("@nCurrentYear", SqlDbType.Int)
+                        .Value = (object?)model.nCurrentYear ?? DBNull.Value;
+
+                    cmd.Parameters.Add("@nAdmissionYear", SqlDbType.Int)
+                        .Value = (object?)model.nAdmissionYear ?? DBNull.Value;
+
+                    cn.Open();
+
+                    return cmd.ExecuteNonQuery() > 0;
+                }
+            }
+        }
+
+        #endregion
+
+
+
+        public bool CandidateMobileExistsForAnotherCandidate(
+            string mobile,
+            int candidateId)
+        {
+            using (SqlConnection cn = _db.GetConnection())
+            {
+                string query = @"
+            SELECT COUNT(1)
+            FROM tblCandidateRegister
+            WHERE sMobile = @Mobile
+              AND nID <> @CandidateID";
+
+                using (SqlCommand cmd = new SqlCommand(query, cn))
+                {
+                    cmd.Parameters.Add("@Mobile", SqlDbType.NVarChar, 20)
+                        .Value = mobile.Trim();
+
+                    cmd.Parameters.Add("@CandidateID", SqlDbType.Int)
+                        .Value = candidateId;
+
+                    cn.Open();
+
+                    return Convert.ToInt32(cmd.ExecuteScalar()) > 0;
+                }
+            }
+        }
+
+
+
     }
 }
