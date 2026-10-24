@@ -3047,5 +3047,32 @@ public IActionResult OrganizationResetPassword()
         }
 
 
+        // khushi 23-10-26
+        // Validate duplicate TPO mobile number
+        [AcceptVerbs("GET", "POST")]
+        public IActionResult CheckTPOMobile(string mobileNo)
+        {
+            if (string.IsNullOrWhiteSpace(mobileNo))
+                return Json(true);
+
+            bool exists = _accountRepository.IsTPOMobileExists(mobileNo);
+
+            return Json(!exists);
+        }
+
+        // khushi 23-10-26
+        // Validate duplicate TPO email
+        [AcceptVerbs("GET", "POST")]
+        public IActionResult CheckTPOEmail(string collegeMailID)
+        {
+            if (string.IsNullOrWhiteSpace(collegeMailID))
+                return Json(true);
+
+            bool exists = _accountRepository.IsTPOEmailExists(collegeMailID);
+
+            return Json(!exists);
+        }
+
+
     }
 }

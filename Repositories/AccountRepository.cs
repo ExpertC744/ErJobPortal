@@ -6269,5 +6269,60 @@ WHERE
             return count > 0;
         }
 
+
+        // khushi 23-10-26
+        // Check whether TPO email already exists
+        public bool IsTPOEmailExists(string email)
+        {
+            using var con = _db.GetConnection();
+
+            if (con.State != System.Data.ConnectionState.Open)
+                con.Open();
+
+            using var cmd = con.CreateCommand();
+
+            cmd.CommandText = @"
+ SELECT COUNT(1)
+ FROM dbo.tblTPORegistration
+ WHERE LTRIM(RTRIM(CollegeMailID)) = @Email";
+
+            var parameter = cmd.CreateParameter();
+            parameter.ParameterName = "@Email";
+            parameter.Value = email.Trim();
+
+            cmd.Parameters.Add(parameter);
+
+            int count = Convert.ToInt32(cmd.ExecuteScalar());
+
+            return count > 0;
+        }
+
+        // khushi 23-10-26
+        // Check whether TPO mobile number already exists
+        public bool IsTPOMobileExists(string mobile)
+        {
+            using var con = _db.GetConnection();
+
+            if (con.State != System.Data.ConnectionState.Open)
+                con.Open();
+
+            using var cmd = con.CreateCommand();
+
+            cmd.CommandText = @"
+ SELECT COUNT(1)
+ FROM dbo.tblTPORegistration
+ WHERE LTRIM(RTRIM(MobileNo)) = @Mobile";
+
+            var parameter = cmd.CreateParameter();
+            parameter.ParameterName = "@Mobile";
+            parameter.Value = mobile.Trim();
+
+            cmd.Parameters.Add(parameter);
+
+            int count = Convert.ToInt32(cmd.ExecuteScalar());
+
+            return count > 0;
+        }
+
     }
 }
