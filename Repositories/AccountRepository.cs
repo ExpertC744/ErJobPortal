@@ -2,6 +2,7 @@
 using ErJobPortal.Data;
 using ErJobPortal.Models;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing.Matching;
 using Microsoft.Data.SqlClient;
 using System.Data;
@@ -186,9 +187,9 @@ namespace ErJobPortal.Repositories
                     // =====================================================
 
                     cmd.Parameters.AddWithValue(
-      "@sCollegeName",
-      model.sCollegeName
-  );
+                          "@sCollegeName",
+                          model.sCollegeName
+                    );
 
 
                     // =====================================================
@@ -417,16 +418,16 @@ namespace ErJobPortal.Repositories
         #endregion
 
         public (int OrganizationID, DateTime? RegDate)?
-GetOrganizationRegistrationDetails(int orgId)
+        GetOrganizationRegistrationDetails(int orgId)
         {
             using (SqlConnection cn = _db.GetConnection())
             {
                 string query = @"
-       SELECT
-           nID,
-           RegDate
-       FROM tblOrgRegistration
-       WHERE nID = @nID";
+                   SELECT
+                       nID,
+                       RegDate
+                   FROM tblOrgRegistration
+                   WHERE nID = @nID";
 
                 using (SqlCommand cmd =
                        new SqlCommand(query, cn))
@@ -857,6 +858,7 @@ public List<BranchM> GetBranches(int departmentId)
         #endregion
 
 
+
         #region "Candidate Login"
 
         public CandidateUser? LoginCandidate(CandidateLogin model)
@@ -864,22 +866,22 @@ public List<BranchM> GetBranches(int departmentId)
             using (SqlConnection cn = _db.GetConnection())
             {
                 string query = @"
-       SELECT
-           nID,
-           sFName,
-           sLName,
-           sMobile,
-           sEmail,
-           DOB,
-           nGender,
-           sProfileImage,
-           nCollegeCode,
-           sCollegeName,
-           sPassword,
-           nSABit
-       FROM tblCandidateRegister
-       WHERE sEmail = @sEmail
-         AND nBit = 1;";
+     SELECT
+         nID,
+         sFName,
+         sLName,
+         sMobile,
+         sEmail,
+         DOB,
+         nGender,
+         sProfileImage,
+         nCollegeCode,
+         sCollegeName,
+         sPassword,
+         nSABit
+     FROM tblCandidateRegister
+     WHERE sEmail = @sEmail
+       AND nBit = 1;";
 
                 using (SqlCommand cmd = new SqlCommand(query, cn))
                 {
@@ -959,6 +961,7 @@ public List<BranchM> GetBranches(int departmentId)
             return null;
         }
 
+
         #endregion
 
 
@@ -969,18 +972,18 @@ public List<BranchM> GetBranches(int departmentId)
             using (SqlConnection con = _db.GetConnection())
             {
                 string query = @"
-     SELECT
-         nID,
-         SAID,
-         sFName,
-         sLName,
-         sEmail,
-         sMobile,
-         sRole,
-         sPassword
-     FROM tblSuperAdmin
-     WHERE nBit = 1
-       AND sEmail = @Email;";
+      SELECT
+          nID,
+          SAID,
+          sFName,
+          sLName,
+          sEmail,
+          sMobile,
+          sRole,
+          sPassword
+      FROM tblSuperAdmin
+      WHERE nBit = 1
+        AND sEmail = @Email;";
 
                 using (SqlCommand cmd = new SqlCommand(query, con))
                 {
@@ -1888,15 +1891,53 @@ public List<BranchM> GetBranches(int departmentId)
         #endregion
 
 
-        public bool ResetCandidatePassword(string email, string newPassword) { using (SqlConnection cn = _db.GetConnection()) { string query = @" UPDATE tblCandidateRegister SET sPassword = @NewPassword, ModDate = GETDATE() WHERE sEmail = @Email AND nBit = 1"; using (SqlCommand cmd = new SqlCommand(query, cn)) { cmd.Parameters.Add("@NewPassword", SqlDbType.NVarChar, 300).Value = newPassword; cmd.Parameters.Add("@Email", SqlDbType.NVarChar, 150).Value = email.Trim(); cn.Open(); int rowsAffected = cmd.ExecuteNonQuery(); return rowsAffected > 0; } } }
+        public bool ResetCandidatePassword(string email, string newPassword)
+        {
+            // Hash the new password before saving it
+            var passwordHasher = new PasswordHasher<CandidateUser>();
 
+            string hashedPassword = passwordHasher.HashPassword(
+                new CandidateUser(),
+                newPassword
+            );
 
-       
-// ==========================================================
-// ORGANIZATION RESET PASSWORD
-// ==========================================================
+            using (SqlConnection cn = _db.GetConnection())
+            {
+                string query = @"
+     UPDATE tblCandidateRegister
+     SET sPassword = @NewPassword,
+         ModDate = GETDATE()
+     WHERE sEmail = @Email
+       AND nBit = 1";
 
-public OrganizationLogin? GetOrganizationLoginDetails(string email)
+                using (SqlCommand cmd = new SqlCommand(query, cn))
+                {
+                    cmd.Parameters.Add(
+                        "@NewPassword",
+                        SqlDbType.NVarChar,
+                        500
+                    ).Value = hashedPassword;
+
+                    cmd.Parameters.Add(
+                        "@Email",
+                        SqlDbType.NVarChar,
+                        200
+                    ).Value = email.Trim();
+
+                    cn.Open();
+
+                    int rowsAffected = cmd.ExecuteNonQuery();
+
+                    return rowsAffected > 0;
+                }
+            }
+        }
+
+        // ==========================================================
+        // ORGANIZATION RESET PASSWORD
+        // ==========================================================
+
+        public OrganizationLogin? GetOrganizationLoginDetails(string email)
         {
             using (SqlConnection cn = _db.GetConnection())
             {
@@ -1946,26 +1987,35 @@ public OrganizationLogin? GetOrganizationLoginDetails(string email)
         // ==========================================================
 
         public bool ResetOrganizationPassword(
-            string email,
-            string newPassword)
+     string email,
+     string newPassword)
         {
             using (SqlConnection cn = _db.GetConnection())
             {
                 string query = @"
-            UPDATE tblOrgRegistration
-            SET
-                sPassword = @NewPassword,
-                ModDate = GETDATE()
-            WHERE sEmail = @Email
-              AND nBit = 1";
+     UPDATE tblOrgRegistration
+     SET
+         sPassword = @NewPassword,
+         ModDate = GETDATE()
+     WHERE sEmail = @Email
+       AND nBit = 1;";
 
                 using (SqlCommand cmd = new SqlCommand(query, cn))
                 {
+                    // Hash the new password before saving
+                    var passwordHasher =
+                        new PasswordHasher<OrganizationUser>();
+
+                    string hashedPassword = passwordHasher.HashPassword(
+                        new OrganizationUser(),
+                        newPassword
+                    );
+
                     cmd.Parameters.Add(
                         "@NewPassword",
                         SqlDbType.NVarChar,
-                        300
-                    ).Value = newPassword;
+                        500
+                    ).Value = hashedPassword;
 
                     cmd.Parameters.Add(
                         "@Email",
@@ -1999,11 +2049,11 @@ public OrganizationLogin? GetOrganizationLoginDetails(string email)
                 );
 
                 string query = @"
-     UPDATE tblSuperAdmin
-     SET sPassword = @Password,
-         ModDate = GETDATE()
-     WHERE sEmail = @Email
-       AND nBit = 1";
+      UPDATE tblSuperAdmin
+      SET sPassword = @Password,
+          ModDate = GETDATE()
+      WHERE sEmail = @Email
+        AND nBit = 1";
 
                 using (SqlCommand cmd = new SqlCommand(query, cn))
                 {

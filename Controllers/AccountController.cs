@@ -1,6 +1,8 @@
 ﻿using ErJobPortal.Models;
 using ErJobPortal.Repositories;
 using ErJobPortal.Services;
+using ErJobPortal.Services;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Configuration;
@@ -9,7 +11,6 @@ using System.Data;
 using System.Net;
 using System.Net.Mail;
 using System.Security.Cryptography;
-using ErJobPortal.Services;
 
 
 
@@ -650,111 +651,46 @@ namespace ErJobPortal.Controllers
         // khushi 16-10-26
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> OrganizationRegister(OrganizationRegister model)
+        public IActionResult OrganizationRegister(OrganizationRegister model)
         {
             try
             {
-                // 1. Verify email OTP using server-side Session.
-                string email = (model.sEmail ?? "")
-                    .Trim()
-                    .ToLowerInvariant();
-
-                string? verifiedEmail =
-                    HttpContext.Session.GetString("OrgOtpEmail");
-
-                string? verified =
-                    HttpContext.Session.GetString("OrgOtpVerified");
-
-                string? savedOtp =
-                    HttpContext.Session.GetString("OrgOtp");
-
-                string? expiryValue =
-                    HttpContext.Session.GetString("OrgOtpExpiry");
-
-                bool validExpiry =
-                    long.TryParse(expiryValue, out long expiry) &&
-                    DateTimeOffset.UtcNow.ToUnixTimeSeconds() < expiry;
-
-                bool otpVerified =
-                    verified == "true" &&
-                    !string.IsNullOrWhiteSpace(savedOtp) &&
-                    validExpiry &&
-                    string.Equals(
-                        email,
-                        verifiedEmail,
-                        StringComparison.OrdinalIgnoreCase
-                    );
-
-                if (!otpVerified)
+                // Static OTP validation
+                if (model.sOTP != "123456")
                 {
                     ModelState.AddModelError(
                         "sOTP",
-                        "Please verify your email using a valid OTP before registration."
+                        "Invalid OTP. Please enter 123456."
                     );
                 }
 
-                // 2. Check model validation.
                 if (!ModelState.IsValid)
                 {
-                    foreach (var item in ModelState)
-                    {
-                        foreach (var error in item.Value.Errors)
-                        {
-                            Console.WriteLine(
-                                $"Field: {item.Key}, Error: {error.ErrorMessage}"
-                            );
-                        }
-                    }
-
                     return View(model);
                 }
 
-                // 3. Register organization only after OTP verification.
+                // Repository hashes the password before saving
                 int result = _accountRepository.RegisterOrganization(model);
 
                 if (result > 0)
                 {
-                    // 4. Send registration confirmation email.
-                    try
-                    {
-                        await SendOrganizationRegistrationEmail(
-                            model.sEmail,
-                            model.sOrgName
-                        );
-                    }
-                    catch (Exception emailEx)
-                    {
-                        // Registration succeeded even if confirmation email fails.
-                        Console.WriteLine(
-                            "Organization registration email error: " +
-                            emailEx
-                        );
-                    }
-
-                    // 5. Clear OTP session after successful registration.
-                    HttpContext.Session.Remove("OrgOtp");
-                    HttpContext.Session.Remove("OrgOtpEmail");
-                    HttpContext.Session.Remove("OrgOtpExpiry");
-                    HttpContext.Session.Remove("OrgOtpVerified");
-
                     TempData["Success"] =
-                        "Organization registered successfully! Please check your email for confirmation.";
+                        "Organization Registration Successfully.";
 
                     return RedirectToAction("OrganizationRegister");
                 }
 
-                TempData["Error"] = "Organization registration failed.";
-
+                TempData["Error"] = "Organization Registration Failed.";
                 return View(model);
             }
             catch (Exception ex)
             {
-                Console.WriteLine("Organization Register Error:");
+                // Log the exception on the server
                 Console.WriteLine(ex.ToString());
 
                 ModelState.AddModelError(
                     "",
-                    "An error occurred while registering the organization. Please try again."
+                    "Registration failed. Please try again."
                 );
 
                 return View(model);
@@ -829,76 +765,70 @@ namespace ErJobPortal.Controllers
 
 
         [HttpPost]
-        public async Task<IActionResult> OrganizationLogin(OrganizationLogin model)
+        public IActionResult OrganizationLogin(OrganizationLogin model)
         {
             if (!ModelState.IsValid)
             {
                 return View(model);
             }
 
+            // Get organization by email using inline SQL
             OrganizationUser? user =
                 _accountRepository.LoginOrganization(model);
 
-            if (user != null)
+            if (user == null)
             {
-                // Super Admin disabled organization
-                if (!user.nSABit)
-                {
-                    TempData["Error"] =
-                        "Your organization has been disabled by the Super Admin. Please contact the administrator.";
-
-                    return View(model);
-                }
-
-                // Normal login: set organization session
-                HttpContext.Session.SetInt32("OrgID", user.nID);
-
-                HttpContext.Session.SetString(
-                    "OrgName",
-                    user.sOrgName ?? ""
-                );
-
-                HttpContext.Session.SetString(
-                    "OrgEmail",
-                    user.sEmail ?? ""
-                );
-
-                HttpContext.Session.SetString(
-                    "OrgCode",
-                    user.orgCode ?? ""
-                );
-
-                // Record successful organization login
-                try
-                {
-                    await _visitorTrackingService.TrackVisitAsync(
-                        HttpContext,
-                        "Organization",
-                        "OrganizationLogin",
-                        user.nID,
-                        "Organization",
-                        true
-                    );
-                }
-                catch (Exception ex)
-                {
-                    // Tracking failure should not prevent login
-                    _logger.LogError(
-                        ex,
-                        "Failed to record organization login activity for OrgID {OrgID}",
-                        user.nID
-                    );
-                }
-
-                return RedirectToAction(
-                    "Dashboard",
-                    "Organization"
-                );
+                TempData["Error"] = "Invalid Email or Password";
+                return View(model);
             }
 
-            TempData["Error"] = "Invalid Email or Password";
+            // Verify entered password against the stored hash
+            var passwordHasher = new PasswordHasher<OrganizationUser>();
 
-            return View(model);
+            PasswordVerificationResult passwordResult;
+
+            try
+            {
+                passwordResult = passwordHasher.VerifyHashedPassword(
+                    user,
+                    user.sPassword ?? "",
+                    model.sPassword ?? ""
+                );
+            }
+            catch (FormatException)
+            {
+                TempData["Error"] =
+                    "Stored password format is invalid. Please reset your password.";
+
+                return View(model);
+            }
+
+            if (passwordResult == PasswordVerificationResult.Failed)
+            {
+                TempData["Error"] = "Invalid Email or Password";
+                return View(model);
+            }
+
+            // Block organizations disabled by Super Admin
+            if (!user.nSABit)
+            {
+                TempData["Error"] =
+                    "Your organization account has been disabled by the Super Admin.";
+
+                return View(model);
+            }
+
+            // Create existing organization sessions
+            HttpContext.Session.SetInt32("OrgID", user.nID);
+
+            HttpContext.Session.SetString(
+                "OrgName", user.sOrgName ?? "");
+
+            HttpContext.Session.SetString(
+                "OrgEmail", user.sEmail ?? "");
+
+            // Redirect after successful login
+            return RedirectToAction("Dashboard", "Organization");
         }
 
 
@@ -911,10 +841,8 @@ namespace ErJobPortal.Controllers
         }
 
 
-
-
         [HttpPost]
-        public async Task<IActionResult> CandidateLogin(CandidateLogin model)
+        public IActionResult CandidateLogin(CandidateLogin model)
         {
             if (!ModelState.IsValid)
             {
@@ -924,9 +852,26 @@ namespace ErJobPortal.Controllers
             CandidateUser? user =
                 _accountRepository.LoginCandidate(model);
 
+            var passwordHasher = new PasswordHasher<CandidateUser>();
+
+            var passwordResult = passwordHasher.VerifyHashedPassword(
+                user,
+                user.sPassword ?? "",
+                model.sPassword ?? ""
+            );
+
+            if (passwordResult == PasswordVerificationResult.Failed)
+            {
+                TempData["Error"] = "Invalid Email or Password";
+                return View(model);
+            }
+
             if (user != null)
             {
+                // =====================================================
                 // SUPER ADMIN DISABLED CANDIDATE
+                // =====================================================
+
                 if (!user.nSABit)
                 {
                     TempData["Error"] =
@@ -935,7 +880,10 @@ namespace ErJobPortal.Controllers
                     return View(model);
                 }
 
-                // SET CANDIDATE SESSION
+                // =====================================================
+                // CANDIDATE ENABLED
+                // =====================================================
+
                 HttpContext.Session.SetInt32(
                     "CandidateID",
                     user.nID
@@ -951,32 +899,18 @@ namespace ErJobPortal.Controllers
                     user.sEmail ?? ""
                 );
 
-                // RECORD SUCCESSFUL CANDIDATE LOGIN
-                try
-                {
-                    await _visitorTrackingService.TrackVisitAsync(
-                        HttpContext,
-                        "Candidate",
-                        "CandidateLogin",
-                        user.nID,
-                        "Candidate",
-                        true
-                    );
-                }
-                catch (Exception ex)
-                {
-                    // Tracking errors should not prevent a successful login.
-                    // Log ex using ILogger if available.
-                }
-
                 return RedirectToAction(
                     "Dashboard",
                     "Candidate"
                 );
             }
 
+            // =====================================================
             // INVALID LOGIN
-            TempData["Error"] = "Invalid Email or Password";
+            // =====================================================
+
+            TempData["Error"] =
+                "Invalid Email or Password";
 
             return View(model);
         }
@@ -1158,21 +1092,21 @@ namespace ErJobPortal.Controllers
                 }
 
       
-// ==========================================================
-// ORGANIZATION RESET PASSWORD
-// ==========================================================
+            // ==========================================================
+            // ORGANIZATION RESET PASSWORD
+            // ==========================================================
 
-[HttpGet]
-public IActionResult OrganizationResetPassword()
-        {
-            return View();
-        }
+            [HttpGet]
+            public IActionResult OrganizationResetPassword()
+                    {
+                        return View();
+                    }
 
 
         [HttpPost]
         [ValidateAntiForgeryToken]
         public IActionResult OrganizationResetPassword(
-            OrganizationResetPassword model)
+                            OrganizationResetPassword model)
         {
             if (!ModelState.IsValid)
             {
@@ -1197,7 +1131,7 @@ public IActionResult OrganizationResetPassword()
                     return View(model);
                 }
 
-                // Update password
+                // Repository hashes the new password before saving it
                 bool updated =
                     _accountRepository.ResetOrganizationPassword(
                         email,
@@ -1222,8 +1156,7 @@ public IActionResult OrganizationResetPassword()
             catch (Exception ex)
             {
                 Console.WriteLine(
-                    "Organization Reset Password Error: "
-                    + ex.ToString()
+                    "Organization Reset Password Error: " + ex
                 );
 
                 ModelState.AddModelError(
@@ -1242,12 +1175,12 @@ public IActionResult OrganizationResetPassword()
         [HttpGet]
         public IActionResult OrganizationForgotPassword()
         {
-            return View();
+            return View(new OrganizationForgotPassword());
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> OrganizationForgotPassword(
+        public IActionResult OrganizationForgotPassword(
             OrganizationForgotPassword model)
         {
             if (!ModelState.IsValid)
@@ -1273,37 +1206,23 @@ public IActionResult OrganizationResetPassword()
                     return View(model);
                 }
 
-                if (string.IsNullOrWhiteSpace(organization.sPassword))
-                {
-                    ModelState.AddModelError(
-                        "",
-                        "Password information is not available for this account."
-                    );
-
-                    return View(model);
-                }
-
-                // Send login details to registered email
-                await _emailService.SendOrganizationLoginDetailsAsync(
-                    organization.sEmail,
-                    organization.sPassword
-                );
+                // Pass email to the reset page
+                TempData["ResetEmail"] = organization.sEmail ?? email;
 
                 TempData["Success"] =
-                    "Your login details have been sent to your registered email address.";
+                    "Organization found. Please reset your password.";
 
-                return RedirectToAction("OrganizationLogin");
+                return RedirectToAction("OrganizationResetPassword");
             }
             catch (Exception ex)
             {
-                Console.WriteLine("========================================");
-                Console.WriteLine("Organization Forgot Password Error");
-                Console.WriteLine(ex.ToString());
-                Console.WriteLine("========================================");
+                Console.WriteLine(
+                    "Organization Forgot Password Error: " + ex
+                );
 
                 ModelState.AddModelError(
                     "",
-                    "Email Error: " + ex.Message
+                    "Unable to process your request. Please try again later."
                 );
 
                 return View(model);
