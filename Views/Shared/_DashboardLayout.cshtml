@@ -4175,23 +4175,48 @@
 
 
 					<!-- ================= CREATE USER ================= -->
+					<!-- ================= CREATE USER ================= -->
+					@if (Context.Session.GetString("SubTpoBit") != "1")
+					{
+						<div class="sidebar-dropdown">
 
-@if (Context.Session.GetString("SubTpoBit") != "1")
-{
-    <a asp-controller="TPO"
-       asp-action="CreateUser"
-       class="sidebar-link">
+							<div class="sidebar-link"
+								 onclick="toggleSidebarMenu('tpoCreateUserSubmenu', 'tpoCreateUserArrow')">
 
-        <span class="menu-icon">
-            <i class="fas fa-user-plus"></i>
-        </span>
+								<span class="menu-icon">
+									<i class="fas fa-user-plus"></i>
+								</span>
 
-        <span class="menu-text">
-            Create User
-        </span>
+								<span class="menu-text">
+									Create User
+								</span>
 
-    </a>
-}
+								<span class="profile-arrow"
+									  id="tpoCreateUserArrow">
+									<i class="fas fa-chevron-right"></i>
+								</span>
+
+							</div>
+
+							<div class="profile-submenu"
+								 id="tpoCreateUserSubmenu">
+
+								<a asp-controller="TPO"
+								   asp-action="Addsubtpo"
+								   class="profile-submenu-link">
+									Add Sub TPO
+								</a>
+
+								<a asp-controller="TPO"
+								   asp-action="ViewTPODetails"
+								   class="profile-submenu-link">
+									View TPO Details
+								</a>
+
+							</div>
+
+						</div>
+					}
 
 				
 					
@@ -4238,6 +4263,8 @@
 							   class="profile-submenu-link">
 								Send Notification/Event
 							</a>
+
+							
 						}
 						else
 						{
@@ -5051,7 +5078,7 @@ else
 								<!-- TPO MY PROFILE -->
 
 								<a asp-controller="TPO"
-								   asp-action="Profile"
+								   asp-action="Viewprofile"
 								   class="user-dropdown-item">
 
 									<span class="dropdown-item-icon">
@@ -5111,8 +5138,8 @@ else
 
 
 							@* =========================================================
-SUPER ADMIN
-========================================================= *@
+							SUPER ADMIN
+							========================================================= *@
 
 							else if (ViewData["Panel"]?.ToString() == "SuperAdmin")
 							{

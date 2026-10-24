@@ -1081,81 +1081,81 @@ namespace ErJobPortal.Controllers
         }
 
         
-// ==========================================================
-// Candidate Reset Password
-// ==========================================================
+        // ==========================================================
+        // Candidate Reset Password
+        // ==========================================================
 
-[HttpGet]
-public IActionResult CandidateResetPassword()
-        {
-            return View();
-        }
-
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public IActionResult CandidateResetPassword(
-            CandidateResetPassword model)
-        {
-            if (!ModelState.IsValid)
-            {
-                return View(model);
-            }
-
-            try
-            {
-                string email = model.sEmail.Trim();
-
-                // Check whether candidate exists
-                CandidateLogin? candidate =
-                    _accountRepository.GetCandidateLoginDetails(email);
-
-                if (candidate == null)
+        [HttpGet]
+        public IActionResult CandidateResetPassword()
                 {
-                    ModelState.AddModelError(
-                        "sEmail",
-                        "No candidate account was found with this email address."
-                    );
-
-                    return View(model);
+                    return View();
                 }
 
-                // Update password
-                bool updated =
-                    _accountRepository.ResetCandidatePassword(
-                        email,
-                        model.NewPassword
-                    );
-
-                if (!updated)
+                [HttpPost]
+                [ValidateAntiForgeryToken]
+                public IActionResult CandidateResetPassword(
+                    CandidateResetPassword model)
                 {
-                    ModelState.AddModelError(
-                        "",
-                        "Unable to reset password. Please try again."
-                    );
+                    if (!ModelState.IsValid)
+                    {
+                        return View(model);
+                    }
 
-                    return View(model);
+                    try
+                    {
+                        string email = model.sEmail.Trim();
+
+                        // Check whether candidate exists
+                        CandidateLogin? candidate =
+                            _accountRepository.GetCandidateLoginDetails(email);
+
+                        if (candidate == null)
+                        {
+                            ModelState.AddModelError(
+                                "sEmail",
+                                "No candidate account was found with this email address."
+                            );
+
+                            return View(model);
+                        }
+
+                        // Update password
+                        bool updated =
+                            _accountRepository.ResetCandidatePassword(
+                                email,
+                                model.NewPassword
+                            );
+
+                        if (!updated)
+                        {
+                            ModelState.AddModelError(
+                                "",
+                                "Unable to reset password. Please try again."
+                            );
+
+                            return View(model);
+                        }
+
+                        TempData["Success"] =
+                            "Your password has been reset successfully. Please login with your new password.";
+
+                        return RedirectToAction("CandidateLogin");
+                    }
+                    catch (Exception ex)
+                    {
+                        Console.WriteLine(
+                            "Candidate Reset Password Error: "
+                            + ex.ToString()
+                        );
+
+                        ModelState.AddModelError(
+                            "",
+                            "Unable to reset password. Please try again later."
+                        );
+
+                        return View(model);
+                    }
                 }
-
-                TempData["Success"] =
-                    "Your password has been reset successfully. Please login with your new password.";
-
-                return RedirectToAction("CandidateLogin");
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine(
-                    "Candidate Reset Password Error: "
-                    + ex.ToString()
-                );
-
-                ModelState.AddModelError(
-                    "",
-                    "Unable to reset password. Please try again later."
-                );
-
-                return View(model);
-            }
-        }
 
       
 // ==========================================================
@@ -3047,31 +3047,164 @@ public IActionResult OrganizationResetPassword()
         }
 
 
-        // khushi 23-10-26
-        // Validate duplicate TPO mobile number
-        [AcceptVerbs("GET", "POST")]
-        public IActionResult CheckTPOMobile(string mobileNo)
+
+
+
+
+   
+        // ============================================================
+        // EDIT CANDIDATE REGISTRATION - GET
+        // ============================================================
+
+        [HttpGet]
+        public IActionResult EditCandidateRegistration()
+                {
+                    int? candidateId = HttpContext.Session.GetInt32("CandidateID");
+
+                    if (candidateId == null)
+                    {
+                        return RedirectToAction("CandidateLogin", "Account");
+                    }
+
+                    var candidate = _accountRepository
+                        .GetCandidateRegistrationForEdit(candidateId.Value);
+
+                    if (candidate == null)
+                    {
+                        return NotFound("Candidate registration details not found.");
+                    }
+
+                    return View(candidate);
+                }
+
+
+        // ============================================================
+        // EDIT CANDIDATE REGISTRATION - POST
+        // ============================================================
+
+
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public IActionResult EditCandidateRegistration(CandidateRegister model)
         {
-            if (string.IsNullOrWhiteSpace(mobileNo))
-                return Json(true);
+            int? candidateId = HttpContext.Session.GetInt32("CandidateID");
 
-            bool exists = _accountRepository.IsTPOMobileExists(mobileNo);
+            if (candidateId == null)
+            {
+                return RedirectToAction("CandidateLogin", "Account");
+            }
 
-            return Json(!exists);
+            // Password changes are not allowed on this page.
+            ModelState.Remove(nameof(model.sPassword));
+
+            var existingCandidate =
+                _accountRepository.GetCandidateRegistrationForEdit(candidateId.Value);
+
+            if (existingCandidate == null)
+            {
+                return NotFound("Candidate registration details not found.");
+            }
+
+            // Always preserve the registered email.
+            model.sEmail = existingCandidate.sEmail;
+
+            // Preserve the existing profile image unless a new image is uploaded.
+            model.sProfileImage = existingCandidate.sProfileImage;
+
+            // Check whether the new mobile number belongs to another candidate.
+            if (!string.IsNullOrWhiteSpace(model.sMobile))
+            {
+                model.sMobile = model.sMobile.Trim();
+
+                if (_accountRepository.CandidateMobileExistsForAnotherCandidate(
+                        model.sMobile, candidateId.Value))
+                {
+                    ModelState.AddModelError(
+                        nameof(model.sMobile),
+                        "This mobile number is already registered.");
+                }
+            }
+
+            // Validate submitted profile details.
+            if (!ModelState.IsValid)
+            {
+                return View(model);
+            }
+
+            try
+            {
+                if (model.ProfileImageFile != null &&
+                    model.ProfileImageFile.Length > 0)
+                {
+                    var extension = Path
+                        .GetExtension(model.ProfileImageFile.FileName)
+                        .ToLowerInvariant();
+
+                    var allowedExtensions = new[] { ".jpg", ".jpeg", ".png" };
+
+                    if (!allowedExtensions.Contains(extension))
+                    {
+                        ModelState.AddModelError(
+                            nameof(model.ProfileImageFile),
+                            "Only JPG, JPEG, and PNG images are allowed.");
+
+                        return View(model);
+                    }
+
+                    if (model.ProfileImageFile.Length > 5 * 1024 * 1024)
+                    {
+                        ModelState.AddModelError(
+                            nameof(model.ProfileImageFile),
+                            "The image must not exceed 5 MB.");
+
+                        return View(model);
+                    }
+
+                    string uploadFolder = Path.Combine(
+                        Directory.GetCurrentDirectory(),
+                        "wwwroot",
+                        "uploads",
+                        "candidates");
+
+                    Directory.CreateDirectory(uploadFolder);
+
+                    string fileName = $"{Guid.NewGuid():N}{extension}";
+                    string filePath = Path.Combine(uploadFolder, fileName);
+
+                    using (var stream = new FileStream(filePath, FileMode.Create))
+                    {
+                        model.ProfileImageFile.CopyTo(stream);
+                    }
+
+                    model.sProfileImage = "/uploads/candidates/" + fileName;
+                }
+
+                // Update profile without changing the password.
+                bool updated = _accountRepository
+                    .UpdateCandidateRegistrationForEdit(candidateId.Value, model);
+
+                if (!updated)
+                {
+                    TempData["Error"] = "Profile was not updated.";
+                    return View(model);
+                }
+
+                TempData["Success"] = "Profile updated successfully.";
+
+                return RedirectToAction("EditCandidateRegistration");
+            }
+            catch (Exception)
+            {
+                TempData["Error"] =
+                    "An error occurred while updating your profile.";
+
+                return View(model);
+            }
         }
 
-        // khushi 23-10-26
-        // Validate duplicate TPO email
-        [AcceptVerbs("GET", "POST")]
-        public IActionResult CheckTPOEmail(string collegeMailID)
-        {
-            if (string.IsNullOrWhiteSpace(collegeMailID))
-                return Json(true);
 
-            bool exists = _accountRepository.IsTPOEmailExists(collegeMailID);
 
-            return Json(!exists);
-        }
 
 
     }
