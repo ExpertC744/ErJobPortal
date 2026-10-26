@@ -1,7 +1,6 @@
 ﻿using ErJobPortal.Models;
 using ErJobPortal.Repositories;
 using ErJobPortal.Services;
-using ErJobPortal.Services;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Data.SqlClient;
@@ -763,26 +762,32 @@ namespace ErJobPortal.Controllers
             return View();
         }
 
-
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public IActionResult OrganizationLogin(OrganizationLogin model)
         {
+            // Validate email and password fields
             if (!ModelState.IsValid)
             {
                 return View(model);
             }
 
-            // Get organization by email using inline SQL
+            // Get organization by email
             OrganizationUser? user =
                 _accountRepository.LoginOrganization(model);
 
+            // Email not registered
             if (user == null)
             {
-                TempData["Error"] = "Invalid Email or Password";
+                ModelState.AddModelError(
+                    nameof(model.sEmail),
+                    "Invalid email address."
+                );
+
                 return View(model);
             }
 
-            // Verify entered password against the stored hash
+            // Verify entered password against stored password hash
             var passwordHasher = new PasswordHasher<OrganizationUser>();
 
             PasswordVerificationResult passwordResult;
@@ -803,9 +808,14 @@ namespace ErJobPortal.Controllers
                 return View(model);
             }
 
+            // Incorrect password
             if (passwordResult == PasswordVerificationResult.Failed)
             {
-                TempData["Error"] = "Invalid Email or Password";
+                ModelState.AddModelError(
+                    nameof(model.sPassword),
+                    "Incorrect password. Please try again."
+                );
+
                 return View(model);
             }
 
@@ -818,14 +828,18 @@ namespace ErJobPortal.Controllers
                 return View(model);
             }
 
-            // Create existing organization sessions
+            // Create organization sessions
             HttpContext.Session.SetInt32("OrgID", user.nID);
 
             HttpContext.Session.SetString(
-                "OrgName", user.sOrgName ?? "");
+                "OrgName",
+                user.sOrgName ?? ""
+            );
 
             HttpContext.Session.SetString(
-                "OrgEmail", user.sEmail ?? "");
+                "OrgEmail",
+                user.sEmail ?? ""
+            );
 
             // Redirect after successful login
             return RedirectToAction("Dashboard", "Organization");
@@ -840,8 +854,8 @@ namespace ErJobPortal.Controllers
             return View();
         }
 
-
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public IActionResult CandidateLogin(CandidateLogin model)
         {
             if (!ModelState.IsValid)
@@ -849,9 +863,20 @@ namespace ErJobPortal.Controllers
                 return View(model);
             }
 
-            CandidateUser? user =
-                _accountRepository.LoginCandidate(model);
+            CandidateUser? user = _accountRepository.LoginCandidate(model);
 
+            // Email not registered
+            if (user == null)
+            {
+                ModelState.AddModelError(
+                    nameof(model.sEmail),
+                    "Invalid email address."
+                );
+
+                return View(model);
+            }
+
+            // Verify password
             var passwordHasher = new PasswordHasher<CandidateUser>();
 
             var passwordResult = passwordHasher.VerifyHashedPassword(
@@ -860,59 +885,40 @@ namespace ErJobPortal.Controllers
                 model.sPassword ?? ""
             );
 
+            // Incorrect password
             if (passwordResult == PasswordVerificationResult.Failed)
             {
-                TempData["Error"] = "Invalid Email or Password";
+                ModelState.AddModelError(
+                    nameof(model.sPassword),
+                    "Incorrect password. Please try again."
+                );
+
                 return View(model);
             }
 
-            if (user != null)
+            // Candidate disabled by Super Admin
+            if (!user.nSABit)
             {
-                // =====================================================
-                // SUPER ADMIN DISABLED CANDIDATE
-                // =====================================================
+                TempData["Error"] =
+                    "Your account has been disabled by the Super Admin. Please contact the administrator.";
 
-                if (!user.nSABit)
-                {
-                    TempData["Error"] =
-                        "Your account has been disabled by the Super Admin. Please contact the administrator.";
-
-                    return View(model);
-                }
-
-                // =====================================================
-                // CANDIDATE ENABLED
-                // =====================================================
-
-                HttpContext.Session.SetInt32(
-                    "CandidateID",
-                    user.nID
-                );
-
-                HttpContext.Session.SetString(
-                    "CandidateName",
-                    (user.sFName + " " + user.sLName).Trim()
-                );
-
-                HttpContext.Session.SetString(
-                    "CandidateEmail",
-                    user.sEmail ?? ""
-                );
-
-                return RedirectToAction(
-                    "Dashboard",
-                    "Candidate"
-                );
+                return View(model);
             }
 
-            // =====================================================
-            // INVALID LOGIN
-            // =====================================================
+            // Set session
+            HttpContext.Session.SetInt32("CandidateID", user.nID);
 
-            TempData["Error"] =
-                "Invalid Email or Password";
+            HttpContext.Session.SetString(
+                "CandidateName",
+                (user.sFName + " " + user.sLName).Trim()
+            );
 
-            return View(model);
+            HttpContext.Session.SetString(
+                "CandidateEmail",
+                user.sEmail ?? ""
+            );
+
+            return RedirectToAction("Dashboard", "Candidate");
         }
 
 
@@ -1694,6 +1700,7 @@ namespace ErJobPortal.Controllers
         //    }
         //}
 
+
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> TPOLogin(TPOLogin model)
@@ -1705,49 +1712,62 @@ namespace ErJobPortal.Controllers
 
             try
             {
-                if (string.IsNullOrWhiteSpace(model.CollegeMailID))
-                {
-                    ModelState.AddModelError(
-                        "",
-                        "Please enter your College Mail ID."
-                    );
-
-                    return View(model);
-                }
-
                 string email = model.CollegeMailID.Trim();
 
-                TPOLoginResult? tpo =
-                    _accountRepository.LoginTPO(email);
+                // Find TPO by college email
+                TPOLoginResult? tpo = _accountRepository.LoginTPO(email);
 
-                // CHECK TPO EXISTS
+                // Email not registered
                 if (tpo == null)
                 {
                     ModelState.AddModelError(
-                        "",
-                        "Invalid College Mail ID or Password."
+                        nameof(model.CollegeMailID),
+                        "Invalid email address."
                     );
 
                     return View(model);
                 }
 
-                // CHECK PASSWORD
-                // Existing comparison retained from your code.
-                if (tpo.PasswordHash != model.Password)
+                // Verify password
+                var passwordHasher = new PasswordHasher<string>();
+
+                PasswordVerificationResult passwordResult;
+
+                try
+                {
+                    passwordResult = passwordHasher.VerifyHashedPassword(
+                        email,
+                        tpo.PasswordHash ?? "",
+                        model.Password
+                    );
+                }
+                catch (FormatException ex)
+                {
+                    _logger.LogError(
+                        ex,
+                        "Invalid password hash format for TPO email {Email}",
+                        email
+                    );
+
+                    TempData["Error"] =
+                        "Your stored password format is invalid. Please reset your password.";
+
+                    return View(model);
+                }
+
+                // Incorrect password
+                if (passwordResult == PasswordVerificationResult.Failed)
                 {
                     ModelState.AddModelError(
-                        "",
-                        "Invalid College Mail ID or Password."
+                        nameof(model.Password),
+                        "Incorrect password. Please try again."
                     );
 
                     return View(model);
                 }
 
-                // SET TPO SESSION
-                HttpContext.Session.SetInt32(
-                    "TPOID",
-                    tpo.TPOID
-                );
+                // Set TPO session after successful login
+                HttpContext.Session.SetInt32("TPOID", tpo.TPOID);
 
                 HttpContext.Session.SetString(
                     "TPOName",
@@ -1764,10 +1784,7 @@ namespace ErJobPortal.Controllers
                     tpo.CollegeName ?? ""
                 );
 
-                HttpContext.Session.SetString(
-                    "TPORole",
-                    "TPO"
-                );
+                HttpContext.Session.SetString("TPORole", "TPO");
 
                 // 0 = Main TPO, 1 = Sub-TPO
                 HttpContext.Session.SetString(
@@ -1775,7 +1792,7 @@ namespace ErJobPortal.Controllers
                     tpo.SubTpoBit ? "1" : "0"
                 );
 
-                // RECORD SUCCESSFUL TPO LOGIN
+                // Record successful login; tracking failure must not block login
                 try
                 {
                     await _visitorTrackingService.TrackVisitAsync(
@@ -1789,7 +1806,6 @@ namespace ErJobPortal.Controllers
                 }
                 catch (Exception trackingException)
                 {
-                    // Tracking failure must not prevent a valid login.
                     _logger.LogError(
                         trackingException,
                         "Failed to record TPO login activity for TPOID {TPOID}",
@@ -1797,24 +1813,139 @@ namespace ErJobPortal.Controllers
                     );
                 }
 
-                // REDIRECT TO TPO DASHBOARD
-                return RedirectToAction(
-                    "Dashboard",
-                    "TPO"
-                );
+                return RedirectToAction("Dashboard", "TPO");
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "TPO login failed.");
 
-                ModelState.AddModelError(
-                    "",
-                    "Unable to login. Please try again later."
-                );
+                TempData["Error"] = "Unable to login. Please try again later.";
 
                 return View(model);
             }
         }
+
+        //[HttpPost]
+        //[ValidateAntiForgeryToken]
+        //public async Task<IActionResult> TPOLogin(TPOLogin model)
+        //{
+        //    if (!ModelState.IsValid)
+        //    {
+        //        return View(model);
+        //    }
+
+        //    try
+        //    {
+        //        if (string.IsNullOrWhiteSpace(model.CollegeMailID))
+        //        {
+        //            ModelState.AddModelError(
+        //                "",
+        //                "Please enter your College Mail ID."
+        //            );
+
+        //            return View(model);
+        //        }
+
+        //        string email = model.CollegeMailID.Trim();
+
+        //        TPOLoginResult? tpo =
+        //            _accountRepository.LoginTPO(email);
+
+        //        // CHECK TPO EXISTS
+        //        if (tpo == null)
+        //        {
+        //            ModelState.AddModelError(
+        //                "",
+        //                "Invalid College Mail ID or Password."
+        //            );
+
+        //            return View(model);
+        //        }
+
+        //        // CHECK PASSWORD
+        //        // Existing comparison retained from your code.
+        //        if (tpo.PasswordHash != model.Password)
+        //        {
+        //            ModelState.AddModelError(
+        //                "",
+        //                "Invalid College Mail ID or Password."
+        //            );
+
+        //            return View(model);
+        //        }
+
+        //        // SET TPO SESSION
+        //        HttpContext.Session.SetInt32(
+        //            "TPOID",
+        //            tpo.TPOID
+        //        );
+
+        //        HttpContext.Session.SetString(
+        //            "TPOName",
+        //            tpo.FullName ?? ""
+        //        );
+
+        //        HttpContext.Session.SetString(
+        //            "TPOEmail",
+        //            tpo.CollegeMailID ?? ""
+        //        );
+
+        //        HttpContext.Session.SetString(
+        //            "TPOCollegeName",
+        //            tpo.CollegeName ?? ""
+        //        );
+
+        //        HttpContext.Session.SetString(
+        //            "TPORole",
+        //            "TPO"
+        //        );
+
+        //        // 0 = Main TPO, 1 = Sub-TPO
+        //        HttpContext.Session.SetString(
+        //            "SubTpoBit",
+        //            tpo.SubTpoBit ? "1" : "0"
+        //        );
+
+        //        // RECORD SUCCESSFUL TPO LOGIN
+        //        try
+        //        {
+        //            await _visitorTrackingService.TrackVisitAsync(
+        //                HttpContext,
+        //                "TPO",
+        //                "TPOLogin",
+        //                tpo.TPOID,
+        //                "TPO",
+        //                true
+        //            );
+        //        }
+        //        catch (Exception trackingException)
+        //        {
+        //            // Tracking failure must not prevent a valid login.
+        //            _logger.LogError(
+        //                trackingException,
+        //                "Failed to record TPO login activity for TPOID {TPOID}",
+        //                tpo.TPOID
+        //            );
+        //        }
+
+        //        // REDIRECT TO TPO DASHBOARD
+        //        return RedirectToAction(
+        //            "Dashboard",
+        //            "TPO"
+        //        );
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        _logger.LogError(ex, "TPO login failed.");
+
+        //        ModelState.AddModelError(
+        //            "",
+        //            "Unable to login. Please try again later."
+        //        );
+
+        //        return View(model);
+        //    }
+        //}
 
 
         // ==========================================================
