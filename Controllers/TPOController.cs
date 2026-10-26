@@ -1098,6 +1098,7 @@ namespace ErJobPortal.Controllers
             return View(model);
         }
 
+
         [HttpGet]
         [Route("TPO/ViewProfile")]
         public IActionResult ViewProfile()
@@ -1109,6 +1110,7 @@ namespace ErJobPortal.Controllers
                 return RedirectToAction("TPOLogin", "Account");
             }
 
+
             TPORegistration? model =
                 _accountRepository.GetTPOById(tpoId.Value);
 
@@ -1116,6 +1118,20 @@ namespace ErJobPortal.Controllers
             {
                 TempData["Error"] = "TPO profile not found.";
                 return RedirectToAction("Dashboard", "TPO");
+            }
+
+            // Convert the stored College ID into the college name.
+            if (int.TryParse(model.CollegeName, out int collegeId))
+            {
+                var colleges = _accountRepository.GetColleges();
+
+                var selectedCollege = colleges
+                    .FirstOrDefault(c => c.nID == collegeId);
+
+                if (selectedCollege != null)
+                {
+                    model.CollegeName = selectedCollege.sCollegeName;
+                }
             }
 
             ViewData["Panel"] = "TPO";
@@ -1127,6 +1143,7 @@ namespace ErJobPortal.Controllers
 
             return View(model);
         }
+
 
         //[HttpGet]
         //[Route("TPO/CreateNotification")]

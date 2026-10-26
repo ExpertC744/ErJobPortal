@@ -4117,25 +4117,36 @@
 
 
 						<div class="profile-submenu"
-							 id="tpoProfileSubmenu">
+     id="tpoProfileSubmenu">
 
-							<a asp-controller="TPO"
-							   asp-action="Viewprofile"
-							   class="profile-submenu-link">
+    <!-- View Profile -->
+    <a asp-controller="TPO"
+       asp-action="Viewprofile"
+       class="profile-submenu-link">
 
-								View Profile
+        View Profile
 
-							</a>
+    </a>
 
-							<a asp-controller="TPO"
-							   asp-action="EditProfile"
-							   class="profile-submenu-link">
+    <!-- Edit Profile -->
+    <a asp-controller="TPO"
+       asp-action="EditProfile"
+       class="profile-submenu-link">
 
-								Edit Profile
+        Edit Profile
 
-							</a>
+    </a>
 
-						</div>
+    <!-- Edit TPO Registration -->
+    <a asp-controller="Account"
+       asp-action="EditTPORegistration"
+       class="profile-submenu-link">
+
+        Edit TPO Registration
+
+    </a>
+
+</div>
 
 					</div>
 
@@ -4937,12 +4948,13 @@ else
 											CANDIDATE
 						========================================================= *@
 
+
 							@if (ViewData["Panel"]?.ToString() == "Candidate")
 							{
 								<!-- CANDIDATE MY PROFILE -->
 
 								<a asp-controller="Candidate"
-								   asp-action="Dashboard"
+								   asp-action="ViewProfile"
 								   class="user-dropdown-item">
 
 									<span class="dropdown-item-icon">
