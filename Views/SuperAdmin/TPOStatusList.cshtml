@@ -1,227 +1,360 @@
 ﻿@model IEnumerable<ErJobPortal.Models.TPORegistration>
 
-@{
-    
-    Layout = "~/Views/Shared/_DashboardLayout.cshtml";
-   
 
+@{
+    Layout = "~/Views/Shared/_DashboardLayout.cshtml";
     ViewData["Title"] = "TPO Status List";
     ViewData["Panel"] = "SuperAdmin";
 }
+<link rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" />
+<link rel="stylesheet"
+      href="~/css/TPOStatusList.css"
+      asp-append-version="true" />
 
-@if (TempData["SuccessMessage"] != null)
-{
-    <div class="alert alert-success">
-        @TempData["SuccessMessage"]
-    </div>
-}
+<div class="container-fluid tpo-status-page">
 
-@if (TempData["ErrorMessage"] != null)
-{
-    <div class="alert alert-danger">
-        @TempData["ErrorMessage"]
-    </div>
-}
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success tpo-alert" role="alert">
+            <i class="bi bi-check-circle-fill"></i>
+            <span>@TempData["SuccessMessage"]</span>
+        </div>
+    }
 
-<div class="container-fluid py-4">
+    @if (TempData["ErrorMessage"] != null)
+    {
+        <div class="alert alert-danger tpo-alert" role="alert">
+            <i class="bi bi-exclamation-triangle-fill"></i>
+            <span>@TempData["ErrorMessage"]</span>
+        </div>
+    }
 
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <div>
-            <h2>TPO & Sub-TPO Status List</h2>
-            <p class="text-muted mb-0">
-                View approved and rejected TPO registrations.
+    <!-- PAGE HEADER -->
+    <div class="tpo-page-header">
+        <div class="tpo-page-heading">
+            <div class="tpo-page-label">
+                <span class="tpo-label-dot"></span>
+                Super Admin / TPO Management
+            </div>
+
+            <h1>
+                TPO &amp; Sub-TPO Status List
+            </h1>
+
+            <p>
+                Monitor registration status and manage rejected TPO registrations.
             </p>
         </div>
-        <a href="/SuperAdmin/Dashboard/1"
-           class="btn btn-secondary">
-            Back to Dashboard
+
+        <a href="/SuperAdmin/Dashboard/1" class="tpo-back-button">
+            <i class="bi bi-arrow-left"></i>
+            <span>Back to Dashboard</span>
         </a>
     </div>
 
-    <div class="row g-3 mb-4">
+    <!-- SUMMARY CARDS -->
+    <div class="row g-3 tpo-summary-row">
+
         <div class="col-md-6">
-            <div class="card border-success shadow-sm">
-                <div class="card-body">
-                    <h6 class="text-muted">Approved</h6>
-                    <h3 class="text-success">
+            <div class="tpo-summary-card tpo-approved-card">
+                <div class="tpo-summary-content">
+                    <span class="tpo-summary-label">
+                        Approved Registrations
+                    </span>
+
+                    <h2 class="tpo-summary-number">
                         @ViewBag.ApprovedCount
-                    </h3>
+                    </h2>
+
+                    <span class="tpo-summary-caption">
+                        Successfully approved
+                    </span>
+                </div>
+
+                <div class="tpo-summary-icon">
+                    <i class="bi bi-check-circle"></i>
                 </div>
             </div>
         </div>
 
         <div class="col-md-6">
-            <div class="card border-danger shadow-sm">
-                <div class="card-body">
-                    <h6 class="text-muted">Rejected</h6>
-                    <h3 class="text-danger">
+            <div class="tpo-summary-card tpo-rejected-card">
+                <div class="tpo-summary-content">
+                    <span class="tpo-summary-label">
+                        Rejected Registrations
+                    </span>
+
+                    <h2 class="tpo-summary-number">
                         @ViewBag.RejectedCount
-                    </h3>
+                    </h2>
+
+                    <span class="tpo-summary-caption">
+                        Require review if restored
+                    </span>
+                </div>
+
+                <div class="tpo-summary-icon">
+                    <i class="bi bi-x-circle"></i>
                 </div>
             </div>
         </div>
+
     </div>
 
-    <div class="card shadow-sm">
-        <div class="card-body">
+    <!-- MAIN RECORDS PANEL -->
+    <section class="tpo-records-panel">
 
-            <div class="row g-2 mb-3">
-                <div class="col-md-6">
-                    <input type="text"
-                           id="searchTPO"
-                           class="form-control"
-                           placeholder="Search name, email, college or code..." />
+        <div class="tpo-records-header">
+            <div class="tpo-records-heading">
+                <div class="tpo-records-heading-icon">
+                    <i class="bi bi-buildings"></i>
                 </div>
 
-                <div class="col-md-3">
-                    <select id="filterStatus" class="form-select">
-                        <option value="">All Statuses</option>
-                        <option value="approved">Approved</option>
-                        <option value="rejected">Rejected</option>
-                    </select>
-                </div>
-
-                <div class="col-md-3">
-                    <select id="filterType" class="form-select">
-                        <option value="">All Types</option>
-                        <option value="main tpo">Main TPO</option>
-                        <option value="sub-tpo">Sub-TPO</option>
-                    </select>
+                <div>
+                    <h2>TPO Registration Records</h2>
+                    <p>Search, filter and review registration details.</p>
                 </div>
             </div>
 
-            <div class="table-responsive">
-                <table class="table table-bordered table-hover align-middle"
-                       id="tpoTable">
+            <span class="tpo-records-tag">
+                <i class="bi bi-shield-check"></i>
+                Registration Overview
+            </span>
+        </div>
 
-                    <thead class="table-dark">
-                        <tr>
-                            <th>#</th>
-                            <th>TPO Type</th>
-                            <th>Name</th>
-                            <th>Email</th>
-                            <th>Mobile</th>
-                            <th>College</th>
-                            <th>College Code</th>
-                            <th>Status</th>
-                            <th>Active</th>
-                            <th>Created Date</th>
-                            <th>Action</th>
-                        </tr>
-                    </thead>
+        <div class="tpo-records-body">
 
-                    <tbody>
-                    @if (Model != null && Model.Any())
-                    {
-                        var sr = 1;
+            <!-- SEARCH AND FILTERS -->
+            <div class="tpo-filter-panel">
+                <div class="tpo-filter-heading">
+                    <i class="bi bi-sliders"></i>
+                    Search &amp; Filters
+                </div>
 
-                        foreach (var tpo in Model)
-                        {
-                            var status = tpo.Status ?? "";
-                            var type = tpo.SubTpoBit == true
-                                ? "Sub-TPO"
-                                : "Main TPO";
+                <div class="row g-3">
 
+                    <div class="col-lg-6 col-md-12">
+                        <label for="searchTPO" class="tpo-filter-label">
+                            Search Records
+                        </label>
+
+                        <div class="tpo-search-field">
+                            <i class="bi bi-search"></i>
+
+                            <input type="text"
+                                   id="searchTPO"
+                                   class="form-control"
+                                   placeholder="Name, email, college or code..." />
+                        </div>
+                    </div>
+
+                    <div class="col-lg-3 col-md-6">
+                        <label for="filterStatus" class="tpo-filter-label">
+                            Registration Status
+                        </label>
+
+                        <select id="filterStatus" class="form-select">
+                            <option value="">All Statuses</option>
+                            <option value="approved">Approved</option>
+                            <option value="rejected">Rejected</option>
+                        </select>
+                    </div>
+
+                    <div class="col-lg-3 col-md-6">
+                        <label for="filterType" class="tpo-filter-label">
+                            TPO Type
+                        </label>
+
+                        <select id="filterType" class="form-select">
+                            <option value="">All Types</option>
+                            <option value="main tpo">Main TPO</option>
+                            <option value="sub-tpo">Sub-TPO</option>
+                        </select>
+                    </div>
+
+                </div>
+            </div>
+
+            <!-- TABLE -->
+            <div class="tpo-table-container">
+                <div class="table-responsive tpo-table-scroll">
+
+                    <table class="table table-hover align-middle"
+                           id="tpoTable">
+
+                        <thead>
                             <tr>
-                                <td>@sr</td>
-                                <td>@type</td>
-                                <td>@tpo.FullName</td>
-                                <td>@tpo.CollegeMailID</td>
-                                <td>@tpo.MobileNo</td>
-                                <td>@tpo.CollegeName</td>
-                                <td>@tpo.CollegeCode</td>
-
-                                <td>
-                                    @if (status.Equals(
-                                        "Approved",
-                                        StringComparison.OrdinalIgnoreCase))
-                                    {
-                                        <span class="badge bg-success">
-                                            Approved
-                                        </span>
-                                    }
-                                    else
-                                    {
-                                        <span class="badge bg-danger">
-                                            Rejected
-                                        </span>
-                                    }
-                                </td>
-
-                                <td>
-                                    @if (tpo.IsActive)
-                                    {
-                                        <span class="badge bg-success">
-                                            Active
-                                        </span>
-                                    }
-                                    else
-                                    {
-                                        <span class="badge bg-secondary">
-                                            Inactive
-                                        </span>
-                                    }
-                                </td>
-
-                                <td>
-                                    @(tpo.CreatedDate?.ToString("dd-MMM-yyyy") ?? "-")
-                                </td>
-
-                                <td>
-                                    @if (string.Equals(
-                                        tpo.Status,
-                                        "Rejected",
-                                        StringComparison.OrdinalIgnoreCase))
-                                    {
-                                        <form asp-controller="SuperAdmin"
-                                              asp-action="RollbackTPORejection"
-                                              method="post"
-                                              onsubmit="return confirm(
-                                                  'Restore this registration to Pending for review?');">
-
-                                            @Html.AntiForgeryToken()
-
-                                            <input type="hidden"
-                                                   name="tpoId"
-                                                   value="@tpo.TPOID" />
-
-                                            <button type="submit"
-                                                    class="btn btn-warning btn-sm">
-                                                <i class="bi bi-arrow-counterclockwise"></i>
-                                                Restore
-                                            </button>
-                                        </form>
-                                    }
-                                    else
-                                    {
-                                        <span class="text-muted">—</span>
-                                    }
-                                </td>
-
+                                <th>#</th>
+                                <th>TPO Type</th>
+                                <th>Name</th>
+                                <th>Email</th>
+                                <th>Mobile</th>
+                                <th>College</th>
+                                <th>College Code</th>
+                                <th>Status</th>
+                                <th>Active</th>
+                                <th>Created Date</th>
+                                <th>Action</th>
                             </tr>
+                        </thead>
 
-                            sr++;
-                        }
-                    }
-                    else
-                    {
-                        <tr>
-                            <td colspan="10"
-                                class="text-center text-muted py-4">
-                                No approved or rejected TPO records found.
-                            </td>
-                        </tr>
-                    }
-                    </tbody>
-                </table>
+                        <tbody>
+                            @if (Model != null && Model.Any())
+                            {
+                                var sr = 1;
+
+                                foreach (var tpo in Model)
+                                {
+                                    var status = tpo.Status ?? "";
+
+                                    var type = tpo.SubTpoBit == true
+                                        ? "Sub-TPO"
+                                        : "Main TPO";
+
+                                    <tr>
+                                        <td class="tpo-serial">@sr</td>
+
+                                        <td>
+                                            <span class="tpo-type-label">
+                                                @type
+                                            </span>
+                                        </td>
+
+                                        <td class="tpo-name-cell">
+                                            @tpo.FullName
+                                        </td>
+
+                                        <td class="tpo-email-cell">
+                                            @tpo.CollegeMailID
+                                        </td>
+
+                                        <td>@tpo.MobileNo</td>
+
+                                        <td>@tpo.CollegeName</td>
+
+                                        <td>
+                                            <span class="tpo-college-code">
+                                                @tpo.CollegeCode
+                                            </span>
+                                        </td>
+
+                                        <td>
+                                            @if (status.Equals(
+                                                "Approved",
+                                                StringComparison.OrdinalIgnoreCase))
+                                            {
+                                                <span class="badge tpo-status-badge tpo-status-approved">
+                                                    <span class="tpo-status-dot"></span>
+                                                    Approved
+                                                </span>
+                                            }
+                                            else
+                                            {
+                                                <span class="badge tpo-status-badge tpo-status-rejected">
+                                                    <span class="tpo-status-dot"></span>
+                                                    Rejected
+                                                </span>
+                                            }
+                                        </td>
+
+                                        <td>
+                                            @if (tpo.IsActive)
+                                            {
+                                                <span class="badge tpo-status-badge tpo-active">
+                                                    <span class="tpo-status-dot"></span>
+                                                    Active
+                                                </span>
+                                            }
+                                            else
+                                            {
+                                                <span class="badge tpo-status-badge tpo-inactive">
+                                                    <span class="tpo-status-dot"></span>
+                                                    Inactive
+                                                </span>
+                                            }
+                                        </td>
+
+                                        <td class="tpo-date-cell">
+                                            @(tpo.CreatedDate?.ToString("dd-MMM-yyyy") ?? "-")
+                                        </td>
+
+                                        <td>
+                                            @if (string.Equals(
+                                                tpo.Status,
+                                                "Rejected",
+                                                StringComparison.OrdinalIgnoreCase))
+                                            {
+                                                <form asp-controller="SuperAdmin"
+                                                      asp-action="RollbackTPORejection"
+                                                      method="post"
+                                                      onsubmit="return confirm('Restore this registration to Pending for review?');">
+
+                                                    @Html.AntiForgeryToken()
+
+                                                    <input type="hidden"
+                                                           name="tpoId"
+                                                           value="@tpo.TPOID" />
+
+                                                    <button type="submit"
+                                                            class="btn tpo-restore-button">
+                                                        <i class="bi bi-arrow-counterclockwise"></i>
+                                                        Restore
+                                                    </button>
+                                                </form>
+                                            }
+                                            else
+                                            {
+                                                <span class="tpo-no-action">—</span>
+                                            }
+                                        </td>
+                                    </tr>
+
+                                    sr++;
+                                }
+                            }
+                            else
+                            {
+                                <tr>
+                                    <td colspan="11" class="tpo-empty-cell">
+                                        <div class="tpo-empty-state">
+                                            <div class="tpo-empty-icon">
+                                                <i class="bi bi-inbox"></i>
+                                            </div>
+
+                                            <h3>No TPO Records Found</h3>
+
+                                            <p>
+                                                No approved or rejected TPO records found.
+                                            </p>
+                                        </div>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+
+                    </table>
+
+                </div>
             </div>
 
-            <div class="text-muted small">
-                Total records: <span id="visibleCount">0</span>
+            <!-- RECORD COUNT -->
+            <div class="tpo-records-footer">
+                <span class="tpo-footer-note">
+                    <i class="bi bi-info-circle"></i>
+                    Results update automatically when you search or filter.
+                </span>
+
+                <div class="tpo-count-pill">
+                    <i class="bi bi-list-check"></i>
+                    <span>Total records:</span>
+                    <strong id="visibleCount">0</strong>
+                </div>
             </div>
 
         </div>
-    </div>
+    </section>
+
 </div>
 
 <script>

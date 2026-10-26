@@ -726,6 +726,7 @@
 }
 <div class="candidate-dashboard">
 
+
     <!-- Welcome -->
     <div class="welcome-banner">
         <div class="row align-items-center">
@@ -738,9 +739,13 @@
             </div>
 
             <div class="col-md-4 text-md-end">
-                <a href="#" class="profile-btn">
+                <a asp-controller="Candidate"
+                   asp-action="Profile"
+                   class="profile-btn">
+
                     <i class="fas fa-user-edit"></i>
                     Complete Profile
+
                 </a>
             </div>
         </div>
