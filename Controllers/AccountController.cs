@@ -1572,6 +1572,128 @@ namespace ErJobPortal.Controllers
         // =========================================================
 
 
+        //[HttpPost]
+        //[ValidateAntiForgeryToken]
+        //public async Task<IActionResult> TPOLogin(TPOLogin model)
+        //{
+        //    if (!ModelState.IsValid)
+        //    {
+        //        return View(model);
+        //    }
+
+        //    try
+        //    {
+        //        if (string.IsNullOrWhiteSpace(model.CollegeMailID))
+        //        {
+        //            ModelState.AddModelError(
+        //                "",
+        //                "Please enter your College Mail ID."
+        //            );
+
+        //            return View(model);
+        //        }
+
+        //        string email = model.CollegeMailID.Trim();
+
+        //        TPOLoginResult? tpo =
+        //            _accountRepository.LoginTPO(email);
+
+        //        // CHECK TPO EXISTS
+        //        if (tpo == null)
+        //        {
+        //            ModelState.AddModelError(
+        //                "",
+        //                "Invalid College Mail ID or Password."
+        //            );
+
+        //            return View(model);
+        //        }
+
+        //        // CHECK PASSWORD
+        //        // Existing comparison retained from your code.
+        //        if (tpo.PasswordHash != model.Password)
+        //        {
+        //            ModelState.AddModelError(
+        //                "",
+        //                "Invalid College Mail ID or Password."
+        //            );
+
+        //            return View(model);
+        //        }
+
+        //        // SET TPO SESSION
+        //        HttpContext.Session.SetInt32(
+        //            "TPOID",
+        //            tpo.TPOID
+        //        );
+
+        //        HttpContext.Session.SetString(
+        //            "TPOName",
+        //            tpo.FullName ?? ""
+        //        );
+
+        //        HttpContext.Session.SetString(
+        //            "TPOEmail",
+        //            tpo.CollegeMailID ?? ""
+        //        );
+
+        //        HttpContext.Session.SetString(
+        //            "TPOCollegeName",
+        //            tpo.CollegeName ?? ""
+        //        );
+
+        //        HttpContext.Session.SetString(
+        //            "TPORole",
+        //            "TPO"
+        //        );
+
+        //        // 0 = Main TPO, 1 = Sub-TPO
+        //        HttpContext.Session.SetString(
+        //            "SubTpoBit",
+        //            tpo.SubTpoBit ? "1" : "0"
+        //        );
+
+        //        // RECORD SUCCESSFUL TPO LOGIN
+        //        try
+        //        {
+        //            await _visitorTrackingService.TrackVisitAsync(
+        //                HttpContext,
+        //                "TPO",
+        //                "TPOLogin",
+        //                tpo.TPOID,
+        //                "TPO",
+        //                true
+        //            );
+        //        }
+        //        catch (Exception trackingException)
+        //        {
+        //            // Tracking failure must not prevent a valid login.
+        //            _logger.LogError(
+        //                trackingException,
+        //                "Failed to record TPO login activity for TPOID {TPOID}",
+        //                tpo.TPOID
+        //            );
+        //        }
+
+        //        // REDIRECT TO TPO DASHBOARD
+        //        return RedirectToAction(
+        //            "Dashboard",
+        //            "TPO"
+        //        );
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        _logger.LogError(ex, "TPO login failed.");
+
+        //        ModelState.AddModelError(
+        //            "",
+        //            "Unable to login. Please try again later."
+        //        );
+
+        //        return View(model);
+        //    }
+        //}
+
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> TPOLogin(TPOLogin model)
@@ -1693,8 +1815,6 @@ namespace ErJobPortal.Controllers
                 return View(model);
             }
         }
-
-
 
 
         // ==========================================================
