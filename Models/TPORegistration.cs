@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
 using System;
 using System.ComponentModel.DataAnnotations;
 
@@ -21,14 +22,29 @@ namespace ErJobPortal.Models
         [StringLength(150)]
         public string FullName { get; set; }
 
+
         [Required(ErrorMessage = "College Email ID is required.")]
+        [RegularExpression(
+    @"^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$",
+    ErrorMessage = "Please enter a valid email address, e.g., example@gmail.com."
+)]
         [EmailAddress(ErrorMessage = "Enter a valid college email address.")]
+        [Remote(
+    action: "CheckTPOEmail",
+    controller: "Account",
+    ErrorMessage = "This email is already registered."
+)]
         [StringLength(200)]
         public string CollegeMailID { get; set; }
 
         [Required(ErrorMessage = "Mobile Number is required.")]
         [Phone(ErrorMessage = "Enter a valid mobile number.")]
         [StringLength(15)]
+        [Remote(
+    action: "CheckTPOMobile",
+    controller: "Account",
+    ErrorMessage = "This mobile number is already registered."
+)]
         public string MobileNo { get; set; }
 
 
@@ -82,9 +98,12 @@ namespace ErJobPortal.Models
         [StringLength(150)]
         public string Designation { get; set; }
 
-        [Required(ErrorMessage = "Department Name is required.")]
-        [StringLength(150)]
-        public string DepartmentName { get; set; }
+        public string? DepartmentName { get; set; }
+
+        [Required(ErrorMessage = "Please select a department.")]
+        [Range(1, int.MaxValue,
+            ErrorMessage = "Please select a valid department.")]
+        public int? nDepartment { get; set; }
 
         [Required(ErrorMessage = "College Employee ID is required.")]
         [StringLength(100)]
@@ -155,7 +174,7 @@ namespace ErJobPortal.Models
         public string? TPOType { get; set; }
 
 
-        public int? nDepartment { get; set; }
+        
 
 
         public bool? SubTpoBit { get; set; }

@@ -1,6 +1,7 @@
 ﻿using ErJobPortal.Models;
 using ErJobPortal.Repositories;
 using ErJobPortal.Services;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Configuration;
@@ -9,7 +10,6 @@ using System.Data;
 using System.Net;
 using System.Net.Mail;
 using System.Security.Cryptography;
-using ErJobPortal.Services;
 
 
 
@@ -650,111 +650,46 @@ namespace ErJobPortal.Controllers
         // khushi 16-10-26
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> OrganizationRegister(OrganizationRegister model)
+        public IActionResult OrganizationRegister(OrganizationRegister model)
         {
             try
             {
-                // 1. Verify email OTP using server-side Session.
-                string email = (model.sEmail ?? "")
-                    .Trim()
-                    .ToLowerInvariant();
-
-                string? verifiedEmail =
-                    HttpContext.Session.GetString("OrgOtpEmail");
-
-                string? verified =
-                    HttpContext.Session.GetString("OrgOtpVerified");
-
-                string? savedOtp =
-                    HttpContext.Session.GetString("OrgOtp");
-
-                string? expiryValue =
-                    HttpContext.Session.GetString("OrgOtpExpiry");
-
-                bool validExpiry =
-                    long.TryParse(expiryValue, out long expiry) &&
-                    DateTimeOffset.UtcNow.ToUnixTimeSeconds() < expiry;
-
-                bool otpVerified =
-                    verified == "true" &&
-                    !string.IsNullOrWhiteSpace(savedOtp) &&
-                    validExpiry &&
-                    string.Equals(
-                        email,
-                        verifiedEmail,
-                        StringComparison.OrdinalIgnoreCase
-                    );
-
-                if (!otpVerified)
+                // Static OTP validation
+                if (model.sOTP != "123456")
                 {
                     ModelState.AddModelError(
                         "sOTP",
-                        "Please verify your email using a valid OTP before registration."
+                        "Invalid OTP. Please enter 123456."
                     );
                 }
 
-                // 2. Check model validation.
                 if (!ModelState.IsValid)
                 {
-                    foreach (var item in ModelState)
-                    {
-                        foreach (var error in item.Value.Errors)
-                        {
-                            Console.WriteLine(
-                                $"Field: {item.Key}, Error: {error.ErrorMessage}"
-                            );
-                        }
-                    }
-
                     return View(model);
                 }
 
-                // 3. Register organization only after OTP verification.
+                // Repository hashes the password before saving
                 int result = _accountRepository.RegisterOrganization(model);
 
                 if (result > 0)
                 {
-                    // 4. Send registration confirmation email.
-                    try
-                    {
-                        await SendOrganizationRegistrationEmail(
-                            model.sEmail,
-                            model.sOrgName
-                        );
-                    }
-                    catch (Exception emailEx)
-                    {
-                        // Registration succeeded even if confirmation email fails.
-                        Console.WriteLine(
-                            "Organization registration email error: " +
-                            emailEx
-                        );
-                    }
-
-                    // 5. Clear OTP session after successful registration.
-                    HttpContext.Session.Remove("OrgOtp");
-                    HttpContext.Session.Remove("OrgOtpEmail");
-                    HttpContext.Session.Remove("OrgOtpExpiry");
-                    HttpContext.Session.Remove("OrgOtpVerified");
-
                     TempData["Success"] =
-                        "Organization registered successfully! Please check your email for confirmation.";
+                        "Organization Registration Successfully.";
 
                     return RedirectToAction("OrganizationRegister");
                 }
 
-                TempData["Error"] = "Organization registration failed.";
-
+                TempData["Error"] = "Organization Registration Failed.";
                 return View(model);
             }
             catch (Exception ex)
             {
-                Console.WriteLine("Organization Register Error:");
+                // Log the exception on the server
                 Console.WriteLine(ex.ToString());
 
                 ModelState.AddModelError(
                     "",
-                    "An error occurred while registering the organization. Please try again."
+                    "Registration failed. Please try again."
                 );
 
                 return View(model);
@@ -828,56 +763,88 @@ namespace ErJobPortal.Controllers
         }
 
         [HttpPost]
-        [HttpPost]
+        [ValidateAntiForgeryToken]
         public IActionResult OrganizationLogin(OrganizationLogin model)
         {
+            // Validate email and password fields
             if (!ModelState.IsValid)
             {
                 return View(model);
             }
 
+            // Get organization by email
             OrganizationUser? user =
                 _accountRepository.LoginOrganization(model);
 
-            if (user != null)
+            // Email not registered
+            if (user == null)
             {
-                // Super Admin disabled organization
-                if (!user.nSABit)
-                {
-                    TempData["Error"] =
-                        "Your organization has been disabled by the Super Admin. Please contact the administrator.";
-
-                    return View(model);
-                }
-
-                // Normal login
-                HttpContext.Session.SetInt32("OrgID", user.nID);
-
-                HttpContext.Session.SetString(
-                    "OrgName",
-                    user.sOrgName ?? ""
+                ModelState.AddModelError(
+                    nameof(model.sEmail),
+                    "Invalid email address."
                 );
 
-                HttpContext.Session.SetString(
-                    "OrgEmail",
-                    user.sEmail ?? ""
-                );
-
-                HttpContext.Session.SetString(
-                    "OrgCode",
-                    user.orgCode ?? ""
-                );
-
-                return RedirectToAction(
-                    "Dashboard",
-                    "Organization"
-                );
+                return View(model);
             }
 
-            TempData["Error"] = "Invalid Email or Password";
+            // Verify entered password against stored password hash
+            var passwordHasher = new PasswordHasher<OrganizationUser>();
 
-            return View(model);
+            PasswordVerificationResult passwordResult;
+
+            try
+            {
+                passwordResult = passwordHasher.VerifyHashedPassword(
+                    user,
+                    user.sPassword ?? "",
+                    model.sPassword ?? ""
+                );
+            }
+            catch (FormatException)
+            {
+                TempData["Error"] =
+                    "Stored password format is invalid. Please reset your password.";
+
+                return View(model);
+            }
+
+            // Incorrect password
+            if (passwordResult == PasswordVerificationResult.Failed)
+            {
+                ModelState.AddModelError(
+                    nameof(model.sPassword),
+                    "Incorrect password. Please try again."
+                );
+
+                return View(model);
+            }
+
+            // Block organizations disabled by Super Admin
+            if (!user.nSABit)
+            {
+                TempData["Error"] =
+                    "Your organization account has been disabled by the Super Admin.";
+
+                return View(model);
+            }
+
+            // Create organization sessions
+            HttpContext.Session.SetInt32("OrgID", user.nID);
+
+            HttpContext.Session.SetString(
+                "OrgName",
+                user.sOrgName ?? ""
+            );
+
+            HttpContext.Session.SetString(
+                "OrgEmail",
+                user.sEmail ?? ""
+            );
+
+            // Redirect after successful login
+            return RedirectToAction("Dashboard", "Organization");
         }
+
 
         // candidate login
 
@@ -887,75 +854,71 @@ namespace ErJobPortal.Controllers
             return View();
         }
 
-
-
-
         [HttpPost]
-        public async Task<IActionResult> CandidateLogin(CandidateLogin model)
+        [ValidateAntiForgeryToken]
+        public IActionResult CandidateLogin(CandidateLogin model)
         {
             if (!ModelState.IsValid)
             {
                 return View(model);
             }
 
-            CandidateUser? user =
-                _accountRepository.LoginCandidate(model);
+            CandidateUser? user = _accountRepository.LoginCandidate(model);
 
-            if (user != null)
+            // Email not registered
+            if (user == null)
             {
-                // SUPER ADMIN DISABLED CANDIDATE
-                if (!user.nSABit)
-                {
-                    TempData["Error"] =
-                        "Your account has been disabled by the Super Admin. Please contact the administrator.";
-
-                    return View(model);
-                }
-
-                // SET CANDIDATE SESSION
-                HttpContext.Session.SetInt32(
-                    "CandidateID",
-                    user.nID
+                ModelState.AddModelError(
+                    nameof(model.sEmail),
+                    "Invalid email address."
                 );
 
-                HttpContext.Session.SetString(
-                    "CandidateName",
-                    (user.sFName + " " + user.sLName).Trim()
-                );
-
-                HttpContext.Session.SetString(
-                    "CandidateEmail",
-                    user.sEmail ?? ""
-                );
-
-                // RECORD SUCCESSFUL CANDIDATE LOGIN
-                try
-                {
-                    await _visitorTrackingService.TrackVisitAsync(
-                        HttpContext,
-                        "Candidate",
-                        "CandidateLogin",
-                        user.nID,
-                        "Candidate",
-                        true
-                    );
-                }
-                catch (Exception ex)
-                {
-                    // Tracking errors should not prevent a successful login.
-                    // Log ex using ILogger if available.
-                }
-
-                return RedirectToAction(
-                    "Dashboard",
-                    "Candidate"
-                );
+                return View(model);
             }
 
-            // INVALID LOGIN
-            TempData["Error"] = "Invalid Email or Password";
+            // Verify password
+            var passwordHasher = new PasswordHasher<CandidateUser>();
 
-            return View(model);
+            var passwordResult = passwordHasher.VerifyHashedPassword(
+                user,
+                user.sPassword ?? "",
+                model.sPassword ?? ""
+            );
+
+            // Incorrect password
+            if (passwordResult == PasswordVerificationResult.Failed)
+            {
+                ModelState.AddModelError(
+                    nameof(model.sPassword),
+                    "Incorrect password. Please try again."
+                );
+
+                return View(model);
+            }
+
+            // Candidate disabled by Super Admin
+            if (!user.nSABit)
+            {
+                TempData["Error"] =
+                    "Your account has been disabled by the Super Admin. Please contact the administrator.";
+
+                return View(model);
+            }
+
+            // Set session
+            HttpContext.Session.SetInt32("CandidateID", user.nID);
+
+            HttpContext.Session.SetString(
+                "CandidateName",
+                (user.sFName + " " + user.sLName).Trim()
+            );
+
+            HttpContext.Session.SetString(
+                "CandidateEmail",
+                user.sEmail ?? ""
+            );
+
+            return RedirectToAction("Dashboard", "Candidate");
         }
 
 
@@ -1058,98 +1021,98 @@ namespace ErJobPortal.Controllers
         }
 
         
-// ==========================================================
-// Candidate Reset Password
-// ==========================================================
+        // ==========================================================
+        // Candidate Reset Password
+        // ==========================================================
 
-[HttpGet]
-public IActionResult CandidateResetPassword()
-        {
-            return View();
-        }
-
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public IActionResult CandidateResetPassword(
-            CandidateResetPassword model)
-        {
-            if (!ModelState.IsValid)
-            {
-                return View(model);
-            }
-
-            try
-            {
-                string email = model.sEmail.Trim();
-
-                // Check whether candidate exists
-                CandidateLogin? candidate =
-                    _accountRepository.GetCandidateLoginDetails(email);
-
-                if (candidate == null)
+        [HttpGet]
+        public IActionResult CandidateResetPassword()
                 {
-                    ModelState.AddModelError(
-                        "sEmail",
-                        "No candidate account was found with this email address."
-                    );
-
-                    return View(model);
+                    return View();
                 }
 
-                // Update password
-                bool updated =
-                    _accountRepository.ResetCandidatePassword(
-                        email,
-                        model.NewPassword
-                    );
-
-                if (!updated)
+                [HttpPost]
+                [ValidateAntiForgeryToken]
+                public IActionResult CandidateResetPassword(
+                    CandidateResetPassword model)
                 {
-                    ModelState.AddModelError(
-                        "",
-                        "Unable to reset password. Please try again."
-                    );
+                    if (!ModelState.IsValid)
+                    {
+                        return View(model);
+                    }
 
-                    return View(model);
+                    try
+                    {
+                        string email = model.sEmail.Trim();
+
+                        // Check whether candidate exists
+                        CandidateLogin? candidate =
+                            _accountRepository.GetCandidateLoginDetails(email);
+
+                        if (candidate == null)
+                        {
+                            ModelState.AddModelError(
+                                "sEmail",
+                                "No candidate account was found with this email address."
+                            );
+
+                            return View(model);
+                        }
+
+                        // Update password
+                        bool updated =
+                            _accountRepository.ResetCandidatePassword(
+                                email,
+                                model.NewPassword
+                            );
+
+                        if (!updated)
+                        {
+                            ModelState.AddModelError(
+                                "",
+                                "Unable to reset password. Please try again."
+                            );
+
+                            return View(model);
+                        }
+
+                        TempData["Success"] =
+                            "Your password has been reset successfully. Please login with your new password.";
+
+                        return RedirectToAction("CandidateLogin");
+                    }
+                    catch (Exception ex)
+                    {
+                        Console.WriteLine(
+                            "Candidate Reset Password Error: "
+                            + ex.ToString()
+                        );
+
+                        ModelState.AddModelError(
+                            "",
+                            "Unable to reset password. Please try again later."
+                        );
+
+                        return View(model);
+                    }
                 }
-
-                TempData["Success"] =
-                    "Your password has been reset successfully. Please login with your new password.";
-
-                return RedirectToAction("CandidateLogin");
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine(
-                    "Candidate Reset Password Error: "
-                    + ex.ToString()
-                );
-
-                ModelState.AddModelError(
-                    "",
-                    "Unable to reset password. Please try again later."
-                );
-
-                return View(model);
-            }
-        }
 
       
-// ==========================================================
-// ORGANIZATION RESET PASSWORD
-// ==========================================================
+            // ==========================================================
+            // ORGANIZATION RESET PASSWORD
+            // ==========================================================
 
-[HttpGet]
-public IActionResult OrganizationResetPassword()
-        {
-            return View();
-        }
+            [HttpGet]
+            public IActionResult OrganizationResetPassword()
+                    {
+                        return View();
+                    }
 
 
         [HttpPost]
         [ValidateAntiForgeryToken]
         public IActionResult OrganizationResetPassword(
-            OrganizationResetPassword model)
+                            OrganizationResetPassword model)
         {
             if (!ModelState.IsValid)
             {
@@ -1174,7 +1137,7 @@ public IActionResult OrganizationResetPassword()
                     return View(model);
                 }
 
-                // Update password
+                // Repository hashes the new password before saving it
                 bool updated =
                     _accountRepository.ResetOrganizationPassword(
                         email,
@@ -1199,8 +1162,7 @@ public IActionResult OrganizationResetPassword()
             catch (Exception ex)
             {
                 Console.WriteLine(
-                    "Organization Reset Password Error: "
-                    + ex.ToString()
+                    "Organization Reset Password Error: " + ex
                 );
 
                 ModelState.AddModelError(
@@ -1219,12 +1181,12 @@ public IActionResult OrganizationResetPassword()
         [HttpGet]
         public IActionResult OrganizationForgotPassword()
         {
-            return View();
+            return View(new OrganizationForgotPassword());
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> OrganizationForgotPassword(
+        public IActionResult OrganizationForgotPassword(
             OrganizationForgotPassword model)
         {
             if (!ModelState.IsValid)
@@ -1250,37 +1212,23 @@ public IActionResult OrganizationResetPassword()
                     return View(model);
                 }
 
-                if (string.IsNullOrWhiteSpace(organization.sPassword))
-                {
-                    ModelState.AddModelError(
-                        "",
-                        "Password information is not available for this account."
-                    );
-
-                    return View(model);
-                }
-
-                // Send login details to registered email
-                await _emailService.SendOrganizationLoginDetailsAsync(
-                    organization.sEmail,
-                    organization.sPassword
-                );
+                // Pass email to the reset page
+                TempData["ResetEmail"] = organization.sEmail ?? email;
 
                 TempData["Success"] =
-                    "Your login details have been sent to your registered email address.";
+                    "Organization found. Please reset your password.";
 
-                return RedirectToAction("OrganizationLogin");
+                return RedirectToAction("OrganizationResetPassword");
             }
             catch (Exception ex)
             {
-                Console.WriteLine("========================================");
-                Console.WriteLine("Organization Forgot Password Error");
-                Console.WriteLine(ex.ToString());
-                Console.WriteLine("========================================");
+                Console.WriteLine(
+                    "Organization Forgot Password Error: " + ex
+                );
 
                 ModelState.AddModelError(
                     "",
-                    "Email Error: " + ex.Message
+                    "Unable to process your request. Please try again later."
                 );
 
                 return View(model);
@@ -1309,6 +1257,7 @@ public IActionResult OrganizationResetPassword()
         // ==========================================================
         // TPO REGISTRATION - POST
         // ==========================================================
+        // shrirang 22/10/26
 
         [HttpPost]
         [ValidateAntiForgeryToken]
@@ -1317,27 +1266,53 @@ public IActionResult OrganizationResetPassword()
             try
             {
                 // ==========================================================
-                // STATIC OTP
+                // 1. CHECK DUPLICATE EMAIL
+                // ==========================================================
+
+                if (!string.IsNullOrWhiteSpace(model.CollegeMailID) &&
+                    _accountRepository.TPOEmailExists(model.CollegeMailID.Trim()))
+                {
+                    ModelState.AddModelError(
+                        nameof(model.CollegeMailID),
+                        "This email address is already registered."
+                    );
+                }
+
+                // ==========================================================
+                // 2. CHECK DUPLICATE PRIMARY MOBILE
+                // Alternate mobile is intentionally NOT checked.
+                // ==========================================================
+
+                if (!string.IsNullOrWhiteSpace(model.MobileNo) &&
+                    _accountRepository.TPOMobileExists(model.MobileNo.Trim()))
+                {
+                    ModelState.AddModelError(
+                        nameof(model.MobileNo),
+                        "This mobile number is already registered."
+                    );
+                }
+
+                // ==========================================================
+                // 3. STATIC OTP VALIDATION
                 // ==========================================================
 
                 if (model.OTP != "123456")
                 {
                     ModelState.AddModelError(
-                        "OTP",
+                        nameof(model.OTP),
                         "Invalid OTP. Please enter 123456."
                     );
                 }
 
-
                 // ==========================================================
-                // CHECK REQUIRED FILES
+                // 4. REQUIRED FILE VALIDATION
                 // ==========================================================
 
                 if (model.SupportingDocument1File == null ||
                     model.SupportingDocument1File.Length == 0)
                 {
                     ModelState.AddModelError(
-                        "SupportingDocument1File",
+                        nameof(model.SupportingDocument1File),
                         "Supporting Document 1 is required."
                     );
                 }
@@ -1346,7 +1321,7 @@ public IActionResult OrganizationResetPassword()
                     model.SupportingDocument2File.Length == 0)
                 {
                     ModelState.AddModelError(
-                        "SupportingDocument2File",
+                        nameof(model.SupportingDocument2File),
                         "Supporting Document 2 is required."
                     );
                 }
@@ -1355,14 +1330,13 @@ public IActionResult OrganizationResetPassword()
                     model.ProfilePhotoFile.Length == 0)
                 {
                     ModelState.AddModelError(
-                        "ProfilePhotoFile",
+                        nameof(model.ProfilePhotoFile),
                         "Profile Photo is required."
                     );
                 }
 
-
                 // ==========================================================
-                // NOW CHECK MODEL
+                // 5. STOP IF ANY MODEL OR DUPLICATE VALIDATION FAILED
                 // ==========================================================
 
                 if (!ModelState.IsValid)
@@ -1370,9 +1344,87 @@ public IActionResult OrganizationResetPassword()
                     return View(model);
                 }
 
+                // ==========================================================
+                // 6. VALIDATE FILE EXTENSIONS AND SIZES BEFORE UPLOAD
+                // ==========================================================
+
+                string[] allowedDocumentExtensions =
+                {
+            ".pdf", ".jpg", ".jpeg", ".png"
+        };
+
+                string[] allowedImageExtensions =
+                {
+            ".jpg", ".jpeg", ".png"
+        };
+
+                string extension1 =
+                    Path.GetExtension(model.SupportingDocument1File!.FileName)
+                        .ToLowerInvariant();
+
+                string extension2 =
+                    Path.GetExtension(model.SupportingDocument2File!.FileName)
+                        .ToLowerInvariant();
+
+                string profileExtension =
+                    Path.GetExtension(model.ProfilePhotoFile!.FileName)
+                        .ToLowerInvariant();
+
+                if (!allowedDocumentExtensions.Contains(extension1))
+                {
+                    ModelState.AddModelError(
+                        nameof(model.SupportingDocument1File),
+                        "Only PDF, JPG, JPEG and PNG files are allowed."
+                    );
+                }
+
+                if (model.SupportingDocument1File.Length > 10 * 1024 * 1024)
+                {
+                    ModelState.AddModelError(
+                        nameof(model.SupportingDocument1File),
+                        "Supporting Document 1 must be less than or equal to 10 MB."
+                    );
+                }
+
+                if (!allowedDocumentExtensions.Contains(extension2))
+                {
+                    ModelState.AddModelError(
+                        nameof(model.SupportingDocument2File),
+                        "Only PDF, JPG, JPEG and PNG files are allowed."
+                    );
+                }
+
+                if (model.SupportingDocument2File.Length > 10 * 1024 * 1024)
+                {
+                    ModelState.AddModelError(
+                        nameof(model.SupportingDocument2File),
+                        "Supporting Document 2 must be less than or equal to 10 MB."
+                    );
+                }
+
+                if (!allowedImageExtensions.Contains(profileExtension))
+                {
+                    ModelState.AddModelError(
+                        nameof(model.ProfilePhotoFile),
+                        "Only JPG, JPEG and PNG profile photos are allowed."
+                    );
+                }
+
+                if (model.ProfilePhotoFile.Length > 5 * 1024 * 1024)
+                {
+                    ModelState.AddModelError(
+                        nameof(model.ProfilePhotoFile),
+                        "Profile photo must be less than or equal to 5 MB."
+                    );
+                }
+
+                if (!ModelState.IsValid)
+                {
+                    return View(model);
+                }
 
                 // ==========================================================
-                // UPLOAD FOLDER
+                // 7. CREATE UPLOAD FOLDER
                 // ==========================================================
 
                 string uploadFolder = Path.Combine(
@@ -1382,203 +1434,77 @@ public IActionResult OrganizationResetPassword()
                     "tpo"
                 );
 
-                if (!Directory.Exists(uploadFolder))
-                {
-                    Directory.CreateDirectory(uploadFolder);
-                }
-
+                Directory.CreateDirectory(uploadFolder);
 
                 // ==========================================================
-                // DOCUMENT 1
+                // 8. SAVE SUPPORTING DOCUMENT 1
                 // ==========================================================
-
-                string[] allowedDocumentExtensions =
-                {
-            ".pdf",
-            ".jpg",
-            ".jpeg",
-            ".png"
-        };
-
-                string extension1 =
-                    Path.GetExtension(
-                        model.SupportingDocument1File.FileName
-                    ).ToLowerInvariant();
-
-                if (!allowedDocumentExtensions.Contains(extension1))
-                {
-                    ModelState.AddModelError(
-                        "SupportingDocument1File",
-                        "Only PDF, JPG, JPEG and PNG files are allowed."
-                    );
-
-                    return View(model);
-                }
-
-                if (model.SupportingDocument1File.Length >
-                    10 * 1024 * 1024)
-                {
-                    ModelState.AddModelError(
-                        "SupportingDocument1File",
-                        "Supporting Document 1 must be less than 10 MB."
-                    );
-
-                    return View(model);
-                }
 
                 string document1Name =
-                    "TPO_DOC1_" +
-                    Guid.NewGuid().ToString("N") +
-                    extension1;
+                    "TPO_DOC1_" + Guid.NewGuid().ToString("N") + extension1;
 
                 string document1Path =
-                    Path.Combine(
-                        uploadFolder,
-                        document1Name
-                    );
+                    Path.Combine(uploadFolder, document1Name);
 
-                using (FileStream stream =
-                       new FileStream(
-                           document1Path,
-                           FileMode.Create))
+                using (FileStream stream = new FileStream(
+                    document1Path, FileMode.Create, FileAccess.Write))
                 {
                     model.SupportingDocument1File.CopyTo(stream);
                 }
 
                 model.SupportingDocument1 = document1Name;
 
-
                 // ==========================================================
-                // DOCUMENT 2
+                // 9. SAVE SUPPORTING DOCUMENT 2
                 // ==========================================================
-
-                string extension2 =
-                    Path.GetExtension(
-                        model.SupportingDocument2File.FileName
-                    ).ToLowerInvariant();
-
-                if (!allowedDocumentExtensions.Contains(extension2))
-                {
-                    ModelState.AddModelError(
-                        "SupportingDocument2File",
-                        "Only PDF, JPG, JPEG and PNG files are allowed."
-                    );
-
-                    return View(model);
-                }
-
-                if (model.SupportingDocument2File.Length >
-                    10 * 1024 * 1024)
-                {
-                    ModelState.AddModelError(
-                        "SupportingDocument2File",
-                        "Supporting Document 2 must be less than 10 MB."
-                    );
-
-                    return View(model);
-                }
 
                 string document2Name =
-                    "TPO_DOC2_" +
-                    Guid.NewGuid().ToString("N") +
-                    extension2;
+                    "TPO_DOC2_" + Guid.NewGuid().ToString("N") + extension2;
 
                 string document2Path =
-                    Path.Combine(
-                        uploadFolder,
-                        document2Name
-                    );
+                    Path.Combine(uploadFolder, document2Name);
 
-                using (FileStream stream =
-                       new FileStream(
-                           document2Path,
-                           FileMode.Create))
+                using (FileStream stream = new FileStream(
+                    document2Path, FileMode.Create, FileAccess.Write))
                 {
                     model.SupportingDocument2File.CopyTo(stream);
                 }
 
                 model.SupportingDocument2 = document2Name;
 
-
                 // ==========================================================
-                // PROFILE PHOTO
+                // 10. SAVE PROFILE PHOTO
                 // ==========================================================
-
-                string[] allowedImageExtensions =
-                {
-            ".jpg",
-            ".jpeg",
-            ".png"
-        };
-
-                string profileExtension =
-                    Path.GetExtension(
-                        model.ProfilePhotoFile.FileName
-                    ).ToLowerInvariant();
-
-                if (!allowedImageExtensions.Contains(profileExtension))
-                {
-                    ModelState.AddModelError(
-                        "ProfilePhotoFile",
-                        "Only JPG, JPEG and PNG profile photos are allowed."
-                    );
-
-                    return View(model);
-                }
-
-                if (model.ProfilePhotoFile.Length >
-                    5 * 1024 * 1024)
-                {
-                    ModelState.AddModelError(
-                        "ProfilePhotoFile",
-                        "Profile photo must be less than 5 MB."
-                    );
-
-                    return View(model);
-                }
 
                 string profileName =
-                    "TPO_PROFILE_" +
-                    Guid.NewGuid().ToString("N") +
+                    "TPO_PROFILE_" + Guid.NewGuid().ToString("N") +
                     profileExtension;
 
                 string profilePath =
-                    Path.Combine(
-                        uploadFolder,
-                        profileName
-                    );
+                    Path.Combine(uploadFolder, profileName);
 
-                using (FileStream stream =
-                       new FileStream(
-                           profilePath,
-                           FileMode.Create))
+                using (FileStream stream = new FileStream(
+                    profilePath, FileMode.Create, FileAccess.Write))
                 {
                     model.ProfilePhotoFile.CopyTo(stream);
                 }
 
                 model.ProfilePhoto = profileName;
 
-
                 // ==========================================================
-                // TPO DEFAULT STATUS
+                // 11. SET DEFAULT TPO STATUS
                 // ==========================================================
 
                 model.OTPVerified = true;
-
                 model.Status = "Pending";
-
                 model.IsApproved = false;
-
                 model.IsActive = false;
 
-
                 // ==========================================================
-                // REGISTER
+                // 12. REGISTER TPO IN DATABASE
                 // ==========================================================
 
-                int result =
-                    _accountRepository.RegisterTPO(model);
-
+                int result = _accountRepository.RegisterTPO(model);
 
                 if (result > 0)
                 {
@@ -1589,9 +1515,13 @@ public IActionResult OrganizationResetPassword()
                     return RedirectToAction("TPOLogin");
                 }
 
+                // Remove files if registration failed.
+                DeleteUploadedFile(document1Path);
+                DeleteUploadedFile(document2Path);
+                DeleteUploadedFile(profilePath);
 
                 ModelState.AddModelError(
-                    "",
+                    string.Empty,
                     "TPO registration failed. Please try again."
                 );
 
@@ -1600,16 +1530,36 @@ public IActionResult OrganizationResetPassword()
             catch (Exception ex)
             {
                 Console.WriteLine("TPO Registration Error");
-                Console.WriteLine(ex.ToString());
+                Console.WriteLine(ex);
 
                 ModelState.AddModelError(
-                    "",
+                    string.Empty,
                     "Unable to complete TPO registration. Please try again later."
                 );
 
                 return View(model);
             }
         }
+
+        // ==========================================================
+        // HELPER: DELETE UPLOADED FILE IF REGISTRATION FAILS
+        // ==========================================================
+
+        private void DeleteUploadedFile(string filePath)
+        {
+            try
+            {
+                if (System.IO.File.Exists(filePath))
+                {
+                    System.IO.File.Delete(filePath);
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("Unable to delete uploaded file: " + ex.Message);
+            }
+        }
+
 
 
         // ==========================================================
@@ -1627,9 +1577,133 @@ public IActionResult OrganizationResetPassword()
         // TPO LOGIN - POST
         // =========================================================
 
+
+        //[HttpPost]
+        //[ValidateAntiForgeryToken]
+        //public async Task<IActionResult> TPOLogin(TPOLogin model)
+        //{
+        //    if (!ModelState.IsValid)
+        //    {
+        //        return View(model);
+        //    }
+
+        //    try
+        //    {
+        //        if (string.IsNullOrWhiteSpace(model.CollegeMailID))
+        //        {
+        //            ModelState.AddModelError(
+        //                "",
+        //                "Please enter your College Mail ID."
+        //            );
+
+        //            return View(model);
+        //        }
+
+        //        string email = model.CollegeMailID.Trim();
+
+        //        TPOLoginResult? tpo =
+        //            _accountRepository.LoginTPO(email);
+
+        //        // CHECK TPO EXISTS
+        //        if (tpo == null)
+        //        {
+        //            ModelState.AddModelError(
+        //                "",
+        //                "Invalid College Mail ID or Password."
+        //            );
+
+        //            return View(model);
+        //        }
+
+        //        // CHECK PASSWORD
+        //        // Existing comparison retained from your code.
+        //        if (tpo.PasswordHash != model.Password)
+        //        {
+        //            ModelState.AddModelError(
+        //                "",
+        //                "Invalid College Mail ID or Password."
+        //            );
+
+        //            return View(model);
+        //        }
+
+        //        // SET TPO SESSION
+        //        HttpContext.Session.SetInt32(
+        //            "TPOID",
+        //            tpo.TPOID
+        //        );
+
+        //        HttpContext.Session.SetString(
+        //            "TPOName",
+        //            tpo.FullName ?? ""
+        //        );
+
+        //        HttpContext.Session.SetString(
+        //            "TPOEmail",
+        //            tpo.CollegeMailID ?? ""
+        //        );
+
+        //        HttpContext.Session.SetString(
+        //            "TPOCollegeName",
+        //            tpo.CollegeName ?? ""
+        //        );
+
+        //        HttpContext.Session.SetString(
+        //            "TPORole",
+        //            "TPO"
+        //        );
+
+        //        // 0 = Main TPO, 1 = Sub-TPO
+        //        HttpContext.Session.SetString(
+        //            "SubTpoBit",
+        //            tpo.SubTpoBit ? "1" : "0"
+        //        );
+
+        //        // RECORD SUCCESSFUL TPO LOGIN
+        //        try
+        //        {
+        //            await _visitorTrackingService.TrackVisitAsync(
+        //                HttpContext,
+        //                "TPO",
+        //                "TPOLogin",
+        //                tpo.TPOID,
+        //                "TPO",
+        //                true
+        //            );
+        //        }
+        //        catch (Exception trackingException)
+        //        {
+        //            // Tracking failure must not prevent a valid login.
+        //            _logger.LogError(
+        //                trackingException,
+        //                "Failed to record TPO login activity for TPOID {TPOID}",
+        //                tpo.TPOID
+        //            );
+        //        }
+
+        //        // REDIRECT TO TPO DASHBOARD
+        //        return RedirectToAction(
+        //            "Dashboard",
+        //            "TPO"
+        //        );
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        _logger.LogError(ex, "TPO login failed.");
+
+        //        ModelState.AddModelError(
+        //            "",
+        //            "Unable to login. Please try again later."
+        //        );
+
+        //        return View(model);
+        //    }
+        //}
+
+
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult TPOLogin(TPOLogin model)
+        public async Task<IActionResult> TPOLogin(TPOLogin model)
         {
             if (!ModelState.IsValid)
             {
@@ -1638,60 +1712,62 @@ public IActionResult OrganizationResetPassword()
 
             try
             {
-                if (string.IsNullOrWhiteSpace(model.CollegeMailID))
-                {
-                    ModelState.AddModelError(
-                        "",
-                        "Please enter your College Mail ID."
-                    );
-
-                    return View(model);
-                }
-
                 string email = model.CollegeMailID.Trim();
 
-                TPOLoginResult? tpo =
-                    _accountRepository.LoginTPO(email);
+                // Find TPO by college email
+                TPOLoginResult? tpo = _accountRepository.LoginTPO(email);
 
-                // CHECK TPO EXISTS
+                // Email not registered
                 if (tpo == null)
                 {
                     ModelState.AddModelError(
-                        "",
-                        "Invalid College Mail ID or Password."
+                        nameof(model.CollegeMailID),
+                        "Invalid email address."
                     );
 
                     return View(model);
                 }
 
-                // CHECK PASSWORD
-                // PasswordHash currently contains plain password
-                if (tpo.PasswordHash != model.Password)
+                // Verify password
+                var passwordHasher = new PasswordHasher<string>();
+
+                PasswordVerificationResult passwordResult;
+
+                try
+                {
+                    passwordResult = passwordHasher.VerifyHashedPassword(
+                        email,
+                        tpo.PasswordHash ?? "",
+                        model.Password
+                    );
+                }
+                catch (FormatException ex)
+                {
+                    _logger.LogError(
+                        ex,
+                        "Invalid password hash format for TPO email {Email}",
+                        email
+                    );
+
+                    TempData["Error"] =
+                        "Your stored password format is invalid. Please reset your password.";
+
+                    return View(model);
+                }
+
+                // Incorrect password
+                if (passwordResult == PasswordVerificationResult.Failed)
                 {
                     ModelState.AddModelError(
-                        "",
-                        "Invalid College Mail ID or Password."
+                        nameof(model.Password),
+                        "Incorrect password. Please try again."
                     );
 
                     return View(model);
                 }
 
-                // CHECK OTP
-                //if (!tpo.OTPVerified)
-                //{
-                //    ModelState.AddModelError(
-                //        "",
-                //        "Your OTP verification is not completed."
-                //    );
-
-                //    return View(model);
-                //}
-
-                // SET TPO SESSION
-                HttpContext.Session.SetInt32(
-                    "TPOID",
-                    tpo.TPOID
-                );
+                // Set TPO session after successful login
+                HttpContext.Session.SetInt32("TPOID", tpo.TPOID);
 
                 HttpContext.Session.SetString(
                     "TPOName",
@@ -1708,41 +1784,168 @@ public IActionResult OrganizationResetPassword()
                     tpo.CollegeName ?? ""
                 );
 
-                HttpContext.Session.SetString(
-                    "TPORole",
-                    "TPO"
-                );
+                HttpContext.Session.SetString("TPORole", "TPO");
 
-                // IMPORTANT:
-                // 0 = Main TPO
-                // 1 = Sub-TPO
+                // 0 = Main TPO, 1 = Sub-TPO
                 HttpContext.Session.SetString(
                     "SubTpoBit",
                     tpo.SubTpoBit ? "1" : "0"
                 );
 
-                // REDIRECT TO TPO DASHBOARD
-                return RedirectToAction(
-                    "Dashboard",
-                    "TPO"
-                );
+                // Record successful login; tracking failure must not block login
+                try
+                {
+                    await _visitorTrackingService.TrackVisitAsync(
+                        HttpContext,
+                        "TPO",
+                        "TPOLogin",
+                        tpo.TPOID,
+                        "TPO",
+                        true
+                    );
+                }
+                catch (Exception trackingException)
+                {
+                    _logger.LogError(
+                        trackingException,
+                        "Failed to record TPO login activity for TPOID {TPOID}",
+                        tpo.TPOID
+                    );
+                }
+
+                return RedirectToAction("Dashboard", "TPO");
             }
             catch (Exception ex)
             {
-                Console.WriteLine("========================================");
-                Console.WriteLine("TPO Login Error");
-                Console.WriteLine(ex.ToString());
-                Console.WriteLine("========================================");
+                _logger.LogError(ex, "TPO login failed.");
 
-                ModelState.AddModelError(
-                    "",
-                    "Unable to login. Please try again later."
-                );
+                TempData["Error"] = "Unable to login. Please try again later.";
 
                 return View(model);
             }
         }
 
+        //[HttpPost]
+        //[ValidateAntiForgeryToken]
+        //public async Task<IActionResult> TPOLogin(TPOLogin model)
+        //{
+        //    if (!ModelState.IsValid)
+        //    {
+        //        return View(model);
+        //    }
+
+        //    try
+        //    {
+        //        if (string.IsNullOrWhiteSpace(model.CollegeMailID))
+        //        {
+        //            ModelState.AddModelError(
+        //                "",
+        //                "Please enter your College Mail ID."
+        //            );
+
+        //            return View(model);
+        //        }
+
+        //        string email = model.CollegeMailID.Trim();
+
+        //        TPOLoginResult? tpo =
+        //            _accountRepository.LoginTPO(email);
+
+        //        // CHECK TPO EXISTS
+        //        if (tpo == null)
+        //        {
+        //            ModelState.AddModelError(
+        //                "",
+        //                "Invalid College Mail ID or Password."
+        //            );
+
+        //            return View(model);
+        //        }
+
+        //        // CHECK PASSWORD
+        //        // Existing comparison retained from your code.
+        //        if (tpo.PasswordHash != model.Password)
+        //        {
+        //            ModelState.AddModelError(
+        //                "",
+        //                "Invalid College Mail ID or Password."
+        //            );
+
+        //            return View(model);
+        //        }
+
+        //        // SET TPO SESSION
+        //        HttpContext.Session.SetInt32(
+        //            "TPOID",
+        //            tpo.TPOID
+        //        );
+
+        //        HttpContext.Session.SetString(
+        //            "TPOName",
+        //            tpo.FullName ?? ""
+        //        );
+
+        //        HttpContext.Session.SetString(
+        //            "TPOEmail",
+        //            tpo.CollegeMailID ?? ""
+        //        );
+
+        //        HttpContext.Session.SetString(
+        //            "TPOCollegeName",
+        //            tpo.CollegeName ?? ""
+        //        );
+
+        //        HttpContext.Session.SetString(
+        //            "TPORole",
+        //            "TPO"
+        //        );
+
+        //        // 0 = Main TPO, 1 = Sub-TPO
+        //        HttpContext.Session.SetString(
+        //            "SubTpoBit",
+        //            tpo.SubTpoBit ? "1" : "0"
+        //        );
+
+        //        // RECORD SUCCESSFUL TPO LOGIN
+        //        try
+        //        {
+        //            await _visitorTrackingService.TrackVisitAsync(
+        //                HttpContext,
+        //                "TPO",
+        //                "TPOLogin",
+        //                tpo.TPOID,
+        //                "TPO",
+        //                true
+        //            );
+        //        }
+        //        catch (Exception trackingException)
+        //        {
+        //            // Tracking failure must not prevent a valid login.
+        //            _logger.LogError(
+        //                trackingException,
+        //                "Failed to record TPO login activity for TPOID {TPOID}",
+        //                tpo.TPOID
+        //            );
+        //        }
+
+        //        // REDIRECT TO TPO DASHBOARD
+        //        return RedirectToAction(
+        //            "Dashboard",
+        //            "TPO"
+        //        );
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        _logger.LogError(ex, "TPO login failed.");
+
+        //        ModelState.AddModelError(
+        //            "",
+        //            "Unable to login. Please try again later."
+        //        );
+
+        //        return View(model);
+        //    }
+        //}
 
 
         // ==========================================================
@@ -2955,6 +3158,223 @@ public IActionResult OrganizationResetPassword()
 
             return View(activities);
         }
+
+
+        //khushi 22-10
+        // Check whether email already exists
+        [AcceptVerbs("GET", "POST")]
+        public IActionResult CheckCandidateEmail(string? sEmail)
+        {
+            if (string.IsNullOrWhiteSpace(sEmail))
+                return Json(true);
+
+            bool exists = _accountRepository
+                .IsCandidateEmailExists(sEmail.Trim());
+
+            return Json(!exists);
+        }
+
+        //khushi 22-10
+        // Check whether mobile number already exists
+        [AcceptVerbs("GET", "POST")]
+        public IActionResult CheckCandidateMobile(string? sMobile)
+        {
+            if (string.IsNullOrWhiteSpace(sMobile))
+                return Json(true);
+
+            bool exists = _accountRepository
+                .IsCandidateMobileExists(sMobile.Trim());
+
+            return Json(!exists);
+        }
+
+        //khushi 22-10
+        // Check organization email
+        [AcceptVerbs("GET", "POST")]
+        public IActionResult CheckOrganizationEmail(string? sEmail)
+        {
+            if (string.IsNullOrWhiteSpace(sEmail))
+                return Json(true);
+
+            bool exists = _accountRepository
+                .IsOrganizationEmailExists(sEmail.Trim());
+
+            return Json(!exists);
+        }
+
+        //khushi 22-10
+        // Check organization mobile
+        [AcceptVerbs("GET", "POST")]
+        public IActionResult CheckOrganizationMobile(string? sMobile)
+        {
+            if (string.IsNullOrWhiteSpace(sMobile))
+                return Json(true);
+
+            bool exists = _accountRepository
+                .IsOrganizationMobileExists(sMobile.Trim());
+
+            return Json(!exists);
+        }
+
+
+
+
+
+
+   
+        // ============================================================
+        // EDIT CANDIDATE REGISTRATION - GET
+        // ============================================================
+
+        [HttpGet]
+        public IActionResult EditCandidateRegistration()
+                {
+                    int? candidateId = HttpContext.Session.GetInt32("CandidateID");
+
+                    if (candidateId == null)
+                    {
+                        return RedirectToAction("CandidateLogin", "Account");
+                    }
+
+                    var candidate = _accountRepository
+                        .GetCandidateRegistrationForEdit(candidateId.Value);
+
+                    if (candidate == null)
+                    {
+                        return NotFound("Candidate registration details not found.");
+                    }
+
+                    return View(candidate);
+                }
+
+
+        // ============================================================
+        // EDIT CANDIDATE REGISTRATION - POST
+        // ============================================================
+
+
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public IActionResult EditCandidateRegistration(CandidateRegister model)
+        {
+            int? candidateId = HttpContext.Session.GetInt32("CandidateID");
+
+            if (candidateId == null)
+            {
+                return RedirectToAction("CandidateLogin", "Account");
+            }
+
+            // Password changes are not allowed on this page.
+            ModelState.Remove(nameof(model.sPassword));
+
+            var existingCandidate =
+                _accountRepository.GetCandidateRegistrationForEdit(candidateId.Value);
+
+            if (existingCandidate == null)
+            {
+                return NotFound("Candidate registration details not found.");
+            }
+
+            // Always preserve the registered email.
+            model.sEmail = existingCandidate.sEmail;
+
+            // Preserve the existing profile image unless a new image is uploaded.
+            model.sProfileImage = existingCandidate.sProfileImage;
+
+            // Check whether the new mobile number belongs to another candidate.
+            if (!string.IsNullOrWhiteSpace(model.sMobile))
+            {
+                model.sMobile = model.sMobile.Trim();
+
+                if (_accountRepository.CandidateMobileExistsForAnotherCandidate(
+                        model.sMobile, candidateId.Value))
+                {
+                    ModelState.AddModelError(
+                        nameof(model.sMobile),
+                        "This mobile number is already registered.");
+                }
+            }
+
+            // Validate submitted profile details.
+            if (!ModelState.IsValid)
+            {
+                return View(model);
+            }
+
+            try
+            {
+                if (model.ProfileImageFile != null &&
+                    model.ProfileImageFile.Length > 0)
+                {
+                    var extension = Path
+                        .GetExtension(model.ProfileImageFile.FileName)
+                        .ToLowerInvariant();
+
+                    var allowedExtensions = new[] { ".jpg", ".jpeg", ".png" };
+
+                    if (!allowedExtensions.Contains(extension))
+                    {
+                        ModelState.AddModelError(
+                            nameof(model.ProfileImageFile),
+                            "Only JPG, JPEG, and PNG images are allowed.");
+
+                        return View(model);
+                    }
+
+                    if (model.ProfileImageFile.Length > 5 * 1024 * 1024)
+                    {
+                        ModelState.AddModelError(
+                            nameof(model.ProfileImageFile),
+                            "The image must not exceed 5 MB.");
+
+                        return View(model);
+                    }
+
+                    string uploadFolder = Path.Combine(
+                        Directory.GetCurrentDirectory(),
+                        "wwwroot",
+                        "uploads",
+                        "candidates");
+
+                    Directory.CreateDirectory(uploadFolder);
+
+                    string fileName = $"{Guid.NewGuid():N}{extension}";
+                    string filePath = Path.Combine(uploadFolder, fileName);
+
+                    using (var stream = new FileStream(filePath, FileMode.Create))
+                    {
+                        model.ProfileImageFile.CopyTo(stream);
+                    }
+
+                    model.sProfileImage = "/uploads/candidates/" + fileName;
+                }
+
+                // Update profile without changing the password.
+                bool updated = _accountRepository
+                    .UpdateCandidateRegistrationForEdit(candidateId.Value, model);
+
+                if (!updated)
+                {
+                    TempData["Error"] = "Profile was not updated.";
+                    return View(model);
+                }
+
+                TempData["Success"] = "Profile updated successfully.";
+
+                return RedirectToAction("EditCandidateRegistration");
+            }
+            catch (Exception)
+            {
+                TempData["Error"] =
+                    "An error occurred while updating your profile.";
+
+                return View(model);
+            }
+        }
+
+
+
 
 
     }

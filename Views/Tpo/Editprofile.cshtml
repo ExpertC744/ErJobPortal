@@ -274,56 +274,44 @@
 
                 <!-- COLLEGE NAME -->
 
-                <div class="tpo-field">
+               <!-- COLLEGE NAME DROPDOWN -->
+<div class="tpo-field">
+    <label asp-for="CollegeName">College Name</label>
 
-                    <label asp-for="CollegeName">
-                        College Name
-                    </label>
+    <div class="input-wrapper">
+        <i class="fas fa-building"></i>
 
-                    <div class="input-wrapper">
+        <select asp-for="CollegeName"
+                id="CollegeName"
+                class="form-control">
+            <option value="">-- Select College Name --</option>
+        </select>
+    </div>
 
-                        <i class="fas fa-building"></i>
-
-                        <input asp-for="CollegeName"
-                               class="form-control"
-                               type="text"
-                               placeholder="Enter college name"
-                               autocomplete="organization" />
-
-                    </div>
-
-                    <span asp-validation-for="CollegeName"
-                          class="validation-message">
-                    </span>
-
-                </div>
+    <span asp-validation-for="CollegeName"
+          class="validation-message"></span>
+</div>
 
 
                 <!-- COLLEGE CODE -->
 
+               <!-- COLLEGE CODE DROPDOWN -->
                 <div class="tpo-field">
+    <label asp-for="CollegeCode">College Code</label>
 
-                    <label asp-for="CollegeCode">
-                        College Code
-                    </label>
+    <div class="input-wrapper">
+        <i class="fas fa-hashtag"></i>
 
-                    <div class="input-wrapper">
+        <select asp-for="CollegeCode"
+                id="CollegeCode"
+                class="form-control">
+            <option value="">-- Select College Code --</option>
+        </select>
+    </div>
 
-                        <i class="fas fa-hashtag"></i>
-
-                        <input asp-for="CollegeCode"
-                               class="form-control"
-                               type="text"
-                               placeholder="Enter college code"
-                               autocomplete="off" />
-
-                    </div>
-
-                    <span asp-validation-for="CollegeCode"
-                          class="validation-message">
-                    </span>
-
-                </div>
+    <span asp-validation-for="CollegeCode"
+          class="validation-message"></span>
+</div>
 
 
                 <!-- COLLEGE ADDRESS -->
@@ -690,5 +678,159 @@
         });
 
     </script>
+
+    <script>
+    $(document).ready(function () {
+
+        const collegeNameSelect = $('#CollegeName');
+        const collegeCodeSelect = $('#CollegeCode');
+
+        // Existing values loaded from the TPO profile.
+        const savedCollegeId = '@Model.CollegeName';
+        const savedCollegeCode = '@Model.CollegeCode';
+
+        function getArrayResponse(data) {
+            if (Array.isArray(data)) return data;
+            if (data && Array.isArray(data.data)) return data.data;
+            return [];
+        }
+
+        function getProperty(object, names) {
+            for (const name of names) {
+                if (object && object[name] !== undefined &&
+                    object[name] !== null) {
+                    return object[name];
+                }
+            }
+            return '';
+        }
+
+        function resetDropdown(dropdown, placeholder) {
+            dropdown.empty().append(
+                $('<option>', { value: '', text: placeholder })
+            );
+        }
+
+        function loadCollegeCodes(collegeId, selectedCode) {
+
+            resetDropdown(
+                collegeCodeSelect,
+                '-- Select College Code --'
+            );
+
+            if (!collegeId) return;
+
+            $.ajax({
+                url: '@Url.Action("GetCollegeCodes", "Account")',
+                type: 'GET',
+                dataType: 'json',
+                data: { collegeId: collegeId },
+
+                success: function (response) {
+                    const codes = getArrayResponse(response);
+
+                    $.each(codes, function (_, item) {
+                        const code = getProperty(item, [
+                            'nCode',
+                            'ncode',
+                            'collegeCode',
+                            'CollegeCode',
+                            'code'
+                        ]);
+
+                        if (code === '') return;
+
+                        collegeCodeSelect.append(
+                            $('<option>', {
+                                value: String(code),
+                                text: String(code)
+                            })
+                        );
+                    });
+
+                    // Restore the existing college code.
+                    if (selectedCode) {
+                        collegeCodeSelect.val(String(selectedCode));
+                    }
+                },
+
+                error: function (xhr) {
+                    console.error(
+                        'Failed to load college codes:',
+                        xhr.responseText
+                    );
+                }
+            });
+        }
+
+        function loadColleges() {
+
+            resetDropdown(
+                collegeNameSelect,
+                '-- Select College Name --'
+            );
+
+            $.ajax({
+                url: '@Url.Action("GetColleges", "Account")',
+                type: 'GET',
+                dataType: 'json',
+                cache: false,
+
+                success: function (response) {
+                    const colleges = getArrayResponse(response);
+
+                    $.each(colleges, function (_, college) {
+                        const id = getProperty(college, [
+                            'nID', 'nId', 'id',
+                            'collegeId', 'CollegeID'
+                        ]);
+
+                        const name = getProperty(college, [
+                            'sCollegeName',
+                            'collegeName',
+                            'CollegeName'
+                        ]);
+
+                        if (id === '' || name === '') return;
+
+                        collegeNameSelect.append(
+                            $('<option>', {
+                                value: String(id),
+                                text: String(name)
+                            })
+                        );
+                    });
+
+                    // Select the TPO's existing college.
+                    if (savedCollegeId) {
+                        collegeNameSelect.val(String(savedCollegeId));
+                    }
+
+                    // Load codes for the selected college.
+                    loadCollegeCodes(
+                        collegeNameSelect.val(),
+                        savedCollegeCode
+                    );
+                },
+
+
+                error: function (xhr) {
+                    console.error(
+                        'Failed to load colleges:',
+                        xhr.responseText
+                    );
+                }
+            });
+        }
+
+        // Reload college codes whenever the college changes.
+        collegeNameSelect.on('change', function () {
+            loadCollegeCodes($(this).val(), '');
+        });
+
+        // Initial load.
+        loadColleges();
+    });
+</script>
 
 }

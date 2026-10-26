@@ -297,7 +297,6 @@ button {
         top: 18%;
         bottom: 18%;
         width: 4px;
-        background: var(--c);
         border-radius: 0 4px 4px 0;
     }
 

@@ -1098,6 +1098,7 @@ namespace ErJobPortal.Controllers
             return View(model);
         }
 
+
         [HttpGet]
         [Route("TPO/ViewProfile")]
         public IActionResult ViewProfile()
@@ -1109,6 +1110,7 @@ namespace ErJobPortal.Controllers
                 return RedirectToAction("TPOLogin", "Account");
             }
 
+
             TPORegistration? model =
                 _accountRepository.GetTPOById(tpoId.Value);
 
@@ -1116,6 +1118,20 @@ namespace ErJobPortal.Controllers
             {
                 TempData["Error"] = "TPO profile not found.";
                 return RedirectToAction("Dashboard", "TPO");
+            }
+
+            // Convert the stored College ID into the college name.
+            if (int.TryParse(model.CollegeName, out int collegeId))
+            {
+                var colleges = _accountRepository.GetColleges();
+
+                var selectedCollege = colleges
+                    .FirstOrDefault(c => c.nID == collegeId);
+
+                if (selectedCollege != null)
+                {
+                    model.CollegeName = selectedCollege.sCollegeName;
+                }
             }
 
             ViewData["Panel"] = "TPO";
@@ -1127,6 +1143,7 @@ namespace ErJobPortal.Controllers
 
             return View(model);
         }
+
 
         //[HttpGet]
         //[Route("TPO/CreateNotification")]
@@ -5821,6 +5838,103 @@ ORDER BY
         public IActionResult GradeNormalization() => View();
         public IActionResult DriveTracking() => View();
         public IActionResult SharedData() => View();
+        public IActionResult EditTPORegistration() => View();
+
+
+        [HttpGet]
+        [ResponseCache(
+            NoStore = true,
+            Location = ResponseCacheLocation.None)]
+        public async Task<IActionResult> ActivityLog()
+        {
+            // Verify TPO login
+            int? tpoId = HttpContext.Session.GetInt32("TPOID");
+
+            if (tpoId == null)
+            {
+                return RedirectToAction("TPOLogin", "Account");
+            }
+
+            var activities =
+                new List<CandidateActivityLogViewModel>();
+
+            string connectionString =
+                _configuration.GetConnectionString("DefaultConnection")
+                ?? throw new InvalidOperationException(
+                    "DefaultConnection is missing from configuration.");
+
+            const string query = @"
+        SELECT
+            VisitID,
+            IPAddress,
+            ISP,
+            Country,
+            Region,
+            City,
+            TimeZone,
+            BrowserName,
+            BrowserVersion,
+            OperatingSystem,
+            DeviceType,
+            RequestPath,
+            PageName,
+            ReferrerUrl,
+            VisitDateTime,
+            IsLoggedIn
+        FROM dbo.tblLoginPageVisits
+        WHERE UserID = @TPOID
+          AND UserType = @UserType
+          AND PanelType = @PanelType
+        ORDER BY VisitDateTime DESC;";
+
+            await using var connection =
+                new Microsoft.Data.SqlClient.SqlConnection(connectionString);
+
+            await using var command =
+                new Microsoft.Data.SqlClient.SqlCommand(query, connection);
+
+            command.Parameters.Add("@TPOID", System.Data.SqlDbType.Int)
+                .Value = tpoId.Value;
+
+            command.Parameters.Add("@UserType", System.Data.SqlDbType.NVarChar, 30)
+                .Value = "TPO";
+
+            command.Parameters.Add("@PanelType", System.Data.SqlDbType.NVarChar, 30)
+                .Value = "TPO";
+
+            await connection.OpenAsync();
+
+            await using (var reader = await command.ExecuteReaderAsync())
+            {
+                while (await reader.ReadAsync())
+                {
+                    activities.Add(new CandidateActivityLogViewModel
+                    {
+                        VisitID = Convert.ToInt64(reader["VisitID"]),
+                        IPAddress = reader["IPAddress"] as string,
+                        ISP = reader["ISP"] as string,
+                        Country = reader["Country"] as string,
+                        Region = reader["Region"] as string,
+                        City = reader["City"] as string,
+                        TimeZone = reader["TimeZone"] as string,
+                        BrowserName = reader["BrowserName"] as string,
+                        BrowserVersion = reader["BrowserVersion"] as string,
+                        OperatingSystem = reader["OperatingSystem"] as string,
+                        DeviceType = reader["DeviceType"] as string,
+                        RequestPath = reader["RequestPath"] as string,
+                        PageName = reader["PageName"] as string,
+                        ReferrerUrl = reader["ReferrerUrl"] as string,
+                        VisitDateTime = Convert.ToDateTime(
+                            reader["VisitDateTime"]),
+                        IsLoggedIn = Convert.ToBoolean(
+                            reader["IsLoggedIn"])
+                    });
+                }
+            }
+
+            return View("ActivityLog", activities);
+        }
+
 
     }
 }

@@ -1,0 +1,343 @@
+/* =========================================================
+   TRAINEE PROFILES LIST
+   (scoped to .trainee-profiles-page)
+========================================================= */
+
+.trainee-profiles-page {
+    --photo-w: 100px;
+    --photo-h: 120px;
+    padding: 20px 15px 30px;
+}
+
+
+    /* =========================================================
+   TABLE CARD
+========================================================= */
+
+    .trainee-profiles-page .master-table-container {
+        padding: 18px 20px 14px;
+        background: #ffffff;
+        border: 1px solid #e5eeec;
+        border-radius: 14px;
+        box-shadow: 0 8px 24px rgba(16, 24, 40, 0.06);
+    }
+
+
+    /* =========================================================
+   PAGE HEADER
+========================================================= */
+
+    .trainee-profiles-page .page-header {
+        margin-bottom: 14px !important;
+        padding-bottom: 10px;
+        border-bottom: 1px solid #edf1f0;
+    }
+
+        .trainee-profiles-page .page-header h1 {
+            margin: 0;
+            color: #172033;
+            font-size: 20px;
+            font-weight: 700;
+        }
+
+        .trainee-profiles-page .page-header p {
+            margin: 4px 0 0;
+            color: #98a2b3;
+            font-size: 13px;
+        }
+
+
+    /* =========================================================
+   TABLE
+========================================================= */
+
+    .trainee-profiles-page .table-responsive {
+        width: 100%;
+        overflow-x: auto;
+    }
+
+    .trainee-profiles-page .master-data-table {
+        width: 100% !important;
+        min-width: 900px;
+        border-collapse: separate;
+        border-spacing: 0;
+        font-size: 13px;
+        color: #344054;
+    }
+
+        /* ---------- Head ---------- */
+
+        .trainee-profiles-page .master-data-table thead th {
+            padding: 10px 12px;
+            background: #edf7f5;
+            border-top: 1px solid #dcebe8;
+            border-bottom: 1px solid #dcebe8;
+            color: #0f766e;
+            font-size: 12.5px;
+            font-weight: 700;
+            line-height: 1.3;
+            text-align: left;
+            white-space: nowrap;
+            vertical-align: middle;
+        }
+
+            .trainee-profiles-page .master-data-table thead th:first-child {
+                border-left: 1px solid #dcebe8;
+                border-top-left-radius: 8px;
+                text-align: center;
+            }
+
+            .trainee-profiles-page .master-data-table thead th:last-child {
+                border-right: 1px solid #dcebe8;
+                border-top-right-radius: 8px;
+            }
+
+            .trainee-profiles-page .master-data-table thead th:nth-child(3) {
+                text-align: center;
+            }
+
+        /* ---------- Body ---------- */
+
+        .trainee-profiles-page .master-data-table tbody td {
+            padding: 9px 12px;
+            border-bottom: 1px solid #edf1f0;
+            color: #344054;
+            font-size: 13px;
+            line-height: 1.45;
+            vertical-align: middle;
+            word-break: break-word;
+        }
+
+        .trainee-profiles-page .master-data-table tbody tr {
+            transition: background 0.15s ease;
+        }
+
+            .trainee-profiles-page .master-data-table tbody tr:hover {
+                background: #f6fbfa;
+            }
+
+        .trainee-profiles-page .master-data-table .master-id {
+            width: 60px;
+            color: #667085;
+            font-weight: 600;
+        }
+
+        /* column widths */
+        .trainee-profiles-page .master-data-table th:nth-child(1),
+        .trainee-profiles-page .master-data-table td:nth-child(1) {
+            width: 60px;
+        }
+
+        .trainee-profiles-page .master-data-table th:nth-child(3),
+        .trainee-profiles-page .master-data-table td:nth-child(3) {
+            width: 130px;
+        }
+
+        .trainee-profiles-page .master-data-table td:nth-child(4),
+        .trainee-profiles-page .master-data-table td:nth-child(5),
+        .trainee-profiles-page .master-data-table td:nth-child(6) {
+            max-width: 220px;
+        }
+
+        .trainee-profiles-page .master-data-table td:nth-child(7) {
+            min-width: 110px;
+            white-space: normal;
+        }
+
+
+        /* =========================================================
+   PHOTO (PORTRAIT 100 x 120)
+   change --photo-w / --photo-h at the top to resize
+========================================================= */
+
+        .trainee-profiles-page .master-data-table td:nth-child(3) {
+            padding-top: 10px;
+            padding-bottom: 10px;
+            text-align: center;
+        }
+
+        .trainee-profiles-page .master-data-table .trainee-profile-image,
+        .trainee-profiles-page img.trainee-profile-image {
+            width: var(--photo-w) !important;
+            height: var(--photo-h) !important;
+            min-width: var(--photo-w);
+            max-width: var(--photo-w) !important;
+            max-height: var(--photo-h) !important;
+            display: block;
+            margin: 0 auto;
+            object-fit: contain;
+            object-position: center center;
+            border-radius: 10px !important;
+            border: 2px solid #e6f6f3;
+            background: #f5faf9;
+            box-shadow: 0 3px 10px rgba(16, 24, 40, 0.14);
+        }
+
+
+    /* =========================================================
+   DATATABLES CONTROLS
+   (works with DataTables 1.x and 2.x)
+========================================================= */
+
+    .trainee-profiles-page .dataTables_wrapper,
+    .trainee-profiles-page .dt-container {
+        font-size: 13px;
+        color: #667085;
+    }
+
+    .trainee-profiles-page .dataTables_length,
+    .trainee-profiles-page .dataTables_filter,
+    .trainee-profiles-page .dt-length,
+    .trainee-profiles-page .dt-search {
+        margin-bottom: 12px;
+    }
+
+        .trainee-profiles-page .dataTables_length select,
+        .trainee-profiles-page .dt-length select {
+            height: 32px;
+            margin-right: 6px;
+            padding: 0 8px;
+            border: 1px solid #dfe6e5;
+            border-radius: 7px;
+            background: #fbfdfd;
+            color: #344054;
+            font-size: 13px;
+            outline: none;
+        }
+
+        .trainee-profiles-page .dataTables_filter input,
+        .trainee-profiles-page .dt-search input {
+            width: 200px;
+            max-width: 100%;
+            height: 32px;
+            margin-left: 0;
+            padding: 0 10px;
+            border: 1px solid #dfe6e5;
+            border-radius: 7px;
+            background: #fbfdfd;
+            color: #344054;
+            font-size: 13px;
+            outline: none;
+            transition: 0.2s ease;
+        }
+
+            .trainee-profiles-page .dataTables_filter input:focus,
+            .trainee-profiles-page .dt-search input:focus,
+            .trainee-profiles-page .dataTables_length select:focus,
+            .trainee-profiles-page .dt-length select:focus {
+                background: #ffffff;
+                border-color: #0d9488;
+                box-shadow: 0 0 0 3px rgba(13, 148, 136, 0.07);
+            }
+
+        .trainee-profiles-page .dataTables_filter label,
+        .trainee-profiles-page .dt-search label {
+            margin: 0;
+        }
+
+    /* info + pagination */
+
+    .trainee-profiles-page .dataTables_info,
+    .trainee-profiles-page .dt-info {
+        padding-top: 12px;
+        color: #98a2b3;
+        font-size: 12.5px;
+    }
+
+    .trainee-profiles-page .dataTables_paginate,
+    .trainee-profiles-page .dt-paging {
+        padding-top: 10px;
+    }
+
+        .trainee-profiles-page .dataTables_paginate .paginate_button,
+        .trainee-profiles-page .dt-paging .dt-paging-button {
+            min-width: 30px;
+            height: 30px;
+            margin: 0 2px;
+            padding: 0 10px !important;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            border: 1px solid #dfe6e5 !important;
+            border-radius: 7px !important;
+            background: #ffffff !important;
+            color: #344054 !important;
+            font-size: 12.5px;
+            cursor: pointer;
+            transition: 0.2s ease;
+        }
+
+            .trainee-profiles-page .dataTables_paginate .paginate_button:hover,
+            .trainee-profiles-page .dt-paging .dt-paging-button:hover {
+                background: #e6f6f3 !important;
+                border-color: #0d9488 !important;
+                color: #0d9488 !important;
+            }
+
+            .trainee-profiles-page .dataTables_paginate .paginate_button.current,
+            .trainee-profiles-page .dt-paging .dt-paging-button.current {
+                background: #0d9488 !important;
+                border-color: #0d9488 !important;
+                color: #ffffff !important;
+                font-weight: 600;
+            }
+
+            .trainee-profiles-page .dataTables_paginate .paginate_button.disabled,
+            .trainee-profiles-page .dt-paging .dt-paging-button.disabled {
+                opacity: 0.5;
+                cursor: not-allowed;
+            }
+
+    /* sort arrows spacing */
+    .trainee-profiles-page table.dataTable thead th {
+        padding-right: 22px;
+    }
+
+        .trainee-profiles-page table.dataTable thead th:first-child,
+        .trainee-profiles-page table.dataTable thead th:nth-child(3) {
+            padding-right: 12px;
+        }
+
+    /* empty row */
+    .trainee-profiles-page td.dataTables_empty,
+    .trainee-profiles-page td.dt-empty {
+        padding: 22px 12px;
+        color: #98a2b3;
+        text-align: center;
+    }
+
+
+/* =========================================================
+   RESPONSIVE
+========================================================= */
+
+@media (max-width: 768px) {
+
+    .trainee-profiles-page {
+        padding: 12px 8px 24px;
+    }
+
+        .trainee-profiles-page .master-table-container {
+            padding: 14px 12px 12px;
+            border-radius: 12px;
+        }
+
+    .trainee-profiles-page {
+        --photo-w: 80px;
+        --photo-h: 96px;
+    }
+
+        .trainee-profiles-page .page-header h1 {
+            font-size: 18px;
+        }
+
+        .trainee-profiles-page .dataTables_filter input,
+        .trainee-profiles-page .dt-search input {
+            width: 100%;
+        }
+
+        .trainee-profiles-page .dataTables_paginate,
+        .trainee-profiles-page .dt-paging {
+            text-align: center;
+        }
+}

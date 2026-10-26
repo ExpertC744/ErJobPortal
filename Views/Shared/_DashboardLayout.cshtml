@@ -3460,6 +3460,19 @@
 
 							@* end *@
 
+							<!-- Edit Registration Details -->
+
+							<a asp-controller="Candidate"
+							   asp-action="EditCandidateRegistration"
+							   class="profile-submenu-link">
+
+								<span>
+									<i class="fas fa-id-card me-1"></i>
+									Edit Registration Details
+								</span>
+
+							</a>
+
 						</div>
 
 					</div>
@@ -4104,25 +4117,36 @@
 
 
 						<div class="profile-submenu"
-							 id="tpoProfileSubmenu">
+     id="tpoProfileSubmenu">
 
-							<a asp-controller="TPO"
-							   asp-action="Viewprofile"
-							   class="profile-submenu-link">
+    <!-- View Profile -->
+    <a asp-controller="TPO"
+       asp-action="Viewprofile"
+       class="profile-submenu-link">
 
-								View Profile
+        View Profile
 
-							</a>
+    </a>
 
-							<a asp-controller="TPO"
-							   asp-action="EditProfile"
-							   class="profile-submenu-link">
+    <!-- Edit Profile -->
+    <a asp-controller="TPO"
+       asp-action="EditProfile"
+       class="profile-submenu-link">
 
-								Edit Profile
+        Edit Profile
 
-							</a>
+    </a>
 
-						</div>
+    <!-- Edit TPO Registration -->
+    <a asp-controller="Account"
+       asp-action="EditTPORegistration"
+       class="profile-submenu-link">
+
+        Edit TPO Registration
+
+    </a>
+
+</div>
 
 					</div>
 
@@ -4162,23 +4186,48 @@
 
 
 					<!-- ================= CREATE USER ================= -->
+					<!-- ================= CREATE USER ================= -->
+					@if (Context.Session.GetString("SubTpoBit") != "1")
+					{
+						<div class="sidebar-dropdown">
 
-@if (Context.Session.GetString("SubTpoBit") != "1")
-{
-    <a asp-controller="TPO"
-       asp-action="CreateUser"
-       class="sidebar-link">
+							<div class="sidebar-link"
+								 onclick="toggleSidebarMenu('tpoCreateUserSubmenu', 'tpoCreateUserArrow')">
 
-        <span class="menu-icon">
-            <i class="fas fa-user-plus"></i>
-        </span>
+								<span class="menu-icon">
+									<i class="fas fa-user-plus"></i>
+								</span>
 
-        <span class="menu-text">
-            Create User
-        </span>
+								<span class="menu-text">
+									Create User
+								</span>
 
-    </a>
-}
+								<span class="profile-arrow"
+									  id="tpoCreateUserArrow">
+									<i class="fas fa-chevron-right"></i>
+								</span>
+
+							</div>
+
+							<div class="profile-submenu"
+								 id="tpoCreateUserSubmenu">
+
+								<a asp-controller="TPO"
+								   asp-action="Addsubtpo"
+								   class="profile-submenu-link">
+									Add Sub TPO
+								</a>
+
+								<a asp-controller="TPO"
+								   asp-action="ViewTPODetails"
+								   class="profile-submenu-link">
+									View TPO Details
+								</a>
+
+							</div>
+
+						</div>
+					}
 
 				
 					
@@ -4225,6 +4274,8 @@
 							   class="profile-submenu-link">
 								Send Notification/Event
 							</a>
+
+							
 						}
 						else
 						{
@@ -4339,21 +4390,21 @@
 					<!-- ================= LOGOUT ================= -->
 					@*  <div class="sidebar-logout">
 
-            <a asp-controller="Account"
-               asp-action="Logout"
-               class="logout-link">
+						<a asp-controller="Account"
+						   asp-action="Logout"
+						   class="logout-link">
 
-                <span class="menu-icon">
-                    <i class="fas fa-right-from-bracket"></i>
-                </span>
+							<span class="menu-icon">
+								<i class="fas fa-right-from-bracket"></i>
+							</span>
 
-                <span class="menu-text">
-                    Logout
-                </span>
+							<span class="menu-text">
+								Logout
+							</span>
 
-            </a>
+						</a>
 
-        </div> *@
+					</div> *@
 
 				</div>
 			}
@@ -4897,12 +4948,13 @@ else
 											CANDIDATE
 						========================================================= *@
 
+
 							@if (ViewData["Panel"]?.ToString() == "Candidate")
 							{
 								<!-- CANDIDATE MY PROFILE -->
 
 								<a asp-controller="Candidate"
-								   asp-action="Dashboard"
+								   asp-action="ViewProfile"
 								   class="user-dropdown-item">
 
 									<span class="dropdown-item-icon">
@@ -5017,6 +5069,15 @@ else
 									</span>
 
 								</a>
+
+								<a asp-controller="Organization"
+								   asp-action="ActivityLog"
+								   class="user-dropdown-item">
+									<span class="dropdown-item-icon">
+										<i class="fas fa-history"></i>
+									</span>
+									<span>Activity Log</span>
+								</a>
 							}
 
 
@@ -5029,7 +5090,7 @@ else
 								<!-- TPO MY PROFILE -->
 
 								<a asp-controller="TPO"
-								   asp-action="Profile"
+								   asp-action="Viewprofile"
 								   class="user-dropdown-item">
 
 									<span class="dropdown-item-icon">
@@ -5075,12 +5136,22 @@ else
 									</span>
 
 								</a>
+
+
+								<a asp-controller="TPO"
+								   asp-action="ActivityLog"
+								   class="user-dropdown-item">
+									<span class="dropdown-item-icon">
+										<i class="fas fa-history"></i>
+									</span>
+									<span>Activity Log</span>
+								</a>
 							}
 
 
 							@* =========================================================
-SUPER ADMIN
-========================================================= *@
+							SUPER ADMIN
+							========================================================= *@
 
 							else if (ViewData["Panel"]?.ToString() == "SuperAdmin")
 							{
