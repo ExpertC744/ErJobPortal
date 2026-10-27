@@ -3402,20 +3402,19 @@ namespace ErJobPortal.Controllers
 
 
             // =========================================================
-            // IF ID IS MISSING FROM URL
+            // IF ID IS MISSING FROM URL radhika26-10
             // =========================================================
 
-            if (string.IsNullOrEmpty(id))
+            if (string.IsNullOrWhiteSpace(id))
             {
-                return RedirectToAction(
-                    "Charts",
-                    "Candidate",
+                return RedirectToRoute(
                     new
                     {
+                        controller = "Candidate",
+                        action = "Charts",
                         id = candidateCode
                     });
             }
-
 
             // =========================================================
             // VALIDATE CANDIDATE CODE

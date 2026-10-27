@@ -1369,627 +1369,215 @@
 
 </div>
 
+@* radhika26-10 charts *@
 <script>
 
-    /* =====================================================
-    1. MONTH NAMES
-    ===================================================== */
+    /* 1. MONTH NAMES */
+    const chartMonths = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
 
-    const chartMonths = [
-    "Jan",
-    "Feb",
-    "Mar",
-    "Apr",
-    "May",
-    "Jun",
-    "Jul",
-    "Aug",
-    "Sep",
-    "Oct",
-    "Nov",
-    "Dec"
-    ];
+    /* Y-AXIS MAX (shared by both charts) */
+    const CHART_MAX_Y = 1000;
 
-
-    /* =====================================================
-    2. SUITABLE OPENINGS DATA
-    DATA COMES FROM CANDIDATE CONTROLLER
-    ===================================================== */
-
+    /* 2. SUITABLE OPENINGS DATA (from Candidate controller) */
     const suitableOpeningsMonthly =
     @Html.Raw(
-            System.Text.Json.JsonSerializer.Serialize(
-                            ViewBag.SuitableOpeningsMonthly
-                                            ?? new int[12]
-            )
+        System.Text.Json.JsonSerializer.Serialize(
+                ViewBag.SuitableOpeningsMonthly ?? new int[12]
+        )
         );
 
-
-    /* =====================================================
-    3. INTERNSHIP POST DATA
-    DATA COMES FROM SP_GetSACharts
-    ===================================================== */
-
+    /* 3. INTERNSHIP POST DATA (from SP_GetSACharts) */
     const internshipPostData =
     @Html.Raw(
-                        System.Text.Json.JsonSerializer.Serialize(
-                                        Model?.InternshipPostData ??
-                                        new List<ErJobPortal.Models.SAChartData>()
-                        )
+                System.Text.Json.JsonSerializer.Serialize(
+                        Model?.InternshipPostData ??
+                        new List<ErJobPortal.Models.SAChartData>()
+                )
         );
 
+    /* 4. CONVERT INTERNSHIP DATA TO 12 MONTH ARRAY */
+    const internshipPostsMonthly = new Array(12).fill(0);
 
-    /* =====================================================
-    4. CONVERT INTERNSHIP DATA TO 12 MONTH ARRAY
-    ===================================================== */
+    if (internshipPostData.length > 0) {
+        const latestYear = Math.max(...internshipPostData.map(x => x.Year));
 
-    const internshipPostsMonthly =
-    new Array(12).fill(0);
-
-
-    if (internshipPostData.length > 0)
-    {
-    /*
-    * Get latest year available
-    * from SP_GetSACharts
-    */
-
-    const latestYear =
-    Math.max(
-    ...internshipPostData.map(
-    x => x.Year
-    )
-    );
-
-
-    /*
-    * Put monthly values
-    * into Jan-Dec array
-    */
-
-    internshipPostData
-    .filter(x => x.Year === latestYear)
-    .forEach(x => {
-
-    const monthIndex =
-    x.Month - 1;
-
-
-    if (
-    monthIndex >= 0 &&
-    monthIndex < 12
-    )
-    {
-    internshipPostsMonthly[monthIndex] =
-    x.TotalCount;
+        internshipPostData
+            .filter(x => x.Year === latestYear)
+            .forEach(x => {
+                const monthIndex = x.Month - 1;
+                if (monthIndex >= 0 && monthIndex < 12) {
+                    internshipPostsMonthly[monthIndex] = x.TotalCount;
+                }
+            });
     }
 
-    });
+    /* 5. LINE / AREA CHART */
+    function drawLineChart(svgId, values) {
+        const svg = document.getElementById(svgId);
+
+        if (!svg) {
+            console.error("SVG not found:", svgId);
+            return;
+        }
+
+        if (!values || values.length !== 12) {
+            console.error("Invalid line chart data:", values);
+            return;
+        }
+
+        const width = 700;
+        const height = 240;
+        const left = 48;
+        const right = 12;
+        const top = 25;
+        const bottom = 38;
+
+        const chartWidth = width - left - right;
+        const chartHeight = height - top - bottom;
+        const maxY = CHART_MAX_Y;
+
+        let html = "";
+
+        /* Horizontal grid + Y axis labels */
+        for (let i = 0; i <= 4; i++) {
+            const value = maxY - (i * maxY / 4);
+            const y = top + (i * chartHeight / 4);
+
+            html += `
+                <line x1="${left}" y1="${y}" x2="${width - right}" y2="${y}" class="chart-grid"></line>
+                <text x="${left - 10}" y="${y + 4}" text-anchor="end" class="chart-axis-text">${Math.round(value)}</text>
+            `;
+        }
+
+        /* Vertical grid + months */
+        chartMonths.forEach((month, index) => {
+            const x = left + (index * chartWidth / 11);
+
+            html += `
+                <line x1="${x}" y1="${top}" x2="${x}" y2="${height - bottom}" class="chart-grid"></line>
+                <text x="${x}" y="${height - 13}" text-anchor="middle" class="chart-axis-text">${month}</text>
+            `;
+        });
+
+        /* Axis */
+        html += `
+            <line x1="${left}" y1="${height - bottom}" x2="${width - right}" y2="${height - bottom}" class="chart-axis"></line>
+            <line x1="${left}" y1="${top}" x2="${left}" y2="${height - bottom}" class="chart-axis"></line>
+        `;
+
+        /* Points (value capped at maxY so the line never leaves the chart) */
+        const points = values.map((value, index) => {
+            const safeValue = Math.min(Math.max(value, 0), maxY);
+            return {
+                x: left + (index * chartWidth / 11),
+                y: top + chartHeight - ((safeValue / maxY) * chartHeight),
+                value: value
+            };
+        });
+
+        const pointString = points.map(p => `${p.x},${p.y}`).join(" ");
+
+        /* Area */
+        const areaPoints =
+            `${left},${height - bottom} ` +
+            pointString +
+            ` ${width - right},${height - bottom}`;
+
+        html += `<polygon points="${areaPoints}" class="chart-area"></polygon>`;
+
+        /* Line */
+        html += `<polyline points="${pointString}" class="chart-line"></polyline>`;
+
+        /* Dots */
+        points.forEach((point, index) => {
+            html += `
+                <circle cx="${point.x}" cy="${point.y}" r="3.5" class="chart-point">
+                    <title>${chartMonths[index]}: ${point.value} openings</title>
+                </circle>
+            `;
+        });
+
+        svg.innerHTML = html;
     }
 
+    /* 6. BAR CHART */
+    function drawBarChart(svgId, values) {
+        const svg = document.getElementById(svgId);
 
-    /* =====================================================
-    5. LINE / AREA CHART
-    ===================================================== */
+        if (!svg) {
+            console.error("SVG not found:", svgId);
+            return;
+        }
 
-    function drawLineChart(svgId, values)
-    {
-    const svg =
-    document.getElementById(svgId);
+        if (!values || values.length !== 12) {
+            console.error("Invalid bar chart data:", values);
+            return;
+        }
 
+        const width = 700;
+        const height = 240;
+        const left = 48;
+        const right = 12;
+        const top = 25;
+        const bottom = 38;
 
-    if (!svg)
-    {
-    console.error(
-    "SVG not found:",
-    svgId
-    );
+        const chartWidth = width - left - right;
+        const chartHeight = height - top - bottom;
+        const maxY = CHART_MAX_Y;
 
-    return;
+        const barSpace = chartWidth / values.length;
+        const barWidth = barSpace * 0.58;
+
+        let html = "";
+
+        /* Y axis + grid */
+        for (let i = 0; i <= 4; i++) {
+            const value = maxY - (i * maxY / 4);
+            const y = top + (i * chartHeight / 4);
+
+            html += `
+                <line x1="${left}" y1="${y}" x2="${width - right}" y2="${y}" class="chart-grid"></line>
+                <text x="${left - 10}" y="${y + 4}" text-anchor="end" class="chart-axis-text">${Math.round(value)}</text>
+            `;
+        }
+
+        /* Vertical grid + months */
+        chartMonths.forEach((month, index) => {
+            const centerX = left + (index * barSpace) + (barSpace / 2);
+
+            html += `
+                <line x1="${centerX}" y1="${top}" x2="${centerX}" y2="${height - bottom}" class="chart-grid"></line>
+                <text x="${centerX}" y="${height - 13}" text-anchor="middle" class="chart-axis-text">${month}</text>
+            `;
+        });
+
+        /* Axis */
+        html += `
+            <line x1="${left}" y1="${height - bottom}" x2="${width - right}" y2="${height - bottom}" class="chart-axis"></line>
+            <line x1="${left}" y1="${top}" x2="${left}" y2="${height - bottom}" class="chart-axis"></line>
+        `;
+
+        /* Bars (value capped at maxY) */
+        values.forEach((value, index) => {
+            const safeValue = Math.min(Math.max(value, 0), maxY);
+            const centerX = left + (index * barSpace) + (barSpace / 2);
+            const barHeight = (safeValue / maxY) * chartHeight;
+            const x = centerX - (barWidth / 2);
+            const y = height - bottom - barHeight;
+
+            html += `
+                <rect x="${x}" y="${y}" width="${barWidth}" height="${barHeight}" rx="1" class="chart-bar">
+                    <title>${chartMonths[index]}: ${value} posts</title>
+                </rect>
+            `;
+        });
+
+        svg.innerHTML = html;
     }
 
-
-    if (
-    !values ||
-    values.length !== 12
-    )
-    {
-    console.error(
-    "Invalid line chart data:",
-    values
-    );
-
-    return;
-    }
-
-
-    const width = 700;
-    const height = 240;
-
-    const left = 48;
-    const right = 12;
-    const top = 25;
-    const bottom = 38;
-
-
-    const chartWidth =
-    width - left - right;
-
-    const chartHeight =
-    height - top - bottom;
-
-
-    /* =================================================
-    MAX VALUE
-    ================================================= */
-
-    const maxY = 100;
-
-
-    let html = "";
-
-
-    /* =================================================
-    HORIZONTAL GRID + Y AXIS
-    ================================================= */
-
-    for (let i = 0; i <= 4; i++)
-    {
-    const value =
-    maxY -
-    (
-    i * maxY / 4
-    );
-
-
-    const y =
-    top +
-    (
-    i * chartHeight / 4
-    );
-
-
-    html += `
-    <line
-    x1="${left}"
-    y1="${y}"
-    x2="${width - right}"
-    y2="${y}"
-    class="chart-grid">
-    </line>
-
-    <text
-    x="${left - 10}"
-    y="${y + 4}"
-    text-anchor="end"
-    class="chart-axis-text">
-    ${Math.round(value)}
-    </text>
-    `;
-    }
-
-
-    /* =================================================
-    VERTICAL GRID + MONTHS
-    ================================================= */
-
-    chartMonths.forEach(
-    (month, index) =>
-    {
-    const x =
-    left +
-    (
-    index *
-    chartWidth / 11
-    );
-
-
-    html += `
-    <line
-    x1="${x}"
-    y1="${top}"
-    x2="${x}"
-    y2="${height - bottom}"
-    class="chart-grid">
-    </line>
-    `;
-
-
-    html += `
-    <text
-    x="${x}"
-    y="${height - 13}"
-    text-anchor="middle"
-    class="chart-axis-text">
-    ${month}
-    </text>
-    `;
-    });
-
-
-    /* =================================================
-    AXIS
-    ================================================= */
-
-    html += `
-    <line
-    x1="${left}"
-    y1="${height - bottom}"
-    x2="${width - right}"
-    y2="${height - bottom}"
-    class="chart-axis">
-    </line>
-
-    <line
-    x1="${left}"
-    y1="${top}"
-    x2="${left}"
-    y2="${height - bottom}"
-    class="chart-axis">
-    </line>
-    `;
-
-
-    /* =================================================
-    CALCULATE POINTS
-    ================================================= */
-
-    const points =
-    values.map(
-    (value, index) =>
-    {
-
-    const x =
-    left +
-    (
-    index *
-    chartWidth / 11
-    );
-
-
-    const y =
-    top +
-    chartHeight -
-    (
-    (value / maxY) *
-    chartHeight
-    );
-
-
-    return {
-    x: x,
-    y: y,
-    value: value
-    };
-
-    });
-
-
-    const pointString =
-    points
-    .map(
-    p =>
-    `${p.x},${p.y}`
-    )
-    .join(" ");
-
-
-    /* =================================================
-    AREA
-    ================================================= */
-
-    const areaPoints =
-    `${left},${height - bottom} ` +
-    pointString +
-    ` ${width - right},${height - bottom}`;
-
-
-    html += `
-    <polygon
-    points="${areaPoints}"
-    class="chart-area">
-    </polygon>
-    `;
-
-
-    /* =================================================
-    LINE
-    ================================================= */
-
-    html += `
-    <polyline
-    points="${pointString}"
-    class="chart-line">
-    </polyline>
-    `;
-
-
-    /* =================================================
-    POINTS
-    ================================================= */
-
-    points.forEach(
-    point =>
-    {
-
-    html += `
-    <circle
-    cx="${point.x}"
-    cy="${point.y}"
-    r="3.5"
-    class="chart-point">
-
-    <title>
-    ${chartMonths[points.indexOf(point)]}:
-    ${point.value} openings
-    </title>
-
-    </circle>
-    `;
-
-    });
-
-
-    /* =================================================
-    PUT HTML INTO SVG
-    ================================================= */
-
-    svg.innerHTML = html;
-    }
-
-
-    /* =====================================================
-    6. BAR CHART
-    ===================================================== */
-
-    function drawBarChart(svgId, values)
-    {
-    const svg =
-    document.getElementById(svgId);
-
-
-    if (!svg)
-    {
-    console.error(
-    "SVG not found:",
-    svgId
-    );
-
-    return;
-    }
-
-
-    if (
-    !values ||
-    values.length !== 12
-    )
-    {
-    console.error(
-    "Invalid bar chart data:",
-    values
-    );
-
-    return;
-    }
-
-
-    const width = 700;
-    const height = 240;
-
-    const left = 48;
-    const right = 12;
-    const top = 25;
-    const bottom = 38;
-
-
-    const chartWidth =
-    width - left - right;
-
-    const chartHeight =
-    height - top - bottom;
-
-
-    /* =================================================
-    MAX VALUE
-    ================================================= */
-
-    const maxY = 100;
-
-
-    const barSpace =
-    chartWidth /
-    values.length;
-
-
-    const barWidth =
-    barSpace * 0.58;
-
-
-    let html = "";
-
-
-    /* =================================================
-    Y AXIS + GRID
-    ================================================= */
-
-    for (let i = 0; i <= 4; i++)
-    {
-    const value =
-    maxY -
-    (
-    i * maxY / 4
-    );
-
-
-    const y =
-    top +
-    (
-    i * chartHeight / 4
-    );
-
-
-    html += `
-    <line
-    x1="${left}"
-    y1="${y}"
-    x2="${width - right}"
-    y2="${y}"
-    class="chart-grid">
-    </line>
-
-    <text
-    x="${left - 10}"
-    y="${y + 4}"
-    text-anchor="end"
-    class="chart-axis-text">
-    ${Math.round(value)}
-    </text>
-    `;
-    }
-
-
-    /* =================================================
-    VERTICAL GRID + MONTHS
-    ================================================= */
-
-    chartMonths.forEach(
-    (month, index) =>
-    {
-
-    const centerX =
-    left +
-    (
-    index * barSpace
-    ) +
-    (
-    barSpace / 2
-    );
-
-
-    html += `
-    <line
-    x1="${centerX}"
-    y1="${top}"
-    x2="${centerX}"
-    y2="${height - bottom}"
-    class="chart-grid">
-    </line>
-
-    <text
-    x="${centerX}"
-    y="${height - 13}"
-    text-anchor="middle"
-    class="chart-axis-text">
-    ${month}
-    </text>
-    `;
-
-    });
-
-
-    /* =================================================
-    AXIS
-    ================================================= */
-
-    html += `
-    <line
-    x1="${left}"
-    y1="${height - bottom}"
-    x2="${width - right}"
-    y2="${height - bottom}"
-    class="chart-axis">
-    </line>
-
-    <line
-    x1="${left}"
-    y1="${top}"
-    x2="${left}"
-    y2="${height - bottom}"
-    class="chart-axis">
-    </line>
-    `;
-
-
-    /* =================================================
-    BARS
-    ================================================= */
-
-    values.forEach(
-    (value, index) =>
-    {
-
-    const centerX =
-    left +
-    (
-    index * barSpace
-    ) +
-    (
-    barSpace / 2
-    );
-
-
-    const barHeight =
-    (
-    value / maxY
-    ) *
-    chartHeight;
-
-
-    const x =
-    centerX -
-    (
-    barWidth / 2
-    );
-
-
-    const y =
-    height -
-    bottom -
-    barHeight;
-
-
-    html += `
-    <rect
-    x="${x}"
-    y="${y}"
-    width="${barWidth}"
-    height="${barHeight}"
-    rx="1"
-    class="chart-bar">
-
-    <title>
-    ${chartMonths[index]}:
-    ${value} posts
-    </title>
-
-    </rect>
-    `;
-
-    });
-
-
-    /* =================================================
-    PUT HTML INTO SVG
-    ================================================= */
-
-    svg.innerHTML = html;
-    }
-
-
-    /* =====================================================
-    7. DRAW BOTH CHARTS
-    ===================================================== */
-
-    drawLineChart(
-    "suitableOpeningsChart",
-    suitableOpeningsMonthly
-    );
-
-
-    drawBarChart(
-    "internshipPostsChart",
-    internshipPostsMonthly
-    );
+    /* 7. DRAW BOTH CHARTS */
+    drawLineChart("suitableOpeningsChart", suitableOpeningsMonthly);
+    drawBarChart("internshipPostsChart", internshipPostsMonthly);
 
 </script>
 <!-- =====================================================
