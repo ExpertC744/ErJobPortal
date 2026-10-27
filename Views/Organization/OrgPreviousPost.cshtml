@@ -1,4 +1,6 @@
-﻿@{
+﻿@model List<ErJobPortal.Models.OrgPostM>
+
+@{
     Layout = "~/Views/Shared/_DashboardLayout.cshtml";
 
     ViewData["Title"] = "Previous Post";
@@ -7,259 +9,174 @@
 }
 
 <div class="container-fluid">
-
-
-
-
-    <!-- =====================================================
-         MASTER TABLE
-    ====================================================== -->
-
     <div class="master-table-container">
-
-
         <div class="table-responsive">
-            <h1>
-                Previous Post
-            </h1>
 
-            <p>
-                @Model?.nID
-            </p>
+            <h1>Previous Post</h1>
+
+            <p>Previous expired posts</p>
+
             <table id="previousPostTable"
                    class="master-data-table">
 
                 <thead>
-
                     <tr>
-
                         <th>Sr. No</th>
-
                         <th>Position</th>
-
                         <th>Action</th>
-
                         <th>No. of Trainee</th>
-
                         <th>Gender</th>
-
                         <th>Minimum Qualification</th>
-
                         <th>Location</th>
-
                         <th>Working Hrs / Day</th>
-
                         <th>Weekly Working Days</th>
-
                         <th>Internship Type</th>
-
                         <th>Internship / Fellowship Type</th>
-
                         <th>Total Charges</th>
-
                         <th>Training Involved</th>
-
                         <th>Duration</th>
-
                         <th>Facilities Available</th>
-
                         <th>Internship Mode</th>
-
                         <th>Divyang (Allowed)</th>
-
                         <th>Status</th>
-
                     </tr>
-
                 </thead>
 
-
                 <tbody>
-
-                    @if (Model != null)
+                    @if (Model != null && Model.Any())
                     {
-                        <tr>
+                        var srNo = 1;
 
-                            <td class="master-id">
-                                1
-                            </td>
+                        foreach (var post in Model)
+                        {
+                            <tr>
+                                <td class="master-id">@srNo</td>
 
-                            <td>
-                                @Model.sPositionName
-                            </td>
+                                <td>@post.sPositionName</td>
 
-                            <td class="master-action">
+                                <td class="master-action">
+                                    <a asp-controller="Organization"
+                                       asp-action="ViewOrgPost"
+                                       asp-route-id="@post.nID"
+                                       asp-route-source="PreviousPosts"
+                                       title="View Post">
+                                        <i class="fa-solid fa-eye"></i>
+                                    </a>
 
-                                <!-- View -->
-                                <a asp-controller="Organization"
-                                   asp-action="ViewOrgPost"
-                                   asp-route-id="@Model.nID"
-                                   asp-route-source="PreviousPosts"
-                                   title="View Post">
-                                    <i class="fa-solid fa-eye"></i>
-                                </a>
+                                    <a asp-controller="Organization"
+                                       asp-action="EditPost"
+                                       asp-route-id="@post.nID"
+                                       class="resume-edit-btn"
+                                       title="Edit Post">
+                                        <i class="fas fa-edit"></i>
+                                    </a>
 
-                                <!-- Edit -->
-                                <a asp-controller="Organization"
-                                   asp-action="EditPost"
-                                   asp-route-id="@Model.nID"
-                                   class="resume-edit-btn"
-                                   title="Edit Post">
-                                    <i class="fas fa-edit"></i>
-                                </a>
+                                    <a asp-controller="Organization"
+                                       asp-action="RepostOrgPost"
+                                       asp-route-id="@post.nID"
+                                       class="resume-repost-btn"
+                                       title="Repost">
+                                        <i class="fas fa-redo"></i>
+                                    </a>
+                                </td>
 
-                                <!-- Repost -->
-                                <a asp-controller="Organization"
-                                   asp-action="RepostOrgPost"
-                                   asp-route-id="@Model.nID"
-                                   class="resume-repost-btn"
-                                   title="Repost">
-                                    <i class="fas fa-redo"></i>
-                                </a>
+                                <td>@post.nRequiredTrainees</td>
+                                <td>@post.sGenderName</td>
+                                <td>@post.sMinimumQualificationName</td>
 
-                            </td>
+                                <td>
+                                    @post.sCountryName<br />
+                                    @post.sStateName<br />
+                                    @post.sCityName
+                                </td>
 
-                            <td>
-                                @Model.nRequiredTrainees
-                            </td>
+                                <td>@post.sWorkingHours</td>
+                                <td>@post.sWorkingDays</td>
+                                <td>@post.sInternshipTypeName</td>
+                                <td>@post.sInternshipFellowshipTypeName</td>
 
-                            <td>
-                                @Model.sGenderName
-                            </td>
+                                <td>
+                                    @if (post.sTotalCharges.HasValue &&
+                                                                post.sTotalCharges.Value > 0)
+                                    {
+                                        @post.sCurrency @post.sTotalCharges.Value
+                                    }
+                                    else
+                                    {
+                                        @:NA
+                                    }
+                                </td>
 
-                            <td>
-                                @Model.sMinimumQualificationName
-                            </td>
+                                <td>@post.sTrainingInvolvedName</td>
+                                <td>@post.sInternshipDurationName</td>
 
-                            <td>
-                                @Model.sCountryName<br />
-                                @Model.sStateName<br />
-                                @Model.sCityName
-                            </td>
+                                <td>
+                                    @if (!string.IsNullOrWhiteSpace(post.sFacilities))
+                                    {
+                                        <i class="fas fa-wifi"
+                                           title="@post.sFacilities"></i>
+                                    }
+                                    else
+                                    {
+                                        @:NA
+                                    }
+                                </td>
 
-                            <td>
-                                @Model.sWorkingHours
-                            </td>
+                                <td>@post.sInternshipModeName</td>
+                                <td>@post.sDivyang</td>
 
-                            <td>
-                                @Model.sWorkingDays
-                            </td>
+                                <td>
+                                    <button type="button"
+                                            class="master-status @(post.nBit ? "enabled" : "disabled")"
+                                            onclick="toggleOrgPreviousPostStatus(@post.nID, this)">
+                                        @(post.nBit ? "Enabled" : "Disabled")
+                                    </button>
+                                </td>
+                            </tr>
 
-                            <td>
-                                @Model.sInternshipTypeName
-                            </td>
-
-                            <td>
-                                @Model.sInternshipFellowshipTypeName
-                            </td>
-
-                            <td>
-                                @if (Model.sTotalCharges > 0)
-                                {
-                                    @Model.sCurrency @Model.sTotalCharges
-                                }
-                                else
-                                {
-                                    @:NA
-                                }
-                            </td>
-
-                            <td>
-                                @Model.sTrainingInvolvedName
-                            </td>
-
-                            <td>
-                                @Model.sInternshipDurationName
-                            </td>
-
-                            <td>
-
-                                @if (!string.IsNullOrWhiteSpace(Model.sFacilities))
-                                {
-                                    <i class="fas fa-wifi"
-                                       title="@Model.sFacilities"></i>
-                                }
-                                else
-                                {
-                                    @:NA
-                                }
-
-                            </td>
-
-                            <td>
-                                @Model.sInternshipModeName
-                            </td>
-
-                            <td>
-                                @Model.sDivyang
-                            </td>
-                            <td>
-                                <button type="button"
-                                        class="master-status @(Model.nBit ? "enabled" : "disabled")"
-                                        onclick="toggleOrgPreviousPostStatus(@Model.nID, this)">
-                                    @(Model.nBit ? "Enabled" : "Disabled")
-                                </button>
-                            </td>
-
-                        </tr>
+                            srNo++;
+                        }
                     }
-
                 </tbody>
-
             </table>
-
         </div>
-
-
-        <!-- =====================================================
-             PAGE INFO
-        ====================================================== -->
 
         <div id="previousPostPageInfo"
              class="master-page-info text-center d-none">
         </div>
-
     </div>
 
     <script>
         function toggleOrgPreviousPostStatus(id, button) {
-
             fetch('/Organization/ToggleOrgPreviousPostStatus?id=' + id, {
                 method: 'POST'
             })
-            .then(() => {
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Unable to update post status.');
+                }
 
                 if (button.textContent.trim() === "Enabled") {
-
                     button.textContent = "Disabled";
-
                     button.classList.remove("enabled");
                     button.classList.add("disabled");
-
                 } else {
-
                     button.textContent = "Enabled";
-
                     button.classList.remove("disabled");
                     button.classList.add("enabled");
-
                 }
+            })
+            .catch(error => {
+                console.error(error);
+                alert("Unable to update post status. Please try again.");
             });
         }
     </script>
 </div>
 
-
-<!-- =========================================================
-     DATATABLE
-========================================================= -->
-
 <script>
-
     $(document).ready(function () {
-
         $('#previousPostTable').DataTable({
-
             pageLength: 25,
 
             lengthMenu: [
@@ -268,99 +185,34 @@
             ],
 
             searching: true,
-
             ordering: true,
-
             paging: true,
-
             info: true,
-
             autoWidth: false,
-
             responsive: false,
-
             scrollX: true,
 
             language: {
-
                 search: "",
-
                 searchPlaceholder: "Search...",
-
                 lengthMenu: "_MENU_ entries per page",
-
                 emptyTable: "No entries found",
-
                 zeroRecords: "No matching records found",
-
                 info: "Showing _START_ to _END_ of _TOTAL_ entries",
-
                 infoEmpty: "Showing 0 to 0 of 0 entries"
-
             },
 
             columnDefs: [
-
                 {
-                    targets: 0,
+                    targets: [0, 3, 4, 11, 12, 13, 14, 15, 16, 17],
                     className: "text-center"
                 },
-
                 {
                     targets: 2,
                     className: "text-center",
                     orderable: false
-                },
-
-                {
-                    targets: 3,
-                    className: "text-center"
-                },
-
-                {
-                    targets: 4,
-                    className: "text-center"
-                },
-
-                {
-                    targets: 11,
-                    className: "text-center"
-                },
-
-                {
-                    targets: 12,
-                    className: "text-center"
-                },
-
-                {
-                    targets: 13,
-                    className: "text-center"
-                },
-
-                {
-                    targets: 14,
-                    className: "text-center"
-                },
-
-                {
-                    targets: 15,
-                    className: "text-center"
-                },
-
-                {
-                    targets: 16,
-                    className: "text-center"
-                },
-
-                {
-                    targets: 17,
-                    className: "text-center"
                 }
-
             ]
-
         });
-
     });
-
 </script>
