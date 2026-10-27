@@ -9,8 +9,8 @@
     ViewData["Panel"] = "Organization";
     ViewData["UserName"] = "Organization";
 }
-   
- 
+
+
 
 <div class="feedback-page">
 
@@ -39,6 +39,7 @@
 
         <form asp-controller="Organization"
               asp-action="CreateFeedback"
+              asp-route-id="@ViewBag.OrgCode"
               method="post">
 
             @Html.AntiForgeryToken()

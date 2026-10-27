@@ -3599,18 +3599,13 @@
 						</div>
 
 
-						<div class="profile-submenu"
-							 id="candidateChartsSubmenu">
-
+						@* radhika26-10 *@
+						<div class="profile-submenu" id="candidateChartsSubmenu">
 							<a asp-controller="Candidate"
 							   asp-action="Charts"
-							   asp-route-id="@ViewBag.CandidateCode"
 							   class="profile-submenu-link">
-
 								Charts
-
 							</a>
-
 						</div>
 
 
@@ -5023,7 +5018,7 @@ else
 								<!-- ORGANIZATION MY PROFILE -->
 
 								<a asp-controller="Organization"
-								   asp-action="Dashboard"
+								   asp-action="ViewOrgProfile"
 								   class="user-dropdown-item">
 
 									<span class="dropdown-item-icon">
