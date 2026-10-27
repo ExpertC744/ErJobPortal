@@ -3221,115 +3221,280 @@ namespace ErJobPortal.Controllers
 
 
 
-   
+
+
+
+        #region Edit Candidate Registration
+
+        private const string EditCandidateView =
+            "~/Views/Candidate/EditCandidateRegistration.cshtml";
+
         // ============================================================
         // EDIT CANDIDATE REGISTRATION - GET
         // ============================================================
 
         [HttpGet]
+        [ResponseCache(NoStore = true, Location = ResponseCacheLocation.None)]
         public IActionResult EditCandidateRegistration()
+        {
+            int? candidateId =
+                HttpContext.Session.GetInt32("CandidateID");
+
+            if (!candidateId.HasValue || candidateId.Value <= 0)
+            {
+                return RedirectToAction("CandidateLogin", "Account");
+            }
+
+            try
+            {
+                CandidateRegister? model =
+                    _accountRepository.GetCandidateRegistrationForEdit(
+                        candidateId.Value);
+
+                if (model == null)
                 {
-                    int? candidateId = HttpContext.Session.GetInt32("CandidateID");
-
-                    if (candidateId == null)
-                    {
-                        return RedirectToAction("CandidateLogin", "Account");
-                    }
-
-                    var candidate = _accountRepository
-                        .GetCandidateRegistrationForEdit(candidateId.Value);
-
-                    if (candidate == null)
-                    {
-                        return NotFound("Candidate registration details not found.");
-                    }
-
-                    return View(candidate);
+                    return NotFound(
+                        "Candidate registration details not found.");
                 }
 
+                ViewData["Title"] = "Edit Candidate Registration";
+                ViewData["Panel"] = "Candidate";
+                ViewData["UserName"] =
+                    HttpContext.Session.GetString("CandidateName")
+                    ?? "Candidate";
+
+                return View(EditCandidateView, model);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(
+                    ex,
+                    "Error loading Candidate registration for ID {CandidateID}",
+                    candidateId.Value);
+
+                TempData["Error"] =
+                    "Unable to load Candidate registration details.";
+
+                return RedirectToAction("Dashboard", "Candidate");
+            }
+        }
 
         // ============================================================
         // EDIT CANDIDATE REGISTRATION - POST
         // ============================================================
 
-
-
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult EditCandidateRegistration(CandidateRegister model)
+        public async Task<IActionResult> EditCandidateRegistration(
+            CandidateRegister model)
         {
-            int? candidateId = HttpContext.Session.GetInt32("CandidateID");
+            int? candidateId =
+                HttpContext.Session.GetInt32("CandidateID");
 
-            if (candidateId == null)
+            if (!candidateId.HasValue || candidateId.Value <= 0)
             {
                 return RedirectToAction("CandidateLogin", "Account");
             }
 
-            // Password changes are not allowed on this page.
-            ModelState.Remove(nameof(model.sPassword));
+            ViewData["Title"] = "Edit Candidate Registration";
+            ViewData["Panel"] = "Candidate";
+            ViewData["UserName"] =
+                HttpContext.Session.GetString("CandidateName")
+                ?? "Candidate";
 
-            var existingCandidate =
-                _accountRepository.GetCandidateRegistrationForEdit(candidateId.Value);
-
-            if (existingCandidate == null)
-            {
-                return NotFound("Candidate registration details not found.");
-            }
-
-            // Always preserve the registered email.
-            model.sEmail = existingCandidate.sEmail;
-
-            // Preserve the existing profile image unless a new image is uploaded.
-            model.sProfileImage = existingCandidate.sProfileImage;
-
-            // Check whether the new mobile number belongs to another candidate.
-            if (!string.IsNullOrWhiteSpace(model.sMobile))
-            {
-                model.sMobile = model.sMobile.Trim();
-
-                if (_accountRepository.CandidateMobileExistsForAnotherCandidate(
-                        model.sMobile, candidateId.Value))
-                {
-                    ModelState.AddModelError(
-                        nameof(model.sMobile),
-                        "This mobile number is already registered.");
-                }
-            }
-
-            // Validate submitted profile details.
-            if (!ModelState.IsValid)
-            {
-                return View(model);
-            }
+            CandidateRegister? existingCandidate;
 
             try
             {
-                if (model.ProfileImageFile != null &&
-                    model.ProfileImageFile.Length > 0)
+                existingCandidate =
+                    _accountRepository.GetCandidateRegistrationForEdit(
+                        candidateId.Value);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(
+                    ex,
+                    "Unable to load Candidate ID {CandidateID}",
+                    candidateId.Value);
+
+                ModelState.AddModelError(
+                    "",
+                    "Unable to load your registration details.");
+
+                return View(EditCandidateView, model);
+            }
+
+            if (existingCandidate == null)
+            {
+                return NotFound(
+                    "Candidate registration details not found.");
+            }
+
+            // ============================================================
+            // REMOVE REGISTRATION-ONLY VALIDATION
+            // ============================================================
+
+            ModelState.Remove(nameof(model.sPassword));
+            ModelState.Remove(nameof(model.sOTP));
+            ModelState.Remove(nameof(model.ProfileImageFile));
+
+            // ============================================================
+            // NORMALIZE INPUT
+            // ============================================================
+
+            model.sPrefix = model.sPrefix?.Trim();
+            model.sFName = model.sFName?.Trim();
+            model.sLName = model.sLName?.Trim();
+            model.sEmail = model.sEmail?.Trim();
+            model.sMobile = model.sMobile?.Trim();
+            model.sAlternateMobile =
+                model.sAlternateMobile?.Trim();
+
+            // Preserve existing image by default
+            model.sProfileImage = existingCandidate.sProfileImage;
+
+            // ============================================================
+            // NO EMAIL OR MOBILE DUPLICATE CHECKS
+            // ============================================================
+
+            // Candidates may change email and mobile without
+            // duplicate-registration validation.
+
+            // ============================================================
+            // CHECK COLLEGE, CODE, DEPARTMENT AND BRANCH
+            // ============================================================
+
+            if (!_accountRepository.GetColleges()
+                .Any(c => c.nID == model.sCollegeName))
+            {
+                ModelState.AddModelError(
+                    nameof(model.sCollegeName),
+                    "Please select a valid college.");
+            }
+            else if (!_accountRepository
+                .GetCollegeCodes(model.sCollegeName)
+                .Any(c => int.TryParse(c.nCode, out int code)
+                          && code == model.nCollegeCode))
+            {
+                ModelState.AddModelError(
+                    nameof(model.nCollegeCode),
+                    "Please select a valid college code.");
+            }
+
+            if (!_accountRepository.GetDepartments()
+                .Any(d => d.nID == model.nDepartment))
+            {
+                ModelState.AddModelError(
+                    nameof(model.nDepartment),
+                    "Please select a valid department.");
+            }
+            else if (!_accountRepository
+                .GetBranches(model.nDepartment)
+                .Any(b => b.nID == model.nBranch))
+            {
+                ModelState.AddModelError(
+                    nameof(model.nBranch),
+                    "Please select a valid branch.");
+            }
+
+            // ============================================================
+            // OPTIONAL PROFILE IMAGE VALIDATION
+            // ============================================================
+
+            IFormFile? image = model.ProfileImageFile;
+
+            if (image != null)
+            {
+                string extension =
+                    Path.GetExtension(image.FileName).ToLowerInvariant();
+
+                string[] allowedExtensions =
                 {
-                    var extension = Path
-                        .GetExtension(model.ProfileImageFile.FileName)
-                        .ToLowerInvariant();
+            ".jpg",
+            ".jpeg",
+            ".png"
+        };
 
-                    var allowedExtensions = new[] { ".jpg", ".jpeg", ".png" };
+                if (image.Length == 0)
+                {
+                    ModelState.AddModelError(
+                        nameof(model.ProfileImageFile),
+                        "The selected image is empty.");
+                }
+                else if (image.Length > 5 * 1024 * 1024)
+                {
+                    ModelState.AddModelError(
+                        nameof(model.ProfileImageFile),
+                        "Profile image cannot exceed 5 MB.");
+                }
+                else if (!allowedExtensions.Contains(extension))
+                {
+                    ModelState.AddModelError(
+                        nameof(model.ProfileImageFile),
+                        "Only JPG, JPEG and PNG images are allowed.");
+                }
+                else
+                {
+                    byte[] header = new byte[8];
 
-                    if (!allowedExtensions.Contains(extension))
+                    using (Stream stream = image.OpenReadStream())
                     {
-                        ModelState.AddModelError(
-                            nameof(model.ProfileImageFile),
-                            "Only JPG, JPEG, and PNG images are allowed.");
+                        int read = await stream.ReadAsync(
+                            header, 0, header.Length);
 
-                        return View(model);
+                        bool isJpeg =
+                            read >= 3 &&
+                            header[0] == 0xFF &&
+                            header[1] == 0xD8 &&
+                            header[2] == 0xFF;
+
+                        bool isPng =
+                            read >= 8 &&
+                            header[0] == 0x89 &&
+                            header[1] == 0x50 &&
+                            header[2] == 0x4E &&
+                            header[3] == 0x47 &&
+                            header[4] == 0x0D &&
+                            header[5] == 0x0A &&
+                            header[6] == 0x1A &&
+                            header[7] == 0x0A;
+
+                        bool validSignature =
+                            (extension == ".png" && isPng) ||
+                            ((extension == ".jpg" ||
+                              extension == ".jpeg") && isJpeg);
+
+                        if (!validSignature)
+                        {
+                            ModelState.AddModelError(
+                                nameof(model.ProfileImageFile),
+                                "The selected file is not a valid image.");
+                        }
                     }
+                }
+            }
 
-                    if (model.ProfileImageFile.Length > 5 * 1024 * 1024)
-                    {
-                        ModelState.AddModelError(
-                            nameof(model.ProfileImageFile),
-                            "The image must not exceed 5 MB.");
+            // ============================================================
+            // VALIDATE FORM BEFORE UPLOADING FILES
+            // ============================================================
 
-                        return View(model);
-                    }
+            if (!ModelState.IsValid)
+            {
+                return View(EditCandidateView, model);
+            }
+
+            string? newlySavedImagePath = null;
+
+            try
+            {
+                // ========================================================
+                // SAVE NEW PROFILE IMAGE
+                // ========================================================
+
+                if (image != null)
+                {
+                    string extension =
+                        Path.GetExtension(image.FileName).ToLowerInvariant();
 
                     string uploadFolder = Path.Combine(
                         Directory.GetCurrentDirectory(),
@@ -3339,39 +3504,125 @@ namespace ErJobPortal.Controllers
 
                     Directory.CreateDirectory(uploadFolder);
 
-                    string fileName = $"{Guid.NewGuid():N}{extension}";
-                    string filePath = Path.Combine(uploadFolder, fileName);
+                    string fileName =
+                        "CAND_" +
+                        candidateId.Value + "_" +
+                        Guid.NewGuid().ToString("N") +
+                        extension;
 
-                    using (var stream = new FileStream(filePath, FileMode.Create))
+                    string fullPath =
+                        Path.Combine(uploadFolder, fileName);
+
+                    newlySavedImagePath = fullPath;
+
+                    using (FileStream stream = new FileStream(
+                        fullPath,
+                        FileMode.CreateNew))
                     {
-                        model.ProfileImageFile.CopyTo(stream);
+                        await image.CopyToAsync(stream);
                     }
 
-                    model.sProfileImage = "/uploads/candidates/" + fileName;
+                    // Save filename only
+                    model.sProfileImage = fileName;
                 }
 
-                // Update profile without changing the password.
-                bool updated = _accountRepository
-                    .UpdateCandidateRegistrationForEdit(candidateId.Value, model);
+                // ========================================================
+                // UPDATE DATABASE
+                // ========================================================
+
+                bool updated =
+                    _accountRepository.UpdateCandidateRegistrationForEdit(
+                        candidateId.Value,
+                        model);
 
                 if (!updated)
                 {
-                    TempData["Error"] = "Profile was not updated.";
-                    return View(model);
+                    if (!string.IsNullOrEmpty(newlySavedImagePath) &&
+                        System.IO.File.Exists(newlySavedImagePath))
+                    {
+                        System.IO.File.Delete(newlySavedImagePath);
+                    }
+
+                    ModelState.AddModelError(
+                        "",
+                        "Candidate registration could not be updated.");
+
+                    model.sProfileImage =
+                        existingCandidate.sProfileImage;
+
+                    return View(EditCandidateView, model);
                 }
 
-                TempData["Success"] = "Profile updated successfully.";
+                // ========================================================
+                // UPDATE SESSION
+                // ========================================================
 
-                return RedirectToAction("EditCandidateRegistration");
+                string candidateName =
+                    ((model.sFName ?? "") + " " +
+                     (model.sLName ?? "")).Trim();
+
+                HttpContext.Session.SetString(
+                    "CandidateName",
+                    candidateName);
+
+                HttpContext.Session.SetString(
+                    "CandidateEmail",
+                    model.sEmail ?? "");
+
+                // ========================================================
+                // SUCCESS
+                // ========================================================
+
+                TempData["Success"] =
+                    "Candidate registration updated successfully.";
+
+                return RedirectToAction(
+                    nameof(EditCandidateRegistration));
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                TempData["Error"] =
-                    "An error occurred while updating your profile.";
+                _logger.LogError(
+                    ex,
+                    "Error updating Candidate ID {CandidateID}",
+                    candidateId.Value);
 
-                return View(model);
+                if (!string.IsNullOrEmpty(newlySavedImagePath))
+                {
+                    try
+                    {
+                        if (System.IO.File.Exists(newlySavedImagePath))
+                        {
+                            System.IO.File.Delete(newlySavedImagePath);
+                        }
+                    }
+                    catch (IOException cleanupEx)
+                    {
+                        _logger.LogWarning(
+                            cleanupEx,
+                            "Unable to clean up Candidate image.");
+                    }
+                    catch (UnauthorizedAccessException cleanupEx)
+                    {
+                        _logger.LogWarning(
+                            cleanupEx,
+                            "Unable to clean up Candidate image.");
+                    }
+                }
+
+                model.sProfileImage =
+                    existingCandidate.sProfileImage;
+
+                ModelState.AddModelError(
+                    "",
+                    "An error occurred while updating your profile.");
+
+                return View(EditCandidateView, model);
             }
         }
+
+        #endregion
+
+
 
 
 

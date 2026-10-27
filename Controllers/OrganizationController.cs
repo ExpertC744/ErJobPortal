@@ -16,7 +16,6 @@ namespace ErJobPortal.Controllers
         private readonly IWebHostEnvironment _environment;
         private readonly OrgQuestionBankRepository _questionBankRepository;
 
-
         public OrganizationController(
             IConfiguration configuration,
             AccountRepository repository,
@@ -6061,7 +6060,7 @@ WHERE nID = @nID
         public IActionResult DriveTracking() => View();
         public IActionResult SharedData() => View();
         public IActionResult History() => View();
-        public IActionResult EditOrganizationRegistration() => View();
+        //public IActionResult EditOrganizationRegistration() => View();
         public IActionResult CreateDrive() => View();
 
 
@@ -6161,6 +6160,132 @@ WHERE nID = @nID
             // 4. Return the organization activity view
             return View("ActivityLog", activities);
         }
+
+
+
+        #region Edit Organization Registration
+
+        // ============================================================
+        // GET - LOAD EXISTING ORGANIZATION REGISTRATION DETAILS
+        // ============================================================
+
+        [HttpGet]
+        [ResponseCache(
+            NoStore = true,
+            Location = ResponseCacheLocation.None)]
+        public IActionResult EditOrganizationRegistration()
+        {
+            int? orgId = HttpContext.Session.GetInt32("OrgID");
+
+            if (!orgId.HasValue || orgId.Value <= 0)
+            {
+                return RedirectToAction(
+                    "OrganizationLogin",
+                    "Account");
+            }
+
+            try
+            {
+                // Fetch saved details using existing repository
+                EditOrganizationRegistrationM? model =
+                    _repository.GetOrganizationRegistrationForEdit(
+                        orgId.Value);
+
+                if (model == null)
+                {
+                    return NotFound(
+                        "Organization registration details not found.");
+                }
+
+                return View("EditOrganizationRegistration", model);
+            }
+            catch (Exception ex)
+            {
+                Console.Error.WriteLine(
+                    "Edit Organization Registration GET Error: " + ex);
+
+                TempData["Error"] =
+                    "Unable to load organization registration details.";
+
+                return RedirectToAction("Dashboard", "Organization");
+            }
+        }
+
+
+        // ============================================================
+        // POST - UPDATE ORGANIZATION REGISTRATION DETAILS
+        // ============================================================
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public IActionResult EditOrganizationRegistration(
+            EditOrganizationRegistrationM model)
+        {
+            int? orgId = HttpContext.Session.GetInt32("OrgID");
+
+            if (!orgId.HasValue || orgId.Value <= 0)
+            {
+                return RedirectToAction(
+                    "OrganizationLogin",
+                    "Account");
+            }
+
+            if (!ModelState.IsValid)
+            {
+                return View("EditOrganizationRegistration", model);
+            }
+
+            try
+            {
+                bool updated =
+                    _repository.UpdateOrganizationRegistration(
+                        orgId.Value,
+                        model);
+
+                if (updated)
+                {
+                    HttpContext.Session.SetString(
+                        "OrgName",
+                        model.sOrgName?.Trim() ?? "");
+
+                    HttpContext.Session.SetString(
+                        "OrgEmail",
+                        model.sEmail?.Trim() ?? "");
+
+                    TempData["Success"] =
+                        "Organization registration updated successfully.";
+
+                    return RedirectToAction(
+                        nameof(EditOrganizationRegistration));
+                }
+
+                ModelState.AddModelError(
+                    "",
+                    "Organization registration could not be updated.");
+
+                return View("EditOrganizationRegistration", model);
+            }
+            catch (InvalidOperationException ex)
+            {
+                ModelState.AddModelError("", ex.Message);
+
+                return View("EditOrganizationRegistration", model);
+            }
+            catch (Exception ex)
+            {
+                Console.Error.WriteLine(
+                    "Edit Organization Registration POST Error: " + ex);
+
+                ModelState.AddModelError(
+                    "",
+                    "Unable to update organization registration. Please try again.");
+
+                return View("EditOrganizationRegistration", model);
+            }
+        }
+
+        #endregion
+
 
 
 
