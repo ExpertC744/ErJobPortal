@@ -8,7 +8,18 @@ var builder = WebApplication.CreateBuilder(args);
 // MVC
 builder.Services.AddControllersWithViews();
 
-// HTTP Client
+// Services
+builder.Services.AddScoped<EmailService>();
+builder.Services.AddScoped<VisitorTrackingService>();
+
+// Database
+builder.Services.AddScoped<DbConnection>();
+
+// Repository
+builder.Services.AddScoped<AccountRepository>();
+builder.Services.AddScoped<CandidateProfileRepository>();
+
+// Register HttpClientFactory
 builder.Services.AddHttpClient();
 
 // Session
@@ -51,7 +62,7 @@ app.UseRouting();
 app.UseSession();
 app.UseAuthorization();
 
-// Default route
+// Route
 app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Home}/{action=Index}/{id?}");
