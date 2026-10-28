@@ -2,6 +2,10 @@
 <html lang="en">
 
 <head>
+	@{
+		ViewBag.OrganizationLogo = Context.Session.GetString("OrganizationLogo");
+		ViewBag.sOrgName = Context.Session.GetString("sOrgName");
+	}
 	<meta charset="utf-8" />
 	<meta name="viewport"
 		  content="width=device-width, initial-scale=1.0" />
@@ -2722,6 +2726,42 @@
 				padding: 9px 0;
 			}
 		}
+
+		.header-user .header-avatar {
+			width: 38px !important;
+			height: 38px !important;
+			min-width: 38px !important;
+			min-height: 38px !important;
+			max-width: 38px !important;
+			max-height: 38px !important;
+			display: flex !important;
+			align-items: center;
+			justify-content: center;
+			overflow: hidden !important;
+			position: relative;
+			flex-shrink: 0;
+			border-radius: 50%;
+		}
+
+			.header-user .header-avatar img {
+				display: block !important;
+				width: 100% !important;
+				height: 100% !important;
+				min-width: 0 !important;
+				min-height: 0 !important;
+				max-width: 100% !important;
+				max-height: 100% !important;
+				object-fit: contain !important;
+				object-position: center;
+				margin: 0 !important;
+				padding: 2px;
+				border-radius: 50%;
+			}
+
+			.header-user .header-avatar i {
+				font-size: 16px;
+				line-height: 1;
+			}
 	</style>
 
 	@* data-table css *@
@@ -4884,13 +4924,24 @@ else
 								id="userDropdownBtn">
 
 							<div class="header-avatar">
-								<i class="fas fa-user"></i>
+								@if (!string.IsNullOrWhiteSpace(ViewData["OrganizationLogo"]?.ToString()))
+								{
+									<img src="~/uploads/organization/@ViewData["OrganizationLogo"]"
+										 alt="Organization Logo"
+										 onerror="this.style.display='none'; this.nextElementSibling.style.display='inline-block';" />
+
+									<i class="fas fa-user" style="display:none;"></i>
+								}
+								else
+								{
+									<i class="fas fa-user"></i>
+								}
 							</div>
 
 							<div class="header-user-info">
 
 								<strong>
-									@ViewData["UserName"]
+									@ViewData["sOrgName"]
 								</strong>
 
 								<small>

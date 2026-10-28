@@ -762,6 +762,8 @@ namespace ErJobPortal.Controllers
             return View();
         }
 
+
+        //khushi 27-10
         [HttpPost]
         [ValidateAntiForgeryToken]
         public IActionResult OrganizationLogin(OrganizationLogin model)
@@ -841,9 +843,129 @@ namespace ErJobPortal.Controllers
                 user.sEmail ?? ""
             );
 
+            // Store organization name for the shared header
+            HttpContext.Session.SetString(
+                "sOrgName",
+                user.sOrgName ?? ""
+            );
+
+            // Get organization logo from database
+            string? companyLogo = null;
+
+            string logoQuery = @"
+   SELECT TOP 1 sCompanyLogo
+   FROM tblOrgProfile
+   WHERE nOrgID = @nOrgID
+     AND nBit = 1
+   ORDER BY nID DESC;";
+
+            using (SqlConnection con = new SqlConnection(
+                _configuration.GetConnectionString("DefaultConnection")))
+            using (SqlCommand cmd = new SqlCommand(logoQuery, con))
+            {
+                cmd.Parameters.Add("@nOrgID", SqlDbType.Int).Value = user.nID;
+
+                con.Open();
+
+                object result = cmd.ExecuteScalar();
+
+                if (result != null && result != DBNull.Value)
+                {
+                    companyLogo = result.ToString();
+                }
+            }
+
+            // Store organization logo filename in Session
+            HttpContext.Session.SetString(
+                "OrganizationLogo",
+                companyLogo ?? ""
+            );
+
             // Redirect after successful login
             return RedirectToAction("Dashboard", "Organization");
         }
+        //[HttpPost]
+        //[ValidateAntiForgeryToken]
+        //public IActionResult OrganizationLogin(OrganizationLogin model)
+        //{
+        //    // Validate email and password fields
+        //    if (!ModelState.IsValid)
+        //    {
+        //        return View(model);
+        //    }
+
+        //    // Get organization by email
+        //    OrganizationUser? user =
+        //        _accountRepository.LoginOrganization(model);
+
+        //    // Email not registered
+        //    if (user == null)
+        //    {
+        //        ModelState.AddModelError(
+        //            nameof(model.sEmail),
+        //            "Invalid email address."
+        //        );
+
+        //        return View(model);
+        //    }
+
+        //    // Verify entered password against stored password hash
+        //    var passwordHasher = new PasswordHasher<OrganizationUser>();
+
+        //    PasswordVerificationResult passwordResult;
+
+        //    try
+        //    {
+        //        passwordResult = passwordHasher.VerifyHashedPassword(
+        //            user,
+        //            user.sPassword ?? "",
+        //            model.sPassword ?? ""
+        //        );
+        //    }
+        //    catch (FormatException)
+        //    {
+        //        TempData["Error"] =
+        //            "Stored password format is invalid. Please reset your password.";
+
+        //        return View(model);
+        //    }
+
+        //    // Incorrect password
+        //    if (passwordResult == PasswordVerificationResult.Failed)
+        //    {
+        //        ModelState.AddModelError(
+        //            nameof(model.sPassword),
+        //            "Incorrect password. Please try again."
+        //        );
+
+        //        return View(model);
+        //    }
+
+        //    // Block organizations disabled by Super Admin
+        //    if (!user.nSABit)
+        //    {
+        //        TempData["Error"] =
+        //            "Your organization account has been disabled by the Super Admin.";
+
+        //        return View(model);
+        //    }
+
+        //    // Create organization sessions
+        //    HttpContext.Session.SetInt32("OrgID", user.nID);
+
+        //    HttpContext.Session.SetString(
+        //        "OrgName",
+        //        user.sOrgName ?? ""
+        //    );
+
+        //    HttpContext.Session.SetString(
+        //        "OrgEmail",
+        //        user.sEmail ?? ""
+        //    );
+
+        //    // Redirect after successful login
+        //    return RedirectToAction("Dashboard", "Organization");
+        //}
 
 
         // candidate login

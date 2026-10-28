@@ -16,9 +16,23 @@
 
     <div class="feedback-container">
 
-        <h1 class="feedback-title">
-            Add Feedback
-        </h1>
+        <div class="master-table-title">
+
+            <div>
+                <h1 class="feedback-title">
+                    Add Feedback
+                </h1>
+            </div>
+
+
+            <a asp-controller="Organization"
+               asp-action="Dashboard"
+               class="master-back-btn"
+               title="Back to Dashboard">
+                <i class="fas fa-arrow-left"></i>
+            </a>
+
+        </div>
 
 
         @if (TempData["Success"] != null)

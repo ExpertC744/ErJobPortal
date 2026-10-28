@@ -5,16 +5,30 @@
 
     ViewData["Title"] = "Previous Post";
     ViewData["Panel"] = "Organization";
-    ViewData["UserName"] = "Atharv Infotech";
 }
 
 <div class="container-fluid">
+
     <div class="master-table-container">
+
         <div class="table-responsive">
 
-            <h1>Previous Post</h1>
+            <div class="master-table-title">
 
-            <p>Previous expired posts</p>
+                <div>
+                    <h1>Previous Post</h1>
+                    <p>Previous expired posts</p>
+                </div>
+
+                @* radhika30-09 *@
+                <a asp-controller="Organization"
+                   asp-action="Dashboard"
+                   class="master-back-btn"
+                   title="Back to Dashboard">
+                    <i class="fas fa-arrow-left"></i>
+                </a>
+
+            </div>
 
             <table id="previousPostTable"
                    class="master-data-table">

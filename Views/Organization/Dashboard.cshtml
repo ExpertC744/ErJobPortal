@@ -246,7 +246,7 @@
     <div class="org-page-header">
         <div class="org-page-title">
             <h2>
-                Organization Dashboard
+                @(Context.Session.GetString("sOrgName") ?? "Organization Dashboard")
             </h2>
             <p>
                 Manage your jobs, candidates and hiring activities.
