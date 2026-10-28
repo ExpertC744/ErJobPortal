@@ -20,7 +20,13 @@
     color: var(--terms-text);
 }
 
-
+.section-title {
+    display: flex;
+    align-items: center;
+    gap: 0px;
+    margin: 0rem 0 0rem;
+    flex-direction: column;
+}
 /* =========================================================
    HERO
    ========================================================= */
