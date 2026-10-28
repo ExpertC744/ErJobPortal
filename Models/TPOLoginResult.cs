@@ -27,5 +27,6 @@
         public bool IsApproved { get; set; }
 
         public bool IsActive { get; set; }
+        public bool SubTpoBit { get; internal set; }
     }
 }

@@ -30,7 +30,7 @@ namespace ErJobPortal.Models
         [Phone(ErrorMessage = "Enter a valid mobile number.")]
         [StringLength(15)]
         public string MobileNo { get; set; }
-
+        public int? nDepartment { get; set; }
 
         // =========================================================
         // PASSWORD

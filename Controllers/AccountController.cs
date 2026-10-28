@@ -1,20 +1,41 @@
 ﻿using ErJobPortal.Models;
 using ErJobPortal.Repositories;
-using Microsoft.AspNetCore.Mvc;
 using ErJobPortal.Services;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.Data.SqlClient;
+using Microsoft.Extensions.Caching.Memory;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
+using System.ComponentModel.DataAnnotations;
+using System.Data;
+using System.Net;
+using System.Net.Mail;
+using System.Security.Cryptography;
 
 
 namespace ErJobPortal.Controllers
 {
     public class AccountController : Controller
     {
+
+        private readonly IConfiguration _configuration;
         private readonly AccountRepository _accountRepository;
         private readonly EmailService _emailService;
+        private readonly ILogger<AccountController> _logger;
+        private readonly VisitorTrackingService _visitorTrackingService;
+        private readonly IWebHostEnvironment _environment;
+        private readonly IMemoryCache _memoryCache;
 
-        public AccountController(AccountRepository accountRepository, EmailService emailService)
+        public AccountController(AccountRepository accountRepository, EmailService emailService, IConfiguration configuration, ILogger<AccountController> logger, VisitorTrackingService visitorTrackingService, IWebHostEnvironment environment, IMemoryCache memoryCache)
         {
             _accountRepository = accountRepository;
             _emailService = emailService;
+            _configuration = configuration;
+            _logger = logger;
+            _visitorTrackingService = visitorTrackingService;
+            _environment = environment;
+            _memoryCache = memoryCache;
         }
 
         // Candidate Registration
@@ -417,7 +438,7 @@ namespace ErJobPortal.Controllers
         }
 
 
-        [HttpPost]
+      
         [HttpPost]
         public IActionResult CandidateLogin(CandidateLogin model)
         {
@@ -581,11 +602,167 @@ namespace ErJobPortal.Controllers
 // Candidate Reset Password
 // ==========================================================
 
-[HttpGet]
-public IActionResult CandidateResetPassword()
+        [HttpGet]
+        public IActionResult CandidateResetPassword()
+                {
+                    return View();
+                }
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> SendCandidateResetOTP(
+          [FromForm] string sEmail)
         {
-            return View();
+            string email = sEmail?.Trim() ?? "";
+
+            if (string.IsNullOrWhiteSpace(email) ||
+                !new System.ComponentModel.DataAnnotations.EmailAddressAttribute()
+                    .IsValid(email))
+            {
+                return Json(new
+                {
+                    success = false,
+                    message = "Please enter a valid registered email address."
+                });
+            }
+
+            try
+            {
+                CandidateLogin? candidate =
+                    _accountRepository.GetCandidateLoginDetails(email);
+
+                if (candidate == null)
+                {
+                    return Json(new
+                    {
+                        success = false,
+                        message = "No candidate account was found with this email address."
+                    });
+                }
+
+                string otp = RandomNumberGenerator
+                    .GetInt32(100000, 1000000)
+                    .ToString();
+
+                // Send the email before storing the OTP.
+                await _emailService.SendOtpEmailAsync(
+                     email,
+                     otp,
+                     "password-reset");
+
+                HttpContext.Session.SetString("CandidateResetOtp", otp);
+                HttpContext.Session.SetString("CandidateResetOtpEmail", email);
+
+                HttpContext.Session.SetString(
+                    "CandidateResetOtpExpiry",
+                    DateTimeOffset.UtcNow.AddMinutes(10)
+                        .ToUnixTimeSeconds().ToString());
+
+                // Clear any earlier verification.
+                HttpContext.Session.Remove("CandidateResetVerifiedEmail");
+
+                return Json(new
+                {
+                    success = true,
+                    message = "OTP sent successfully. Please check your registered email."
+                });
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("Send Candidate Reset OTP Error: " + ex);
+
+                return Json(new
+                {
+                    success = false,
+                    message = "Unable to send OTP right now. Please try again later."
+                });
+            }
         }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public IActionResult VerifyCandidateResetOTP(
+    [FromForm] string sEmail,
+    [FromForm] string otp)
+        {
+            string email = sEmail?.Trim() ?? "";
+            string enteredOtp = otp?.Trim() ?? "";
+
+            string? savedOtp =
+                HttpContext.Session.GetString("CandidateResetOtp");
+
+            string? savedEmail =
+                HttpContext.Session.GetString("CandidateResetOtpEmail");
+
+            string? expiryText =
+                HttpContext.Session.GetString("CandidateResetOtpExpiry");
+
+            if (string.IsNullOrWhiteSpace(savedOtp) ||
+                string.IsNullOrWhiteSpace(savedEmail) ||
+                string.IsNullOrWhiteSpace(expiryText) ||
+                !long.TryParse(expiryText, out long expiry))
+            {
+                return Json(new
+                {
+                    success = false,
+                    message = "OTP is missing or expired. Please request a new OTP."
+                });
+            }
+
+            if (!string.Equals(
+                email, savedEmail, StringComparison.OrdinalIgnoreCase))
+            {
+                return Json(new
+                {
+                    success = false,
+                    message = "The email does not match the email used to request the OTP."
+                });
+            }
+
+            if (DateTimeOffset.UtcNow.ToUnixTimeSeconds() >= expiry)
+            {
+                ClearCandidateResetOtpSession();
+
+                return Json(new
+                {
+                    success = false,
+                    message = "OTP has expired. Please request a new OTP."
+                });
+            }
+
+            if (!System.Text.RegularExpressions.Regex.IsMatch(
+                enteredOtp, @"^\d{6}$") ||
+                !string.Equals(enteredOtp, savedOtp, StringComparison.Ordinal))
+            {
+                return Json(new
+                {
+                    success = false,
+                    message = "Invalid OTP. Please enter the correct 6-digit OTP."
+                });
+            }
+
+            // Store verified email server-side.
+            HttpContext.Session.SetString(
+                "CandidateResetVerifiedEmail", savedEmail);
+
+            // Make the OTP one-time use.
+            HttpContext.Session.Remove("CandidateResetOtp");
+            HttpContext.Session.Remove("CandidateResetOtpExpiry");
+
+            return Json(new
+            {
+                success = true,
+                message = "Email verified successfully. You can now reset your password."
+            });
+        }
+
+        private void ClearCandidateResetOtpSession()
+        {
+            HttpContext.Session.Remove("CandidateResetOtp");
+            HttpContext.Session.Remove("CandidateResetOtpEmail");
+            HttpContext.Session.Remove("CandidateResetOtpExpiry");
+            HttpContext.Session.Remove("CandidateResetVerifiedEmail");
+        }
+
 
         [HttpPost]
         [ValidateAntiForgeryToken]
@@ -599,38 +776,50 @@ public IActionResult CandidateResetPassword()
 
             try
             {
-                string email = model.sEmail.Trim();
+                string email = model.sEmail?.Trim() ?? "";
 
-                // Check whether candidate exists
+                string? verifiedEmail =
+                    HttpContext.Session.GetString("CandidateResetVerifiedEmail");
+
+                if (string.IsNullOrWhiteSpace(verifiedEmail) ||
+                    !string.Equals(
+                        email, verifiedEmail, StringComparison.OrdinalIgnoreCase))
+                {
+                    ModelState.AddModelError(
+                        "",
+                        "Please verify the OTP for your registered email before resetting your password.");
+
+                    return View(model);
+                }
+
                 CandidateLogin? candidate =
                     _accountRepository.GetCandidateLoginDetails(email);
 
                 if (candidate == null)
                 {
+                    ClearCandidateResetOtpSession();
+
                     ModelState.AddModelError(
-                        "sEmail",
-                        "No candidate account was found with this email address."
-                    );
+                        nameof(model.sEmail),
+                        "No candidate account was found with this email address.");
 
                     return View(model);
                 }
 
-                // Update password
-                bool updated =
-                    _accountRepository.ResetCandidatePassword(
-                        email,
-                        model.NewPassword
-                    );
+                bool updated = _accountRepository.ResetCandidatePassword(
+                    email,
+                    model.NewPassword);
 
                 if (!updated)
                 {
                     ModelState.AddModelError(
                         "",
-                        "Unable to reset password. Please try again."
-                    );
+                        "Unable to reset password. Please try again.");
 
                     return View(model);
                 }
+
+                ClearCandidateResetOtpSession();
 
                 TempData["Success"] =
                     "Your password has been reset successfully. Please login with your new password.";
@@ -639,30 +828,190 @@ public IActionResult CandidateResetPassword()
             }
             catch (Exception ex)
             {
-                Console.WriteLine(
-                    "Candidate Reset Password Error: "
-                    + ex.ToString()
-                );
+                Console.WriteLine("Candidate Reset Password Error: " + ex);
 
                 ModelState.AddModelError(
                     "",
-                    "Unable to reset password. Please try again later."
-                );
+                    "Unable to reset password. Please try again later.");
 
                 return View(model);
             }
         }
 
-      
-// ==========================================================
-// ORGANIZATION RESET PASSWORD
-// ==========================================================
 
-[HttpGet]
-public IActionResult OrganizationResetPassword()
+        // ==========================================================
+        // ORGANIZATION RESET PASSWORD
+        // ==========================================================
+
+        [HttpGet]
+        public IActionResult OrganizationResetPassword()
         {
-            return View();
+            ClearOrganizationResetOtpSession();
+
+            return View(new OrganizationResetPassword());
         }
+
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> SendOrganizationResetOTP(
+            [FromForm] string sEmail)
+        {
+            string email = sEmail?.Trim() ?? "";
+
+            if (string.IsNullOrWhiteSpace(email) ||
+                !new System.ComponentModel.DataAnnotations.EmailAddressAttribute()
+                    .IsValid(email))
+            {
+                return Json(new
+                {
+                    success = false,
+                    message = "Please enter a valid registered email address."
+                });
+            }
+
+            try
+            {
+                OrganizationLogin? organization =
+                    _accountRepository.GetOrganizationLoginDetails(email);
+
+                if (organization == null)
+                {
+                    return Json(new
+                    {
+                        success = false,
+                        message = "No organization account was found with this email address."
+                    });
+                }
+
+                string otp = RandomNumberGenerator
+                    .GetInt32(100000, 1000000)
+                    .ToString();
+
+                // Send email first. Store OTP only after sending succeeds.
+                await _emailService.SendOrganizationOtpEmailAsync(
+                    email,
+                    otp,
+                    "password-reset");
+
+                // Store OTP and expiry on the server.
+                HttpContext.Session.SetString("OrgResetOtp", otp);
+                HttpContext.Session.SetString("OrgResetOtpEmail", email);
+
+                HttpContext.Session.SetString(
+                    "OrgResetOtpExpiry",
+                    DateTimeOffset.UtcNow.AddMinutes(10)
+                        .ToUnixTimeSeconds().ToString());
+
+                // A newly sent OTP invalidates any earlier verification.
+                HttpContext.Session.Remove("OrgResetVerifiedEmail");
+
+                return Json(new
+                {
+                    success = true,
+                    message = "OTP sent successfully. Please check your registered email."
+                });
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("Send Organization Reset OTP Error: " + ex);
+
+                return Json(new
+                {
+                    success = false,
+                    message = "Unable to send OTP right now. Please try again later."
+                });
+            }
+        }
+
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public IActionResult VerifyOrganizationResetOTP(
+                [FromForm] string sEmail,
+                [FromForm] string otp)
+        {
+            string email = sEmail?.Trim() ?? "";
+            string enteredOtp = otp?.Trim() ?? "";
+
+            string? savedOtp =
+                HttpContext.Session.GetString("OrgResetOtp");
+
+            string? savedEmail =
+                HttpContext.Session.GetString("OrgResetOtpEmail");
+
+            string? expiryText =
+                HttpContext.Session.GetString("OrgResetOtpExpiry");
+
+            if (string.IsNullOrWhiteSpace(savedOtp) ||
+                string.IsNullOrWhiteSpace(savedEmail) ||
+                string.IsNullOrWhiteSpace(expiryText) ||
+                !long.TryParse(expiryText, out long expiry))
+            {
+                return Json(new
+                {
+                    success = false,
+                    message = "OTP is missing or expired. Please request a new OTP."
+                });
+            }
+
+            if (!string.Equals(
+                email, savedEmail, StringComparison.OrdinalIgnoreCase))
+            {
+                return Json(new
+                {
+                    success = false,
+                    message = "The email does not match the email used to request the OTP."
+                });
+            }
+
+            if (DateTimeOffset.UtcNow.ToUnixTimeSeconds() >= expiry)
+            {
+                ClearOrganizationResetOtpSession();
+
+                return Json(new
+                {
+                    success = false,
+                    message = "OTP has expired. Please request a new OTP."
+                });
+            }
+
+            if (!System.Text.RegularExpressions.Regex.IsMatch(
+                    enteredOtp, @"^\d{6}$") ||
+                !string.Equals(
+                    enteredOtp, savedOtp, StringComparison.Ordinal))
+            {
+                return Json(new
+                {
+                    success = false,
+                    message = "Invalid OTP. Please enter the correct 6-digit OTP."
+                });
+            }
+
+            // Keep verified email on the server.
+            HttpContext.Session.SetString(
+                "OrgResetVerifiedEmail", savedEmail);
+
+            // Make the OTP one-time use.
+            HttpContext.Session.Remove("OrgResetOtp");
+            HttpContext.Session.Remove("OrgResetOtpExpiry");
+
+            return Json(new
+            {
+                success = true,
+                message = "Email verified successfully. You can now reset your password."
+            });
+        }
+
+
+        private void ClearOrganizationResetOtpSession()
+        {
+            HttpContext.Session.Remove("OrgResetOtp");
+            HttpContext.Session.Remove("OrgResetOtpEmail");
+            HttpContext.Session.Remove("OrgResetOtpExpiry");
+            HttpContext.Session.Remove("OrgResetVerifiedEmail");
+        }
+
 
 
         [HttpPost]
@@ -670,6 +1019,27 @@ public IActionResult OrganizationResetPassword()
         public IActionResult OrganizationResetPassword(
             OrganizationResetPassword model)
         {
+            string email = model.sEmail?.Trim() ?? "";
+
+            string? verifiedEmail =
+                HttpContext.Session.GetString("OrgResetVerifiedEmail");
+
+            // Verify OTP authorization on the server.
+            if (string.IsNullOrWhiteSpace(verifiedEmail) ||
+                !string.Equals(
+                    email,
+                    verifiedEmail,
+                    StringComparison.OrdinalIgnoreCase))
+            {
+                ClearOrganizationResetOtpSession();
+
+                ModelState.AddModelError(
+                    "",
+                    "Please verify your organization email using OTP before resetting your password.");
+
+                return View(model);
+            }
+
             if (!ModelState.IsValid)
             {
                 return View(model);
@@ -677,38 +1047,35 @@ public IActionResult OrganizationResetPassword()
 
             try
             {
-                string email = model.sEmail.Trim();
-
-                // Check whether organization email exists
                 OrganizationLogin? organization =
                     _accountRepository.GetOrganizationLoginDetails(email);
 
                 if (organization == null)
                 {
+                    ClearOrganizationResetOtpSession();
+
                     ModelState.AddModelError(
                         "sEmail",
-                        "No organization account was found with this email address."
-                    );
+                        "No organization account was found with this email address.");
 
                     return View(model);
                 }
 
-                // Update password
-                bool updated =
-                    _accountRepository.ResetOrganizationPassword(
-                        email,
-                        model.NewPassword
-                    );
+                bool updated = _accountRepository.ResetOrganizationPassword(
+                    email,
+                    model.NewPassword);
 
                 if (!updated)
                 {
                     ModelState.AddModelError(
                         "",
-                        "Unable to reset password. Please try again."
-                    );
+                        "Unable to reset password. Please try again.");
 
                     return View(model);
                 }
+
+                // Clear verification after a successful password reset.
+                ClearOrganizationResetOtpSession();
 
                 TempData["Success"] =
                     "Your password has been reset successfully. Please login with your new password.";
@@ -718,18 +1085,16 @@ public IActionResult OrganizationResetPassword()
             catch (Exception ex)
             {
                 Console.WriteLine(
-                    "Organization Reset Password Error: "
-                    + ex.ToString()
-                );
+                    "Organization Reset Password Error: " + ex);
 
                 ModelState.AddModelError(
                     "",
-                    "Unable to reset password. Please try again later."
-                );
+                    "Unable to reset password. Please try again later.");
 
                 return View(model);
             }
         }
+
 
         // ==========================================================
         // Organization Forgot Password
@@ -831,300 +1196,287 @@ public IActionResult OrganizationResetPassword()
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult TPORegister(TPORegistration model)
+        public async Task<IActionResult> TPORegister(TPORegistration model)
         {
+            string uploadDirectory = Path.Combine(
+                _environment.WebRootPath,
+                "uploads",
+                "tpo");
+
+            var savedFiles = new List<string>();
+
+            string email = model.CollegeMailID?.Trim() ?? "";
+
+            string verifiedKey =
+                "TPO_EMAIL_VERIFIED_" + email.ToLowerInvariant();
+
             try
             {
-                // ==========================================================
-                // STATIC OTP
-                // ==========================================================
+                model.CollegeMailID = email;
+                model.MobileNo = model.MobileNo?.Trim() ?? "";
 
-                if (model.OTP != "123456")
+                // ============================================
+                // 1. DUPLICATE EMAIL CHECK
+                // ============================================
+
+                if (!string.IsNullOrWhiteSpace(model.CollegeMailID) &&
+                    _accountRepository.TPOEmailExists(model.CollegeMailID))
                 {
                     ModelState.AddModelError(
-                        "OTP",
-                        "Invalid OTP. Please enter 123456."
-                    );
+                        nameof(model.CollegeMailID),
+                        "This college email is already registered.");
                 }
 
+                // ============================================
+                // 2. DUPLICATE MOBILE CHECK
+                // ============================================
 
-                // ==========================================================
-                // CHECK REQUIRED FILES
-                // ==========================================================
+                if (!string.IsNullOrWhiteSpace(model.MobileNo) &&
+                    _accountRepository.TPOMobileExists(model.MobileNo))
+                {
+                    ModelState.AddModelError(
+                        nameof(model.MobileNo),
+                        "This mobile number is already registered.");
+                }
+
+                // ============================================
+                // 3. REQUIRED FILES
+                // ============================================
 
                 if (model.SupportingDocument1File == null ||
                     model.SupportingDocument1File.Length == 0)
                 {
                     ModelState.AddModelError(
-                        "SupportingDocument1File",
-                        "Supporting Document 1 is required."
-                    );
+                        nameof(model.SupportingDocument1File),
+                        "Supporting Document 1 is required.");
                 }
 
                 if (model.SupportingDocument2File == null ||
                     model.SupportingDocument2File.Length == 0)
                 {
                     ModelState.AddModelError(
-                        "SupportingDocument2File",
-                        "Supporting Document 2 is required."
-                    );
+                        nameof(model.SupportingDocument2File),
+                        "Supporting Document 2 is required.");
                 }
 
                 if (model.ProfilePhotoFile == null ||
                     model.ProfilePhotoFile.Length == 0)
                 {
                     ModelState.AddModelError(
-                        "ProfilePhotoFile",
-                        "Profile Photo is required."
-                    );
+                        nameof(model.ProfilePhotoFile),
+                        "Profile photo is required.");
                 }
 
+                // ============================================
+                // 4. FILE TYPE AND SIZE VALIDATION
+                // ============================================
 
-                // ==========================================================
-                // NOW CHECK MODEL
-                // ==========================================================
+                string[] documentExtensions =
+                {
+                    ".pdf", ".jpg", ".jpeg", ".png"
+                };
+
+                string[] photoExtensions =
+                {
+                    ".jpg", ".jpeg", ".png"
+                };
+
+                bool IsAllowedFile(
+                    IFormFile? file,
+                    string[] allowedExtensions,
+                    long maxSizeBytes)
+                {
+                    if (file == null || file.Length == 0)
+                        return false;
+
+                    string extension =
+                        Path.GetExtension(file.FileName).ToLowerInvariant();
+
+                    return allowedExtensions.Contains(extension)
+                           && file.Length <= maxSizeBytes;
+                }
+
+                if (model.SupportingDocument1File != null &&
+                    model.SupportingDocument1File.Length > 0 &&
+                    !IsAllowedFile(
+                        model.SupportingDocument1File,
+                        documentExtensions,
+                        10 * 1024 * 1024))
+                {
+                    ModelState.AddModelError(
+                        nameof(model.SupportingDocument1File),
+                        "Document 1 must be PDF, JPG, JPEG or PNG and not exceed 10 MB.");
+                }
+
+                if (model.SupportingDocument2File != null &&
+                    model.SupportingDocument2File.Length > 0 &&
+                    !IsAllowedFile(
+                        model.SupportingDocument2File,
+                        documentExtensions,
+                        10 * 1024 * 1024))
+                {
+                    ModelState.AddModelError(
+                        nameof(model.SupportingDocument2File),
+                        "Document 2 must be PDF, JPG, JPEG or PNG and not exceed 10 MB.");
+                }
+
+                if (model.ProfilePhotoFile != null &&
+                    model.ProfilePhotoFile.Length > 0 &&
+                    !IsAllowedFile(
+                        model.ProfilePhotoFile,
+                        photoExtensions,
+                        5 * 1024 * 1024))
+                {
+                    ModelState.AddModelError(
+                        nameof(model.ProfilePhotoFile),
+                        "Profile photo must be JPG, JPEG or PNG and not exceed 5 MB.");
+                }
+
+                // ============================================
+                // 5. CHECK SERVER-SIDE EMAIL VERIFICATION
+                // ============================================
+
+                if (string.IsNullOrWhiteSpace(email))
+                {
+                    ModelState.AddModelError(
+                        nameof(model.CollegeMailID),
+                        "College email is required.");
+
+                    return View(model);
+                }
+
+                if (!_memoryCache.TryGetValue(
+                        verifiedKey,
+                        out bool isVerified) ||
+                    !isVerified)
+                {
+                    ModelState.AddModelError(
+                        nameof(model.OTP),
+                        "Please verify your college email using OTP before registering.");
+
+                    return View(model);
+                }
+
+                // Do not check the OTP again here.
+                // VerifyTPOOTP has already validated and consumed it.
+                // Keep the verification marker if other fields are invalid.
 
                 if (!ModelState.IsValid)
                 {
                     return View(model);
                 }
 
+                // ============================================
+                // 6. SAVE UPLOADED FILES
+                // ============================================
 
-                // ==========================================================
-                // UPLOAD FOLDER
-                // ==========================================================
+                Directory.CreateDirectory(uploadDirectory);
 
-                string uploadFolder = Path.Combine(
-                    Directory.GetCurrentDirectory(),
-                    "wwwroot",
-                    "uploads",
-                    "tpo"
-                );
-
-                if (!Directory.Exists(uploadFolder))
+                async Task<string> SaveFileAsync(IFormFile file)
                 {
-                    Directory.CreateDirectory(uploadFolder);
+                    string extension =
+                        Path.GetExtension(file.FileName).ToLowerInvariant();
+
+                    string fileName =
+                        Guid.NewGuid().ToString("N") + extension;
+
+                    string fullPath =
+                        Path.Combine(uploadDirectory, fileName);
+
+                    await using (var stream = new FileStream(
+                        fullPath,
+                        FileMode.CreateNew,
+                        FileAccess.Write,
+                        FileShare.None))
+                    {
+                        await file.CopyToAsync(stream);
+                    }
+
+                    savedFiles.Add(fullPath);
+
+                    // Save relative paths in the database.
+                    return Path.Combine("uploads", "tpo", fileName)
+                        .Replace("\\", "/");
                 }
 
+                model.SupportingDocument1 =
+                    await SaveFileAsync(model.SupportingDocument1File!);
 
-                // ==========================================================
-                // DOCUMENT 1
-                // ==========================================================
+                model.SupportingDocument2 =
+                    await SaveFileAsync(model.SupportingDocument2File!);
 
-                string[] allowedDocumentExtensions =
-                {
-            ".pdf",
-            ".jpg",
-            ".jpeg",
-            ".png"
-        };
+                model.ProfilePhoto =
+                    await SaveFileAsync(model.ProfilePhotoFile!);
 
-                string extension1 =
-                    Path.GetExtension(
-                        model.SupportingDocument1File.FileName
-                    ).ToLowerInvariant();
-
-                if (!allowedDocumentExtensions.Contains(extension1))
-                {
-                    ModelState.AddModelError(
-                        "SupportingDocument1File",
-                        "Only PDF, JPG, JPEG and PNG files are allowed."
-                    );
-
-                    return View(model);
-                }
-
-                if (model.SupportingDocument1File.Length >
-                    10 * 1024 * 1024)
-                {
-                    ModelState.AddModelError(
-                        "SupportingDocument1File",
-                        "Supporting Document 1 must be less than 10 MB."
-                    );
-
-                    return View(model);
-                }
-
-                string document1Name =
-                    "TPO_DOC1_" +
-                    Guid.NewGuid().ToString("N") +
-                    extension1;
-
-                string document1Path =
-                    Path.Combine(
-                        uploadFolder,
-                        document1Name
-                    );
-
-                using (FileStream stream =
-                       new FileStream(
-                           document1Path,
-                           FileMode.Create))
-                {
-                    model.SupportingDocument1File.CopyTo(stream);
-                }
-
-                model.SupportingDocument1 = document1Name;
-
-
-                // ==========================================================
-                // DOCUMENT 2
-                // ==========================================================
-
-                string extension2 =
-                    Path.GetExtension(
-                        model.SupportingDocument2File.FileName
-                    ).ToLowerInvariant();
-
-                if (!allowedDocumentExtensions.Contains(extension2))
-                {
-                    ModelState.AddModelError(
-                        "SupportingDocument2File",
-                        "Only PDF, JPG, JPEG and PNG files are allowed."
-                    );
-
-                    return View(model);
-                }
-
-                if (model.SupportingDocument2File.Length >
-                    10 * 1024 * 1024)
-                {
-                    ModelState.AddModelError(
-                        "SupportingDocument2File",
-                        "Supporting Document 2 must be less than 10 MB."
-                    );
-
-                    return View(model);
-                }
-
-                string document2Name =
-                    "TPO_DOC2_" +
-                    Guid.NewGuid().ToString("N") +
-                    extension2;
-
-                string document2Path =
-                    Path.Combine(
-                        uploadFolder,
-                        document2Name
-                    );
-
-                using (FileStream stream =
-                       new FileStream(
-                           document2Path,
-                           FileMode.Create))
-                {
-                    model.SupportingDocument2File.CopyTo(stream);
-                }
-
-                model.SupportingDocument2 = document2Name;
-
-
-                // ==========================================================
-                // PROFILE PHOTO
-                // ==========================================================
-
-                string[] allowedImageExtensions =
-                {
-            ".jpg",
-            ".jpeg",
-            ".png"
-        };
-
-                string profileExtension =
-                    Path.GetExtension(
-                        model.ProfilePhotoFile.FileName
-                    ).ToLowerInvariant();
-
-                if (!allowedImageExtensions.Contains(profileExtension))
-                {
-                    ModelState.AddModelError(
-                        "ProfilePhotoFile",
-                        "Only JPG, JPEG and PNG profile photos are allowed."
-                    );
-
-                    return View(model);
-                }
-
-                if (model.ProfilePhotoFile.Length >
-                    5 * 1024 * 1024)
-                {
-                    ModelState.AddModelError(
-                        "ProfilePhotoFile",
-                        "Profile photo must be less than 5 MB."
-                    );
-
-                    return View(model);
-                }
-
-                string profileName =
-                    "TPO_PROFILE_" +
-                    Guid.NewGuid().ToString("N") +
-                    profileExtension;
-
-                string profilePath =
-                    Path.Combine(
-                        uploadFolder,
-                        profileName
-                    );
-
-                using (FileStream stream =
-                       new FileStream(
-                           profilePath,
-                           FileMode.Create))
-                {
-                    model.ProfilePhotoFile.CopyTo(stream);
-                }
-
-                model.ProfilePhoto = profileName;
-
-
-                // ==========================================================
-                // TPO DEFAULT STATUS
-                // ==========================================================
+                // ============================================
+                // 7. SET SERVER-VERIFIED REGISTRATION VALUES
+                // ============================================
 
                 model.OTPVerified = true;
+                model.OTP = null;
+                model.OTPType = "Email";
 
                 model.Status = "Pending";
-
                 model.IsApproved = false;
-
                 model.IsActive = false;
 
+                // ============================================
+                // 8. SAVE REGISTRATION
+                // ============================================
 
-                // ==========================================================
-                // REGISTER
-                // ==========================================================
-
-                int result =
-                    _accountRepository.RegisterTPO(model);
-
+                int result = _accountRepository.RegisterTPO(model);
 
                 if (result > 0)
                 {
-                    TempData["Success"] =
-                        "TPO registration submitted successfully. " +
-                        "Your application is pending Super Admin approval.";
+                    // Prevent reuse of this email verification.
+                    _memoryCache.Remove(verifiedKey);
 
-                    return RedirectToAction("TPOLogin");
+                    TempData["Success"] =
+                        "TPO registration submitted successfully. Your account is pending Super Admin approval.";
+
+                    return RedirectToAction("TPOLogin", "Account");
                 }
 
-
                 ModelState.AddModelError(
-                    "",
-                    "TPO registration failed. Please try again."
-                );
+                    string.Empty,
+                    "TPO registration failed. Please try again.");
+
+                // Clean up files if database insertion fails.
+                foreach (string path in savedFiles)
+                {
+                    if (System.IO.File.Exists(path))
+                    {
+                        System.IO.File.Delete(path);
+                    }
+                }
 
                 return View(model);
             }
             catch (Exception ex)
             {
-                Console.WriteLine("TPO Registration Error");
-                Console.WriteLine(ex.ToString());
+                _logger.LogError(ex, "Error during TPO registration.");
+
+                // Clean up uploaded files if registration throws an exception.
+                foreach (string path in savedFiles)
+                {
+                    try
+                    {
+                        if (System.IO.File.Exists(path))
+                        {
+                            System.IO.File.Delete(path);
+                        }
+                    }
+                    catch (Exception cleanupException)
+                    {
+                        _logger.LogWarning(
+                            cleanupException,
+                            "Unable to clean up a TPO registration upload.");
+                    }
+                }
 
                 ModelState.AddModelError(
-                    "",
-                    "Unable to complete TPO registration. Please try again later."
-                );
+                    string.Empty,
+                    "An error occurred during registration. Please try again.");
 
                 return View(model);
             }
@@ -1144,10 +1496,9 @@ public IActionResult OrganizationResetPassword()
         // =========================================================
         // TPO LOGIN - POST
         // =========================================================
-
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult TPOLogin(TPOLogin model)
+        public async Task<IActionResult> TPOLogin(TPOLogin model)
         {
             if (!ModelState.IsValid)
             {
@@ -1158,60 +1509,60 @@ public IActionResult OrganizationResetPassword()
             {
                 string email = model.CollegeMailID.Trim();
 
-                TPOLoginResult? tpo =
-                    _accountRepository.LoginTPO(email);
+                // Find TPO by college email
+                TPOLoginResult? tpo = _accountRepository.LoginTPO(email);
 
-                // =====================================================
-                // CHECK TPO EXISTS
-                // =====================================================
-
+                // Email not registered
                 if (tpo == null)
                 {
                     ModelState.AddModelError(
-                        "",
-                        "Invalid College Mail ID or Password."
+                        nameof(model.CollegeMailID),
+                        "Invalid email address."
                     );
 
                     return View(model);
                 }
 
-                // =====================================================
-                // CHECK PASSWORD
-                // PasswordHash column currently contains plain password
-                // =====================================================
+                // Verify password
+                var passwordHasher = new PasswordHasher<string>();
 
-                if (tpo.PasswordHash != model.Password)
+                PasswordVerificationResult passwordResult;
+
+                try
+                {
+                    passwordResult = passwordHasher.VerifyHashedPassword(
+                        email,
+                        tpo.PasswordHash ?? "",
+                        model.Password
+                    );
+                }
+                catch (FormatException ex)
+                {
+                    _logger.LogError(
+                        ex,
+                        "Invalid password hash format for TPO email {Email}",
+                        email
+                    );
+
+                    TempData["Error"] =
+                        "Your stored password format is invalid. Please reset your password.";
+
+                    return View(model);
+                }
+
+                // Incorrect password
+                if (passwordResult == PasswordVerificationResult.Failed)
                 {
                     ModelState.AddModelError(
-                        "",
-                        "Invalid College Mail ID or Password."
+                        nameof(model.Password),
+                        "Incorrect password. Please try again."
                     );
 
                     return View(model);
                 }
 
-                // =====================================================
-                // CHECK OTP
-                // =====================================================
-
-                if (!tpo.OTPVerified)
-                {
-                    ModelState.AddModelError(
-                        "",
-                        "Your OTP verification is not completed."
-                    );
-
-                    return View(model);
-                }
-
-                // =====================================================
-                // SET TPO SESSION
-                // =====================================================
-
-                HttpContext.Session.SetInt32(
-                    "TPOID",
-                    tpo.TPOID
-                );
+                // Set TPO session after successful login
+                HttpContext.Session.SetInt32("TPOID", tpo.TPOID);
 
                 HttpContext.Session.SetString(
                     "TPOName",
@@ -1228,32 +1579,42 @@ public IActionResult OrganizationResetPassword()
                     tpo.CollegeName ?? ""
                 );
 
+                HttpContext.Session.SetString("TPORole", "TPO");
+
+                // 0 = Main TPO, 1 = Sub-TPO
                 HttpContext.Session.SetString(
-                    "TPORole",
-                    "TPO"
+                    "SubTpoBit",
+                    tpo.SubTpoBit ? "1" : "0"
                 );
 
-                // =====================================================
-                // SUCCESSFUL LOGIN
-                // REDIRECT TO TPO DASHBOARD
-                // =====================================================
+                // Record successful login; tracking failure must not block login
+                try
+                {
+                    await _visitorTrackingService.TrackVisitAsync(
+                        HttpContext,
+                        "TPO",
+                        "TPOLogin",
+                        tpo.TPOID,
+                        "TPO",
+                        true
+                    );
+                }
+                catch (Exception trackingException)
+                {
+                    _logger.LogError(
+                        trackingException,
+                        "Failed to record TPO login activity for TPOID {TPOID}",
+                        tpo.TPOID
+                    );
+                }
 
-                return RedirectToAction(
-                    "Dashboard",
-                    "TPO"
-                );
+                return RedirectToAction("Dashboard", "TPO");
             }
             catch (Exception ex)
             {
-                Console.WriteLine("========================================");
-                Console.WriteLine("TPO Login Error");
-                Console.WriteLine(ex.ToString());
-                Console.WriteLine("========================================");
+                _logger.LogError(ex, "TPO login failed.");
 
-                ModelState.AddModelError(
-                    "",
-                    "Unable to login. Please try again later."
-                );
+                TempData["Error"] = "Unable to login. Please try again later.";
 
                 return View(model);
             }
@@ -1359,6 +1720,143 @@ public IActionResult OrganizationResetPassword()
         // TPO RESET PASSWORD - GET
         // ==========================================================
 
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> SendTPOResetOTP(string collegeMailID)
+        {
+            collegeMailID = collegeMailID?.Trim() ?? "";
+
+            if (string.IsNullOrWhiteSpace(collegeMailID) ||
+                !new EmailAddressAttribute().IsValid(collegeMailID))
+            {
+                return Json(new
+                {
+                    success = false,
+                    message = "Please enter a valid college email."
+                });
+            }
+
+            // Confirm that the TPO account exists.
+            if (!_accountRepository.TPOEmailExists(collegeMailID))
+            {
+                return Json(new
+                {
+                    success = false,
+                    message = "No TPO account was found for this email."
+                });
+            }
+
+            string normalizedEmail = collegeMailID.ToLowerInvariant();
+
+            string otpKey = "TPO_RESET_EMAIL_OTP_" + normalizedEmail;
+            string verifiedKey = "TPO_RESET_EMAIL_VERIFIED_" + normalizedEmail;
+
+            string otp = RandomNumberGenerator
+                .GetInt32(100000, 1000000)
+                .ToString();
+
+            try
+            {
+                await _emailService.SendTPOOtpEmailAsync(collegeMailID, otp);
+
+                _memoryCache.Set(
+                    otpKey,
+                    otp,
+                    TimeSpan.FromMinutes(10));
+
+                // Sending a new OTP invalidates any previous verification.
+                _memoryCache.Remove(verifiedKey);
+
+                return Json(new
+                {
+                    success = true,
+                    message = "Password reset OTP sent to your college email."
+                });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Failed to send TPO password reset OTP.");
+
+                _memoryCache.Remove(otpKey);
+
+                return Json(new
+                {
+                    success = false,
+                    message = "Unable to send OTP. Please try again."
+                });
+            }
+        }
+
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public IActionResult VerifyTPOResetOTP(
+            string collegeMailID,
+            string otp)
+        {
+            collegeMailID = collegeMailID?.Trim() ?? "";
+            otp = otp?.Trim() ?? "";
+
+            if (string.IsNullOrWhiteSpace(collegeMailID) ||
+                !new EmailAddressAttribute().IsValid(collegeMailID))
+            {
+                return Json(new
+                {
+                    success = false,
+                    message = "Please enter a valid college email."
+                });
+            }
+
+            if (otp.Length != 6 || !otp.All(char.IsDigit))
+            {
+                return Json(new
+                {
+                    success = false,
+                    message = "Enter the six-digit OTP."
+                });
+            }
+
+            string normalizedEmail = collegeMailID.ToLowerInvariant();
+
+            string otpKey = "TPO_RESET_EMAIL_OTP_" + normalizedEmail;
+            string verifiedKey = "TPO_RESET_EMAIL_VERIFIED_" + normalizedEmail;
+
+            if (!_memoryCache.TryGetValue(otpKey, out string? storedOtp) ||
+                string.IsNullOrWhiteSpace(storedOtp))
+            {
+                return Json(new
+                {
+                    success = false,
+                    message = "OTP expired. Please request a new OTP."
+                });
+            }
+
+            if (!string.Equals(storedOtp, otp, StringComparison.Ordinal))
+            {
+                return Json(new
+                {
+                    success = false,
+                    message = "Invalid OTP."
+                });
+            }
+
+            // Consume OTP after successful verification.
+            _memoryCache.Remove(otpKey);
+
+            _memoryCache.Set(
+                verifiedKey,
+                true,
+                TimeSpan.FromMinutes(10));
+
+            return Json(new
+            {
+                success = true,
+                message = "OTP verified successfully. You can reset your password."
+            });
+        }
+
+
+
         [HttpGet]
         public IActionResult TPORestPassword()
         {
@@ -1368,6 +1866,7 @@ public IActionResult OrganizationResetPassword()
         // ==========================================================
         // TPO RESET PASSWORD - POST
         // ==========================================================
+
 
         [HttpPost]
         [ValidateAntiForgeryToken]
@@ -1381,54 +1880,46 @@ public IActionResult OrganizationResetPassword()
 
             try
             {
-                string email =
-                    model.CollegeMailID.Trim();
+                string email = model.CollegeMailID?.Trim() ?? "";
 
-                // =====================================================
-                // CHECK WHETHER TPO EXISTS
-                // =====================================================
+                string verifiedKey =
+                    "TPO_RESET_EMAIL_VERIFIED_" + email.ToLowerInvariant();
 
-                TPOLoginResult? tpo =
-                    _accountRepository.LoginTPO(email);
-
-                if (tpo == null)
+                if (!_memoryCache.TryGetValue(
+                        verifiedKey,
+                        out bool isVerified) ||
+                    !isVerified)
                 {
                     ModelState.AddModelError(
-                        "CollegeMailID",
-                        "No TPO account was found with this college email address."
-                    );
+                        "",
+                        "Please verify the OTP sent to your college email first.");
 
                     return View(model);
                 }
 
-                // =====================================================
-                // UPDATE PASSWORD
-                // =====================================================
+                // Keep your existing ModelState and password-confirmation checks
+                // before this point.
 
-                bool updated =
-                    _accountRepository.ResetTPOPassword(
-                        email,
-                        model.NewPassword
-                    );
+                bool updated = _accountRepository.ResetTPOPassword(
+                    email,
+                    model.NewPassword);
 
                 if (!updated)
                 {
                     ModelState.AddModelError(
                         "",
-                        "Unable to reset password. Please try again."
-                    );
+                        "Unable to reset password. Please try again.");
 
                     return View(model);
                 }
 
-                // =====================================================
-                // SUCCESS
-                // =====================================================
+                // OTP verification cannot be reused after a successful reset.
+                _memoryCache.Remove(verifiedKey);
 
                 TempData["Success"] =
-                    "Your password has been reset successfully. Please login with your new password.";
+                    "Password reset successfully. Please log in with your new password.";
 
-                return RedirectToAction("TPOLogin");
+                return RedirectToAction("TPOLogin", "Account");
             }
             catch (Exception ex)
             {
