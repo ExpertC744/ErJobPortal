@@ -1,4 +1,5 @@
 ﻿@* Radhika30-09 *@
+
 <link rel="stylesheet"
       href="~/css/OrgTopSearch.css"
       asp-append-version="true" />
@@ -11,27 +12,22 @@
     ViewData["UserName"] = "Candidate";
 }
 
-
 <div class="organization-charts-page">
 
-
-    <!-- =====================================================
-         PAGE HEADER
-    ====================================================== -->
-
-    <div class="charts-header">
+    <!-- PAGE HEADER -->
+    <div class="master-table-title">
 
         <div>
-
-            <h1>
-                Charts &amp; Statistics
-            </h1>
-
-            <p>
-                Candidate Statistics
-            </p>
-
+            <h1>Charts &amp; Statistics</h1>
+            <p>Candidate Statistics</p>
         </div>
+
+        <a asp-controller="Candidate"
+           asp-action="Dashboard"
+           class="master-back-btn"
+           title="Back to Dashboard">
+            <i class="fas fa-arrow-left"></i>
+        </a>
 
     </div>
 

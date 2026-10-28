@@ -1098,6 +1098,7 @@ namespace ErJobPortal.Controllers
             return View(model);
         }
 
+
         [HttpGet]
         [Route("TPO/ViewProfile")]
         public IActionResult ViewProfile()
@@ -1109,6 +1110,7 @@ namespace ErJobPortal.Controllers
                 return RedirectToAction("TPOLogin", "Account");
             }
 
+
             TPORegistration? model =
                 _accountRepository.GetTPOById(tpoId.Value);
 
@@ -1116,6 +1118,20 @@ namespace ErJobPortal.Controllers
             {
                 TempData["Error"] = "TPO profile not found.";
                 return RedirectToAction("Dashboard", "TPO");
+            }
+
+            // Convert the stored College ID into the college name.
+            if (int.TryParse(model.CollegeName, out int collegeId))
+            {
+                var colleges = _accountRepository.GetColleges();
+
+                var selectedCollege = colleges
+                    .FirstOrDefault(c => c.nID == collegeId);
+
+                if (selectedCollege != null)
+                {
+                    model.CollegeName = selectedCollege.sCollegeName;
+                }
             }
 
             ViewData["Panel"] = "TPO";
@@ -1127,6 +1143,7 @@ namespace ErJobPortal.Controllers
 
             return View(model);
         }
+
 
         //[HttpGet]
         //[Route("TPO/CreateNotification")]
@@ -5917,6 +5934,362 @@ ORDER BY
 
             return View("ActivityLog", activities);
         }
+
+
+
+        #region Edit TPO Registration
+
+        // ============================================================
+        // EDIT TPO REGISTRATION - GET
+        // ============================================================
+
+        //[HttpGet]
+        //[ResponseCache(NoStore = true, Location = ResponseCacheLocation.None)]
+        //public IActionResult EditTPORegistration()
+        //{
+        //    int? tpoId = HttpContext.Session.GetInt32("TPOID");
+
+        //    if (!tpoId.HasValue || tpoId.Value <= 0)
+        //    {
+        //        return RedirectToAction("TPOLogin", "Account");
+        //    }
+
+        //    try
+        //    {
+        //        EditTPORegistrationM? model =
+        //            _accountRepository.GetTPORegistrationForEdit(tpoId.Value);
+
+        //        if (model == null)
+        //        {
+        //            return NotFound("TPO registration details not found.");
+        //        }
+
+        //        ViewData["Title"] = "Edit TPO Registration";
+        //        ViewData["Panel"] = "TPO";
+        //        ViewData["UserName"] =
+        //            HttpContext.Session.GetString("TPOName") ?? "TPO";
+
+        //        return View("EditTPORegistration", model);
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        Console.Error.WriteLine(
+        //            "Edit TPO Registration GET Error: " + ex);
+
+        //        TempData["Error"] =
+        //            "Unable to load TPO registration details.";
+
+        //        return RedirectToAction("Dashboard", "TPO");
+        //    }
+        //}
+
+
+        // ============================================================
+        // EDIT TPO REGISTRATION - POST
+        // ============================================================
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> EditTPORegistration(
+            EditTPORegistrationM model)
+        {
+            int? tpoId = HttpContext.Session.GetInt32("TPOID");
+
+            if (!tpoId.HasValue || tpoId.Value <= 0)
+            {
+                return RedirectToAction("TPOLogin", "Account");
+            }
+
+            ViewData["Title"] = "Edit TPO Registration";
+            ViewData["Panel"] = "TPO";
+            ViewData["UserName"] =
+                HttpContext.Session.GetString("TPOName") ?? "TPO";
+
+            // Always fetch the existing record from the database.
+            // Do not trust saved file paths submitted by the browser.
+            EditTPORegistrationM? existing;
+
+            try
+            {
+                existing = _accountRepository
+                    .GetTPORegistrationForEdit(tpoId.Value);
+            }
+            catch (Exception ex)
+            {
+                Console.Error.WriteLine(
+                    "Edit TPO Registration lookup error: " + ex);
+
+                ModelState.AddModelError(
+                    "",
+                    "Unable to load the current registration details.");
+
+                return View("EditTPORegistration", model);
+            }
+
+            if (existing == null)
+            {
+                return NotFound("TPO registration details not found.");
+            }
+
+            // Keep the existing files available for display
+            // when validation fails.
+            model.SupportingDocument1 = existing.SupportingDocument1;
+            model.SupportingDocument2 = existing.SupportingDocument2;
+            model.ProfilePhoto = existing.ProfilePhoto;
+
+            // DepartmentName is not a user-editable text field.
+            // Resolve it from the selected department ID.
+            if (model.nDepartment.HasValue &&
+                model.nDepartment.Value > 0)
+            {
+                var department = _accountRepository
+                    .GetDepartments()
+                    .FirstOrDefault(d =>
+                        d.nID == model.nDepartment.Value);
+
+                if (department == null)
+                {
+                    ModelState.AddModelError(
+                        nameof(model.nDepartment),
+                        "Please select a valid department.");
+                }
+                else
+                {
+                    model.DepartmentName = department.sDepartment;
+                }
+            }
+
+            // Validate the college ID against existing college records.
+            if (!int.TryParse(model.CollegeName, out int collegeId) ||
+                collegeId <= 0 ||
+                !_accountRepository.GetColleges()
+                    .Any(c => c.nID == collegeId))
+            {
+                ModelState.AddModelError(
+                    nameof(model.CollegeName),
+                    "Please select a valid college.");
+            }
+
+            // Validate new uploads before saving any files.
+            ValidateTPOEditUpload(
+                model.SupportingDocument1File,
+                nameof(model.SupportingDocument1File),
+                false);
+
+            ValidateTPOEditUpload(
+                model.SupportingDocument2File,
+                nameof(model.SupportingDocument2File),
+                false);
+
+            ValidateTPOEditUpload(
+                model.ProfilePhotoFile,
+                nameof(model.ProfilePhotoFile),
+                true);
+
+            if (!ModelState.IsValid)
+            {
+                return View("EditTPORegistration", model);
+            }
+
+            string uploadFolder = Path.Combine(
+                _environment.WebRootPath,
+                "Uploads",
+                "TPO");
+
+            string? savedDoc1 = null;
+            string? savedDoc2 = null;
+            string? savedPhoto = null;
+
+            var newlyCreatedFiles = new List<string>();
+
+            try
+            {
+                Directory.CreateDirectory(uploadFolder);
+
+                // Save only files selected by the user.
+                savedDoc1 = await SaveTPOEditUploadAsync(
+                    model.SupportingDocument1File,
+                    uploadFolder,
+                    "TPO_DOC1",
+                    newlyCreatedFiles);
+
+                savedDoc2 = await SaveTPOEditUploadAsync(
+                    model.SupportingDocument2File,
+                    uploadFolder,
+                    "TPO_DOC2",
+                    newlyCreatedFiles);
+
+                savedPhoto = await SaveTPOEditUploadAsync(
+                    model.ProfilePhotoFile,
+                    uploadFolder,
+                    "TPO_PROFILE",
+                    newlyCreatedFiles);
+
+                bool updated = _accountRepository.UpdateTPORegistration(
+                    tpoId.Value,
+                    model,
+                    savedDoc1,
+                    savedDoc2,
+                    savedPhoto);
+
+                if (!updated)
+                {
+                    DeleteNewTPOEditFiles(newlyCreatedFiles);
+
+                    ModelState.AddModelError(
+                        "",
+                        "TPO registration could not be updated.");
+
+                    return View("EditTPORegistration", model);
+                }
+
+                // Refresh session values after a successful update.
+                HttpContext.Session.SetString(
+                    "TPOName", model.FullName.Trim());
+
+                HttpContext.Session.SetString(
+                    "TPOEmail", model.CollegeMailID.Trim());
+
+                TempData["Success"] =
+                    "TPO registration updated successfully.";
+
+                return RedirectToAction(nameof(EditTPORegistration));
+            }
+            catch (InvalidOperationException ex)
+            {
+                DeleteNewTPOEditFiles(newlyCreatedFiles);
+
+                ModelState.AddModelError("", ex.Message);
+
+                return View("EditTPORegistration", model);
+            }
+            catch (Exception ex)
+            {
+                DeleteNewTPOEditFiles(newlyCreatedFiles);
+
+                Console.Error.WriteLine(
+                    "Edit TPO Registration POST Error: " + ex);
+
+                ModelState.AddModelError(
+                    "",
+                    "Unable to update TPO registration. Please try again.");
+
+                return View("EditTPORegistration", model);
+            }
+        }
+
+
+        // ============================================================
+        // VALIDATE OPTIONAL FILE UPLOAD
+        // ============================================================
+
+        private void ValidateTPOEditUpload(
+            IFormFile? file,
+            string fieldName,
+            bool isPhoto)
+        {
+            if (file == null || file.Length == 0)
+            {
+                return;
+            }
+
+            const long maxFileSize = 5 * 1024 * 1024;
+
+            if (file.Length > maxFileSize)
+            {
+                ModelState.AddModelError(
+                    fieldName,
+                    "File size must not exceed 5 MB.");
+
+                return;
+            }
+
+            string extension = Path.GetExtension(
+                file.FileName).ToLowerInvariant();
+
+            string[] allowedExtensions = isPhoto
+                ? new[] { ".jpg", ".jpeg", ".png" }
+                : new[] { ".pdf", ".jpg", ".jpeg", ".png" };
+
+            if (!allowedExtensions.Contains(extension))
+            {
+                ModelState.AddModelError(
+                    fieldName,
+                    isPhoto
+                        ? "Only JPG, JPEG and PNG photos are allowed."
+                        : "Only PDF, JPG, JPEG and PNG documents are allowed.");
+            }
+        }
+
+
+        // ============================================================
+        // SAVE OPTIONAL NEW FILE
+        // ============================================================
+
+        private static async Task<string?> SaveTPOEditUploadAsync(
+            IFormFile? file,
+            string uploadFolder,
+            string prefix,
+            List<string> newlyCreatedFiles)
+        {
+            if (file == null || file.Length == 0)
+            {
+                return null;
+            }
+
+            string extension = Path.GetExtension(
+                file.FileName).ToLowerInvariant();
+
+            string fileName =
+                prefix + "_" + Guid.NewGuid().ToString("N") + extension;
+
+            string fullPath = Path.Combine(uploadFolder, fileName);
+
+            // Register the new path for cleanup if saving fails.
+            newlyCreatedFiles.Add(fullPath);
+
+            using (FileStream stream = new FileStream(
+                fullPath,
+                FileMode.CreateNew))
+            {
+                await file.CopyToAsync(stream);
+            }
+
+            return fileName;
+        }
+
+
+        // ============================================================
+        // DELETE ONLY NEWLY CREATED FILES IF UPDATE FAILS
+        // ============================================================
+
+        private static void DeleteNewTPOEditFiles(
+            IEnumerable<string> filePaths)
+        {
+            foreach (string path in filePaths)
+            {
+                try
+                {
+                    if (System.IO.File.Exists(path))
+                    {
+                        System.IO.File.Delete(path);
+                    }
+                }
+                catch (IOException ex)
+                {
+                    Console.Error.WriteLine(
+                        "TPO upload cleanup failed: " + ex);
+                }
+                catch (UnauthorizedAccessException ex)
+                {
+                    Console.Error.WriteLine(
+                        "TPO upload cleanup failed: " + ex);
+                }
+            }
+        }
+
+        #endregion
+
 
 
     }

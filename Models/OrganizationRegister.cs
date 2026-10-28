@@ -28,31 +28,29 @@ namespace ErJobPortal.Models
         public string? sDesignation { get; set; }
 
 
-        // 6 to 20 digits allowed
         [Required(ErrorMessage = "Mobile number is required.")]
         [RegularExpression(
-            @"^[0-9]{6,20}$",
-            ErrorMessage = "Mobile number must contain 6 to 20 digits."
-        )]
+@"^[0-9]{10}$",
+ErrorMessage = "Mobile number must contain exactly 10 digits."
+)]
         [Remote(
-    action: "CheckOrganizationMobile",
-    controller: "Account",
-    ErrorMessage = "This mobile number is already registered."
+action: "CheckOrganizationMobile",
+controller: "Account",
+ErrorMessage = "This mobile number is already registered."
 )]
         public string? sMobile { get; set; }
 
 
-        // @ and . are compulsory
         [Required(ErrorMessage = "Email address is required.")]
         [RegularExpression(
-            @"^[^@\s]+@[^@\s]+\.[^@\s]+$",
-            ErrorMessage = "Email must contain @ and ."
-        )]
+@"^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$",
+ErrorMessage = "Please enter a valid email address, e.g., example@gmail.com."
+)]
         [StringLength(150, ErrorMessage = "Email cannot exceed 150 characters.")]
         [Remote(
-    action: "CheckOrganizationEmail",
-    controller: "Account",
-    ErrorMessage = "This email address is already registered."
+action: "CheckOrganizationEmail",
+controller: "Account",
+ErrorMessage = "This email address is already registered."
 )]
         public string? sEmail { get; set; }
 
