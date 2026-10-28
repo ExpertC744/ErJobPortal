@@ -1,5 +1,4 @@
-﻿
-@using Microsoft.AspNetCore.Http
+﻿@using Microsoft.AspNetCore.Http
 
 @{
     Layout = "~/Views/Shared/_DashboardLayout.cshtml";
@@ -9,543 +8,353 @@
 }
 
 <link rel="stylesheet"
-      href="~/css/CandidateRegister.css"
+      href="~/css/AddSubTPO.css"
       asp-append-version="true" />
-
-<style>
-    .subtpo-page {
-        max-width: 1050px;
-        margin: 25px auto;
-        padding: 0 15px 30px;
-    }
-
-    .subtpo-card {
-        background: #fff;
-        padding: 30px;
-        border-radius: 14px;
-        box-shadow: 0 5px 25px rgba(0,0,0,.08);
-    }
-
-    .subtpo-heading {
-        text-align: center;
-        margin-bottom: 25px;
-    }
-
-    .subtpo-heading h2 {
-        margin: 10px 0;
-        color: #243b60;
-        font-size: 27px;
-    }
-
-    .subtpo-heading p {
-        color: #6b7280;
-        margin: 0;
-    }
-
-    .subtpo-heading-icon {
-        font-size: 35px;
-        color: #3457d5;
-    }
-
-    .subtpo-section-title {
-        font-size: 16px;
-        font-weight: 700;
-        margin: 28px 0 16px;
-        padding-bottom: 9px;
-        border-bottom: 1px solid #e5e7eb;
-        color: #253858;
-    }
-
-    .subtpo-section-title i {
-        margin-right: 8px;
-    }
-
-    .subtpo-row {
-        display: flex;
-        gap: 20px;
-        flex-wrap: wrap;
-    }
-
-    .subtpo-field {
-        flex: 1 1 280px;
-        min-width: 0;
-        margin-bottom: 17px;
-    }
-
-    .subtpo-field label,
-    .subtpo-label {
-        display: block;
-        font-weight: 600;
-        margin-bottom: 7px;
-        color: #374151;
-    }
-
-    .subtpo-field input:not([type="radio"]),
-    .subtpo-field select,
-    .subtpo-field textarea {
-        display: block;
-        width: 100%;
-        box-sizing: border-box;
-        border: 1px solid #d1d5db;
-        border-radius: 7px;
-        padding: 11px 12px;
-        background: #fff;
-        color: #111827;
-        font: inherit;
-    }
-
-    .subtpo-field input:focus,
-    .subtpo-field select:focus,
-    .subtpo-field textarea:focus {
-        outline: none;
-        border-color: #3457d5;
-        box-shadow: 0 0 0 3px rgba(52,87,213,.12);
-    }
-
-    .subtpo-field input[type="file"] {
-        padding: 9px;
-    }
-
-    .subtpo-help {
-        display: block;
-        font-size: 12px;
-        color: #6b7280;
-        margin-top: 6px;
-    }
-
-    .subtpo-alert {
-        padding: 13px 15px;
-        margin: 15px 0;
-        border-radius: 7px;
-        overflow-wrap: anywhere;
-    }
-
-    .subtpo-alert-error {
-        color: #842029;
-        background: #f8d7da;
-        border: 1px solid #f5c2c7;
-    }
-
-    .subtpo-alert-success {
-        color: #0f5132;
-        background: #d1e7dd;
-        border: 1px solid #badbcc;
-    }
-
-    .subtpo-status {
-        font-size: 12px;
-        margin-top: 6px;
-        color: #6b7280;
-    }
-
-    .subtpo-otp-box {
-        padding: 18px;
-        border: 1px solid #e1e5eb;
-        border-radius: 9px;
-        background: #f8fafc;
-    }
-
-    .subtpo-otp-options {
-        display: flex;
-        flex-wrap: wrap;
-        align-items: center;
-        gap: 18px;
-        margin-bottom: 15px;
-    }
-
-    .subtpo-otp-options label {
-        display: flex;
-        align-items: center;
-        gap: 6px;
-        margin: 0;
-    }
-
-    .subtpo-submit {
-        width: 100%;
-        margin-top: 20px;
-        padding: 13px 18px;
-        border: 0;
-        border-radius: 8px;
-        color: #fff;
-        background: #3457d5;
-        font-weight: 700;
-        cursor: pointer;
-    }
-
-    .subtpo-submit:hover {
-        background: #2745b5;
-    }
-
-    .subtpo-submit:disabled {
-        opacity: .65;
-        cursor: not-allowed;
-    }
-
-    .subtpo-back {
-        text-align: center;
-        margin-top: 20px;
-    }
-
-    .subtpo-back a {
-        text-decoration: none;
-        color: #3457d5;
-    }
-
-    .subtpo-required {
-        color: #dc2626;
-    }
-
-    @@media (max-width: 600px) {
-        .subtpo-card {
-            padding: 18px;
-        }
-
-        .subtpo-row {
-            gap: 0;
-        }
-
-        .subtpo-field {
-            flex-basis: 100%;
-        }
-    }
-</style>
 
 <div class="subtpo-page">
     <div class="subtpo-card">
 
-        <div class="subtpo-heading">
-            <div class="subtpo-heading-icon">
+        <div class="subtpo-header">
+            <div class="subtpo-header-icon">
                 <i class="fa-solid fa-user-plus"></i>
             </div>
-            <h2>Add Sub TPO</h2>
-            <p>Register a Sub Training and Placement Officer</p>
+
+            <div class="subtpo-header-content">
+                <h2>Add Sub TPO</h2>
+                <p>Register and verify a Sub Training and Placement Officer.</p>
+            </div>
+
+            <div class="subtpo-header-tag">
+                <i class="fa-solid fa-shield-halved"></i>
+                Officer Registration
+            </div>
         </div>
 
-        @if (TempData["Success"] != null)
-        {
-            <div class="subtpo-alert subtpo-alert-success" role="status">
-                <i class="fa-solid fa-circle-check"></i>
-                @TempData["Success"]
-            </div>
-        }
+        <div class="subtpo-form-body">
 
-        @if (TempData["Error"] != null)
-        {
-            <div class="subtpo-alert subtpo-alert-error" role="alert">
-                <i class="fa-solid fa-circle-exclamation"></i>
-                @TempData["Error"]
-            </div>
-        }
+            @if (TempData["Success"] != null)
+            {
+                <div class="subtpo-alert subtpo-alert-success" role="status">
+                    <i class="fa-solid fa-circle-check"></i>
+                    <span>@TempData["Success"]</span>
+                </div>
+            }
 
-        <form id="addSubTPOForm"
-              asp-controller="TPO"
-              asp-action="AddSubTPO"
-              method="post"
-              enctype="multipart/form-data">
+            @if (TempData["Error"] != null)
+            {
+                <div class="subtpo-alert subtpo-alert-error" role="alert">
+                    <i class="fa-solid fa-circle-exclamation"></i>
+                    <span>@TempData["Error"]</span>
+                </div>
+            }
 
-            @Html.AntiForgeryToken()
+            <form id="addSubTPOForm"
+                  asp-controller="TPO"
+                  asp-action="AddSubTPO"
+                  method="post"
+                  enctype="multipart/form-data">
 
-            <!-- PERSONAL DETAILS -->
-            <div class="subtpo-section-title">
-                <i class="fa-solid fa-user"></i>
-                Personal Details
-            </div>
+                @Html.AntiForgeryToken()
 
-            <div class="subtpo-row">
-                <div class="subtpo-field">
-                    <label for="FullName">
-                        Full Name <span class="subtpo-required">*</span>
-                    </label>
-                    <input type="text"
-                           id="FullName"
-                           name="FullName"
-                           maxlength="150"
-                           autocomplete="name"
-                           placeholder="Enter full name"
-                           required />
+                <div class="subtpo-section">
+                    <div class="subtpo-section-heading">
+                        <span class="subtpo-section-icon">
+                            <i class="fa-solid fa-user"></i>
+                        </span>
+                        <div>
+                            <h3>Personal Details</h3>
+                            <p>Enter the officer's contact information.</p>
+                        </div>
+                    </div>
+
+                    <div class="subtpo-grid">
+                        <div class="subtpo-field">
+                            <label for="FullName">Full Name <span>*</span></label>
+                            <div class="subtpo-input-wrap">
+                                <i class="fa-regular fa-user"></i>
+                                <input type="text" id="FullName" name="FullName"
+                                       maxlength="150" autocomplete="name"
+                                       placeholder="Enter full name" required />
+                            </div>
+                        </div>
+
+                        <div class="subtpo-field">
+                            <label for="MobileNo">Mobile Number <span>*</span></label>
+                            <div class="subtpo-input-wrap">
+                                <i class="fa-solid fa-mobile-screen-button"></i>
+                                <input type="tel" id="MobileNo" name="MobileNo"
+                                       maxlength="10" pattern="[0-9]{10}"
+                                       inputmode="numeric" autocomplete="tel"
+                                       placeholder="10-digit mobile number" required />
+                            </div>
+                        </div>
+
+                        <div class="subtpo-field">
+                            <label for="CollegeMailID">College Email ID <span>*</span></label>
+                            <div class="subtpo-input-wrap">
+                                <i class="fa-regular fa-envelope"></i>
+                                <input type="email" id="CollegeMailID" name="CollegeMailID"
+                                       maxlength="150" autocomplete="email"
+                                       placeholder="Enter official college email" required />
+                            </div>
+                        </div>
+
+                        <div class="subtpo-field">
+                            <label for="CollegeEmployeeID">College Employee ID <span>*</span></label>
+                            <div class="subtpo-input-wrap">
+                                <i class="fa-solid fa-id-card"></i>
+                                <input type="text" id="CollegeEmployeeID" name="CollegeEmployeeID"
+                                       maxlength="100" placeholder="Enter employee ID" required />
+                            </div>
+                        </div>
+                    </div>
                 </div>
 
-                <div class="subtpo-field">
-                    <label for="MobileNo">
-                        Mobile Number <span class="subtpo-required">*</span>
-                    </label>
-                    <input type="tel"
-                           id="MobileNo"
-                           name="MobileNo"
-                           maxlength="10"
-                           pattern="[0-9]{10}"
-                           inputmode="numeric"
-                           autocomplete="tel"
-                           placeholder="10-digit mobile number"
-                           required />
-                </div>
-            </div>
+                <div class="subtpo-section">
+                    <div class="subtpo-section-heading">
+                        <span class="subtpo-section-icon">
+                            <i class="fa-solid fa-building-columns"></i>
+                        </span>
+                        <div>
+                            <h3>College / Organization Details</h3>
+                            <p>Select the associated college and provide its details.</p>
+                        </div>
+                    </div>
 
-            <div class="subtpo-row">
-                <div class="subtpo-field">
-                    <label for="CollegeMailID">
-                        College Email ID <span class="subtpo-required">*</span>
-                    </label>
-                    <input type="email"
-                           id="CollegeMailID"
-                           name="CollegeMailID"
-                           maxlength="150"
-                           autocomplete="email"
-                           placeholder="Enter official college email"
-                           required />
-                </div>
+                    <div class="subtpo-grid">
+                        <div class="subtpo-field">
+                            <label for="CollegeName">College Name <span>*</span></label>
+                            <div class="subtpo-input-wrap">
+                                <i class="fa-solid fa-school"></i>
+                                <select id="CollegeName" name="CollegeName" required>
+                                    <option value="">Loading colleges...</option>
+                                </select>
+                            </div>
+                            <small id="collegeStatus" class="subtpo-status"></small>
+                        </div>
 
-                <div class="subtpo-field">
-                    <label for="CollegeEmployeeID">
-                        College Employee ID <span class="subtpo-required">*</span>
-                    </label>
-                    <input type="text"
-                           id="CollegeEmployeeID"
-                           name="CollegeEmployeeID"
-                           maxlength="100"
-                           placeholder="Enter employee ID"
-                           required />
-                </div>
-            </div>
+                        <div class="subtpo-field">
+                            <label for="CollegeCode">College Code <span>*</span></label>
+                            <div class="subtpo-input-wrap">
+                                <i class="fa-solid fa-hashtag"></i>
+                                <select id="CollegeCode" name="CollegeCode" required disabled>
+                                    <option value="">Select a college first</option>
+                                </select>
+                            </div>
+                            <small id="collegeCodeStatus" class="subtpo-status"></small>
+                        </div>
 
-            <!-- COLLEGE DETAILS -->
-            <div class="subtpo-section-title">
-                <i class="fa-solid fa-building-columns"></i>
-                College / Organization Details
-            </div>
+                        <div class="subtpo-field subtpo-field-full">
+                            <label for="CollegeAddress">College Address <span>*</span></label>
+                            <div class="subtpo-input-wrap subtpo-textarea-wrap">
+                                <i class="fa-solid fa-location-dot"></i>
+                                <textarea id="CollegeAddress" name="CollegeAddress"
+                                          rows="3" maxlength="500"
+                                          placeholder="Enter complete college address"
+                                          required></textarea>
+                            </div>
+                        </div>
 
-            <div class="subtpo-row">
-                <div class="subtpo-field">
-                    <label for="CollegeName">
-                        College Name <span class="subtpo-required">*</span>
-                    </label>
-                    <select id="CollegeName"
-                            name="CollegeName"
-                            required>
-                        <option value="">Loading colleges...</option>
-                    </select>
-                    <div id="collegeStatus" class="subtpo-status"></div>
+                        <div class="subtpo-field subtpo-field-full">
+                            <label for="OrganizationWebsiteURL">College / Organization Website</label>
+                            <div class="subtpo-input-wrap">
+                                <i class="fa-solid fa-globe"></i>
+                                <input type="url" id="OrganizationWebsiteURL"
+                                       name="OrganizationWebsiteURL" maxlength="250"
+                                       placeholder="https://www.examplecollege.ac.in" />
+                            </div>
+                        </div>
+                    </div>
                 </div>
 
-                <div class="subtpo-field">
-                    <label for="CollegeCode">
-                        College Code <span class="subtpo-required">*</span>
-                    </label>
-                    <select id="CollegeCode"
-                            name="CollegeCode"
-                            required
-                            disabled>
-                        <option value="">Select a college first</option>
-                    </select>
-                    <div id="collegeCodeStatus" class="subtpo-status"></div>
-                </div>
-            </div>
+                <div class="subtpo-section">
+                    <div class="subtpo-section-heading">
+                        <span class="subtpo-section-icon">
+                            <i class="fa-solid fa-briefcase"></i>
+                        </span>
+                        <div>
+                            <h3>Professional Details</h3>
+                            <p>Specify the officer's role and department.</p>
+                        </div>
+                    </div>
 
-            <div class="subtpo-row">
-                <div class="subtpo-field">
-                    <label for="CollegeAddress">
-                        College Address <span class="subtpo-required">*</span>
-                    </label>
-                    <textarea id="CollegeAddress"
-                              name="CollegeAddress"
-                              rows="3"
-                              maxlength="500"
-                              placeholder="Enter complete college address"
-                              required></textarea>
-                </div>
-            </div>
+                    <div class="subtpo-grid">
+                        <div class="subtpo-field">
+                            <label for="Designation">Designation <span>*</span></label>
+                            <div class="subtpo-input-wrap">
+                                <i class="fa-solid fa-user-tie"></i>
+                                <input type="text" id="Designation" name="Designation"
+                                       maxlength="150" placeholder="Enter designation" required />
+                            </div>
+                        </div>
 
-            <div class="subtpo-row">
-                <div class="subtpo-field">
-                    <label for="OrganizationWebsiteURL">
-                        College / Organization Website
-                    </label>
-                    <input type="url"
-                           id="OrganizationWebsiteURL"
-                           name="OrganizationWebsiteURL"
-                           maxlength="250"
-                           placeholder="https://www.examplecollege.ac.in" />
-                </div>
-            </div>
-
-            <!-- PROFESSIONAL DETAILS -->
-            <div class="subtpo-section-title">
-                <i class="fa-solid fa-briefcase"></i>
-                Professional Details
-            </div>
-
-            <div class="subtpo-row">
-                <div class="subtpo-field">
-                    <label for="Designation">
-                        Designation <span class="subtpo-required">*</span>
-                    </label>
-                    <input type="text"
-                           id="Designation"
-                           name="Designation"
-                           maxlength="150"
-                           placeholder="Enter designation"
-                           required />
+                        <div class="subtpo-field">
+                            <label for="DepartmentName">Department <span>*</span></label>
+                            <div class="subtpo-input-wrap">
+                                <i class="fa-solid fa-sitemap"></i>
+                                <select id="DepartmentName" name="DepartmentName" required>
+                                    <option value="">Loading departments...</option>
+                                </select>
+                            </div>
+                            <small id="departmentStatus" class="subtpo-status"></small>
+                        </div>
+                    </div>
                 </div>
 
-                <div class="subtpo-field">
-                    <label for="DepartmentName">
-                        Department <span class="subtpo-required">*</span>
-                    </label>
-                    <select id="DepartmentName"
-                            name="DepartmentName"
-                            required>
-                        <option value="">Loading departments...</option>
-                    </select>
-                    <div id="departmentStatus" class="subtpo-status"></div>
-                </div>
-            </div>
+                <div class="subtpo-section">
+                    <div class="subtpo-section-heading">
+                        <span class="subtpo-section-icon">
+                            <i class="fa-solid fa-file-shield"></i>
+                        </span>
+                        <div>
+                            <h3>Verification Documents</h3>
+                            <p>Upload the required documents for verification.</p>
+                        </div>
+                    </div>
 
-            <!-- DOCUMENTS -->
-            <div class="subtpo-section-title">
-                <i class="fa-solid fa-file-shield"></i>
-                Verification Documents
-            </div>
+                    <div class="subtpo-grid">
+                        <div class="subtpo-field">
+                            <label for="SupportingDocument1">Supporting Document 1 <span>*</span></label>
+                            <div class="subtpo-upload">
+                                <input type="file" id="SupportingDocument1"
+                                       name="SupportingDocument1"
+                                       accept=".pdf,.jpg,.jpeg,.png" required />
+                            </div>
+                            <small class="subtpo-help">ID card or appointment letter (PDF, JPG, PNG).</small>
+                        </div>
 
-            <div class="subtpo-row">
-                <div class="subtpo-field">
-                    <label for="SupportingDocument1">
-                        Supporting Document 1 <span class="subtpo-required">*</span>
-                    </label>
-                    <input type="file"
-                           id="SupportingDocument1"
-                           name="SupportingDocument1"
-                           accept=".pdf,.jpg,.jpeg,.png"
-                           required />
-                    <small class="subtpo-help">
-                        ID card or appointment letter (PDF/JPG/PNG)
-                    </small>
-                </div>
+                        <div class="subtpo-field">
+                            <label for="SupportingDocument2">Supporting Document 2 <span>*</span></label>
+                            <div class="subtpo-upload">
+                                <input type="file" id="SupportingDocument2"
+                                       name="SupportingDocument2"
+                                       accept=".pdf,.jpg,.jpeg,.png" required />
+                            </div>
+                            <small class="subtpo-help">Authorization or other supporting proof.</small>
+                        </div>
 
-                <div class="subtpo-field">
-                    <label for="SupportingDocument2">
-                        Supporting Document 2 <span class="subtpo-required">*</span>
-                    </label>
-                    <input type="file"
-                           id="SupportingDocument2"
-                           name="SupportingDocument2"
-                           accept=".pdf,.jpg,.jpeg,.png"
-                           required />
-                    <small class="subtpo-help">
-                        Authorization or other supporting proof
-                    </small>
-                </div>
-            </div>
-
-            <div class="subtpo-row">
-                <div class="subtpo-field">
-                    <label for="ProfilePhoto">
-                        Profile Photo <span class="subtpo-required">*</span>
-                    </label>
-                    <input type="file"
-                           id="ProfilePhoto"
-                           name="ProfilePhoto"
-                           accept=".jpg,.jpeg,.png"
-                           required />
-                    <small class="subtpo-help">
-                        Upload a JPG or PNG profile photo.
-                    </small>
-                </div>
-            </div>
-
-            <!-- STATIC OTP SECTION -->
-            <div class="subtpo-section-title">
-                <i class="fa-solid fa-shield-halved"></i>
-                Email / Mobile Verification
-            </div>
-
-            <div class="subtpo-otp-box">
-                <label class="subtpo-label">OTP Verification</label>
-
-                <div class="subtpo-otp-options">
-                    <label>
-                        <input type="radio"
-                               name="OTPType"
-                               value="Mobile"
-                               checked />
-                        Mobile Number
-                    </label>
-
-                    <label>
-                        <input type="radio"
-                               name="OTPType"
-                               value="Email" />
-                        College Email
-                    </label>
-
-                    <button type="button"
-                            id="sendOtpButton"
-                            class="btn btn-outline-primary">
-                        Send OTP
-                    </button>
+                        <div class="subtpo-field subtpo-field-full">
+                            <label for="ProfilePhoto">Profile Photo <span>*</span></label>
+                            <div class="subtpo-upload subtpo-photo-upload">
+                                <input type="file" id="ProfilePhoto" name="ProfilePhoto"
+                                       accept=".jpg,.jpeg,.png" required />
+                            </div>
+                            <small class="subtpo-help">Upload a JPG or PNG profile photo.</small>
+                        </div>
+                    </div>
                 </div>
 
-                <input type="text"
-                       id="OTP"
-                       name="OTP"
-                       maxlength="6"
-                       pattern="[0-9]{4,6}"
-                       inputmode="numeric"
-                       autocomplete="one-time-code"
-                       placeholder="Enter OTP"
-                       required />
+                <div class="subtpo-section">
+                    <div class="subtpo-section-heading">
+                        <span class="subtpo-section-icon">
+                            <i class="fa-solid fa-shield-halved"></i>
+                        </span>
+                        <div>
+                            <h3>Email / Mobile Verification</h3>
+                            <p>Choose a verification method and enter the OTP.</p>
+                        </div>
+                    </div>
 
-                <small class="subtpo-help">
-                    The OTP interface is static; sending and verifying OTP
-                    requires separate server-side implementation.
-                </small>
-            </div>
+                    <div class="subtpo-otp-panel">
+                        <label class="subtpo-label">Verify using</label>
 
-            <!-- LOGIN DETAILS -->
-            <div class="subtpo-section-title">
-                <i class="fa-solid fa-lock"></i>
-                Login Details
-            </div>
+                        <div class="subtpo-otp-options">
+                            <label>
+                                <input type="radio" name="OTPType" value="Mobile" checked />
+                                <i class="fa-solid fa-mobile-screen-button"></i>
+                                Mobile Number
+                            </label>
 
-            <div class="subtpo-row">
-                <div class="subtpo-field">
-                    <label for="Password">
-                        Password <span class="subtpo-required">*</span>
-                    </label>
-                    <input type="password"
-                           id="Password"
-                           name="Password"
-                           autocomplete="new-password"
-                           placeholder="Create password"
-                           required />
+                            <label>
+                                <input type="radio" name="OTPType" value="Email" />
+                                <i class="fa-regular fa-envelope"></i>
+                                College Email
+                            </label>
+                        </div>
+
+                        <div class="subtpo-otp-entry">
+                            <div class="subtpo-field">
+                                <label for="OTP">One-Time Password <span>*</span></label>
+                                <div class="subtpo-input-wrap">
+                                    <i class="fa-solid fa-key"></i>
+                                    <input type="text" id="OTP" name="OTP"
+                                           maxlength="6" pattern="[0-9]{4,6}"
+                                           inputmode="numeric" autocomplete="one-time-code"
+                                           placeholder="Enter OTP" required />
+                                </div>
+                            </div>
+
+                            <button type="button" id="sendOtpButton"
+                                    class="subtpo-secondary-btn">
+                                <i class="fa-regular fa-paper-plane"></i>
+                                Send OTP
+                            </button>
+                        </div>
+
+                        <small class="subtpo-help">
+                            OTP sending and verification require a server-side OTP service.
+                        </small>
+                    </div>
                 </div>
 
-                <div class="subtpo-field">
-                    <label for="ConfirmPassword">
-                        Confirm Password <span class="subtpo-required">*</span>
-                    </label>
-                    <input type="password"
-                           id="ConfirmPassword"
-                           name="ConfirmPassword"
-                           autocomplete="new-password"
-                           placeholder="Confirm password"
-                           required />
-                    <small id="passwordStatus" class="subtpo-status"></small>
+                <div class="subtpo-section subtpo-section-last">
+                    <div class="subtpo-section-heading">
+                        <span class="subtpo-section-icon">
+                            <i class="fa-solid fa-lock"></i>
+                        </span>
+                        <div>
+                            <h3>Login Details</h3>
+                            <p>Create secure login credentials for the Sub TPO.</p>
+                        </div>
+                    </div>
+
+                    <div class="subtpo-grid">
+                        <div class="subtpo-field">
+                            <label for="Password">Password <span>*</span></label>
+                            <div class="subtpo-input-wrap">
+                                <i class="fa-solid fa-lock"></i>
+                                <input type="password" id="Password" name="Password"
+                                       autocomplete="new-password"
+                                       placeholder="Create password" required />
+                            </div>
+                        </div>
+
+                        <div class="subtpo-field">
+                            <label for="ConfirmPassword">Confirm Password <span>*</span></label>
+                            <div class="subtpo-input-wrap">
+                                <i class="fa-solid fa-lock"></i>
+                                <input type="password" id="ConfirmPassword" name="ConfirmPassword"
+                                       autocomplete="new-password"
+                                       placeholder="Confirm password" required />
+                            </div>
+                            <small id="passwordStatus" class="subtpo-status"></small>
+                        </div>
+                    </div>
                 </div>
+
+                <div class="subtpo-form-footer">
+                    <p><span>*</span> Required fields must be completed.</p>
+
+                    <div class="subtpo-actions">
+                        <button type="reset" id="resetButton" class="subtpo-reset-btn">
+                            <i class="fa-solid fa-rotate-left"></i>
+                            Reset Form
+                        </button>
+
+                        <button type="submit" id="submitButton" class="subtpo-submit-btn">
+                            <i class="fa-solid fa-user-plus"></i>
+                            Register Sub TPO
+                        </button>
+                    </div>
+                </div>
+            </form>
+
+            <div class="subtpo-back">
+                <a asp-controller="TPO" asp-action="Dashboard">
+                    <i class="fa-solid fa-arrow-left"></i>
+                    Back to Dashboard
+                </a>
             </div>
-
-            <button type="submit"
-                    id="submitButton"
-                    class="subtpo-submit">
-                <i class="fa-solid fa-user-plus"></i>
-                Register Sub TPO
-            </button>
-        </form>
-
-        <div class="subtpo-back">
-            <a asp-controller="TPO" asp-action="Dashboard">
-                <i class="fa-solid fa-arrow-left"></i>
-                Back to Dashboard
-            </a>
         </div>
     </div>
 </div>
@@ -554,9 +363,7 @@
     <script>
         (function () {
             if (!window.jQuery) {
-                console.error(
-                    "jQuery is not loaded. Check _DashboardLayout.cshtml."
-                );
+                console.error("jQuery is not loaded. Check _DashboardLayout.cshtml.");
                 return;
             }
 
@@ -568,24 +375,15 @@
 
                 function setPlaceholder($select, message) {
                     $select.empty().append(
-                        $("<option>", {
-                            value: "",
-                            text: message
-                        })
+                        $("<option>", { value: "", text: message })
                     );
                 }
 
                 function showRequestError(label, xhr) {
-                    console.error(
-                        label + " request failed.",
-                        "HTTP:", xhr.status,
-                        "Response:", xhr.responseText
-                    );
+                    console.error(label + " request failed.", xhr.status, xhr.responseText);
                 }
 
-                // LOAD COLLEGES
-                
-                // LOAD COLLEGES
+                // Load colleges.
                 $.ajax({
                     url: '@Url.Action("GetColleges", "Account")',
                     method: "GET",
@@ -593,30 +391,16 @@
                     cache: false
                 })
                 .done(function (data) {
-                    console.log("GetColleges response:", data);
-
-                    setPlaceholder(
-                        $collegeName,
-                        "-- Select College Name --"
-                    );
+                    setPlaceholder($collegeName, "-- Select College Name --");
 
                     if (!Array.isArray(data) || data.length === 0) {
-                        setPlaceholder(
-                            $collegeName,
-                            "No colleges available"
-                        );
-
-                        $("#collegeStatus").text(
-                            "No colleges were returned."
-                        );
+                        setPlaceholder($collegeName, "No colleges available");
+                        $("#collegeStatus").text("No colleges were returned.");
                         return;
                     }
 
                     data.forEach(function (college) {
-                        if (college.nID == null ||
-                            !college.sCollegeName) {
-                            return;
-                        }
+                        if (college.nID == null || !college.sCollegeName) return;
 
                         $("<option>", {
                             value: college.nID,
@@ -624,33 +408,24 @@
                         }).appendTo($collegeName);
                     });
 
-                    $("#collegeStatus").text("");
+                    if ($collegeName.children("option").length === 1) {
+                        setPlaceholder($collegeName, "No valid colleges available");
+                        $("#collegeStatus").text("No valid colleges were returned.");
+                    } else {
+                        $("#collegeStatus").text("");
+                    }
                 })
                 .fail(function (xhr) {
-                    setPlaceholder(
-                        $collegeName,
-                        "Unable to load colleges"
-                    );
-
-                    $("#collegeStatus").text(
-                        "Failed to load colleges."
-                    );
-
+                    setPlaceholder($collegeName, "Unable to load colleges");
+                    $("#collegeStatus").text("Failed to load colleges.");
                     showRequestError("GetColleges", xhr);
                 });
 
-
-                // LOAD COLLEGE CODES WHEN COLLEGE CHANGES
-                
-                // LOAD COLLEGE CODES WHEN COLLEGE CHANGES
+                // Load college codes when the college changes.
                 $collegeName.on("change", function () {
                     const collegeId = $(this).val();
 
-                    setPlaceholder(
-                        $collegeCode,
-                        "-- Select College Code --"
-                    );
-
+                    setPlaceholder($collegeCode, "-- Select College Code --");
                     $collegeCode.prop("disabled", true);
                     $("#collegeCodeStatus").text("");
 
@@ -664,17 +439,9 @@
                         data: { collegeId: collegeId }
                     })
                     .done(function (data) {
-                        console.log("GetCollegeCodes response:", data);
-
                         if (!Array.isArray(data) || data.length === 0) {
-                            setPlaceholder(
-                                $collegeCode,
-                                "No codes available"
-                            );
-
-                            $("#collegeCodeStatus").text(
-                                "No college codes were returned."
-                            );
+                            setPlaceholder($collegeCode, "No codes available");
+                            $("#collegeCodeStatus").text("No college codes were returned.");
                             return;
                         }
 
@@ -687,24 +454,21 @@
                             }).appendTo($collegeCode);
                         });
 
-                        $collegeCode.prop("disabled", false);
+                        if ($collegeCode.children("option").length > 1) {
+                            $collegeCode.prop("disabled", false);
+                        } else {
+                            setPlaceholder($collegeCode, "No valid codes available");
+                            $("#collegeCodeStatus").text("No valid college codes were returned.");
+                        }
                     })
                     .fail(function (xhr) {
-                        setPlaceholder(
-                            $collegeCode,
-                            "Unable to load college codes"
-                        );
-
-                        $("#collegeCodeStatus").text(
-                            "Failed to load college codes."
-                        );
-
+                        setPlaceholder($collegeCode, "Unable to load college codes");
+                        $("#collegeCodeStatus").text("Failed to load college codes.");
                         showRequestError("GetCollegeCodes", xhr);
                     });
                 });
 
-
-                // LOAD DEPARTMENTS
+                // Load departments.
                 $.ajax({
                     url: '@Url.Action("GetDepartments", "Account")',
                     method: "GET",
@@ -712,15 +476,11 @@
                     cache: false
                 })
                 .done(function (data) {
-                    console.log("GetDepartments response:", data);
-
                     setPlaceholder($department, "-- Select Department --");
 
                     if (!Array.isArray(data) || data.length === 0) {
                         setPlaceholder($department, "No departments available");
-                        $("#departmentStatus").text(
-                            "No departments were returned."
-                        );
+                        $("#departmentStatus").text("No departments were returned.");
                         return;
                     }
 
@@ -733,17 +493,20 @@
                         }).appendTo($department);
                     });
 
-                    $("#departmentStatus").text("");
+                    if ($department.children("option").length === 1) {
+                        setPlaceholder($department, "No valid departments available");
+                        $("#departmentStatus").text("No valid departments were returned.");
+                    } else {
+                        $("#departmentStatus").text("");
+                    }
                 })
                 .fail(function (xhr) {
                     setPlaceholder($department, "Unable to load departments");
-                    $("#departmentStatus").text(
-                        "Failed to load departments."
-                    );
+                    $("#departmentStatus").text("Failed to load departments.");
                     showRequestError("GetDepartments", xhr);
                 });
 
-                // PASSWORD MATCH VALIDATION
+                // Password match validation.
                 function validatePasswords() {
                     const password = $("#Password").val();
                     const confirmPassword = $("#ConfirmPassword").val();
@@ -757,26 +520,19 @@
                     }
 
                     if (password !== confirmPassword) {
-                        input.setCustomValidity(
-                            "Password and Confirm Password do not match."
-                        );
-                        $status.text("Passwords do not match.");
-                        $status.css("color", "#dc2626");
+                        input.setCustomValidity("Password and Confirm Password do not match.");
+                        $status.text("Passwords do not match.").removeClass("is-success");
                         return false;
                     }
 
                     input.setCustomValidity("");
-                    $status.text("Passwords match.");
-                    $status.css("color", "#198754");
+                    $status.text("Passwords match.").addClass("is-success");
                     return true;
                 }
 
-                $("#Password, #ConfirmPassword").on(
-                    "input",
-                    validatePasswords
-                );
+                $("#Password, #ConfirmPassword").on("input", validatePasswords);
 
-                // STATIC OTP BUTTON: intentionally no API call.
+                // OTP is not connected to a server endpoint.
                 $("#sendOtpButton").on("click", function () {
                     alert(
                         "OTP sending is not configured yet. " +
@@ -784,7 +540,22 @@
                     );
                 });
 
-                // FORM VALIDATION
+                // Restore submit-button state when the form is reset.
+                $form.on("reset", function () {
+                    setTimeout(function () {
+                        $("#submitButton")
+                            .prop("disabled", false)
+                            .html('<i class="fa-solid fa-user-plus"></i> Register Sub TPO');
+
+                        $("#passwordStatus").text("").removeClass("is-success");
+                        $("#ConfirmPassword").get(0).setCustomValidity("");
+
+                        setPlaceholder($collegeCode, "Select a college first");
+                        $collegeCode.prop("disabled", true);
+                        $("#collegeCodeStatus").text("");
+                    }, 0);
+                });
+
                 $form.on("submit", function (event) {
                     if (!validatePasswords()) {
                         event.preventDefault();
@@ -807,8 +578,7 @@
                         return;
                     }
 
-                    if ($collegeCode.prop("disabled") ||
-                        !$collegeCode.val()) {
+                    if ($collegeCode.prop("disabled") || !$collegeCode.val()) {
                         event.preventDefault();
                         alert("Please select a college code.");
                         $collegeCode.trigger("focus");
@@ -822,7 +592,6 @@
                         return;
                     }
 
-                    // Prevent accidental double submissions.
                     $("#submitButton")
                         .prop("disabled", true)
                         .html('<i class="fa-solid fa-spinner fa-spin"></i> Registering...');
