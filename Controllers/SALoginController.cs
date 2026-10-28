@@ -1,6 +1,7 @@
 ﻿using ErJobPortal.Models;
 using ErJobPortal.Repositories;
 using ErJobPortal.Services;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Cryptography;
 
@@ -38,43 +39,66 @@ namespace ErJobPortal.Controllers
             if (!ModelState.IsValid)
                 return View(model);
 
-            var user =
-                _repository.Login(
-                    model.sEmail,
-                    model.sPassword);
+            // Retrieve Super Admin by email
+            var user = _repository.Login(
+                model.sEmail ?? "",
+                ""
+            );
 
-            if (user != null)
+            if (user == null)
             {
-                // Store Super Admin details in session
-
-                HttpContext.Session.SetString(
-                    "SAID",
-                    user.nID.ToString()
-                );
-
-                HttpContext.Session.SetString(
-                    "SAName",
-                    user.sFName
-                );
-
-                HttpContext.Session.SetString(
-                    "SARole",
-                    user.sRole
-                );
-
-                // Redirect to Super Admin Dashboard
-
-                return RedirectToAction(
-                    "Dashboard",
-                    "SuperAdmin",
-                    new { id = user.nID }
-                );
+                ViewBag.Error = "Invalid Email or Password";
+                return View(model);
             }
 
-            ViewBag.Error =
-                "Invalid Email or Password";
+            var passwordHasher = new PasswordHasher<SALoginModel>();
 
-            return View(model);
+            PasswordVerificationResult passwordResult;
+
+            try
+            {
+                passwordResult = passwordHasher.VerifyHashedPassword(
+                    user,
+                    user.sPassword ?? "",
+                    model.sPassword ?? ""
+                );
+            }
+            catch (FormatException)
+            {
+                ViewBag.Error =
+                    "Stored password is not in a valid hash format. Please reset or migrate the password.";
+
+                return View(model);
+            }
+
+            if (passwordResult == PasswordVerificationResult.Failed)
+            {
+                ViewBag.Error = "Invalid Email or Password";
+                return View(model);
+            }
+
+            // Store Super Admin details in session
+            HttpContext.Session.SetString(
+                "SAID",
+                user.nID.ToString()
+            );
+
+            HttpContext.Session.SetString(
+                "SAName",
+                user.sFName ?? ""
+            );
+
+            HttpContext.Session.SetString(
+                "SARole",
+                user.sRole ?? ""
+            );
+
+            // Redirect to Super Admin Dashboard
+            return RedirectToAction(
+                "Dashboard",
+                "SuperAdmin",
+                new { id = user.nID }
+            );
         }
 
 

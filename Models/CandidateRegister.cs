@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
 using System.ComponentModel.DataAnnotations;
 
 namespace ErJobPortal.Models
@@ -41,12 +42,16 @@ namespace ErJobPortal.Models
         // MOBILE
         // 6 TO 20 DIGITS
         // =====================================================
-
         [Required(ErrorMessage = "Mobile number is required.")]
         [RegularExpression(
-            @"^[0-9]{6,20}$",
-            ErrorMessage = "Mobile number must contain 6 to 20 digits."
-        )]
+     @"^[0-9]{10}$",
+     ErrorMessage = "Mobile number must contain exactly 10 digits."
+ )]
+        [Remote(
+    action: "CheckCandidateMobile",
+    controller: "Account",
+    ErrorMessage = "This mobile number is already registered."
+)]
         public string? sMobile { get; set; }
 
 
@@ -57,13 +62,19 @@ namespace ErJobPortal.Models
 
         [Required(ErrorMessage = "Email address is required.")]
         [RegularExpression(
-            @"^[^@\s]+@[^@\s]+\.[^@\s]+$",
-            ErrorMessage = "Email must contain @ and ."
-        )]
+@"^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$",
+ErrorMessage = "Please enter a valid email address, e.g., example@gmail.com."
+)]
         [StringLength(
-            150,
-            ErrorMessage = "Email cannot exceed 150 characters."
-        )]
+      150,
+      ErrorMessage = "Email cannot exceed 150 characters."
+  )]
+
+        [Remote(
+action: "CheckCandidateEmail",
+controller: "Account",
+ErrorMessage = "This email address is already registered."
+)]
         public string? sEmail { get; set; }
 
 
@@ -163,12 +174,36 @@ namespace ErJobPortal.Models
         // BROAD GROUP
         // =====================================================
 
+        //[Range(
+        //    1,
+        //    int.MaxValue,
+        //    ErrorMessage = "Please select a broad group."
+        //)]
+        //public int nBroadGroup { get; set; }
+
+
+        // =====================================================
+        // CURRENT YEAR
+        // =====================================================
+
         [Range(
             1,
-            int.MaxValue,
-            ErrorMessage = "Please select a broad group."
+            5,
+            ErrorMessage = "Please select a valid current year."
         )]
-        public int nBroadGroup { get; set; }
+        public int? nCurrentYear { get; set; }
+
+
+        // =====================================================
+        // ADMISSION YEAR
+        // =====================================================
+
+        [Range(
+            1900,
+            2100,
+            ErrorMessage = "Please enter a valid admission year."
+        )]
+        public int? nAdmissionYear { get; set; }
 
 
         // =====================================================
@@ -212,16 +247,23 @@ namespace ErJobPortal.Models
         public string? sOTP { get; set; }
 
 
+        [Required(ErrorMessage = "Please select a prefix.")]
+       
+        public string? sPrefix { get; set; }
+
+        public string? sAlternateMobile { get; set; }
+
+
         // =====================================================
         // CONFIRM PASSWORD
         // =====================================================
 
-        [Required(ErrorMessage = "Confirm password is required.")]
-        [Compare(
-            "sPassword",
-            ErrorMessage = "Password and confirm password do not match."
-        )]
-        public string? sConfirmPassword { get; set; }
+        //[Required(ErrorMessage = "Confirm password is required.")]
+        //[Compare(
+        //    "sPassword",
+        //    ErrorMessage = "Password and confirm password do not match."
+        //)]
+        //public string? sConfirmPassword { get; set; }
 
 
         // =====================================================

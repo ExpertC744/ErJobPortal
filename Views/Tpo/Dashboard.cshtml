@@ -538,11 +538,13 @@
             </div>
 
             <div class="col-md-4 text-md-end">
-                <a href="#" class="profile-btn">
-                    <i class="fas fa-user-edit"></i>
-                    Complete Profile
-                </a>
-            </div>
+    <a asp-controller="TPO"
+       asp-action="EditProfile"
+       class="profile-btn">
+        <i class="fas fa-user-edit"></i>
+        Complete Profile
+    </a>
+</div>
         </div>
     </div>
 
@@ -756,7 +758,7 @@
     <div class="row">
 
         <!-- Profile Progress -->
-        <div class="col-lg-5 mb-4">
+        <div class="col-lg-5 mb-4 d-none">
 
             <div class="dashboard-section">
 
@@ -794,7 +796,7 @@
 
 
         <!-- Quick Actions -->
-        <div class="col-lg-7 mb-4">
+        <div class="col-lg-7 mb-4 d-none">
 
             <div class="dashboard-section">
 
@@ -888,7 +890,7 @@
     <div class="row">
 
         <!-- Applications -->
-        <div class="col-lg-7 mb-4">
+        <div class="col-lg-7 mb-4 d-none">
 
             <div class="dashboard-section">
 
@@ -980,7 +982,7 @@
 
 
         <!-- Recommended Jobs -->
-        <div class="col-lg-5 mb-4">
+        <div class="col-lg-5 mb-4 d-none">
 
             <div class="dashboard-section">
 
@@ -1101,6 +1103,7 @@
                     </div>
 
                 </div>
+
 
             </div>
 

@@ -7,6 +7,12 @@
     ViewData["Title"] = "Internship Post";
     ViewData["Panel"] = "Candidate";
     ViewData["UserName"] = "Candidate";
+
+
+    var candidateCode = ViewBag.candidateCode as string;
+
+    // Get id passed from controller
+    var internshipId = ViewBag.InternshipId as string;
 }
 
 <div class="container-fluid">
@@ -31,7 +37,7 @@
                 </h1>
 
                 <p class="mb-0 text-muted">
-                    HN236383503368076
+                    @internshipId
                 </p>
 
             </div>
@@ -94,11 +100,15 @@
 
                             <!-- Organization -->
                             <td>
-                                <a href="#"
-                                   class="text-primary fw-semibold text-decoration-underline">
-                                    @post.sName
-                                </a>
-                            </td>
+                               <a asp-controller="Account"
+   asp-action="ViewOrgPost"
+   asp-route-id="@post.nID"
+   asp-route-nOrgID="@post.nOrgID"
+   asp-route-matchingPostIds="@string.Join(",", internshipPosts.Select(p => p.nID))"
+   class="text-primary fw-semibold text-decoration-underline">
+    @post.sName
+</a>
+</td>
 
                             <!-- Position -->
                             <td>
@@ -129,42 +139,45 @@
                                 }
                             </td>
 
-                            <!-- Apply Status -->
-                            <td>
+                           <!-- Apply Status -->
+<td>
 
-                                @if (post.IsApplied)
-                                {
-                                    <span class="master-action-btn">
-                                        Applied
-                                    </span>
-                                }
-                                else
-                                {
-                                    <form asp-controller="Candidate"
-                                          asp-action="ApplyToPost"
-                                          method="post"
-                                          style="display:inline;">
+    @if (post.IsApplied)
+    {
+        <span class="apply-status-btn applied-btn">
+            <i class="fas fa-check-circle me-1"></i>
+            Applied
+        </span>
+    }
+    else
+    {
+        <form asp-controller="Candidate"
+              asp-action="ApplyToPost"
+              method="post"
+              class="apply-form">
 
-                                        @Html.AntiForgeryToken()
+            @Html.AntiForgeryToken()
 
-                                        <input type="hidden"
-                                               name="postId"
-                                               value="@post.nID" />
+            <input type="hidden"
+                   name="postId"
+                   value="@post.nID" />
 
-                                        <input type="hidden"
-                                               name="orgId"
-                                               value="@post.nOrgID" />
+            <input type="hidden"
+                   name="orgId"
+                   value="@post.nOrgID" />
 
-                                        <button type="submit"
-                                                class="master-action-btn"
-                                                style="border:none; cursor:pointer;">
-                                            Apply Now
-                                        </button>
+            <button type="submit"
+                    class="apply-status-btn apply-now-btn">
 
-                                    </form>
-                                }
+                <i class="fas fa-paper-plane me-1"></i>
+                Apply Now
 
-                            </td>
+            </button>
+
+        </form>
+    }
+
+</td>
 
                         </tr>
 
@@ -182,16 +195,18 @@
              EXTRA POST BUTTON
         ================================================== -->
 
-        <div class="mt-4">
+        <form asp-controller="Candidate"
+              asp-action="ExtraPost"
+              asp-route-id="@internshipId"
+              method="get">
 
-            <button type="button"
-                    class="submit-button">
-
+            <button type="submit"
+                    class="post-job-btn">
+                    <i class="fas fa-plus me-2"></i>
                 Extra Post
-
             </button>
 
-        </div>
+        </form>
 
     </div>
 

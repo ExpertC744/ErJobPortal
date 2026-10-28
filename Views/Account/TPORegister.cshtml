@@ -4,7 +4,7 @@
     ViewData["Title"] = "TPO Registration";
 }
 
-<link rel="stylesheet" href="~/css/CandidateRegister.css" />
+<link rel="stylesheet" href="~/css/TPORegister.css" />
 
 <div class="candidate-register-page">
 
@@ -26,9 +26,9 @@
                asp-action="OrganizationRegister"
                class="switch-btn">
                 Organization
-            </a> *@
+            </a>
 
-            @* <a asp-controller="Account"
+            <a asp-controller="Account"
                asp-action="TPORegister"
                class="switch-btn active">
                 TPO
@@ -50,7 +50,7 @@
             <h2>TPO Registration</h2>
 
             <p>
-                Register as a Training & Placement Officer
+                Register as a Training &amp; Placement Officer
             </p>
 
         </div>
@@ -81,45 +81,21 @@
         <form asp-controller="Account"
               asp-action="TPORegister"
               method="post"
-              enctype="multipart/form-data">
+              enctype="multipart/form-data"
+              id="tpoRegistrationForm">
 
             @Html.AntiForgeryToken()
-
-
-            <!-- =================================================
-                 VALIDATION SUMMARY
-            ================================================== -->
 
             <div asp-validation-summary="All"
                  class="text-danger register-summary">
             </div>
 
 
-            <!-- =================================================
-                 PERSONAL DETAILS
-            ================================================== -->
-
-            <div class="section-title mt-3 mb-3">
-
-                <i class="fa-solid fa-user"></i>
-
-                Personal Details
-
-            </div>
-
-
-            <!-- =================================================
-                 FULL NAME + MOBILE
-            ================================================== -->
-
             <div class="register-form-row">
-
-                <!-- Full Name -->
 
                 <div class="register-form-group">
 
-                    <label asp-for="FullName"
-                           class="register-label">
+                    <label for="FullName" class="register-label">
                         Full Name
                     </label>
 
@@ -136,20 +112,18 @@
                 </div>
 
 
-                <!-- Mobile -->
-
                 <div class="register-form-group">
 
-                    <label asp-for="MobileNo"
-                           class="register-label">
+                    <label for="MobileNo" class="register-label">
                         Mobile Number
                     </label>
 
                     <input asp-for="MobileNo"
                            type="tel"
                            class="register-input"
-                           placeholder="Enter mobile number"
+                           placeholder="Enter 10 digit mobile number"
                            maxlength="10"
+                           inputmode="numeric"
                            autocomplete="tel" />
 
                     <span asp-validation-for="MobileNo"
@@ -160,17 +134,11 @@
 
             </div>
 
-
-            <!-- =================================================
-                 COLLEGE EMAIL
-            ================================================== -->
-
             <div class="register-form-row">
 
                 <div class="register-form-group">
 
-                    <label asp-for="CollegeMailID"
-                           class="register-label">
+                    <label for="CollegeMailID" class="register-label">
                         College Mail ID
                     </label>
 
@@ -189,8 +157,7 @@
 
                 <div class="register-form-group">
 
-                    <label asp-for="CollegeEmployeeID"
-                           class="register-label">
+                    <label for="CollegeEmployeeID" class="register-label">
                         College Employee ID
                     </label>
 
@@ -208,40 +175,27 @@
 
             </div>
 
-
-            <!-- =================================================
-                 ORGANIZATION DETAILS
-            ================================================== -->
-
-            <div class="section-title mt-4 mb-3">
-
-                <i class="fa-solid fa-building-columns"></i>
-
-                College / Organization Details
-
-            </div>
-
-
-            <!-- =================================================
-                 COLLEGE NAME + COLLEGE CODE
-            ================================================== -->
-
             <div class="register-form-row">
-
-                <!-- College Name -->
 
                 <div class="register-form-group">
 
-                    <label asp-for="CollegeName"
-                           class="register-label">
+                    <label for="CollegeName" class="register-label">
                         College Name
                     </label>
 
-                    <input asp-for="CollegeName"
-                           type="text"
-                           class="register-input"
-                           placeholder="Enter college name"
-                           autocomplete="organization" />
+                    <div class="register-input-box">
+
+                        <select asp-for="CollegeName"
+                                id="CollegeName"
+                                class="register-select">
+
+                            <option value="0">
+                                -- Select College Name --
+                            </option>
+
+                        </select>
+
+                    </div>
 
                     <span asp-validation-for="CollegeName"
                           class="text-danger register-validation">
@@ -250,20 +204,25 @@
                 </div>
 
 
-                <!-- College Code -->
-
                 <div class="register-form-group">
 
-                    <label asp-for="CollegeCode"
-                           class="register-label">
+                    <label for="CollegeCode" class="register-label">
                         College Code
                     </label>
 
-                    <input asp-for="CollegeCode"
-                           type="text"
-                           class="register-input"
-                           placeholder="Enter college code"
-                           autocomplete="off" />
+                    <div class="register-input-box">
+
+                        <select asp-for="CollegeCode"
+                                id="CollegeCode"
+                                class="register-select">
+
+                            <option value="0">
+                                -- Select College Code --
+                            </option>
+
+                        </select>
+
+                    </div>
 
                     <span asp-validation-for="CollegeCode"
                           class="text-danger register-validation">
@@ -273,47 +232,62 @@
 
             </div>
 
-
-            <!-- =================================================
-                 COLLEGE ADDRESS
-            ================================================== -->
-
             <div class="register-form-row">
 
-                <div class="register-form-group"
-                     style="width:100%;">
+                <div class="register-form-group">
 
-                    <label asp-for="CollegeAddress"
-                           class="register-label">
-                        College Address
+                    <label for="Designation" class="register-label">
+                        Designation
                     </label>
 
-                    <textarea asp-for="CollegeAddress"
-                              class="register-input"
-                              rows="3"
-                              placeholder="Enter complete college address"></textarea>
+                    <input asp-for="Designation"
+                           type="text"
+                           class="register-input"
+                           placeholder="e.g. Training &amp; Placement Officer" />
 
-                    <span asp-validation-for="CollegeAddress"
+                    <span asp-validation-for="Designation"
                           class="text-danger register-validation">
                     </span>
 
                 </div>
 
+
+                
+                <div class="register-form-group">
+
+                    <label asp-for="nDepartment" class="register-label">
+                        Department
+                    </label>
+
+                    <div class="register-input-box">
+
+                        <select asp-for="nDepartment"
+                                id="departmentSelect"
+                                class="register-select">
+
+                            <option value="">
+                                -- Select Department --
+                            </option>
+
+                        </select>
+
+                    </div>
+
+                    <span asp-validation-for="nDepartment"
+                          class="text-danger register-validation">
+                    </span>
+
+                </div>
+
+
             </div>
-
-
-            <!-- =================================================
-                 ORGANIZATION WEBSITE
-            ================================================== -->
 
             <div class="register-form-row">
 
-                <div class="register-form-group"
-                     style="width:100%;">
+                <div class="register-form-group">
 
-                    <label asp-for="OrganizationWebsiteURL"
-                           class="register-label">
-                        College / Organization Website URL
+                    <label for="OrganizationWebsiteURL" class="register-label">
+                        College Website URL
                     </label>
 
                     <input asp-for="OrganizationWebsiteURL"
@@ -328,155 +302,10 @@
 
                 </div>
 
-            </div>
-
-
-            <!-- =================================================
-                 PROFESSIONAL DETAILS
-            ================================================== -->
-
-            <div class="section-title mt-4 mb-3">
-
-                <i class="fa-solid fa-briefcase"></i>
-
-                Professional Details
-
-            </div>
-
-
-            <!-- =================================================
-                 DESIGNATION + DEPARTMENT
-            ================================================== -->
-
-            <div class="register-form-row">
-
-                <!-- Designation -->
 
                 <div class="register-form-group">
 
-                    <label asp-for="Designation"
-                           class="register-label">
-                        Designation
-                    </label>
-
-                    <input asp-for="Designation"
-                           type="text"
-                           class="register-input"
-                           placeholder="e.g. Training & Placement Officer" />
-
-                    <span asp-validation-for="Designation"
-                          class="text-danger register-validation">
-                    </span>
-
-                </div>
-
-
-                <!-- Department -->
-
-                <div class="register-form-group">
-
-                    <label asp-for="DepartmentName"
-                           class="register-label">
-                        Department Name
-                    </label>
-
-                    <input asp-for="DepartmentName"
-                           type="text"
-                           class="register-input"
-                           placeholder="e.g. Training & Placement" />
-
-                    <span asp-validation-for="DepartmentName"
-                          class="text-danger register-validation">
-                    </span>
-
-                </div>
-
-            </div>
-
-
-            <!-- =================================================
-                 VERIFICATION DOCUMENTS
-            ================================================== -->
-
-            <div class="section-title mt-4 mb-3">
-
-                <i class="fa-solid fa-file-shield"></i>
-
-                Verification Documents
-
-            </div>
-
-
-            <!-- =================================================
-                 SUPPORTING DOCUMENT 1 + 2
-            ================================================== -->
-
-            <div class="register-form-row">
-
-                <!-- Supporting Document 1 -->
-
-                <div class="register-form-group">
-
-                    <label asp-for="SupportingDocument1File"
-                           class="register-label">
-
-                        Supporting Document 1
-                        <small>
-                            (ID Card / Appointment Letter)
-                        </small>
-
-                    </label>
-
-                    <input asp-for="SupportingDocument1File"
-                           type="file"
-                           accept=".pdf,.jpg,.jpeg,.png"
-                           class="register-input register-file" />
-
-                    <span asp-validation-for="SupportingDocument1File"
-                          class="text-danger register-validation">
-                    </span>
-
-                </div>
-
-
-                <!-- Supporting Document 2 -->
-
-                <div class="register-form-group">
-
-                    <label asp-for="SupportingDocument2File"
-                           class="register-label">
-
-                        Supporting Document 2
-                        <small>
-                            (Authorization / Other Proof)
-                        </small>
-
-                    </label>
-
-                    <input asp-for="SupportingDocument2File"
-                           type="file"
-                           accept=".pdf,.jpg,.jpeg,.png"
-                           class="register-input register-file" />
-
-                    <span asp-validation-for="SupportingDocument2File"
-                          class="text-danger register-validation">
-                    </span>
-
-                </div>
-
-            </div>
-
-
-            <!-- =================================================
-                 PROFILE PHOTO
-            ================================================== -->
-
-            <div class="register-form-row">
-
-                <div class="register-form-group">
-
-                    <label asp-for="ProfilePhotoFile"
-                           class="register-label">
+                    <label for="ProfilePhotoFile" class="register-label">
                         Profile Photo
                     </label>
 
@@ -493,117 +322,100 @@
 
             </div>
 
+            <div class="register-form-row full">
 
-            <!-- =================================================
-                 OTP VERIFICATION
-            ================================================== -->
+                <div class="register-form-group">
 
-            <div class="section-title mt-4 mb-3">
+                    <label for="CollegeAddress" class="register-label">
+                        College Address
+                    </label>
 
-                <i class="fa-solid fa-shield-halved"></i>
+                    <textarea asp-for="CollegeAddress"
+                              class="register-input"
+                              rows="3"
+                              placeholder="Enter complete college address"></textarea>
 
-                Email / Mobile Verification
+                    <span asp-validation-for="CollegeAddress"
+                          class="text-danger register-validation">
+                    </span>
+
+                </div>
+
+
+                <!-- Department -->
+
+                <!-- Department -->
+
+                @* <div class="register-form-group">
+
+                    <label asp-for="nDepartment" class="register-label">
+                        Department
+                    </label>
+
+                    <div class="register-input-box">
+                        <select asp-for="nDepartment"
+                                id="departmentSelect"
+                                class="register-select">
+
+                            <option value="">-- Select Department --</option>
+
+                        </select>
+                    </div>
+
+                    <span asp-validation-for="nDepartment"
+                          class="text-danger register-validation">
+                    </span>
+
+                </div> *@
 
             </div>
 
+            <div class="register-form-row">
 
-            <div class="otp-section">
+                <div class="register-form-group">
 
-                <label class="otp-label">
-                    OTP Verification
-                </label>
+                    <label for="SupportingDocument1File" class="register-label">
+                        Supporting Document 1
+                        <small>(ID Card / Appointment Letter)</small>
+                    </label>
 
-                <div class="otp-content">
+                    <input asp-for="SupportingDocument1File"
+                           type="file"
+                           accept=".pdf,.jpg,.jpeg,.png"
+                           class="register-input register-file" />
 
-                    <!-- OTP Options -->
+                    <span asp-validation-for="SupportingDocument1File"
+                          class="text-danger register-validation">
+                    </span>
 
-                    <div class="otp-options">
-
-                        <label class="radio-option">
-
-                            <input type="radio"
-                                   name="OTPType"
-                                   value="Mobile"
-                                   checked />
-
-                            <span>
-                                Mobile No.
-                            </span>
-
-                        </label>
+                </div>
 
 
-                        <label class="radio-option">
+                <div class="register-form-group">
 
-                            <input type="radio"
-                                   name="OTPType"
-                                   value="Email" />
+                    <label for="SupportingDocument2File" class="register-label">
+                        Supporting Document 2
+                        <small>(Authorization / Other Proof)</small>
+                    </label>
 
-                            <span>
-                                College Email
-                            </span>
+                    <input asp-for="SupportingDocument2File"
+                           type="file"
+                           accept=".pdf,.jpg,.jpeg,.png"
+                           class="register-input register-file" />
 
-                        </label>
-
-
-                        <button type="button"
-                                class="send-otp-btn"
-                                id="btnSendOTP">
-
-                            Send OTP
-
-                        </button>
-
-                    </div>
-
-
-                    <!-- OTP Input -->
-
-                    <div class="otp-input-container">
-
-                        <input asp-for="OTP"
-                               type="text"
-                               class="otp-input"
-                               placeholder="Enter OTP"
-                               maxlength="6"
-                               autocomplete="one-time-code" />
-
-                        <span asp-validation-for="OTP"
-                              class="text-danger register-validation">
-                        </span>
-
-                    </div>
+                    <span asp-validation-for="SupportingDocument2File"
+                          class="text-danger register-validation">
+                    </span>
 
                 </div>
 
             </div>
 
-
-            <!-- =================================================
-                 LOGIN DETAILS
-            ================================================== -->
-
-            <div class="section-title mt-4 mb-3">
-
-                <i class="fa-solid fa-lock"></i>
-
-                Login Details
-
-            </div>
-
-
-            <!-- =================================================
-                 PASSWORD + CONFIRM PASSWORD
-            ================================================== -->
-
             <div class="register-form-row">
-
-                <!-- Password -->
 
                 <div class="register-form-group">
 
-                    <label asp-for="Password"
-                           class="register-label">
+                    <label for="Password" class="register-label">
                         Password
                     </label>
 
@@ -620,12 +432,9 @@
                 </div>
 
 
-                <!-- Confirm Password -->
-
                 <div class="register-form-group">
 
-                    <label asp-for="ConfirmPassword"
-                           class="register-label">
+                    <label for="ConfirmPassword" class="register-label">
                         Confirm Password
                     </label>
 
@@ -643,14 +452,70 @@
 
             </div>
 
+            <!-- =================================================
+                 OTP VERIFICATION
+            ================================================== -->
+
+            <div class="otp-section">
+
+                <label class="otp-label">
+                    OTP Verification
+                </label>
+
+                <input asp-for="OTP" type="hidden" id="OTP" />
+
+                <div class="otp-options">
+
+                    <label class="radio-option">
+                        <input type="radio" name="OTPType" value="Mobile" checked />
+                        <span>Mobile No.</span>
+                    </label>
+
+                    <label class="radio-option">
+                        <input type="radio" name="OTPType" value="Email" />
+                        <span>College Email</span>
+                    </label>
+
+                    <button type="button"
+                            class="send-otp-btn"
+                            id="btnSendOTP">
+                        <i class="fa-solid fa-paper-plane"></i>
+                        Send OTP
+                    </button>
+
+                </div>
+
+                <div class="otp-box-row">
+
+                    <input type="text" maxlength="1" class="org-otp-input" inputmode="numeric" autocomplete="one-time-code" />
+                    <input type="text" maxlength="1" class="org-otp-input" inputmode="numeric" />
+                    <input type="text" maxlength="1" class="org-otp-input" inputmode="numeric" />
+                    <input type="text" maxlength="1" class="org-otp-input" inputmode="numeric" />
+                    <input type="text" maxlength="1" class="org-otp-input" inputmode="numeric" />
+                    <input type="text" maxlength="1" class="org-otp-input" inputmode="numeric" />
+
+                </div>
+
+                <span class="register-validation org-otp-status"
+                      role="status"
+                      aria-live="polite">
+                    Click Send OTP, then enter the 6-digit OTP.
+                </span>
+
+                <span asp-validation-for="OTP"
+                      class="text-danger register-validation">
+                </span>
+
+            </div>
+
 
             <!-- =================================================
                  IMPORTANT NOTICE
             ================================================== -->
 
-            <div class="alert alert-info mt-3">
+            <div class="alert alert-info">
 
-                <i class="fa-solid fa-circle-info me-2"></i>
+                <i class="fa-solid fa-circle-info"></i>
 
                 Your TPO account will remain pending until it is
                 verified and approved by the Super Admin.
@@ -682,9 +547,7 @@
 
                 <a asp-controller="Account"
                    asp-action="TPOLogin">
-
                     Sign In
-
                 </a>
 
             </div>
@@ -696,6 +559,7 @@
 </div>
 
 
+
 @section Scripts
 {
     @{
@@ -703,184 +567,582 @@
     }
 
     <script>
+        $(document).ready(function () {
 
-        $(document).ready(function() {
+            // =====================================================
+            // ELEMENT REFERENCES
+            // =====================================================
+
+            const collegeNameSelect = $('#CollegeName');
+            const collegeCodeSelect = $('#CollegeCode');
+            const departmentSelect = $('#departmentSelect');
+
+            const otpInputs = document.querySelectorAll('.org-otp-input');
+            const otpHidden = document.getElementById('OTP');
+            const otpStatus = document.querySelector('.org-otp-status');
+            const tpoForm = document.getElementById('tpoRegistrationForm');
+            const sendOtpButton = $('#btnSendOTP');
 
             // =====================================================
             // BASIC INPUT SPACE HANDLING
             // =====================================================
 
-            $('input[type="text"], input[type="email"], input[type="tel"], input[type="password"], textarea')
-                .on('keydown', function(e) {
-
-                    if (e.key === " " && this.value.length === 0) {
+            $('input[type="text"], input[type="email"], input[type="url"], input[type="tel"], input[type="password"], textarea')
+                .not('.org-otp-input')
+                .on('keydown', function (e) {
+                    if (e.key === ' ' && this.value.length === 0) {
                         e.preventDefault();
                     }
-
                 })
-                .on('input', function() {
-
+                .on('input', function () {
                     this.value = this.value.replace(/^\s+/, '');
-
                 })
-                .on('blur', function() {
-
+                .on('blur', function () {
                     this.value = this.value.trim();
-
                 });
 
+            // =====================================================
+            // MOBILE NUMBER - ONLY 10 DIGITS
+            // =====================================================
+
+            $('#MobileNo').on('input', function () {
+                this.value = this.value.replace(/\D/g, '').substring(0, 10);
+            });
 
             // =====================================================
-            // MOBILE NUMBER - ONLY DIGITS
+            // HELPER: HANDLE AJAX RESPONSE
             // =====================================================
 
-            $('#MobileNo').on('input', function() {
-
-                this.value = this.value.replace(/\D/g, '');
-
-                if (this.value.length > 10) {
-
-                    this.value =
-                        this.value.substring(0, 10);
-
+            function getArrayResponse(data) {
+                if (Array.isArray(data)) {
+                    return data;
                 }
 
+                if (data && Array.isArray(data.data)) {
+                    return data.data;
+                }
+
+                return [];
+            }
+
+            function getProperty(object, propertyNames) {
+                for (const propertyName of propertyNames) {
+                    if (object && object[propertyName] !== undefined &&
+                        object[propertyName] !== null) {
+                        return object[propertyName];
+                    }
+                }
+
+                return '';
+            }
+
+            function resetDropdown(dropdown, placeholder) {
+                dropdown.empty();
+                dropdown.append(
+                    $('<option>', {
+                        value: '',
+                        text: placeholder
+                    })
+                );
+            }
+
+            // =====================================================
+            // LOAD COLLEGES
+            // Endpoint must return an array containing nID and
+            // sCollegeName (or equivalent property names).
+            // =====================================================
+
+            function loadColleges() {
+
+                resetDropdown(
+                    collegeNameSelect,
+                    '-- Select College Name --'
+                );
+
+                resetDropdown(
+                    collegeCodeSelect,
+                    '-- Select College Code --'
+                );
+
+                $.ajax({
+                    url: '@Url.Action("GetColleges", "Account")',
+                    type: 'GET',
+                    dataType: 'json',
+                    cache: false,
+
+                    success: function (response) {
+
+                        const colleges = getArrayResponse(response);
+
+                        console.log('Colleges response:', response);
+
+                        if (colleges.length === 0) {
+                            console.warn('No colleges returned by GetColleges.');
+                            return;
+                        }
+
+                        $.each(colleges, function (index, college) {
+
+                            const collegeId = getProperty(
+                                college,
+                                ['nID', 'nId', 'id', 'collegeId', 'CollegeID']
+                            );
+
+                            const collegeName = getProperty(
+                                college,
+                                ['sCollegeName', 'collegeName', 'CollegeName']
+                            );
+
+                            if (collegeId === '' || collegeName === '') {
+                                console.warn(
+                                    'College record is missing an ID or name:',
+                                    college
+                                );
+                                return;
+                            }
+
+                            collegeNameSelect.append(
+                                $('<option>', {
+                                    value: collegeId,
+                                    text: collegeName
+                                })
+                            );
+                        });
+                    },
+
+                    error: function (xhr, status, error) {
+                        console.error(
+                            'College loading failed:',
+                            status,
+                            error,
+                            xhr.responseText
+                        );
+                    }
+                });
+            }
+
+            // =====================================================
+            // LOAD DEPARTMENTS
+            // Endpoint must return an array containing nID and
+            // sDepartment (or equivalent property names).
+            // =====================================================
+
+            function loadDepartments() {
+
+                resetDropdown(
+                    departmentSelect,
+                    '-- Select Department --'
+                );
+
+                $.ajax({
+                    url: '@Url.Action("GetDepartments", "Account")',
+                    type: 'GET',
+                    dataType: 'json',
+                    cache: false,
+
+                    success: function (response) {
+
+                        const departments = getArrayResponse(response);
+
+                        console.log('Departments response:', response);
+
+                        if (departments.length === 0) {
+                            console.warn(
+                                'No departments returned by GetDepartments.'
+                            );
+                            return;
+                        }
+
+                        $.each(departments, function (index, department) {
+
+                            const departmentId = getProperty(
+                                department,
+                                ['nID', 'nId', 'id', 'departmentId', 'DepartmentID']
+                            );
+
+                            const departmentName = getProperty(
+                                department,
+                                ['sDepartment', 'departmentName', 'DepartmentName']
+                            );
+
+                            if (departmentName === '') {
+                                console.warn(
+                                    'Department record is missing its name:',
+                                    department
+                                );
+                                return;
+                            }
+
+                                    departmentSelect.append(
+            $('<option>', {
+                value: Number(departmentId),
+                text: departmentName
+            })
+        );
+                        });
+                    },
+
+                    error: function (xhr, status, error) {
+                        console.error(
+                            'Department loading failed:',
+                            status,
+                            error,
+                            xhr.responseText
+                        );
+                    }
+                });
+            }
+
+            // =====================================================
+            // LOAD COLLEGE CODES WHEN COLLEGE CHANGES
+            // =====================================================
+
+            collegeNameSelect.on('change', function () {
+
+                const collegeId = $(this).val();
+
+                resetDropdown(
+                    collegeCodeSelect,
+                    '-- Select College Code --'
+                );
+
+                if (!collegeId) {
+                    return;
+                }
+
+                $.ajax({
+                    url: '@Url.Action("GetCollegeCodes", "Account")',
+                    type: 'GET',
+                    dataType: 'json',
+                    data: {
+                        collegeId: collegeId
+                    },
+                    cache: false,
+
+                    success: function (response) {
+
+                        const codes = getArrayResponse(response);
+
+                        console.log('College codes response:', response);
+
+                        if (codes.length === 0) {
+                            collegeCodeSelect.append(
+                                $('<option>', {
+                                    value: '',
+                                    text: 'No College Code Available'
+                                })
+                            );
+                            return;
+                        }
+
+                        $.each(codes, function (index, item) {
+
+                            const code = getProperty(
+                                item,
+                                ['nCode', 'ncode', 'collegeCode', 'CollegeCode', 'code']
+                            );
+
+                            if (code === '') {
+                                console.warn(
+                                    'College code record is missing its code:',
+                                    item
+                                );
+                                return;
+                            }
+
+                            collegeCodeSelect.append(
+                                $('<option>', {
+                                    value: code,
+                                    text: code
+                                })
+                            );
+                        });
+                    },
+
+                    error: function (xhr, status, error) {
+                        console.error(
+                            'College code loading failed:',
+                            status,
+                            error,
+                            xhr.responseText
+                        );
+                    }
+                });
             });
 
+            // =====================================================
+            // OTP HELPERS
+            // =====================================================
+
+            function getOtp() {
+                return Array.from(otpInputs)
+                    .map(function (input) {
+                        return input.value;
+                    })
+                    .join('');
+            }
+
+            function syncOtp() {
+                if (otpHidden) {
+                    otpHidden.value = getOtp();
+                }
+            }
+
+            function showOtpStatus(message, success) {
+
+                if (!otpStatus) {
+                    console.log(message);
+                    return;
+                }
+
+                otpStatus.textContent = message;
+                otpStatus.classList.remove('success', 'error');
+                otpStatus.classList.add(success ? 'success' : 'error');
+            }
 
             // =====================================================
-            // COLLEGE CODE - TRIM
+            // OTP INPUT: DIGITS, AUTO-FOCUS, BACKSPACE, PASTE
             // =====================================================
 
-            $('#CollegeCode').on('blur', function() {
+            otpInputs.forEach(function (input, index) {
 
-                this.value = this.value.trim();
+                input.setAttribute('inputmode', 'numeric');
+                input.setAttribute('maxlength', '1');
+                input.setAttribute('autocomplete', 'one-time-code');
 
+                input.addEventListener('input', function () {
+
+                    this.value = this.value.replace(/\D/g, '').substring(0, 1);
+
+                    if (this.value && index < otpInputs.length - 1) {
+                        otpInputs[index + 1].focus();
+                    }
+
+                    syncOtp();
+                });
+
+                input.addEventListener('keydown', function (e) {
+
+                    if (
+                        e.key === 'Backspace' &&
+                        this.value === '' &&
+                        index > 0
+                    ) {
+                        otpInputs[index - 1].focus();
+                    }
+
+                    if (e.key === 'ArrowLeft' && index > 0) {
+                        otpInputs[index - 1].focus();
+                    }
+
+                    if (
+                        e.key === 'ArrowRight' &&
+                        index < otpInputs.length - 1
+                    ) {
+                        otpInputs[index + 1].focus();
+                    }
+                });
+
+                input.addEventListener('paste', function (e) {
+
+                    e.preventDefault();
+
+                    const clipboard = e.clipboardData ||
+                        window.clipboardData;
+
+                    const pasted = clipboard
+                        .getData('text')
+                        .replace(/\D/g, '')
+                        .substring(0, otpInputs.length);
+
+                    otpInputs.forEach(function (otpInput) {
+                        otpInput.value = '';
+                    });
+
+                    pasted.split('').forEach(function (digit, i) {
+                        if (otpInputs[i]) {
+                            otpInputs[i].value = digit;
+                        }
+                    });
+
+                    if (pasted.length > 0) {
+                        otpInputs[
+                            Math.min(pasted.length, otpInputs.length) - 1
+                        ].focus();
+                    }
+
+                    syncOtp();
+                });
             });
 
-
             // =====================================================
-            // EMPLOYEE ID - TRIM
+            // VALIDATE OTP BEFORE FORM SUBMISSION
             // =====================================================
 
-            $('#CollegeEmployeeID').on('blur', function() {
+            if (tpoForm) {
 
-                this.value = this.value.trim();
+                tpoForm.addEventListener('submit', function (e) {
 
-            });
+                    syncOtp();
 
+                    if (otpInputs.length > 0 && getOtp().length !== 6) {
+
+                        e.preventDefault();
+
+                        showOtpStatus(
+                            'Please enter the complete 6-digit OTP.',
+                            false
+                        );
+
+                        if (otpInputs[0]) {
+                            otpInputs[0].focus();
+                        }
+
+                        return false;
+                    }
+                });
+            }
 
             // =====================================================
             // SEND OTP
             // =====================================================
 
-            $('#btnSendOTP').click(function() {
+            sendOtpButton.on('click', function (e) {
 
-                const otpType =
-                    $('input[name="OTPType"]:checked').val();
+                e.preventDefault();
 
-                const email =
-                    $('#CollegeMailID').val();
+                const otpType = $('input[name="OTPType"]:checked').val();
+                const email = ($('#CollegeMailID').val() || '').trim();
+                const mobile = ($('#MobileNo').val() || '').trim();
 
-                const mobile =
-                    $('#MobileNo').val();
-
-
-                if (otpType === "Email") {
-
-                    if (!email) {
-
-                        alert("Please enter College Mail ID.");
-
-                        $('#CollegeMailID').focus();
-
-                        return;
-
-                    }
-
-                }
-                else {
-
-                    if (!mobile) {
-
-                        alert("Please enter Mobile Number.");
-
-                        $('#MobileNo').focus();
-
-                        return;
-
-                    }
-
+                if (!otpType) {
+                    showOtpStatus(
+                        'Please select Email or Mobile OTP.',
+                        false
+                    );
+                    return;
                 }
 
+                if (otpType === 'Email' && !email) {
+                    showOtpStatus(
+                        'Please enter College Mail ID.',
+                        false
+                    );
+                    $('#CollegeMailID').focus();
+                    return;
+                }
 
-                const button = $(this);
+                if (otpType === 'Mobile' && !mobile) {
+                    showOtpStatus(
+                        'Please enter Mobile Number.',
+                        false
+                    );
+                    $('#MobileNo').focus();
+                    return;
+                }
 
-                button.prop('disabled', true);
+                if (otpType === 'Mobile' && !/^\d{10}$/.test(mobile)) {
+                    showOtpStatus(
+                        'Please enter a valid 10-digit mobile number.',
+                        false
+                    );
+                    $('#MobileNo').focus();
+                    return;
+                }
 
-                button.text('Sending...');
+                const originalButtonHtml = sendOtpButton.html();
 
+                sendOtpButton
+                    .prop('disabled', true)
+                    .html(
+                        '<i class="fa-solid fa-spinner fa-spin"></i> Sending...'
+                    );
 
                 $.ajax({
-
                     url: '@Url.Action("SendTPOOTP", "Account")',
-
                     type: 'POST',
+                    dataType: 'json',
 
+                    // If the controller requires anti-forgery validation,
+                    // add the token here and ensure the form contains
+                    // @Html.AntiForgeryToken().
                     data: {
-
                         email: email,
-
                         mobile: mobile,
-
                         otpType: otpType
-
                     },
 
-                    success: function(response) {
+                    success: function (response) {
 
-                        if (response.success) {
+                        console.log('Send OTP response:', response);
 
-                            alert(response.message);
+                        const success = response &&
+                            (
+                                response.success === true ||
+                                response.success === 'true'
+                            );
 
-                            button.text('OTP Sent');
+                        const message = response && response.message
+                            ? response.message
+                            : (
+                                success
+                                    ? 'OTP sent successfully.'
+                                    : 'Unable to send OTP.'
+                            );
 
+                        showOtpStatus(message, success);
+
+                        if (success) {
+
+                            sendOtpButton.html(
+                                '<i class="fa-solid fa-check"></i> OTP Sent'
+                            );
+
+                            if (otpInputs.length > 0) {
+                                otpInputs[0].focus();
+                            }
+
+                        } else {
+
+                            sendOtpButton
+                                .prop('disabled', false)
+                                .html(originalButtonHtml);
                         }
-                        else {
-
-                            alert(response.message);
-
-                            button.prop('disabled', false);
-
-                            button.text('Send OTP');
-
-                        }
-
                     },
 
-                    error: function(xhr, status, error) {
+                    error: function (xhr, status, error) {
 
                         console.error(
-                            "OTP Error:",
-                            error
+                            'OTP sending failed:',
+                            status,
+                            error,
+                            xhr.responseText
                         );
 
-                        alert(
-                            "Unable to send OTP. Please try again."
-                        );
+                        let message = 'Unable to send OTP. Please try again.';
 
-                        button.prop('disabled', false);
+                        if (xhr.responseJSON && xhr.responseJSON.message) {
+                            message = xhr.responseJSON.message;
+                        }
 
-                        button.text('Send OTP');
+                        showOtpStatus(message, false);
 
+                        sendOtpButton
+                            .prop('disabled', false)
+                            .html(originalButtonHtml);
                     }
-
                 });
-
             });
 
+            // =====================================================
+            // INITIALIZE DROPDOWNS ONCE
+            // =====================================================
+
+            loadColleges();
+            loadDepartments();
 
         });
-
     </script>
+}
+
 }

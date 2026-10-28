@@ -1,0 +1,147 @@
+﻿@{
+    ViewData["Title"] = "Upload Question Bank";
+    Layout = "~/Views/Shared/_DashboardLayout.cshtml";
+    ViewData["Panel"] = "TPO";
+}
+
+<link rel="stylesheet" href="~/css/UploadQuestionBank.css" />
+
+<div class="qb-page">
+
+    <div class="qb-hero">
+        <div class="qb-eyebrow">TPO Panel</div>
+        <h2>Upload Question Bank</h2>
+        <p>Add a question paper for placement preparation and assessments.</p>
+    </div>
+
+    <div class="qb-form-wrap">
+
+        <div class="qb-section">
+            <div class="qb-section-head">
+                <div class="qb-section-icon">1</div>
+                <div>
+                    <h3>Basic Details</h3>
+                    <p class="qb-sub">Title, category and stream of the question bank.</p>
+                </div>
+            </div>
+
+            <div class="qb-grid">
+                <div class="qb-field">
+                    <label for="Title">Question Bank Title *</label>
+                    <input type="text" id="Title"
+                           placeholder="e.g. Java Programming Assessment" />
+                </div>
+
+                <div class="qb-field">
+                    <label for="Category">Category *</label>
+                    <select id="Category">
+                        <option value="">-- Select Category --</option>
+                        <option>Technical</option>
+                        <option>Non-Technical</option>
+                        <option>Aptitude</option>
+                        <option>Reasoning</option>
+                        <option>Programming</option>
+                        <option>Communication</option>
+                        <option>Other</option>
+                    </select>
+                </div>
+
+                <div class="qb-field">
+                    <label for="StreamDomain">Stream / Domain *</label>
+                    <select id="StreamDomain">
+                        <option value="">-- Select Stream / Domain --</option>
+                        <option>Computer Science / IT</option>
+                        <option>Mechanical</option>
+                        <option>Civil</option>
+                        <option>Electrical</option>
+                        <option>Electronics / E&amp;TC</option>
+                        <option>Management</option>
+                        <option>Commerce</option>
+                        <option>Science</option>
+                        <option>Arts</option>
+                        <option>General</option>
+                        <option>Other</option>
+                    </select>
+                </div>
+
+                <div class="qb-field">
+                    <label for="Course">Course</label>
+                    <input type="text" id="Course"
+                           placeholder="e.g. B.E., B.Tech, MBA" />
+                </div>
+            </div>
+        </div>
+
+        <div class="qb-section">
+            <div class="qb-section-head">
+                <div class="qb-section-icon">2</div>
+                <div>
+                    <h3>Subject &amp; Content</h3>
+                    <p class="qb-sub">What the question paper covers.</p>
+                </div>
+            </div>
+
+            <div class="qb-grid">
+                <div class="qb-field">
+                    <label for="Subject">Subject *</label>
+                    <input type="text" id="Subject"
+                           placeholder="e.g. Data Structures" />
+                </div>
+
+                <div class="qb-field">
+                    <label for="Topics">Topics *</label>
+                    <input type="text" id="Topics"
+                           placeholder="e.g. Arrays, Trees, Sorting" />
+                </div>
+
+                <div class="qb-field full">
+                    <label for="Description">Description *</label>
+                    <textarea id="Description" rows="4"
+                              placeholder="Describe the question paper, difficulty level and instructions."></textarea>
+                </div>
+            </div>
+        </div>
+
+        <div class="qb-section">
+            <div class="qb-section-head">
+                <div class="qb-section-icon">3</div>
+                <div>
+                    <h3>Question Paper File</h3>
+                    <p class="qb-sub">Attach the document candidates will be assessed on.</p>
+                </div>
+            </div>
+
+            <div class="qb-grid">
+                <div class="qb-field full">
+                    <label for="QuestionFile">Question Paper File *</label>
+                    <input type="file" id="QuestionFile"
+                           accept=".pdf,.doc,.docx,.txt,.xls,.xlsx" />
+
+                    <small class="qb-help">
+                        Allowed formats: PDF, DOC, DOCX, TXT, XLS and XLSX.
+                        Maximum file size: 10 MB.
+                    </small>
+                </div>
+            </div>
+        </div>
+
+        <div class="qb-actions">
+            <p class="qb-actions-note">
+                Drafts stay private until you publish them.
+            </p>
+
+            <div class="qb-btn-row">
+                <button type="button"
+                        class="qb-btn qb-btn-secondary">
+                    Save Draft
+                </button>
+
+                <button type="button"
+                        class="qb-btn qb-btn-primary">
+                    Upload &amp; Publish
+                </button>
+            </div>
+        </div>
+
+    </div>
+</div>

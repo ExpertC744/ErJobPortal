@@ -257,19 +257,30 @@
 
 <div class="candidate-charts-page">
 
-    <!-- =====================================================
-         PAGE HEADING
-         ===================================================== -->
+    <div class="master-table-container">
 
-    <div class="charts-heading">
+        <!-- MASTER TABLE HEADER -->
+        <div class="master-table-title">
 
-        <h1>Charts</h1>
+            <div>
+                <h2>
+                    Charts
+                </h2>
 
-        <p>
-            @ViewContext.RouteData.Values["id"]
-        </p>
+                <p>
+                    @ViewContext.RouteData.Values["id"]
+                </p>
+            </div>
 
-    </div>
+            @* radhika30-09 *@
+            <a asp-controller="Organization"
+               asp-action="Dashboard"
+               class="master-back-btn"
+               title="Back to Dashboard">
+                <i class="fas fa-arrow-left"></i>
+            </a>
+
+        </div>
 
 
     <!-- =====================================================

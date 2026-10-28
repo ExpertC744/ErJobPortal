@@ -1,0 +1,41 @@
+﻿@model ErJobPortal.Models.ResumeViewModel
+
+@{
+    Layout = "~/Views/Shared/ResumeLayout.cshtml";
+    ViewData["ResumeCss"] = "ViewProfileEight.css";
+    ViewData["ResumeClass"] = "resume-eight";
+}
+
+<div style="background:yellow; color:black; padding:10px;">
+    <h2>ViewProfile8 Layout Test</h2>
+    <p>Candidate ID: @Model.CandidateID</p>
+</div>
+
+<div class="education-section">
+    <h3>Education</h3>
+
+    @if (Model.Profile?.dSSC.HasValue == true)
+    {
+        <p>SSC: @Model.Profile.dSSC.Value.ToString("0.##")%</p>
+    }
+
+    @if (Model.Profile?.dHSC.HasValue == true)
+    {
+        <p>HSC: @Model.Profile.dHSC.Value.ToString("0.##")%</p>
+    }
+
+    @if (Model.Profile?.dGraduation.HasValue == true)
+    {
+        <p>Graduation: @Model.Profile.dGraduation.Value.ToString("0.##")%</p>
+    }
+
+    @if (Model.Profile?.dPG.HasValue == true)
+    {
+        <p>Post Graduation: @Model.Profile.dPG.Value.ToString("0.##")%</p>
+    }
+
+    @if (Model.Profile?.dPhD.HasValue == true)
+    {
+        <p>PhD: @Model.Profile.dPhD.Value.ToString("0.##")%</p>
+    }
+</div>

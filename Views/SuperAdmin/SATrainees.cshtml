@@ -278,13 +278,16 @@
                                 <!-- ACTION -->
                                 <td>
 
-                                    <button type="button"
-                                            class="master-view-btn"
-                                            data-id="@item.nID">
+                                   
+                                     <a asp-controller="SuperAdmin"
+                                   asp-action="ViewTraineeResume"
+                                   asp-route-id="@item.nID"
+                                   class="resume-view-btn"
+                                   title="View Resume">
 
-                                        View
+                                    <i class="fas fa-eye"></i>
 
-                                    </button>
+                                </a>
 
                                 </td>
 

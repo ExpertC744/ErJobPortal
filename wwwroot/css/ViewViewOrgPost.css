@@ -1,5 +1,4 @@
-﻿ 
-/* =========================================================
+﻿/* =========================================================
        PAGE
        ========================================================= */
 * {
@@ -12,7 +11,7 @@ body {
 
 .view-post-page {
     width: 100%;
-    min-height: 100vh;
+    min-height: 80vh;
     padding: 95px 30px 70px;
     font-family: Arial, Helvetica, sans-serif;
 }
@@ -23,8 +22,9 @@ body {
        ========================================================= */
 
 .post-card {
+    zoom: 70%;
     width: 100%;
-    max-width: 1100px;
+    max-width: 1400px;
     margin: 0 auto;
     background: #ffffff;
     border: 1px solid #e1eaea;
@@ -43,10 +43,9 @@ body {
     width: 100%;
     min-height: 255px;
     padding: 75px 32px 35px;
-    background: linear-gradient( 135deg, #287f79 0%, #0d9488 55%, #14b8a6 100% );
+    background: linear-gradient(135deg, #287f79 0%, #0d9488 55%, #14b8a6 100%);
     overflow: hidden;
 }
-
 
     /* Decorative circles */
 
@@ -118,13 +117,11 @@ body {
 
 /* =========================================================
        PROFILE IMAGE AREA
-       IMPORTANT:
-       Image is NOT positioned inside the header.
-       This prevents clipping.
+       Image is NOT positioned inside the header (prevents clipping)
        ========================================================= */
 
 .profile-image-area {
-    height: 95px;
+    height: 60px;
     background: #ffffff;
     position: relative;
     padding-left: 32px;
@@ -171,7 +168,7 @@ body {
     display: flex;
     align-items: center;
     gap: 12px;
-    margin-bottom: 16px;
+    margin-bottom: 15px;
     color: #132238;
     font-family: Georgia, "Times New Roman", serif;
     font-size: 18px;
@@ -201,7 +198,7 @@ body {
 
 .post-details {
     display: grid;
-    grid-template-columns: repeat(4, minmax(0, 1fr));
+    grid-template-columns: repeat(6, minmax(0, 1fr));
     gap: 10px;
 }
 
@@ -286,7 +283,8 @@ body {
     font-size: 13px;
     font-weight: 700;
     line-height: 1.35;
-    word-break: break-word;
+    word-break: normal;
+    overflow-wrap: break-word;
 }
 
 .skill-value {
@@ -394,6 +392,42 @@ body {
     .copyright a {
         color: #0d9488;
         font-weight: 700;
+        text-decoration: none;
+    }
+
+
+/* =========================================================
+       PREVIOUS / NEXT
+       ========================================================= */
+
+.post-navigation {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 15px;
+    margin: 25px 0;
+}
+
+.post-nav-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    min-width: 120px;
+    padding: 10px 20px;
+    border-radius: 8px;
+    background: #198f7a;
+    color: #ffffff;
+    text-decoration: none;
+    font-size: 14px;
+    font-weight: 600;
+    transition: 0.2s ease;
+}
+
+    .post-nav-btn:hover {
+        background: #147564;
+        color: #ffffff;
         text-decoration: none;
     }
 
@@ -546,27 +580,91 @@ body {
 
 
 /* =========================================================
-       PRINT
+       PRINT - SINGLE PAGE, NO EXTRA WHITE SPACE
        ========================================================= */
+
+@page {
+    size: 1075px 605px;
+    margin: 0;
+}
 
 @media print {
 
-    body {
+    html, body {
+        width: auto !important;
+        height: auto !important;
+        margin: 0 !important;
+        padding: 0 !important;
         background: #ffffff !important;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
     }
 
     .view-post-page {
-        padding: 0;
+        padding: 0 !important;
+        min-height: 0 !important;
+        width: auto !important;
     }
 
+    /* 1250px * 0.86 = 1075px */
     .post-card {
-        max-width: 100%;
-        box-shadow: none;
+        zoom: 0.86 !important;
+        width: 1250px !important;
+        max-width: 1250px !important;
+        min-height: 0 !important;
+        height: auto !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        display: block !important;
+        box-shadow: none !important;
         border: 1px solid #ddd;
+        border-radius: 0 !important;
+        page-break-inside: avoid;
+        break-inside: avoid;
+    }
+
+    .post-header {
+        min-height: 190px !important;
+        padding: 25px 32px 70px !important; /* room for the logo */
+    }
+
+    .profile-image-area {
+        height: 50px !important;
+    }
+
+    .post-content {
+        padding: 0 32px 0 !important;
+    }
+
+    .post-details {
+        grid-template-columns: repeat(6, minmax(0, 1fr)) !important;
+        grid-auto-rows: auto !important;
+        gap: 10px !important;
+        margin: 0 !important;
+        padding: 0 !important;
+    }
+
+    .detail-item {
+        min-height: 0 !important;
+        height: auto !important;
+    }
+
+    .detail-value {
+        word-break: normal !important;
+        overflow-wrap: break-word !important;
+        white-space: normal !important;
+    }
+
+    .post-footer {
+        margin: 12px 0 0 !important;
+        padding: 8px 30px !important;
+        min-height: 0 !important;
+        height: auto !important;
     }
 
     .right-buttons,
     .right-arrow,
+    .post-navigation,
     .copyright {
         display: none !important;
     }
@@ -576,4 +674,72 @@ body {
     }
 }
 
- 
+
+/* =========================================================
+       PDF DOWNLOAD STAGE
+       Used by the hidden off-screen copy that JS creates.
+       Same layout as print. The visible page is never touched.
+       ========================================================= */
+
+.pdf-stage {
+    width: 1250px;
+    background: #ffffff;
+}
+
+    .pdf-stage .post-card {
+        zoom: 1 !important;
+        width: 1250px !important;
+        max-width: 1250px !important;
+        min-height: 0 !important;
+        height: auto !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        display: block !important;
+        box-shadow: none !important;
+        border: none !important;
+        border-radius: 0 !important;
+    }
+
+    .pdf-stage .post-header {
+        min-height: 190px !important;
+        padding: 25px 32px 70px !important;
+    }
+
+    .pdf-stage .profile-image-area {
+        height: 50px !important;
+    }
+
+    .pdf-stage .post-content {
+        padding: 0 32px 0 !important;
+    }
+
+    .pdf-stage .post-details {
+        grid-template-columns: repeat(6, minmax(0, 1fr)) !important;
+        grid-auto-rows: auto !important;
+        gap: 10px !important;
+        margin: 0 !important;
+        padding: 0 !important;
+    }
+
+    .pdf-stage .detail-item {
+        min-height: 0 !important;
+        height: auto !important;
+    }
+
+    .pdf-stage .detail-value {
+        word-break: normal !important;
+        overflow-wrap: break-word !important;
+        white-space: normal !important;
+    }
+
+    .pdf-stage .post-footer {
+        margin: 12px 0 0 !important;
+        padding: 8px 30px !important;
+        min-height: 0 !important;
+        height: auto !important;
+    }
+
+    .pdf-stage .post-navigation,
+    .pdf-stage .right-buttons {
+        display: none !important;
+    }

@@ -667,10 +667,26 @@ body {
     background: var(--ink);
 }
 
-.photo-wrapper { width: 70px; height: 70px; box-shadow: 0 0 0 3px var(--accent); }
-.candidate-name { font-size: 26px; }
-.candidate-role { font-size: 12px; letter-spacing: 1.5px; text-transform: uppercase; color: var(--accent); }
-.header-accent { display: none; }
+.photo-wrapper {
+    width: 70px;
+    height: 70px;
+    box-shadow: 0 0 0 3px var(--accent);
+}
+
+.candidate-name {
+    font-size: 26px;
+}
+
+.candidate-role {
+    font-size: 12px;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: var(--accent);
+}
+
+.header-accent {
+    display: none;
+}
 
 .header-contact {
     flex-direction: row;
@@ -680,9 +696,14 @@ body {
     max-width: 470px;
 }
 
-.header-contact-item i { background: var(--accent); color: var(--ink); }
+.header-contact-item i {
+    background: var(--accent);
+    color: var(--ink);
+}
 
-.resume-body { flex-direction: column; }
+.resume-body {
+    flex-direction: column;
+}
 
 .right-column {
     order: 1;
@@ -702,13 +723,278 @@ body {
     border-top: 3px solid var(--primary);
 }
 
-.left-column .resume-section { margin-bottom: 8px; }
+    .left-column .resume-section {
+        margin-bottom: 8px;
+    }
 
-/* contact + preferred location already shown in header / career preference */
-.left-column .resume-section:has(.fa-address-card),
-.left-column .resume-section:has(.fa-location-arrow) { display: none; }
+        /* contact + preferred location already shown in header / career preference */
+        .left-column .resume-section:has(.fa-address-card),
+        .left-column .resume-section:has(.fa-location-arrow) {
+            display: none;
+        }
 
-.section-heading { margin-bottom: 6px; }
+.section-heading {
+    margin-bottom: 6px;
+}
+
+/* =========================================================
+   CONTENT FIX  -  no empty space, education rows, compact footer
+========================================================= */
+
+/* Preferred Location is already shown in Career Preference */
+.left-column .resume-section:has(.fa-location-arrow) {
+    display: none;
+}
+
+/* ---------- content area: two stacks, no holes ----------
+   Profile                 (full width)
+   LEFT STACK : Experience / Certifications / References
+   RIGHT STACK: Education (spans 2 rows) / Career Preference
+   Sections in the left stack auto-fill upward if one is missing. */
+
+.right-column {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    grid-auto-flow: row dense;
+    align-content: start;
+    align-items: start;
+    column-count: auto;
+    column-gap: 30px;
+    row-gap: 12px;
+}
+
+.resume-sheet .right-column > .resume-section {
+    min-width: 0;
+    margin-bottom: 0;
+    grid-column: 1; /* default: left stack */
+}
+
+    /* Profile: full width, first row */
+    .resume-sheet .right-column > .resume-section:has(.summary) {
+        grid-column: 1 / -1;
+        grid-row: 1;
+    }
+
+/* Education: right stack, spans two rows */
+.resume-sheet .right-column > .education-section {
+    grid-column: 2;
+    grid-row: 2 / span 2;
+}
+
+/* Career Preference: right stack, under Education */
+.resume-sheet .right-column > .resume-section:has(.fa-bullseye) {
+    grid-column: 2;
+    grid-row: 4;
+    display: block;
+}
+
+    .resume-sheet .right-column > .resume-section:has(.fa-bullseye) .preference-item {
+        margin-bottom: 4px;
+    }
+
+/* Education card rows (Year / Stream / Division ...) */
+.education-section .education-item {
+    margin-bottom: 6px;
+}
+
+    .education-section .education-item:last-child {
+        margin-bottom: 0;
+    }
+
+.education-section .education-row {
+    font-size: 10.5px;
+    line-height: 1.4;
+    color: var(--text);
+}
+
+    .education-section .education-row strong {
+        margin-right: 4px;
+        color: var(--heading);
+    }
+
+/* =========================================================
+   FOOTER  -  signature / location / date / powered by
+   Compact bar under the content. Flex directions are forced so
+   the layout's phone rule (max-width: 700px) can never reflow it.
+========================================================= */
+
+.resume-sheet .resume-footer {
+    flex: 0 0 auto;
+    width: auto;
+    margin: 0;
+    padding: 8px 30px 10px;
+    background: var(--page);
+    border-top: 1px solid var(--soft-border);
+}
+
+.resume-sheet .resume-footer-row {
+    display: flex;
+    flex-direction: row;
+    align-items: flex-end;
+    justify-content: space-between;
+    flex-wrap: nowrap;
+    gap: 20px;
+    width: 100%;
+}
+
+.resume-sheet .resume-signature-section {
+    flex: 0 0 auto;
+    min-width: 0;
+}
+
+.resume-sheet .resume-signature-box {
+    width: 170px;
+    margin: 0;
+}
+
+.resume-sheet .resume-signature-image {
+    width: 120px;
+    height: 36px;
+    margin: 0 auto 3px;
+}
+
+.resume-sheet .resume-signature-line {
+    width: 150px;
+    margin: 0 auto 3px;
+    border-top-color: var(--muted);
+}
+
+.resume-sheet .resume-signature-label {
+    font-size: 10px;
+    color: var(--muted);
+}
+
+.resume-sheet .resume-footer-info {
+    flex: 1 1 auto;
+    min-width: 0;
+    flex-direction: row;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 16px;
+    font-size: 10.5px;
+    color: var(--text);
+}
+
+.resume-sheet .resume-footer-label {
+    margin-right: 4px;
+    color: var(--heading);
+}
+
+.resume-sheet .resume-powered-by {
+    flex: 0 0 auto;
+    min-width: 0;
+    margin: 0;
+    font-size: 9.5px;
+    text-align: right;
+    white-space: nowrap;
+    color: var(--muted);
+}
+
+    .resume-sheet .resume-powered-by strong {
+        color: var(--heading);
+    }
+
+/* =========================================================
+   FIT FIX  -  bottom dock / content was clipped
+   Compact header + dock + content + footer so everything
+   fits inside the 794px sheet.
+========================================================= */
+
+/* slimmer header */
+.resume-header {
+    padding: 8px 30px;
+}
+
+.photo-wrapper {
+    width: 62px;
+    height: 62px;
+}
+
+.candidate-name {
+    font-size: 24px;
+}
+
+/* compact dock (skills / languages / interests / links) */
+.left-column {
+    padding: 8px 30px 6px;
+    column-gap: 22px;
+}
+
+    .left-column .resume-section {
+        margin-bottom: 6px;
+    }
+
+    .left-column .section-heading {
+        margin-bottom: 4px;
+    }
+
+    .left-column .skill-group {
+        margin-bottom: 4px;
+    }
+
+    .left-column .skill-list,
+    .left-column .interest-box {
+        padding: 3px 8px;
+        line-height: 1.35;
+    }
+
+    /* languages in two columns = half the height */
+    .left-column .language-list {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        column-gap: 14px;
+    }
+
+    .left-column .language-row {
+        padding: 2px 0;
+    }
+
+    .left-column .language-level {
+        line-height: 1.3;
+        padding: 0 7px;
+    }
+
+    .left-column .social-item {
+        margin-bottom: 3px;
+    }
+
+/* compact main content */
+.right-column {
+    padding: 10px 30px 4px;
+    row-gap: 8px;
+}
+
+.education-section .education-item {
+    padding: 4px 10px;
+    margin-bottom: 4px;
+}
+
+.education-section .education-row {
+    line-height: 1.3;
+}
+
+.experience-item {
+    padding-bottom: 7px;
+}
+
+.summary {
+    padding: 6px 12px;
+    line-height: 1.5;
+}
+
+/* slimmer footer */
+.resume-sheet .resume-footer {
+    padding: 5px 30px 6px;
+}
+
+.resume-sheet .resume-signature-image {
+    height: 28px;
+    margin-bottom: 2px;
+}
+
+.resume-sheet .resume-signature-line {
+    margin-bottom: 2px;
+}
 
 /* =========================================================
    RESPONSIVE  -  ZOOM OUT ONLY (sheet = 1123px wide)

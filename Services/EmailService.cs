@@ -1,5 +1,8 @@
 ﻿using System.Net;
 using System.Net.Mail;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
+using ErJobPortal.Services;
 
 namespace ErJobPortal.Services
 {

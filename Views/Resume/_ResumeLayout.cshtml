@@ -14,108 +14,162 @@
 
     var resumeClass = ViewData["ResumeClass"]?.ToString()
                       ?? "resume-one";
+
+    var fullName = string.IsNullOrWhiteSpace(candidateName)
+        ? "Candidate"
+        : candidateName;
 }
 
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-    <meta name="viewport"
-          content="width=device-width, initial-scale=1.0" />
+    <title>@fullName - Resume</title>
 
-    <title>
-        @(string.IsNullOrWhiteSpace(candidateName)
-            ? "Resume"
-            : candidateName + " - Resume")
-    </title>
-
-    <!-- Common Resume CSS -->
     <link rel="stylesheet"
           href="~/css/ResumeLayout.css"
           asp-append-version="true" />
 
-    <!-- Template-specific CSS -->
     <link rel="stylesheet"
           href="~/css/@resumeCss"
           asp-append-version="true" />
+
+    <style>
+        .education-section {
+    display: block !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    color: #000 !important;
+    position: relative !important;
+    z-index: 10;
+}
+
+.education-section .education-item,
+.education-section .education-row,
+.education-section .education-title {
+    display: block !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    color: #000 !important;
+}
+
+.education-section .education-row strong {
+    display: inline !important;
+}
+
+
+
+
+
+        /* Shared education styles */
+        .education-item {
+            margin-bottom: 10px;
+            break-inside: avoid;
+        }
+
+        .education-title {
+            font-size: 11.8px;
+            font-weight: 700;
+            margin-bottom: 3px;
+        }
+
+        .education-row {
+            font-size: 10.8px;
+            line-height: 1.5;
+            overflow-wrap: anywhere;
+        }
+
+        .education-row strong {
+            margin-right: 3px;
+        }
+
+        .education-section .section-heading {
+            margin-bottom: 8px;
+        }
+
+        .education-section .section-title {
+            font-size: 12.5px;
+            font-weight: 700;
+        }
+
+        .education-section .section-title-line {
+            flex: 1;
+            height: 1px;
+        }
+
+        .resume-debug-percentages {
+            display: none;
+        }
+
+        @@media print {
+            .education-item {
+                break-inside: avoid;
+            }
+        }
+    </style>
 </head>
 
 <body class="@resumeClass">
 
     <main class="resume-page">
 
-        <!-- ==========================================
-             HEADER
-             ========================================== -->
-
+        <!-- HEADER -->
         <section class="resume-header">
 
             <div class="candidate-photo">
                 @if (!string.IsNullOrWhiteSpace(p?.sPhoto))
                 {
                     <img src="@p.sPhoto"
-                         alt="@candidateName" />
+                         alt="@fullName"
+                         class="profile-photo" />
+                }
+                else
+                {
+                    <div class="profile-placeholder">
+                        @fullName.Substring(0, 1).ToUpperInvariant()
+                    </div>
                 }
             </div>
 
             <div class="candidate-basic-info">
-
-                <h1>
-                    @candidateName
-                </h1>
+                <h1 class="candidate-name">@fullName</h1>
 
                 @if (!string.IsNullOrWhiteSpace(candidateEmail))
                 {
-                    <div class="contact-item">
+                    <div class="header-contact-item">
                         @candidateEmail
                     </div>
                 }
 
                 @if (!string.IsNullOrWhiteSpace(candidatePhone))
                 {
-                    <div class="contact-item">
+                    <div class="header-contact-item">
                         @candidatePhone
                     </div>
                 }
-
             </div>
 
         </section>
 
-
-        <!-- ==========================================
-             MAIN RESUME
-             ========================================== -->
-
+        <!-- MAIN CONTENT -->
         <section class="resume-content">
 
-            <!-- LEFT / SIDEBAR -->
+            <!-- LEFT SIDEBAR -->
             <aside class="resume-sidebar">
 
-                <!-- Skills -->
                 <section class="resume-section skills-section">
-
                     <h2>Skills</h2>
-
-                    @* Your existing skill-resolution code goes here *@
-
+                    @* Add your existing skills rendering code here. *@
                 </section>
 
-
-                <!-- Languages -->
                 <section class="resume-section languages-section">
-
                     <h2>Languages</h2>
-
-                    @* Your existing language code goes here *@
-
+                    @* Add your existing languages rendering code here. *@
                 </section>
 
-
-                <!-- Contact -->
                 <section class="resume-section contact-section">
-
                     <h2>Contact</h2>
 
                     @if (!string.IsNullOrWhiteSpace(candidateEmail))
@@ -127,69 +181,268 @@
                     {
                         <p>@candidatePhone</p>
                     }
-
                 </section>
 
             </aside>
 
-
-            <!-- RIGHT / MAIN -->
+            <!-- MAIN RESUME COLUMN -->
             <div class="resume-main">
 
-                <!-- Profile -->
+                <!-- PROFILE -->
                 <section class="resume-section profile-section">
-
                     <h2>Profile</h2>
-
-                    @* Existing profile/about data *@
-
+                    @* Add your existing profile/about rendering code here. *@
                 </section>
-
-
-                <!-- Education -->
+                
+                <!-- EDUCATION -->
                 <section class="resume-section education-section">
 
-                    <h2>Education</h2>
+                    <div class="section-heading">
+                        <h2 class="section-title">Education</h2>
+                        <div class="section-title-line"></div>
+                    </div>
+                   
 
-                    @* Existing SSC / HSC / Graduation / PG / PhD
-                       data and lookup code *@
+                    @if (p != null)
+                    {
+                        <!-- SSC -->
+                        @if (p.SSC_YEAR.HasValue ||
+                             p.SSC_DIVISION.HasValue ||
+                             p.dSSC.HasValue)
+                        {
+                            <div class="education-item">
+                                <div class="education-title">SSC / 10th</div>
+
+                                @if (p.SSC_YEAR.HasValue)
+                                {
+                                    <div class="education-row">
+                                        <strong>Year:</strong>
+                                        @p.SSC_YEAR.Value
+                                    </div>
+                                }
+
+                                @if (p.SSC_DIVISION.HasValue)
+                                {
+                                    <div class="education-row">
+                                        <strong>Division:</strong>
+                                        @p.SSC_DIVISION.Value
+                                    </div>
+                                }
+
+                                @if (p.dSSC.HasValue)
+                                {
+                                    <div class="education-row">
+                                        <strong>Percentage:</strong>
+                                        @p.dSSC.Value.ToString("0.##")%
+                                    </div>
+                                }
+                            </div>
+                        }
+
+                        <!-- HSC / DIPLOMA -->
+                        @if (p.HSC_DIPLOMA_YEAR.HasValue ||
+                             p.HSC_DIPLOMA_DIVISION.HasValue ||
+                             p.dHSC.HasValue)
+                        {
+                            <div class="education-item">
+                                <div class="education-title">HSC / Diploma</div>
+
+                                @if (p.HSC_DIPLOMA_YEAR.HasValue)
+                                {
+                                    <div class="education-row">
+                                        <strong>Year:</strong>
+                                        @p.HSC_DIPLOMA_YEAR.Value
+                                    </div>
+                                }
+
+                                @if (p.HSC_DIPLOMA_DIVISION.HasValue)
+                                {
+                                    <div class="education-row">
+                                        <strong>Division:</strong>
+                                        @p.HSC_DIPLOMA_DIVISION.Value
+                                    </div>
+                                }
+
+                                @if (p.dHSC.HasValue)
+                                {
+                                    <div class="education-row">
+                                        <strong>Percentage:</strong>
+                                        @p.dHSC.Value.ToString("0.##")%
+                                    </div>
+                                }
+                            </div>
+                        }
+
+                        <!-- GRADUATION -->
+                        @if (p.Graduation_Year.HasValue ||
+                             p.Graduation_Stream.HasValue ||
+                             p.Graduation_Division.HasValue ||
+                             !string.IsNullOrWhiteSpace(p.Other_Stream) ||
+                             p.dGraduation.HasValue)
+                        {
+                            <div class="education-item">
+                                <div class="education-title">Graduation</div>
+
+                                @if (p.Graduation_Year.HasValue)
+                                {
+                                    <div class="education-row">
+                                        <strong>Year:</strong>
+                                        @p.Graduation_Year.Value
+                                    </div>
+                                }
+
+                                @if (p.Graduation_Stream.HasValue)
+                                {
+                                    <div class="education-row">
+                                        <strong>Stream ID:</strong>
+                                        @p.Graduation_Stream.Value
+                                    </div>
+                                }
+
+                                @if (!string.IsNullOrWhiteSpace(p.Other_Stream))
+                                {
+                                    <div class="education-row">
+                                        <strong>Other Stream:</strong>
+                                        @p.Other_Stream
+                                    </div>
+                                }
+
+                                @if (p.Graduation_Division.HasValue)
+                                {
+                                    <div class="education-row">
+                                        <strong>Division:</strong>
+                                        @p.Graduation_Division.Value
+                                    </div>
+                                }
+
+                                @if (p.dGraduation.HasValue)
+                                {
+                                    <div class="education-row">
+                                        <strong>Percentage:</strong>
+                                        @p.dGraduation.Value.ToString("0.##")%
+                                    </div>
+                                }
+                            </div>
+                        }
+
+                        <!-- POST GRADUATION -->
+                        @if (p.PG_Year.HasValue ||
+                             p.PG_Stream.HasValue ||
+                             p.PG_Division.HasValue ||
+                             !string.IsNullOrWhiteSpace(p.Other_Specialization) ||
+                             p.dPG.HasValue)
+                        {
+                            <div class="education-item">
+                                <div class="education-title">Post Graduation</div>
+
+                                @if (p.PG_Year.HasValue)
+                                {
+                                    <div class="education-row">
+                                        <strong>Year:</strong>
+                                        @p.PG_Year.Value
+                                    </div>
+                                }
+
+                                @if (p.PG_Stream.HasValue)
+                                {
+                                    <div class="education-row">
+                                        <strong>Stream ID:</strong>
+                                        @p.PG_Stream.Value
+                                    </div>
+                                }
+
+                                @if (!string.IsNullOrWhiteSpace(p.Other_Specialization))
+                                {
+                                    <div class="education-row">
+                                        <strong>Specialization:</strong>
+                                        @p.Other_Specialization
+                                    </div>
+                                }
+
+                                @if (p.PG_Division.HasValue)
+                                {
+                                    <div class="education-row">
+                                        <strong>Division:</strong>
+                                        @p.PG_Division.Value
+                                    </div>
+                                }
+
+                                @if (p.dPG.HasValue)
+                                {
+                                    <div class="education-row">
+                                        <strong>Percentage:</strong>
+                                        @p.dPG.Value.ToString("0.##")%
+                                    </div>
+                                }
+                            </div>
+                        }
+
+                        <!-- PhD -->
+                        @if (p.PhD_Year.HasValue ||
+                             p.PhD_Status.HasValue ||
+                             !string.IsNullOrWhiteSpace(p.PhD_Topic) ||
+                             p.dPhD.HasValue)
+                        {
+                            <div class="education-item">
+                                <div class="education-title">PhD</div>
+
+                                @if (p.PhD_Year.HasValue)
+                                {
+                                    <div class="education-row">
+                                        <strong>Year:</strong>
+                                        @p.PhD_Year.Value
+                                    </div>
+                                }
+
+                                @if (p.PhD_Status.HasValue)
+                                {
+                                    <div class="education-row">
+                                        <strong>Status ID:</strong>
+                                        @p.PhD_Status.Value
+                                    </div>
+                                }
+
+                                @if (!string.IsNullOrWhiteSpace(p.PhD_Topic))
+                                {
+                                    <div class="education-row">
+                                        <strong>Topic:</strong>
+                                        @p.PhD_Topic
+                                    </div>
+                                }
+
+                                @if (p.dPhD.HasValue)
+                                {
+                                    <div class="education-row">
+                                        <strong>Percentage:</strong>
+                                        @p.dPhD.Value.ToString("0.##")%
+                                    </div>
+                                }
+                            </div>
+                        }
+                    }
 
                 </section>
 
-
-                <!-- Internship / Experience -->
+                <!-- EXPERIENCE -->
                 <section class="resume-section experience-section">
-
                     <h2>Experience</h2>
-
-                    @* Existing internship / experience data *@
-
+                    @* Add your existing internship/experience rendering code here. *@
                 </section>
 
-
-                <!-- Achievements -->
+                <!-- ACHIEVEMENTS -->
                 <section class="resume-section achievements-section">
-
                     <h2>Achievements</h2>
-
-                    @* Existing achievement data *@
-
+                    @* Add your existing achievement rendering code here. *@
                 </section>
 
-
-                <!-- References -->
+                <!-- REFERENCES -->
                 <section class="resume-section references-section">
-
                     <h2>References</h2>
-
-                    @* Existing reference data *@
-
+                    @* Add your existing reference rendering code here. *@
                 </section>
 
             </div>
-
         </section>
-
     </main>
 
 </body>

@@ -1,673 +1,544 @@
+
 @model ErJobPortal.Models.OrgProfile
+
+
 
 @{
     ViewData["Title"] = "View Organization Profile";
     Layout = null;
 
-    // ====
+    // Check whether Super Admin is logged in
+    bool isSuperAdminLoggedIn =
+    int.TryParse(Context.Session.GetString("SAID"), out int saId)
+    && saId == 1
+    && Context.Request.Path.StartsWithSegments("/SuperAdmin/ViewOrgProfile");
+
+    // ============================================================
+    // HELPER
+    // ============================================================
+    string Safe(string? value) =>
+        string.IsNullOrWhiteSpace(value) ? "-" : value.Trim();
+
+    // ============================================================
     // ORGANIZATION DATA
-    // ====
-
-    string organizationName =
-        string.IsNullOrWhiteSpace(Model?.sOrganizationName)
-            ? "-"
-            : Model.sOrganizationName;
-
-    string contactName =
-        string.IsNullOrWhiteSpace(Model?.sOrganizationName)
-            ? "-"
-            : Model.sOrganizationName;
-
-    string designation =
-        string.IsNullOrWhiteSpace(Model?.sDesignation)
-            ? "-"
-            : Model.sDesignation;
-
-    string email =
-        string.IsNullOrWhiteSpace(Model?.sOrganizationEmail)
-            ? "-"
-            : Model.sOrganizationEmail;
-
-    string mobile =
-        string.IsNullOrWhiteSpace(Model?.sMobile)
-            ? "-"
-            : Model.sMobile;
-
-
-    // ====
-    // PROFILE DATA
-    // ====
-
-    string companyAddress =
-        string.IsNullOrWhiteSpace(Model?.sCompanyAddress)
-            ? "-"
-            : Model.sCompanyAddress;
+    // ============================================================
+    string organizationName = Safe(Model?.sOrganizationName);
+    string contactName = Safe(Model?.sOrganizationName);
+    string designation = Safe(Model?.sDesignation);
+    string email = Safe(Model?.sOrganizationEmail);
+    string mobile = Safe(Model?.sMobile);
+    string companyAddress = Safe(Model?.sCompanyAddress);
+    string gstNo = Safe(Model?.sGSTNo);
+    string cinNo = Safe(Model?.sCINNo);
+    string employeeStrength = Safe(Model?.nEmployeeStrength);
 
     string establishmentYear =
         Model?.nEstablishmentYear > 0
             ? Model.nEstablishmentYear.ToString()
             : "-";
 
-    string gstNo =
-        string.IsNullOrWhiteSpace(Model?.sGSTNo)
-            ? "-"
-            : Model.sGSTNo;
-
-    string cinNo =
-        string.IsNullOrWhiteSpace(Model?.sCINNo)
-            ? "-"
-            : Model.sCINNo;
-
-    string employeeStrength =
-        string.IsNullOrWhiteSpace(Model?.nEmployeeStrength)
-            ? "-"
-            : Model.nEmployeeStrength;
-
-
-    // ====
-    // DATE OF BIRTH
-    // ====
-
-    string dateOfBirth =
-        Model?.dDateOfBirth.HasValue == true
-            ? Model.dDateOfBirth.Value.ToString("dd-MM-yyyy")
-            : "-";
-
-
-    // ====
-    // CREATED DATE
-    // ====
-
+    // ============================================================
+    // SYSTEM DATA
+    // ============================================================
     string createdDate =
-        Model?.dCreatedDate != DateTime.MinValue
+        Model != null && Model.dCreatedDate != DateTime.MinValue
             ? Model.dCreatedDate.ToString("dd-MM-yyyy")
             : "-";
-
-
-    // ====
-    // MODIFIED DATE
-    // ====
 
     string modifiedDate =
         Model?.dModifiedDate.HasValue == true
             ? Model.dModifiedDate.Value.ToString("dd-MM-yyyy")
             : "-";
 
-
-    // ====
-    // ORGANIZATION ID
-    // ====
-
     string organizationId =
-        Model?.nOrgID > 0
-            ? Model.nOrgID.ToString()
-            : "-";
-
-
-    // ====
-    // PROFILE ID
-    // ====
+        Model?.nOrgID > 0 ? Model.nOrgID.ToString() : "-";
 
     string profileId =
-        Model?.nID > 0
-            ? Model.nID.ToString()
-            : "-";
+        Model?.nID > 0 ? Model.nID.ToString() : "-";
 
+    bool isActive = Model?.nBit == true;
+    bool isApproved = Model?.nSABit == true;
 
-    // ====
-    // STATUS
-    // ====
+    // ============================================================
+    // PREVIOUS / NEXT NAVIGATION
+    // Values are populated by SuperAdminController.
+    // ============================================================
+    int? previousId = ViewBag.PreviousId as int?;
+    int? nextId = ViewBag.NextId as int?;
 
-    string profileStatus =
-        Model?.nBit == true
-            ? "Active"
-            : "Inactive";
+    int currentRecord = ViewBag.CurrentRecord ?? 0;
+    int totalRecords = ViewBag.TotalRecords ?? 0;
 
+    // ============================================================
+    // LOGO
+    // ============================================================
+    string defaultLogo = Url.Content("~/images/it-networkz-logo.png");
 
-    // ====
-    // SUPER ADMIN STATUS
-    // ====
-
-    string saStatus =
-        Model?.nSABit == true
-            ? "Approved"
-            : "Not Approved";
-
-
-    // ====
-    // DYNAMIC LOGO
-    // ====
-
-    string logoPath;
-
-    if (!string.IsNullOrWhiteSpace(Model?.sCompanyLogo))
-    {
-        logoPath =
-            Url.Content(
-                "~/uploads/organization/" +
-                Model.sCompanyLogo
-            );
-    }
-    else
-    {
-        logoPath =
-            Url.Content(
-                "~/images/it-networkz-logo.png"
-            );
-    }
+    string logoPath =
+        !string.IsNullOrWhiteSpace(Model?.sCompanyLogo)
+            ? Url.Content("~/uploads/organization/" + Model.sCompanyLogo)
+            : defaultLogo;
 }
 
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+
     <title>View Organization Profile - 1Trainee</title>
 
     <link rel="stylesheet"
           href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
+
     <link href="~/css/vieworgprofile.css" rel="stylesheet" />
 
+    <style>
+        /* ========================================================
+           PREVIOUS / NEXT NAVIGATION
+           ======================================================== */
+
+        .org-profile-navigation {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 12px;
+            padding: 16px 24px;
+            background: #ffffff;
+            border-bottom: 1px solid #e8edf3;
+        }
+
+        .org-nav-left,
+        .org-nav-right {
+            display: flex;
+            align-items: center;
+        }
+
+        .org-nav-btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 9px;
+            min-width: 112px;
+            padding: 10px 16px;
+            border: 1px solid #d6e2f0;
+            border-radius: 8px;
+            background: #f7faff;
+            color: #174a83;
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.2s ease,
+                        border-color 0.2s ease,
+                        color 0.2s ease;
+        }
+
+        a.org-nav-btn:hover {
+            background: #e8f2ff;
+            border-color: #9fc4f2;
+            color: #0d3767;
+        }
+
+        .org-nav-counter {
+            color: #5c6675;
+            font-size: 13px;
+            font-weight: 600;
+            text-align: center;
+        }
+
+.org-nav-disabled {
+    color: #6b7280;
+    background: #f3f4f6;
+    border-color: #d1d5db;
+    cursor: not-allowed;
+    pointer-events: none;
+    opacity: 1;
+    filter: none;
+}
+
+        /* Bottom navigation */
+        .org-profile-navigation-bottom {
+            margin-top: 10px;
+            border-top: 1px solid #e8edf3;
+            border-bottom: none;
+        }
+
+        /* Keep navigation usable on mobile screens */
+        @@media (max-width: 480px) {
+            .org-profile-navigation {
+                padding: 12px;
+                gap: 8px;
+            }
+
+            .org-nav-btn {
+                min-width: auto;
+                padding: 9px 10px;
+                font-size: 12px;
+            }
+
+            .org-nav-counter {
+                width: 100%;
+                order: -1;
+                font-size: 12px;
+            }
+        }
+
+        /* Do not print navigation controls */
+        @@media print {
+            .org-profile-navigation {
+                display: none !important;
+            }
+        }
+    </style>
 </head>
 
 <body>
 
     <main class="profile-page">
+
         <article class="profile-card" id="organizationProfile">
 
-            <!-- === COVER === -->
+            <!-- ================= COVER ================= -->
             <header class="profile-cover">
+
+                <div class="cover-label">
+                    <i class="fa-solid fa-building"></i>
+                    <span>Organization Profile</span>
+                </div>
+
                 <div class="profile-actions">
-                    <button type="button" class="profile-action-btn" title="Home" aria-label="Home" onclick="goHome();">
+
+
+
+                    <button type="button"
+                            class="profile-action-btn"
+                            title="Home"
+                            aria-label="Home"
+                            onclick="goHome()">
                         <i class="fa-solid fa-house"></i>
                     </button>
-                    <button type="button" class="profile-action-btn" title="Print" aria-label="Print" onclick="printProfile();">
+
+                    <button type="button"
+                            class="profile-action-btn"
+                            title="Print"
+                            aria-label="Print"
+                            onclick="printProfile()">
                         <i class="fa-solid fa-print"></i>
                     </button>
-                    <button type="button" class="profile-action-btn" title="Download as PDF" aria-label="Download" onclick="downloadProfile();">
+
+                    <button type="button"
+                            class="profile-action-btn"
+                            title="Download as PDF"
+                            aria-label="Download as PDF"
+                            onclick="downloadProfile()">
                         <i class="fa-solid fa-download"></i>
                     </button>
+
+
+                    <button type="button"
+        class="profile-action-btn"
+        title="Go Back"
+        aria-label="Go Back"
+        onclick="window.history.back()">
+    <i class="fa-solid fa-arrow-left"></i>
+</button>
+
                 </div>
 
             </header>
 
-            <!-- === IDENTITY === -->
+           
+
+            <!-- ================= IDENTITY ================= -->
             <section class="organization-section">
 
-
-
-                <div class="organization-main">
-
-
-                    <!-- ORGANIZATION LOGO -->
-
-                    <div class="organization-logo">
-
-                        <img src="@logoPath"
-                             alt="@organizationName Logo" />
-
-                    </div>
-
-
-                    <!-- ORGANIZATION INFORMATION -->
-
-                    <div class="organization-info">
-
-
-                        <div class="organization-name">
-
-                            @organizationName
-
-
-                            <span class="verified-icon"
-                                  title="Verified Organization">
-
-                                <i class="fa-solid fa-check"></i>
-
-                            </span>
-
-
-                        </div>
-
-
-                        <div class="organization-meta">
-
-
-                            <span>
-
-                                <i class="fa-solid fa-building"></i>
-
-                                Organization
-
-                            </span>
-
-
-                            <span class="meta-dot">
-                                •
-                            </span>
-
-
-                            <span>
-
-                                <i class="fa-solid fa-location-dot"></i>
-
-                                @companyAddress
-
-                            </span>
-
-
-                            <span class="meta-dot">
-                                •
-                            </span>
-
-
-                            <span>
-
-                                <i class="fa-solid fa-globe"></i>
-
-                                1Trainee
-
-                            </span>
-
-
-                        </div>
-
-
-                    </div>
-
-
-
                 <div class="organization-logo">
-                    <img src="~/images/it-networkz-logo.png" alt="IT-NetworkZ Infosystems Pvt Ltd Logo" />
-
+                    <img src="@logoPath"
+                         alt="@organizationName logo"
+                         onerror="this.onerror=null;this.src='@defaultLogo';" />
                 </div>
 
-                <h1 class="organization-name">IT-NetworkZ Infosystems Pvt Ltd</h1>
+                <h1 class="organization-name" title="@organizationName">
+
+                    <span class="organization-title">
+                        @organizationName
+                    </span>
+
+                    <span class="verified-tick"
+                          title="Verified Organization">
+                        <i class="fa-solid fa-check"></i>
+                    </span>
+
+                </h1>
 
                 <div class="organization-meta">
-                    <span class="verified-badge">
-                        <i class="fa-solid fa-circle-check"></i> Verified Organization
+
+                    <span class="pill pill-verified">
+                        <i class="fa-solid fa-circle-check"></i>
+                        Verified Organization
                     </span>
-                    <span class="meta-item">
-                        <i class="fa-solid fa-location-dot"></i> Nagpur, India
+
+                    <span class="pill @(isActive ? "pill-ok" : "pill-off")">
+                        <span class="pill-dot"></span>
+                        @(isActive ? "Active" : "Inactive")
                     </span>
-                    <span class="meta-item">
-                        <i class="fa-solid fa-globe"></i> 1Trainee
+
+                    <span class="pill @(isApproved ? "pill-ok" : "pill-warn")">
+                        <i class="fa-solid @(isApproved
+                                                   ? "fa-shield-halved"
+                                                   : "fa-clock")"></i>
+                        @(isApproved ? "Approved" : "Not Approved")
                     </span>
+
                 </div>
 
             </section>
 
-            <!-- === DETAILS === -->
+            <!-- ================= DETAILS ================= -->
             <section class="profile-body">
 
                 <div class="information-grid">
 
-                    <div class="information-card">
-
-
-
-                        <div class="information-top">
-
-
-                            <div class="information-icon">
-
-                                <i class="fa-solid fa-user"></i>
-
-                            </div>
-
-
-                            <div class="information-label">
-
-                                Contact Person Name
-
-                            </div>
-
-
+                    <!-- Contact Person -->
+                    <div class="information-card tone-teal">
+                        <div class="information-icon">
+                            <i class="fa-solid fa-user"></i>
                         </div>
-
-
-                        <div class="information-value">
-
-                            @contactName
-
-                        </div>
-
-
-
-                        <div class="information-icon"><i class="fa-solid fa-user"></i></div>
                         <div class="information-text">
                             <div class="information-label">Contact Person</div>
-                            <div class="information-value">Harshada Girhe</div>
+                            <div class="information-value" title="@contactName">
+                                @contactName
+                            </div>
                         </div>
-
                     </div>
 
-                    <div class="information-card">
-
-
-
-                        <div class="information-top">
-
-
-                            <div class="information-icon">
-
-                                <i class="fa-solid fa-briefcase"></i>
-
-                            </div>
-
-
-                            <div class="information-label">
-
-                                Designation
-
-                            </div>
-
-
+                    <!-- Designation -->
+                    <div class="information-card tone-blue">
+                        <div class="information-icon">
+                            <i class="fa-solid fa-briefcase"></i>
                         </div>
-
-
-                        <div class="information-value">
-
-                            @designation
-
-                        </div>
-
-
-
-                        <div class="information-icon"><i class="fa-solid fa-briefcase"></i></div>
                         <div class="information-text">
                             <div class="information-label">Designation</div>
-                            <div class="information-value">HRM</div>
+                            <div class="information-value" title="@designation">
+                                @designation
+                            </div>
                         </div>
-
                     </div>
 
-                    <div class="information-card">
-
-
-
-                        <div class="information-top">
-
-
-                            <div class="information-icon">
-
-                                <i class="fa-solid fa-location-dot"></i>
-
-                            </div>
-
-
-                            <div class="information-label">
-
-                                Company Address
-
-                            </div>
-
-
+                    <!-- Email -->
+                    <div class="information-card tone-violet">
+                        <div class="information-icon">
+                            <i class="fa-solid fa-envelope"></i>
                         </div>
-
-
-                        <div class="information-value">
-
-                            @companyAddress
-
-                        </div>
-
-
-
-                        <div class="information-icon"><i class="fa-solid fa-location-dot"></i></div>
-                        <div class="information-text">
-                            <div class="information-label">Company Address</div>
-                            <div class="information-value">Laxmi Nagar, Nagpur</div>
-                        </div>
-
-                    </div>
-
-                    <div class="information-card">
-
-
-
-                        <div class="information-top">
-
-
-                            <div class="information-icon">
-
-                                <i class="fa-solid fa-calendar-days"></i>
-
-                            </div>
-
-
-                            <div class="information-label">
-
-                                Establishment Year
-
-                            </div>
-
-
-                        </div>
-
-
-                        <div class="information-value">
-
-                            @establishmentYear
-
-                        </div>
-
-
-
-                        <div class="information-icon"><i class="fa-solid fa-calendar-days"></i></div>
-                        <div class="information-text">
-                            <div class="information-label">Established</div>
-                            <div class="information-value">2007</div>
-                        </div>
-
-                    </div>
-
-                    <div class="information-card">
-
-
-
-                        <div class="information-top">
-
-
-                            <div class="information-icon">
-
-                                <i class="fa-solid fa-envelope"></i>
-
-                            </div>
-
-
-                            <div class="information-label">
-
-                                Verification Email
-
-                            </div>
-
-
-                        </div>
-
-
-                        <div class="information-value">
-
-                            @email
-
-                        </div>
-
-
-
-                        <div class="information-icon"><i class="fa-solid fa-envelope"></i></div>
                         <div class="information-text">
                             <div class="information-label">Verification Email</div>
-                            <div class="information-value">contact@it-networkz.com</div>
+                            <div class="information-value" title="@email">
+                                @email
+                            </div>
                         </div>
-
                     </div>
 
-                    <div class="information-card">
-
-
-
-                        <div class="information-top">
-
-
-                            <div class="information-icon">
-
-                                <i class="fa-solid fa-file-invoice"></i>
-
-                            </div>
-
-
-                            <div class="information-label">
-
-                                GST No.
-
-                            </div>
-
-
+                    <!-- Mobile -->
+                    <div class="information-card tone-green">
+                        <div class="information-icon">
+                            <i class="fa-solid fa-phone"></i>
                         </div>
-
-
-                        <div class="information-value">
-
-                            @gstNo
-
+                        <div class="information-text">
+                            <div class="information-label">Mobile</div>
+                            <div class="information-value" title="@mobile">
+                                @mobile
+                            </div>
                         </div>
+                    </div>
 
+                    <!-- Company Address -->
+                    <div class="information-card information-card-wide tone-red">
+                        <div class="information-icon">
+                            <i class="fa-solid fa-location-dot"></i>
+                        </div>
+                        <div class="information-text">
+                            <div class="information-label">Company Address</div>
+                            <div class="information-value" title="@companyAddress">
+                                @companyAddress
+                            </div>
+                        </div>
+                    </div>
 
+                    <!-- Establishment Year -->
+                    <div class="information-card tone-amber">
+                        <div class="information-icon">
+                            <i class="fa-solid fa-calendar-days"></i>
+                        </div>
+                        <div class="information-text">
+                            <div class="information-label">Established</div>
+                            <div class="information-value" title="@establishmentYear">
+                                @establishmentYear
+                            </div>
+                        </div>
+                    </div>
 
-                        <div class="information-icon"><i class="fa-solid fa-users"></i></div>
+                    <!-- Employee Strength -->
+                    <div class="information-card tone-sky">
+                        <div class="information-icon">
+                            <i class="fa-solid fa-users"></i>
+                        </div>
                         <div class="information-text">
                             <div class="information-label">Employee Strength</div>
-                            <div class="information-value">11-100</div>
+                            <div class="information-value" title="@employeeStrength">
+                                @employeeStrength
+                            </div>
                         </div>
-
                     </div>
 
-                    <div class="information-card">
-
-
-
-                        <div class="information-top">
-
-
-                            <div class="information-icon">
-
-                                <i class="fa-solid fa-file-lines"></i>
-
-                            </div>
-
-
-                            <div class="information-label">
-
-                                CIN No.
-
-                            </div>
-
-
+                    <!-- GST -->
+                    <div class="information-card tone-purple">
+                        <div class="information-icon">
+                            <i class="fa-solid fa-file-invoice"></i>
                         </div>
-
-
-                        <div class="information-value">
-
-                            @cinNo
-
-                        </div>
-
-
-
-                        <div class="information-icon"><i class="fa-solid fa-file-invoice"></i></div>
                         <div class="information-text">
                             <div class="information-label">GST No.</div>
-                            <div class="information-value">27AADCI8640L1Z6</div>
+                            <div class="information-value" title="@gstNo">
+                                @gstNo
+                            </div>
                         </div>
-
                     </div>
 
-                    <div class="information-card">
-
-
-
-                        <div class="information-top">
-
-
-                            <div class="information-icon">
-
-                                <i class="fa-solid fa-users"></i>
-
-                            </div>
-
-
-                            <div class="information-label">
-
-                                Current Employee Strength
-
-                            </div>
-
-
+                    <!-- CIN -->
+                    <div class="information-card tone-slate">
+                        <div class="information-icon">
+                            <i class="fa-solid fa-file-lines"></i>
                         </div>
-
-
-                        <div class="information-value">
-
-                            @employeeStrength
-
-                        </div>
-
-
-
-                        <div class="information-icon"><i class="fa-solid fa-file-lines"></i></div>
                         <div class="information-text">
                             <div class="information-label">CIN No.</div>
-                            <div class="information-value">U72200MH2015PTC266007</div>
+                            <div class="information-value" title="@cinNo">
+                                @cinNo
+                            </div>
                         </div>
+                    </div>
 
+                    <!-- Created Date -->
+                    <div class="information-card tone-teal">
+                        <div class="information-icon">
+                            <i class="fa-solid fa-calendar-plus"></i>
+                        </div>
+                        <div class="information-text">
+                            <div class="information-label">Created On</div>
+                            <div class="information-value" title="@createdDate">
+                                @createdDate
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Modified Date -->
+                    <div class="information-card tone-blue">
+                        <div class="information-icon">
+                            <i class="fa-solid fa-calendar-check"></i>
+                        </div>
+                        <div class="information-text">
+                            <div class="information-label">Last Modified</div>
+                            <div class="information-value" title="@modifiedDate">
+                                @modifiedDate
+                            </div>
+                        </div>
                     </div>
 
                 </div>
 
             </section>
 
-            <!-- === FOOTER === -->
+            <!-- ================= BOTTOM PREVIOUS / NEXT ================= -->
+            @if (isSuperAdminLoggedIn)
+            {
+                <nav class="org-profile-navigation org-profile-navigation-bottom"
+                     aria-label="Bottom organization profile navigation">
+
+                    <div class="org-nav-left">
+                        @if (previousId.HasValue)
+                        {
+                            <a href="@Url.Action(
+                                         "ViewOrgProfile",
+                                         "SuperAdmin",
+                                         new { id = previousId.Value })"
+                               class="org-nav-btn">
+                                <i class="fa-solid fa-chevron-left"></i>
+                                Previous
+                            </a>
+                        }
+                        else
+                        {
+                            <span class="org-nav-btn org-nav-disabled">
+                                <i class="fa-solid fa-chevron-left"></i>
+                                Previous
+                            </span>
+                        }
+                    </div>
+
+                    <div class="org-nav-counter">
+                        Record @currentRecord of @totalRecords
+                    </div>
+
+                    <div class="org-nav-right">
+                        @if (nextId.HasValue)
+                        {
+                            <a href="@Url.Action(
+                                         "ViewOrgProfile",
+                                         "SuperAdmin",
+                                         new { id = nextId.Value })"
+                               class="org-nav-btn">
+                                Next
+                                <i class="fa-solid fa-chevron-right"></i>
+                            </a>
+                        }
+                        else
+                        {
+                            <span class="org-nav-btn org-nav-disabled">
+                                Next
+                                <i class="fa-solid fa-chevron-right"></i>
+                            </span>
+                        }
+                    </div>
+
+                </nav>
+            }
+
+            <!-- ================= FOOTER ================= -->
             <footer class="profile-footer">
-                Powered by <strong>1Trainee</strong>
+
+                <span class="footer-brand">
+                    Powered by <strong>1Trainee</strong>
+                </span>
+
+                <span class="footer-ids">
+                    Org ID <strong>@organizationId</strong>
+                    <i class="footer-sep"></i>
+                    Profile ID <strong>@profileId</strong>
+                </span>
+
             </footer>
 
         </article>
+
     </main>
 
+    <!-- ================= JAVASCRIPT ================= -->
     <script>
-
-
         function goHome() {
-
             window.location.href = "/";
-
         }
-
 
         function printProfile() {
-
             window.print();
-
         }
 
-
+        // Opens the browser print dialog, where the user can
+        // select "Save as PDF".
         function downloadProfile() {
-
             window.print();
-
         }
-
-
-        function goHome() { window.location.href = "/"; }
-        function printProfile() { window.print(); }
-        function downloadProfile() { window.print(); } // choose "Save as PDF" in the print dialog
-
     </script>
 
 </body>
-
-
 </html>
-
-

@@ -1,0 +1,915 @@
+﻿/* =========================================================
+   INTERNSHIP DETAILS PAGE
+   COMPACT SCREENSHOT STYLE
+   SINGLE TEAL COLOR THEME
+========================================================= */
+
+*,
+*::before,
+*::after {
+    box-sizing: border-box;
+}
+
+html,
+body {
+    margin: 0;
+    padding: 0;
+    width: 100%;
+}
+
+body {
+    background: #f3f8f7;
+    color: #071b38;
+    font-family: Arial, Helvetica, sans-serif;
+}
+
+
+/* =========================================================
+   COLOR VARIABLES
+========================================================= */
+
+:root {
+    --teal: #079d91;
+    --teal-dark: #087d75;
+    --teal-light: #dff8f4;
+    --teal-soft: #eefaf8;
+    --text-dark: #071b38;
+    --text: #18304c;
+    --text-muted: #5e7894;
+    --border: #d7e2e4;
+    --border-light: #e6eeee;
+    --white: #ffffff;
+}
+
+
+/* =========================================================
+   MAIN PAGE
+========================================================= */
+
+.internship-page {
+    width: 100%;
+    min-height: 100vh;
+    padding: 123px 20px 70px;
+    background: #f3f8f7;
+}
+
+
+/* =========================================================
+   MAIN CARD
+========================================================= */
+
+.internship-card {
+    width: 100%;
+    max-width: 1155px;
+    margin: 0 auto;
+    background: var(--white);
+    border: 1px solid var(--border);
+    border-radius: 15px;
+    overflow: hidden;
+    box-shadow: 0 15px 40px rgba(20, 90, 85, 0.10);
+}
+
+
+/* =========================================================
+   HEADER / COVER
+========================================================= */
+
+.internship-cover {
+    position: relative;
+    width: 100%;
+    height: 211px;
+    padding: 61px 26px 20px;
+    background: radial-gradient( circle at 15px 15px, rgba(255,255,255,.12) 1.4px, transparent 1.6px ), linear-gradient( 135deg, #277d78 0%, #079d91 55%, #14b5a5 100% );
+    background-size: 20px 20px, auto;
+    overflow: hidden;
+}
+
+
+    /* =========================================================
+   HEADER DECORATIVE CIRCLES
+========================================================= */
+
+    .internship-cover::before {
+        content: "";
+        position: absolute;
+        width: 160px;
+        height: 160px;
+        right: 20px;
+        top: -84px;
+        border: 1px solid rgba(255,255,255,.16);
+        border-radius: 50%;
+    }
+
+    .internship-cover::after {
+        content: "";
+        position: absolute;
+        width: 145px;
+        height: 145px;
+        right: -35px;
+        bottom: -70px;
+        border: 1px solid rgba(255,255,255,.15);
+        border-radius: 50%;
+    }
+
+
+/* =========================================================
+   HEADER CONTENT
+========================================================= */
+
+.cover-left {
+    position: relative;
+    z-index: 3;
+    display: block;
+}
+
+
+/* =========================================================
+   HIDE EXTRA COVER ICON
+========================================================= */
+
+.cover-icon {
+    display: none;
+}
+
+
+/* =========================================================
+   ORGANIZATION POST BADGE
+========================================================= */
+
+.cover-label {
+    display: inline-flex;
+    align-items: center;
+    height: 26px;
+    padding: 0 10px;
+    border: 1px solid rgba(255,255,255,.55);
+    border-radius: 4px;
+    background: rgba(255,255,255,.05);
+    color: #ffffff;
+    font-size: 9px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: .2px;
+}
+
+    .cover-label::before {
+        content: "\f1ad";
+        font-family: "Font Awesome 6 Free";
+        font-weight: 900;
+        margin-right: 5px;
+    }
+
+
+/* =========================================================
+   HEADER TITLE
+========================================================= */
+
+.cover-left h1 {
+    margin: 11px 0 0;
+    color: #ffffff;
+    font-family: Georgia, "Times New Roman", serif;
+    font-size: 29px;
+    line-height: 1.05;
+    font-weight: 700;
+}
+
+
+/* =========================================================
+   HEADER SUBTITLE
+========================================================= */
+
+.cover-left p {
+    margin: 6px 0 0;
+    color: rgba(255,255,255,.88);
+    font-size: 9px;
+    font-weight: 600;
+}
+
+
+/* =========================================================
+   TOP RIGHT ACTION BUTTONS
+========================================================= */
+
+.profile-actions {
+    position: fixed;
+    top: 37px;
+    right: 15px;
+    z-index: 9999;
+    display: flex;
+    gap: 10px;
+}
+
+
+/* =========================================================
+   ACTION BUTTON
+========================================================= */
+
+.profile-action-btn {
+    width: 49px;
+    height: 49px;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid #e0ebea;
+    border-radius: 12px;
+    background: #ffffff;
+    color: var(--teal);
+    box-shadow: 0 7px 20px rgba(10,100,95,.10);
+    cursor: pointer;
+    transition: background .2s ease, color .2s ease, transform .2s ease;
+}
+
+    .profile-action-btn i {
+        font-size: 17px;
+    }
+
+    .profile-action-btn:hover {
+        background: var(--teal);
+        color: #ffffff;
+        transform: translateY(-2px);
+    }
+
+
+/* =========================================================
+   POST IDENTITY AREA
+========================================================= */
+
+.post-identity {
+    position: relative;
+    width: 100%;
+    height: 62px;
+    padding: 0 26px;
+    background: #ffffff;
+    border-bottom: 1px solid var(--border-light);
+}
+
+
+    /* =========================================================
+   ORGANIZATION LOGO BACKGROUND
+========================================================= */
+
+    .post-identity::before {
+        content: "";
+        position: absolute;
+        left: 26px;
+        top: -39px;
+        width: 79px;
+        height: 79px;
+        border-radius: 10px;
+        background: #ffffff;
+        border: 1px solid var(--border);
+        box-shadow: 0 5px 15px rgba(0,0,0,.10);
+        z-index: 20;
+    }
+
+
+/* =========================================================
+   IDENTITY ICON
+========================================================= */
+
+.post-identity-icon {
+    display: none;
+}
+
+
+/* =========================================================
+   IDENTITY CONTENT
+========================================================= */
+
+.post-identity-content {
+    display: none;
+}
+
+
+/* =========================================================
+   CANDIDATE CODE
+========================================================= */
+
+.candidate-code-box {
+    display: none;
+}
+
+
+/* =========================================================
+   POST BODY
+========================================================= */
+
+.post-body {
+    width: 100%;
+    padding: 0 26px 25px;
+    background: #ffffff;
+}
+
+
+/* =========================================================
+   DETAIL SECTION
+========================================================= */
+
+.detail-section {
+    width: 100%;
+    margin: 0;
+    border: 0;
+    border-radius: 0;
+    background: transparent;
+    overflow: visible;
+}
+
+
+/* =========================================================
+   SECTION HEADER
+========================================================= */
+
+.detail-section-header {
+    width: 100%;
+    height: 58px;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: #ffffff;
+    border: 0;
+}
+
+
+/* =========================================================
+   SECTION HEADER ICON
+========================================================= */
+
+.detail-section-icon {
+    width: 28px;
+    height: 28px;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 8px;
+    background: var(--teal-light);
+    color: var(--teal);
+}
+
+    .detail-section-icon i {
+        font-size: 12px;
+    }
+
+
+/* =========================================================
+   SECTION TITLE
+========================================================= */
+
+.detail-section-header h3 {
+    margin: 0;
+    color: var(--text-dark);
+    font-family: Georgia, "Times New Roman", serif;
+    font-size: 17px;
+    font-weight: 700;
+}
+
+
+/* =========================================================
+   HIDE SECTION DESCRIPTION
+========================================================= */
+
+.detail-section-header p {
+    display: none;
+}
+
+
+/* =========================================================
+   SECTION BODY
+========================================================= */
+
+.detail-section-body {
+    width: 100%;
+    padding: 0;
+}
+
+
+/* =========================================================
+   INFORMATION GRID
+   DESKTOP = 6 COLUMNS
+========================================================= */
+
+.information-grid {
+    width: 100%;
+    display: grid;
+    grid-template-columns: repeat(6, minmax(0, 1fr));
+    gap: 8px;
+}
+
+
+/* =========================================================
+   INFORMATION CARD
+========================================================= */
+
+.information-card {
+    position: relative;
+    width: 100%;
+    min-width: 0;
+    min-height: 63px;
+    padding: 9px 7px 8px 39px;
+    display: flex;
+    align-items: center;
+    background: #ffffff;
+    border: 1px solid var(--border);
+    border-radius: 7px;
+    overflow: hidden;
+    transition: box-shadow .2s ease, transform .2s ease;
+}
+
+
+    /* =========================================================
+   CARD HOVER
+========================================================= */
+
+    .information-card:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 5px 15px rgba(10,100,95,.07);
+    }
+
+
+    /* =========================================================
+   SINGLE TEAL LEFT BAR
+========================================================= */
+
+    .information-card::before {
+        content: "";
+        position: absolute;
+        left: 0;
+        top: 9px;
+        bottom: 9px;
+        width: 3px;
+        background: var(--teal);
+        border-radius: 0 2px 2px 0;
+    }
+
+
+    /* =========================================================
+   REMOVE ALL TONE COLORS
+========================================================= */
+
+    .information-card.tone-teal::before,
+    .information-card.tone-blue::before,
+    .information-card.tone-violet::before,
+    .information-card.tone-green::before,
+    .information-card.tone-red::before,
+    .information-card.tone-amber::before,
+    .information-card.tone-sky::before,
+    .information-card.tone-purple::before {
+        background: var(--teal) !important;
+    }
+
+
+/* =========================================================
+   INFORMATION ICON
+========================================================= */
+
+.information-icon {
+    position: absolute;
+    left: 9px;
+    width: 23px;
+    height: 23px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 7px;
+    background: var(--teal-light) !important;
+    color: var(--teal) !important;
+    font-size: 9px;
+}
+
+
+/* =========================================================
+   REMOVE ALL ICON COLORS
+========================================================= */
+
+.tone-teal .information-icon,
+.tone-blue .information-icon,
+.tone-violet .information-icon,
+.tone-green .information-icon,
+.tone-red .information-icon,
+.tone-amber .information-icon,
+.tone-sky .information-icon,
+.tone-purple .information-icon {
+    background: var(--teal-light) !important;
+    color: var(--teal) !important;
+}
+
+
+/* =========================================================
+   INFORMATION TEXT
+========================================================= */
+
+.information-text {
+    width: 100%;
+    min-width: 0;
+}
+
+
+/* =========================================================
+   INFORMATION LABEL
+========================================================= */
+
+.information-label {
+    margin: 0 0 4px;
+    color: var(--text-muted);
+    font-size: 7px;
+    line-height: 1.05;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: .1px;
+    overflow-wrap: anywhere;
+}
+
+
+/* =========================================================
+   INFORMATION VALUE
+========================================================= */
+
+.information-value {
+    color: var(--text-dark);
+    font-family: Georgia, "Times New Roman", serif;
+    font-size: 10px;
+    font-weight: 700;
+    line-height: 1.25;
+    word-break: break-word;
+    overflow-wrap: anywhere;
+}
+
+
+/* =========================================================
+   EMPTY VALUE
+========================================================= */
+
+.empty-value {
+    color: #9ba8b5;
+    font-weight: 400;
+}
+
+
+/* =========================================================
+   WIDE INFORMATION CARD
+========================================================= */
+
+.information-card-wide {
+    grid-column: span 2;
+}
+
+
+/* =========================================================
+   SKILLS WRAPPER
+========================================================= */
+
+.skills-wrapper {
+    width: 100%;
+    margin-top: 8px;
+    padding: 10px;
+    border: 1px solid var(--border);
+    border-radius: 7px;
+    background: #ffffff;
+}
+
+
+/* =========================================================
+   SKILLS TITLE
+========================================================= */
+
+.skills-title {
+    margin: 0 0 8px;
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    color: var(--text-dark);
+    font-size: 11px;
+    font-weight: 700;
+}
+
+    .skills-title i {
+        width: 25px;
+        height: 25px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 7px;
+        background: var(--teal-light);
+        color: var(--teal);
+    }
+
+
+/* =========================================================
+   SKILLS GRID
+========================================================= */
+
+.skills-grid {
+    width: 100%;
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 7px;
+}
+
+
+/* =========================================================
+   SKILL CARD
+========================================================= */
+
+.skill-card {
+    min-width: 0;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    overflow: hidden;
+    background: #ffffff;
+}
+
+
+/* =========================================================
+   SKILL HEADER
+========================================================= */
+
+.skill-card-header {
+    padding: 7px 8px;
+    background: var(--teal-soft);
+    border-bottom: 1px solid var(--border-light);
+    color: var(--text-dark);
+    font-size: 9px;
+}
+
+
+/* =========================================================
+   SKILL BODY
+========================================================= */
+
+.skill-card-body {
+    padding: 7px 8px;
+    color: var(--text-muted);
+    font-size: 9px;
+    line-height: 1.35;
+}
+
+
+/* =========================================================
+   NAVIGATION
+========================================================= */
+
+.post-navigation {
+    display: none;
+}
+
+
+/* =========================================================
+   FOOTER
+========================================================= */
+
+.profile-footer {
+    width: 100%;
+    min-height: 40px;
+    padding: 0 26px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: #f9fbfb;
+    border-top: 1px solid var(--border-light);
+    color: #8593a2;
+    font-size: 8px;
+}
+
+
+/* =========================================================
+   FOOTER TEAL
+========================================================= */
+
+.footer-brand strong,
+.footer-info strong {
+    color: var(--teal);
+}
+
+
+/* =========================================================
+   FOOTER INFO
+========================================================= */
+
+.footer-info {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+}
+
+
+.footer-separator {
+    width: 3px;
+    height: 3px;
+    border-radius: 50%;
+    background: #c6d2d6;
+}
+
+
+/* =========================================================
+   RESPONSIVE - 1200
+========================================================= */
+
+@media (max-width: 1200px) {
+
+    .internship-page {
+        padding: 90px 15px 50px;
+    }
+
+    .internship-card {
+        max-width: 1000px;
+    }
+
+    .information-grid {
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+    }
+}
+
+
+/* =========================================================
+   RESPONSIVE - 900
+========================================================= */
+
+@media (max-width: 900px) {
+
+    .internship-page {
+        padding: 80px 12px 40px;
+    }
+
+    .internship-cover {
+        height: 190px;
+    }
+
+    .information-grid {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+
+    .information-card-wide {
+        grid-column: span 1;
+    }
+}
+
+
+/* =========================================================
+   RESPONSIVE - 650
+========================================================= */
+
+@media (max-width: 650px) {
+
+    .internship-page {
+        padding: 70px 8px 30px;
+    }
+
+    .internship-card {
+        border-radius: 10px;
+    }
+
+    .internship-cover {
+        height: 170px;
+        padding: 45px 18px 15px;
+    }
+
+    .cover-left h1 {
+        font-size: 23px;
+    }
+
+    .post-identity {
+        height: 58px;
+        padding: 0 18px;
+    }
+
+        .post-identity::before {
+            left: 18px;
+            width: 70px;
+            height: 70px;
+            top: -34px;
+        }
+
+    .post-body {
+        padding: 0 18px 20px;
+    }
+
+    .information-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .profile-footer {
+        padding: 0 18px;
+    }
+
+    .profile-actions {
+        top: 20px;
+        right: 10px;
+    }
+
+    .profile-action-btn {
+        width: 40px;
+        height: 40px;
+    }
+}
+
+
+/* =========================================================
+   RESPONSIVE - 430
+========================================================= */
+
+@media (max-width: 430px) {
+
+    .internship-page {
+        padding: 60px 5px 25px;
+    }
+
+    .internship-cover {
+        padding-left: 15px;
+        padding-right: 15px;
+    }
+
+    .cover-left h1 {
+        font-size: 21px;
+    }
+
+    .cover-label {
+        font-size: 8px;
+    }
+
+    .post-body {
+        padding-left: 12px;
+        padding-right: 12px;
+    }
+
+    .information-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .information-card-wide {
+        grid-column: span 1;
+    }
+
+    .information-card {
+        min-height: 65px;
+    }
+
+    .profile-actions {
+        right: 7px;
+        gap: 5px;
+    }
+
+    .profile-action-btn {
+        width: 36px;
+        height: 36px;
+    }
+
+        .profile-action-btn i {
+            font-size: 13px;
+        }
+
+    .profile-footer {
+        min-height: 45px;
+        padding: 8px 12px;
+        flex-direction: column;
+        gap: 5px;
+    }
+}
+
+
+/* =========================================================
+   PRINT
+========================================================= */
+
+@media print {
+
+    html,
+    body {
+        background: #ffffff !important;
+    }
+
+    .internship-page {
+        padding: 0 !important;
+    }
+
+    .internship-card {
+        max-width: 100%;
+        border: 1px solid #cccccc;
+        border-radius: 0;
+        box-shadow: none;
+    }
+
+    .profile-actions {
+        display: none !important;
+    }
+
+    .information-card:hover {
+        transform: none;
+        box-shadow: none;
+    }
+}
+.profile-action-btn:disabled {
+    opacity: .45;
+    cursor: not-allowed;
+    box-shadow: none;
+}
+
+    .profile-action-btn:disabled:hover {
+        background: #ffffff;
+        color: var(--teal);
+        transform: none;
+    }
+
+a.profile-action-btn {
+    text-decoration: none;
+}

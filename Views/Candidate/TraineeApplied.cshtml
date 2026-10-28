@@ -11,23 +11,27 @@
 }
 <div class="master-table-container">
 
-    <!-- HEADER -->
-
-    <div class="feedback-title-row">
+    <div class="master-table-title">
 
         <div>
-
             <h1 class="feedback-title">
                 Trainee Applied
             </h1>
 
-            <div class="feedback-subtitle">
+            <p class="feedback-subtitle">
                 @candidateCode
-            </div>
-
+            </p>
         </div>
 
+        <a asp-controller="Candidate"
+           asp-action="Dashboard"
+           class="master-back-btn"
+           title="Back to Dashboard">
+            <i class="fas fa-arrow-left"></i>
+        </a>
+
     </div>
+
 
 
     <!-- MASTER TABLE -->
@@ -92,12 +96,16 @@
                             <!-- ORGANIZATION -->
 
                             <td>
-                                <a href="javascript:void(0);"
-                                   class="organization-link">
+                               
+<a asp-controller="Account"
+   asp-action="ViewOrgPost"
+   asp-route-id="@post.nID"
+   asp-route-nOrgID="@post.nOrgID"
+   asp-route-matchingPostIds="@string.Join(",", traineeAppliedPosts.Select(p => p.nID).Distinct())"
+   class="organization-link">
+    @post.sName
+</a>
 
-                                    @post.sName
-
-                                </a>
                             </td>
 
 
@@ -185,9 +193,9 @@
 <style>
 
     /*
-           Only responsive behavior.
-           Master 1Trainee CSS remains untouched.
-        */
+               Only responsive behavior.
+               Master 1Trainee CSS remains untouched.
+            */
 
     .trainee-applied-responsive {
         width: 100%;

@@ -7,57 +7,26 @@
 <link rel="stylesheet" href="~/css/CandidateRegister.css" />
 
 <div class="candidate-register-page">
-
     <div class="candidate-register-card">
 
-        <!-- =====================================================
-             REGISTRATION SWITCH
-        ====================================================== -->
-
         <div class="registration-switch">
-
-            <a asp-controller="Account"
-               asp-action="CandidateRegister"
-               class="switch-btn active">
-                Trainee
-            </a>
-
-            <a asp-controller="Account"
-               asp-action="OrganizationRegister"
-               class="switch-btn">
-                Organization
-            </a>
-            <a asp-controller="Account"
-               asp-action="TPORegister"
-               class="switch-btn">
-                TPO
-            </a>
-
+            <a asp-controller="Account" asp-action="CandidateRegister"
+               class="switch-btn active">Trainee</a>
+            <a asp-controller="Account" asp-action="OrganizationRegister"
+               class="switch-btn">Organization</a>
+            <a asp-controller="Account" asp-action="TPORegister"
+               class="switch-btn">TPO</a>
         </div>
-
-
-        <!-- =====================================================
-             HEADER
-        ====================================================== -->
 
         <div class="register-icon">
             <i class="fa-solid fa-user"></i>
         </div>
 
         <div class="register-heading">
-
             <h2>Create Account</h2>
-
-            <p>
-                Register as a student and start your journey
-            </p>
-
+            <p>Register as a student and start your journey</p>
         </div>
 
-
-        <!-- =====================================================
-             SUCCESS / ERROR MESSAGE
-        ====================================================== -->
         @if (TempData["Success"] != null)
         {
             <div class="alert alert-success register-alert">
@@ -72,946 +41,625 @@
             </div>
         }
 
-
-        <!-- =====================================================
-             FORM
-        ====================================================== -->
-
-        <form asp-controller="Account"
+        <form id="candidateRegistrationForm"
+              asp-controller="Account"
               asp-action="CandidateRegister"
               method="post"
               enctype="multipart/form-data">
 
             @Html.AntiForgeryToken()
 
-
-            <!-- =================================================
-                 FIRST NAME + LAST NAME
-            ================================================== -->
-
             <div class="register-form-row">
-
-                <!-- First Name -->
-
                 <div class="register-form-group">
-
-                    <label asp-for="sFName"
-                           class="register-label">
-                        First Name
-                    </label>
-
-                    <input asp-for="sFName"
-                           type="text"
-                           class="register-input"
-                           placeholder="Enter first name"
-                           autocomplete="given-name" />
-
-                    <span asp-validation-for="sFName"
-                          class="text-danger register-validation">
-                    </span>
-
-                </div>
-
-
-                <!-- Last Name -->
-
-                <div class="register-form-group">
-
-                    <label asp-for="sLName"
-                           class="register-label">
-                        Last Name
-                    </label>
-
-                    <input asp-for="sLName"
-                           type="text"
-                           class="register-input"
-                           placeholder="Enter last name"
-                           autocomplete="family-name" />
-
-                    <span asp-validation-for="sLName"
-                          class="text-danger register-validation">
-                    </span>
-
-                </div>
-
-            </div>
-
-
-            <!-- =================================================
-                 GENDER + DATE OF BIRTH
-            ================================================== -->
-
-            <div class="register-form-row">
-
-                <!-- Gender -->
-
-                <div class="register-form-group">
-
-                    <label asp-for="nGender"
-                           class="register-label">
-                        Gender
-                    </label>
-
-                    <select asp-for="nGender"
-                            class="register-select">
-
-                        <option value="0">
-                            -- Select Gender --
-                        </option>
-
-                        <option value="1">
-                            Female
-                        </option>
-
-                        <option value="2">
-                            Male
-                        </option>
-
-                        <option value="3">
-                            Other
-                        </option>
-
+                    <label asp-for="sPrefix" class="register-label">Prefix</label>
+                    <select asp-for="sPrefix" class="register-select" required>
+                        <option value="">-- Select Prefix --</option>
+                        <option value="1">Mr.</option>
+                        <option value="2">Ms.</option>
+                        <option value="3">Mrs.</option>
+                        <option value="4">Dr.</option>
+                        <option value="5">Prof.</option>
                     </select>
-
-                    <span asp-validation-for="nGender"
-                          class="text-danger register-validation">
-                    </span>
-
+                    <span asp-validation-for="sPrefix" class="text-danger register-validation"></span>
                 </div>
-
-
-                <!-- Date of Birth -->
 
                 <div class="register-form-group">
-
-                    <label asp-for="DOB"
-                           class="register-label">
-                        Date of Birth
-                    </label>
-
-                    <input asp-for="DOB"
-                           type="date"
-                           class="register-input" />
-
-                    <span asp-validation-for="DOB"
-                          class="text-danger register-validation">
-                    </span>
-
+                    <label asp-for="sFName" class="register-label">First Name</label>
+                    <input asp-for="sFName" class="register-input"
+                           placeholder="Enter first name" maxlength="50"
+                           autocomplete="given-name" required />
+                    <span asp-validation-for="sFName" class="text-danger register-validation"></span>
                 </div>
 
+                <div class="register-form-group">
+                    <label asp-for="sLName" class="register-label">Last Name</label>
+                    <input asp-for="sLName" class="register-input"
+                           placeholder="Enter last name" maxlength="50"
+                           autocomplete="family-name" required />
+                    <span asp-validation-for="sLName" class="text-danger register-validation"></span>
+                </div>
             </div>
-
-
-            <!-- =================================================
-                 MOBILE + EMAIL
-            ================================================== -->
 
             <div class="register-form-row">
-
-                <!-- Mobile -->
-
                 <div class="register-form-group">
-
-                    <label asp-for="sMobile"
-                           class="register-label">
-                        Mobile Number
-                    </label>
-
-                    <input asp-for="sMobile"
-                           type="tel"
-                           class="register-input"
-                           placeholder="Enter mobile number"
-                           maxlength="10"
-                           autocomplete="tel" />
-
-                    <span asp-validation-for="sMobile"
-                          class="text-danger register-validation">
-                    </span>
-
+                    <label asp-for="nGender" class="register-label">Gender</label>
+                    <select asp-for="nGender" class="register-select" required>
+                        <option value="0">-- Select Gender --</option>
+                        <option value="1">Female</option>
+                        <option value="2">Male</option>
+                        <option value="3">Other</option>
+                    </select>
+                    <span asp-validation-for="nGender" class="text-danger register-validation"></span>
                 </div>
 
-
-                <!-- Email -->
-
                 <div class="register-form-group">
-
-                    <label asp-for="sEmail"
-                           class="register-label">
-                        Email
-                    </label>
-
-                    <input asp-for="sEmail"
-                           type="email"
-                           class="register-input"
-                           placeholder="Enter email"
-                           autocomplete="email" />
-
-                    <span asp-validation-for="sEmail"
-                          class="text-danger register-validation">
-                    </span>
-
+                    <label asp-for="DOB" class="register-label">Date of Birth</label>
+                    <input asp-for="DOB" type="date" class="register-input"
+                           id="DOB" required />
+                    <span asp-validation-for="DOB" class="text-danger register-validation"></span>
                 </div>
-
             </div>
 
+            <div class="register-form-row">
+                <div class="register-form-group">
+                    <label asp-for="sMobile" class="register-label">Mobile Number</label>
+                    <input asp-for="sMobile" type="tel" class="register-input"
+                           placeholder="Enter mobile number" maxlength="10"
+                           inputmode="numeric" autocomplete="tel" required />
+                    <span asp-validation-for="sMobile" class="text-danger register-validation"></span>
+                </div>
 
-            <!-- =================================================
-                 OTP VERIFICATION
-            ================================================== -->
+                <div class="register-form-group">
+                    <label asp-for="sAlternateMobile" class="register-label">
+                        Alternate Mobile Number
+                    </label>
+                    <input asp-for="sAlternateMobile" type="tel"
+                           class="register-input"
+                           placeholder="Enter alternate mobile number"
+                           maxlength="20" inputmode="numeric" />
+                    <span asp-validation-for="sAlternateMobile" class="text-danger register-validation"></span>
+                </div>
+
+                <div class="register-form-group">
+                    <label asp-for="sEmail" class="register-label">Email</label>
+                    <input asp-for="sEmail" type="email" class="register-input"
+                           placeholder="Enter email" autocomplete="email"
+                           maxlength="150" required />
+                    <span asp-validation-for="sEmail" class="text-danger register-validation"></span>
+                </div>
+            </div>
 
             <div class="otp-section">
-
-                <label class="otp-label">
-                    OTP Verification
-                </label>
+                <label class="otp-label">OTP Verification</label>
 
                 <div class="otp-content">
-
-                    <!-- OTP Options -->
-
                     <div class="otp-options">
-
                         <label class="radio-option">
-
-                            <input type="radio"
-                                   name="OTPType"
-                                   value="Mobile"
-                                   checked />
-
-                            <span>
-                                Mobile No.
-                            </span>
-
+                            <input type="radio" name="OTPType" value="Mobile" />
+                            <span>Mobile No.</span>
                         </label>
 
-
                         <label class="radio-option">
-
-                            <input type="radio"
-                                   name="OTPType"
-                                   value="Email" />
-
-                            <span>
-                                Email
-                            </span>
-
+                            <input type="radio" name="OTPType" value="Email" checked />
+                            <span>Email</span>
                         </label>
 
-
-                        <button type="button"
-                                class="send-otp-btn"
-                                id="btnSendOTP">
-
+                        <button type="button" class="send-otp-btn" id="btnSendOTP">
                             Send OTP
-
                         </button>
-
                     </div>
-
-
-                    <!-- OTP Input -->
 
                     <div class="otp-input-container">
+                        <input asp-for="sOTP" type="text" class="otp-input"
+                               placeholder="Enter 6-digit OTP" maxlength="6"
+                               inputmode="numeric" autocomplete="one-time-code" />
 
-                        <input asp-for="sOTP"
-                               type="text"
-                               class="otp-input"
-                               placeholder="Enter OTP"
-                               maxlength="6"
-                               autocomplete="one-time-code" />
+                        <span asp-validation-for="sOTP" class="text-danger register-validation"></span>
 
-                        <span asp-validation-for="sOTP"
-                              class="text-danger register-validation">
-                        </span>
+                        <button type="button" class="send-otp-btn" id="btnVerifyOTP" disabled>
+                            Verify OTP
+                        </button>
 
+                        <span id="otpStatus" class="register-validation"
+                              role="status" aria-live="polite"></span>
                     </div>
-
                 </div>
-
             </div>
 
-
-            <!-- =================================================
-                 COLLEGE NAME + COLLEGE CODE
-            ================================================== -->
-
             <div class="register-form-row">
-
-                <!-- College Name -->
-
                 <div class="register-form-group">
-
-                    <label asp-for="sCollegeName"
-                           class="register-label">
-                        College Name
-                    </label>
-
-                    <div class="register-input-box">
-
-                        <select asp-for="sCollegeName"
-                                id="sCollegeName"
-                                class="register-select">
-
-                            <option value="0">
-                                -- Select College Name --
-                            </option>
-
-                        </select>
-
-                    </div>
-
-                    <span asp-validation-for="sCollegeName"
-                          class="text-danger register-validation">
-                    </span>
-
-                </div>
-
-
-                <!-- College Code -->
-
-                <div class="register-form-group">
-
-                    <label asp-for="nCollegeCode"
-                           class="register-label">
-                        College Code
-                    </label>
-
-                    <div class="register-input-box">
-
-                        <select asp-for="nCollegeCode"
-                                id="nCollegeCode"
-                                class="register-select">
-
-                            <option value="0">
-                                -- Select College Code --
-                            </option>
-
-                        </select>
-
-                    </div>
-
-                    <span asp-validation-for="nCollegeCode"
-                          class="text-danger register-validation">
-                    </span>
-
-                </div>
-
-            </div>
-
-
-            <!-- =================================================
-                 DEPARTMENT + BRANCH
-            ================================================== -->
-
-            <div class="register-form-row">
-
-                <!-- Department -->
-
-                <div class="register-form-group">
-
-                    <label asp-for="nDepartment"
-                           class="register-label">
-                        Department
-                    </label>
-
-                    <div class="register-input-box">
-
-                        <select asp-for="nDepartment"
-                                id="departmentSelect"
-                                class="register-select">
-
-                            <option value="0">
-                                -- Select Department --
-                            </option>
-
-                        </select>
-
-                    </div>
-
-                    <span asp-validation-for="nDepartment"
-                          class="text-danger register-validation">
-                    </span>
-
-                </div>
-
-
-                <!-- Branch -->
-
-                <div class="register-form-group">
-
-                    <label asp-for="nBranch"
-                           class="register-label">
-                        Branch
-                    </label>
-
-                    <div class="register-input-box">
-
-                        <select asp-for="nBranch"
-                                id="branchSelect"
-                                class="register-select">
-
-                            <option value="0">
-                                -- Select Branch --
-                            </option>
-
-                        </select>
-
-                    </div>
-
-                    <span asp-validation-for="nBranch"
-                          class="text-danger register-validation">
-                    </span>
-
-                </div>
-
-            </div>
-
-
-            <!-- =================================================
-                 PASSOUT YEAR + PROFILE IMAGE
-            ================================================== -->
-
-            <div class="register-form-row">
-
-                <!-- Passout Year -->
-
-                <div class="register-form-group">
-
-                    <label asp-for="nPassoutYear"
-                           class="register-label">
-                        Passout Year
-                    </label>
-
-                    <select asp-for="nPassoutYear"
-                            class="register-select">
-
-                        <option value="0">
-                            -- Select Passout Year --
-                        </option>
-
-                        <option value="2020">2020</option>
-                        <option value="2021">2021</option>
-                        <option value="2022">2022</option>
-                        <option value="2023">2023</option>
-                        <option value="2024">2024</option>
-                        <option value="2025">2025</option>
-                        <option value="2026">2026</option>
-                        <option value="2027">2027</option>
-                        <option value="2028">2028</option>
-                        <option value="2029">2029</option>
-                        <option value="2030">2030</option>
-
+                    <label asp-for="sCollegeName" class="register-label">College Name</label>
+                    <select asp-for="sCollegeName" id="sCollegeName"
+                            class="register-select" required>
+                        <option value="0">-- Select College Name --</option>
                     </select>
-
-                    <span asp-validation-for="nPassoutYear"
-                          class="text-danger register-validation">
-                    </span>
-
+                    <span asp-validation-for="sCollegeName" class="text-danger register-validation"></span>
                 </div>
 
+                <div class="register-form-group">
+                    <label asp-for="nCollegeCode" class="register-label">College Code</label>
+                    <select asp-for="nCollegeCode" id="nCollegeCode"
+                            class="register-select" required>
+                        <option value="0">-- Select College Code --</option>
+                    </select>
+                    <span asp-validation-for="nCollegeCode" class="text-danger register-validation"></span>
+                </div>
+            </div>
 
-                <!-- Profile Image -->
+            <div class="register-form-row">
+                <div class="register-form-group">
+                    <label asp-for="nDepartment" class="register-label">Department</label>
+                    <select asp-for="nDepartment" id="departmentSelect"
+                            class="register-select" required>
+                        <option value="0">-- Select Department --</option>
+                    </select>
+                    <span asp-validation-for="nDepartment" class="text-danger register-validation"></span>
+                </div>
 
                 <div class="register-form-group">
+                    <label asp-for="nBranch" class="register-label">Branch</label>
+                    <select asp-for="nBranch" id="branchSelect"
+                            class="register-select" required>
+                        <option value="0">-- Select Branch --</option>
+                    </select>
+                    <span asp-validation-for="nBranch" class="text-danger register-validation"></span>
+                </div>
+            </div>
 
-                    <label asp-for="ProfileImageFile"
-                           class="register-label">
-                        Profile Image
-                    </label>
+            <div class="register-form-row">
+                <div class="register-form-group">
+                    <label asp-for="nCurrentYear" class="register-label">Current Year</label>
+                    <select asp-for="nCurrentYear" class="register-select" required>
+                        <option value="">-- Select Current Year --</option>
+                        <option value="1">1st</option>
+                        <option value="2">2nd</option>
+                        <option value="3">3rd</option>
+                        <option value="4">4th</option>
+                        <option value="5">5th</option>
+                    </select>
+                    <span asp-validation-for="nCurrentYear" class="text-danger register-validation"></span>
+                </div>
 
-                    <input asp-for="ProfileImageFile"
-                           type="file"
+                <div class="register-form-group">
+                    <label asp-for="nAdmissionYear" class="register-label">Admission Year</label>
+                    <select asp-for="nAdmissionYear" class="register-select" required>
+                        <option value="">-- Select Admission Year --</option>
+                        @for (int year = 2020; year <= 2030; year++)
+                        {
+                            <option value="@year">@year</option>
+                        }
+                    </select>
+                    <span asp-validation-for="nAdmissionYear" class="text-danger register-validation"></span>
+                </div>
+            </div>
+
+            <div class="register-form-row">
+                <div class="register-form-group">
+                    <label asp-for="nPassoutYear" class="register-label">Passout Year</label>
+                    <select asp-for="nPassoutYear" class="register-select" required>
+                        <option value="0">-- Select Passout Year --</option>
+                        @for (int year = 2020; year <= 2030; year++)
+                        {
+                            <option value="@year">@year</option>
+                        }
+                    </select>
+                    <span asp-validation-for="nPassoutYear" class="text-danger register-validation"></span>
+                </div>
+
+                <div class="register-form-group">
+                    <label asp-for="ProfileImageFile" class="register-label">Profile Image</label>
+                    <input asp-for="ProfileImageFile" type="file"
                            accept=".jpg,.jpeg,.png"
                            class="register-input register-file" />
-
-                    <span asp-validation-for="ProfileImageFile"
-                          class="text-danger register-validation">
-                    </span>
-
+                    <span asp-validation-for="ProfileImageFile" class="text-danger register-validation"></span>
                 </div>
-
             </div>
-
-
-            <!-- =================================================
-                 PASSWORD
-            ================================================== -->
 
             <div class="register-form-row">
-
                 <div class="register-form-group">
-
-                    <label asp-for="sPassword"
-                           class="register-label">
-                        Password
-                    </label>
-
-                    <input asp-for="sPassword"
-                           type="password"
-                           class="register-input"
-                           placeholder="Create password" />
-
-                    <span asp-validation-for="sPassword"
-                          class="text-danger register-validation">
-                    </span>
-
+                    <label asp-for="sPassword" class="register-label">Password</label>
+                    <input asp-for="sPassword" type="password"
+                           class="register-input" placeholder="Create password"
+                           autocomplete="new-password" required />
+                    <span asp-validation-for="sPassword" class="text-danger register-validation"></span>
                 </div>
-
             </div>
 
-
-            <!-- =================================================
-                 REGISTER BUTTON
-            ================================================== -->
-
-            <button type="submit"
-                    class="register-main-btn">
-
-                <i class="fa-solid fa-user-plus"></i>
-
-                Register
-
+            <!-- Do not disable this button initially -->
+            <button type="submit" class="register-main-btn" id="btnRegister">
+                <i class="fa-solid fa-user-plus"></i> Register
             </button>
 
-
-            <!-- =================================================
-                 LOGIN LINK
-            ================================================== -->
-
             <div class="register-bottom-text">
-
                 Already have an account?
-
-                <a asp-controller="Account"
-                   asp-action="CandidateLogin">
-                    Sign In
-                </a>
-
+                <a asp-controller="Account" asp-action="CandidateLogin">Sign In</a>
             </div>
-
         </form>
-
     </div>
-
 </div>
 
-
-@section Scripts
-{
+@section Scripts {
     @{
         await Html.RenderPartialAsync("_ValidationScriptsPartial");
     }
 
     <script>
-
-        $(document).ready(function () {
-
-            // =====================================================
-            // BASIC INPUT SPACE HANDLING
-            // =====================================================
-
-            $('input[type="text"], input[type="email"], input[type="tel"], input[type="password"]')
-                .on('keydown', function (e) {
-
-                    if (e.key === " " && this.value.length === 0) {
-                        e.preventDefault();
-                    }
-
-                })
-                .on('input', function () {
-
-                    this.value = this.value.replace(/^\s+/, '');
-
-                })
-                .on('blur', function () {
-
-                    this.value = this.value.trim();
-
-                });
-
-
-            // =====================================================
-            // ELEMENTS
-            // =====================================================
-
-            const collegeNameSelect =
-                $('#sCollegeName');
-
-            const collegeCodeSelect =
-                $('#nCollegeCode');
-
-            const departmentSelect =
-                $('#departmentSelect');
-
-            const branchSelect =
-                $('#branchSelect');
-
-
-            // =====================================================
-            // LOAD COLLEGES
-            // =====================================================
-
-            $.ajax({
-
-                url: '@Url.Action("GetColleges", "Account")',
-
-                type: 'GET',
-
-                success: function (data) {
-
-                    console.log("Colleges:", data);
-
-                    collegeNameSelect.empty();
-
-                    collegeNameSelect.append(
-                        $('<option>', {
-                            value: '0',
-                            text: '-- Select College Name --'
-                        })
-                    );
-
-                    $.each(data, function (index, college) {
-
-                        collegeNameSelect.append(
-                            $('<option>', {
-
-                                value: college.nID,
-
-                                text: college.sCollegeName
-
-                            })
-                        );
-
-                    });
-
-                },
-
-                error: function (xhr, status, error) {
-
-                    console.error(
-                        "College loading failed:",
-                        error
-                    );
-
-                }
-
-            });
-
-
-            // =====================================================
-            // COLLEGE NAME CHANGE
-            // LOAD COLLEGE CODE
-            // =====================================================
-
-            collegeNameSelect.on('change', function () {
-
-                const collegeId = $(this).val();
-
-                collegeCodeSelect.empty();
-
-                collegeCodeSelect.append(
-                    $('<option>', {
-
-                        value: '0',
-
-                        text: '-- Select College Code --'
-
-                    })
-                );
-
-
-                if (!collegeId ||
-                    collegeId === '0') {
-
-                    return;
-
-                }
-
-
-                $.ajax({
-
-                    url: '@Url.Action("GetCollegeCodes", "Account")',
-
-                    type: 'GET',
-
-                    data: {
-
-                        collegeId: collegeId
-
-                    },
-
-                    success: function (data) {
-
-                        console.log(
-                            "College Codes:",
-                            data
-                        );
-
-                        if (!data ||
-                            data.length === 0) {
-
-                            collegeCodeSelect.append(
-                                $('<option>', {
-
-                                    value: '0',
-
-                                    text: 'No College Code Available'
-
-                                })
-                            );
-
-                            return;
-
-                        }
-
-
-                        $.each(data, function (index, code) {
-
-                            collegeCodeSelect.append(
-                                $('<option>', {
-
-                                    value: code.nCode,
-
-                                    text: code.nCode
-
-                                })
-                            );
-
-                        });
-
-                    },
-
-                    error: function (xhr, status, error) {
-
-                        console.error(
-                            "College code loading failed:",
-                            error
-                        );
-
-                    }
-
-                });
-
-            });
-
-
-            // =====================================================
-            // LOAD DEPARTMENTS
-            // =====================================================
-
-            $.ajax({
-
-                url: '@Url.Action("GetDepartments", "Account")',
-
-                type: 'GET',
-
-                success: function (data) {
-
-                    console.log(
-                        "Departments:",
-                        data
-                    );
-
-                    departmentSelect.empty();
-
-                    departmentSelect.append(
-                        $('<option>', {
-
-                            value: '0',
-
-                            text: '-- Select Department --'
-
-                        })
-                    );
-
-
-                    $.each(data, function (index, item) {
-
-                        departmentSelect.append(
-                            $('<option>', {
-
-                                value: item.nID,
-
-                                text: item.sDepartment
-
-                            })
-                        );
-
-                    });
-
-                },
-
-                error: function (xhr, status, error) {
-
-                    console.error(
-                        "Department loading failed:",
-                        error
-                    );
-
-                }
-
-            });
-
-
-            // =====================================================
-            // DEPARTMENT CHANGE
-            // LOAD BRANCHES
-            // =====================================================
-
-            departmentSelect.on('change', function () {
-
-                const departmentId = $(this).val();
-
-                console.log(
-                    "Selected Department ID:",
-                    departmentId
-                );
-
-
-                branchSelect.empty();
-
-                branchSelect.append(
-                    $('<option>', {
-
-                        value: '0',
-
-                        text: '-- Select Branch --'
-
-                    })
-                );
-
-
-                if (!departmentId ||
-                    departmentId === '0') {
-
-                    return;
-
-                }
-
-
-                $.ajax({
-
-                    url: '@Url.Action("GetBranches", "Account")',
-
-                    type: 'GET',
-
-                    data: {
-
-                        departmentId: departmentId
-
-                    },
-
-                    success: function (data) {
-
-                        console.log(
-                            "Branches:",
-                            data
-                        );
-
-
-                        if (!data ||
-                            data.length === 0) {
-
-                            branchSelect.append(
-                                $('<option>', {
-
-                                    value: '0',
-
-                                    text: 'No Branch Available'
-
-                                })
-                            );
-
-                            return;
-
-                        }
-
-
-                        $.each(data, function (index, item) {
-
-                            branchSelect.append(
-                                $('<option>', {
-
-                                    value: item.nID,
-
-                                    text: item.sBranch
-
-                                })
-                            );
-
-                        });
-
-                    },
-
-                    error: function (xhr, status, error) {
-
-                        console.error(
-                            "Branch loading failed:",
-                            error
-                        );
-
-                        branchSelect.empty();
-
-                        branchSelect.append(
-                            $('<option>', {
-
-                                value: '0',
-
-                                text: 'Unable to load branches'
-
-                            })
-                        );
-
-                    }
-
-                });
-
-            });
-
-
-        });
-
-    </script>
-}
-
-
-<!-- =========================================================
-     CAPITALIZE FIRST LETTER OF FIRST NAME / LAST NAME
-========================================================== -->
-
-<script>
-
-    document.addEventListener("DOMContentLoaded", function () {
-
-        const nameFields = [
-            "sFName",
-            "sLName"
-        ];
-
-        nameFields.forEach(function (fieldName) {
-
-            const input = document.querySelector(
-                `[name="${fieldName}"]`
-            );
-
-            if (!input) {
-                return;
+        $(function () {
+            const form = $("#candidateRegistrationForm");
+            const emailInput = $("#sEmail");
+            const otpInput = $("#sOTP");
+            const sendButton = $("#btnSendOTP");
+            const verifyButton = $("#btnVerifyOTP");
+            const registerButton = $("#btnRegister");
+            const status = $("#otpStatus");
+
+            const collegeNameSelect = $("#sCollegeName");
+            const collegeCodeSelect = $("#nCollegeCode");
+            const departmentSelect = $("#departmentSelect");
+            const branchSelect = $("#branchSelect");
+
+            let otpSent = false;
+            let emailVerified = false;
+            let verifiedEmail = "";
+
+            function showStatus(message, success) {
+                status.text(message).css("color", success ? "green" : "red");
             }
 
-            input.addEventListener("input", function () {
+            function resetVerification() {
+                otpSent = false;
+                emailVerified = false;
+                verifiedEmail = "";
+                otpInput.val("").prop("readonly", false);
+                verifyButton.prop("disabled", true);
+            }
 
-                if (this.value.length > 0) {
+            // Do not disable Register here.
+            resetVerification();
 
-                    this.value =
-                        this.value.charAt(0).toUpperCase() +
-                        this.value.slice(1);
+            // Trim leading spaces and remove whitespace-only input.
+            $('input[type="text"], input[type="email"], input[type="tel"], input[type="password"]')
+                .on("input", function () {
+                    this.value = this.value.replace(/^\s+/, "");
+                })
+                .on("blur", function () {
+                    this.value = this.value.trim();
+                });
 
+            // Capitalize the first character of names.
+            ["sFName", "sLName"].forEach(function (name) {
+                const element = document.querySelector('[name="' + name + '"]');
+                if (element) {
+                    element.addEventListener("input", function () {
+                        this.value = this.value.length
+                            ? this.value.charAt(0).toUpperCase() + this.value.slice(1)
+                            : "";
+                    });
                 }
-
             });
 
+            // Mobile numbers: digits only, 10 digits required.
+            $('input[name="sMobile"], input[name="sAlternateMobile"]').on("input", function () {
+                this.value = this.value.replace(/\D/g, "").substring(0, 10);
+            });
+
+            otpInput.on("input", function () {
+                this.value = this.value.replace(/\D/g, "").substring(0, 6);
+            });
+
+            emailInput.on("input", function () {
+                resetVerification();
+                showStatus("Email changed. Please send and verify a new OTP.", false);
+            });
+
+            $('input[name="OTPType"]').on("change", function () {
+                resetVerification();
+
+                if (this.value === "Mobile") {
+                    showStatus("Mobile OTP is not implemented. Please select Email.", false);
+                } else {
+                    showStatus("Send an OTP to your email address.", true);
+                }
+            });
+
+            // Validation messages for fields that use placeholder values such as 0.
+            function validateSelections() {
+                let valid = true;
+
+                const selections = [
+                    { selector: '[name="nGender"]', message: "Please select gender." },
+                    { selector: '[name="sCollegeName"]', message: "Please select a college name." },
+                    { selector: '[name="nCollegeCode"]', message: "Please select a college code." },
+                    { selector: '[name="nDepartment"]', message: "Please select a department." },
+                    { selector: '[name="nBranch"]', message: "Please select a branch." },
+                    { selector: '[name="nPassoutYear"]', message: "Please select passout year." }
+                ];
+
+                selections.forEach(function (item) {
+                    const field = $(item.selector);
+                    const value = field.val();
+                    const invalid = !value || value === "0";
+
+                    field.toggleClass("input-validation-error", invalid);
+
+                    const messageSpan = field.closest(".register-form-group")
+                        .find(".register-validation").last();
+
+                    if (invalid) {
+                        messageSpan.text(item.message);
+                        valid = false;
+                    } else {
+                        messageSpan.text("");
+                    }
+                });
+
+                return valid;
+            }
+
+            // Send OTP.
+            sendButton.on("click", function () {
+                const email = emailInput.val().trim();
+                const emailElement = emailInput[0];
+
+                if ($('input[name="OTPType"]:checked').val() !== "Email") {
+                    showStatus("Please select Email OTP.", false);
+                    return;
+                }
+
+                if (!email || !emailElement.checkValidity()) {
+                    emailElement.reportValidity();
+                    emailElement.focus();
+                    return;
+                }
+
+                resetVerification();
+                sendButton.prop("disabled", true).text("Sending...");
+                showStatus("Sending OTP to your email...", true);
+
+                $.ajax({
+                    url: '@Url.Action("SendCandidateOTP", "Account")',
+                    type: "POST",
+                    data: {
+                        email: email,
+                        otpType: "Email",
+                        __RequestVerificationToken: $('input[name="__RequestVerificationToken"]').val()
+                    },
+                    success: function (response) {
+                        if (response && response.success) {
+                            otpSent = true;
+                            verifyButton.prop("disabled", false);
+                            otpInput.trigger("focus");
+                            showStatus(response.message || "OTP sent. Please check your email.", true);
+                        } else {
+                            showStatus(response?.message || "Unable to send OTP.", false);
+                        }
+                    },
+                    error: function (xhr) {
+                        showStatus(xhr.responseJSON?.message || "Failed to send OTP. Please try again.", false);
+                        console.error(xhr.responseText);
+                    },
+                    complete: function () {
+                        sendButton.prop("disabled", false).text("Send OTP");
+                    }
+                });
+            });
+
+            // Verify OTP.
+            verifyButton.on("click", function () {
+                const email = emailInput.val().trim();
+                const otp = otpInput.val().trim();
+
+                if (!otpSent) {
+                    showStatus("Please send OTP first.", false);
+                    return;
+                }
+
+                if (!/^\d{6}$/.test(otp)) {
+                    showStatus("Please enter the six-digit OTP.", false);
+                    otpInput.trigger("focus");
+                    return;
+                }
+
+                verifyButton.prop("disabled", true).text("Verifying...");
+
+                $.ajax({
+                    url: '@Url.Action("VerifyCandidateOTP", "Account")',
+                    type: "POST",
+                    data: {
+                        email: email,
+                        otp: otp,
+                        __RequestVerificationToken: $('input[name="__RequestVerificationToken"]').val()
+                    },
+                    success: function (response) {
+                        if (response && response.success) {
+                            emailVerified = true;
+                            verifiedEmail = email.toLowerCase();
+                            otpInput.prop("readonly", true);
+                            showStatus(response.message || "Email verified successfully.", true);
+                        } else {
+                            emailVerified = false;
+                            verifiedEmail = "";
+                            showStatus(response?.message || "Invalid or expired OTP.", false);
+                        }
+                    },
+                    error: function (xhr) {
+                        showStatus(xhr.responseJSON?.message || "OTP verification failed.", false);
+                        console.error(xhr.responseText);
+                    },
+                    complete: function () {
+                        verifyButton.prop("disabled", false).text("Verify OTP");
+                    }
+                });
+            });
+
+            // Load colleges.
+            $.get('@Url.Action("GetColleges", "Account")')
+                .done(function (data) {
+                    collegeNameSelect.empty().append(
+                        $("<option>", { value: "0", text: "-- Select College Name --" })
+                    );
+
+                    $.each(data || [], function (_, college) {
+                        collegeNameSelect.append(
+                            $("<option>", {
+                                value: college.nID,
+                                text: college.sCollegeName
+                            })
+                        );
+                    });
+                })
+                .fail(function (xhr) {
+                    console.error("College loading failed:", xhr.responseText);
+                });
+
+            // Load college codes for selected college.
+            collegeNameSelect.on("change", function () {
+                const collegeId = $(this).val();
+
+                collegeCodeSelect.empty().append(
+                    $("<option>", { value: "0", text: "-- Select College Code --" })
+                );
+
+                if (!collegeId || collegeId === "0") return;
+
+                $.get('@Url.Action("GetCollegeCodes", "Account")', { collegeId: collegeId })
+                    .done(function (data) {
+                        $.each(data || [], function (_, item) {
+                            collegeCodeSelect.append(
+                                $("<option>", {
+                                    value: item.nCode,
+                                    text: item.nCode
+                                })
+                            );
+                        });
+                    })
+                    .fail(function (xhr) {
+                        console.error("College code loading failed:", xhr.responseText);
+                    });
+            });
+
+            // Load departments.
+            $.get('@Url.Action("GetDepartments", "Account")')
+                .done(function (data) {
+                    departmentSelect.empty().append(
+                        $("<option>", { value: "0", text: "-- Select Department --" })
+                    );
+
+                    $.each(data || [], function (_, item) {
+                        departmentSelect.append(
+                            $("<option>", {
+                                value: item.nID,
+                                text: item.sDepartment
+                            })
+                        );
+                    });
+                })
+                .fail(function (xhr) {
+                    console.error("Department loading failed:", xhr.responseText);
+                });
+
+            // Load branches for selected department.
+            departmentSelect.on("change", function () {
+                const departmentId = $(this).val();
+
+                branchSelect.empty().append(
+                    $("<option>", { value: "0", text: "-- Select Branch --" })
+                );
+
+                if (!departmentId || departmentId === "0") return;
+
+                $.get('@Url.Action("GetBranches", "Account")', { departmentId: departmentId })
+                    .done(function (data) {
+                        $.each(data || [], function (_, item) {
+                            branchSelect.append(
+                                $("<option>", {
+                                    value: item.nID,
+                                    text: item.sBranch
+                                })
+                            );
+                        });
+                    })
+                    .fail(function (xhr) {
+                        console.error("Branch loading failed:", xhr.responseText);
+                    });
+            });
+
+            // Validate the entire form when Register is clicked.
+            form.on("submit", function (e) {
+                const formElement = this;
+
+                // Allow ASP.NET unobtrusive validation and native HTML validation.
+                if (!formElement.checkValidity()) {
+                    e.preventDefault();
+                    formElement.reportValidity();
+                    return false;
+                }
+
+                // Run jQuery unobtrusive validation if available.
+                if ($.validator && $.validator.unobtrusive) {
+                    if (!form.data("validator")) {
+                        $.validator.unobtrusive.parse(form);
+                    }
+
+                    if (!form.valid()) {
+                        e.preventDefault();
+                        return false;
+                    }
+                }
+
+                // Additional selection validation.
+                if (!validateSelections()) {
+                    e.preventDefault();
+                    return false;
+                }
+
+                // Date of birth cannot be today or in the future.
+                const dob = $("#DOB").val();
+                if (dob && new Date(dob) >= new Date(new Date().toDateString())) {
+                    e.preventDefault();
+                    $("#DOB").closest(".register-form-group")
+                        .find(".register-validation").text("Date of birth must be in the past.");
+                    $("#DOB").trigger("focus");
+                    return false;
+                }
+
+                // Mobile numbers must contain exactly 10 digits.
+                const mobile = $('input[name="sMobile"]').val().trim();
+                const alternate = $('input[name="sAlternateMobile"]').val().trim();
+
+                if (!/^\d{10}$/.test(mobile)) {
+                    e.preventDefault();
+                    $('input[name="sMobile"]').closest(".register-form-group")
+                        .find(".register-validation").text("Mobile number must contain exactly 10 digits.");
+                    $('input[name="sMobile"]').trigger("focus");
+                    return false;
+                }
+
+                if (alternate && !/^\d{10}$/.test(alternate)) {
+                    e.preventDefault();
+                    $('input[name="sAlternateMobile"]').closest(".register-form-group")
+                        .find(".register-validation").text("Alternate mobile number must contain exactly 10 digits.");
+                    $('input[name="sAlternateMobile"]').trigger("focus");
+                    return false;
+                }
+
+                // Require OTP verification for the current email.
+                const currentEmail = emailInput.val().trim().toLowerCase();
+
+                if (!emailVerified || currentEmail !== verifiedEmail) {
+                    e.preventDefault();
+                    showStatus("Please verify your email OTP before registering.", false);
+                    otpInput.trigger("focus");
+                    return false;
+                }
+
+                // Prevent double-click submission.
+                registerButton.prop("disabled", true).html(
+                    '<i class="fa-solid fa-spinner fa-spin"></i> Registering...'
+                );
+
+                return true;
+            });
         });
-
-    });
-
-</script>
+    </script>
+}

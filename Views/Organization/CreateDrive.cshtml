@@ -1,0 +1,2867 @@
+﻿@{
+	Layout = "~/Views/Shared/_DashboardLayout.cshtml";
+
+	ViewData["Title"] = "Create Recruitment Drive";
+	ViewData["Panel"] = "Organization";
+}
+
+<style>
+	/* =========================================================
+			   CREATE RECRUITMENT DRIVE  -  Compact • Smart • Responsive
+			   Order: Header > Stats > Filters + Candidate Table > Drive Form
+			========================================================= */
+	.drive-page {
+		--drive-primary: #0d9488;
+		--drive-dark: #0f766e;
+		--drive-deep: #115e59;
+		--drive-light: #f0fdfa;
+		--drive-soft: #ccfbf1;
+		--drive-border: #dbe5e7;
+		--drive-border-soft: #edf2f2;
+		--drive-text: #172033;
+		--drive-muted: #667085;
+		--drive-error: #d92d20;
+		background: #f7faf9;
+		color: var(--drive-text);
+		padding: 16px 14px 30px;
+		font-family: inherit;
+	}
+
+		.drive-page * {
+			box-sizing: border-box;
+		}
+
+	.drive-wrap {
+		width: 100%;
+		max-width: 1320px;
+		margin: 0 auto;
+	}
+
+
+	/* ---------- HEADER ---------- */
+
+	.drive-header {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		gap: 10px;
+		flex-wrap: wrap;
+		margin-bottom: 12px;
+		padding: 12px 16px;
+		background: #fff;
+		border: 1px solid var(--drive-border-soft);
+		border-radius: 12px;
+		box-shadow: 0 3px 12px rgba(15, 23, 42, .045);
+	}
+
+	.drive-header-left {
+		display: flex;
+		align-items: center;
+		gap: 12px;
+		min-width: 0;
+	}
+
+	.drive-header-icon {
+		width: 38px;
+		height: 38px;
+		flex-shrink: 0;
+		display: grid;
+		place-items: center;
+		background: var(--drive-soft);
+		color: var(--drive-dark);
+		border-radius: 10px;
+		font-size: 16px;
+	}
+
+	.drive-heading h2 {
+		margin: 0;
+		font-size: 19px;
+		font-weight: 700;
+		line-height: 1.3;
+		color: var(--drive-deep);
+	}
+
+	.drive-heading p {
+		margin: 1px 0 0;
+		font-size: 12px;
+		color: var(--drive-muted);
+	}
+
+
+	/* ---------- BUTTONS ---------- */
+
+	.drive-btn {
+		height: 34px;
+		padding: 0 14px;
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+		gap: 7px;
+		border: 1px solid var(--drive-border);
+		border-radius: 8px;
+		background: #fff;
+		color: var(--drive-dark);
+		font-family: inherit;
+		font-size: 12.5px;
+		font-weight: 600;
+		text-decoration: none;
+		white-space: nowrap;
+		cursor: pointer;
+		transition: .2s ease;
+	}
+
+		.drive-btn:hover {
+			background: var(--drive-light);
+			border-color: var(--drive-primary);
+			color: var(--drive-dark);
+		}
+
+		.drive-btn:disabled {
+			opacity: .5;
+			cursor: not-allowed;
+		}
+
+	.drive-btn-primary {
+		background: var(--drive-primary);
+		border-color: var(--drive-primary);
+		color: #fff;
+		box-shadow: 0 4px 10px rgba(13, 148, 136, .18);
+	}
+
+		.drive-btn-primary:hover {
+			background: var(--drive-dark);
+			border-color: var(--drive-dark);
+			color: #fff;
+			transform: translateY(-1px);
+		}
+
+	.drive-btn-sm {
+		height: 30px;
+		padding: 0 11px;
+		font-size: 12px;
+	}
+
+
+	/* ---------- STATS ---------- */
+
+	.drive-stats {
+		display: grid;
+		grid-template-columns: repeat(4, minmax(0, 1fr));
+		gap: 10px;
+		margin-bottom: 12px;
+	}
+
+	.drive-stat-card {
+		display: flex;
+		align-items: center;
+		gap: 10px;
+		min-width: 0;
+		padding: 10px 14px;
+		background: #fff;
+		border: 1px solid var(--drive-border-soft);
+		border-radius: 12px;
+		box-shadow: 0 3px 12px rgba(15, 23, 42, .035);
+	}
+
+	.drive-stat-icon {
+		width: 34px;
+		height: 34px;
+		flex-shrink: 0;
+		display: grid;
+		place-items: center;
+		border-radius: 9px;
+		font-size: 14px;
+	}
+
+		.drive-stat-icon.teal {
+			background: #ccfbf1;
+			color: #0f766e;
+		}
+
+		.drive-stat-icon.blue {
+			background: #e8f1ff;
+			color: #3568a8;
+		}
+
+		.drive-stat-icon.purple {
+			background: #f1eaff;
+			color: #7650a8;
+		}
+
+		.drive-stat-icon.orange {
+			background: #fff1df;
+			color: #b87524;
+		}
+
+	.drive-stat-label {
+		color: var(--drive-muted);
+		font-size: 11.5px;
+		margin-bottom: 2px;
+	}
+
+	.drive-stat-value {
+		color: var(--drive-deep);
+		font-size: 18px;
+		line-height: 1.1;
+		font-weight: 700;
+	}
+
+
+	/* ---------- MAIN GRID ---------- */
+
+	.drive-main-grid {
+		display: grid;
+		grid-template-columns: 255px minmax(0, 1fr);
+		gap: 12px;
+		align-items: start;
+	}
+
+	.drive-panel {
+		background: #fff;
+		border: 1px solid var(--drive-border-soft);
+		border-radius: 12px;
+		box-shadow: 0 3px 12px rgba(15, 23, 42, .04);
+		min-width: 0;
+		overflow: hidden;
+	}
+
+	.drive-panel-header {
+		padding: 11px 14px;
+		border-bottom: 1px solid var(--drive-border-soft);
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		gap: 10px;
+	}
+
+		.drive-panel-header h3 {
+			margin: 0;
+			font-size: 14px;
+			font-weight: 700;
+			color: var(--drive-deep);
+		}
+
+	.drive-filter-count {
+		background: var(--drive-light);
+		color: var(--drive-dark);
+		padding: 3px 9px;
+		font-size: 11px;
+		border-radius: 20px;
+		font-weight: 700;
+	}
+
+
+	/* ---------- FILTERS (collapsible, compact) ---------- */
+
+	.drive-filters {
+		position: sticky;
+		top: 14px;
+	}
+
+	.drive-filter-body {
+		padding: 4px 14px 14px;
+		max-height: calc(100vh - 150px);
+		overflow-y: auto;
+	}
+
+	.drive-fs {
+		border-bottom: 1px solid var(--drive-border-soft);
+		padding: 9px 0;
+	}
+
+		.drive-fs:last-of-type {
+			border-bottom: 0;
+		}
+
+		.drive-fs > summary {
+			list-style: none;
+			cursor: pointer;
+			user-select: none;
+			display: flex;
+			align-items: center;
+			justify-content: space-between;
+			color: #244944;
+			font-size: 12px;
+			font-weight: 700;
+		}
+
+			.drive-fs > summary::-webkit-details-marker {
+				display: none;
+			}
+
+			.drive-fs > summary::after {
+				content: "\f078";
+				font-family: "Font Awesome 6 Free", "Font Awesome 5 Free";
+				font-weight: 900;
+				font-size: 9px;
+				color: #98a2b3;
+				transition: .2s ease;
+			}
+
+		.drive-fs[open] > summary::after {
+			transform: rotate(180deg);
+		}
+
+	.drive-fs-body {
+		padding-top: 9px;
+	}
+
+	.drive-filter-options {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 6px;
+	}
+
+	.drive-chip {
+		display: flex;
+		align-items: center;
+		gap: 6px;
+		padding: 5px 10px;
+		background: #fff;
+		border: 1px solid var(--drive-border);
+		border-radius: 20px;
+		font-size: 12px;
+		color: #49635e;
+		cursor: pointer;
+		transition: .2s ease;
+	}
+
+		.drive-chip:hover {
+			border-color: #8fd5cc;
+		}
+
+		.drive-chip:has(input:checked) {
+			border-color: var(--drive-primary);
+			background: var(--drive-light);
+			color: var(--drive-dark);
+			font-weight: 600;
+		}
+
+		.drive-chip input {
+			accent-color: var(--drive-primary);
+			margin: 0;
+		}
+
+	.drive-check-block {
+		display: grid;
+		grid-template-columns: 1fr 1fr;
+		gap: 7px 8px;
+	}
+
+		.drive-check-block.one {
+			grid-template-columns: 1fr;
+		}
+
+	.drive-check {
+		display: flex;
+		align-items: flex-start;
+		gap: 7px;
+		font-size: 12px;
+		line-height: 1.4;
+		color: #506863;
+		cursor: pointer;
+	}
+
+		.drive-check input {
+			accent-color: var(--drive-primary);
+			width: 14px;
+			height: 14px;
+			margin: 1px 0 0;
+			flex-shrink: 0;
+			cursor: pointer;
+		}
+
+	.drive-field {
+		min-width: 0;
+	}
+
+	.drive-fs .drive-field {
+		margin-top: 9px;
+	}
+
+	.drive-field label {
+		display: block;
+		margin-bottom: 3px;
+		font-size: 11.5px;
+		font-weight: 600;
+		color: #344054;
+	}
+
+		.drive-field label .req {
+			color: var(--drive-error);
+		}
+
+	.drive-control {
+		display: block;
+		width: 100%;
+		min-width: 0;
+		height: 34px;
+		padding: 0 10px;
+		background: #fbfdfd;
+		border: 1px solid var(--drive-border);
+		border-radius: 7px;
+		color: var(--drive-text);
+		font-family: inherit;
+		font-size: 12.5px;
+		outline: none;
+		transition: .2s ease;
+	}
+
+		.drive-control::placeholder {
+			color: #a0aab5;
+		}
+
+		.drive-control:hover:not(:disabled) {
+			border-color: #b8cacc;
+		}
+
+		.drive-control:focus {
+			background: #fff;
+			border-color: var(--drive-primary);
+			box-shadow: 0 0 0 3px rgba(13, 148, 136, .09);
+		}
+
+		.drive-control:disabled {
+			background: #f2f4f7;
+			color: #98a2b3;
+			cursor: not-allowed;
+		}
+
+		.drive-control.invalid {
+			border-color: var(--drive-error);
+			background: #fffafa;
+		}
+
+	select.drive-control {
+		cursor: pointer;
+	}
+
+	.drive-input-icon {
+		position: relative;
+	}
+
+		.drive-input-icon > i {
+			position: absolute;
+			left: 10px;
+			top: 50%;
+			transform: translateY(-50%);
+			color: #94a3b8;
+			font-size: 11.5px;
+			pointer-events: none;
+		}
+
+		.drive-input-icon .drive-control {
+			padding-left: 30px;
+		}
+
+	.drive-hint {
+		margin: 0;
+		font-size: 11px;
+		color: #81938e;
+	}
+
+	.drive-filter-actions {
+		display: flex;
+		gap: 8px;
+		margin-top: 12px;
+	}
+
+		.drive-filter-actions .drive-btn {
+			flex: 1;
+		}
+
+	.drive-error {
+		display: block;
+		margin-top: 2px;
+		color: var(--drive-error);
+		font-size: 11px;
+		line-height: 1.25;
+	}
+
+		.drive-error:empty {
+			display: none;
+		}
+
+
+	/* ---------- RESULTS / TABLE ---------- */
+
+	.drive-results-top {
+		padding: 11px 14px;
+		border-bottom: 1px solid var(--drive-border-soft);
+	}
+
+	.drive-results-title {
+		display: flex;
+		justify-content: space-between;
+		align-items: center;
+		gap: 10px;
+		margin-bottom: 10px;
+		flex-wrap: wrap;
+	}
+
+		.drive-results-title h3 {
+			margin: 0;
+			font-size: 14px;
+			font-weight: 700;
+			color: var(--drive-deep);
+		}
+
+		.drive-results-title p {
+			margin: 1px 0 0;
+			font-size: 11.5px;
+			color: var(--drive-muted);
+		}
+
+	.drive-title-actions {
+		display: flex;
+		gap: 8px;
+	}
+
+	.drive-search-row {
+		display: flex;
+		gap: 8px;
+		align-items: center;
+	}
+
+	.drive-search-wrap {
+		position: relative;
+		flex: 1;
+		min-width: 0;
+	}
+
+		.drive-search-wrap i {
+			position: absolute;
+			left: 11px;
+			top: 50%;
+			transform: translateY(-50%);
+			color: #94a3b8;
+			font-size: 12px;
+			pointer-events: none;
+		}
+
+	.drive-search {
+		width: 100%;
+		height: 34px;
+		padding: 0 12px 0 31px;
+		border: 1px solid var(--drive-border);
+		border-radius: 8px;
+		outline: none;
+		font-family: inherit;
+		font-size: 12.5px;
+		background: #fbfdfd;
+	}
+
+		.drive-search:focus {
+			border-color: var(--drive-primary);
+			background: #fff;
+			box-shadow: 0 0 0 3px rgba(13, 148, 136, .09);
+		}
+
+	#toggleFilters {
+		display: none;
+	}
+
+		#toggleFilters .drive-filter-count {
+			padding: 1px 7px;
+		}
+
+	.drive-table-wrap {
+		overflow-x: auto;
+		width: 100%;
+	}
+
+	.drive-table {
+		width: 100%;
+		border-collapse: collapse;
+		min-width: 860px;
+	}
+
+		.drive-table th {
+			background: #f0f7f6;
+			color: #54716b;
+			text-align: left;
+			padding: 9px 10px;
+			font-size: 11px;
+			font-weight: 700;
+			letter-spacing: .3px;
+			text-transform: uppercase;
+			white-space: nowrap;
+			border-bottom: 1px solid var(--drive-border);
+		}
+
+		.drive-table td {
+			padding: 8px 10px;
+			border-bottom: 1px solid var(--drive-border-soft);
+			color: #49615c;
+			font-size: 12.5px;
+			vertical-align: middle;
+		}
+
+		.drive-table tbody tr:last-child td {
+			border-bottom: 0;
+		}
+
+		.drive-table tbody tr:hover {
+			background: #f8fcfb;
+		}
+
+		.drive-table tbody tr.is-selected {
+			background: #effaf8;
+		}
+
+		.drive-table input[type="checkbox"] {
+			accent-color: var(--drive-primary);
+			width: 15px;
+			height: 15px;
+			cursor: pointer;
+		}
+
+	.drive-candidate {
+		display: flex;
+		align-items: center;
+		gap: 9px;
+		min-width: 150px;
+	}
+
+	.drive-avatar {
+		width: 30px;
+		height: 30px;
+		flex-shrink: 0;
+		display: grid;
+		place-items: center;
+		border-radius: 8px;
+		background: #d8f4ed;
+		color: #0f766e;
+		font-size: 11px;
+		font-weight: 800;
+	}
+
+	.drive-candidate strong {
+		display: block;
+		font-size: 12.5px;
+		color: #254740;
+		white-space: nowrap;
+	}
+
+	.drive-candidate small {
+		display: block;
+		font-size: 10.5px;
+		color: #8a9b96;
+	}
+
+	.drive-education {
+		display: block;
+		font-size: 12.5px;
+		font-weight: 600;
+		color: #365d55;
+	}
+
+	.drive-subtext {
+		font-size: 10.5px;
+		color: #82938e;
+	}
+
+	.drive-status {
+		display: inline-flex;
+		align-items: center;
+		gap: 5px;
+		border-radius: 20px;
+		padding: 3px 9px;
+		font-size: 11px;
+		font-weight: 700;
+		white-space: nowrap;
+	}
+
+		.drive-status::before {
+			content: "";
+			width: 6px;
+			height: 6px;
+			border-radius: 50%;
+			background: currentColor;
+		}
+
+		.drive-status.eligible {
+			background: #dcfce7;
+			color: #166534;
+		}
+
+		.drive-status.review {
+			background: #fff4d8;
+			color: #946200;
+		}
+
+	.drive-empty {
+		display: none;
+		padding: 28px 12px;
+		text-align: center;
+		color: var(--drive-muted);
+		font-size: 13px;
+	}
+
+		.drive-empty i {
+			display: block;
+			margin-bottom: 8px;
+			color: #b8cacc;
+			font-size: 26px;
+		}
+
+	.drive-table-footer {
+		padding: 10px 14px;
+		border-top: 1px solid var(--drive-border-soft);
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		gap: 10px;
+		flex-wrap: wrap;
+	}
+
+	.drive-selection-info {
+		font-size: 12px;
+		color: var(--drive-muted);
+	}
+
+		.drive-selection-info strong {
+			color: var(--drive-dark);
+		}
+
+	.drive-foot-right {
+		display: flex;
+		align-items: center;
+		gap: 10px;
+		flex-wrap: wrap;
+	}
+
+	.drive-size {
+		display: flex;
+		align-items: center;
+		gap: 6px;
+		font-size: 12px;
+		color: var(--drive-muted);
+	}
+
+		.drive-size .drive-control {
+			width: 64px;
+			height: 30px;
+		}
+
+	.drive-pager {
+		display: flex;
+		align-items: center;
+		gap: 4px;
+	}
+
+		.drive-pager button {
+			min-width: 30px;
+			height: 30px;
+			padding: 0 8px;
+			background: #fff;
+			border: 1px solid var(--drive-border);
+			border-radius: 7px;
+			color: #475467;
+			font-family: inherit;
+			font-size: 12px;
+			font-weight: 600;
+			cursor: pointer;
+			transition: .2s ease;
+		}
+
+			.drive-pager button:hover:not(:disabled) {
+				border-color: var(--drive-primary);
+				color: var(--drive-primary);
+			}
+
+			.drive-pager button.active {
+				background: var(--drive-primary);
+				border-color: var(--drive-primary);
+				color: #fff;
+			}
+
+			.drive-pager button:disabled {
+				opacity: .45;
+				cursor: not-allowed;
+			}
+
+
+	/* ---------- DRIVE DETAILS FORM ---------- */
+
+	.drive-create-section {
+		margin-top: 12px;
+		padding: 14px 16px 16px;
+		overflow: visible;
+		scroll-margin-top: 14px;
+	}
+
+	.drive-sec-head {
+		display: flex;
+		align-items: center;
+		gap: 10px;
+		flex-wrap: wrap;
+		margin-bottom: 12px;
+		padding-bottom: 9px;
+		border-bottom: 1px solid var(--drive-border-soft);
+	}
+
+		.drive-sec-head .ico {
+			width: 30px;
+			height: 30px;
+			flex-shrink: 0;
+			display: grid;
+			place-items: center;
+			background: var(--drive-light);
+			color: var(--drive-primary);
+			border-radius: 8px;
+			font-size: 13px;
+		}
+
+		.drive-sec-head h3 {
+			margin: 0;
+			font-size: 15px;
+			color: var(--drive-deep);
+		}
+
+		.drive-sec-head p {
+			margin: 1px 0 0;
+			font-size: 11.5px;
+			color: var(--drive-muted);
+		}
+
+	.drive-sel-badge {
+		margin-left: auto;
+		padding: 4px 11px;
+		border-radius: 20px;
+		background: var(--drive-light);
+		border: 1px solid var(--drive-soft);
+		color: var(--drive-dark);
+		font-size: 12px;
+		font-weight: 700;
+	}
+
+	.drive-block-title {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		gap: 10px;
+		margin: 14px 0 8px;
+		color: var(--drive-deep);
+		font-size: 12.5px;
+		font-weight: 700;
+	}
+
+		.drive-block-title:first-of-type {
+			margin-top: 0;
+		}
+
+		.drive-block-title span i {
+			margin-right: 6px;
+			color: var(--drive-primary);
+		}
+
+	.drive-grid {
+		display: grid;
+		gap: 10px 12px;
+	}
+
+	.drive-g2 {
+		grid-template-columns: repeat(2, minmax(0, 1fr));
+	}
+
+	.drive-g3 {
+		grid-template-columns: repeat(3, minmax(0, 1fr));
+	}
+
+	.drive-g4 {
+		grid-template-columns: repeat(4, minmax(0, 1fr));
+	}
+
+	.drive-venue-list {
+		display: grid;
+		grid-template-columns: repeat(2, minmax(0, 1fr));
+		gap: 8px 12px;
+	}
+
+	.drive-venue-row {
+		display: flex;
+		align-items: center;
+		gap: 7px;
+	}
+
+		.drive-venue-row .drive-input-icon {
+			flex: 1;
+			min-width: 0;
+		}
+
+	.drive-venue-no {
+		width: 22px;
+		height: 22px;
+		flex-shrink: 0;
+		display: grid;
+		place-items: center;
+		background: var(--drive-soft);
+		color: var(--drive-dark);
+		border-radius: 50%;
+		font-size: 11px;
+		font-weight: 700;
+	}
+
+	.drive-icon-btn {
+		width: 34px;
+		height: 34px;
+		flex-shrink: 0;
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+		background: #fff;
+		border: 1px solid var(--drive-border);
+		border-radius: 7px;
+		color: #98a2b3;
+		font-size: 12px;
+		cursor: pointer;
+		transition: .2s ease;
+	}
+
+		.drive-icon-btn:hover:not(:disabled) {
+			background: #fef3f2;
+			border-color: #fecdca;
+			color: var(--drive-error);
+		}
+
+		.drive-icon-btn:disabled {
+			opacity: .45;
+			cursor: not-allowed;
+		}
+
+	.drive-rounds {
+		display: grid;
+		grid-template-columns: repeat(4, minmax(0, 1fr));
+		gap: 10px;
+	}
+
+	.drive-round {
+		position: relative;
+	}
+
+		.drive-round input[type="checkbox"] {
+			position: absolute;
+			width: 1px;
+			height: 1px;
+			opacity: 0;
+			pointer-events: none;
+		}
+
+		.drive-round label {
+			position: relative;
+			height: 58px;
+			margin: 0;
+			padding: 6px;
+			display: flex;
+			flex-direction: column;
+			align-items: center;
+			justify-content: center;
+			gap: 4px;
+			background: #fbfdfd;
+			border: 1px solid var(--drive-border);
+			border-radius: 10px;
+			color: #475569;
+			font-size: 12px;
+			font-weight: 600;
+			text-align: center;
+			line-height: 1.2;
+			cursor: pointer;
+			user-select: none;
+			transition: .2s ease;
+		}
+
+			.drive-round label i {
+				font-size: 16px;
+				color: #94a3b8;
+				transition: .2s ease;
+			}
+
+			.drive-round label:hover {
+				background: var(--drive-light);
+				border-color: #8fd5cc;
+			}
+
+		.drive-round input:checked + label {
+			background: #e6f6f3;
+			border-color: var(--drive-primary);
+			color: var(--drive-dark);
+			box-shadow: 0 4px 10px rgba(13, 148, 136, .15);
+		}
+
+			.drive-round input:checked + label i {
+				color: var(--drive-primary);
+			}
+
+		.drive-round input:focus-visible + label {
+			box-shadow: 0 0 0 3px rgba(13, 148, 136, .25);
+		}
+
+	.drive-order {
+		position: absolute;
+		top: -7px;
+		right: -7px;
+		width: 20px;
+		height: 20px;
+		display: none;
+		align-items: center;
+		justify-content: center;
+		background: var(--drive-primary);
+		border: 2px solid #fff;
+		border-radius: 50%;
+		color: #fff;
+		font-size: 10.5px;
+		font-weight: 700;
+	}
+
+	.drive-round input:checked + label .drive-order {
+		display: flex;
+	}
+
+	.drive-rounds-foot {
+		display: flex;
+		align-items: center;
+		flex-wrap: wrap;
+		gap: 6px 12px;
+		margin-top: 10px;
+		color: var(--drive-muted);
+		font-size: 12px;
+	}
+
+	.drive-rounds-count {
+		padding: 3px 10px;
+		background: var(--drive-light);
+		border: 1px solid var(--drive-soft);
+		border-radius: 20px;
+		color: var(--drive-dark);
+		font-weight: 700;
+	}
+
+	.drive-notice {
+		display: none;
+		margin: 12px 0 0;
+		padding: 9px 12px;
+		border-radius: 8px;
+		background: #fef3f2;
+		border: 1px solid #fecdca;
+		color: #b42318;
+		font-size: 12.5px;
+		line-height: 1.4;
+	}
+
+		.drive-notice i {
+			margin-right: 6px;
+		}
+
+	.drive-form-actions {
+		display: flex;
+		justify-content: flex-end;
+		gap: 10px;
+		margin-top: 14px;
+		padding-top: 12px;
+		border-top: 1px solid var(--drive-border-soft);
+	}
+
+		.drive-form-actions .drive-btn-primary {
+			min-width: 190px;
+		}
+
+
+	/* ---------- RESPONSIVE ---------- */
+
+	@@media (max-width: 1200px) {
+		.drive-main-grid {
+			grid-template-columns: 235px minmax(0, 1fr);
+		}
+	}
+
+	/* filters become a toggle panel above the table; table becomes cards */
+	@@media (max-width: 900px) {
+		.drive-main-grid {
+			grid-template-columns: 1fr;
+		}
+
+		.drive-stats {
+			grid-template-columns: repeat(2, minmax(0, 1fr));
+		}
+
+		.drive-filters {
+			display: none;
+			position: static;
+		}
+
+			.drive-filters.open {
+				display: block;
+			}
+
+		.drive-filter-body {
+			max-height: none;
+			overflow: visible;
+		}
+
+			.drive-filter-body .drive-fs-grid {
+				display: grid;
+				grid-template-columns: repeat(2, minmax(0, 1fr));
+				column-gap: 18px;
+			}
+
+		#toggleFilters {
+			display: inline-flex;
+		}
+
+		.drive-table-wrap {
+			overflow: visible;
+		}
+
+		.drive-table {
+			min-width: 0;
+			display: block;
+		}
+
+			.drive-table thead {
+				display: none;
+			}
+
+			.drive-table tbody {
+				display: grid;
+				grid-template-columns: repeat(2, minmax(0, 1fr));
+				gap: 10px;
+				padding: 10px;
+			}
+
+				.drive-table tbody tr {
+					position: relative;
+					display: block;
+					padding: 10px 12px;
+					background: #fff;
+					border: 1px solid var(--drive-border-soft);
+					border-radius: 10px;
+					box-shadow: 0 2px 8px rgba(15, 23, 42, .04);
+				}
+
+					.drive-table tbody tr.is-selected {
+						border-color: var(--drive-primary);
+						background: #effaf8;
+					}
+
+			.drive-table td {
+				display: flex;
+				justify-content: space-between;
+				gap: 12px;
+				padding: 4px 0;
+				border-bottom: 1px dashed var(--drive-border-soft);
+				text-align: right;
+			}
+
+				.drive-table td:last-child {
+					border-bottom: 0;
+				}
+
+				.drive-table td::before {
+					content: attr(data-label);
+					flex-shrink: 0;
+					color: var(--drive-muted);
+					font-size: 11px;
+					font-weight: 600;
+					text-align: left;
+				}
+
+				.drive-table td.td-select {
+					position: absolute;
+					top: 10px;
+					right: 12px;
+					padding: 0;
+					border: 0;
+				}
+
+					.drive-table td.td-select::before {
+						display: none;
+					}
+
+				.drive-table td.td-cand {
+					padding-bottom: 8px;
+					padding-right: 30px;
+					text-align: left;
+				}
+
+					.drive-table td.td-cand::before {
+						display: none;
+					}
+	}
+
+	@@media (max-width: 760px) {
+		.drive-g4 {
+			grid-template-columns: repeat(2, minmax(0, 1fr));
+		}
+
+		.drive-g3 {
+			grid-template-columns: repeat(2, minmax(0, 1fr));
+		}
+
+		.drive-rounds {
+			grid-template-columns: repeat(2, minmax(0, 1fr));
+		}
+
+		.drive-venue-list {
+			grid-template-columns: 1fr;
+		}
+	}
+
+	@@media (max-width: 600px) {
+		.drive-table tbody {
+			grid-template-columns: 1fr;
+		}
+
+		.drive-filter-body .drive-fs-grid {
+			grid-template-columns: 1fr;
+		}
+	}
+
+	@@media (max-width: 540px) {
+		.drive-page {
+			padding: 10px 8px 24px;
+		}
+
+		.drive-header {
+			padding: 11px 12px;
+		}
+
+		.drive-heading h2 {
+			font-size: 17px;
+		}
+
+		.drive-header-icon {
+			width: 34px;
+			height: 34px;
+			font-size: 14px;
+		}
+
+		.drive-stats {
+			gap: 8px;
+		}
+
+		.drive-stat-card {
+			padding: 9px 10px;
+			gap: 8px;
+		}
+
+		.drive-stat-icon {
+			width: 30px;
+			height: 30px;
+			font-size: 12px;
+		}
+
+		.drive-stat-value {
+			font-size: 16px;
+		}
+
+		.drive-stat-label {
+			font-size: 10.5px;
+		}
+
+		.drive-g2, .drive-g3 {
+			grid-template-columns: 1fr;
+		}
+
+		.drive-create-section {
+			padding: 12px 12px 14px;
+		}
+
+		.drive-sel-badge {
+			margin-left: 0;
+		}
+
+		.drive-table-footer, .drive-foot-right {
+			justify-content: center;
+			text-align: center;
+		}
+
+		.drive-form-actions {
+			flex-direction: column-reverse;
+		}
+
+			.drive-form-actions .drive-btn {
+				width: 100%;
+			}
+
+		.drive-title-actions {
+			width: 100%;
+		}
+
+			.drive-title-actions .drive-btn {
+				flex: 1;
+			}
+	}
+</style>
+
+<div class="drive-page">
+	<div class="drive-wrap">
+
+		<!-- ================= PAGE HEADER ================= -->
+
+		<div class="drive-header">
+			<div class="drive-header-left">
+				<div class="drive-header-icon"><i class="fa-solid fa-building-user"></i></div>
+				<div class="drive-heading">
+					<h2>Create Recruitment Drive</h2>
+					<p>Find eligible candidates and organize your campus placement drive.</p>
+				</div>
+			</div>
+
+			<a asp-controller="Organization"
+			   asp-action="Dashboard"
+			   class="drive-btn">
+				<i class="fa-solid fa-arrow-left"></i>
+				Back to Dashboard
+			</a>
+		</div>
+
+
+		<!-- ================= SUMMARY CARDS ================= -->
+
+		<div class="drive-stats">
+			<div class="drive-stat-card">
+				<div class="drive-stat-icon teal"><i class="fa-solid fa-users"></i></div>
+				<div>
+					<div class="drive-stat-label">Matching Candidates</div>
+					<div class="drive-stat-value" id="statMatching">0</div>
+				</div>
+			</div>
+
+			<div class="drive-stat-card">
+				<div class="drive-stat-icon blue"><i class="fa-solid fa-user-check"></i></div>
+				<div>
+					<div class="drive-stat-label">Selected Candidates</div>
+					<div class="drive-stat-value" id="statSelected">0</div>
+				</div>
+			</div>
+
+			<div class="drive-stat-card">
+				<div class="drive-stat-icon purple"><i class="fa-solid fa-graduation-cap"></i></div>
+				<div>
+					<div class="drive-stat-label">Education Levels</div>
+					<div class="drive-stat-value">UG / PG</div>
+				</div>
+			</div>
+
+			<div class="drive-stat-card">
+				<div class="drive-stat-icon orange"><i class="fa-solid fa-sliders"></i></div>
+				<div>
+					<div class="drive-stat-label">Eligibility Criteria</div>
+					<div class="drive-stat-value" id="statCriteria">0 Active</div>
+				</div>
+			</div>
+		</div>
+
+
+		<div class="drive-main-grid">
+
+			<!-- ================= CANDIDATE FILTERS ================= -->
+
+			<aside class="drive-panel drive-filters" id="filterPanel">
+				<div class="drive-panel-header">
+					<h3><i class="fa-solid fa-filter" style="margin-right:6px;color:var(--drive-primary);"></i>Candidate Filters</h3>
+					<span class="drive-filter-count" id="activeFilterCount">0 active</span>
+				</div>
+
+				<div class="drive-filter-body">
+
+					<div class="drive-fs-grid">
+
+						<!-- Education level -->
+						<details class="drive-fs" open>
+							<summary>Education Level</summary>
+							<div class="drive-fs-body">
+								<div class="drive-filter-options">
+									<label class="drive-chip"><input type="checkbox" class="drive-filter" data-filter="level" value="UG"> UG</label>
+									<label class="drive-chip"><input type="checkbox" class="drive-filter" data-filter="level" value="PG"> PG</label>
+									<label class="drive-chip"><input type="checkbox" class="drive-filter" data-filter="level" value="Diploma"> Diploma</label>
+								</div>
+							</div>
+						</details>
+
+						<!-- Degree / course -->
+						<details class="drive-fs" open>
+							<summary>Degree / Course</summary>
+							<div class="drive-fs-body">
+								<div class="drive-check-block">
+									<label class="drive-check"><input type="checkbox" class="drive-filter" data-filter="course" value="B.E."> B.E.</label>
+									<label class="drive-check"><input type="checkbox" class="drive-filter" data-filter="course" value="B.Tech"> B.Tech</label>
+									<label class="drive-check"><input type="checkbox" class="drive-filter" data-filter="course" value="BCA"> BCA</label>
+									<label class="drive-check"><input type="checkbox" class="drive-filter" data-filter="course" value="MCA"> MCA</label>
+									<label class="drive-check"><input type="checkbox" class="drive-filter" data-filter="course" value="M.Tech"> M.Tech</label>
+									<label class="drive-check"><input type="checkbox" class="drive-filter" data-filter="course" value="MBA"> MBA</label>
+								</div>
+							</div>
+						</details>
+
+						<!-- Branch + year -->
+						<details class="drive-fs" open>
+							<summary>Branch &amp; Passing Year</summary>
+							<div class="drive-fs-body">
+								<div class="drive-field" style="margin-top:0;">
+									<label for="filterBranch">Branch / Specialization</label>
+									<select class="drive-control" id="filterBranch">
+										<option value="">All Branches</option>
+										<option value="Computer Science">Computer Science</option>
+										<option value="Information Technology">Information Technology</option>
+										<option value="Electronics">Electronics</option>
+										<option value="Mechanical">Mechanical</option>
+										<option value="Civil">Civil</option>
+										<option value="Electrical">Electrical</option>
+									</select>
+								</div>
+								<div class="drive-field">
+									<label for="filterYear">Passing Year</label>
+									<select class="drive-control" id="filterYear">
+										<option value="">All Years</option>
+										<option value="2025">2025</option>
+										<option value="2026">2026</option>
+										<option value="2027">2027</option>
+										<option value="2028">2028</option>
+									</select>
+								</div>
+							</div>
+						</details>
+
+						<!-- 10th / 12th -->
+						<details class="drive-fs">
+							<summary>10th &amp; 12th / Diploma</summary>
+							<div class="drive-fs-body">
+								<label class="drive-check">
+									<input type="checkbox" class="drive-filter" data-filter="criteria" value="tenth">
+									Minimum 10th percentage
+								</label>
+								<div class="drive-field">
+									<label for="minTenth">10th Minimum (%)</label>
+									<input id="minTenth" class="drive-control" type="number" min="0" max="100" step="0.01" value="60" disabled>
+								</div>
+
+								<label class="drive-check" style="margin-top:12px;">
+									<input type="checkbox" class="drive-filter" data-filter="criteria" value="twelfth">
+									Minimum 12th / Diploma percentage
+								</label>
+								<div class="drive-field">
+									<label for="minTwelfth">12th Minimum (%)</label>
+									<input id="minTwelfth" class="drive-control" type="number" min="0" max="100" step="0.01" value="60" disabled>
+								</div>
+							</div>
+						</details>
+
+						<!-- Semester CGPA -->
+						<details class="drive-fs">
+							<summary>Semester-wise CGPA</summary>
+							<div class="drive-fs-body">
+								<p class="drive-hint" style="margin-bottom:9px;">Select the semesters that need a minimum CGPA.</p>
+
+								<div class="drive-check-block">
+									<label class="drive-check"><input type="checkbox" class="drive-filter drive-sem-check" data-filter="criteria" data-sem="1" value="sem1"> Sem 1</label>
+									<label class="drive-check"><input type="checkbox" class="drive-filter drive-sem-check" data-filter="criteria" data-sem="2" value="sem2"> Sem 2</label>
+									<label class="drive-check"><input type="checkbox" class="drive-filter drive-sem-check" data-filter="criteria" data-sem="3" value="sem3"> Sem 3</label>
+									<label class="drive-check"><input type="checkbox" class="drive-filter drive-sem-check" data-filter="criteria" data-sem="4" value="sem4"> Sem 4</label>
+									<label class="drive-check"><input type="checkbox" class="drive-filter drive-sem-check" data-filter="criteria" data-sem="5" value="sem5"> Sem 5</label>
+									<label class="drive-check"><input type="checkbox" class="drive-filter drive-sem-check" data-filter="criteria" data-sem="6" value="sem6"> Sem 6</label>
+									<label class="drive-check"><input type="checkbox" class="drive-filter drive-sem-check" data-filter="criteria" data-sem="7" value="sem7"> Sem 7</label>
+								</div>
+
+								<div class="drive-field">
+									<label for="minCgpa">Minimum CGPA (0-10)</label>
+									<input id="minCgpa" class="drive-control" type="number" min="0" max="10" step="0.01" value="6.5" disabled>
+								</div>
+							</div>
+						</details>
+
+						<!-- Backlogs -->
+						<details class="drive-fs">
+							<summary>Backlog Criteria</summary>
+							<div class="drive-fs-body">
+								<div class="drive-check-block one">
+									<label class="drive-check">
+										<input type="checkbox" class="drive-filter" data-filter="backlog" value="zero">
+										Only candidates with zero active backlogs
+									</label>
+								</div>
+							</div>
+						</details>
+
+					</div>
+
+					<div class="drive-filter-actions">
+						<button type="button" class="drive-btn" id="resetFilters">
+							<i class="fa-solid fa-rotate-left"></i> Reset
+						</button>
+						<button type="button" class="drive-btn drive-btn-primary" id="applyFilters">
+							<i class="fa-solid fa-check"></i> Apply
+						</button>
+					</div>
+				</div>
+			</aside>
+
+
+			<!-- ================= CANDIDATE RESULTS ================= -->
+
+			<section class="drive-panel">
+				<div class="drive-results-top">
+					<div class="drive-results-title">
+						<div>
+							<h3>Eligible Candidate Directory</h3>
+							<p>Review profiles and select candidates for your recruitment drive.</p>
+						</div>
+						<div class="drive-title-actions">
+							<button type="button" class="drive-btn drive-btn-sm" id="toggleFilters">
+								<i class="fa-solid fa-filter"></i> Filters
+								<span class="drive-filter-count" id="activeFilterCountMobile">0</span>
+							</button>
+							<button type="button" class="drive-btn drive-btn-sm" id="clearSelection">
+								<i class="fa-solid fa-xmark"></i> Clear Selection
+							</button>
+						</div>
+					</div>
+
+					<div class="drive-search-row">
+						<div class="drive-search-wrap">
+							<i class="fa-solid fa-magnifying-glass"></i>
+							<input type="search" id="candidateSearch" class="drive-search"
+								   placeholder="Search name, candidate ID, branch or course...">
+						</div>
+					</div>
+				</div>
+
+				<div class="drive-table-wrap" id="tableWrap">
+					<table class="drive-table" id="candidateTable">
+						<thead>
+							<tr>
+								<th style="width:34px;">
+									<input type="checkbox" id="selectAll" aria-label="Select all visible candidates">
+								</th>
+								<th>Candidate</th>
+								<th>Education</th>
+								<th>Branch</th>
+								<th>Passing Year</th>
+								<th>10th / 12th</th>
+								<th>CGPA</th>
+								<th>Backlogs</th>
+								<th>Status</th>
+							</tr>
+						</thead>
+
+						<tbody id="candidateBody">
+							<!-- Demo rows: replace these with candidates from your database/model.
+								 Keep the data-* attributes - the filters read them. -->
+
+							<tr class="candidate-row" data-id="CD26010101" data-level="UG" data-course="B.Tech" data-branch="Computer Science" data-year="2027" data-tenth="85" data-twelfth="82" data-sem1="7.5" data-sem2="7.8" data-sem3="8.1" data-sem4="8.0" data-sem5="8.2" data-sem6="8.1" data-sem7="8.3" data-backlogs="0">
+								<td class="td-select" data-label=""><input type="checkbox" class="candidate-select" aria-label="Select Aarav Sharma"></td>
+								<td class="td-cand" data-label="Candidate"><div class="drive-candidate"><div class="drive-avatar">AS</div><div><strong>Aarav Sharma</strong><small>CD26010101</small></div></div></td>
+								<td data-label="Education"><span><span class="drive-education">B.Tech</span><span class="drive-subtext">UG</span></span></td>
+								<td data-label="Branch">Computer Science</td>
+								<td data-label="Passing Year">2027</td>
+								<td data-label="10th / 12th">85% / 82%</td>
+								<td data-label="CGPA">8.1</td>
+								<td data-label="Backlogs">0</td>
+								<td data-label="Status"><span class="drive-status eligible">Eligible</span></td>
+							</tr>
+
+							<tr class="candidate-row" data-id="CD26010102" data-level="UG" data-course="B.E." data-branch="Information Technology" data-year="2027" data-tenth="78" data-twelfth="75" data-sem1="7.0" data-sem2="7.2" data-sem3="7.4" data-sem4="7.6" data-sem5="7.8" data-sem6="7.9" data-sem7="8.0" data-backlogs="0">
+								<td class="td-select" data-label=""><input type="checkbox" class="candidate-select" aria-label="Select Priya Patil"></td>
+								<td class="td-cand" data-label="Candidate"><div class="drive-candidate"><div class="drive-avatar">PP</div><div><strong>Priya Patil</strong><small>CD26010102</small></div></div></td>
+								<td data-label="Education"><span><span class="drive-education">B.E.</span><span class="drive-subtext">UG</span></span></td>
+								<td data-label="Branch">Information Technology</td>
+								<td data-label="Passing Year">2027</td>
+								<td data-label="10th / 12th">78% / 75%</td>
+								<td data-label="CGPA">7.9</td>
+								<td data-label="Backlogs">0</td>
+								<td data-label="Status"><span class="drive-status eligible">Eligible</span></td>
+							</tr>
+
+							<tr class="candidate-row" data-id="CD26010103" data-level="UG" data-course="B.Tech" data-branch="Mechanical" data-year="2026" data-tenth="72" data-twelfth="68" data-sem1="6.2" data-sem2="6.5" data-sem3="6.8" data-sem4="7.0" data-sem5="7.2" data-sem6="7.1" data-sem7="7.3" data-backlogs="1">
+								<td class="td-select" data-label=""><input type="checkbox" class="candidate-select" aria-label="Select Rohan Deshmukh"></td>
+								<td class="td-cand" data-label="Candidate"><div class="drive-candidate"><div class="drive-avatar">RD</div><div><strong>Rohan Deshmukh</strong><small>CD26010103</small></div></div></td>
+								<td data-label="Education"><span><span class="drive-education">B.Tech</span><span class="drive-subtext">UG</span></span></td>
+								<td data-label="Branch">Mechanical</td>
+								<td data-label="Passing Year">2026</td>
+								<td data-label="10th / 12th">72% / 68%</td>
+								<td data-label="CGPA">7.1</td>
+								<td data-label="Backlogs">1</td>
+								<td data-label="Status"><span class="drive-status review">Review</span></td>
+							</tr>
+
+							<tr class="candidate-row" data-id="CD26010104" data-level="PG" data-course="MCA" data-branch="Computer Science" data-year="2027" data-tenth="88" data-twelfth="86" data-sem1="8.0" data-sem2="8.2" data-sem3="8.4" data-sem4="8.5" data-sem5="8.6" data-sem6="8.7" data-sem7="8.8" data-backlogs="0">
+								<td class="td-select" data-label=""><input type="checkbox" class="candidate-select" aria-label="Select Sneha Kulkarni"></td>
+								<td class="td-cand" data-label="Candidate"><div class="drive-candidate"><div class="drive-avatar">SK</div><div><strong>Sneha Kulkarni</strong><small>CD26010104</small></div></div></td>
+								<td data-label="Education"><span><span class="drive-education">MCA</span><span class="drive-subtext">PG</span></span></td>
+								<td data-label="Branch">Computer Science</td>
+								<td data-label="Passing Year">2027</td>
+								<td data-label="10th / 12th">88% / 86%</td>
+								<td data-label="CGPA">8.5</td>
+								<td data-label="Backlogs">0</td>
+								<td data-label="Status"><span class="drive-status eligible">Eligible</span></td>
+							</tr>
+
+							<tr class="candidate-row" data-id="CD26010105" data-level="UG" data-course="B.E." data-branch="Electronics" data-year="2026" data-tenth="65" data-twelfth="70" data-sem1="6.4" data-sem2="6.7" data-sem3="6.9" data-sem4="7.0" data-sem5="7.2" data-sem6="7.4" data-sem7="7.6" data-backlogs="0">
+								<td class="td-select" data-label=""><input type="checkbox" class="candidate-select" aria-label="Select Aditya Joshi"></td>
+								<td class="td-cand" data-label="Candidate"><div class="drive-candidate"><div class="drive-avatar">AJ</div><div><strong>Aditya Joshi</strong><small>CD26010105</small></div></div></td>
+								<td data-label="Education"><span><span class="drive-education">B.E.</span><span class="drive-subtext">UG</span></span></td>
+								<td data-label="Branch">Electronics</td>
+								<td data-label="Passing Year">2026</td>
+								<td data-label="10th / 12th">65% / 70%</td>
+								<td data-label="CGPA">7.4</td>
+								<td data-label="Backlogs">0</td>
+								<td data-label="Status"><span class="drive-status eligible">Eligible</span></td>
+							</tr>
+
+							<tr class="candidate-row" data-id="CD26010106" data-level="UG" data-course="BCA" data-branch="Computer Science" data-year="2027" data-tenth="81" data-twelfth="79" data-sem1="7.1" data-sem2="7.3" data-sem3="7.5" data-sem4="7.7" data-sem5="7.8" data-sem6="8.0" data-sem7="8.1" data-backlogs="0">
+								<td class="td-select" data-label=""><input type="checkbox" class="candidate-select" aria-label="Select Neha Wankhede"></td>
+								<td class="td-cand" data-label="Candidate"><div class="drive-candidate"><div class="drive-avatar">NW</div><div><strong>Neha Wankhede</strong><small>CD26010106</small></div></div></td>
+								<td data-label="Education"><span><span class="drive-education">BCA</span><span class="drive-subtext">UG</span></span></td>
+								<td data-label="Branch">Computer Science</td>
+								<td data-label="Passing Year">2027</td>
+								<td data-label="10th / 12th">81% / 79%</td>
+								<td data-label="CGPA">7.8</td>
+								<td data-label="Backlogs">0</td>
+								<td data-label="Status"><span class="drive-status eligible">Eligible</span></td>
+							</tr>
+
+							<tr class="candidate-row" data-id="CD26010107" data-level="PG" data-course="M.Tech" data-branch="Information Technology" data-year="2026" data-tenth="91" data-twelfth="89" data-sem1="8.1" data-sem2="8.3" data-sem3="8.5" data-sem4="8.6" data-sem5="8.7" data-sem6="8.8" data-sem7="8.9" data-backlogs="0">
+								<td class="td-select" data-label=""><input type="checkbox" class="candidate-select" aria-label="Select Kunal Verma"></td>
+								<td class="td-cand" data-label="Candidate"><div class="drive-candidate"><div class="drive-avatar">KV</div><div><strong>Kunal Verma</strong><small>CD26010107</small></div></div></td>
+								<td data-label="Education"><span><span class="drive-education">M.Tech</span><span class="drive-subtext">PG</span></span></td>
+								<td data-label="Branch">Information Technology</td>
+								<td data-label="Passing Year">2026</td>
+								<td data-label="10th / 12th">91% / 89%</td>
+								<td data-label="CGPA">8.7</td>
+								<td data-label="Backlogs">0</td>
+								<td data-label="Status"><span class="drive-status eligible">Eligible</span></td>
+							</tr>
+
+							<tr class="candidate-row" data-id="CD26010108" data-level="UG" data-course="B.Tech" data-branch="Civil" data-year="2028" data-tenth="74" data-twelfth="66" data-sem1="6.1" data-sem2="6.4" data-sem3="6.6" data-sem4="6.8" data-sem5="6.9" data-sem6="7.0" data-sem7="7.1" data-backlogs="2">
+								<td class="td-select" data-label=""><input type="checkbox" class="candidate-select" aria-label="Select Pooja More"></td>
+								<td class="td-cand" data-label="Candidate"><div class="drive-candidate"><div class="drive-avatar">PM</div><div><strong>Pooja More</strong><small>CD26010108</small></div></div></td>
+								<td data-label="Education"><span><span class="drive-education">B.Tech</span><span class="drive-subtext">UG</span></span></td>
+								<td data-label="Branch">Civil</td>
+								<td data-label="Passing Year">2028</td>
+								<td data-label="10th / 12th">74% / 66%</td>
+								<td data-label="CGPA">6.8</td>
+								<td data-label="Backlogs">2</td>
+								<td data-label="Status"><span class="drive-status review">Review</span></td>
+							</tr>
+
+							<tr class="candidate-row" data-id="CD26010109" data-level="UG" data-course="B.E." data-branch="Electrical" data-year="2026" data-tenth="73" data-twelfth="82" data-sem1="7.0" data-sem2="6.8" data-sem3="7.5" data-sem4="7.2" data-sem5="7.5" data-sem6="7.5" data-sem7="7.2" data-backlogs="0">
+								<td class="td-select" data-label=""><input type="checkbox" class="candidate-select" aria-label="Select Vivek Gupta"></td>
+								<td class="td-cand" data-label="Candidate"><div class="drive-candidate"><div class="drive-avatar">VG</div><div><strong>Vivek Gupta</strong><small>CD26010109</small></div></div></td>
+								<td data-label="Education"><span><span class="drive-education">B.E.</span><span class="drive-subtext">UG</span></span></td>
+								<td data-label="Branch">Electrical</td>
+								<td data-label="Passing Year">2026</td>
+								<td data-label="10th / 12th">73% / 82%</td>
+								<td data-label="CGPA">7.2</td>
+								<td data-label="Backlogs">0</td>
+								<td data-label="Status"><span class="drive-status eligible">Eligible</span></td>
+							</tr>
+
+							<tr class="candidate-row" data-id="CD26010110" data-level="UG" data-course="B.E." data-branch="Electrical" data-year="2025" data-tenth="59" data-twelfth="74" data-sem1="8.0" data-sem2="7.5" data-sem3="7.6" data-sem4="7.9" data-sem5="8.2" data-sem6="8.0" data-sem7="7.9" data-backlogs="0">
+								<td class="td-select" data-label=""><input type="checkbox" class="candidate-select" aria-label="Select Ananya Mehta"></td>
+								<td class="td-cand" data-label="Candidate"><div class="drive-candidate"><div class="drive-avatar">AM</div><div><strong>Ananya Mehta</strong><small>CD26010110</small></div></div></td>
+								<td data-label="Education"><span><span class="drive-education">B.E.</span><span class="drive-subtext">UG</span></span></td>
+								<td data-label="Branch">Electrical</td>
+								<td data-label="Passing Year">2025</td>
+								<td data-label="10th / 12th">59% / 74%</td>
+								<td data-label="CGPA">7.9</td>
+								<td data-label="Backlogs">0</td>
+								<td data-label="Status"><span class="drive-status eligible">Eligible</span></td>
+							</tr>
+
+							<tr class="candidate-row" data-id="CD26010111" data-level="PG" data-course="M.Tech" data-branch="Civil" data-year="2025" data-tenth="61" data-twelfth="72" data-sem1="7.3" data-sem2="7.3" data-sem3="7.5" data-sem4="7.3" data-sem5="7.4" data-sem6="7.8" data-sem7="7.7" data-backlogs="0">
+								<td class="td-select" data-label=""><input type="checkbox" class="candidate-select" aria-label="Select Rahul Pawar"></td>
+								<td class="td-cand" data-label="Candidate"><div class="drive-candidate"><div class="drive-avatar">RP</div><div><strong>Rahul Pawar</strong><small>CD26010111</small></div></div></td>
+								<td data-label="Education"><span><span class="drive-education">M.Tech</span><span class="drive-subtext">PG</span></span></td>
+								<td data-label="Branch">Civil</td>
+								<td data-label="Passing Year">2025</td>
+								<td data-label="10th / 12th">61% / 72%</td>
+								<td data-label="CGPA">7.5</td>
+								<td data-label="Backlogs">0</td>
+								<td data-label="Status"><span class="drive-status eligible">Eligible</span></td>
+							</tr>
+
+							<tr class="candidate-row" data-id="CD26010112" data-level="UG" data-course="B.E." data-branch="Civil" data-year="2028" data-tenth="63" data-twelfth="90" data-sem1="8.3" data-sem2="8.0" data-sem3="8.1" data-sem4="8.2" data-sem5="8.6" data-sem6="8.9" data-sem7="8.3" data-backlogs="0">
+								<td class="td-select" data-label=""><input type="checkbox" class="candidate-select" aria-label="Select Isha Bhosale"></td>
+								<td class="td-cand" data-label="Candidate"><div class="drive-candidate"><div class="drive-avatar">IB</div><div><strong>Isha Bhosale</strong><small>CD26010112</small></div></div></td>
+								<td data-label="Education"><span><span class="drive-education">B.E.</span><span class="drive-subtext">UG</span></span></td>
+								<td data-label="Branch">Civil</td>
+								<td data-label="Passing Year">2028</td>
+								<td data-label="10th / 12th">63% / 90%</td>
+								<td data-label="CGPA">8.3</td>
+								<td data-label="Backlogs">0</td>
+								<td data-label="Status"><span class="drive-status eligible">Eligible</span></td>
+							</tr>
+
+							<tr class="candidate-row" data-id="CD26010113" data-level="UG" data-course="BCA" data-branch="Computer Science" data-year="2025" data-tenth="75" data-twelfth="78" data-sem1="6.6" data-sem2="7.0" data-sem3="7.1" data-sem4="6.8" data-sem5="7.1" data-sem6="7.5" data-sem7="7.7" data-backlogs="3">
+								<td class="td-select" data-label=""><input type="checkbox" class="candidate-select" aria-label="Select Siddharth Thakur"></td>
+								<td class="td-cand" data-label="Candidate"><div class="drive-candidate"><div class="drive-avatar">ST</div><div><strong>Siddharth Thakur</strong><small>CD26010113</small></div></div></td>
+								<td data-label="Education"><span><span class="drive-education">BCA</span><span class="drive-subtext">UG</span></span></td>
+								<td data-label="Branch">Computer Science</td>
+								<td data-label="Passing Year">2025</td>
+								<td data-label="10th / 12th">75% / 78%</td>
+								<td data-label="CGPA">7.1</td>
+								<td data-label="Backlogs">3</td>
+								<td data-label="Status"><span class="drive-status review">Review</span></td>
+							</tr>
+
+							<tr class="candidate-row" data-id="CD26010114" data-level="PG" data-course="M.Tech" data-branch="Electrical" data-year="2028" data-tenth="88" data-twelfth="58" data-sem1="6.7" data-sem2="6.8" data-sem3="6.6" data-sem4="6.6" data-sem5="7.1" data-sem6="7.2" data-sem7="7.6" data-backlogs="0">
+								<td class="td-select" data-label=""><input type="checkbox" class="candidate-select" aria-label="Select Meera Kale"></td>
+								<td class="td-cand" data-label="Candidate"><div class="drive-candidate"><div class="drive-avatar">MK</div><div><strong>Meera Kale</strong><small>CD26010114</small></div></div></td>
+								<td data-label="Education"><span><span class="drive-education">M.Tech</span><span class="drive-subtext">PG</span></span></td>
+								<td data-label="Branch">Electrical</td>
+								<td data-label="Passing Year">2028</td>
+								<td data-label="10th / 12th">88% / 58%</td>
+								<td data-label="CGPA">6.9</td>
+								<td data-label="Backlogs">0</td>
+								<td data-label="Status"><span class="drive-status eligible">Eligible</span></td>
+							</tr>
+
+							<tr class="candidate-row" data-id="CD26010115" data-level="PG" data-course="M.Tech" data-branch="Information Technology" data-year="2025" data-tenth="59" data-twelfth="83" data-sem1="8.0" data-sem2="7.5" data-sem3="8.3" data-sem4="7.7" data-sem5="7.9" data-sem6="8.5" data-sem7="7.9" data-backlogs="1">
+								<td class="td-select" data-label=""><input type="checkbox" class="candidate-select" aria-label="Select Harsh Iyer"></td>
+								<td class="td-cand" data-label="Candidate"><div class="drive-candidate"><div class="drive-avatar">HI</div><div><strong>Harsh Iyer</strong><small>CD26010115</small></div></div></td>
+								<td data-label="Education"><span><span class="drive-education">M.Tech</span><span class="drive-subtext">PG</span></span></td>
+								<td data-label="Branch">Information Technology</td>
+								<td data-label="Passing Year">2025</td>
+								<td data-label="10th / 12th">59% / 83%</td>
+								<td data-label="CGPA">8.0</td>
+								<td data-label="Backlogs">1</td>
+								<td data-label="Status"><span class="drive-status review">Review</span></td>
+							</tr>
+
+							<tr class="candidate-row" data-id="CD26010116" data-level="PG" data-course="M.Tech" data-branch="Computer Science" data-year="2027" data-tenth="67" data-twelfth="94" data-sem1="7.5" data-sem2="7.4" data-sem3="7.4" data-sem4="7.3" data-sem5="7.2" data-sem6="7.9" data-sem7="7.6" data-backlogs="0">
+								<td class="td-select" data-label=""><input type="checkbox" class="candidate-select" aria-label="Select Divya Nair"></td>
+								<td class="td-cand" data-label="Candidate"><div class="drive-candidate"><div class="drive-avatar">DN</div><div><strong>Divya Nair</strong><small>CD26010116</small></div></div></td>
+								<td data-label="Education"><span><span class="drive-education">M.Tech</span><span class="drive-subtext">PG</span></span></td>
+								<td data-label="Branch">Computer Science</td>
+								<td data-label="Passing Year">2027</td>
+								<td data-label="10th / 12th">67% / 94%</td>
+								<td data-label="CGPA">7.5</td>
+								<td data-label="Backlogs">0</td>
+								<td data-label="Status"><span class="drive-status eligible">Eligible</span></td>
+							</tr>
+
+							<tr class="candidate-row" data-id="CD26010117" data-level="PG" data-course="M.Tech" data-branch="Mechanical" data-year="2028" data-tenth="78" data-twelfth="60" data-sem1="7.4" data-sem2="7.3" data-sem3="8.0" data-sem4="7.4" data-sem5="7.6" data-sem6="8.1" data-sem7="7.6" data-backlogs="0">
+								<td class="td-select" data-label=""><input type="checkbox" class="candidate-select" aria-label="Select Nikhil Rao"></td>
+								<td class="td-cand" data-label="Candidate"><div class="drive-candidate"><div class="drive-avatar">NR</div><div><strong>Nikhil Rao</strong><small>CD26010117</small></div></div></td>
+								<td data-label="Education"><span><span class="drive-education">M.Tech</span><span class="drive-subtext">PG</span></span></td>
+								<td data-label="Branch">Mechanical</td>
+								<td data-label="Passing Year">2028</td>
+								<td data-label="10th / 12th">78% / 60%</td>
+								<td data-label="CGPA">7.6</td>
+								<td data-label="Backlogs">0</td>
+								<td data-label="Status"><span class="drive-status eligible">Eligible</span></td>
+							</tr>
+
+							<tr class="candidate-row" data-id="CD26010118" data-level="UG" data-course="B.E." data-branch="Electronics" data-year="2027" data-tenth="67" data-twelfth="91" data-sem1="6.8" data-sem2="7.1" data-sem3="6.8" data-sem4="7.6" data-sem5="7.5" data-sem6="7.1" data-sem7="7.3" data-backlogs="1">
+								<td class="td-select" data-label=""><input type="checkbox" class="candidate-select" aria-label="Select Shruti Chavan"></td>
+								<td class="td-cand" data-label="Candidate"><div class="drive-candidate"><div class="drive-avatar">SC</div><div><strong>Shruti Chavan</strong><small>CD26010118</small></div></div></td>
+								<td data-label="Education"><span><span class="drive-education">B.E.</span><span class="drive-subtext">UG</span></span></td>
+								<td data-label="Branch">Electronics</td>
+								<td data-label="Passing Year">2027</td>
+								<td data-label="10th / 12th">67% / 91%</td>
+								<td data-label="CGPA">7.2</td>
+								<td data-label="Backlogs">1</td>
+								<td data-label="Status"><span class="drive-status review">Review</span></td>
+							</tr>
+
+							<tr class="candidate-row" data-id="CD26010119" data-level="UG" data-course="B.E." data-branch="Computer Science" data-year="2026" data-tenth="61" data-twelfth="91" data-sem1="8.4" data-sem2="8.5" data-sem3="7.8" data-sem4="8.3" data-sem5="8.0" data-sem6="8.6" data-sem7="8.3" data-backlogs="0">
+								<td class="td-select" data-label=""><input type="checkbox" class="candidate-select" aria-label="Select Yash Jadhav"></td>
+								<td class="td-cand" data-label="Candidate"><div class="drive-candidate"><div class="drive-avatar">YJ</div><div><strong>Yash Jadhav</strong><small>CD26010119</small></div></div></td>
+								<td data-label="Education"><span><span class="drive-education">B.E.</span><span class="drive-subtext">UG</span></span></td>
+								<td data-label="Branch">Computer Science</td>
+								<td data-label="Passing Year">2026</td>
+								<td data-label="10th / 12th">61% / 91%</td>
+								<td data-label="CGPA">8.3</td>
+								<td data-label="Backlogs">0</td>
+								<td data-label="Status"><span class="drive-status eligible">Eligible</span></td>
+							</tr>
+
+							<tr class="candidate-row" data-id="CD26010120" data-level="UG" data-course="B.Tech" data-branch="Electronics" data-year="2027" data-tenth="76" data-twelfth="93" data-sem1="7.1" data-sem2="7.0" data-sem3="7.2" data-sem4="7.2" data-sem5="7.7" data-sem6="7.6" data-sem7="7.7" data-backlogs="2">
+								<td class="td-select" data-label=""><input type="checkbox" class="candidate-select" aria-label="Select Kavya Shinde"></td>
+								<td class="td-cand" data-label="Candidate"><div class="drive-candidate"><div class="drive-avatar">KS</div><div><strong>Kavya Shinde</strong><small>CD26010120</small></div></div></td>
+								<td data-label="Education"><span><span class="drive-education">B.Tech</span><span class="drive-subtext">UG</span></span></td>
+								<td data-label="Branch">Electronics</td>
+								<td data-label="Passing Year">2027</td>
+								<td data-label="10th / 12th">76% / 93%</td>
+								<td data-label="CGPA">7.4</td>
+								<td data-label="Backlogs">2</td>
+								<td data-label="Status"><span class="drive-status review">Review</span></td>
+							</tr>
+
+							<tr class="candidate-row" data-id="CD26010121" data-level="PG" data-course="MCA" data-branch="Computer Science" data-year="2025" data-tenth="94" data-twelfth="72" data-sem1="8.1" data-sem2="8.5" data-sem3="8.5" data-sem4="8.8" data-sem5="8.7" data-sem6="8.3" data-sem7="8.5" data-backlogs="3">
+								<td class="td-select" data-label=""><input type="checkbox" class="candidate-select" aria-label="Select Tanmay Kamble"></td>
+								<td class="td-cand" data-label="Candidate"><div class="drive-candidate"><div class="drive-avatar">TK</div><div><strong>Tanmay Kamble</strong><small>CD26010121</small></div></div></td>
+								<td data-label="Education"><span><span class="drive-education">MCA</span><span class="drive-subtext">PG</span></span></td>
+								<td data-label="Branch">Computer Science</td>
+								<td data-label="Passing Year">2025</td>
+								<td data-label="10th / 12th">94% / 72%</td>
+								<td data-label="CGPA">8.5</td>
+								<td data-label="Backlogs">3</td>
+								<td data-label="Status"><span class="drive-status review">Review</span></td>
+							</tr>
+
+							<tr class="candidate-row" data-id="CD26010122" data-level="PG" data-course="M.Tech" data-branch="Electrical" data-year="2028" data-tenth="58" data-twelfth="59" data-sem1="7.4" data-sem2="8.0" data-sem3="8.1" data-sem4="8.0" data-sem5="7.7" data-sem6="7.8" data-sem7="8.6" data-backlogs="0">
+								<td class="td-select" data-label=""><input type="checkbox" class="candidate-select" aria-label="Select Riya Bansal"></td>
+								<td class="td-cand" data-label="Candidate"><div class="drive-candidate"><div class="drive-avatar">RB</div><div><strong>Riya Bansal</strong><small>CD26010122</small></div></div></td>
+								<td data-label="Education"><span><span class="drive-education">M.Tech</span><span class="drive-subtext">PG</span></span></td>
+								<td data-label="Branch">Electrical</td>
+								<td data-label="Passing Year">2028</td>
+								<td data-label="10th / 12th">58% / 59%</td>
+								<td data-label="CGPA">7.9</td>
+								<td data-label="Backlogs">0</td>
+								<td data-label="Status"><span class="drive-status eligible">Eligible</span></td>
+							</tr>
+
+							<tr class="candidate-row" data-id="CD26010123" data-level="PG" data-course="M.Tech" data-branch="Civil" data-year="2025" data-tenth="70" data-twelfth="82" data-sem1="6.3" data-sem2="6.6" data-sem3="6.0" data-sem4="6.6" data-sem5="6.4" data-sem6="6.6" data-sem7="6.7" data-backlogs="1">
+								<td class="td-select" data-label=""><input type="checkbox" class="candidate-select" aria-label="Select Omkar Tiwari"></td>
+								<td class="td-cand" data-label="Candidate"><div class="drive-candidate"><div class="drive-avatar">OT</div><div><strong>Omkar Tiwari</strong><small>CD26010123</small></div></div></td>
+								<td data-label="Education"><span><span class="drive-education">M.Tech</span><span class="drive-subtext">PG</span></span></td>
+								<td data-label="Branch">Civil</td>
+								<td data-label="Passing Year">2025</td>
+								<td data-label="10th / 12th">70% / 82%</td>
+								<td data-label="CGPA">6.5</td>
+								<td data-label="Backlogs">1</td>
+								<td data-label="Status"><span class="drive-status review">Review</span></td>
+							</tr>
+
+							<tr class="candidate-row" data-id="CD26010124" data-level="UG" data-course="BCA" data-branch="Computer Science" data-year="2027" data-tenth="72" data-twelfth="92" data-sem1="8.0" data-sem2="8.0" data-sem3="7.7" data-sem4="8.4" data-sem5="8.0" data-sem6="8.0" data-sem7="8.1" data-backlogs="1">
+								<td class="td-select" data-label=""><input type="checkbox" class="candidate-select" aria-label="Select Sakshi Mishra"></td>
+								<td class="td-cand" data-label="Candidate"><div class="drive-candidate"><div class="drive-avatar">SM</div><div><strong>Sakshi Mishra</strong><small>CD26010124</small></div></div></td>
+								<td data-label="Education"><span><span class="drive-education">BCA</span><span class="drive-subtext">UG</span></span></td>
+								<td data-label="Branch">Computer Science</td>
+								<td data-label="Passing Year">2027</td>
+								<td data-label="10th / 12th">72% / 92%</td>
+								<td data-label="CGPA">8.0</td>
+								<td data-label="Backlogs">1</td>
+								<td data-label="Status"><span class="drive-status review">Review</span></td>
+							</tr>
+
+							<tr class="candidate-row" data-id="CD26010125" data-level="UG" data-course="BCA" data-branch="Computer Science" data-year="2026" data-tenth="88" data-twelfth="69" data-sem1="8.5" data-sem2="8.3" data-sem3="8.4" data-sem4="8.0" data-sem5="8.4" data-sem6="8.3" data-sem7="8.9" data-backlogs="1">
+								<td class="td-select" data-label=""><input type="checkbox" class="candidate-select" aria-label="Select Varun Pandey"></td>
+								<td class="td-cand" data-label="Candidate"><div class="drive-candidate"><div class="drive-avatar">VP</div><div><strong>Varun Pandey</strong><small>CD26010125</small></div></div></td>
+								<td data-label="Education"><span><span class="drive-education">BCA</span><span class="drive-subtext">UG</span></span></td>
+								<td data-label="Branch">Computer Science</td>
+								<td data-label="Passing Year">2026</td>
+								<td data-label="10th / 12th">88% / 69%</td>
+								<td data-label="CGPA">8.4</td>
+								<td data-label="Backlogs">1</td>
+								<td data-label="Status"><span class="drive-status review">Review</span></td>
+							</tr>
+
+							<tr class="candidate-row" data-id="CD26010126" data-level="UG" data-course="B.E." data-branch="Computer Science" data-year="2027" data-tenth="87" data-twelfth="63" data-sem1="5.8" data-sem2="6.3" data-sem3="6.3" data-sem4="6.0" data-sem5="6.0" data-sem6="6.2" data-sem7="6.6" data-backlogs="0">
+								<td class="td-select" data-label=""><input type="checkbox" class="candidate-select" aria-label="Select Pallavi Yadav"></td>
+								<td class="td-cand" data-label="Candidate"><div class="drive-candidate"><div class="drive-avatar">PY</div><div><strong>Pallavi Yadav</strong><small>CD26010126</small></div></div></td>
+								<td data-label="Education"><span><span class="drive-education">B.E.</span><span class="drive-subtext">UG</span></span></td>
+								<td data-label="Branch">Computer Science</td>
+								<td data-label="Passing Year">2027</td>
+								<td data-label="10th / 12th">87% / 63%</td>
+								<td data-label="CGPA">6.2</td>
+								<td data-label="Backlogs">0</td>
+								<td data-label="Status"><span class="drive-status eligible">Eligible</span></td>
+							</tr>
+
+							<tr class="candidate-row" data-id="CD26010127" data-level="UG" data-course="B.E." data-branch="Electronics" data-year="2028" data-tenth="77" data-twelfth="87" data-sem1="7.4" data-sem2="7.1" data-sem3="7.0" data-sem4="7.4" data-sem5="7.7" data-sem6="7.5" data-sem7="7.9" data-backlogs="0">
+								<td class="td-select" data-label=""><input type="checkbox" class="candidate-select" aria-label="Select Sahil Sawant"></td>
+								<td class="td-cand" data-label="Candidate"><div class="drive-candidate"><div class="drive-avatar">SS</div><div><strong>Sahil Sawant</strong><small>CD26010127</small></div></div></td>
+								<td data-label="Education"><span><span class="drive-education">B.E.</span><span class="drive-subtext">UG</span></span></td>
+								<td data-label="Branch">Electronics</td>
+								<td data-label="Passing Year">2028</td>
+								<td data-label="10th / 12th">77% / 87%</td>
+								<td data-label="CGPA">7.4</td>
+								<td data-label="Backlogs">0</td>
+								<td data-label="Status"><span class="drive-status eligible">Eligible</span></td>
+							</tr>
+
+							<tr class="candidate-row" data-id="CD26010128" data-level="UG" data-course="B.Tech" data-branch="Mechanical" data-year="2025" data-tenth="94" data-twelfth="57" data-sem1="8.2" data-sem2="8.6" data-sem3="9.0" data-sem4="8.8" data-sem5="8.9" data-sem6="8.8" data-sem7="8.8" data-backlogs="0">
+								<td class="td-select" data-label=""><input type="checkbox" class="candidate-select" aria-label="Select Mrunal Gaikwad"></td>
+								<td class="td-cand" data-label="Candidate"><div class="drive-candidate"><div class="drive-avatar">MG</div><div><strong>Mrunal Gaikwad</strong><small>CD26010128</small></div></div></td>
+								<td data-label="Education"><span><span class="drive-education">B.Tech</span><span class="drive-subtext">UG</span></span></td>
+								<td data-label="Branch">Mechanical</td>
+								<td data-label="Passing Year">2025</td>
+								<td data-label="10th / 12th">94% / 57%</td>
+								<td data-label="CGPA">8.7</td>
+								<td data-label="Backlogs">0</td>
+								<td data-label="Status"><span class="drive-status eligible">Eligible</span></td>
+							</tr>
+
+							<tr class="candidate-row" data-id="CD26010129" data-level="UG" data-course="BCA" data-branch="Computer Science" data-year="2028" data-tenth="95" data-twelfth="88" data-sem1="8.0" data-sem2="7.5" data-sem3="7.7" data-sem4="8.4" data-sem5="8.5" data-sem6="8.0" data-sem7="8.0" data-backlogs="0">
+								<td class="td-select" data-label=""><input type="checkbox" class="candidate-select" aria-label="Select Akash Naik"></td>
+								<td class="td-cand" data-label="Candidate"><div class="drive-candidate"><div class="drive-avatar">AN</div><div><strong>Akash Naik</strong><small>CD26010129</small></div></div></td>
+								<td data-label="Education"><span><span class="drive-education">BCA</span><span class="drive-subtext">UG</span></span></td>
+								<td data-label="Branch">Computer Science</td>
+								<td data-label="Passing Year">2028</td>
+								<td data-label="10th / 12th">95% / 88%</td>
+								<td data-label="CGPA">8.0</td>
+								<td data-label="Backlogs">0</td>
+								<td data-label="Status"><span class="drive-status eligible">Eligible</span></td>
+							</tr>
+
+							<tr class="candidate-row" data-id="CD26010130" data-level="UG" data-course="BCA" data-branch="Computer Science" data-year="2028" data-tenth="92" data-twelfth="62" data-sem1="7.6" data-sem2="7.6" data-sem3="7.1" data-sem4="7.6" data-sem5="8.0" data-sem6="7.7" data-sem7="7.6" data-backlogs="0">
+								<td class="td-select" data-label=""><input type="checkbox" class="candidate-select" aria-label="Select Tanvi Kadam"></td>
+								<td class="td-cand" data-label="Candidate"><div class="drive-candidate"><div class="drive-avatar">TK</div><div><strong>Tanvi Kadam</strong><small>CD26010130</small></div></div></td>
+								<td data-label="Education"><span><span class="drive-education">BCA</span><span class="drive-subtext">UG</span></span></td>
+								<td data-label="Branch">Computer Science</td>
+								<td data-label="Passing Year">2028</td>
+								<td data-label="10th / 12th">92% / 62%</td>
+								<td data-label="CGPA">7.6</td>
+								<td data-label="Backlogs">0</td>
+								<td data-label="Status"><span class="drive-status eligible">Eligible</span></td>
+							</tr>
+
+							<tr class="candidate-row" data-id="CD26010131" data-level="PG" data-course="MCA" data-branch="Computer Science" data-year="2028" data-tenth="73" data-twelfth="65" data-sem1="6.7" data-sem2="6.5" data-sem3="6.5" data-sem4="6.8" data-sem5="6.9" data-sem6="6.6" data-sem7="6.8" data-backlogs="1">
+								<td class="td-select" data-label=""><input type="checkbox" class="candidate-select" aria-label="Select Pratik Dixit"></td>
+								<td class="td-cand" data-label="Candidate"><div class="drive-candidate"><div class="drive-avatar">PD</div><div><strong>Pratik Dixit</strong><small>CD26010131</small></div></div></td>
+								<td data-label="Education"><span><span class="drive-education">MCA</span><span class="drive-subtext">PG</span></span></td>
+								<td data-label="Branch">Computer Science</td>
+								<td data-label="Passing Year">2028</td>
+								<td data-label="10th / 12th">73% / 65%</td>
+								<td data-label="CGPA">6.7</td>
+								<td data-label="Backlogs">1</td>
+								<td data-label="Status"><span class="drive-status review">Review</span></td>
+							</tr>
+
+							<tr class="candidate-row" data-id="CD26010132" data-level="UG" data-course="B.E." data-branch="Electronics" data-year="2025" data-tenth="76" data-twelfth="83" data-sem1="8.3" data-sem2="8.5" data-sem3="8.2" data-sem4="8.4" data-sem5="8.9" data-sem6="9.0" data-sem7="8.9" data-backlogs="0">
+								<td class="td-select" data-label=""><input type="checkbox" class="candidate-select" aria-label="Select Komal Agarwal"></td>
+								<td class="td-cand" data-label="Candidate"><div class="drive-candidate"><div class="drive-avatar">KA</div><div><strong>Komal Agarwal</strong><small>CD26010132</small></div></div></td>
+								<td data-label="Education"><span><span class="drive-education">B.E.</span><span class="drive-subtext">UG</span></span></td>
+								<td data-label="Branch">Electronics</td>
+								<td data-label="Passing Year">2025</td>
+								<td data-label="10th / 12th">76% / 83%</td>
+								<td data-label="CGPA">8.6</td>
+								<td data-label="Backlogs">0</td>
+								<td data-label="Status"><span class="drive-status eligible">Eligible</span></td>
+							</tr>
+
+							<tr class="candidate-row" data-id="CD26010133" data-level="UG" data-course="BCA" data-branch="Computer Science" data-year="2028" data-tenth="80" data-twelfth="74" data-sem1="8.3" data-sem2="7.8" data-sem3="8.2" data-sem4="8.4" data-sem5="8.3" data-sem6="8.7" data-sem7="8.2" data-backlogs="0">
+								<td class="td-select" data-label=""><input type="checkbox" class="candidate-select" aria-label="Select Mayur Saxena"></td>
+								<td class="td-cand" data-label="Candidate"><div class="drive-candidate"><div class="drive-avatar">MS</div><div><strong>Mayur Saxena</strong><small>CD26010133</small></div></div></td>
+								<td data-label="Education"><span><span class="drive-education">BCA</span><span class="drive-subtext">UG</span></span></td>
+								<td data-label="Branch">Computer Science</td>
+								<td data-label="Passing Year">2028</td>
+								<td data-label="10th / 12th">80% / 74%</td>
+								<td data-label="CGPA">8.3</td>
+								<td data-label="Backlogs">0</td>
+								<td data-label="Status"><span class="drive-status eligible">Eligible</span></td>
+							</tr>
+
+							<tr class="candidate-row" data-id="CD26010134" data-level="PG" data-course="M.Tech" data-branch="Computer Science" data-year="2027" data-tenth="81" data-twelfth="65" data-sem1="7.0" data-sem2="7.2" data-sem3="6.8" data-sem4="7.3" data-sem5="7.3" data-sem6="7.3" data-sem7="7.2" data-backlogs="0">
+								<td class="td-select" data-label=""><input type="checkbox" class="candidate-select" aria-label="Select Ritika Bhatt"></td>
+								<td class="td-cand" data-label="Candidate"><div class="drive-candidate"><div class="drive-avatar">RB</div><div><strong>Ritika Bhatt</strong><small>CD26010134</small></div></div></td>
+								<td data-label="Education"><span><span class="drive-education">M.Tech</span><span class="drive-subtext">PG</span></span></td>
+								<td data-label="Branch">Computer Science</td>
+								<td data-label="Passing Year">2027</td>
+								<td data-label="10th / 12th">81% / 65%</td>
+								<td data-label="CGPA">7.2</td>
+								<td data-label="Backlogs">0</td>
+								<td data-label="Status"><span class="drive-status eligible">Eligible</span></td>
+							</tr>
+
+							<tr class="candidate-row" data-id="CD26010135" data-level="UG" data-course="B.E." data-branch="Mechanical" data-year="2027" data-tenth="60" data-twelfth="80" data-sem1="8.5" data-sem2="8.3" data-sem3="8.0" data-sem4="8.5" data-sem5="8.4" data-sem6="8.4" data-sem7="8.3" data-backlogs="1">
+								<td class="td-select" data-label=""><input type="checkbox" class="candidate-select" aria-label="Select Gaurav Menon"></td>
+								<td class="td-cand" data-label="Candidate"><div class="drive-candidate"><div class="drive-avatar">GM</div><div><strong>Gaurav Menon</strong><small>CD26010135</small></div></div></td>
+								<td data-label="Education"><span><span class="drive-education">B.E.</span><span class="drive-subtext">UG</span></span></td>
+								<td data-label="Branch">Mechanical</td>
+								<td data-label="Passing Year">2027</td>
+								<td data-label="10th / 12th">60% / 80%</td>
+								<td data-label="CGPA">8.3</td>
+								<td data-label="Backlogs">1</td>
+								<td data-label="Status"><span class="drive-status review">Review</span></td>
+							</tr>
+
+							<tr class="candidate-row" data-id="CD26010136" data-level="UG" data-course="B.E." data-branch="Computer Science" data-year="2025" data-tenth="94" data-twelfth="60" data-sem1="7.7" data-sem2="7.6" data-sem3="7.9" data-sem4="8.1" data-sem5="7.8" data-sem6="7.9" data-sem7="8.4" data-backlogs="2">
+								<td class="td-select" data-label=""><input type="checkbox" class="candidate-select" aria-label="Select Swati Reddy"></td>
+								<td class="td-cand" data-label="Candidate"><div class="drive-candidate"><div class="drive-avatar">SR</div><div><strong>Swati Reddy</strong><small>CD26010136</small></div></div></td>
+								<td data-label="Education"><span><span class="drive-education">B.E.</span><span class="drive-subtext">UG</span></span></td>
+								<td data-label="Branch">Computer Science</td>
+								<td data-label="Passing Year">2025</td>
+								<td data-label="10th / 12th">94% / 60%</td>
+								<td data-label="CGPA">7.9</td>
+								<td data-label="Backlogs">2</td>
+								<td data-label="Status"><span class="drive-status review">Review</span></td>
+							</tr>
+
+							<tr class="candidate-row" data-id="CD26010137" data-level="PG" data-course="MCA" data-branch="Computer Science" data-year="2025" data-tenth="79" data-twelfth="75" data-sem1="6.6" data-sem2="6.4" data-sem3="6.5" data-sem4="7.2" data-sem5="6.8" data-sem6="6.9" data-sem7="7.4" data-backlogs="0">
+								<td class="td-select" data-label=""><input type="checkbox" class="candidate-select" aria-label="Select Aniket Patel"></td>
+								<td class="td-cand" data-label="Candidate"><div class="drive-candidate"><div class="drive-avatar">AP</div><div><strong>Aniket Patel</strong><small>CD26010137</small></div></div></td>
+								<td data-label="Education"><span><span class="drive-education">MCA</span><span class="drive-subtext">PG</span></span></td>
+								<td data-label="Branch">Computer Science</td>
+								<td data-label="Passing Year">2025</td>
+								<td data-label="10th / 12th">79% / 75%</td>
+								<td data-label="CGPA">6.8</td>
+								<td data-label="Backlogs">0</td>
+								<td data-label="Status"><span class="drive-status eligible">Eligible</span></td>
+							</tr>
+
+							<tr class="candidate-row" data-id="CD26010138" data-level="UG" data-course="BCA" data-branch="Computer Science" data-year="2026" data-tenth="60" data-twelfth="80" data-sem1="6.5" data-sem2="6.7" data-sem3="6.4" data-sem4="6.8" data-sem5="7.3" data-sem6="7.3" data-sem7="7.4" data-backlogs="0">
+								<td class="td-select" data-label=""><input type="checkbox" class="candidate-select" aria-label="Select Nidhi Shah"></td>
+								<td class="td-cand" data-label="Candidate"><div class="drive-candidate"><div class="drive-avatar">NS</div><div><strong>Nidhi Shah</strong><small>CD26010138</small></div></div></td>
+								<td data-label="Education"><span><span class="drive-education">BCA</span><span class="drive-subtext">UG</span></span></td>
+								<td data-label="Branch">Computer Science</td>
+								<td data-label="Passing Year">2026</td>
+								<td data-label="10th / 12th">60% / 80%</td>
+								<td data-label="CGPA">6.9</td>
+								<td data-label="Backlogs">0</td>
+								<td data-label="Status"><span class="drive-status eligible">Eligible</span></td>
+							</tr>
+
+							<tr class="candidate-row" data-id="CD26010139" data-level="UG" data-course="B.E." data-branch="Mechanical" data-year="2025" data-tenth="76" data-twelfth="93" data-sem1="7.1" data-sem2="7.4" data-sem3="7.8" data-sem4="7.7" data-sem5="7.9" data-sem6="7.8" data-sem7="7.9" data-backlogs="1">
+								<td class="td-select" data-label=""><input type="checkbox" class="candidate-select" aria-label="Select Shubham Khan"></td>
+								<td class="td-cand" data-label="Candidate"><div class="drive-candidate"><div class="drive-avatar">SK</div><div><strong>Shubham Khan</strong><small>CD26010139</small></div></div></td>
+								<td data-label="Education"><span><span class="drive-education">B.E.</span><span class="drive-subtext">UG</span></span></td>
+								<td data-label="Branch">Mechanical</td>
+								<td data-label="Passing Year">2025</td>
+								<td data-label="10th / 12th">76% / 93%</td>
+								<td data-label="CGPA">7.7</td>
+								<td data-label="Backlogs">1</td>
+								<td data-label="Status"><span class="drive-status review">Review</span></td>
+							</tr>
+
+							<tr class="candidate-row" data-id="CD26010140" data-level="UG" data-course="B.E." data-branch="Computer Science" data-year="2025" data-tenth="94" data-twelfth="67" data-sem1="7.2" data-sem2="8.0" data-sem3="7.9" data-sem4="7.6" data-sem5="8.1" data-sem6="8.3" data-sem7="7.9" data-backlogs="1">
+								<td class="td-select" data-label=""><input type="checkbox" class="candidate-select" aria-label="Select Payal Singh"></td>
+								<td class="td-cand" data-label="Candidate"><div class="drive-candidate"><div class="drive-avatar">PS</div><div><strong>Payal Singh</strong><small>CD26010140</small></div></div></td>
+								<td data-label="Education"><span><span class="drive-education">B.E.</span><span class="drive-subtext">UG</span></span></td>
+								<td data-label="Branch">Computer Science</td>
+								<td data-label="Passing Year">2025</td>
+								<td data-label="10th / 12th">94% / 67%</td>
+								<td data-label="CGPA">7.9</td>
+								<td data-label="Backlogs">1</td>
+								<td data-label="Status"><span class="drive-status review">Review</span></td>
+							</tr>
+
+							<tr class="candidate-row" data-id="CD26010141" data-level="UG" data-course="B.Tech" data-branch="Civil" data-year="2027" data-tenth="65" data-twelfth="63" data-sem1="7.6" data-sem2="8.2" data-sem3="8.2" data-sem4="7.7" data-sem5="7.8" data-sem6="7.9" data-sem7="7.8" data-backlogs="0">
+								<td class="td-select" data-label=""><input type="checkbox" class="candidate-select" aria-label="Select Chinmay Ghate"></td>
+								<td class="td-cand" data-label="Candidate"><div class="drive-candidate"><div class="drive-avatar">CG</div><div><strong>Chinmay Ghate</strong><small>CD26010141</small></div></div></td>
+								<td data-label="Education"><span><span class="drive-education">B.Tech</span><span class="drive-subtext">UG</span></span></td>
+								<td data-label="Branch">Civil</td>
+								<td data-label="Passing Year">2027</td>
+								<td data-label="10th / 12th">65% / 63%</td>
+								<td data-label="CGPA">7.9</td>
+								<td data-label="Backlogs">0</td>
+								<td data-label="Status"><span class="drive-status eligible">Eligible</span></td>
+							</tr>
+
+							<tr class="candidate-row" data-id="CD26010142" data-level="PG" data-course="MCA" data-branch="Computer Science" data-year="2025" data-tenth="67" data-twelfth="83" data-sem1="8.7" data-sem2="8.5" data-sem3="8.5" data-sem4="9.0" data-sem5="8.7" data-sem6="9.3" data-sem7="9.4" data-backlogs="0">
+								<td class="td-select" data-label=""><input type="checkbox" class="candidate-select" aria-label="Select Rutuja Raut"></td>
+								<td class="td-cand" data-label="Candidate"><div class="drive-candidate"><div class="drive-avatar">RR</div><div><strong>Rutuja Raut</strong><small>CD26010142</small></div></div></td>
+								<td data-label="Education"><span><span class="drive-education">MCA</span><span class="drive-subtext">PG</span></span></td>
+								<td data-label="Branch">Computer Science</td>
+								<td data-label="Passing Year">2025</td>
+								<td data-label="10th / 12th">67% / 83%</td>
+								<td data-label="CGPA">8.9</td>
+								<td data-label="Backlogs">0</td>
+								<td data-label="Status"><span class="drive-status eligible">Eligible</span></td>
+							</tr>
+
+							<tr class="candidate-row" data-id="CD26010143" data-level="PG" data-course="M.Tech" data-branch="Electronics" data-year="2025" data-tenth="94" data-twelfth="79" data-sem1="6.6" data-sem2="6.8" data-sem3="6.8" data-sem4="6.8" data-sem5="6.8" data-sem6="7.6" data-sem7="7.6" data-backlogs="0">
+								<td class="td-select" data-label=""><input type="checkbox" class="candidate-select" aria-label="Select Dhruv Dhoke"></td>
+								<td class="td-cand" data-label="Candidate"><div class="drive-candidate"><div class="drive-avatar">DD</div><div><strong>Dhruv Dhoke</strong><small>CD26010143</small></div></div></td>
+								<td data-label="Education"><span><span class="drive-education">M.Tech</span><span class="drive-subtext">PG</span></span></td>
+								<td data-label="Branch">Electronics</td>
+								<td data-label="Passing Year">2025</td>
+								<td data-label="10th / 12th">94% / 79%</td>
+								<td data-label="CGPA">7.0</td>
+								<td data-label="Backlogs">0</td>
+								<td data-label="Status"><span class="drive-status eligible">Eligible</span></td>
+							</tr>
+
+							<tr class="candidate-row" data-id="CD26010144" data-level="UG" data-course="B.E." data-branch="Electrical" data-year="2025" data-tenth="67" data-twelfth="93" data-sem1="5.8" data-sem2="6.4" data-sem3="6.3" data-sem4="6.3" data-sem5="6.4" data-sem6="6.7" data-sem7="6.3" data-backlogs="0">
+								<td class="td-select" data-label=""><input type="checkbox" class="candidate-select" aria-label="Select Vaishnavi Meshram"></td>
+								<td class="td-cand" data-label="Candidate"><div class="drive-candidate"><div class="drive-avatar">VM</div><div><strong>Vaishnavi Meshram</strong><small>CD26010144</small></div></div></td>
+								<td data-label="Education"><span><span class="drive-education">B.E.</span><span class="drive-subtext">UG</span></span></td>
+								<td data-label="Branch">Electrical</td>
+								<td data-label="Passing Year">2025</td>
+								<td data-label="10th / 12th">67% / 93%</td>
+								<td data-label="CGPA">6.3</td>
+								<td data-label="Backlogs">0</td>
+								<td data-label="Status"><span class="drive-status eligible">Eligible</span></td>
+							</tr>
+
+							<tr class="candidate-row" data-id="CD26010145" data-level="UG" data-course="BCA" data-branch="Computer Science" data-year="2027" data-tenth="70" data-twelfth="67" data-sem1="7.2" data-sem2="7.3" data-sem3="8.0" data-sem4="8.2" data-sem5="8.1" data-sem6="8.2" data-sem7="8.3" data-backlogs="0">
+								<td class="td-select" data-label=""><input type="checkbox" class="candidate-select" aria-label="Select Ajay Bawane"></td>
+								<td class="td-cand" data-label="Candidate"><div class="drive-candidate"><div class="drive-avatar">AB</div><div><strong>Ajay Bawane</strong><small>CD26010145</small></div></div></td>
+								<td data-label="Education"><span><span class="drive-education">BCA</span><span class="drive-subtext">UG</span></span></td>
+								<td data-label="Branch">Computer Science</td>
+								<td data-label="Passing Year">2027</td>
+								<td data-label="10th / 12th">70% / 67%</td>
+								<td data-label="CGPA">7.9</td>
+								<td data-label="Backlogs">0</td>
+								<td data-label="Status"><span class="drive-status eligible">Eligible</span></td>
+							</tr>
+
+							<tr class="candidate-row" data-id="CD26010146" data-level="UG" data-course="BCA" data-branch="Computer Science" data-year="2026" data-tenth="82" data-twelfth="74" data-sem1="8.0" data-sem2="8.1" data-sem3="8.1" data-sem4="8.4" data-sem5="8.3" data-sem6="8.4" data-sem7="8.7" data-backlogs="0">
+								<td class="td-select" data-label=""><input type="checkbox" class="candidate-select" aria-label="Select Madhuri Lokhande"></td>
+								<td class="td-cand" data-label="Candidate"><div class="drive-candidate"><div class="drive-avatar">ML</div><div><strong>Madhuri Lokhande</strong><small>CD26010146</small></div></div></td>
+								<td data-label="Education"><span><span class="drive-education">BCA</span><span class="drive-subtext">UG</span></span></td>
+								<td data-label="Branch">Computer Science</td>
+								<td data-label="Passing Year">2026</td>
+								<td data-label="10th / 12th">82% / 74%</td>
+								<td data-label="CGPA">8.3</td>
+								<td data-label="Backlogs">0</td>
+								<td data-label="Status"><span class="drive-status eligible">Eligible</span></td>
+							</tr>
+
+							<tr class="candidate-row" data-id="CD26010147" data-level="PG" data-course="M.Tech" data-branch="Electrical" data-year="2026" data-tenth="70" data-twelfth="87" data-sem1="7.5" data-sem2="7.0" data-sem3="7.3" data-sem4="7.5" data-sem5="7.4" data-sem6="7.4" data-sem7="7.4" data-backlogs="0">
+								<td class="td-select" data-label=""><input type="checkbox" class="candidate-select" aria-label="Select Tushar Ingle"></td>
+								<td class="td-cand" data-label="Candidate"><div class="drive-candidate"><div class="drive-avatar">TI</div><div><strong>Tushar Ingle</strong><small>CD26010147</small></div></div></td>
+								<td data-label="Education"><span><span class="drive-education">M.Tech</span><span class="drive-subtext">PG</span></span></td>
+								<td data-label="Branch">Electrical</td>
+								<td data-label="Passing Year">2026</td>
+								<td data-label="10th / 12th">70% / 87%</td>
+								<td data-label="CGPA">7.4</td>
+								<td data-label="Backlogs">0</td>
+								<td data-label="Status"><span class="drive-status eligible">Eligible</span></td>
+							</tr>
+
+							<tr class="candidate-row" data-id="CD26010148" data-level="UG" data-course="BCA" data-branch="Computer Science" data-year="2025" data-tenth="72" data-twelfth="75" data-sem1="8.4" data-sem2="8.9" data-sem3="8.5" data-sem4="8.9" data-sem5="8.5" data-sem6="8.8" data-sem7="9.0" data-backlogs="1">
+								<td class="td-select" data-label=""><input type="checkbox" class="candidate-select" aria-label="Select Bhavna Wagh"></td>
+								<td class="td-cand" data-label="Candidate"><div class="drive-candidate"><div class="drive-avatar">BW</div><div><strong>Bhavna Wagh</strong><small>CD26010148</small></div></div></td>
+								<td data-label="Education"><span><span class="drive-education">BCA</span><span class="drive-subtext">UG</span></span></td>
+								<td data-label="Branch">Computer Science</td>
+								<td data-label="Passing Year">2025</td>
+								<td data-label="10th / 12th">72% / 75%</td>
+								<td data-label="CGPA">8.7</td>
+								<td data-label="Backlogs">1</td>
+								<td data-label="Status"><span class="drive-status review">Review</span></td>
+							</tr>
+
+							<tr class="candidate-row" data-id="CD26010149" data-level="UG" data-course="BCA" data-branch="Computer Science" data-year="2028" data-tenth="88" data-twelfth="92" data-sem1="7.7" data-sem2="8.4" data-sem3="8.1" data-sem4="7.7" data-sem5="8.3" data-sem6="8.4" data-sem7="8.4" data-backlogs="0">
+								<td class="td-select" data-label=""><input type="checkbox" class="candidate-select" aria-label="Select Sagar Zade"></td>
+								<td class="td-cand" data-label="Candidate"><div class="drive-candidate"><div class="drive-avatar">SZ</div><div><strong>Sagar Zade</strong><small>CD26010149</small></div></div></td>
+								<td data-label="Education"><span><span class="drive-education">BCA</span><span class="drive-subtext">UG</span></span></td>
+								<td data-label="Branch">Computer Science</td>
+								<td data-label="Passing Year">2028</td>
+								<td data-label="10th / 12th">88% / 92%</td>
+								<td data-label="CGPA">8.1</td>
+								<td data-label="Backlogs">0</td>
+								<td data-label="Status"><span class="drive-status eligible">Eligible</span></td>
+							</tr>
+
+							<tr class="candidate-row" data-id="CD26010150" data-level="UG" data-course="B.E." data-branch="Electronics" data-year="2025" data-tenth="93" data-twelfth="59" data-sem1="6.7" data-sem2="6.9" data-sem3="6.5" data-sem4="6.6" data-sem5="7.2" data-sem6="6.8" data-sem7="6.9" data-backlogs="0">
+								<td class="td-select" data-label=""><input type="checkbox" class="candidate-select" aria-label="Select Anjali Nimje"></td>
+								<td class="td-cand" data-label="Candidate"><div class="drive-candidate"><div class="drive-avatar">AN</div><div><strong>Anjali Nimje</strong><small>CD26010150</small></div></div></td>
+								<td data-label="Education"><span><span class="drive-education">B.E.</span><span class="drive-subtext">UG</span></span></td>
+								<td data-label="Branch">Electronics</td>
+								<td data-label="Passing Year">2025</td>
+								<td data-label="10th / 12th">93% / 59%</td>
+								<td data-label="CGPA">6.8</td>
+								<td data-label="Backlogs">0</td>
+								<td data-label="Status"><span class="drive-status eligible">Eligible</span></td>
+							</tr>
+						</tbody>
+					</table>
+				</div>
+
+				<div id="emptyState" class="drive-empty">
+					<i class="fa-regular fa-folder-open"></i>
+					No candidates match your selected filters.
+					<div style="margin-top:6px;font-size:12px;">Try changing the criteria or resetting your filters.</div>
+				</div>
+
+				<div class="drive-table-footer">
+					<div class="drive-selection-info">
+						Showing <strong id="visibleCount">0</strong> candidates
+						&middot; <strong id="selectedCount">0</strong> selected
+					</div>
+
+					<div class="drive-foot-right">
+						<div class="drive-size">
+							<span>Rows</span>
+							<select id="pageSize" class="drive-control">
+								<option value="5">5</option>
+								<option value="10" selected>10</option>
+								<option value="25">25</option>
+								<option value="50">50</option>
+							</select>
+						</div>
+						<div class="drive-pager" id="pager"></div>
+						<button type="button" class="drive-btn drive-btn-primary" id="continueDrive">
+							Continue with Selected <i class="fa-solid fa-arrow-right"></i>
+						</button>
+					</div>
+				</div>
+			</section>
+		</div>
+
+
+		<!-- ================= RECRUITMENT DRIVE DETAILS ================= -->
+
+		<section class="drive-panel drive-create-section" id="driveDetails">
+
+			<div class="drive-sec-head">
+				<span class="ico"><i class="fa-solid fa-clipboard-list"></i></span>
+				<div>
+					<h3>Recruitment Drive Details</h3>
+					<p>Enter the company and drive details before proceeding with your selected candidates.</p>
+				</div>
+				<span class="drive-sel-badge"><i class="fa-solid fa-user-check"></i> <span id="formSelectedCount">0</span> candidates selected</span>
+			</div>
+
+			<form id="createDriveForm" method="post" asp-controller="Organization" asp-action="CreateDrive" novalidate>
+				@Html.AntiForgeryToken()
+
+				<!-- Company & offer -->
+				<div class="drive-block-title"><span><i class="fa-solid fa-briefcase"></i>Company &amp; Offer</span></div>
+
+				<div class="drive-grid drive-g4">
+					<div class="drive-field">
+						<label for="CompanyName">Company Name <span class="req">*</span></label>
+						<div class="drive-input-icon">
+							<i class="fa-solid fa-building"></i>
+							<input type="text" id="CompanyName" name="CompanyName" class="drive-control"
+								   placeholder="Enter company name" maxlength="150" required />
+						</div>
+						<span class="drive-error"></span>
+					</div>
+
+					<div class="drive-field">
+						<label for="Destination">Destination <span class="req">*</span></label>
+						<div class="drive-input-icon">
+							<i class="fa-solid fa-location-dot"></i>
+							<input type="text" id="Destination" name="Destination" class="drive-control"
+								   placeholder="e.g. Software Developer / Pune" maxlength="150" required />
+						</div>
+						<span class="drive-error"></span>
+					</div>
+
+					<div class="drive-field">
+						<label for="Package">Package (LPA) <span class="req">*</span></label>
+						<div class="drive-input-icon">
+							<i class="fa-solid fa-indian-rupee-sign"></i>
+							<input type="number" id="Package" name="Package" class="drive-control"
+								   placeholder="e.g. 4.5" min="0" step="0.01" required />
+						</div>
+						<span class="drive-error"></span>
+					</div>
+
+					<div class="drive-field">
+						<label for="ExpectedJoining">Expected Joining <span class="req">*</span></label>
+						<input type="date" id="ExpectedJoining" name="ExpectedJoining" class="drive-control" required />
+						<span class="drive-error"></span>
+					</div>
+				</div>
+
+				<!-- Schedule -->
+				<div class="drive-block-title"><span><i class="fa-solid fa-calendar-days"></i>Drive Schedule</span></div>
+
+				<div class="drive-grid drive-g4">
+					<div class="drive-field">
+						<label for="DateFrom">Date From <span class="req">*</span></label>
+						<input type="date" id="DateFrom" name="DateFrom" class="drive-control" required />
+						<span class="drive-error"></span>
+					</div>
+
+					<div class="drive-field">
+						<label for="DateTo">Date To <span class="req">*</span></label>
+						<input type="date" id="DateTo" name="DateTo" class="drive-control" required />
+						<span class="drive-error"></span>
+					</div>
+
+					<div class="drive-field">
+						<label for="TimeFrom">Timing From <span class="req">*</span></label>
+						<input type="time" id="TimeFrom" name="TimeFrom" class="drive-control" required />
+						<span class="drive-error"></span>
+					</div>
+
+					<div class="drive-field">
+						<label for="TimeTo">Timing To <span class="req">*</span></label>
+						<input type="time" id="TimeTo" name="TimeTo" class="drive-control" required />
+						<span class="drive-error"></span>
+					</div>
+				</div>
+
+				<!-- Venues -->
+				<div class="drive-block-title">
+					<span><i class="fa-solid fa-map-location-dot"></i>Venue(s) <span style="color:#d92d20;">*</span></span>
+					<button type="button" class="drive-btn drive-btn-sm" id="btnAddVenue">
+						<i class="fa-solid fa-plus"></i> Add Venue
+					</button>
+				</div>
+
+				<div class="drive-venue-list" id="venueList"></div>
+				<span class="drive-error" id="venueError"></span>
+
+				<!-- Contact -->
+				<div class="drive-block-title"><span><i class="fa-solid fa-user-tie"></i>Company Contact Person</span></div>
+
+				<div class="drive-grid drive-g3">
+					<div class="drive-field">
+						<label for="ContactPersonName">Person Name <span class="req">*</span></label>
+						<div class="drive-input-icon">
+							<i class="fa-solid fa-user"></i>
+							<input type="text" id="ContactPersonName" name="ContactPersonName" class="drive-control"
+								   placeholder="Enter full name" maxlength="100" autocomplete="name" required />
+						</div>
+						<span class="drive-error"></span>
+					</div>
+
+					<div class="drive-field">
+						<label for="Email">Email <span class="req">*</span></label>
+						<div class="drive-input-icon">
+							<i class="fa-solid fa-envelope"></i>
+							<input type="email" id="Email" name="Email" class="drive-control"
+								   placeholder="name@company.com" maxlength="150" autocomplete="email" required />
+						</div>
+						<span class="drive-error"></span>
+					</div>
+
+					<div class="drive-field">
+						<label for="ContactNo">Contact No. <span class="req">*</span></label>
+						<div class="drive-input-icon">
+							<i class="fa-solid fa-phone"></i>
+							<input type="tel" id="ContactNo" name="ContactNo" class="drive-control"
+								   placeholder="10 digit number" maxlength="10" inputmode="numeric" autocomplete="tel" required />
+						</div>
+						<span class="drive-error"></span>
+					</div>
+				</div>
+
+				<!-- Rounds -->
+				<div class="drive-block-title"><span><i class="fa-solid fa-list-check"></i>Selection Schedule (select in order)</span></div>
+
+				<div class="drive-rounds">
+					<div class="drive-round">
+						<input type="checkbox" id="roundInduction" name="Rounds" value="Induction/PPT" />
+						<label for="roundInduction"><span class="drive-order"></span><i class="fa-solid fa-chalkboard-user"></i>Induction / PPT</label>
+					</div>
+					<div class="drive-round">
+						<input type="checkbox" id="roundAptitude" name="Rounds" value="Aptitude" />
+						<label for="roundAptitude"><span class="drive-order"></span><i class="fa-solid fa-brain"></i>Aptitude</label>
+					</div>
+					<div class="drive-round">
+						<input type="checkbox" id="roundGD" name="Rounds" value="GD" />
+						<label for="roundGD"><span class="drive-order"></span><i class="fa-solid fa-users"></i>Group Discussion (GD)</label>
+					</div>
+					<div class="drive-round">
+						<input type="checkbox" id="roundPI" name="Rounds" value="PI" />
+						<label for="roundPI"><span class="drive-order"></span><i class="fa-solid fa-user-check"></i>Personal Interview (PI)</label>
+					</div>
+				</div>
+
+				<div class="drive-rounds-foot">
+					<span>No. of Rounds:</span>
+					<span class="drive-rounds-count" id="roundsCount">0</span>
+					<span>Select the rounds to include. The number shows the order.</span>
+				</div>
+				<span class="drive-error" id="roundsError"></span>
+
+				<input type="hidden" name="NoOfRounds" id="NoOfRounds" value="0" />
+				<input type="hidden" name="RoundSequence" id="RoundSequence" />
+				<input type="hidden" name="SelectedCandidateIds" id="SelectedCandidateIds" />
+
+				<div class="drive-notice" id="driveNotice" role="alert"></div>
+
+				<div class="drive-form-actions">
+					<button type="reset" class="drive-btn" id="resetDriveForm">
+						<i class="fa-solid fa-rotate-left"></i> Clear Details
+					</button>
+					<button type="submit" class="drive-btn drive-btn-primary">
+						<i class="fa-solid fa-circle-check"></i> Create Recruitment Drive
+					</button>
+				</div>
+			</form>
+		</section>
+
+	</div>
+</div>
+
+<script>
+	(function () {
+
+		const root = document.querySelector(".drive-page");
+		if (!root) return;
+
+		const $ = function (sel) { return root.querySelector(sel); };
+
+		/* =====================================================
+		   CANDIDATE FILTERS + TABLE
+		===================================================== */
+
+		const rows = Array.from(root.querySelectorAll(".candidate-row"));
+		const checkFilters = Array.from(root.querySelectorAll('input.drive-filter[type="checkbox"]'));
+		const searchInput = $("#candidateSearch");
+		const selectAll = $("#selectAll");
+		const pageSize = $("#pageSize");
+		const emptyState = $("#emptyState");
+		const tableWrap = $("#tableWrap");
+
+		// search text is built once from the visible row content
+		rows.forEach(function (row) {
+			row.dataset.search = (row.dataset.id + " " + row.textContent + " " +
+				row.dataset.course + " " + row.dataset.branch).replace(/\s+/g, " ").toLowerCase();
+		});
+
+		let filteredRows = rows.slice();
+		let visibleRows = rows.slice();
+		let currentPage = 1;
+
+		function checkedValues(name) {
+			return checkFilters
+				.filter(function (x) { return x.dataset.filter === name && x.checked; })
+				.map(function (x) { return x.value; });
+		}
+
+		function num(value) {
+			const n = Number(value);
+			return value !== "" && Number.isFinite(n) ? n : null;
+		}
+
+		function matches(row) {
+
+			const d = row.dataset;
+
+			const levels = checkedValues("level");
+			const courses = checkedValues("course");
+			const criteria = checkedValues("criteria");
+			const branch = $("#filterBranch").value;
+			const year = $("#filterYear").value;
+
+			if (levels.length && levels.indexOf(d.level) < 0) return false;
+			if (courses.length && courses.indexOf(d.course) < 0) return false;
+			if (branch && d.branch !== branch) return false;
+			if (year && d.year !== year) return false;
+
+			if (criteria.indexOf("tenth") >= 0) {
+				const min = num($("#minTenth").value), score = num(d.tenth);
+				if (min === null || score === null || score < min) return false;
+			}
+
+			if (criteria.indexOf("twelfth") >= 0) {
+				const min = num($("#minTwelfth").value), score = num(d.twelfth);
+				if (min === null || score === null || score < min) return false;
+			}
+
+			const sems = checkFilters.filter(function (x) {
+				return x.classList.contains("drive-sem-check") && x.checked;
+			});
+
+			if (sems.length) {
+				const min = num($("#minCgpa").value);
+				if (min === null || min < 0 || min > 10) return false;
+
+				for (let i = 0; i < sems.length; i++) {
+					const score = num(d["sem" + sems[i].dataset.sem]);
+					if (score === null || score < min) return false;
+				}
+			}
+
+			if (checkedValues("backlog").indexOf("zero") >= 0 && num(d.backlogs) !== 0) return false;
+
+			const q = searchInput.value.trim().toLowerCase();
+			if (q && d.search.indexOf(q) < 0) return false;
+
+			return true;
+		}
+
+		function selectedRows() {
+			return rows.filter(function (r) { return r.querySelector(".candidate-select").checked; });
+		}
+
+		function updateSelection() {
+
+			const selected = selectedRows();
+
+			rows.forEach(function (r) {
+				r.classList.toggle("is-selected", r.querySelector(".candidate-select").checked);
+			});
+
+			$("#statSelected").textContent = selected.length;
+			$("#selectedCount").textContent = selected.length;
+			$("#formSelectedCount").textContent = selected.length;
+			$("#SelectedCandidateIds").value = selected.map(function (r) { return r.dataset.id; }).join(",");
+
+			const allChecked = visibleRows.length > 0 && visibleRows.every(function (r) {
+				return r.querySelector(".candidate-select").checked;
+			});
+			const anyChecked = visibleRows.some(function (r) {
+				return r.querySelector(".candidate-select").checked;
+			});
+
+			selectAll.checked = allChecked;
+			selectAll.indeterminate = anyChecked && !allChecked;
+		}
+
+		function renderPager(pages) {
+
+			let html = '<button type="button" data-p="' + (currentPage - 1) + '"' +
+				(currentPage === 1 ? " disabled" : "") + '><i class="fa-solid fa-chevron-left"></i></button>';
+
+			for (let p = 1; p <= pages; p++) {
+				if (p === 1 || p === pages || Math.abs(p - currentPage) <= 1) {
+					html += '<button type="button" data-p="' + p + '"' +
+						(p === currentPage ? ' class="active"' : "") + ">" + p + "</button>";
+				} else if (Math.abs(p - currentPage) === 2) {
+					html += '<button type="button" disabled>...</button>';
+				}
+			}
+
+			html += '<button type="button" data-p="' + (currentPage + 1) + '"' +
+				(currentPage === pages ? " disabled" : "") + '><i class="fa-solid fa-chevron-right"></i></button>';
+
+			$("#pager").innerHTML = html;
+		}
+
+		function activeFilterTotal() {
+			return checkFilters.filter(function (x) { return x.checked; }).length +
+				($("#filterBranch").value ? 1 : 0) +
+				($("#filterYear").value ? 1 : 0);
+		}
+
+		function updateFilters() {
+
+			filteredRows = rows.filter(matches);
+
+			const limit = Number(pageSize.value) || 10;
+			const pages = Math.max(1, Math.ceil(filteredRows.length / limit));
+			if (currentPage > pages) currentPage = pages;
+
+			const start = (currentPage - 1) * limit;
+			visibleRows = filteredRows.slice(start, start + limit);
+
+			rows.forEach(function (r) { r.style.display = "none"; });
+			visibleRows.forEach(function (r) { r.style.display = ""; });
+
+			emptyState.style.display = filteredRows.length ? "none" : "block";
+			tableWrap.style.display = filteredRows.length ? "" : "none";
+
+			$("#visibleCount").textContent = filteredRows.length;
+			$("#statMatching").textContent = filteredRows.length;
+
+			const active = activeFilterTotal();
+			$("#activeFilterCount").textContent = active + " active";
+			$("#activeFilterCountMobile").textContent = active;
+			$("#statCriteria").textContent = checkedValues("criteria").length + " Active";
+
+			renderPager(pages);
+			updateSelection();
+		}
+
+		// enable / disable the minimum score inputs
+		function updateThresholds() {
+			const crit = checkedValues("criteria");
+			$("#minTenth").disabled = crit.indexOf("tenth") < 0;
+			$("#minTwelfth").disabled = crit.indexOf("twelfth") < 0;
+			$("#minCgpa").disabled = !checkFilters.some(function (x) {
+				return x.classList.contains("drive-sem-check") && x.checked;
+			});
+		}
+
+		function refresh(resetPage) {
+			if (resetPage) currentPage = 1;
+			updateThresholds();
+			updateFilters();
+		}
+
+		checkFilters.forEach(function (f) { f.addEventListener("change", function () { refresh(true); }); });
+		["filterBranch", "filterYear"].forEach(function (id) {
+			$("#" + id).addEventListener("change", function () { refresh(true); });
+		});
+		["minTenth", "minTwelfth", "minCgpa"].forEach(function (id) {
+			$("#" + id).addEventListener("input", function () { refresh(true); });
+		});
+
+		searchInput.addEventListener("input", function () { refresh(true); });
+		pageSize.addEventListener("change", function () { refresh(true); });
+
+		$("#pager").addEventListener("click", function (e) {
+			const b = e.target.closest("button[data-p]");
+			if (!b || b.disabled) return;
+			currentPage = parseInt(b.getAttribute("data-p"), 10);
+			updateFilters();
+		});
+
+		$("#applyFilters").addEventListener("click", function () {
+			refresh(true);
+			$("#filterPanel").classList.remove("open");
+		});
+
+		$("#resetFilters").addEventListener("click", function () {
+			checkFilters.forEach(function (x) { x.checked = false; });
+			$("#filterBranch").value = "";
+			$("#filterYear").value = "";
+			$("#minTenth").value = 60;
+			$("#minTwelfth").value = 60;
+			$("#minCgpa").value = 6.5;
+			searchInput.value = "";
+			refresh(true);
+		});
+
+		$("#toggleFilters").addEventListener("click", function () {
+			$("#filterPanel").classList.toggle("open");
+		});
+
+		selectAll.addEventListener("change", function () {
+			visibleRows.forEach(function (r) { r.querySelector(".candidate-select").checked = selectAll.checked; });
+			updateSelection();
+		});
+
+		rows.forEach(function (r) {
+			r.querySelector(".candidate-select").addEventListener("change", updateSelection);
+		});
+
+		$("#clearSelection").addEventListener("click", function () {
+			rows.forEach(function (r) { r.querySelector(".candidate-select").checked = false; });
+			updateSelection();
+		});
+
+		$("#continueDrive").addEventListener("click", function () {
+
+			if (!selectedRows().length) {
+				showNotice("Please select at least one candidate before continuing.");
+				return;
+			}
+
+			$("#driveDetails").scrollIntoView({ behavior: "smooth", block: "start" });
+			$("#CompanyName").focus({ preventScroll: true });
+		});
+
+
+		/* =====================================================
+		   DRIVE DETAILS FORM
+		===================================================== */
+
+		const form = $("#createDriveForm");
+		const notice = $("#driveNotice");
+		const venueList = $("#venueList");
+		const MAX_VENUES = 10;
+
+		function setError(el, message) {
+			const field = el.closest(".drive-field");
+			const msg = field ? field.querySelector(".drive-error") : null;
+			if (message) {
+				el.classList.add("invalid");
+				if (msg) msg.textContent = message;
+			} else {
+				el.classList.remove("invalid");
+				if (msg) msg.textContent = "";
+			}
+		}
+
+		function showNotice(message) {
+			notice.innerHTML = '<i class="fa-solid fa-circle-exclamation"></i>';
+			notice.appendChild(document.createTextNode(message));
+			notice.style.display = "block";
+			notice.scrollIntoView({ behavior: "smooth", block: "center" });
+		}
+
+		function hideNotice() { notice.style.display = "none"; }
+
+		// ---------- venues ----------
+
+		function venueInputs() {
+			return Array.from(venueList.querySelectorAll(".venue-input"));
+		}
+
+		function refreshVenues() {
+			const list = venueList.querySelectorAll(".drive-venue-row");
+
+			list.forEach(function (row, i) {
+				row.querySelector(".drive-venue-no").textContent = i + 1;
+				row.querySelector(".drive-icon-btn").disabled = list.length === 1;
+			});
+
+			$("#btnAddVenue").disabled = list.length >= MAX_VENUES;
+		}
+
+		function addVenue(value) {
+
+			if (venueList.children.length >= MAX_VENUES) return null;
+
+			const row = document.createElement("div");
+			row.className = "drive-venue-row";
+
+			row.innerHTML =
+				'<span class="drive-venue-no"></span>' +
+				'<div class="drive-input-icon">' +
+				'<i class="fa-solid fa-map-pin"></i>' +
+				'<input type="text" name="Venues" class="drive-control venue-input" ' +
+				'placeholder="Enter venue / hall / address" maxlength="200" />' +
+				'</div>' +
+				'<button type="button" class="drive-icon-btn" title="Remove venue" aria-label="Remove venue">' +
+				'<i class="fa-solid fa-trash-can"></i></button>';
+
+			const input = row.querySelector("input");
+			input.value = value || "";
+
+			input.addEventListener("input", function () {
+				input.classList.remove("invalid");
+				$("#venueError").textContent = "";
+			});
+
+			row.querySelector(".drive-icon-btn").addEventListener("click", function () {
+				if (venueList.children.length > 1) {
+					row.remove();
+					refreshVenues();
+				}
+			});
+
+			venueList.appendChild(row);
+			refreshVenues();
+			return input;
+		}
+
+		$("#btnAddVenue").addEventListener("click", function () {
+			const input = addVenue("");
+			if (input) input.focus();
+		});
+
+		addVenue("");
+
+		// ---------- rounds ----------
+
+		let roundOrder = [];
+		const roundBoxes = Array.from(form.querySelectorAll('input[name="Rounds"]'));
+
+		function refreshRounds() {
+
+			roundBoxes.forEach(function (box) {
+				const badge = box.nextElementSibling.querySelector(".drive-order");
+				const index = roundOrder.indexOf(box.value);
+				badge.textContent = index >= 0 ? index + 1 : "";
+			});
+
+			$("#roundsCount").textContent = roundOrder.length;
+			$("#NoOfRounds").value = roundOrder.length;
+			$("#RoundSequence").value = roundOrder.join(",");
+			$("#roundsError").textContent = "";
+		}
+
+		roundBoxes.forEach(function (box) {
+			box.addEventListener("change", function () {
+				if (box.checked) {
+					roundOrder.push(box.value);
+				} else {
+					roundOrder = roundOrder.filter(function (v) { return v !== box.value; });
+				}
+				refreshRounds();
+			});
+		});
+
+		// ---------- input rules + date limits ----------
+
+		$("#ContactNo").addEventListener("input", function () {
+			this.value = this.value.replace(/\D/g, "").substring(0, 10);
+		});
+
+		const now = new Date();
+		const localToday = [
+			now.getFullYear(),
+			String(now.getMonth() + 1).padStart(2, "0"),
+			String(now.getDate()).padStart(2, "0")
+		].join("-");
+
+		["DateFrom", "DateTo", "ExpectedJoining"].forEach(function (id) { $("#" + id).min = localToday; });
+
+		$("#DateFrom").addEventListener("change", function () {
+			$("#DateTo").min = this.value || localToday;
+			if ($("#DateTo").value && this.value && $("#DateTo").value < this.value) $("#DateTo").value = "";
+		});
+
+		$("#DateTo").addEventListener("change", function () {
+			$("#ExpectedJoining").min = this.value || localToday;
+			if ($("#ExpectedJoining").value && this.value && $("#ExpectedJoining").value < this.value) {
+				$("#ExpectedJoining").value = "";
+			}
+		});
+
+		form.addEventListener("input", function (e) {
+			if (e.target.classList && e.target.classList.contains("drive-control")) setError(e.target, "");
+		});
+
+		// ---------- validation + submit ----------
+
+		form.addEventListener("submit", function (e) {
+
+			hideNotice();
+
+			let valid = true;
+			let firstInvalid = null;
+
+			function fail(el, message) {
+				setError(el, message);
+				valid = false;
+				if (!firstInvalid) firstInvalid = el;
+			}
+
+			Array.from(form.querySelectorAll(".drive-field .drive-control")).forEach(function (el) {
+
+				const value = el.value.trim();
+
+				if (el.required && !value) { fail(el, "This field is required."); return; }
+				if (el.type === "email" && value && !el.checkValidity()) { fail(el, "Enter a valid email address."); return; }
+				if (el.id === "ContactNo" && value && !/^\d{10}$/.test(value)) { fail(el, "Enter a valid 10 digit number."); return; }
+				if (el.id === "Package" && value && Number(value) <= 0) { fail(el, "Package must be greater than 0."); return; }
+
+				setError(el, "");
+			});
+
+			const from = $("#DateFrom").value;
+			const to = $("#DateTo").value;
+			const join = $("#ExpectedJoining").value;
+
+			if (from && to && to < from) fail($("#DateTo"), "Must be on or after Date From.");
+			if (to && join && join < to) fail($("#ExpectedJoining"), "Must be on or after Date To.");
+
+			if ($("#TimeFrom").value && $("#TimeTo").value && $("#TimeTo").value <= $("#TimeFrom").value) {
+				fail($("#TimeTo"), "Must be after start time.");
+			}
+
+			const filledVenues = venueInputs().filter(function (v) { return v.value.trim() !== ""; });
+
+			if (!filledVenues.length) {
+				valid = false;
+				$("#venueError").textContent = "Add at least one venue.";
+				const firstVenue = venueInputs()[0];
+				firstVenue.classList.add("invalid");
+				if (!firstInvalid) firstInvalid = firstVenue;
+			}
+
+			if (!roundOrder.length) {
+				valid = false;
+				$("#roundsError").textContent = "Select at least one round.";
+			}
+
+			const selected = selectedRows();
+			if (!selected.length) valid = false;
+
+			if (!valid) {
+				e.preventDefault();
+				showNotice(!selected.length
+					? "Select at least one candidate from the table, then complete the highlighted fields."
+					: "Please correct the highlighted fields and try again.");
+				if (firstInvalid) firstInvalid.focus({ preventScroll: true });
+				return;
+			}
+
+			$("#SelectedCandidateIds").value = selected.map(function (r) { return r.dataset.id; }).join(",");
+
+			// remove empty venue rows before posting
+			venueInputs().forEach(function (v) {
+				if (v.value.trim() === "") v.closest(".drive-venue-row").remove();
+			});
+			refreshVenues();
+
+			// Posting requires a matching server-side [HttpPost] CreateDrive action.
+		});
+
+		$("#resetDriveForm").addEventListener("click", function () {
+
+			setTimeout(function () {
+				hideNotice();
+
+				form.querySelectorAll(".drive-control").forEach(function (el) { el.classList.remove("invalid"); });
+				form.querySelectorAll(".drive-error").forEach(function (el) { el.textContent = ""; });
+
+				venueList.innerHTML = "";
+				addVenue("");
+
+				roundOrder = [];
+				refreshRounds();
+				updateSelection();
+			}, 0);
+		});
+
+		refresh(true);
+
+	})();
+</script>

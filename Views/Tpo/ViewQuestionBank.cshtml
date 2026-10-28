@@ -1,0 +1,306 @@
+﻿@{
+    Layout = "~/Views/Shared/_DashboardLayout.cshtml";
+    ViewData["Title"] = "View Question Bank";
+    ViewData["Panel"] = "TPO";
+}
+
+
+<link rel="stylesheet" href="~/css/ViewQuestionBank.css" asp-append-version="true" />
+
+<div class="qbl-page">
+
+    <!-- Page Header -->
+    <div class="qbl-hero">
+        <div>
+            <div class="qbl-eyebrow">TPO Panel</div>
+            <h2><i class="fas fa-file-alt"></i> View Question Bank</h2>
+            <p>Explore question papers and resources for placement preparation.</p>
+        </div>
+
+        <a href="/TPO/UploadQuestionBank" class="qbl-add-btn">
+            <i class="fas fa-plus"></i> Upload Question Bank
+        </a>
+    </div>
+
+    <div class="qbl-body">
+
+        <!-- Statistics -->
+        <div class="qbl-stats">
+
+            <div class="qbl-stat qbl-stat-navy">
+                <div class="qbl-stat-icon">
+                    <i class="fas fa-layer-group"></i>
+                </div>
+                <div>
+                    <span>Total Question Banks</span>
+                    <h3>12</h3>
+                </div>
+            </div>
+
+            <div class="qbl-stat">
+                <div class="qbl-stat-icon">
+                    <i class="fas fa-check-circle"></i>
+                </div>
+                <div>
+                    <span>Published</span>
+                    <h3>8</h3>
+                </div>
+            </div>
+
+            <div class="qbl-stat qbl-stat-amber">
+                <div class="qbl-stat-icon">
+                    <i class="fas fa-pencil-alt"></i>
+                </div>
+                <div>
+                    <span>Drafts</span>
+                    <h3>4</h3>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- Search and Filter -->
+        <div class="qbl-filter-card">
+
+            <div class="qbl-filter-title">
+                <i class="fas fa-filter"></i> Search &amp; Filter
+            </div>
+
+            <form id="filterForm">
+
+                <div class="qbl-filters">
+
+                    <div class="qbl-field qbl-search-field">
+                        <label for="searchText">Search</label>
+                        <input type="text" id="searchText"
+                               placeholder="Search title, subject or topics..." />
+                    </div>
+
+                    <div class="qbl-field">
+                        <label for="category">Category</label>
+                        <select id="category">
+                            <option value="">All Categories</option>
+                            <option>Interview Preparation</option>
+                            <option>Competitive Exams</option>
+                            <option>Academic Questions</option>
+                            <option>Aptitude &amp; Reasoning</option>
+                            <option>Technical Skills</option>
+                            <option>Placement Preparation</option>
+                            <option>Other</option>
+                        </select>
+                    </div>
+
+                    <div class="qbl-field">
+                        <label for="streamDomain">Stream / Domain</label>
+                        <select id="streamDomain">
+                            <option value="">All Streams</option>
+                            <option>Engineering</option>
+                            <option>IT &amp; Computer Science</option>
+                            <option>Commerce &amp; Finance</option>
+                            <option>Management</option>
+                            <option>Science</option>
+                            <option>Medical &amp; Healthcare</option>
+                            <option>Arts &amp; Humanities</option>
+                            <option>Law</option>
+                            <option>Polytechnic / ITI</option>
+                            <option>Hospitality</option>
+                            <option>Other</option>
+                        </select>
+                    </div>
+
+                    <div class="qbl-field">
+                        <label for="status">Status</label>
+                        <select id="status">
+                            <option value="">All Statuses</option>
+                            <option>Published</option>
+                            <option>Draft</option>
+                        </select>
+                    </div>
+
+                    <div>
+                        <button type="button" class="qbl-filter-btn">
+                            <i class="fas fa-search"></i> Search
+                        </button>
+                    </div>
+
+                </div>
+
+                <a asp-controller="Organization"
+                   asp-action="ViewQuestionBank"
+                   class="qbl-reset-btn">
+                    <i class="fas fa-undo"></i> Clear Filters
+                </a>
+
+            </form>
+        </div>
+
+        <!-- Question Bank List -->
+        <div class="qbl-list-header">
+            <h3>Question Banks</h3>
+            <span class="qbl-count">5 records</span>
+        </div>
+
+        <div class="qbl-table-wrap">
+
+            <table class="qbl-table">
+                <thead>
+                    <tr>
+                        <th>Question Bank</th>
+                        <th>Category</th>
+                        <th>Stream / Domain</th>
+                        <th>File</th>
+                        <th>Created Date</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+
+                    <tr>
+                        <td>
+                            <div class="qbl-title">Aptitude Practice Set</div>
+                            <div class="qbl-subtitle">Subject: Quantitative Aptitude</div>
+                            <div class="qbl-subtitle">Topics: Percentages, Ratios, Profit &amp; Loss</div>
+                        </td>
+                        <td>Aptitude &amp; Reasoning</td>
+                        <td>Engineering</td>
+                        <td>
+                            <div>aptitude_set.pdf</div>
+                            <div class="qbl-subtitle">PDF · 450 KB</div>
+                        </td>
+                        <td>15 Oct 2026</td>
+                        <td>
+                            <span class="qbl-badge qbl-published">Published</span>
+                        </td>
+                        <td>
+                            <div class="qbl-actions">
+                                <a href="#" class="qbl-action" title="View question paper">
+                                    <i class="fas fa-eye"></i>
+                                </a>
+                                <a href="#" class="qbl-action" title="Download question paper">
+                                    <i class="fas fa-download"></i>
+                                </a>
+                            </div>
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <td>
+                            <div class="qbl-title">Technical Interview Questions</div>
+                            <div class="qbl-subtitle">Subject: Data Structures</div>
+                            <div class="qbl-subtitle">Topics: Arrays, Sorting, Searching</div>
+                        </td>
+                        <td>Technical Skills</td>
+                        <td>IT &amp; Computer Science</td>
+                        <td>
+                            <div>technical_questions.pdf</div>
+                            <div class="qbl-subtitle">PDF · 680 KB</div>
+                        </td>
+                        <td>12 Oct 2026</td>
+                        <td>
+                            <span class="qbl-badge qbl-published">Published</span>
+                        </td>
+                        <td>
+                            <div class="qbl-actions">
+                                <a href="#" class="qbl-action" title="View question paper">
+                                    <i class="fas fa-eye"></i>
+                                </a>
+                                <a href="#" class="qbl-action" title="Download question paper">
+                                    <i class="fas fa-download"></i>
+                                </a>
+                            </div>
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <td>
+                            <div class="qbl-title">HR Interview Preparation</div>
+                            <div class="qbl-subtitle">Subject: Communication Skills</div>
+                            <div class="qbl-subtitle">Topics: HR Questions, Self Introduction</div>
+                        </td>
+                        <td>Interview Preparation</td>
+                        <td>Management</td>
+                        <td>
+                            <div>hr_interview.docx</div>
+                            <div class="qbl-subtitle">DOCX · 320 KB</div>
+                        </td>
+                        <td>10 Oct 2026</td>
+                        <td>
+                            <span class="qbl-badge qbl-published">Published</span>
+                        </td>
+                        <td>
+                            <div class="qbl-actions">
+                                <a href="#" class="qbl-action" title="View question paper">
+                                    <i class="fas fa-eye"></i>
+                                </a>
+                                <a href="#" class="qbl-action" title="Download question paper">
+                                    <i class="fas fa-download"></i>
+                                </a>
+                            </div>
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <td>
+                            <div class="qbl-title">Programming Assessment</div>
+                            <div class="qbl-subtitle">Subject: Python Programming</div>
+                            <div class="qbl-subtitle">Topics: Loops, Functions, Lists</div>
+                        </td>
+                        <td>Placement Preparation</td>
+                        <td>IT &amp; Computer Science</td>
+                        <td>
+                            <div>python_assessment.pdf</div>
+                            <div class="qbl-subtitle">PDF · 520 KB</div>
+                        </td>
+                        <td>08 Oct 2026</td>
+                        <td>
+                            <span class="qbl-badge qbl-draft">Draft</span>
+                        </td>
+                        <td>
+                            <div class="qbl-actions">
+                                <a href="#" class="qbl-action" title="View question paper">
+                                    <i class="fas fa-eye"></i>
+                                </a>
+                                <a href="#" class="qbl-action" title="Download question paper">
+                                    <i class="fas fa-download"></i>
+                                </a>
+                            </div>
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <td>
+                            <div class="qbl-title">Logical Reasoning Set</div>
+                            <div class="qbl-subtitle">Subject: Logical Reasoning</div>
+                            <div class="qbl-subtitle">Topics: Series, Coding-Decoding, Directions</div>
+                        </td>
+                        <td>Aptitude &amp; Reasoning</td>
+                        <td>Engineering</td>
+                        <td>
+                            <div>reasoning_set.pdf</div>
+                            <div class="qbl-subtitle">PDF · 390 KB</div>
+                        </td>
+                        <td>05 Oct 2026</td>
+                        <td>
+                            <span class="qbl-badge qbl-draft">Draft</span>
+                        </td>
+                        <td>
+                            <div class="qbl-actions">
+                                <a href="#" class="qbl-action" title="View question paper">
+                                    <i class="fas fa-eye"></i>
+                                </a>
+                                <a href="#" class="qbl-action" title="Download question paper">
+                                    <i class="fas fa-download"></i>
+                                </a>
+                            </div>
+                        </td>
+                    </tr>
+
+                </tbody>
+            </table>
+
+        </div>
+
+    </div>
+</div>

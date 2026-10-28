@@ -1,10 +1,14 @@
 ﻿using ErJobPortal.Models;
 using ErJobPortal.Repositories;
+using ErJobPortal.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Configuration;
+using System;
+using System.Collections.Generic;
 using System.Data;
 using System.Reflection;
+using Microsoft.Extensions.Logging;
 
 namespace ErJobPortal.Controllers
 {
@@ -13,12 +17,24 @@ namespace ErJobPortal.Controllers
         private readonly CandidateProfileRepository _repo;
         private readonly IConfiguration _configuration;
         private readonly AccountRepository _repository;
+        private readonly EmailService _emailService;
+        private readonly ILogger<CandidateController> _logger;
 
-        public CandidateController(IConfiguration configuration, AccountRepository repository, CandidateProfileRepository repo)
+        private readonly AccountRepository _accountRepository;
+
+        public CandidateController(
+            IConfiguration configuration,
+            AccountRepository repository,
+            CandidateProfileRepository repo,
+            EmailService emailService,
+            ILogger<CandidateController> logger, AccountRepository accountRepository)
         {
             _configuration = configuration;
             _repository = repository;
             _repo = repo;
+            _emailService = emailService;
+            _logger = logger;
+            _accountRepository = accountRepository;
         }
 
 
@@ -96,8 +112,7 @@ namespace ErJobPortal.Controllers
             // =========================================================
 
             string candidateCode = "CD" +
-                candidate.Value.DOB.Value.ToString("ddMMyy") +
-                candidate.Value.RegDate.Value.ToString("MMdd") +
+                candidate.Value.DOB.Value.ToString("ddMMyy") + 
                 candidate.Value.CandidateID.ToString("D2");
 
             // =========================================================
@@ -184,9 +199,6 @@ namespace ErJobPortal.Controllers
             // =========================================================
 
             SAChartsViewModel chartModel = new SAChartsViewModel();
-
-
-
             using (SqlConnection con = new SqlConnection(connectionString))
             {
                 using (SqlCommand cmd =
@@ -228,7 +240,7 @@ namespace ErJobPortal.Controllers
                                         Year = Convert.ToInt32(reader["Year"]),
                                         Month = Convert.ToInt32(reader["Month"]),
                                         TotalCount = Convert.ToInt32(reader["TotalCount"])
-                                    });
+                               });
                             }
                         }
                     }
@@ -843,25 +855,91 @@ namespace ErJobPortal.Controllers
         // UPDATE EDUCATION
         // =====================================================
 
+        // =====================================================
+        // UPDATE EDUCATION
+        // =====================================================
+
+
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult UpdateEducation([Bind(Prefix = "Profile")] CandidateProfileModel model)
+        public IActionResult UpdateEducation(
+     [Bind(Prefix = "Profile")] CandidateProfileModel model)
         {
             int? candidateId = HttpContext.Session.GetInt32("CandidateID");
 
-            if (candidateId == null)
-            {
+            if (candidateId == null || candidateId <= 0)
                 return RedirectToAction("CandidateLogin", "Account");
-            }
 
             model.CandidateID = candidateId.Value;
 
+            // Remove validation errors for fields not submitted by the education form.
+            string[] educationFields =
+            {
+        "SSC_YEAR", "SSC_DIVISION", "dSSC",
+        "HSC_DIPLOMA_YEAR", "HSC_DIPLOMA_DIVISION", "dHSC",
+        "Graduation_Year", "Graduation_Division",
+        "Graduation_Stream", "Other_Stream", "dGraduation",
+        "PG_Year", "PG_Division", "PG_Stream",
+        "Other_Specialization", "dPG",
+        "PhD_Year", "PhD_Status", "PhD_Topic",
+        "Previous_PhD_Topic_Year", "dPhD"
+    };
+
+            var educationKeys = new HashSet<string>(
+                educationFields,
+                StringComparer.OrdinalIgnoreCase);
+
+            // Keep only ModelState entries for education properties.
+            // The Prefix="Profile" binding may use either prefixed or unprefixed keys.
+            foreach (var key in ModelState.Keys.ToList())
+            {
+                string propertyName = key.StartsWith(
+                    "Profile.", StringComparison.OrdinalIgnoreCase)
+                        ? key.Substring("Profile.".Length)
+                        : key;
+
+                if (!educationKeys.Contains(propertyName))
+                {
+                    ModelState.Remove(key);
+                }
+            }
+
+            // Validate percentage ranges.
+            ValidatePercentage(model.dSSC, "Profile.dSSC", "SSC");
+            ValidatePercentage(model.dHSC, "Profile.dHSC", "HSC / Diploma");
+            ValidatePercentage(model.dGraduation, "Profile.dGraduation", "Graduation");
+            ValidatePercentage(model.dPG, "Profile.dPG", "Post Graduation");
+            ValidatePercentage(model.dPhD, "Profile.dPhD", "PhD");
+
+            if (!ModelState.IsValid)
+            {
+                CandidateProfileViewModel viewModel = LoadProfileDropdowns(model);
+                ViewBag.CandidateCode = GetCandidateCode();
+                return View("Profile", viewModel);
+            }
+
+            // TEMPORARY DEBUGGING: verify values before saving.
+            System.Diagnostics.Debug.WriteLine(
+                $"CandidateID={model.CandidateID}, " +
+                $"SSC={model.dSSC}, HSC={model.dHSC}, " +
+                $"Graduation={model.dGraduation}, PG={model.dPG}, PhD={model.dPhD}");
+
             _repo.UpdateEducation(model);
 
-            TempData["Success"] = "Education updated successfully.";
-
+            TempData["Success"] = "Education details updated successfully.";
             return RedirectToAction("Profile");
         }
+
+        private void ValidatePercentage(decimal? value, string key, string label)
+        {
+            if (value.HasValue && (value.Value < 0 || value.Value > 100))
+            {
+                ModelState.AddModelError(
+                    key,
+                    $"{label} percentage must be between 0 and 100.");
+            }
+        }
+
 
         // =====================================================
         // UPDATE INTERNSHIP / FELLOWSHIP PREFERENCE
@@ -2042,7 +2120,8 @@ namespace ErJobPortal.Controllers
         }
 
         [HttpGet]
-        public IActionResult InternshipDetails(string id)
+        [Route("Candidate/InternshipDetails/{id?}")]
+        public IActionResult InternshipDetails(string? id)
         {
             // id = CD080900080701
 
@@ -2063,9 +2142,17 @@ namespace ErJobPortal.Controllers
             {
                 return NotFound("Candidate registration not found.");
             }
-            List<OrgPostM> internshipPosts = GetMatchingJobsForCandidate(candidateId.Value);
+
+            List<OrgPostM> internshipPosts =
+                GetMatchingJobsForCandidate(candidateId.Value);
+
             ViewBag.InternshipPosts = internshipPosts;
-            // Your code to get internship details using id
+
+            // =========================================================
+            // PASS ID TO VIEW
+            // =========================================================
+
+            ViewBag.InternshipId = id;
 
             return View();
         }
@@ -2447,132 +2534,195 @@ namespace ErJobPortal.Controllers
         // =========================================================
 
         [HttpGet]
-        [Route("Candidate/MyInternship/{id?}")]
-        public IActionResult MyInternship(string? id)
+        public IActionResult MyInternship()
         {
-            // =========================================================
-            // GET LOGGED-IN CANDIDATE ID
-            // =========================================================
+            // =====================================================
+            // CHECK CANDIDATE SESSION
+            // =====================================================
 
-            int? candidateId =
+            int? candidateID =
                 HttpContext.Session.GetInt32("CandidateID");
 
-            if (candidateId == null || candidateId <= 0)
+            if (candidateID == null)
             {
                 return RedirectToAction(
                     "CandidateLogin",
-                    "Account");
+                    "Account"
+                );
             }
 
-            // =========================================================
+            // =====================================================
             // GET CANDIDATE CODE
-            // =========================================================
+            // =====================================================
 
-            string? candidateCode = GetCandidateCode();
+            string candidateCode =
+                HttpContext.Session.GetString("CandidateCode")
+                ?? "";
 
-            if (string.IsNullOrEmpty(candidateCode))
+            // =====================================================
+            // LIST
+            // =====================================================
+
+            List<OrgPostM> internships =
+                new List<OrgPostM>();
+
+            string connectionString =
+                _configuration.GetConnectionString("DefaultConnection");
+
+            using (SqlConnection con =
+                   new SqlConnection(connectionString))
             {
-                return NotFound(
-                    "Candidate code could not be generated.");
-            }
-
-            // =========================================================
-            // IF URL DOES NOT HAVE CANDIDATE CODE
-            // =========================================================
-
-            if (string.IsNullOrEmpty(id))
-            {
-                return RedirectToAction(
-                    "MyInternship",
-                    "Candidate",
-                    new
-                    {
-                        id = candidateCode
-                    });
-            }
-
-            // =========================================================
-            // VALIDATE CANDIDATE CODE
-            // =========================================================
-
-            if (!string.Equals(
-                id,
-                candidateCode,
-                StringComparison.OrdinalIgnoreCase))
-            {
-                return NotFound();
-            }
-
-            // =========================================================
-            // GET APPLIED INTERNSHIPS
-            // =========================================================
-
-            List<OrgPostM> appliedPosts =
-                TraineeApplyToPostList(candidateId.Value);
-
-            // =========================================================
-            // CONVERT TO VIEW MODEL
-            // =========================================================
-
-            List<MyInternshipViewModel> myInternships =
-                appliedPosts.Select(post => new MyInternshipViewModel
+                using (SqlCommand cmd =
+                       new SqlCommand(
+                           "SP_CandidateAppliedToPost",
+                           con))
                 {
-                    // IMPORTANT
-                    // These two values are required for redirect
-                    PostID = post.nID,
-                    OrgID = post.nOrgID,
+                    cmd.CommandType =
+                        CommandType.StoredProcedure;
 
-                    OrganizationName =
-                        post.sName ?? "",
+                    cmd.Parameters.Add(
+                        "@CandidateID",
+                        SqlDbType.Int
+                    ).Value = candidateID.Value;
 
-                    Position =
-                        post.sPositionName ?? "",
+                    con.Open();
 
-                    Location =
-                        string.Join(
-                            ", ",
-                            new[]
-                            {
-                  post.nCityName,
-                  post.sStateName,
-                  post.sCountryName
-                            }
-                            .Where(x =>
-                                !string.IsNullOrWhiteSpace(x))
-                        ),
+                    using (SqlDataReader dr =
+                           cmd.ExecuteReader())
+                    {
+                        while (dr.Read())
+                        {
+                            OrgPostM item =
+                                new OrgPostM();
 
-                    InternshipFellowshipType =
-                        post.sInternshipFellowshipTypeName ?? "",
+                            // =================================================
+                            // POST ID
+                            // =================================================
 
-                    Facilities =
-                        post.sFacilities ?? "",
+                            item.nID =
+                                dr["PostID"] == DBNull.Value
+                                    ? 0
+                                    : Convert.ToInt32(
+                                        dr["PostID"]);
 
-                    ApplyStatus =
-                        post.IsApplied
-                            ? "Applied"
-                            : ""
-                })
-                .ToList();
+                            // =================================================
+                            // ORGANIZATION ID
+                            // =================================================
 
-            // =========================================================
-            // VIEW DATA
-            // =========================================================
+                            item.nOrgID =
+                                dr["OrgID"] == DBNull.Value
+                                    ? 0
+                                    : Convert.ToInt32(
+                                        dr["OrgID"]);
 
-            ViewBag.CandidateCode =
-                candidateCode;
+                            // =================================================
+                            // ORGANIZATION NAME
+                            // =================================================
 
-            ViewBag.CandidateID =
-                candidateId.Value;
+                            item.sName =
+                                dr["OrganizationName"] == DBNull.Value
+                                    ? ""
+                                    : dr["OrganizationName"].ToString();
 
-            ViewBag.CandidateName =
-                HttpContext.Session.GetString(
-                    "CandidateName");
+                            // =================================================
+                            // POSITION
+                            // =================================================
 
-            ViewBag.CandidateEmail =
-                HttpContext.Session.GetString(
-                    "CandidateEmail");
+                            item.sPositionName =
+                                dr["Position"] == DBNull.Value
+                                    ? ""
+                                    : dr["Position"].ToString();
 
-            return View(myInternships);
+                            // =================================================
+                            // COUNTRY
+                            // =================================================
+
+                            item.sCountryName =
+                                dr["Country"] == DBNull.Value
+                                    ? ""
+                                    : dr["Country"].ToString();
+
+                            // =================================================
+                            // STATE
+                            // =================================================
+
+                            item.sStateName =
+                                dr["State"] == DBNull.Value
+                                    ? ""
+                                    : dr["State"].ToString();
+
+                            // =================================================
+                            // CITY
+                            // =================================================
+
+                            item.nCityName =
+                                dr["City"] == DBNull.Value
+                                    ? ""
+                                    : dr["City"].ToString();
+
+                            // =================================================
+                            // INTERNSHIP / FELLOWSHIP
+                            // =================================================
+
+                            item.sInternshipFellowshipTypeName =
+                                dr["InternshipFellowshipType"]
+                                    == DBNull.Value
+                                        ? ""
+                                        : dr[
+                                            "InternshipFellowshipType"
+                                          ].ToString();
+
+                            // =================================================
+                            // FACILITIES
+                            // =================================================
+
+                            item.sFacilities =
+                                dr["Facilities"] == DBNull.Value
+                                    ? ""
+                                    : dr["Facilities"].ToString();
+
+                            // =================================================
+                            // APPLIED
+                            // =================================================
+
+                            item.IsApplied = true;
+
+                            internships.Add(item);
+                        }
+                    }
+                }
+            }
+
+            // =====================================================
+            // SEND DATA TO VIEW
+            // =====================================================
+
+            ViewBag.CandidateCode = candidateCode;
+
+            return View(internships);
+        }
+
+
+        // =====================================================
+        // CHECK WHETHER COLUMN EXISTS
+        // =====================================================
+
+        private bool HasColumn(
+            SqlDataReader reader,
+            string columnName)
+        {
+            for (int i = 0; i < reader.FieldCount; i++)
+            {
+                if (string.Equals(
+                    reader.GetName(i),
+                    columnName,
+                    StringComparison.OrdinalIgnoreCase))
+                {
+                    return true;
+                }
+            }
+
+            return false;
         }
 
         // =========================================================
@@ -3252,20 +3402,19 @@ namespace ErJobPortal.Controllers
 
 
             // =========================================================
-            // IF ID IS MISSING FROM URL
+            // IF ID IS MISSING FROM URL radhika26-10
             // =========================================================
 
-            if (string.IsNullOrEmpty(id))
+            if (string.IsNullOrWhiteSpace(id))
             {
-                return RedirectToAction(
-                    "Charts",
-                    "Candidate",
+                return RedirectToRoute(
                     new
                     {
+                        controller = "Candidate",
+                        action = "Charts",
                         id = candidateCode
                     });
             }
-
 
             // =========================================================
             // VALIDATE CANDIDATE CODE
@@ -3820,86 +3969,132 @@ namespace ErJobPortal.Controllers
         //}
 
 
+ 
         #region "Apply for the Post"
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult ApplyToPost(int postId, int orgId)
+        public async Task<IActionResult> ApplyToPost(int postId, int orgId)
         {
-            // ==========================================
-            // CHECK CANDIDATE LOGIN
-            // ==========================================
-
-            int? candidateId =
-                HttpContext.Session.GetInt32("CandidateID");
+            // 1. Check candidate login
+            int? candidateId = HttpContext.Session.GetInt32("CandidateID");
 
             if (candidateId == null)
             {
-                return RedirectToAction(
-                    "CandidateLogin",
-                    "Account");
+                return RedirectToAction("CandidateLogin", "Account");
             }
 
-            // ==========================================
-            // GET CANDIDATE REGISTRATION DETAILS
-            // ==========================================
+            // 2. Get candidate registration details
+            var candidateRegistration =
+                _repository.GetCandidateRegistrationDetails(candidateId.Value);
 
+            if (candidateRegistration == null ||
+                candidateRegistration.Value.DOB == null ||
+                candidateRegistration.Value.RegDate == null)
+            {
+                return BadRequest("Candidate information is missing.");
+            }
+
+            // 3. Generate candidate code
+            string candidateCode = "CD" +
+            candidateRegistration.Value.DOB.Value.ToString("ddMMyy") +
+            candidateRegistration.Value.CandidateID.ToString("D2");
+
+            // 4. Get candidate contact details
             var candidate =
-                _repository.GetCandidateRegistrationDetails(
-                    candidateId.Value);
+                _repository.GetCandidateContactDetails(candidateId.Value);
 
             if (candidate == null ||
-                candidate.Value.DOB == null ||
-                candidate.Value.RegDate == null)
+                string.IsNullOrWhiteSpace(candidate.Value.Email))
             {
-                return BadRequest(
-                    "Candidate information is missing.");
+                TempData["ApplyMessage"] =
+                    "Candidate email address could not be found.";
+
+                TempData["ApplyMessageType"] = "danger";
+
+                return RedirectToAction(
+                    "Dashboard", "Candidate", new { id = candidateCode });
             }
 
-            // ==========================================
-            // CREATE CANDIDATE CODE
-            // ==========================================
+            // 5. Get organization contact details
+            var organization =
+                _repository.GetOrganizationContactDetails(orgId);
 
-            string candidateCode = "CD" +
-                candidate.Value.DOB.Value.ToString("ddMMyy") +
-                candidate.Value.RegDate.Value.ToString("MMdd") +
-                candidate.Value.CandidateID.ToString("D2");
+            if (organization == null)
+            {
+                TempData["ApplyMessage"] =
+                    "Organization details could not be found.";
 
-            // ==========================================
-            // APPLY
-            // ==========================================
+                TempData["ApplyMessageType"] = "danger";
 
-            int result =
-                _repo.ApplyForPost(
-                    orgId,
-                    candidateId.Value,
-                    postId);
+                return RedirectToAction(
+                    "Dashboard", "Candidate", new { id = candidateCode });
+            }
 
-            // ==========================================
-            // SUCCESS
-            // ==========================================
+            // 6. Save the application using your existing method
+            int result = _repo.ApplyForPost(
+                orgId,
+                candidateId.Value,
+                postId);
+
+            // 7. Send emails only for a newly successful application
 
             if (result == 1)
             {
                 TempData["ApplyMessage"] =
                     "Application submitted successfully.";
 
-                TempData["ApplyMessageType"] =
-                    "success";
+                TempData["ApplyMessageType"] = "success";
+
+                try
+                {
+                    await _emailService.SendCandidateApplicationConfirmationAsync(
+                        candidate.Value.Email,
+                        candidate.Value.CandidateName,
+                        organization.Value.OrganizationName,
+                        "Internship");
+
+                    System.Diagnostics.Debug.WriteLine(
+                        "Candidate confirmation email sent successfully.");
+                }
+                catch (Exception ex)
+                {
+                    System.Diagnostics.Debug.WriteLine(
+                        "Candidate email failed: " + ex.ToString());
+
+                    TempData["CandidateEmailError"] = ex.Message;
+                }
+
+                try
+                {
+                    await _emailService.SendOrganizationApplicationNotificationAsync(
+                        organization.Value.Email,
+                        organization.Value.OrganizationName,
+                        candidate.Value.CandidateName,
+                        candidate.Value.Email,
+                        "Internship");
+
+                    System.Diagnostics.Debug.WriteLine(
+                        "Organization notification email sent successfully.");
+                }
+                catch (Exception ex)
+                {
+                    System.Diagnostics.Debug.WriteLine(
+                        "Organization email failed: " + ex.ToString());
+
+                    TempData["OrganizationEmailError"] = ex.Message;
+                }
             }
             else
             {
                 TempData["ApplyMessage"] =
                     "You have already applied for this post.";
 
-                TempData["ApplyMessageType"] =
-                    "info";
+                TempData["ApplyMessageType"] = "info";
             }
 
-            // ==========================================
-            // REDIRECT SAME DASHBOARD PAGE
-            // ==========================================
 
+            // 8. Preserve your existing dashboard redirect
             return RedirectToAction(
                 "Dashboard",
                 "Candidate",
@@ -3907,6 +4102,7 @@ namespace ErJobPortal.Controllers
         }
 
         #endregion
+
 
         #region "TR Apply to Post List Called"
 
@@ -5485,6 +5681,595 @@ ORDER BY
             return posts;
         }
 
+        [HttpGet]
+        [Route("Candidate/ExtraPost/{id?}")]
+        public IActionResult ExtraPost(string? id)
+        {
+            // =====================================================
+            // GET CANDIDATE ID FROM SESSION
+            // =====================================================
 
+            int? candidateId =
+                HttpContext.Session.GetInt32("CandidateID");
+
+            if (candidateId == null || candidateId <= 0)
+            {
+                return RedirectToAction(
+                    "CandidateLogin",
+                    "Account");
+            }
+
+            // =====================================================
+            // GET MATCHING EXTRA POSTS
+            // =====================================================
+
+            var extraPosts =
+                new List<OrgPostM>();
+
+            using (SqlConnection con =
+                new SqlConnection(
+                    _configuration.GetConnectionString("DefaultConnection")))
+            {
+                using (SqlCommand cmd =
+                    new SqlCommand(
+                        "GetMatchingJobsForCandidateExtraPost",
+                        con))
+                {
+                    cmd.CommandType =
+                        CommandType.StoredProcedure;
+
+                    cmd.Parameters.AddWithValue(
+                        "@CandidateID",
+                        candidateId.Value);
+
+                    con.Open();
+
+                    using (SqlDataReader reader =
+                        cmd.ExecuteReader())
+                    {
+                        while (reader.Read())
+                        {
+                            var post = new OrgPostM();
+
+                            // =================================================
+                            // BASIC POST INFORMATION
+                            // =================================================
+
+                            post.nID =
+                                reader["PostID"] == DBNull.Value
+                                    ? 0
+                                    : Convert.ToInt32(reader["PostID"]);
+
+                            post.nOrgID =
+                                reader["OrgID"] == DBNull.Value
+                                    ? 0
+                                    : Convert.ToInt32(reader["OrgID"]);
+
+                            post.sName =
+                                reader["OrganizationName"] == DBNull.Value
+                                    ? ""
+                                    : reader["OrganizationName"].ToString();
+
+                            post.sPositionName =
+                                reader["PositionName"] == DBNull.Value
+                                    ? ""
+                                    : reader["PositionName"].ToString();
+
+                            // =================================================
+                            // LOCATION
+                            // =================================================
+
+                            post.sCountryName =
+                                reader["Country"] == DBNull.Value
+                                    ? ""
+                                    : reader["Country"].ToString();
+
+                            post.sStateName =
+                                reader["State"] == DBNull.Value
+                                    ? ""
+                                    : reader["State"].ToString();
+
+                            post.nCityName =
+                                reader["City"] == DBNull.Value
+                                    ? ""
+                                    : reader["City"].ToString();
+
+                            // =================================================
+                            // INTERNSHIP / FELLOWSHIP
+                            // =================================================
+
+                            post.sInternshipFellowshipTypeName =
+                                reader["InternshipFellowshipType"] == DBNull.Value
+                                    ? ""
+                                    : reader["InternshipFellowshipType"].ToString();
+
+                            // =================================================
+                            // FACILITIES
+                            // =================================================
+
+                            post.sFacilities =
+                                reader["sFacilities"] == DBNull.Value
+                                    ? ""
+                                    : reader["sFacilities"].ToString();
+
+                            // =================================================
+                            // APPLICATION STATUS
+                            // =================================================
+
+                            post.IsApplied =
+                                reader["CApply"] != DBNull.Value &&
+                                Convert.ToInt32(reader["CApply"]) == 1;
+
+                            // =================================================
+                            // OTHER DETAILS
+                            // =================================================
+
+                            if (reader["dStartDate"] != DBNull.Value)
+                            {
+                                post.dStartDate =
+                                    Convert.ToDateTime(
+                                        reader["dStartDate"]);
+                            }
+
+                            if (reader["dCompletionDate"] != DBNull.Value)
+                            {
+                                post.dCompletionDate =
+                                    Convert.ToDateTime(
+                                        reader["dCompletionDate"]);
+                            }
+
+                            post.nRequiredTrainees =
+                                reader["nRequiredTrainees"] == DBNull.Value
+                                    ? 0
+                                    : Convert.ToInt32(
+                                        reader["nRequiredTrainees"]);
+
+                            post.sWorkingHours =
+                                reader["sWorkingHours"] == DBNull.Value
+                                    ? ""
+                                    : reader["sWorkingHours"].ToString();
+
+                            post.sWorkingShift =
+                                reader["sWorkingShift"] == DBNull.Value
+                                    ? ""
+                                    : reader["sWorkingShift"].ToString();
+
+                            post.sCurrency =
+                                reader["sCurrency"] == DBNull.Value
+                                    ? ""
+                                    : reader["sCurrency"].ToString();
+
+                            post.sTotalCharges =
+     reader["sTotalCharges"] == DBNull.Value
+         ? (decimal?)null
+         : Convert.ToDecimal(reader["sTotalCharges"]);
+
+                            post.sMedicalSkills =
+                                reader["JobMedicalSkills"] == DBNull.Value
+                                    ? ""
+                                    : reader["JobMedicalSkills"].ToString();
+
+                            post.sTechnicalSkills =
+                                reader["JobTechnicalSkills"] == DBNull.Value
+                                    ? ""
+                                    : reader["JobTechnicalSkills"].ToString();
+
+                            post.sNonTechnicalSkills =
+                                reader["JobNonTechnicalSkills"] == DBNull.Value
+                                    ? ""
+                                    : reader["JobNonTechnicalSkills"].ToString();
+
+                            post.sDivyang =
+                                reader["sDivyang"] == DBNull.Value
+                                    ? ""
+                                    : reader["sDivyang"].ToString();
+
+                            post.sLanguageKnown =
+                                reader["sLanguageKnown"] == DBNull.Value
+                                    ? ""
+                                    : reader["sLanguageKnown"].ToString();
+
+                            post.sWorkingDays =
+                                reader["sWorkingDays"] == DBNull.Value
+                                    ? ""
+                                    : reader["sWorkingDays"].ToString();
+
+                            extraPosts.Add(post);
+                        }
+                    }
+                }
+            }
+
+            // =====================================================
+            // SEND DATA TO VIEW
+            // =====================================================
+
+            ViewBag.InternshipPosts = extraPosts;
+
+            ViewBag.candidateCode = id;
+
+
+
+            // =========================================================
+            // PASS ID TO VIEW
+            // =========================================================
+
+            ViewBag.InternshipId = id;
+
+            return View();
+        }
+
+        // shrirang 08/10/26
+        // candidate notification section 
+        // ============================================================
+        // CANDIDATE NOTIFICATIONS
+        // ============================================================
+
+        [HttpGet]
+        [Route("Candidate/Notifications")]
+        public IActionResult Notifications()
+        {
+            int? candidateId =
+                HttpContext.Session.GetInt32("CandidateID");
+
+            if (candidateId == null)
+            {
+                return RedirectToAction(
+                    "CandidateLogin",
+                    "Account");
+            }
+
+            try
+            {
+                List<CandidateNotificationM> notifications =
+                    _repository.GetCandidateNotifications(
+                        candidateId.Value);
+
+                ViewBag.UnreadNotificationCount =
+                    _repository.GetCandidateUnreadNotificationCount(
+                        candidateId.Value);
+
+                return View(notifications);
+            }
+            catch (Exception)
+            {
+                TempData["Error"] =
+                    "Unable to load notifications. Please try again.";
+
+                return View(
+                    new List<CandidateNotificationM>());
+            }
+        }
+
+        // ============================================================
+        // CANDIDATE NOTIFICATION DETAIL
+        // ============================================================
+
+        [HttpGet]
+        [Route("Candidate/Notification/{id:int}")]
+        public IActionResult Notification(int id)
+        {
+            int? candidateId =
+                HttpContext.Session.GetInt32("CandidateID");
+
+            if (candidateId == null)
+            {
+                return RedirectToAction(
+                    "CandidateLogin",
+                    "Account");
+            }
+
+            if (id <= 0)
+            {
+                return RedirectToAction(
+                    "Notifications");
+            }
+
+            try
+            {
+                CandidateNotificationM? notification =
+                    _repository.GetCandidateNotification(
+                        candidateId.Value,
+                        id);
+
+                if (notification == null)
+                {
+                    TempData["Error"] =
+                        "Notification not found.";
+
+                    return RedirectToAction(
+                        "Notifications");
+                }
+
+                // ----------------------------------------------------
+                // Mark notification as read
+                // ----------------------------------------------------
+
+                if (!notification.IsRead)
+                {
+                    _repository.MarkCandidateNotificationAsRead(
+                        candidateId.Value,
+                        id);
+
+                    // Update model also so the current page
+                    // immediately shows it as read.
+                    notification.IsRead = true;
+                    notification.ReadDate = DateTime.Now;
+                }
+
+                // ----------------------------------------------------
+                // Get remaining unread count
+                // ----------------------------------------------------
+
+                ViewBag.UnreadNotificationCount =
+                    _repository.GetCandidateUnreadNotificationCount(
+                        candidateId.Value);
+
+                return View(notification);
+            }
+            catch (Exception)
+            {
+                TempData["Error"] =
+                    "Unable to open notification. Please try again.";
+
+                return RedirectToAction(
+                    "Notifications");
+            }
+        }
+
+        // ============================================================
+        // MARK CANDIDATE NOTIFICATION AS READ
+        // ============================================================
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        [Route("Candidate/Notification/MarkAsRead")]
+        public IActionResult MarkNotificationAsRead(
+            int notificationId)
+        {
+            int? candidateId =
+                HttpContext.Session.GetInt32("CandidateID");
+
+            if (candidateId == null)
+            {
+                return Unauthorized();
+            }
+
+            if (notificationId <= 0)
+            {
+                return BadRequest();
+            }
+
+            try
+            {
+                _repository.MarkCandidateNotificationAsRead(
+                    candidateId.Value,
+                    notificationId);
+
+                return Ok(new
+                {
+                    success = true
+                });
+            }
+            catch (Exception)
+            {
+                return StatusCode(
+                    500,
+                    new
+                    {
+                        success = false
+                    });
+            }
+        }
+
+
+
+        [HttpGet]
+        [Route("Candidate/Notification/UnreadCount")]
+        public IActionResult GetUnreadNotificationCount()
+        {
+            int? candidateId =
+                HttpContext.Session.GetInt32("CandidateID");
+
+            if (candidateId == null)
+            {
+                return Unauthorized();
+            }
+
+            try
+            {
+                int count =
+                    _repository.GetCandidateUnreadNotificationCount(
+                        candidateId.Value);
+
+                return Json(new
+                {
+                    success = true,
+                    count = count
+                });
+            }
+            catch (Exception)
+            {
+                return StatusCode(500, new
+                {
+                    success = false,
+                    count = 0
+                });
+            }
+        } // <-- Missing method-closing brace added here
+
+        // radhika07-10
+
+        [HttpGet]
+        public IActionResult TotalOpening()
+        {
+            return View();
+        }
+
+        [HttpGet]
+        public IActionResult TopSearch()
+        {
+            return View();
+        }
+
+        [HttpGet]
+        [Route("Candidate/ViewOrgProfile/{id}")]
+        public IActionResult ViewOrgProfile(string id)
+        {
+            int? candidateID = HttpContext.Session.GetInt32("CandidateID");
+
+            if (!candidateID.HasValue)
+                return RedirectToAction("CandidateLogin", "Account");
+
+            OrgProfile? model = _repository.GetOrganizationProfileByCode(id);
+
+            if (model == null)
+                return NotFound("Organization profile not found.");
+
+            ViewData["Title"] = "View Organization Profile";
+            ViewData["Panel"] = "Candidate";
+            ViewData["UserName"] = "Candidate";
+
+            return View("~/Views/Organization/ViewOrgProfile.cshtml", model);
+        }
+
+
+        [HttpGet]
+        public IActionResult CandidateViewQuestionBank()
+        {
+            return View();
+        }
+
+
+
+       [HttpGet]
+        public async Task<IActionResult> ActivityLog()
+        {
+            int candidateId =
+                HttpContext.Session.GetInt32("CandidateID") ?? 0;
+
+            if (candidateId <= 0)
+            {
+                return RedirectToAction("CandidateLogin", "Account");
+            }
+
+            var activities = new List<CandidateActivityLogViewModel>();
+
+            string connectionString =
+                _configuration.GetConnectionString("DefaultConnection")
+                ?? throw new InvalidOperationException(
+                    "DefaultConnection is missing.");
+
+            const string sql = @"
+                SELECT TOP (500)
+                    VisitID,
+                    IPAddress,
+                    ISP,
+                    Country,
+                    Region,
+                    City,
+                    TimeZone,
+                    BrowserName,
+                    BrowserVersion,
+                    OperatingSystem,
+                    DeviceType,
+                    RequestPath,
+                    PageName,
+                    ReferrerUrl,
+                    VisitDateTime,
+                    IsLoggedIn
+                FROM dbo.tblLoginPageVisits
+                WHERE UserID = @CandidateID
+                  AND PanelType = @PanelType
+                ORDER BY VisitDateTime DESC;";
+
+            await using var connection =
+                new SqlConnection(connectionString);
+
+            await using var command =
+                new SqlCommand(sql, connection);
+
+            command.Parameters.Add("@CandidateID", SqlDbType.Int)
+                .Value = candidateId;
+
+            command.Parameters.Add("@PanelType", SqlDbType.NVarChar, 30)
+                .Value = "Candidate";
+
+            await connection.OpenAsync();
+
+            await using var reader =
+                await command.ExecuteReaderAsync();
+
+            while (await reader.ReadAsync())
+            {
+                activities.Add(new CandidateActivityLogViewModel
+                {
+                    VisitID = Convert.ToInt64(reader["VisitID"]),
+
+                    IPAddress = GetNullableString(reader, "IPAddress"),
+                    ISP = GetNullableString(reader, "ISP"),
+                    Country = GetNullableString(reader, "Country"),
+                    Region = GetNullableString(reader, "Region"),
+                    City = GetNullableString(reader, "City"),
+                    TimeZone = GetNullableString(reader, "TimeZone"),
+
+                    BrowserName = GetNullableString(reader, "BrowserName"),
+                    BrowserVersion = GetNullableString(reader, "BrowserVersion"),
+                    OperatingSystem = GetNullableString(reader, "OperatingSystem"),
+                    DeviceType = GetNullableString(reader, "DeviceType"),
+
+                    RequestPath = GetNullableString(reader, "RequestPath"),
+                    PageName = GetNullableString(reader, "PageName"),
+                    ReferrerUrl = GetNullableString(reader, "ReferrerUrl"),
+
+                    VisitDateTime = Convert.ToDateTime(
+                        reader["VisitDateTime"]),
+
+                    IsLoggedIn = !reader.IsDBNull(
+                        reader.GetOrdinal("IsLoggedIn"))
+                        && Convert.ToBoolean(reader["IsLoggedIn"])
+                });
+            }
+
+            return View(activities);
+        }
+
+        private static string? GetNullableString(
+            SqlDataReader reader,
+            string columnName)
+        {
+            int ordinal = reader.GetOrdinal(columnName);
+
+            return reader.IsDBNull(ordinal)
+                ? null
+                : reader.GetString(ordinal);
+        }
+
+        public IActionResult Pipeline() => View();
+        public IActionResult Community() => View();
+        public IActionResult SharedData() => View();
+
+
+        [HttpGet]
+        public IActionResult EditCandidateRegistration()
+        {
+            int? candidateId = HttpContext.Session.GetInt32("CandidateID");
+
+            if (candidateId == null)
+            {
+                return RedirectToAction("CandidateLogin", "Account");
+            }
+
+            var candidate = _accountRepository
+                .GetCandidateRegistrationForEdit(candidateId.Value);
+
+            if (candidate == null)
+            {
+                return NotFound("Candidate registration details not found.");
+            }
+
+            return View(candidate);
+        }
     }
 }
+

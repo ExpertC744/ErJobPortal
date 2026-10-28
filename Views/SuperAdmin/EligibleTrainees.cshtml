@@ -8,7 +8,10 @@
     ViewData["UserName"] = "ItNetworkZ";
 
     int postID = ViewBag.PostID ?? 0;
-    string orgCode = ViewBag.OrgCode?.ToString() ?? "";
+   int orgID = ViewBag.OrgID ?? 0;
+
+   string orgCode =
+       ViewBag.OrgCode?.ToString() ?? "";
 }
 @* @{
     Layout = "~/Views/Shared/_DashboardLayout.cshtml";
@@ -336,15 +339,15 @@
 
                                 <!-- Resume -->
                                 <td>
-                                    <a asp-controller="Candidate"
-                                       asp-action="Resume"
-                                       asp-route-id="@item.CandidateID"
-                                       class="resume-view-btn"
-                                       title="View Resume">
+                                        <a asp-controller="SuperAdmin"
+                                           asp-action="ViewTraineeResume"
+                                           asp-route-id="@item.CandidateID"
+                                           class="resume-view-btn"
+                                           title="View Resume">
 
-                                        <i class="fas fa-eye"></i>
+                                            <i class="fas fa-eye"></i>
 
-                                    </a>
+                                        </a>
                                 </td>
 
                                 <!-- Email -->

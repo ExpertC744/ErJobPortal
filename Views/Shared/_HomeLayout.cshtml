@@ -110,8 +110,6 @@
           asp-append-version="true">
 
 
-
-
     <link rel="stylesheet"
           href="~/css/interview-preparation.css"
           asp-append-version="true" />
@@ -185,7 +183,7 @@
                 ========================================================== */
 
         .trainee-navbar {
-            width: 100%;
+            width: 100vw;
             min-height: 96px;
             padding: 0 !important;
             background: #ffffff !important;
@@ -1186,47 +1184,16 @@
             About
         </a>
     </li>
+        <!-- ORGANIZATION -->
+    <li class="nav-item">
+        <a class="nav-link @navActive("Home", "Organization")"
+           asp-controller="Home"
+           asp-action="Organization">
 
-    <!-- ORGANIZATION -->
-    <li class="nav-item dropdown">
-
-        <a class="nav-link dropdown-toggle @navActive("Home", "Organization")"
-           href="#"
-           role="button"
-           data-bs-toggle="dropdown"
-           aria-expanded="false">
             Organization
+
         </a>
-
-        <ul class="dropdown-menu">
-
-            <!-- ORGANIZATION -->
-            <li>
-                <a class="dropdown-item @navActive("Home", "Organization")"
-                   asp-controller="Home"
-                   asp-action="Organization">
-
-                    <i class="fa-solid fa-building me-2"></i>
-                    Organization
-
-                </a>
-            </li>
-
-            <!-- COURSE DETAILS -->
-            <li>
-                <a class="dropdown-item @navActive("Home", "CourseDetails")"
-                   asp-controller="Home"
-                   asp-action="CourseDetails">
-
-                    <i class="fa-solid fa-book-open me-2"></i>
-                    Course Details
-
-                </a>
-            </li>
-
-        </ul>
     </li>
-
     <!-- TEAM INVOLVED -->
     <li class="nav-item">
         <a class="nav-link @navActive("Home", "TeamInvolved")"
@@ -1548,8 +1515,12 @@
                                 </a>
                             </li>
 
-                            <li><a href="#">Organizations / Company</a></li>
-
+                              <li>
+                                <a asp-controller="Home"
+                                   asp-action="CoverLetter">
+                                    Organizations / Company
+                                </a>
+                            </li>
                             <li>
                                 <a asp-controller="Home"
                                    asp-action="FAQ">
@@ -1675,7 +1646,7 @@
         <!-- TOP CAREER OPTIONS -->
         <li>
             <a asp-controller="Home"
-               asp-action="TopCarriers">
+               asp-action="TopCareers">
 
                 <span class="ti-angle-right"></span>
                 Top Career Options

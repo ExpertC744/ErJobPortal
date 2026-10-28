@@ -1,0 +1,2065 @@
+﻿@model ErJobPortal.Models.TPOSchedulerPageM
+@{
+    Layout = "~/Views/Shared/_DashboardLayout.cshtml";
+    ViewData["Title"] = "TPO Scheduler";
+    ViewData["Panel"] = "TPO";
+}
+
+
+<link rel="stylesheet"
+      href="~/css/tposcheduler.css"
+      asp-append-version="true" />
+
+<div class="tpo-scheduler">
+
+    <!-- =====================================================
+         MESSAGES
+    ====================================================== -->
+    @if (TempData["SchedulerSuccess"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            @TempData["SchedulerSuccess"]
+            <button type="button" class="btn-close"
+                    data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+
+    @if (TempData["SchedulerError"] != null)
+    {
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            @TempData["SchedulerError"]
+            <button type="button" class="btn-close"
+                    data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+
+    @if (!ViewData.ModelState.IsValid)
+    {
+        <div asp-validation-summary="All"
+             class="alert alert-danger"
+             role="alert"></div>
+    }
+
+
+    <!-- =====================================================
+         HERO HEADER
+    ====================================================== -->
+    <div class="sch-hero">
+
+        <div class="sch-hero-left">
+            <div class="sch-hero-icon">
+                <i class="fas fa-calendar-alt"></i>
+            </div>
+
+            <div>
+                <h2>TPO Scheduler</h2>
+                <p>Plan and manage your activities, meetings, drives and other important events.</p>
+
+                <div class="sch-chips">
+                    <span class="sch-chip">
+                        <i class="far fa-calendar"></i>
+                        <span id="heroDate"></span>
+                    </span>
+
+                    <span class="sch-chip">
+                        <i class="fas fa-bolt"></i>
+                        <span id="nextUp">Loading...</span>
+                    </span>
+                </div>
+            </div>
+        </div>
+
+        <button type="button"
+                id="btnAddActivity"
+                class="btn-add-activity"
+                data-bs-toggle="modal"
+                data-bs-target="#addActivityModal">
+            <i class="fas fa-plus"></i>
+            Add New Activity
+        </button>
+
+    </div>
+
+
+    <!-- =====================================================
+         SUMMARY CARDS
+    ====================================================== -->
+    <div class="scheduler-stats">
+
+        <div class="scheduler-stat stat-total">
+            <div class="stat-top">
+                <div class="stat-icon"><i class="fas fa-calendar-check"></i></div>
+                <span>Total Activities</span>
+            </div>
+            <h3 id="totalActivities">0</h3>
+            <div class="stat-bar"><i id="barTotal"></i></div>
+        </div>
+
+        <div class="scheduler-stat stat-upcoming">
+            <div class="stat-top">
+                <div class="stat-icon"><i class="fas fa-clock"></i></div>
+                <span>Upcoming</span>
+            </div>
+            <h3 id="upcomingActivities">0</h3>
+            <div class="stat-bar"><i id="barUpcoming"></i></div>
+        </div>
+
+        <div class="scheduler-stat stat-completed">
+            <div class="stat-top">
+                <div class="stat-icon"><i class="fas fa-check-circle"></i></div>
+                <span>Completed</span>
+            </div>
+            <h3 id="completedActivities">0</h3>
+            <div class="stat-bar"><i id="barCompleted"></i></div>
+        </div>
+
+        <div class="scheduler-stat stat-cancelled">
+            <div class="stat-top">
+                <div class="stat-icon"><i class="fas fa-times-circle"></i></div>
+                <span>Cancelled</span>
+            </div>
+            <h3 id="cancelledActivities">0</h3>
+            <div class="stat-bar"><i id="barCancelled"></i></div>
+        </div>
+
+    </div>
+
+
+    <!-- =====================================================
+         CALENDAR AND AGENDA
+    ====================================================== -->
+    <div class="scheduler-content">
+
+        <section class="scheduler-panel calendar-panel">
+
+            <div class="calendar-header">
+                <div class="calendar-month-heading">
+                    <h4 id="calendarMonthYear"></h4>
+
+                    <div class="calendar-navigation">
+                        <button type="button" id="previousMonth" aria-label="Previous period">
+                            <i class="fas fa-chevron-left"></i>
+                        </button>
+                        <button type="button" id="nextMonth" aria-label="Next period">
+                            <i class="fas fa-chevron-right"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="calendar-toolbar">
+                    <button type="button" id="todayButton" class="calendar-today">
+                        Today
+                    </button>
+
+                    <div class="calendar-view-switch">
+                        <button type="button" class="calendar-view-btn active" data-view="month">Month</button>
+                        <button type="button" class="calendar-view-btn" data-view="week">Week</button>
+                        <button type="button" class="calendar-view-btn" data-view="day">Day</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="calendar-grid-wrapper">
+                <div class="calendar-weekdays">
+                    <div>Sun</div><div>Mon</div><div>Tue</div>
+                    <div>Wed</div><div>Thu</div><div>Fri</div><div>Sat</div>
+                </div>
+                <div id="calendarGrid" class="calendar-grid"></div>
+            </div>
+
+            <div class="calendar-legend">
+                <span><i class="legend-dot legend-upcoming"></i> Upcoming</span>
+                <span><i class="legend-dot legend-completed"></i> Completed</span>
+                <span><i class="legend-dot legend-draft"></i> Save as Draft</span>
+            </div>
+
+        </section>
+
+        <section class="scheduler-panel activities-panel">
+
+            <div class="agenda-head">
+
+                <div class="agenda-date" aria-hidden="true">
+                    <small id="agendaWeekday">Mon</small>
+                    <strong id="agendaDay">1</strong>
+                    <em id="agendaMonth">Jan</em>
+                </div>
+
+                <div class="agenda-head-text">
+                    <h4 class="panel-title">Scheduled Activities</h4>
+                    <p id="selectedDateInfo" class="selected-date-info" aria-live="polite">
+                        Select a date to view activities.
+                    </p>
+                </div>
+
+                <a href="#" id="viewAllActivities" class="view-all-link">
+                    View All
+                </a>
+
+            </div>
+
+            <div id="activityList" class="activity-list"></div>
+
+            <div id="emptyActivities" class="empty-activities" hidden>
+                <i class="far fa-calendar-times"></i>
+                <p>No activities found for this date.</p>
+            </div>
+
+        </section>
+
+    </div>
+
+
+    <!-- =====================================================
+         ACTIVITY MANAGEMENT TABLE
+    ====================================================== -->
+    <div class="scheduler-panel activity-management-panel">
+
+        <div class="table-head">
+            <div>
+                <h4 class="panel-title">Activity Management</h4>
+                <p class="panel-sub">View, edit, cancel and restore your saved activities and placement drives.</p>
+            </div>
+
+            <div class="table-search">
+                <i class="fas fa-search"></i>
+                <input type="search"
+                       id="tableSearch"
+                       placeholder="Search title, category, venue..." />
+            </div>
+        </div>
+
+        <div class="filter-tabs" id="filterTabs">
+            <button type="button" class="filter-tab active" data-filter="all">
+                All <span class="tab-count" id="countAll">0</span>
+            </button>
+            <button type="button" class="filter-tab" data-filter="general">
+                General <span class="tab-count" id="countGeneral">0</span>
+            </button>
+            <button type="button" class="filter-tab" data-filter="placement">
+                Placement Drives <span class="tab-count" id="countPlacement">0</span>
+            </button>
+            <button type="button" class="filter-tab" data-filter="draft">
+                Drafts <span class="tab-count" id="countDraft">0</span>
+            </button>
+            <button type="button" class="filter-tab" data-filter="cancelled">
+                Cancelled <span class="tab-count" id="countCancelled">0</span>
+            </button>
+        </div>
+
+        <div class="table-responsive">
+            <table class="sch-table" id="activityManagementTable">
+
+                <thead>
+                    <tr>
+                        <th class="col-no">#</th>
+                        <th class="col-activity">Activity</th>
+                        <th class="col-schedule">Schedule</th>
+                        <th class="col-location">Location / Venue</th>
+                        <th class="col-people">Participants</th>
+                        <th class="col-status">Status</th>
+                        <th class="col-actions">Actions</th>
+                    </tr>
+                </thead>
+
+                <tbody id="activityManagementBody">
+                    <tr>
+                        <td colspan="7" class="table-empty">
+                            Loading activities...
+                        </td>
+                    </tr>
+                </tbody>
+
+            </table>
+        </div>
+
+        <div class="table-footer">
+            <span class="table-info" id="tableInfo"></span>
+            <div class="pager" id="tablePager"></div>
+        </div>
+
+    </div>
+
+</div>
+
+
+<!-- =========================================================
+     ADD / EDIT ACTIVITY MODAL
+========================================================== -->
+<div class="modal fade"
+     id="addActivityModal"
+     tabindex="-1"
+     aria-labelledby="addActivityModalLabel"
+     aria-hidden="true">
+
+    <div class="modal-dialog modal-xl modal-dialog-centered">
+        <div class="modal-content scheduler-modal">
+
+            <div class="modal-header scheduler-modal-header">
+                <div>
+                    <h5 class="modal-title" id="addActivityModalLabel">
+                        <i class="fas fa-calendar-plus me-2"></i>
+                        Create Scheduler Activity
+                    </h5>
+                    <p class="mb-0">Choose an activity type and fill in the details.</p>
+                </div>
+
+                <button type="button"
+                        class="btn-close btn-close-white"
+                        data-bs-dismiss="modal"
+                        aria-label="Close"></button>
+            </div>
+
+            <form id="schedulerActivityForm"
+                  asp-controller="TPO"
+                  asp-action="Scheduler"
+                  method="post">
+
+                @Html.AntiForgeryToken()
+
+                <input type="hidden"
+                       name="Placement.PlacementDriveID"
+                       id="placementDriveId"
+                       value="0" />
+
+                <div class="modal-body scheduler-modal-body">
+
+                    <div class="scheduler-form-error alert alert-danger"
+                         id="schedulerFormError"
+                         role="alert"></div>
+
+                    <!-- ACTIVITY TYPE -->
+                    <div class="activity-type-selector">
+                        <label class="form-label fw-semibold">
+                            Select Activity Type
+                        </label>
+
+                        <div class="activity-type-options">
+
+                            <label class="activity-type-option active" for="generalActivityRadio">
+                                <input type="radio"
+                                       name="ActivityType"
+                                       id="generalActivityRadio"
+                                       value="General"
+                                       checked />
+
+                                <span class="activity-type-icon general-icon">
+                                    <i class="fas fa-calendar-alt"></i>
+                                </span>
+
+                                <span>
+                                    <strong>General Activity</strong>
+                                    <small>Meetings, training, events and reminders</small>
+                                </span>
+
+                                <i class="fas fa-check-circle type-check"></i>
+                            </label>
+
+                            <label class="activity-type-option" for="placementDriveRadio">
+                                <input type="radio"
+                                       name="ActivityType"
+                                       id="placementDriveRadio"
+                                       value="PlacementDrive" />
+
+                                <span class="activity-type-icon placement-icon">
+                                    <i class="fas fa-briefcase"></i>
+                                </span>
+
+                                <span>
+                                    <strong>Placement Drive</strong>
+                                    <small>Company, job and eligibility details</small>
+                                </span>
+
+                                <i class="fas fa-check-circle type-check"></i>
+                            </label>
+
+                        </div>
+                    </div>
+
+
+                    <!-- ===================== GENERAL ACTIVITY ===================== -->
+                    <fieldset id="generalActivityForm" class="activity-form-section">
+
+                        <input type="hidden"
+                               name="General.ActivityID"
+                               id="generalActivityId"
+                               value="0" />
+
+                        <div class="activity-section-heading">
+                            <span class="section-heading-icon general-icon">
+                                <i class="fas fa-calendar-check"></i>
+                            </span>
+                            <div>
+                                <h6>General Activity Details</h6>
+                                <p>Enter activity information and schedule.</p>
+                            </div>
+                        </div>
+
+                        <div class="row g-3">
+
+                            <div class="col-md-6">
+                                <label class="form-label">Activity Title *</label>
+                                <input type="text" name="General.Title" class="form-control"
+                                       maxlength="200" required
+                                       placeholder="e.g. TPO Staff Meeting" />
+                            </div>
+
+                            <div class="col-md-6">
+                                <label class="form-label">Category *</label>
+                                <select name="General.Category" class="form-select" required>
+                                    <option value="">Select Category</option>
+                                    <option value="General">General</option>
+                                    <option value="TrainingAndDevelopment">Training &amp; Development</option>
+                                    <option value="Meeting">Meeting</option>
+                                    <option value="CollegeEvent">College Event</option>
+                                    <option value="Other">Other</option>
+                                </select>
+                            </div>
+
+                            <div class="col-12">
+                                <label class="form-label">Description *</label>
+                                <textarea name="General.Description" class="form-control"
+                                          rows="3" required
+                                          placeholder="Describe the activity..."></textarea>
+                            </div>
+
+                            <div class="col-12">
+                                <div class="form-section-label">
+                                    <i class="far fa-clock me-2"></i>Date and Time
+                                </div>
+                            </div>
+
+                            <div class="col-md-6">
+                                <label class="form-label">Start Date *</label>
+                                <input type="date" name="General.StartDate"
+                                       class="form-control" required />
+                            </div>
+
+                            <div class="col-md-6">
+                                <label class="form-label">End Date *</label>
+                                <input type="date" name="General.EndDate"
+                                       class="form-control" required />
+                            </div>
+
+                            <div class="col-md-6">
+                                <label class="form-label">Start Time *</label>
+                                <input type="time" name="General.StartTime"
+                                       class="form-control" required />
+                            </div>
+
+                            <div class="col-md-6">
+                                <label class="form-label">End Time *</label>
+                                <input type="time" name="General.EndTime"
+                                       class="form-control" required />
+                            </div>
+
+                            <div class="col-12">
+                                <label class="form-label">Venue / Location</label>
+                                <input type="text" name="General.Location"
+                                       class="form-control"
+                                       placeholder="Conference Room / Lab 2" />
+                            </div>
+
+                            <div class="col-12">
+                                <div class="form-section-label">
+                                    <i class="fas fa-users me-2"></i>Visibility and Participants
+                                </div>
+                            </div>
+
+                            <div class="col-md-6">
+                                <label class="form-label">Participants *</label>
+                                <select name="General.Participants" class="form-select" required>
+                                    <option value="">Select Participants</option>
+                                    <option value="Students">Students</option>
+                                    <option value="Staff">Staff</option>
+                                    <option value="Everyone">Everyone</option>
+                                </select>
+                            </div>
+
+                            <div class="col-md-6">
+                                <label class="form-label">Reminder Before Activity</label>
+                                <select name="General.Reminder" class="form-select">
+                                    <option value="None">No Reminder</option>
+                                    <option value="15">15 minutes before</option>
+                                    <option value="30">30 minutes before</option>
+                                    <option value="60">1 hour before</option>
+                                    <option value="1440">1 day before</option>
+                                    <option value="10080">1 week before</option>
+                                </select>
+                            </div>
+
+                            <div class="col-md-6">
+                                <label class="form-label">Reminder Channel</label>
+                                <select name="General.ReminderChannel" class="form-select">
+                                    <option value="InApp">In-app notification</option>
+                                    <option value="Email">Email</option>
+                                    <option value="Both">Email and in-app</option>
+                                </select>
+                            </div>
+
+                            <div class="col-md-6">
+                                <label class="form-label">Activity Status</label>
+                                <select name="General.Status" class="form-select">
+                                    <option value="Upcoming">Upcoming</option>
+                                    <option value="Pending">Save as Draft</option>
+                                </select>
+                            </div>
+
+                        </div>
+                    </fieldset>
+
+
+                    <!-- ===================== PLACEMENT DRIVE ===================== -->
+                    <fieldset id="placementDriveForm"
+                              class="activity-form-section"
+                              hidden
+                              disabled>
+
+                        <div class="activity-section-heading">
+                            <span class="section-heading-icon placement-icon">
+                                <i class="fas fa-building"></i>
+                            </span>
+                            <div>
+                                <h6>Placement Drive Details</h6>
+                                <p>Enter company, job, eligibility and recruitment information.</p>
+                            </div>
+                        </div>
+
+                        <div class="row g-3">
+
+                            <div class="col-12">
+                                <div class="form-section-label">
+                                    <i class="fas fa-building me-2"></i>Company and Job Details
+                                </div>
+                            </div>
+
+                            <div class="col-md-6">
+                                <label class="form-label">Company Name *</label>
+                                <input type="text" name="Placement.CompanyName"
+                                       class="form-control" maxlength="200" required />
+                            </div>
+
+                            <div class="col-md-6">
+                                <label class="form-label">Job Position *</label>
+                                <input type="text" name="Placement.JobPosition"
+                                       class="form-control" required
+                                       placeholder="e.g. Software Developer" />
+                            </div>
+
+                            <div class="col-md-6">
+                                <label class="form-label">Job Type *</label>
+                                <select name="Placement.JobType" class="form-select" required>
+                                    <option value="">Select Job Type</option>
+                                    <option value="FullTime">Full Time</option>
+                                    <option value="PartTime">Part Time</option>
+                                    <option value="Internship">Internship</option>
+                                    <option value="Contract">Contract</option>
+                                </select>
+                            </div>
+
+                            <div class="col-md-6">
+                                <label class="form-label">Salary / Stipend</label>
+                                <input type="text" name="Placement.Salary"
+                                       class="form-control"
+                                       placeholder="e.g. ₹4 LPA or ₹15,000/month" />
+                            </div>
+
+                            <div class="col-md-6">
+                                <label class="form-label">Job Location *</label>
+                                <input type="text" name="Placement.JobLocation"
+                                       class="form-control" required
+                                       placeholder="City / Work from home" />
+                            </div>
+
+                            <div class="col-md-6">
+                                <label class="form-label">Required Skills</label>
+                                <input type="text" name="Placement.RequiredSkills"
+                                       class="form-control"
+                                       placeholder="C#, SQL, ASP.NET Core" />
+                            </div>
+
+                            <div class="col-12">
+                                <label class="form-label">Job Description *</label>
+                                <textarea name="Placement.JobDescription"
+                                          class="form-control" rows="3" required></textarea>
+                            </div>
+
+
+                            <!-- ELIGIBILITY CRITERIA -->
+                            <div class="col-12">
+                                <div class="form-section-label">
+                                    <i class="fas fa-user-check me-2"></i>Eligibility Criteria
+                                </div>
+                            </div>
+
+                            <div class="col-md-4">
+                                <label class="form-label">10th Minimum Percentage (%)</label>
+                                <input type="number" name="Placement.TenthPercentage"
+                                       class="form-control" min="0" max="100" step="0.01"
+                                       placeholder="e.g. 60" />
+                            </div>
+
+                            <div class="col-md-4">
+                                <label class="form-label">12th Minimum Percentage (%)</label>
+                                <input type="number" name="Placement.TwelfthPercentage"
+                                       class="form-control" min="0" max="100" step="0.01"
+                                       placeholder="e.g. 60" />
+                            </div>
+
+                            <div class="col-md-4">
+                                <label class="form-label">Graduation Minimum Percentage (%)</label>
+                                <input type="number" name="Placement.MinimumPercentage"
+                                       class="form-control" min="0" max="100" step="0.01"
+                                       placeholder="e.g. 65" />
+                            </div>
+
+                            <div class="col-md-6">
+                                <label class="form-label">Eligible Course</label>
+                                <input type="text" name="Placement.EligibleCourse"
+                                       class="form-control"
+                                       placeholder="e.g. B.E., B.Tech, MCA" />
+                            </div>
+
+                            <div class="col-md-6">
+                                <label class="form-label">Graduation Year</label>
+                                <input type="number" name="Placement.GraduationYear"
+                                       class="form-control" min="2000" max="2100"
+                                       placeholder="e.g. 2027" />
+                            </div>
+
+                            <div class="col-12">
+                                <label class="form-label">Other Eligibility Requirements</label>
+                                <textarea name="Placement.EligibilityCriteria"
+                                          class="form-control" rows="2"
+                                          placeholder="e.g. No active backlogs, eligible branches, etc."></textarea>
+                            </div>
+
+
+                            <div class="col-12">
+                                <div class="form-section-label">
+                                    <i class="far fa-calendar-alt me-2"></i>Drive Schedule
+                                </div>
+                            </div>
+
+                            <div class="col-md-6">
+                                <label class="form-label">Drive Start Date *</label>
+                                <input type="date" name="Placement.StartDate"
+                                       class="form-control" required />
+                            </div>
+
+                            <div class="col-md-6">
+                                <label class="form-label">Drive End Date *</label>
+                                <input type="date" name="Placement.EndDate"
+                                       class="form-control" required />
+                            </div>
+
+                            <div class="col-md-6">
+                                <label class="form-label">Start Time</label>
+                                <input type="time" name="Placement.StartTime"
+                                       class="form-control" />
+                            </div>
+
+                            <div class="col-md-6">
+                                <label class="form-label">End Time</label>
+                                <input type="time" name="Placement.EndTime"
+                                       class="form-control" />
+                            </div>
+
+                            <div class="col-md-6">
+                                <label class="form-label">Drive Venue</label>
+                                <input type="text" name="Placement.Venue"
+                                       class="form-control"
+                                       placeholder="Campus / Online / Company office" />
+                            </div>
+
+                            <div class="col-md-6">
+                                <label class="form-label">Company Contact Person</label>
+                                <input type="text" name="Placement.ContactPerson"
+                                       class="form-control" />
+                            </div>
+
+                            <div class="col-md-6">
+                                <label class="form-label">Contact Email</label>
+                                <input type="email" name="Placement.ContactEmail"
+                                       class="form-control" />
+                            </div>
+
+                            <div class="col-md-6">
+                                <label class="form-label">Contact Phone</label>
+                                <input type="tel" name="Placement.ContactPhone"
+                                       class="form-control" />
+                            </div>
+
+
+                            <div class="col-12">
+                                <div class="form-section-label">
+                                    <i class="fas fa-bullhorn me-2"></i>Participants and Publication
+                                </div>
+                            </div>
+
+                            <div class="col-md-6">
+                                <label class="form-label">Eligible Participants</label>
+                                <select name="Placement.Participants" class="form-select">
+                                    <option value="EligibleStudents">Eligible Students</option>
+                                    <option value="Students">All Students</option>
+                                </select>
+                            </div>
+
+                            <div class="col-md-6">
+                                <label class="form-label">Publication Status</label>
+                                <select name="Placement.PublicationStatus" class="form-select">
+                                    <option value="Draft">Save as Draft</option>
+                                    <option value="Published">Publish Drive</option>
+                                </select>
+                            </div>
+
+                            <div class="col-12">
+                                <label class="form-label">Additional Instructions</label>
+                                <textarea name="Placement.Instructions"
+                                          class="form-control" rows="2"></textarea>
+                            </div>
+
+                        </div>
+                    </fieldset>
+
+                </div>
+
+                <div class="modal-footer scheduler-modal-footer">
+                    <button type="button" class="btn btn-light border"
+                            data-bs-dismiss="modal">
+                        Cancel
+                    </button>
+
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-save me-2"></i>
+                        <span id="activitySubmitText">Save Activity</span>
+                    </button>
+                </div>
+
+            </form>
+        </div>
+    </div>
+</div>
+
+
+@section Scripts {
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            "use strict";
+
+            // =========================================================
+            // ELEMENTS
+            // =========================================================
+            const modalElement = document.getElementById("addActivityModal");
+            const activityForm = document.getElementById("schedulerActivityForm");
+            const generalRadio = document.getElementById("generalActivityRadio");
+            const placementRadio = document.getElementById("placementDriveRadio");
+            const generalForm = document.getElementById("generalActivityForm");
+            const placementForm = document.getElementById("placementDriveForm");
+            const submitText = document.getElementById("activitySubmitText");
+            const formError = document.getElementById("schedulerFormError");
+
+            const calendarGrid = document.getElementById("calendarGrid");
+            const monthYear = document.getElementById("calendarMonthYear");
+            const selectedDateInfo = document.getElementById("selectedDateInfo");
+            const activityList = document.getElementById("activityList");
+            const emptyActivities = document.getElementById("emptyActivities");
+            const managementBody = document.getElementById("activityManagementBody");
+
+            if (!modalElement || !activityForm || !generalRadio ||
+                !placementRadio || !generalForm || !placementForm) {
+                console.error("Scheduler modal elements are missing.");
+                return;
+            }
+
+            // Header date chip
+            const heroDate = document.getElementById("heroDate");
+            if (heroDate) {
+                heroDate.textContent = new Date().toLocaleDateString("en-IN", {
+                    weekday: "long",
+                    day: "2-digit",
+                    month: "long",
+                    year: "numeric"
+                });
+            }
+
+            // =========================================================
+            // SERVER-GENERATED URLS
+            // =========================================================
+            const detailsGeneralUrl =
+                '@Url.Action("GeneralActivityDetails", "TPO")';
+
+            const detailsPlacementUrl =
+                '@Url.Action("PlacementDriveDetails", "TPO")';
+
+            const cancelGeneralUrl =
+                '@Url.Action("CancelGeneralActivity", "TPO")';
+
+            const cancelPlacementUrl =
+                '@Url.Action("CancelPlacementDrive", "TPO")';
+
+            const uncancelGeneralUrl =
+                '@Url.Action("UncancelGeneralActivity", "TPO")';
+
+            const uncancelPlacementUrl =
+                '@Url.Action("UncancelPlacementDrive", "TPO")';
+
+            // =========================================================
+            // DATABASE DATA
+            // =========================================================
+            const generalActivitiesFromDb =
+        @Html.Raw(System.Text.Json.JsonSerializer.Serialize(
+                         ViewBag.GeneralActivities ?? new object[0]));
+
+            const placementDrivesFromDb =
+        @Html.Raw(System.Text.Json.JsonSerializer.Serialize(
+                         ViewBag.PlacementDrives ?? new object[0]));
+
+            // Handle boolean values consistently.
+            function isCancelled(record) {
+                return record?.IsCancelled === true ||
+                       record?.IsCancelled === 1 ||
+                       String(record?.IsCancelled).toLowerCase() === "true";
+            }
+
+            function isPublished(drive) {
+                return String(drive?.PublicationStatus || "")
+                    .toLowerCase() === "published";
+            }
+
+            function getTodayKey() {
+                const now = new Date();
+
+                return now.getFullYear() + "-" +
+                    String(now.getMonth() + 1).padStart(2, "0") + "-" +
+                    String(now.getDate()).padStart(2, "0");
+            }
+
+            function getEffectiveStatus(record, isPlacement = false) {
+                // Cancelled records must remain cancelled.
+                if (isCancelled(record)) {
+                    return "Cancelled";
+                }
+
+                const savedStatus = String(
+                    isPlacement
+                        ? record?.PublicationStatus
+                        : record?.Status
+                ).trim().toLowerCase();
+
+                // Drafts must remain drafts.
+                if (savedStatus === "draft" || savedStatus === "pending") {
+                    return "Save as Draft";
+                }
+
+                // Only published placement drives participate in completion.
+                if (isPlacement && savedStatus !== "published") {
+                    return "Save as Draft";
+                }
+
+                const endDate = String(
+                    record?.EndDate || record?.StartDate || ""
+                ).substring(0, 10);
+
+                // Automatically complete activities whose end date has passed.
+                if (endDate && endDate < getTodayKey()) {
+                    return "Completed";
+                }
+
+                // Retain an explicitly completed status.
+                if (savedStatus === "completed") {
+                    return "Completed";
+                }
+
+                return "Upcoming";
+            }
+
+            function escapeSelectorValue(value) {
+                if (window.CSS && typeof window.CSS.escape === "function") {
+                    return window.CSS.escape(String(value));
+                }
+
+                return String(value).replace(/["\\]/g, "\\$&");
+            }
+
+            // =========================================================
+            // FORM TYPE SWITCHING
+            // =========================================================
+            function updateActivityType(resetScroll = true) {
+                const isGeneral = generalRadio.checked;
+
+                generalForm.hidden = !isGeneral;
+                generalForm.disabled = !isGeneral;
+
+                placementForm.hidden = isGeneral;
+                placementForm.disabled = isGeneral;
+
+                generalRadio.closest(".activity-type-option")
+                    ?.classList.toggle("active", isGeneral);
+
+                placementRadio.closest(".activity-type-option")
+                    ?.classList.toggle("active", !isGeneral);
+
+                const generalId = Number(
+                    document.getElementById("generalActivityId")?.value || 0
+                );
+
+                const placementId = Number(
+                    document.getElementById("placementDriveId")?.value || 0
+                );
+
+                if (submitText) {
+                    if (isGeneral && generalId > 0) {
+                        submitText.textContent = "Update Activity";
+                    } else if (!isGeneral && placementId > 0) {
+                        submitText.textContent = "Update Placement Drive";
+                    } else {
+                        submitText.textContent = isGeneral
+                            ? "Save Activity"
+                            : "Save Placement Drive";
+                    }
+                }
+
+                if (formError) {
+                    formError.style.display = "none";
+                    formError.textContent = "";
+                }
+
+                if (resetScroll) {
+                    const body = modalElement.querySelector(
+                        ".scheduler-modal-body"
+                    );
+                    if (body) body.scrollTop = 0;
+                }
+            }
+
+            generalRadio.addEventListener("change", () => updateActivityType());
+            placementRadio.addEventListener("change", () => updateActivityType());
+            updateActivityType(false);
+
+            if (!calendarGrid || !monthYear || !activityList ||
+                !selectedDateInfo || !emptyActivities) {
+                console.error("Scheduler calendar elements are missing.");
+                return;
+            }
+
+            // =========================================================
+            // CALENDAR DATA
+            // Cancelled activities and unpublished drives are excluded.
+            // =========================================================
+            const generalActivities = generalActivitiesFromDb
+                .filter(a => !isCancelled(a))
+                .map(a => ({
+                    id: a.ActivityID,
+                    title: a.Title || "General Activity",
+                    category: a.Category || "General",
+                    date: String(a.StartDate || "").substring(0, 10),
+                    endDate: String(a.EndDate || a.StartDate || "").substring(0, 10),
+                    time: a.StartTime
+                        ? String(a.StartTime).substring(0, 5) : "",
+                    location: a.Location || "",
+                    status: getEffectiveStatus(a, false),
+                    isPlacement: false
+                }));
+
+            const placementActivities = placementDrivesFromDb
+                .filter(p => isPublished(p) && !isCancelled(p))
+                .map(p => ({
+                    id: p.PlacementDriveID,
+                    title: (p.CompanyName || "Company") + " - " +
+                           (p.JobPosition || "Placement Drive"),
+                    category: "Placement",
+                    date: String(p.StartDate || "").substring(0, 10),
+                    endDate: String(p.EndDate || p.StartDate || "").substring(0, 10),
+                    time: p.StartTime
+                        ? String(p.StartTime).substring(0, 5) : "",
+                    location: p.Venue || p.JobLocation || "",
+                    status: getEffectiveStatus(p, true),
+                    isPlacement: true
+                }));
+
+            const activities = [...generalActivities, ...placementActivities];
+
+            // =========================================================
+            // DATE HELPERS
+            // =========================================================
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+
+            let currentMonth = new Date(
+                today.getFullYear(), today.getMonth(), 1
+            );
+
+            let selectedDate = toDateKey(today);
+            let currentView = "month";
+            let showAllActivities = false;
+
+            const monthNames = [
+                "January", "February", "March", "April",
+                "May", "June", "July", "August",
+                "September", "October", "November", "December"
+            ];
+
+            function toDateKey(date) {
+                return date.getFullYear() + "-" +
+                    String(date.getMonth() + 1).padStart(2, "0") + "-" +
+                    String(date.getDate()).padStart(2, "0");
+            }
+
+            function parseDate(dateKey) {
+                return new Date(dateKey + "T00:00:00");
+            }
+
+            function formatDate(dateKey) {
+                if (!dateKey) return "-";
+
+                const parsed = parseDate(dateKey);
+
+                if (Number.isNaN(parsed.getTime())) return String(dateKey);
+
+                return parsed.toLocaleDateString("en-IN", {
+                    day: "2-digit",
+                    month: "short",
+                    year: "numeric"
+                });
+            }
+
+            function formatTime(time) {
+                if (!time) return "Time not specified";
+
+                const parts = String(time).split(":");
+                let hour = Number(parts[0]);
+                const minute = parts[1] || "00";
+
+                if (!Number.isFinite(hour)) return String(time);
+
+                const suffix = hour >= 12 ? "PM" : "AM";
+                hour = hour % 12 || 12;
+
+                return hour + ":" + minute + " " + suffix;
+            }
+
+            function getActivityForDate(dateKey) {
+                return activities.filter(item => {
+                    if (!item.date) return false;
+
+                    const endDate = item.endDate || item.date;
+                    return dateKey >= item.date && dateKey <= endDate;
+                });
+            }
+
+            function getMarkerClass(activity) {
+                if (activity.status === "Completed") return "marker-completed";
+                if (activity.status === "Save as Draft") return "marker-draft";
+                return "marker-upcoming";
+            }
+
+            function getCategoryClass(category) {
+                switch (category) {
+                    case "Placement":
+                        return "category-blue";
+                    case "Training":
+                    case "TrainingAndDevelopment":
+                        return "category-purple";
+                    case "Meeting":
+                        return "category-orange";
+                    case "College Event":
+                    case "CollegeEvent":
+                        return "category-pink";
+                    default:
+                        return "category-green";
+                }
+            }
+
+            function getStatusClass(status) {
+                switch (String(status || "").toLowerCase()) {
+                    case "completed":
+                        return "status-completed";
+                    case "pending":
+                    case "save as draft":
+                    case "draft":
+                        return "status-pending";
+                    case "cancelled":
+                    case "canceled":
+                        return "status-cancelled";
+                    default:
+                        return "status-upcoming";
+                }
+            }
+
+            // =========================================================
+            // EXTRA FORMAT HELPERS
+            // =========================================================
+            function prettify(value) {
+                return value
+                    ? String(value).replace(/([a-z])([A-Z])/g, "$1 $2")
+                    : "";
+            }
+
+            function formatShortDate(dateKey) {
+                if (!dateKey) return "";
+
+                const parsed = parseDate(dateKey);
+
+                if (Number.isNaN(parsed.getTime())) return String(dateKey);
+
+                return parsed.toLocaleDateString("en-IN", {
+                    day: "2-digit",
+                    month: "short"
+                });
+            }
+
+            function formatRange(start, end) {
+                if (!start) return "-";
+                if (!end || end === start) return formatDate(start);
+
+                const s = parseDate(start);
+                const e = parseDate(end);
+
+                return s.getFullYear() === e.getFullYear()
+                    ? formatShortDate(start) + " \u2013 " + formatDate(end)
+                    : formatDate(start) + " \u2013 " + formatDate(end);
+            }
+
+            function formatTimeRange(start, end) {
+                if (!start) return "Time not specified";
+
+                return formatTime(start) + (end ? " \u2013 " + formatTime(end) : "");
+            }
+
+            // =========================================================
+            // NEXT UP CHIP
+            // =========================================================
+            const nextUpElement = document.getElementById("nextUp");
+
+            if (nextUpElement) {
+                const todayKey = getTodayKey();
+
+                const upcoming = activities
+                    .filter(a => a.status === "Upcoming" &&
+                                 (a.endDate || a.date) >= todayKey)
+                    .sort((a, b) =>
+                        (a.date + (a.time || "")).localeCompare(b.date + (b.time || "")));
+
+                nextUpElement.textContent = upcoming.length
+                    ? "Next: " + upcoming[0].title + " \u00B7 " +
+                      formatShortDate(upcoming[0].date) +
+                      (upcoming[0].time ? ", " + formatTime(upcoming[0].time) : "")
+                    : "No upcoming activities";
+            }
+
+            // =========================================================
+            // AGENDA (TIMELINE) LIST
+            // =========================================================
+            const agendaWeekday = document.getElementById("agendaWeekday");
+            const agendaDay = document.getElementById("agendaDay");
+            const agendaMonth = document.getElementById("agendaMonth");
+            const viewAllLink = document.getElementById("viewAllActivities");
+
+            function renderActivityList(items) {
+                activityList.innerHTML = "";
+
+                const sorted = [...items].sort((a, b) =>
+                    (a.date + (a.time || "")).localeCompare(b.date + (b.time || "")));
+
+                sorted.forEach(activity => {
+                    const item = document.createElement("article");
+                    item.className = "agenda-item";
+                    item.dataset.date = activity.date;
+                    item.dataset.status = activity.status;
+
+                    // time column
+                    const time = document.createElement("div");
+                    time.className = "agenda-time";
+
+                    const timeText = document.createElement("strong");
+                    timeText.textContent = activity.time
+                        ? formatTime(activity.time)
+                        : "All day";
+
+                    const dateText = document.createElement("span");
+                    dateText.textContent = formatShortDate(activity.date);
+
+                    time.append(timeText, dateText);
+
+                    // timeline dot
+                    const dot = document.createElement("span");
+                    dot.className = "agenda-dot";
+
+                    // card
+                    const card = document.createElement("div");
+                    card.className = "agenda-card";
+
+                    const top = document.createElement("div");
+                    top.className = "agenda-card-top";
+
+                    const category = document.createElement("span");
+                    category.className =
+                        "activity-category " + getCategoryClass(activity.category);
+                    category.textContent = prettify(activity.category);
+
+                    const status = document.createElement("span");
+                    status.className =
+                        "activity-status " + getStatusClass(activity.status);
+                    status.textContent = activity.status;
+
+                    top.append(category, status);
+
+                    const title = document.createElement("h5");
+                    title.textContent = activity.title;
+
+                    const meta = document.createElement("div");
+                    meta.className = "agenda-meta";
+
+                    [
+                        ["fa-calendar-day", formatRange(activity.date, activity.endDate)],
+                        ["fa-location-dot", activity.location || "Location not specified"]
+                    ].forEach(pair => {
+                        const span = document.createElement("span");
+
+                        const icon = document.createElement("i");
+                        icon.className = "fas " + pair[0];
+
+                        span.appendChild(icon);
+                        span.appendChild(document.createTextNode(pair[1]));
+                        meta.appendChild(span);
+                    });
+
+                    card.append(top, title, meta);
+                    item.append(time, dot, card);
+                    activityList.appendChild(item);
+                });
+
+                emptyActivities.hidden = items.length !== 0;
+                activityList.hidden = items.length === 0;
+            }
+
+            function showSelectedDateActivities() {
+                const matching = getActivityForDate(selectedDate);
+
+                if (showAllActivities) {
+                    agendaWeekday.textContent = "All";
+                    agendaDay.textContent = activities.length;
+                    agendaMonth.textContent = "Events";
+
+                    selectedDateInfo.textContent =
+                        "Showing all " + activities.length + " scheduled activities.";
+
+                    viewAllLink.textContent = "Show Selected Date";
+                    renderActivityList(activities);
+                    return;
+                }
+
+                const parsed = parseDate(selectedDate);
+
+                agendaWeekday.textContent = parsed.toLocaleDateString("en-IN", {
+                    weekday: "short"
+                });
+                agendaDay.textContent = parsed.getDate();
+                agendaMonth.textContent = parsed.toLocaleDateString("en-IN", {
+                    month: "short",
+                    year: "2-digit"
+                });
+
+                selectedDateInfo.textContent =
+                    formatDate(selectedDate) + " \u00B7 " + matching.length +
+                    (matching.length === 1 ? " activity" : " activities") +
+                    " scheduled";
+
+                viewAllLink.textContent = "View All";
+                renderActivityList(matching);
+            }
+
+            // =========================================================
+            // EDIT GENERAL ACTIVITY
+            // =========================================================
+            function editGeneralActivity(id) {
+                const activity = generalActivitiesFromDb.find(
+                    a => Number(a.ActivityID) === Number(id)
+                );
+
+                if (!activity) {
+                    alert("General activity not found.");
+                    return;
+                }
+
+                if (isCancelled(activity)) {
+                    alert("Restore this activity before editing it.");
+                    return;
+                }
+
+                document.getElementById("generalActivityId").value =
+                    activity.ActivityID;
+
+                document.getElementById("placementDriveId").value = "0";
+
+                generalRadio.checked = true;
+                updateActivityType(false);
+
+                const fields = [
+                    "Title", "Category", "Description",
+                    "StartDate", "EndDate", "StartTime", "EndTime",
+                    "Location", "Participants", "Reminder",
+                    "ReminderChannel", "Status"
+                ];
+
+                fields.forEach(field => {
+                    const input = document.querySelector(
+                        '[name="General.' + escapeSelectorValue(field) + '"]'
+                    );
+
+                    if (!input) return;
+
+                    let value = activity[field];
+
+                    if (value === null || value === undefined) value = "";
+
+                    if ((input.type === "date" || input.type === "time") && value) {
+                        value = String(value).substring(
+                            0, input.type === "date" ? 10 : 5
+                        );
+                    }
+
+                    input.value = value;
+                });
+
+                const title = modalElement.querySelector(".modal-title");
+                if (title) title.textContent = "Edit General Activity";
+
+                updateActivityType(false);
+                bootstrap.Modal.getOrCreateInstance(modalElement).show();
+            }
+
+            // =========================================================
+            // EDIT PLACEMENT DRIVE
+            // =========================================================
+            function editPlacementDrive(id) {
+                const drive = placementDrivesFromDb.find(
+                    p => Number(p.PlacementDriveID) === Number(id)
+                );
+
+                if (!drive) {
+                    alert("Placement drive not found.");
+                    return;
+                }
+
+                if (isCancelled(drive)) {
+                    alert("Restore this placement drive before editing it.");
+                    return;
+                }
+
+                document.getElementById("generalActivityId").value = "0";
+                document.getElementById("placementDriveId").value =
+                    drive.PlacementDriveID;
+
+                placementRadio.checked = true;
+                updateActivityType(false);
+
+                const fields = [
+                    "CompanyName", "JobPosition", "JobType", "Salary",
+                    "JobLocation", "RequiredSkills", "JobDescription",
+                    "TenthPercentage", "TwelfthPercentage", "MinimumPercentage",
+                    "EligibleCourse", "GraduationYear", "EligibilityCriteria",
+                    "StartDate", "EndDate", "StartTime", "EndTime", "Venue",
+                    "ContactPerson", "ContactEmail", "ContactPhone",
+                    "Participants", "PublicationStatus", "Instructions"
+                ];
+
+                fields.forEach(field => {
+                    const input = document.querySelector(
+                        '[name="Placement.' + escapeSelectorValue(field) + '"]'
+                    );
+
+                    if (!input) return;
+
+                    let value = drive[field];
+
+                    if (value === null || value === undefined) value = "";
+
+                    if ((input.type === "date" || input.type === "time") && value) {
+                        value = String(value).substring(
+                            0, input.type === "date" ? 10 : 5
+                        );
+                    }
+
+                    input.value = value;
+                });
+
+                const title = modalElement.querySelector(".modal-title");
+                if (title) title.textContent = "Edit Placement Drive";
+
+                updateActivityType(false);
+                bootstrap.Modal.getOrCreateInstance(modalElement).show();
+            }
+
+            // =========================================================
+            // POST CANCEL / UNCANCEL
+            // =========================================================
+            async function changeCancellationState(id, title, type, cancel) {
+
+                const actionText = cancel ? "cancel" : "restore";
+
+                if (!confirm(
+                    "Are you sure you want to " + actionText +
+                    ' "' + (title || "this record") + '"?'
+                )) {
+                    return;
+                }
+
+                const tokenInput = activityForm.querySelector(
+                    'input[name="__RequestVerificationToken"]'
+                );
+
+                if (!tokenInput) {
+                    alert("Security token not found. Refresh the page and try again.");
+                    return;
+                }
+
+                const url = type === "General"
+                    ? (cancel ? cancelGeneralUrl : uncancelGeneralUrl)
+                    : (cancel ? cancelPlacementUrl : uncancelPlacementUrl);
+
+                try {
+                    const body = new URLSearchParams();
+                    body.append("id", String(id));
+                    body.append("__RequestVerificationToken", tokenInput.value);
+
+                    const response = await fetch(url, {
+                        method: "POST",
+                        headers: {
+                            "Content-Type":
+                                "application/x-www-form-urlencoded; charset=UTF-8",
+                            "X-Requested-With": "XMLHttpRequest"
+                        },
+                        body: body.toString(),
+                        credentials: "same-origin"
+                    });
+
+                    if (!response.ok) {
+                        alert("Unable to " + actionText +
+                              " this record. HTTP status: " + response.status);
+                        return;
+                    }
+
+                    window.location.reload();
+
+                } catch (error) {
+                    console.error("Cancellation state update failed:", error);
+                    alert("Unable to contact the server. Please try again.");
+                }
+            }
+
+            // =========================================================
+            // MANAGEMENT TABLE HELPERS
+            // =========================================================
+            function openDetails(record) {
+                const baseUrl = record.type === "General"
+                    ? detailsGeneralUrl
+                    : detailsPlacementUrl;
+
+                const url = new URL(baseUrl, window.location.origin);
+                url.searchParams.set("id", String(record.id));
+
+                const newTab = window.open(url.toString(), "_blank");
+
+                if (!newTab) {
+                    alert("Your browser blocked the new tab. Please allow pop-ups.");
+                }
+            }
+
+            function makeIconButton(title, className, iconClass, handler) {
+                const button = document.createElement("button");
+                button.type = "button";
+                button.className = "icon-btn " + className;
+                button.title = title;
+                button.setAttribute("aria-label", title);
+
+                const icon = document.createElement("i");
+                icon.className = "fas " + iconClass;
+                button.appendChild(icon);
+
+                button.addEventListener("click", handler);
+                return button;
+            }
+
+            function makeCell(row, className, label) {
+                const cell = document.createElement("td");
+                cell.className = className;
+                if (label) cell.dataset.label = label;
+                row.appendChild(cell);
+                return cell;
+            }
+
+            function iconText(iconClass, text, className) {
+                const span = document.createElement("span");
+                if (className) span.className = className;
+
+                const icon = document.createElement("i");
+                icon.className = "fas " + iconClass;
+
+                span.appendChild(icon);
+                span.appendChild(document.createTextNode(text));
+                return span;
+            }
+
+            // =========================================================
+            // ACTIVITY MANAGEMENT TABLE
+            // Includes drafts and cancelled records.
+            // =========================================================
+            const PAGE_SIZE = 8;
+
+            let tableFilter = "all";
+            let tableSearch = "";
+            let tablePage = 1;
+
+            const dateOnly = value => value ? String(value).substring(0, 10) : "";
+            const timeOnly = value => value ? String(value).substring(0, 5) : "";
+
+            const managementRecords = [
+                ...generalActivitiesFromDb.map(a => ({
+                    type: "General",
+                    id: a.ActivityID,
+                    title: a.Title || "Untitled activity",
+                    sub: prettify(a.Category),
+                    startDate: dateOnly(a.StartDate),
+                    endDate: dateOnly(a.EndDate || a.StartDate),
+                    startTime: timeOnly(a.StartTime),
+                    endTime: timeOnly(a.EndTime),
+                    location: a.Location || "",
+                    participants: prettify(a.Participants),
+                    status: getEffectiveStatus(a, false),
+                    cancelled: isCancelled(a)
+                })),
+                ...placementDrivesFromDb.map(p => ({
+                    type: "Placement Drive",
+                    id: p.PlacementDriveID,
+                    title: p.CompanyName || "Placement drive",
+                    sub: p.JobPosition || "",
+                    startDate: dateOnly(p.StartDate),
+                    endDate: dateOnly(p.EndDate || p.StartDate),
+                    startTime: timeOnly(p.StartTime),
+                    endTime: timeOnly(p.EndTime),
+                    location: p.Venue || p.JobLocation || "",
+                    participants: prettify(p.Participants),
+                    status: getEffectiveStatus(p, true),
+                    cancelled: isCancelled(p)
+                }))
+            ];
+
+            function matchesFilter(record) {
+                switch (tableFilter) {
+                    case "general":   return record.type === "General";
+                    case "placement": return record.type === "Placement Drive";
+                    case "draft":     return record.status === "Save as Draft";
+                    case "cancelled": return record.cancelled;
+                    default:          return true;
+                }
+            }
+
+            function matchesSearch(record) {
+                if (!tableSearch) return true;
+
+                return [
+                    record.title, record.sub, record.location,
+                    record.participants, record.type, record.status
+                ].join(" ").toLowerCase().includes(tableSearch);
+            }
+
+            function buildRow(record, number) {
+                const row = document.createElement("tr");
+
+                if (record.cancelled) row.classList.add("is-cancelled");
+
+                // number
+                makeCell(row, "col-no", "No.").textContent = number;
+
+                // activity
+                const activityCell = makeCell(row, "col-activity", "Activity");
+                const wrap = document.createElement("div");
+                wrap.className = "activity-cell";
+
+                const avatar = document.createElement("div");
+                avatar.className = "type-avatar " +
+                    (record.type === "General" ? "general" : "placement");
+
+                const avatarIcon = document.createElement("i");
+                avatarIcon.className = "fas " +
+                    (record.type === "General" ? "fa-calendar-alt" : "fa-briefcase");
+                avatar.appendChild(avatarIcon);
+
+                const text = document.createElement("div");
+                text.className = "activity-text";
+
+                const title = document.createElement("span");
+                title.className = "activity-title";
+                title.textContent = record.title;
+
+                const sub = document.createElement("span");
+                sub.className = "activity-sub";
+                sub.textContent = (record.sub ? record.sub + " \u00B7 " : "") + record.type;
+
+                text.append(title, sub);
+                wrap.append(avatar, text);
+                activityCell.appendChild(wrap);
+
+                // schedule
+                const scheduleCell = makeCell(row, "col-schedule", "Schedule");
+                const schedule = document.createElement("div");
+                schedule.className = "schedule-cell";
+
+                schedule.appendChild(iconText(
+                    "fa-calendar-day",
+                    formatRange(record.startDate, record.endDate)
+                ));
+                schedule.appendChild(iconText(
+                    "fa-clock",
+                    formatTimeRange(record.startTime, record.endTime),
+                    "time"
+                ));
+                scheduleCell.appendChild(schedule);
+
+                // location
+                const locationCell = makeCell(row, "col-location", "Location");
+
+                if (record.location) {
+                    locationCell.appendChild(
+                        iconText("fa-location-dot", record.location, "loc-cell")
+                    );
+                } else {
+                    const none = document.createElement("span");
+                    none.className = "cell-muted";
+                    none.textContent = "\u2014";
+                    locationCell.appendChild(none);
+                }
+
+                // participants
+                const peopleCell = makeCell(row, "col-people", "Participants");
+
+                if (record.participants) {
+                    const pill = document.createElement("span");
+                    pill.className = "people-pill";
+                    pill.textContent = record.participants;
+                    peopleCell.appendChild(pill);
+                } else {
+                    const none = document.createElement("span");
+                    none.className = "cell-muted";
+                    none.textContent = "\u2014";
+                    peopleCell.appendChild(none);
+                }
+
+                // status
+                const statusCell = makeCell(row, "col-status", "Status");
+                const badge = document.createElement("span");
+                badge.className = "sch-badge " + getStatusClass(record.status);
+                badge.textContent = record.status;
+                statusCell.appendChild(badge);
+
+                // actions
+                const actionCell = makeCell(row, "col-actions", "Actions");
+                const actions = document.createElement("div");
+                actions.className = "row-actions";
+
+                actions.appendChild(makeIconButton(
+                    "View details", "view", "fa-eye",
+                    () => openDetails(record)
+                ));
+
+                if (!record.cancelled) {
+                    actions.appendChild(makeIconButton(
+                        "Edit", "edit", "fa-pen",
+                        () => {
+                            if (record.type === "General") {
+                                editGeneralActivity(record.id);
+                            } else {
+                                editPlacementDrive(record.id);
+                            }
+                        }
+                    ));
+                }
+
+                actions.appendChild(makeIconButton(
+                    record.cancelled ? "Restore" : "Cancel",
+                    record.cancelled ? "restore" : "cancel",
+                    record.cancelled ? "fa-rotate-left" : "fa-ban",
+                    () => changeCancellationState(
+                        record.id,
+                        record.title,
+                        record.type,
+                        !record.cancelled
+                    )
+                ));
+
+                actionCell.appendChild(actions);
+                return row;
+            }
+
+            function renderPager(totalPages) {
+                const pager = document.getElementById("tablePager");
+                pager.innerHTML = "";
+
+                if (totalPages <= 1) return;
+
+                function addButton(label, page, disabled, active, ariaLabel) {
+                    const button = document.createElement("button");
+                    button.type = "button";
+                    button.innerHTML = label;
+                    button.disabled = disabled;
+                    if (active) button.classList.add("active");
+                    if (ariaLabel) button.setAttribute("aria-label", ariaLabel);
+
+                    button.addEventListener("click", function () {
+                        tablePage = page;
+                        renderManagementTable();
+                    });
+
+                    pager.appendChild(button);
+                }
+
+                addButton('<i class="fas fa-chevron-left"></i>',
+                    tablePage - 1, tablePage === 1, false, "Previous page");
+
+                let first = Math.max(1, tablePage - 2);
+                let last = Math.min(totalPages, first + 4);
+                first = Math.max(1, last - 4);
+
+                for (let page = first; page <= last; page++) {
+                    addButton(String(page), page, false, page === tablePage);
+                }
+
+                addButton('<i class="fas fa-chevron-right"></i>',
+                    tablePage + 1, tablePage === totalPages, false, "Next page");
+            }
+
+            function renderManagementTable() {
+                if (!managementBody) return;
+
+                // tab counts
+                const counts = {
+                    countAll: managementRecords.length,
+                    countGeneral: managementRecords.filter(r => r.type === "General").length,
+                    countPlacement: managementRecords.filter(r => r.type === "Placement Drive").length,
+                    countDraft: managementRecords.filter(r => r.status === "Save as Draft").length,
+                    countCancelled: managementRecords.filter(r => r.cancelled).length
+                };
+
+                Object.keys(counts).forEach(id => {
+                    const element = document.getElementById(id);
+                    if (element) element.textContent = counts[id];
+                });
+
+                const filtered = managementRecords
+                    .filter(matchesFilter)
+                    .filter(matchesSearch);
+
+                const totalPages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
+                tablePage = Math.min(tablePage, totalPages);
+
+                const startIndex = (tablePage - 1) * PAGE_SIZE;
+                const pageItems = filtered.slice(startIndex, startIndex + PAGE_SIZE);
+
+                managementBody.innerHTML = "";
+
+                if (pageItems.length === 0) {
+                    const row = document.createElement("tr");
+                    row.className = "empty-row";
+
+                    const cell = document.createElement("td");
+                    cell.colSpan = 7;
+                    cell.className = "table-empty";
+
+                    const icon = document.createElement("i");
+                    icon.className = "far fa-folder-open";
+
+                    cell.appendChild(icon);
+                    cell.appendChild(document.createTextNode(
+                        managementRecords.length === 0
+                            ? "No saved activities found."
+                            : "No activities match your filters."
+                    ));
+
+                    row.appendChild(cell);
+                    managementBody.appendChild(row);
+                } else {
+                    pageItems.forEach((record, index) => {
+                        managementBody.appendChild(
+                            buildRow(record, startIndex + index + 1)
+                        );
+                    });
+                }
+
+                const info = document.getElementById("tableInfo");
+
+                if (info) {
+                    info.textContent = filtered.length
+                        ? "Showing " + (startIndex + 1) + "\u2013" +
+                          (startIndex + pageItems.length) + " of " + filtered.length
+                        : "Showing 0 of 0";
+                }
+
+                renderPager(totalPages);
+            }
+
+            // filter tabs
+            document.querySelectorAll("#filterTabs .filter-tab").forEach(tab => {
+                tab.addEventListener("click", function () {
+                    tableFilter = this.dataset.filter;
+                    tablePage = 1;
+
+                    document.querySelectorAll("#filterTabs .filter-tab")
+                        .forEach(t => t.classList.toggle("active", t === this));
+
+                    renderManagementTable();
+                });
+            });
+
+            // search
+            document.getElementById("tableSearch")
+                ?.addEventListener("input", function () {
+                    tableSearch = this.value.trim().toLowerCase();
+                    tablePage = 1;
+                    renderManagementTable();
+                });
+
+            // =========================================================
+            // ADD NEW ACTIVITY
+            // =========================================================
+            document.getElementById("btnAddActivity")
+                ?.addEventListener("click", function () {
+                    activityForm.reset();
+
+                    document.getElementById("generalActivityId").value = "0";
+                    document.getElementById("placementDriveId").value = "0";
+
+                    generalRadio.checked = true;
+                    updateActivityType(false);
+
+                    const title = modalElement.querySelector(".modal-title");
+                    if (title) title.textContent = "Create Scheduler Activity";
+
+                    const body = modalElement.querySelector(
+                        ".scheduler-modal-body"
+                    );
+                    if (body) body.scrollTop = 0;
+                });
+
+            // =========================================================
+            // CALENDAR RENDERING
+            // =========================================================
+            function renderCalendar() {
+                calendarGrid.innerHTML = "";
+                calendarGrid.className = "calendar-grid";
+
+                if (currentView === "week") {
+                    calendarGrid.classList.add("week-mode");
+                }
+
+                if (currentView === "day") {
+                    calendarGrid.classList.add("day-mode");
+                }
+
+                monthYear.textContent =
+                    monthNames[currentMonth.getMonth()] + " " +
+                    currentMonth.getFullYear();
+
+                document.querySelectorAll(".calendar-view-btn")
+                    .forEach(button => {
+                        button.classList.toggle(
+                            "active",
+                            button.dataset.view === currentView
+                        );
+                    });
+
+                let startDate;
+
+                if (currentView === "day") {
+                    startDate = parseDate(selectedDate);
+                } else if (currentView === "week") {
+                    startDate = parseDate(selectedDate);
+                    startDate.setDate(startDate.getDate() - startDate.getDay());
+                } else {
+                    startDate = new Date(
+                        currentMonth.getFullYear(),
+                        currentMonth.getMonth(),
+                        1
+                    );
+                    startDate.setDate(startDate.getDate() - startDate.getDay());
+                }
+
+                const dayCount = currentView === "day"
+                    ? 1
+                    : currentView === "week" ? 7 : 42;
+
+                for (let i = 0; i < dayCount; i++) {
+                    const date = new Date(startDate);
+                    date.setDate(startDate.getDate() + i);
+
+                    const dateKey = toDateKey(date);
+                    const dayActivities = getActivityForDate(dateKey);
+
+                    const cell = document.createElement("button");
+                    cell.type = "button";
+                    cell.className = "calendar-day";
+                    cell.setAttribute("aria-label", formatDate(dateKey));
+
+                    if (currentView === "month" &&
+                        date.getMonth() !== currentMonth.getMonth()) {
+                        cell.classList.add("other-month");
+                    }
+
+                    if (dateKey === toDateKey(today)) {
+                        cell.classList.add("today");
+                    }
+
+                    if (dateKey === selectedDate) {
+                        cell.classList.add("selected");
+                    }
+
+                    const dayNumber = document.createElement("span");
+                    dayNumber.className = "day-number";
+                    dayNumber.textContent = date.getDate();
+                    cell.appendChild(dayNumber);
+
+                    if (dayActivities.length > 0) {
+                        cell.classList.add("has-events");
+                        const markers = document.createElement("span");
+                        markers.className = "day-markers";
+
+                        dayActivities.slice(0, 3).forEach(activity => {
+                            const marker = document.createElement("span");
+                            marker.className =
+                                "day-marker " + getMarkerClass(activity);
+                            markers.appendChild(marker);
+                        });
+
+                        cell.appendChild(markers);
+                    }
+
+                    cell.addEventListener("click", function () {
+                        selectedDate = dateKey;
+                        currentMonth = new Date(
+                            date.getFullYear(), date.getMonth(), 1
+                        );
+                        showAllActivities = false;
+                        renderCalendar();
+                    });
+
+                    calendarGrid.appendChild(cell);
+                }
+
+                showSelectedDateActivities();
+                updateSummaryCards();
+            }
+
+            // =========================================================
+            // SUMMARY CARDS
+            // Counts use all records, including cancelled and draft records.
+            // =========================================================
+            function updateSummaryCards() {
+                const allRecords = [
+                    ...generalActivitiesFromDb.map(a => ({
+                        record: a,
+                        isPlacement: false
+                    })),
+                    ...placementDrivesFromDb.map(p => ({
+                        record: p,
+                        isPlacement: true
+                    }))
+                ];
+
+                const totalCount = allRecords.length;
+
+                const cancelledCount = allRecords.filter(x =>
+                    isCancelled(x.record)
+                ).length;
+
+                // Use the same date-based status logic as the calendar
+                const completedCount = allRecords.filter(x =>
+                    getEffectiveStatus(x.record, x.isPlacement) === "Completed"
+                ).length;
+
+                const upcomingCount = allRecords.filter(x =>
+                    getEffectiveStatus(x.record, x.isPlacement) === "Upcoming"
+                ).length;
+
+                document.getElementById("totalActivities").textContent = totalCount;
+                document.getElementById("upcomingActivities").textContent = upcomingCount;
+                document.getElementById("completedActivities").textContent = completedCount;
+                document.getElementById("cancelledActivities").textContent = cancelledCount;
+
+                // proportion bars
+                const percent = value =>
+                    totalCount ? Math.round((value / totalCount) * 100) : 0;
+
+                const setBar = (id, value) => {
+                    const bar = document.getElementById(id);
+                    if (bar) bar.style.width = value + "%";
+                };
+
+                setBar("barTotal", totalCount ? 100 : 0);
+                setBar("barUpcoming", percent(upcomingCount));
+                setBar("barCompleted", percent(completedCount));
+                setBar("barCancelled", percent(cancelledCount));
+            }
+
+            // =========================================================
+            // CALENDAR NAVIGATION
+            // =========================================================
+            function changePeriod(direction) {
+                showAllActivities = false;
+
+                if (currentView === "day" || currentView === "week") {
+                    const date = parseDate(selectedDate);
+                    date.setDate(date.getDate() +
+                        direction * (currentView === "week" ? 7 : 1));
+
+                    selectedDate = toDateKey(date);
+                    currentMonth = new Date(
+                        date.getFullYear(), date.getMonth(), 1
+                    );
+                } else {
+                    currentMonth.setMonth(currentMonth.getMonth() + direction);
+                }
+
+                renderCalendar();
+            }
+
+            document.getElementById("previousMonth")
+                ?.addEventListener("click", () => changePeriod(-1));
+
+            document.getElementById("nextMonth")
+                ?.addEventListener("click", () => changePeriod(1));
+
+            document.getElementById("todayButton")
+                ?.addEventListener("click", function () {
+                    selectedDate = toDateKey(today);
+                    currentMonth = new Date(
+                        today.getFullYear(), today.getMonth(), 1
+                    );
+                    showAllActivities = false;
+                    renderCalendar();
+                });
+
+            document.querySelectorAll(".calendar-view-btn")
+                .forEach(button => {
+                    button.addEventListener("click", function () {
+                        currentView = this.dataset.view;
+                        renderCalendar();
+                    });
+                });
+
+            document.getElementById("viewAllActivities")
+                ?.addEventListener("click", function (event) {
+                    event.preventDefault();
+
+                    showAllActivities = !showAllActivities;
+                    showSelectedDateActivities();
+                });
+
+            // =========================================================
+            // INITIAL PAGE RENDER
+            // =========================================================
+            renderCalendar();
+            renderManagementTable();
+        });
+    </script>
+}

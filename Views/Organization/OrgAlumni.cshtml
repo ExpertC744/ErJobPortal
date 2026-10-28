@@ -1,0 +1,1369 @@
+﻿@{
+    ViewData["Title"] = "Alumni Module";
+    ViewData["Panel"] = "Organization";
+    Layout = "~/Views/Shared/_DashboardLayout.cshtml";
+}
+
+<style>
+    /* =========================================
+           ORG ALUMNI MODULE - TEAL & WHITE
+           ========================================= */
+
+    .ap {
+        --ap-primary: #0d9488;
+        --ap-dark: #0f766e;
+        --ap-deep: #115e59;
+        --ap-light: #f0fdfa;
+        --ap-soft: #ccfbf1;
+        --ap-border: #d9e7e5;
+        --ap-text: #0f172a;
+        --ap-muted: #64748b;
+        --ap-bg: #f7faf9;
+        --ap-white: #ffffff;
+        color: var(--ap-text);
+        background: var(--ap-bg);
+        font-family: "Segoe UI", Arial, sans-serif;
+        font-size: 14px;
+        min-height: 100vh;
+        padding: 24px;
+        line-height: 1.5;
+        box-sizing: border-box;
+    }
+
+        .ap *,
+        .ap *::before,
+        .ap *::after {
+            box-sizing: border-box;
+        }
+
+        .ap input,
+        .ap select,
+        .ap textarea,
+        .ap button {
+            font: inherit;
+        }
+
+        .ap a {
+            text-decoration: none;
+        }
+
+        /* PAGE HEADER */
+
+        .ap .page-header {
+            position: relative;
+            overflow: hidden;
+            background: linear-gradient( 125deg, #0f766e 0%, #0d9488 58%, #14b8a6 100% );
+            border-radius: 18px;
+            padding: 32px 36px;
+            margin-bottom: 25px;
+            color: #fff;
+            box-shadow: 0 8px 24px rgba(13, 148, 136, .12);
+        }
+
+            .ap .page-header::before {
+                content: "";
+                position: absolute;
+                width: 250px;
+                height: 250px;
+                right: -65px;
+                top: -145px;
+                border: 38px solid rgba(255,255,255,.08);
+                border-radius: 50%;
+                pointer-events: none;
+            }
+
+            .ap .page-header::after {
+                content: "";
+                position: absolute;
+                width: 130px;
+                height: 130px;
+                right: 100px;
+                bottom: -95px;
+                border: 22px solid rgba(255,255,255,.07);
+                border-radius: 50%;
+                pointer-events: none;
+            }
+
+        .ap .page-header-inner {
+            position: relative;
+            z-index: 1;
+            max-width: 850px;
+        }
+
+        .ap .eyebrow {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 6px 12px;
+            border-radius: 30px;
+            background: rgba(255,255,255,.15);
+            border: 1px solid rgba(255,255,255,.22);
+            color: #e6fffb;
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            margin-bottom: 12px;
+        }
+
+        .ap .page-header h1 {
+            margin: 0 0 9px;
+            font-size: clamp(25px, 3vw, 34px);
+            font-weight: 750;
+            letter-spacing: -.7px;
+            color: #fff;
+        }
+
+        .ap .page-header p {
+            margin: 0;
+            color: #e0fdfa;
+            font-size: 14px;
+            max-width: 700px;
+            line-height: 1.7;
+        }
+
+        /* MAIN LAYOUT */
+
+        .ap .layout {
+            display: grid;
+            grid-template-columns: 245px minmax(0, 1fr);
+            gap: 25px;
+            align-items: start;
+            max-width: 1600px;
+            margin: 0 auto;
+        }
+
+        .ap main {
+            min-width: 0;
+        }
+
+        /* SIDEBAR */
+
+        .ap .side-nav {
+            position: sticky;
+            top: 95px;
+            background: #fff;
+            border: 1px solid var(--ap-border);
+            border-radius: 15px;
+            padding: 13px;
+            box-shadow: 0 4px 15px rgba(15, 23, 42, .025);
+        }
+
+            .ap .side-nav > a {
+                display: flex;
+                align-items: center;
+                gap: 11px;
+                padding: 12px 11px;
+                margin-bottom: 4px;
+                border-radius: 9px;
+                color: #475569;
+                font-size: 12.5px;
+                font-weight: 600;
+                line-height: 1.5;
+                transition: background .2s ease, color .2s ease;
+            }
+
+                .ap .side-nav > a:hover {
+                    background: #f0fdfa;
+                    color: var(--ap-dark);
+                }
+
+                .ap .side-nav > a.active {
+                    background: #e6f7f4;
+                    color: var(--ap-deep);
+                    box-shadow: inset 3px 0 0 var(--ap-primary);
+                }
+
+            .ap .side-nav .dot {
+                width: 8px;
+                height: 8px;
+                flex: 0 0 8px;
+                background: #cbd5e1;
+                border-radius: 50%;
+            }
+
+            .ap .side-nav > a.active .dot {
+                background: var(--ap-primary);
+                box-shadow: 0 0 0 4px rgba(13,148,136,.10);
+            }
+
+        .ap .side-note {
+            border-top: 1px solid #e5eeec;
+            margin-top: 15px;
+            padding: 17px 9px 7px;
+            color: var(--ap-muted);
+            font-size: 11.5px;
+            line-height: 1.8;
+        }
+
+            .ap .side-note b {
+                display: block;
+                color: var(--ap-dark);
+                font-size: 12px;
+                margin-bottom: 3px;
+            }
+
+        /* NOTIFICATION */
+
+        .ap #messageBox {
+            display: none;
+            margin-bottom: 18px;
+            padding: 13px 16px;
+            border-radius: 10px;
+            font-size: 13px;
+            font-weight: 600;
+        }
+
+            .ap #messageBox.success {
+                display: block;
+                color: #166534;
+                background: #f0fdf4;
+                border: 1px solid #bbf7d0;
+            }
+
+            .ap #messageBox.error {
+                display: block;
+                color: #b91c1c;
+                background: #fef2f2;
+                border: 1px solid #fecaca;
+            }
+
+        /* FORM SECTIONS */
+
+        .ap .section {
+            background: #fff;
+            border: 1px solid var(--ap-border);
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 20px;
+            scroll-margin-top: 100px;
+            box-shadow: 0 3px 12px rgba(15,23,42,.025);
+        }
+
+        .ap .section-head {
+            display: flex;
+            align-items: center;
+            gap: 13px;
+            padding-bottom: 19px;
+            margin-bottom: 21px;
+            border-bottom: 1px solid #edf2f1;
+        }
+
+        .ap .section-icon {
+            width: 39px;
+            height: 39px;
+            min-width: 39px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 11px;
+            background: var(--ap-light);
+            border: 1px solid #bcece3;
+            color: var(--ap-dark);
+            font-size: 15px;
+            font-weight: 800;
+        }
+
+        .ap .section-head h2 {
+            margin: 0;
+            font-size: 17px;
+            line-height: 1.4;
+            font-weight: 750;
+            letter-spacing: -.25px;
+            color: #12332f;
+        }
+
+        .ap .section-head .sub {
+            margin: 4px 0 0;
+            color: var(--ap-muted);
+            font-size: 12px;
+        }
+
+        /* INPUT GRID */
+
+        .ap .grid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 20px 18px;
+        }
+
+        .ap .field {
+            min-width: 0;
+        }
+
+            .ap .field.span2 {
+                grid-column: span 2;
+            }
+
+            .ap .field.span4 {
+                grid-column: 1 / -1;
+            }
+
+            .ap .field label {
+                display: block;
+                margin-bottom: 7px;
+                color: #334155;
+                font-size: 12px;
+                font-weight: 700;
+            }
+
+        .ap .req {
+            color: #e11d48;
+            margin-left: 2px;
+        }
+
+        .ap .field input,
+        .ap .field select,
+        .ap .field textarea {
+            width: 100%;
+            min-width: 0;
+            min-height: 43px;
+            padding: 10px 12px;
+            border: 1px solid #d7e2e0;
+            border-radius: 8px;
+            background: #fff;
+            color: #0f172a;
+            font-size: 13px;
+            outline: none;
+            box-shadow: none;
+            transition: border-color .2s ease, box-shadow .2s ease;
+        }
+
+            .ap .field input::placeholder,
+            .ap .field textarea::placeholder {
+                color: #a0aaa9;
+            }
+
+        .ap .field select {
+            cursor: pointer;
+        }
+
+        .ap .field textarea {
+            min-height: 105px;
+            resize: vertical;
+            line-height: 1.6;
+        }
+
+            .ap .field input:focus,
+            .ap .field select:focus,
+            .ap .field textarea:focus {
+                border-color: var(--ap-primary);
+                box-shadow: 0 0 0 3px rgba(13,148,136,.10);
+            }
+
+            .ap .field input.invalid,
+            .ap .field select.invalid,
+            .ap .field textarea.invalid {
+                border-color: #ef4444;
+                box-shadow: 0 0 0 3px rgba(239,68,68,.07);
+            }
+
+        /* MENTORING CHECKBOXES */
+
+        .ap .checkbox-grid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 12px;
+        }
+
+        .ap .check-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            min-height: 48px;
+            padding: 12px 13px;
+            border: 1px solid #e0eae8;
+            border-radius: 9px;
+            background: #fff;
+            color: #334155;
+            font-size: 12.5px;
+            font-weight: 550;
+            cursor: pointer;
+            transition: all .2s ease;
+        }
+
+            .ap .check-item:hover {
+                border-color: #9cddd3;
+                background: #f7fdfc;
+            }
+
+            .ap .check-item:has(input:checked) {
+                border-color: #79cfc2;
+                background: #f0fdfa;
+                color: var(--ap-deep);
+            }
+
+            .ap .check-item input {
+                width: 16px;
+                height: 16px;
+                flex: 0 0 16px;
+                margin: 0;
+                accent-color: var(--ap-primary);
+                cursor: pointer;
+            }
+
+        /* DIRECTORY TABLE */
+
+        .ap .table-wrap {
+            width: 100%;
+            overflow-x: auto;
+            border: 1px solid #e0eae8;
+            border-radius: 10px;
+        }
+
+        .ap table.data {
+            width: 100%;
+            min-width: 720px;
+            border-collapse: collapse;
+            background: #fff;
+            text-align: left;
+        }
+
+            .ap table.data thead {
+                background: #f0fdfa;
+            }
+
+            .ap table.data th {
+                padding: 14px 15px;
+                color: #115e59;
+                border-bottom: 1px solid #d8eeea;
+                font-size: 11px;
+                font-weight: 800;
+                text-transform: uppercase;
+                letter-spacing: .45px;
+                white-space: nowrap;
+            }
+
+            .ap table.data td {
+                padding: 15px;
+                color: #475569;
+                border-bottom: 1px solid #edf2f1;
+                font-size: 12.5px;
+                vertical-align: middle;
+            }
+
+            .ap table.data tbody tr {
+                transition: background .15s ease;
+            }
+
+                .ap table.data tbody tr:hover {
+                    background: #f8fcfb;
+                }
+
+                .ap table.data tbody tr:last-child td {
+                    border-bottom: none;
+                }
+
+            .ap table.data td:first-child {
+                color: #0f172a;
+                font-weight: 700;
+            }
+
+        .ap .link-btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 5px;
+            padding: 7px 11px;
+            border: 1px solid #b8e5dd;
+            border-radius: 7px;
+            background: #f0fdfa;
+            color: #0f766e;
+            font-size: 11.5px;
+            font-weight: 700;
+            white-space: nowrap;
+            cursor: pointer;
+            transition: all .2s ease;
+        }
+
+            .ap .link-btn:hover {
+                color: #fff;
+                background: var(--ap-dark);
+                border-color: var(--ap-dark);
+            }
+
+        .ap .table-wrap .link-btn + .link-btn {
+            margin-left: 4px;
+        }
+
+        /* BUTTONS */
+
+        .ap .btn-row-inline {
+            display: flex;
+            justify-content: flex-end;
+            margin-top: 19px;
+        }
+
+        .ap .btn-row {
+            display: flex;
+            justify-content: flex-end;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .ap .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            min-height: 42px;
+            padding: 10px 19px;
+            border: 1px solid transparent;
+            border-radius: 8px;
+            font-size: 12.5px;
+            font-weight: 750;
+            cursor: pointer;
+            transition: background .2s ease, border-color .2s ease, transform .2s ease, box-shadow .2s ease;
+        }
+
+            .ap .btn:hover {
+                transform: translateY(-1px);
+            }
+
+        .ap .btn-primary {
+            background: var(--ap-primary);
+            border-color: var(--ap-primary);
+            color: #fff;
+            box-shadow: 0 3px 8px rgba(13,148,136,.12);
+        }
+
+            .ap .btn-primary:hover {
+                background: var(--ap-dark);
+                border-color: var(--ap-dark);
+                box-shadow: 0 5px 12px rgba(13,148,136,.18);
+            }
+
+        .ap .btn-secondary {
+            background: #fff;
+            border-color: #d5e1df;
+            color: #475569;
+        }
+
+            .ap .btn-secondary:hover {
+                background: #f8fafc;
+                border-color: #aabbb7;
+            }
+
+        .ap .btn:focus-visible,
+        .ap .link-btn:focus-visible,
+        .ap .side-nav a:focus-visible {
+            outline: 3px solid rgba(13,148,136,.28);
+            outline-offset: 3px;
+        }
+
+        /* SUBMIT BAR */
+
+        .ap .submit-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 15px;
+            flex-wrap: wrap;
+            padding: 19px 22px;
+            margin-bottom: 20px;
+            background: #fff;
+            border: 1px solid var(--ap-border);
+            border-radius: 13px;
+        }
+
+            .ap .submit-bar p {
+                margin: 0;
+                color: #7b8b89;
+                font-size: 11.5px;
+            }
+
+        /* PREVIOUS / NEXT NAVIGATION */
+
+        .ap .page-foot-nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+            flex-wrap: wrap;
+            padding: 5px 0 15px;
+        }
+
+            .ap .page-foot-nav .link-btn {
+                min-height: 38px;
+                font-size: 12px;
+                padding: 9px 13px;
+            }
+
+    /* RESPONSIVE */
+
+    @@media (min-width: 1500px) {
+        .ap {
+            padding: 30px;
+        }
+
+            .ap .layout {
+                grid-template-columns: 260px minmax(0, 1fr);
+                gap: 30px;
+            }
+
+            .ap .section {
+                padding: 29px;
+            }
+    }
+
+    @@media (max-width: 1100px) {
+        .ap {
+            padding: 18px;
+        }
+
+            .ap .layout {
+                grid-template-columns: 205px minmax(0, 1fr);
+                gap: 17px;
+            }
+
+            .ap .section {
+                padding: 20px;
+            }
+
+            .ap .side-nav > a {
+                padding: 11px 9px;
+                font-size: 11.5px;
+            }
+
+            .ap .grid {
+                gap: 17px 13px;
+            }
+    }
+
+    @@media (max-width: 760px) {
+        .ap {
+            padding: 12px;
+        }
+
+            .ap .page-header {
+                padding: 25px 22px;
+                margin-bottom: 17px;
+                border-radius: 13px;
+            }
+
+                .ap .page-header h1 {
+                    font-size: 26px;
+                }
+
+            .ap .layout {
+                grid-template-columns: minmax(0, 1fr);
+                gap: 16px;
+            }
+
+            .ap .side-nav {
+                position: static;
+                display: grid;
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+                gap: 5px;
+                padding: 10px;
+            }
+
+                .ap .side-nav > a {
+                    margin: 0;
+                    padding: 11px 9px;
+                    font-size: 11px;
+                }
+
+                .ap .side-nav .side-note {
+                    grid-column: 1 / -1;
+                    margin-top: 8px;
+                    padding-top: 11px;
+                }
+
+            .ap .section {
+                padding: 19px 16px;
+                border-radius: 12px;
+                margin-bottom: 15px;
+            }
+
+            .ap .section-head {
+                gap: 10px;
+                padding-bottom: 15px;
+                margin-bottom: 18px;
+            }
+
+                .ap .section-head h2 {
+                    font-size: 15px;
+                }
+
+            .ap .grid {
+                grid-template-columns: minmax(0, 1fr);
+                gap: 16px;
+            }
+
+            .ap .field.span2,
+            .ap .field.span4 {
+                grid-column: auto;
+            }
+
+            .ap .checkbox-grid {
+                grid-template-columns: minmax(0, 1fr);
+                gap: 9px;
+            }
+
+            .ap .submit-bar {
+                align-items: flex-start;
+                padding: 16px;
+            }
+
+                .ap .submit-bar p {
+                    width: 100%;
+                }
+    }
+
+    @@media (max-width: 420px) {
+        .ap {
+            padding: 9px;
+        }
+
+            .ap .page-header {
+                padding: 22px 16px;
+            }
+
+                .ap .page-header h1 {
+                    font-size: 23px;
+                }
+
+            .ap .side-nav {
+                grid-template-columns: minmax(0, 1fr);
+            }
+
+                .ap .side-nav .side-note {
+                    grid-column: auto;
+                }
+
+            .ap .section {
+                padding: 16px 12px;
+            }
+
+            .ap .section-head h2 {
+                font-size: 14px;
+            }
+
+            .ap .btn-row {
+                width: 100%;
+            }
+
+                .ap .btn-row .btn {
+                    flex: 1;
+                }
+
+            .ap .btn-row-inline .btn {
+                width: 100%;
+            }
+
+            .ap .page-foot-nav {
+                align-items: stretch;
+                flex-direction: column;
+            }
+
+                .ap .page-foot-nav .link-btn {
+                    width: 100%;
+                }
+    }
+
+    @@media (prefers-reduced-motion: reduce) {
+        .ap *,
+        .ap *::before,
+        .ap *::after {
+            scroll-behavior: auto !important;
+            transition: none !important;
+            animation: none !important;
+        }
+    }
+</style>
+
+<div class="ap">
+
+    <div class="page-header">
+        <div class="page-header-inner">
+            <div class="eyebrow">Phase 13 &middot; TPO &amp; Alumni</div>
+            <h1>Alumni Module</h1>
+            <p>Maintain alumni profiles, employment details, mentoring and opportunity sharing.</p>
+        </div>
+    </div>
+
+    <div class="layout">
+
+        <nav class="side-nav" id="sideNav">
+            <a href="#profile" class="active"><span class="dot"></span>Alumni Profile</a>
+            <a href="#work"><span class="dot"></span>Employment and Professional Details</a>
+            <a href="#engage"><span class="dot"></span>Mentoring and Contribution</a>
+            <a href="#dir"><span class="dot"></span>Alumni Directory</a>
+            <a href="#opp"><span class="dot"></span>Share Opportunity</a>
+
+            <div class="side-note">
+                <b>Outcome</b>
+                Alumni can contribute to student career development and placement support.
+            </div>
+        </nav>
+
+        <main>
+
+            <div id="messageBox" role="status" aria-live="polite"></div>
+
+            <form id="phaseForm" novalidate>
+
+                <!-- 1. ALUMNI PROFILE -->
+
+                <section class="section" id="profile">
+                    <div class="section-head">
+                        <div class="section-icon">1</div>
+                        <div>
+                            <h2>Alumni Profile</h2>
+                            <p class="sub">Basic details and academic background.</p>
+                        </div>
+                    </div>
+
+                    <div class="grid">
+
+                        <div class="field span2">
+                            <label for="alumniName">Full Name <span class="req">*</span></label>
+                            <input id="alumniName" name="AlumniName" type="text"
+                                   placeholder="Enter full name" autocomplete="name" required />
+                        </div>
+
+                        <div class="field">
+                            <label for="graduationYear">Graduation Year <span class="req">*</span></label>
+                            <select id="graduationYear" name="GraduationYear" required>
+                                <option value="">Select graduation year</option>
+                                <option>2022</option>
+                                <option>2023</option>
+                                <option>2024</option>
+                                <option>2025</option>
+                                <option>2026</option>
+                                <option>2027</option>
+                            </select>
+                        </div>
+
+                        <div class="field">
+                            <label for="department">Department</label>
+                            <select id="department" name="Department">
+                                <option value="">Select department</option>
+                                <option>Engineering</option>
+                                <option>Management</option>
+                                <option>Science</option>
+                                <option>Commerce</option>
+                                <option>Arts</option>
+                                <option>Other</option>
+                            </select>
+                        </div>
+
+                        <div class="field">
+                            <label for="branch">Branch</label>
+                            <input id="branch" name="Branch" type="text" placeholder="e.g. CSE" />
+                        </div>
+
+                        <div class="field">
+                            <label for="enrollmentNo">Enrollment No.</label>
+                            <input id="enrollmentNo" name="EnrollmentNo" type="text"
+                                   placeholder="Enter enrollment number" />
+                        </div>
+
+                        <div class="field">
+                            <label for="alumniEmail">Email <span class="req">*</span></label>
+                            <input id="alumniEmail" name="Email" type="email"
+                                   placeholder="name@example.com" autocomplete="email" required />
+                        </div>
+
+                        <div class="field">
+                            <label for="alumniPhone">Phone</label>
+                            <input id="alumniPhone" name="Phone" type="tel"
+                                   placeholder="+91 98765 43210" autocomplete="tel" />
+                        </div>
+
+                        <div class="field span2">
+                            <label for="linkedin">LinkedIn Profile</label>
+                            <input id="linkedin" name="LinkedIn" type="url"
+                                   placeholder="https://linkedin.com/in/your-profile" />
+                        </div>
+
+                    </div>
+                </section>
+
+                <!-- 2. PROFESSIONAL DETAILS -->
+
+                <section class="section" id="work">
+                    <div class="section-head">
+                        <div class="section-icon">2</div>
+                        <div>
+                            <h2>Employment and Professional Details</h2>
+                            <p class="sub">Current employment, experience and professional skills.</p>
+                        </div>
+                    </div>
+
+                    <div class="grid">
+
+                        <div class="field">
+                            <label for="company">Current Company <span class="req">*</span></label>
+                            <input id="company" name="Company" type="text"
+                                   placeholder="Enter company name" required />
+                        </div>
+
+                        <div class="field">
+                            <label for="designation">Designation <span class="req">*</span></label>
+                            <input id="designation" name="Designation" type="text"
+                                   placeholder="e.g. Software Engineer" required />
+                        </div>
+
+                        <div class="field">
+                            <label for="industry">Industry</label>
+                            <select id="industry" name="Industry">
+                                <option value="">Select industry</option>
+                                <option>IT Services</option>
+                                <option>Product</option>
+                                <option>Finance</option>
+                                <option>Core Engineering</option>
+                                <option>Healthcare</option>
+                                <option>Education</option>
+                                <option>Consulting</option>
+                                <option>Other</option>
+                            </select>
+                        </div>
+
+                        <div class="field">
+                            <label for="experience">Experience (years)</label>
+                            <input id="experience" name="Experience" type="number"
+                                   min="0" max="60" step="0.5" placeholder="e.g. 3" />
+                        </div>
+
+                        <div class="field">
+                            <label for="location">Location</label>
+                            <input id="location" name="Location" type="text"
+                                   placeholder="e.g. Bengaluru" />
+                        </div>
+
+                        <div class="field">
+                            <label for="previousEmployers">Previous Employers</label>
+                            <input id="previousEmployers" name="PreviousEmployers" type="text"
+                                   placeholder="Separate companies with commas" />
+                        </div>
+
+                        <div class="field span2">
+                            <label for="skills">Skills</label>
+                            <input id="skills" name="Skills" type="text"
+                                   placeholder="e.g. C#, ASP.NET Core, React, SQL" />
+                        </div>
+
+                    </div>
+                </section>
+
+                <!-- 3. MENTORING -->
+
+                <section class="section" id="engage">
+                    <div class="section-head">
+                        <div class="section-icon">3</div>
+                        <div>
+                            <h2>Mentoring and Contribution</h2>
+                            <p class="sub">Select the activities you are interested in supporting.</p>
+                        </div>
+                    </div>
+
+                    <div class="checkbox-grid">
+                        <label class="check-item">
+                            <input type="checkbox" name="Contributions" value="Mentoring students" />
+                            Mentoring students
+                        </label>
+
+                        <label class="check-item">
+                            <input type="checkbox" name="Contributions" value="Referrals" />
+                            Referrals
+                        </label>
+
+                        <label class="check-item">
+                            <input type="checkbox" name="Contributions" value="Guest lectures" />
+                            Guest lectures
+                        </label>
+
+                        <label class="check-item">
+                            <input type="checkbox" name="Contributions" value="Mock interviews" />
+                            Mock interviews
+                        </label>
+
+                        <label class="check-item">
+                            <input type="checkbox" name="Contributions" value="Resume reviews" />
+                            Resume reviews
+                        </label>
+
+                        <label class="check-item">
+                            <input type="checkbox" name="Contributions" value="Share job openings" />
+                            Share job openings
+                        </label>
+
+                        <label class="check-item">
+                            <input type="checkbox" name="Contributions" value="Career talks" />
+                            Career talks
+                        </label>
+
+                        <label class="check-item">
+                            <input type="checkbox" name="Contributions" value="Campus drive coordination" />
+                            Campus drive coordination
+                        </label>
+                    </div>
+                </section>
+
+                <!-- 4. ALUMNI DIRECTORY -->
+
+                <section class="section" id="dir">
+                    <div class="section-head">
+                        <div class="section-icon">4</div>
+                        <div>
+                            <h2>Alumni Directory</h2>
+                            <p class="sub">Explore alumni profiles and their willingness to contribute.</p>
+                        </div>
+                    </div>
+
+                    <div class="table-wrap">
+                        <table class="data">
+                            <thead>
+                                <tr>
+                                    <th>Name</th>
+                                    <th>Batch</th>
+                                    <th>Company</th>
+                                    <th>Designation</th>
+                                    <th>Open To</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+
+                            <tbody>
+                                <tr>
+                                    <td>Ritu Bhoyar</td>
+                                    <td>2022</td>
+                                    <td>Infosys</td>
+                                    <td>Systems Engineer</td>
+                                    <td>Mentoring</td>
+                                    <td>
+                                        <button type="button" class="link-btn"
+                                                data-profile="Ritu Bhoyar">
+                                            View
+                                        </button>
+                                        <button type="button" class="link-btn"
+                                                data-connect="Ritu Bhoyar">
+                                            Connect
+                                        </button>
+                                    </td>
+                                </tr>
+
+                                <tr>
+                                    <td>Mihir Dange</td>
+                                    <td>2021</td>
+                                    <td>Microsoft</td>
+                                    <td>SDE</td>
+                                    <td>Referral</td>
+                                    <td>
+                                        <button type="button" class="link-btn"
+                                                data-profile="Mihir Dange">
+                                            View
+                                        </button>
+                                        <button type="button" class="link-btn"
+                                                data-connect="Mihir Dange">
+                                            Connect
+                                        </button>
+                                    </td>
+                                </tr>
+
+                                <tr>
+                                    <td>Anjali Wagh</td>
+                                    <td>2023</td>
+                                    <td>TechNova</td>
+                                    <td>Software Engineer</td>
+                                    <td>Mock interviews</td>
+                                    <td>
+                                        <button type="button" class="link-btn"
+                                                data-profile="Anjali Wagh">
+                                            View
+                                        </button>
+                                        <button type="button" class="link-btn"
+                                                data-connect="Anjali Wagh">
+                                            Connect
+                                        </button>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </section>
+
+                <!-- 5. SHARE OPPORTUNITY -->
+
+                <section class="section" id="opp">
+                    <div class="section-head">
+                        <div class="section-icon">5</div>
+                        <div>
+                            <h2>Share Opportunity</h2>
+                            <p class="sub">Share career opportunities with students and recent graduates.</p>
+                        </div>
+                    </div>
+
+                    <div class="grid">
+
+                        <div class="field">
+                            <label for="roleTitle">Role Title <span class="req">*</span></label>
+                            <input id="roleTitle" name="RoleTitle" type="text"
+                                   placeholder="e.g. Junior Developer" />
+                        </div>
+
+                        <div class="field">
+                            <label for="opportunityCompany">Company <span class="req">*</span></label>
+                            <input id="opportunityCompany" name="OpportunityCompany" type="text"
+                                   placeholder="Enter company name" />
+                        </div>
+
+                        <div class="field">
+                            <label for="opportunityLocation">Location</label>
+                            <input id="opportunityLocation" name="OpportunityLocation" type="text"
+                                   placeholder="e.g. Pune / Remote" />
+                        </div>
+
+                        <div class="field">
+                            <label for="applyLink">Apply Link</label>
+                            <input id="applyLink" name="ApplyLink" type="url"
+                                   placeholder="https://" />
+                        </div>
+
+                        <div class="field span4">
+                            <label for="description">Description</label>
+                            <textarea id="description" name="Description" rows="3"
+                                      placeholder="Describe the role, eligibility, skills and application details."></textarea>
+                        </div>
+
+                    </div>
+
+                    <div class="btn-row-inline">
+                        <button type="button" class="btn btn-primary" id="postOpportunity">
+                            Post Opportunity
+                        </button>
+                    </div>
+                </section>
+
+                <!-- SAVE / RESET -->
+
+                <div class="submit-bar">
+                    <p>Static prototype — profile and opportunity data are not saved to a database.</p>
+
+                    <div class="btn-row">
+                        <button type="reset" class="btn btn-secondary">Reset</button>
+                        <button type="submit" class="btn btn-primary">Save Profile</button>
+                    </div>
+                </div>
+
+            </form>
+
+            <div class="page-foot-nav">
+                <a class="link-btn" href="/Organization/TpoAnalytics">
+                    &larr; TPO Placement Analytics
+                </a>
+
+                <a class="link-btn" href="/Organization/Community">
+                    Student-TPO-Alumni Communication &rarr;
+                </a>
+            </div>
+
+        </main>
+    </div>
+</div>
+
+<script>
+    (function () {
+        "use strict";
+
+        const root = document.querySelector(".ap");
+
+        if (!root) return;
+
+        const form = root.querySelector("#phaseForm");
+        const messageBox = root.querySelector("#messageBox");
+        const navLinks = root.querySelectorAll('.side-nav a[href^="#"]');
+
+        // Display feedback
+        function showMessage(message, type) {
+            messageBox.textContent = message;
+            messageBox.className = type;
+            messageBox.setAttribute("role", "status");
+
+            messageBox.scrollIntoView({
+                behavior: "smooth",
+                block: "center"
+            });
+        }
+
+        // Sidebar navigation and active section
+        navLinks.forEach(function (link) {
+            link.addEventListener("click", function (event) {
+                const target = root.querySelector(link.getAttribute("href"));
+
+                if (!target) return;
+
+                event.preventDefault();
+
+                target.scrollIntoView({
+                    behavior: "smooth",
+                    block: "start"
+                });
+
+                navLinks.forEach(function (item) {
+                    item.classList.toggle("active", item === link);
+                });
+            });
+        });
+
+        // Update active navigation on scroll
+        let ticking = false;
+
+        function updateActiveLink() {
+            const offset = 155;
+            let current = null;
+
+            root.querySelectorAll("main .section[id]").forEach(function (section) {
+                if (section.getBoundingClientRect().top <= offset) {
+                    current = section.id;
+                }
+            });
+
+            navLinks.forEach(function (link) {
+                link.classList.toggle(
+                    "active",
+                    link.getAttribute("href") === "#" + current
+                );
+            });
+
+            ticking = false;
+        }
+
+        window.addEventListener("scroll", function () {
+            if (!ticking) {
+                window.requestAnimationFrame(updateActiveLink);
+                ticking = true;
+            }
+        }, { passive: true });
+
+        // Remove invalid styling as the user edits fields
+        form.querySelectorAll("input, select, textarea").forEach(function (field) {
+            field.addEventListener("input", function () {
+                field.classList.remove("invalid");
+            });
+
+            field.addEventListener("change", function () {
+                field.classList.remove("invalid");
+            });
+        });
+
+        // Validate and save the static profile demo
+        form.addEventListener("submit", function (event) {
+            event.preventDefault();
+
+            const requiredFields = [
+                root.querySelector("#alumniName"),
+                root.querySelector("#graduationYear"),
+                root.querySelector("#alumniEmail"),
+                root.querySelector("#company"),
+                root.querySelector("#designation")
+            ];
+
+            let firstInvalid = null;
+
+            requiredFields.forEach(function (field) {
+                field.classList.remove("invalid");
+
+                if (!field.value.trim() || !field.checkValidity()) {
+                    field.classList.add("invalid");
+
+                    if (!firstInvalid) {
+                        firstInvalid = field;
+                    }
+                }
+            });
+
+            if (firstInvalid) {
+                showMessage(
+                    "Please complete all required fields with valid information.",
+                    "error"
+                );
+
+                firstInvalid.focus();
+                return;
+            }
+
+            showMessage(
+                "Profile validated successfully. This is a static demo; no data was saved.",
+                "success"
+            );
+        });
+
+        // Reset form and validation messages
+        form.addEventListener("reset", function () {
+            window.setTimeout(function () {
+                form.querySelectorAll(".invalid").forEach(function (field) {
+                    field.classList.remove("invalid");
+                });
+
+                messageBox.textContent = "";
+                messageBox.className = "";
+            }, 0);
+        });
+
+        // Static opportunity demo
+        root.querySelector("#postOpportunity").addEventListener("click", function () {
+            const role = root.querySelector("#roleTitle");
+            const company = root.querySelector("#opportunityCompany");
+            const applyLink = root.querySelector("#applyLink");
+
+            [role, company, applyLink].forEach(function (field) {
+                field.classList.remove("invalid");
+            });
+
+            let invalid = null;
+
+            if (!role.value.trim()) {
+                invalid = role;
+            } else if (!company.value.trim()) {
+                invalid = company;
+            } else if (applyLink.value.trim() && !applyLink.checkValidity()) {
+                invalid = applyLink;
+            }
+
+            if (invalid) {
+                invalid.classList.add("invalid");
+
+                showMessage(
+                    "Enter a role title and company. If provided, the application link must be valid.",
+                    "error"
+                );
+
+                invalid.focus();
+                return;
+            }
+
+            showMessage(
+                "Opportunity details validated successfully. This is a static demo; the opportunity was not published.",
+                "success"
+            );
+        });
+
+        // Demo directory actions
+        root.querySelectorAll("[data-profile]").forEach(function (button) {
+            button.addEventListener("click", function () {
+                showMessage(
+                    "Static directory preview: " +
+                    button.getAttribute("data-profile") +
+                    ". Connect this action to your alumni profile details page.",
+                    "success"
+                );
+            });
+        });
+
+        root.querySelectorAll("[data-connect]").forEach(function (button) {
+            button.addEventListener("click", function () {
+                showMessage(
+                    "Connect request preview for " +
+                    button.getAttribute("data-connect") +
+                    ". Connect this action to your messaging or connection workflow.",
+                    "success"
+                );
+            });
+        });
+
+    })();
+</script>

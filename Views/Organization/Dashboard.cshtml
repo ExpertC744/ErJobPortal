@@ -204,6 +204,34 @@
             font-size: 9px;
         }
     }
+
+     /* =========================================================
+        VIEW BUTTON
+     ========================================================= */
+
+ .sa-view-btn {
+     display: inline-flex;
+     align-items: center;
+     gap: 5px;
+     padding: 6px 10px;
+     border-radius: 7px;
+     background: #e8f5f1;
+     color: #1e7b67;
+     text-decoration: none;
+     font-size: 10px;
+     font-weight: 700;
+     transition: all .2s ease;
+ }
+
+     .sa-view-btn:hover {
+         background: #1e7b67;
+         color: #ffffff;
+         text-decoration: none;
+     }
+
+     .sa-view-btn i {
+         font-size: 9px;
+     }
 </style>
 <!-- =========================================================
      DASHBOARD
@@ -218,7 +246,7 @@
     <div class="org-page-header">
         <div class="org-page-title">
             <h2>
-                Organization Dashboard
+                @(Context.Session.GetString("sOrgName") ?? "Organization Dashboard")
             </h2>
             <p>
                 Manage your jobs, candidates and hiring activities.
@@ -237,7 +265,7 @@
 
     <div class="row g-4 mb-4">
 
-        <!-- POSTED JOBS -->
+        <!-- POSTED JOBS radhika07-->
 
         <div class="col-xl-3 col-lg-6 col-md-6">
 
@@ -267,7 +295,7 @@
                 <a asp-controller="Organization"
                    asp-action="TraineeList"
                    asp-route-id="@ViewBag.OrgCode"
-                   class="stat-link">
+                   class="sa-view-btn">
                     View Details
                     <i class="fas fa-arrow-right"></i>
                 </a>
@@ -277,7 +305,7 @@
         </div>
 
 
-        <!-- APPLICATIONS -->
+        <!-- APPLICATIONS radhika07-->
 
         <div class="col-xl-3 col-lg-6 col-md-6">
 
@@ -309,7 +337,7 @@
                 <a asp-controller="Organization"
                    asp-action="OrgList"
                    asp-route-id="@ViewBag.OrgCode"
-                   class="stat-link">
+                   class="sa-view-btn">
                     View Details
                     <i class="fas fa-arrow-right"></i>
                 </a>
@@ -318,7 +346,7 @@
         </div>
 
 
-        <!-- SHORTLISTED -->
+        <!-- SHORTLISTED radhika07-->
 
         <div class="col-xl-3 col-lg-6 col-md-6">
 
@@ -347,7 +375,7 @@
 
                 <a asp-controller="Organization"
                    asp-action="OrgTopSearch"
-                   class="stat-link">
+                   class="sa-view-btn">
                     View Candidates
                     <i class="fas fa-arrow-right"></i>
                 </a>
@@ -357,7 +385,7 @@
         </div>
 
 
-        <!-- INTERVIEWS -->
+        <!-- INTERVIEWS radhika07-->
 
         <div class="col-xl-3 col-lg-6 col-md-6">
 
@@ -387,7 +415,7 @@
                 <a asp-controller="Organization"
                    asp-action="AppliedTrainees"
                    asp-route-id="@ViewBag.OrgCode"
-                   class="stat-link">
+                   class="sa-view-btn">
                     View Interviews
                     <i class="fas fa-arrow-right"></i>
                 </a>
@@ -750,7 +778,7 @@
          APPLICATIONS + QUICK ACTIONS
     ====================================================== -->
 
-    <div class="row g-4">
+    <div class="row g-4 d-none">
 
         <!-- RECENT APPLICATIONS -->
 
@@ -1156,14 +1184,17 @@
 
         </div>
 
-        @* khushi 29-09 *@
+        @*  khushi 06/10/26 *@
         <!-- MASTER TABLE CARD -->
         <div class="master-table-container">
 
 
-
-
             <!-- MASTER TABLE -->
+
+  <!-- MASTER TABLE -->
+
+  <!-- MASTER TABLE -->
+
             <div class="table-responsive">
 
                 <table id="organizationJobsTable"
@@ -1181,7 +1212,8 @@
 
                     <tbody>
 
-                        @if (appliedTraineePosts.Any())
+                        @if (appliedTraineePosts != null &&
+                                                appliedTraineePosts.Any())
                         {
                             int srNo = 1;
 
@@ -1220,15 +1252,54 @@
                                         </a>
 
                                     </td>
-
                                     <!-- Applied Trainees -->
                                     <td class="text-center">
 
-                                        <a asp-controller="Organization"
-                                           asp-action="AppliedTraineeList"
+
+                                        <a href="@Url.Action(
+                                                                                                                   "OrgPositionTR",
+                                                                                                                   "Organization",
+                                                                                                                   new { id = item.nID })"
+                                   class="resume-view-btn"
+                                   title="View Applied Trainees">
+                                        <a href="@Url.Action("OrgPositionTR", "Organization", new { id = item.nID })"
+                                           class="resume-view-btn"
+                                           title="View Applied Trainees">
+
+                                            <i class="fas fa-users"></i>
+                                            <span>@item.MatchingTraineeCount</span>
+
+                                        </a>
+                               @*          <a href="@Url.RouteUrl(
+            "OrganizationTraineeList",
+            new { id = item.nID })"
+   class="resume-view">
+    @item.MatchingTraineeCount
+</a> *@
+                                        @* <a href="@Url.RouteUrl(
+                                                           "OrganizationTraineeList",
+                                                           new { id = item.nID })"
+                                   class="resume-view-btn"
+                                   title="View Applied Trainees">
+
+                                            <i class="fas fa-users"></i>
+
+                                            <span>
+                                                @item.MatchingTraineeCount
+                                            </span>
+
+                                        </a> *@
+
+                                    </td>
+                                    <!-- Applied Trainees -->
+                                   @*  <td class="text-center">
+
+                                       @*  <a asp-controller="Organization"
+                                           asp-action="OrgPositionTR"
                                            asp-route-id="@item.nID"
                                            class="resume-view-btn"
                                            title="View Applied Trainees">
+>>>>>>> Shrirang
 
                                             <i class="fas fa-users"></i>
 
@@ -1238,29 +1309,28 @@
 
                                         </a>
 
-                                    </td>
+                                        <a href="@Url.Action(
+                                                           "OrgPositionTR",
+                                                           "Organization",
+                                                           new { id = item.nID })"
+                                   class="applied-trainee-link">
+
+                                            @item.AppliedTraineeCount
+
+                                        </a>
+                                    </td> *@
 
                                 </tr>
 
-                                srNo++;
+                                                srNo++;
                             }
                         }
-                        else
-                        {
-                            <tr>
-                                <td colspan="5" class="text-center">
-                                    No applied trainees found.
-                                </td>
-                            </tr>
-                        }
-
 
                     </tbody>
 
                 </table>
 
             </div>
-
 
             <!-- MASTER PAGE INFO -->
             <div id="organizationJobsPageInfo"

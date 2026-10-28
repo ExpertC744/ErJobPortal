@@ -1,0 +1,393 @@
+﻿@model ErJobPortal.Models.EditOrganizationRegistrationM
+
+@{
+    ViewData["Title"] = "Edit Organization Profile";
+    ViewData["Panel"] = "Organization";
+}
+
+<link rel="stylesheet"
+      href="~/css/EditOrganizationRegistration.css"
+      asp-append-version="true" />
+
+<div class="candidate-register-page edit-org-page">
+    <div class="candidate-register-card edit-org-card">
+
+        <!-- HEADER -->
+        <div class="register-icon">
+            <i class="fa-solid fa-building-user"></i>
+        </div>
+
+        <div class="register-heading">
+            <h2>Edit Organization Profile</h2>
+            <p>Update your organization and contact information</p>
+        </div>
+
+        @if (TempData["Success"] != null)
+        {
+            <div class="alert alert-success register-alert">
+                @TempData["Success"]
+            </div>
+        }
+
+        @if (TempData["Error"] != null)
+        {
+            <div class="alert alert-danger register-alert">
+                @TempData["Error"]
+            </div>
+        }
+
+        <form asp-controller="Organization"
+      asp-action="EditOrganizationRegistration"
+      method="post"
+      id="editOrganizationForm">
+
+            @Html.AntiForgeryToken()
+
+            <div asp-validation-summary="All"
+                 class="text-danger register-summary"></div>
+
+            <!-- ORGANIZATION DETAILS -->
+            <div class="edit-org-section">
+              
+
+                <div class="register-form-row">
+                    <div class="register-form-group">
+                        <label asp-for="sOrgName" class="register-label">
+                            Organization Name
+                        </label>
+
+                        <input asp-for="sOrgName"
+                               class="register-input"
+                               placeholder=" organization name"
+                               autocomplete="organization" />
+
+                        <span asp-validation-for="sOrgName"
+                              class="text-danger register-validation"></span>
+                    </div>
+
+                    <div class="register-form-group">
+                        <label asp-for="sOrgUrl" class="register-label">
+                            Organization Website
+                        </label>
+
+                        <input asp-for="sOrgUrl"
+                               type="url"
+                               class="register-input"
+                               placeholder="https://example.com" />
+
+                        <span asp-validation-for="sOrgUrl"
+                              class="text-danger register-validation"></span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- COLLEGE DETAILS -->
+            <div class="edit-org-section">
+               
+
+                <div class="register-form-row">
+                    <div class="register-form-group">
+                        <label asp-for="nCollegeName" class="register-label">
+                            College Name
+                        </label>
+
+                        <select asp-for="nCollegeName"
+                                id="nCollegeName"
+                                class="register-select">
+                            <option value="0">-- Select College Name --</option>
+                        </select>
+
+                        <span asp-validation-for="nCollegeName"
+                              class="text-danger register-validation"></span>
+                    </div>
+
+                    <div class="register-form-group">
+                        <label asp-for="nCollegeCode" class="register-label">
+                            College Code
+                        </label>
+
+                        <select asp-for="nCollegeCode"
+                                id="nCollegeCode"
+                                class="register-select">
+                            <option value="0">-- Select College Code --</option>
+                        </select>
+
+                        <span asp-validation-for="nCollegeCode"
+                              class="text-danger register-validation"></span>
+                    </div>
+                </div>
+
+                <div class="register-form-row">
+                    <div class="register-form-group">
+                        <label asp-for="nDepartment" class="register-label">
+                            Department
+                        </label>
+
+                        <select asp-for="nDepartment"
+                                id="departmentSelect"
+                                class="register-select">
+                            <option value="0">-- Select Department --</option>
+                        </select>
+
+                        <span asp-validation-for="nDepartment"
+                              class="text-danger register-validation"></span>
+                    </div>
+
+                    <div class="register-form-group">
+                        <label asp-for="nBranch" class="register-label">
+                            Branch
+                        </label>
+
+                        <select asp-for="nBranch"
+                                id="branchSelect"
+                                class="register-select">
+                            <option value="0">-- Select Branch --</option>
+                        </select>
+
+                        <span asp-validation-for="nBranch"
+                              class="text-danger register-validation"></span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- CONTACT DETAILS -->
+            <div class="edit-org-section">
+               
+
+                <div class="register-form-row">
+                    <div class="register-form-group">
+                        <label asp-for="sName" class="register-label">
+                            Contact Person
+                        </label>
+
+                        <input asp-for="sName"
+                               class="register-input"
+                               placeholder=" contact person name"
+                               autocomplete="name" />
+
+                        <span asp-validation-for="sName"
+                              class="text-danger register-validation"></span>
+                    </div>
+
+                    <div class="register-form-group">
+                        <label asp-for="sDesignation" class="register-label">
+                            Designation
+                        </label>
+
+                        <input asp-for="sDesignation"
+                               class="register-input"
+                               placeholder=" designation"
+                               autocomplete="organization-title" />
+
+                        <span asp-validation-for="sDesignation"
+                              class="text-danger register-validation"></span>
+                    </div>
+                </div>
+
+                <div class="register-form-row">
+                    <div class="register-form-group">
+                        <label asp-for="sMobile" class="register-label">
+                            Mobile Number
+                        </label>
+
+                        <input asp-for="sMobile"
+                               type="tel"
+                               class="register-input"
+                               maxlength="10"
+                               inputmode="numeric"
+                               placeholder=" mobile number"
+                               autocomplete="tel" />
+
+                        <span asp-validation-for="sMobile"
+                              class="text-danger register-validation"></span>
+                    </div>
+
+                    <div class="register-form-group">
+                        <label asp-for="sEmail" class="register-label">
+                            Email Address
+                        </label>
+
+                        <input asp-for="sEmail"
+                               type="email"
+                               class="register-input"
+                               placeholder=" organization email"
+                               autocomplete="email" />
+
+                        <span asp-validation-for="sEmail"
+                              class="text-danger register-validation"></span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- OPTIONAL PASSWORD CHANGE -->
+            @* <div class="edit-org-section">
+              
+
+                <div class="register-form-row">
+                    <div class="register-form-group">
+                        <label asp-for="sPassword" class="register-label">
+                            New Password (Optional)
+                        </label>
+
+                        <input asp-for="sPassword"
+                               type="password"
+                               class="register-input"
+                               placeholder="Leave blank to keep current password"
+                               autocomplete="new-password" />
+
+                        <span asp-validation-for="sPassword"
+                              class="text-danger register-validation"></span>
+                    </div>
+                </div>
+
+            </div> *@
+
+            <!-- ACTION BUTTONS -->
+            <div class="edit-org-actions">
+
+                <button type="submit" class="register-main-btn">
+                    <i class="fa-solid fa-floppy-disk"></i>
+                    Update Profile
+                </button>
+
+                <button type="button"
+                        class="edit-org-reset-btn"
+                        id="resetEditOrganization">
+                    <i class="fa-solid fa-rotate-left"></i>
+                    Reset Changes
+                </button>
+
+                <a asp-controller="Organization"
+                   asp-action="OrgDashboard"
+                   class="edit-org-back-btn">
+                    <i class="fa-solid fa-arrow-left"></i>
+                    Back
+                </a>
+
+            </div>
+
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+
+    <script>
+        $(function () {
+            const collegeSelect = $('#nCollegeName');
+            const codeSelect = $('#nCollegeCode');
+            const departmentSelect = $('#departmentSelect');
+            const branchSelect = $('#branchSelect');
+
+            // Saved values loaded by the controller.
+            const savedCollege = @Html.Raw(
+            System.Text.Json.JsonSerializer.Serialize(Model?.nCollegeName));
+
+            const savedCode = @Html.Raw(
+            System.Text.Json.JsonSerializer.Serialize(Model?.nCollegeCode));
+
+            const savedDepartment = @Html.Raw(
+            System.Text.Json.JsonSerializer.Serialize(Model?.nDepartment));
+
+            const savedBranch = @Html.Raw(
+            System.Text.Json.JsonSerializer.Serialize(Model?.nBranch));
+
+            function loadCollegeCodes(collegeId, selectedCode) {
+                codeSelect.empty().append(
+                    new Option('-- Select College Code --', '0'));
+
+                if (!collegeId || collegeId === '0') return;
+
+                $.getJSON('@Url.Action("GetCollegeCodes", "Account")',
+                    { collegeId: collegeId })
+                    .done(function (data) {
+                        $.each(data || [], function (_, item) {
+                            codeSelect.append(
+                                new Option(item.nCode, item.nCode));
+                        });
+
+                        if (selectedCode != null) {
+                            codeSelect.val(String(selectedCode));
+                        }
+                    });
+            }
+
+            function loadBranches(departmentId, selectedBranch) {
+                branchSelect.empty().append(
+                    new Option('-- Select Branch --', '0'));
+
+                if (!departmentId || departmentId === '0') return;
+
+                $.getJSON('@Url.Action("GetBranches", "Account")',
+                    { departmentId: departmentId })
+                    .done(function (data) {
+                        $.each(data || [], function (_, item) {
+                            branchSelect.append(
+                                new Option(item.sBranch, item.nID));
+                        });
+
+                        if (selectedBranch != null) {
+                            branchSelect.val(String(selectedBranch));
+                        }
+                    });
+            }
+
+            // Load colleges and restore the selected college.
+            $.getJSON('@Url.Action("GetColleges", "Account")')
+                .done(function (data) {
+                    collegeSelect.empty().append(
+                        new Option('-- Select College Name --', '0'));
+
+                    $.each(data || [], function (_, item) {
+                        collegeSelect.append(
+                            new Option(item.sCollegeName, item.nID));
+                    });
+
+                    if (savedCollege != null) {
+                        collegeSelect.val(String(savedCollege));
+                    }
+
+                    loadCollegeCodes(collegeSelect.val(), savedCode);
+                });
+
+            collegeSelect.on('change', function () {
+                loadCollegeCodes(this.value, null);
+            });
+
+            // Load departments and restore the selected department.
+            $.getJSON('@Url.Action("GetDepartments", "Account")')
+                .done(function (data) {
+                    departmentSelect.empty().append(
+                        new Option('-- Select Department --', '0'));
+
+                    $.each(data || [], function (_, item) {
+                        departmentSelect.append(
+                            new Option(item.sDepartment, item.nID));
+                    });
+
+                    if (savedDepartment != null) {
+                        departmentSelect.val(String(savedDepartment));
+                    }
+
+                    loadBranches(departmentSelect.val(), savedBranch);
+                });
+
+            departmentSelect.on('change', function () {
+                loadBranches(this.value, null);
+            });
+
+            // Digits only for the mobile field.
+            $('input[name="sMobile"]').on('input', function () {
+                this.value = this.value.replace(/\D/g, '').substring(0, 10);
+            });
+
+            // Reload the saved profile to discard all changes.
+            $('#resetEditOrganization').on('click', function () {
+                window.location.reload();
+            });
+        });
+    </script>
+}

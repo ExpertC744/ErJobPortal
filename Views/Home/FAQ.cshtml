@@ -2,27 +2,19 @@
     ViewData["Title"] = "FAQs";
 }
 
- 
-  <div class="faq-page">
+<link rel="stylesheet"
+      href="~/css/FAQs.css"
+      asp-append-version="true" />
 
-    <!-- =====================================================
-         TOP SPACE
-         ===================================================== -->
-    <div class="faq-top-space"></div>
+<div class="faq-page">
 
-
-    <!-- =====================================================
-         HERO
-         ===================================================== -->
+    <!-- HERO SECTION -->
     <section class="faq-hero">
 
-        <!-- Glow -->
-        <div class="faq-glow faq-glow-1"></div>
-        <div class="faq-glow faq-glow-2"></div>
-        <div class="faq-glow faq-glow-3"></div>
+        <div class="faq-shape faq-shape-one"></div>
+        <div class="faq-shape faq-shape-two"></div>
 
-        <!-- Particles -->
-        <div class="faq-particles">
+        <div class="faq-particles" aria-hidden="true">
             <span></span>
             <span></span>
             <span></span>
@@ -30,641 +22,1022 @@
             <span></span>
             <span></span>
         </div>
+
+        <div class="faq-top-space"></div>
 
         <div class="container faq-hero-container">
+            <div class="faq-title-wrapper">
 
-            <div class="row align-items-center py-5">
+                <span class="faq-small-title">
+                    <i class="fas fa-circle-question"></i>
+                    HELP CENTER
+                </span>
 
-                <!-- TITLE -->
-                <div class="col-md-6 text-center text-md-left">
+                <h1 class="faq-title">
+                    Frequently Asked <span>Questions</span>
+                </h1>
 
-                    <div class="faq-title-wrapper">
+                <div class="faq-title-line"></div>
 
-                        <span class="faq-small-title">
-                            1TRAINEE.COM
-                        </span>
+                <p class="faq-subtitle">
+                    Find helpful answers about 1Trainee, trainee registration,
+                    internship applications, organization accounts, and
+                    international opportunities.
+                </p>
 
-                        <h1 class="faq-title">
-                            FAQ for 1trainee.com
-                        </h1>
+                <nav class="faq-breadcrumb" aria-label="Breadcrumb">
+                    <a asp-controller="Home" asp-action="Index">
+                        <i class="fas fa-house"></i>
+                        Home
+                    </a>
 
-                        <div class="faq-title-line"></div>
+                    <i class="fas fa-chevron-right faq-breadcrumb-arrow"
+                       aria-hidden="true"></i>
 
-                        <p class="faq-subtitle">
-                            Find answers to frequently asked questions
-                            about internships, recruiters and international
-                            internship opportunities.
-                        </p>
-
-                    </div>
-
-                </div>
-
-
-                <!-- BREADCRUMB -->
-                <div class="col-md-6 text-center text-md-right">
-
-                    <div class="faq-breadcrumb">
-
-                        <a class="faq-btn" href="~/Home/Index">
-                            <i class="fas fa-home"></i>
-                            Home
-                        </a>
-
-                        <i class="fas fa-angle-double-right faq-arrow"></i>
-
-                        <span class="faq-current-page">
-                            FAQs
-                        </span>
-
-                    </div>
-
-                </div>
+                    <span class="faq-current-page">FAQs</span>
+                </nav>
 
             </div>
-
         </div>
 
+        <div class="faq-hero-bottom"></div>
     </section>
 
 
-    <!-- =====================================================
-         MAIN CONTENT
-         ===================================================== -->
+    <!-- MAIN CONTENT -->
     <section class="faq-content">
 
         <div class="container">
+            <div class="faq-main-row">
 
-            <div class="row faq-main-row">
+                <!-- LEFT FAQ CONTENT -->
+                <main class="faq-left-content">
 
-                <!-- =================================================
-                     LEFT CONTENT
-                     ================================================= -->
-                <div class="col-lg-8 faq-left-content">
+                    <div class="faq-intro-card scroll-reveal">
+                        <div class="faq-intro-icon">
+                            <i class="fas fa-comments"></i>
+                        </div>
 
+                        <div>
+                            <span class="faq-section-label">
+                                HOW CAN WE HELP?
+                            </span>
 
-                    <!-- =============================================
-                         TRAINEES
-                         ============================================= -->
-                    <div class="faq-section scroll-reveal">
+                            <h2>Everything you need to know</h2>
 
-                        <h4>
-                            For Trainees (Interns / Seekers)
-                        </h4>
-
-
-                        <h4>
-                            I. What is 1trainee.com Internship Portal?
-                        </h4>
-
-                        <p>
-                            The Internship Portal is a platform designed to
-                            connect students, recent graduates, PGs and
-                            research scholars with internship / fellowship
-                            opportunities across various industries
-                            nationally & internationally.
-                        </p>
-
-                        <p>
-                            It allows trainees to browse, apply for
-                            internships / live projects, and manage their
-                            applications & responses in one place.
-                        </p>
-
-
-                        <h4>
-                            II. How do I register on the portal?
-                        </h4>
-
-                        <p>
-                            To register, click on the "Sign Up" button on
-                            the homepage and add details, fill in your
-                            personal details from profile option available
-                            in dashboard with educational background, and
-                            upload your resume.
-                        </p>
-
-                        <p>
-                            After submitting, you will receive a confirmation
-                            email with login details of your account.
-                        </p>
-
-
-                        <h4>
-                            III. How can I search for internships?
-                        </h4>
-
-                        <p>
-                            Once logged in, use the search bar to enter
-                            keywords related to your interests, such as
-                            internship / job titles or companies.
-                        </p>
-
-                        <p>
-                            You can also filter internships by location,
-                            industry, and duration. Do not forget to create
-                            your profile from the dashboard.
-                        </p>
-
-
-                        <h4>
-                            IV. How do I apply for an internship?
-                        </h4>
-
-                        <p>
-                            After finding a suitable internship, click on
-                            the internship / job listing to view details.
-                            If you want to apply, click the "Apply Now"
-                            button, fill out any required fields, and
-                            submit your application.
-                        </p>
-
-
-                        <h4>
-                            V. Can I edit my profile after registration?
-                        </h4>
-
-                        <p>
-                            Yes, you can update your profile by going to the
-                            "Profile" section. Here you can modify your
-                            personal information, resume details like
-                            hobbies, languages, contact information,
-                            references and skills.
-                        </p>
-
-
-                        <h4>
-                            VI. How will I be notified about internship applications?
-                        </h4>
-
-                        <p>
-                            You will receive email notifications about the
-                            status of your application including interview
-                            invitations and other notices.
-                        </p>
-
-                        <p>
-                            You can also check the "Application Status -
-                            Applied" section on your dashboard.
-                        </p>
-
-
-                        <h4>
-                            VII. Is there a fee to use the portal?
-                        </h4>
-
-                        <p>
-                            The portal is free for trainees to use. There
-                            are no charges for applying to internships or
-                            using any features of the platform.
-                        </p>
-
-                        <p>
-                            Resume building facility gives you more than
-                            35 design options and no charges are applied
-                            on this. You can download and use them.
-                        </p>
-
-
-                        <h4>
-                            VIII. What should I do if I forget my password?
-                        </h4>
-
-                        <p>
-                            On the login page, click the
-                            "Forgot Password" link. Enter your registered
-                            email address, and you will receive instructions
-                            to reset your password.
-                        </p>
-
-
-                        <h4>
-                            IX. How can I get support if I encounter issues?
-                        </h4>
-
-                        <p>
-                            If you experience any problems, visit the
-                            "Help" section on the portal or contact our
-                            support team via email at
-                            contact@kavin.co.za / contact@1trainee.com.
-                        </p>
-
-
-                        <h4>
-                            X. What are the responsibilities of the intern?
-                        </h4>
-
-                        <p>
-                            Interns are expected to follow company policies,
-                            complete assigned tasks, seek feedback, and
-                            communicate any challenges they encounter.
-                        </p>
-
-
-                        <h4>
-                            XI. Can internships be offered remotely?
-                        </h4>
-
-                        <p>
-                            Yes, many companies offer remote internships.
-                            It is important to specify this in the internship
-                            posting and ensure that the necessary tools and
-                            support are available.
-                        </p>
-
-
-                        <h4>
-                            XII. What happens if an intern faces issues while
-                            on the internship?
-                        </h4>
-
-                        <p>
-                            Interns should report any issues to their
-                            supervisor or designated contact at the company.
-                            We also provide resources and support for
-                            conflict resolution.
-                        </p>
-
+                            <p>
+                                Browse the questions below and select any
+                                question to view its answer. Whether you are
+                                a trainee or an organization, this guide will
+                                help you get started with 1Trainee.
+                            </p>
+                        </div>
                     </div>
 
 
-                    <!-- =============================================
-                         ORGANIZATIONS
-                         ============================================= -->
-                    <div class="faq-section scroll-reveal">
+                    <!-- =================================================
+                         SECTION 1: TRAINEES
+                    ================================================== -->
+                    <section class="faq-section scroll-reveal">
 
-                        <h4>
-                            For Organizations (Recruiters)
-                        </h4>
+                        <div class="faq-section-heading">
+
+                            <div class="faq-heading-icon">
+                                <i class="fas fa-user-graduate"></i>
+                            </div>
+
+                            <div class="faq-heading-copy">
+                                <span class="faq-section-label">
+                                    FOR CANDIDATES
+                                </span>
+
+                                <h2>Trainees</h2>
+
+                                <p>
+                                    Registration, profiles, applications,
+                                    and trainee accounts.
+                                </p>
+                            </div>
 
-
-                        <h4>
-                            1. How do I create an employer (Recruiter) account?
-                        </h4>
-
-                        <p>
-                            To create an account, click on the "Sign Up"
-                            button for recruiters, fill in your company
-                            details, and create a profile.
-                        </p>
-
-                        <p>
-                            You will be sent a confirmation mail with
-                            login details.
-                        </p>
-
-
-                        <h4>
-                            2. How can I post an internship opportunity?
-                        </h4>
-
-                        <p>
-                            Log in to your recruiter account, go to the
-                            "Post an internship" section, and fill out
-                            the internship details, including job
-                            description, requirements, and application
-                            deadlines.
-                        </p>
-
-
-                        <h4>
-                            3. Can I view applications for my internship postings?
-                        </h4>
-
-                        <p>
-                            Yes, you can view and manage all applications
-                            through the "Manage Applications" section on
-                            your dashboard.
-                        </p>
-
-
-                        <h4>
-                            4. How can I communicate with applicants?
-                        </h4>
-
-                        <p>
-                            You can communicate with applicants via their
-                            provided contact details.
-                        </p>
-
-
-                        <h4>
-                            5. Is there a fee to post internship opportunities?
-                        </h4>
-
-                        <p>
-                            The portal is free for organizations to use.
-                            There are no charges to post internships or
-                            using any features of the platform.
-                        </p>
-
-
-                        <h4>
-                            6. Can I edit or remove an internship job listing?
-                        </h4>
-
-                        <p>
-                            Yes, you can edit or remove a job listing from
-                            the "Edit" section. You can update the job
-                            details or withdraw the posting if it is no
-                            longer available.
-                        </p>
-
-
-                        <h4>
-                            7. How do I track the performance of my job postings?
-                        </h4>
-
-                        <p>
-                            The portal provides analytics on job postings,
-                            including views, applications received, and
-                            other relevant metrics.
-                        </p>
-
-
-                        <h4>
-                            8. What should I do if I have trouble using the portal?
-                        </h4>
-
-                        <p>
-                            If you encounter any issues, visit the
-                            "Contact" section for troubleshooting tips or
-                            contact our support team.
-                        </p>
-
-
-                        <h4>
-                            9. How do I cancel my employer / recruiter account?
-                        </h4>
-
-                        <p>
-                            To cancel your account, contact our support
-                            team. They will guide you through the account
-                            closure process.
-                        </p>
-
-
-                        <h4>
-                            10. How can we promote diversity and inclusion
-                            in our internship programs?
-                        </h4>
-
-                        <p>
-                            Companies can actively seek applicants from
-                            diverse backgrounds, provide training on
-                            inclusivity, and foster an environment that
-                            values different perspectives.
-                        </p>
-
-
-                        <h4>
-                            11. Who can we contact for more information?
-                        </h4>
-
-                        <p>
-                            For any questions or additional information,
-                            companies can reach out to our support team
-                            via email or through the contact form on our
-                            website.
-                        </p>
-
-                    </div>
-
-
-                    <!-- =============================================
-                         INTERNATIONAL INTERNSHIPS
-                         ============================================= -->
-                    <div class="faq-section scroll-reveal">
-
-                        <h4>
-                            For International Internships
-                        </h4>
-
-
-                        <h4>
-                            A. What types of internships are available abroad?
-                        </h4>
-
-                        <p>
-                            Internships vary widely by country and industry.
-                            Common fields include business, engineering,
-                            healthcare, technology, and non-profit.
-                        </p>
-
-
-                        <h4>
-                            B. How do I find an internship abroad?
-                        </h4>
-
-                        <p>
-                            You can search 1trainee.com portal for various
-                            internships by location, field of study, and
-                            duration.
-                        </p>
-
-
-                        <h4>
-                            C. What is the typical duration of international internships?
-                        </h4>
-
-                        <p>
-                            Internship durations can range from a few weeks
-                            to several months, with some lasting up to a year.
-                        </p>
-
-
-                        <h4>
-                            D. Do I need a visa to intern abroad?
-                        </h4>
-
-                        <p>
-                            Most countries require a visa for internships.
-                            The type of visa depends on the country and the
-                            length of your internship.
-                        </p>
-
-
-                        <h4>
-                            E. How can I apply for a visa?
-                        </h4>
-
-                        <p>
-                            The application process varies by country, but
-                            typically includes the following steps:
-                        </p>
-
-                        <ul class="faq-list">
-
-                            <li>
-                                <b>Research:</b>
-                                Find out the specific visa type needed
-                                for your internship.
-                            </li>
-
-                            <li>
-                                <b>Gather Documents:</b>
-                                Prepare necessary documents such as your
-                                internship offer letter, passport,
-                                financial proof and health insurance.
-                            </li>
-
-                            <li>
-                                <b>Submit Application:</b>
-                                Apply through the embassy or consulate
-                                of the host country.
-                            </li>
-
-                            <li>
-                                <b>Interview:</b>
-                                You may need to attend an interview.
-                            </li>
-
-                        </ul>
-
-
-                        <h4>
-                            F. What documents are needed for a visa application?
-                        </h4>
-
-                        <p>
-                            Common documents include:
-                        </p>
-
-                        <ul class="faq-list">
-
-                            <li>Valid passport</li>
-                            <li>Internship offer letter</li>
-                            <li>Financial proof</li>
-                            <li>Health insurance proof</li>
-                            <li>Completed visa application form</li>
-                            <li>Passport-sized photos</li>
-
-                        </ul>
-
-
-                        <h4>
-                            G. How long does the visa process take?
-                        </h4>
-
-                        <p>
-                            The processing time varies by country, ranging
-                            from a few weeks to several months.
-                        </p>
-
-
-                        <h4>
-                            H. Are internships abroad paid?
-                        </h4>
-
-                        <p>
-                            Some internships are paid, while others may be
-                            unpaid or offer stipends to cover living expenses.
-                            Be sure to read the internship details carefully.
-                        </p>
-
-
-                        <h4>
-                            I. Can I work part-time while interning?
-                        </h4>
-
-                        <p>
-                            Policies on working while interning differ by
-                            country and visa type. Check the regulations of
-                            your host country to ensure compliance.
-                        </p>
-
-
-                        <h4>
-                            J. What if I have issues with my internship or host country?
-                        </h4>
-
-                        <p>
-                            If you encounter problems, contact your internship
-                            provider or our support team for assistance.
-                        </p>
-
-
-                        <h4>
-                            K. Do I need to know the local language?
-                        </h4>
-
-                        <p>
-                            While many internships in popular destinations
-                            may be conducted in English, knowing the local
-                            language can enhance your experience.
-                        </p>
-
-
-                        <h4>
-                            L. Can I intern in multiple countries?
-                        </h4>
-
-                        <p>
-                            Yes, many students choose to intern in different
-                            countries. However, you will need to apply for
-                            separate visas and meet the requirements for each
-                            country.
-                        </p>
-
-
-                        <h4>
-                            M. What are some tips for adapting to a new culture?
-                        </h4>
-
-                        <ul class="faq-list">
-
-                            <li>Research local customs and etiquette.</li>
-                            <li>Stay open-minded and flexible.</li>
-                            <li>Engage with locals and other interns.</li>
-                            <li>Be patient and give yourself time to adjust.</li>
-
-                        </ul>
-
-
-                        <h4>
-                            N. How can I prepare for my internship abroad?
-                        </h4>
-
-                        <ul class="faq-list">
-
-                            <li>
-                                Research your host country's culture and
-                                work environment.
-                            </li>
-
-                            <li>
-                                Brush up on relevant skills or languages.
-                            </li>
-
-                            <li>
-                                Connect with other interns or alumni.
-                            </li>
-
-                            <li>
-                                Prepare a budget and plan for living
-                                arrangements.
-                            </li>
-
-                        </ul>
-
-                    </div>
-
-                </div>
-
-
-                <!-- =================================================
-                     RIGHT SIDE
-                     ================================================= -->
-                <div class="col-lg-4 faq-right-content">
+                            <span class="faq-count">06 QUESTIONS</span>
+
+                        </div>
+
+
+                        <div class="faq-accordion">
+
+                            <!-- Q1 -->
+                            <article class="faq-item">
+
+                                <h3 class="faq-question-heading">
+                                    <button class="faq-question"
+                                            type="button"
+                                            aria-expanded="false"
+                                            aria-controls="faq-trainee-1"
+                                            id="faq-question-trainee-1">
+
+                                        <span class="faq-question-text">
+                                            <span class="faq-question-number">01</span>
+                                            What is 1Trainee?
+                                        </span>
+
+                                        <span class="faq-toggle"
+                                              aria-hidden="true">
+                                            <i class="fas fa-plus"></i>
+                                        </span>
+
+                                    </button>
+                                </h3>
+
+                                <div class="faq-answer"
+                                     id="faq-trainee-1"
+                                     role="region"
+                                     aria-labelledby="faq-question-trainee-1"
+                                     hidden>
+
+                                    <p>
+                                        1Trainee is a career and internship
+                                        portal designed to connect trainees
+                                        with organizations offering internship,
+                                        fellowship, and trainee opportunities.
+                                        It helps candidates explore opportunities
+                                        and enables organizations to share
+                                        their requirements through one platform.
+                                    </p>
+
+                                </div>
+
+                            </article>
+
+
+                            <!-- Q2 -->
+                            <article class="faq-item">
+
+                                <h3 class="faq-question-heading">
+                                    <button class="faq-question"
+                                            type="button"
+                                            aria-expanded="false"
+                                            aria-controls="faq-trainee-2"
+                                            id="faq-question-trainee-2">
+
+                                        <span class="faq-question-text">
+                                            <span class="faq-question-number">02</span>
+                                            How can I register as a trainee?
+                                        </span>
+
+                                        <span class="faq-toggle"
+                                              aria-hidden="true">
+                                            <i class="fas fa-plus"></i>
+                                        </span>
+
+                                    </button>
+                                </h3>
+
+                                <div class="faq-answer"
+                                     id="faq-trainee-2"
+                                     role="region"
+                                     aria-labelledby="faq-question-trainee-2"
+                                     hidden>
+
+                                    <p>
+                                        Open the trainee or candidate
+                                        registration page and enter the
+                                        information requested in the form.
+                                        Review your details carefully before
+                                        submitting your registration. After
+                                        registration, sign in using the
+                                        credentials and process provided by
+                                        the portal.
+                                    </p>
+
+                                </div>
+
+                            </article>
+
+
+                            <!-- Q3 -->
+                            <article class="faq-item">
+
+                                <h3 class="faq-question-heading">
+                                    <button class="faq-question"
+                                            type="button"
+                                            aria-expanded="false"
+                                            aria-controls="faq-trainee-3"
+                                            id="faq-question-trainee-3">
+
+                                        <span class="faq-question-text">
+                                            <span class="faq-question-number">03</span>
+                                            How can I find internship opportunities?
+                                        </span>
+
+                                        <span class="faq-toggle"
+                                              aria-hidden="true">
+                                            <i class="fas fa-plus"></i>
+                                        </span>
+
+                                    </button>
+                                </h3>
+
+                                <div class="faq-answer"
+                                     id="faq-trainee-3"
+                                     role="region"
+                                     aria-labelledby="faq-question-trainee-3"
+                                     hidden>
+
+                                    <p>
+                                        Sign in to your candidate account,
+                                        complete your profile, and browse the
+                                        available opportunities. Review the
+                                        eligibility criteria, required skills,
+                                        location, duration, schedule, and other
+                                        conditions before applying for a role.
+                                    </p>
+
+                                </div>
+
+                            </article>
+
+
+                            <!-- Q4 -->
+                            <article class="faq-item">
+
+                                <h3 class="faq-question-heading">
+                                    <button class="faq-question"
+                                            type="button"
+                                            aria-expanded="false"
+                                            aria-controls="faq-trainee-4"
+                                            id="faq-question-trainee-4">
+
+                                        <span class="faq-question-text">
+                                            <span class="faq-question-number">04</span>
+                                            Why should I complete my profile?
+                                        </span>
+
+                                        <span class="faq-toggle"
+                                              aria-hidden="true">
+                                            <i class="fas fa-plus"></i>
+                                        </span>
+
+                                    </button>
+                                </h3>
+
+                                <div class="faq-answer"
+                                     id="faq-trainee-4"
+                                     role="region"
+                                     aria-labelledby="faq-question-trainee-4"
+                                     hidden>
+
+                                    <p>
+                                        A complete and accurate profile helps
+                                        organizations understand your education,
+                                        qualifications, skills, interests, and
+                                        experience. Keep your contact details,
+                                        resume, and other profile information
+                                        up to date so recruiters can review
+                                        your application more effectively.
+                                    </p>
+
+                                </div>
+
+                            </article>
+
+
+                            <!-- Q5 -->
+                            <article class="faq-item">
+
+                                <h3 class="faq-question-heading">
+                                    <button class="faq-question"
+                                            type="button"
+                                            aria-expanded="false"
+                                            aria-controls="faq-trainee-5"
+                                            id="faq-question-trainee-5">
+
+                                        <span class="faq-question-text">
+                                            <span class="faq-question-number">05</span>
+                                            How can I track my applications?
+                                        </span>
+
+                                        <span class="faq-toggle"
+                                              aria-hidden="true">
+                                            <i class="fas fa-plus"></i>
+                                        </span>
+
+                                    </button>
+                                </h3>
+
+                                <div class="faq-answer"
+                                     id="faq-trainee-5"
+                                     role="region"
+                                     aria-labelledby="faq-question-trainee-5"
+                                     hidden>
+
+                                    <p>
+                                        Sign in to your candidate dashboard
+                                        and open the applications or application
+                                        history section, where available.
+                                        You can review your submitted
+                                        applications and check the status
+                                        displayed by the portal. Status
+                                        information may depend on updates
+                                        made by the organization.
+                                    </p>
+
+                                </div>
+
+                            </article>
+
+
+                            <!-- Q6 -->
+                            <article class="faq-item">
+
+                                <h3 class="faq-question-heading">
+                                    <button class="faq-question"
+                                            type="button"
+                                            aria-expanded="false"
+                                            aria-controls="faq-trainee-6"
+                                            id="faq-question-trainee-6">
+
+                                        <span class="faq-question-text">
+                                            <span class="faq-question-number">06</span>
+                                            What should I do if I cannot access my account?
+                                        </span>
+
+                                        <span class="faq-toggle"
+                                              aria-hidden="true">
+                                            <i class="fas fa-plus"></i>
+                                        </span>
+
+                                    </button>
+                                </h3>
+
+                                <div class="faq-answer"
+                                     id="faq-trainee-6"
+                                     role="region"
+                                     aria-labelledby="faq-question-trainee-6"
+                                     hidden>
+
+                                    <p>
+                                        Check that you are using the correct
+                                        registered credentials. If you have
+                                        forgotten your password, use the
+                                        available password-recovery option.
+                                        If the issue continues, contact portal
+                                        support and provide a description of
+                                        the problem without sharing your password.
+                                    </p>
+
+                                </div>
+
+                            </article>
+
+                        </div>
+                    </section>
+
+
+                    <!-- =================================================
+                         SECTION 2: ORGANIZATIONS
+                    ================================================== -->
+                    <section class="faq-section scroll-reveal">
+
+                        <div class="faq-section-heading">
+
+                            <div class="faq-heading-icon">
+                                <i class="fas fa-building"></i>
+                            </div>
+
+                            <div class="faq-heading-copy">
+                                <span class="faq-section-label">
+                                    FOR EMPLOYERS
+                                </span>
+
+                                <h2>Organizations</h2>
+
+                                <p>
+                                    Organization registration, posting
+                                    requirements, and trainee selection.
+                                </p>
+                            </div>
+
+                            <span class="faq-count">06 QUESTIONS</span>
+
+                        </div>
+
+
+                        <div class="faq-accordion">
+
+                            <!-- Q1 -->
+                            <article class="faq-item">
+
+                                <h3 class="faq-question-heading">
+                                    <button class="faq-question"
+                                            type="button"
+                                            aria-expanded="false"
+                                            aria-controls="faq-org-1"
+                                            id="faq-question-org-1">
+
+                                        <span class="faq-question-text">
+                                            <span class="faq-question-number">01</span>
+                                            How can an organization register?
+                                        </span>
+
+                                        <span class="faq-toggle"
+                                              aria-hidden="true">
+                                            <i class="fas fa-plus"></i>
+                                        </span>
+
+                                    </button>
+                                </h3>
+
+                                <div class="faq-answer"
+                                     id="faq-org-1"
+                                     role="region"
+                                     aria-labelledby="faq-question-org-1"
+                                     hidden>
+
+                                    <p>
+                                        Open the organization registration
+                                        page and provide the requested
+                                        organization and contact information.
+                                        Review the details for accuracy and
+                                        complete the registration process.
+                                        Once your account is available, sign
+                                        in to access the organization dashboard.
+                                    </p>
+
+                                </div>
+
+                            </article>
+
+
+                            <!-- Q2 -->
+                            <article class="faq-item">
+
+                                <h3 class="faq-question-heading">
+                                    <button class="faq-question"
+                                            type="button"
+                                            aria-expanded="false"
+                                            aria-controls="faq-org-2"
+                                            id="faq-question-org-2">
+
+                                        <span class="faq-question-text">
+                                            <span class="faq-question-number">02</span>
+                                            Can organizations post opportunities for free?
+                                        </span>
+
+                                        <span class="faq-toggle"
+                                              aria-hidden="true">
+                                            <i class="fas fa-plus"></i>
+                                        </span>
+
+                                    </button>
+                                </h3>
+
+                                <div class="faq-answer"
+                                     id="faq-org-2"
+                                     role="region"
+                                     aria-labelledby="faq-question-org-2"
+                                     hidden>
+
+                                    <p>
+                                        Yes. Organizations can post internship,
+                                        fellowship, and trainee requirements
+                                        free of charge through the 1Trainee
+                                        portal. Provide accurate role details
+                                        and clearly describe the qualifications,
+                                        skills, duration, schedule, and conditions
+                                        for the opportunity.
+                                    </p>
+
+                                </div>
+
+                            </article>
+
+
+                            <!-- Q3 -->
+                            <article class="faq-item">
+
+                                <h3 class="faq-question-heading">
+                                    <button class="faq-question"
+                                            type="button"
+                                            aria-expanded="false"
+                                            aria-controls="faq-org-3"
+                                            id="faq-question-org-3">
+
+                                        <span class="faq-question-text">
+                                            <span class="faq-question-number">03</span>
+                                            What types of opportunities can organizations post?
+                                        </span>
+
+                                        <span class="faq-toggle"
+                                              aria-hidden="true">
+                                            <i class="fas fa-plus"></i>
+                                        </span>
+
+                                    </button>
+                                </h3>
+
+                                <div class="faq-answer"
+                                     id="faq-org-3"
+                                     role="region"
+                                     aria-labelledby="faq-question-org-3"
+                                     hidden>
+
+                                    <p>
+                                        Organizations can post relevant
+                                        internship, fellowship, and trainee
+                                        requirements. Each post should explain
+                                        the role, number of openings, required
+                                        qualifications, preferred skills,
+                                        location, working schedule, duration,
+                                        and any applicable compensation
+                                        or other conditions.
+                                    </p>
+
+                                </div>
+
+                            </article>
+
+
+                            <!-- Q4 -->
+                            <article class="faq-item">
+
+                                <h3 class="faq-question-heading">
+                                    <button class="faq-question"
+                                            type="button"
+                                            aria-expanded="false"
+                                            aria-controls="faq-org-4"
+                                            id="faq-question-org-4">
+
+                                        <span class="faq-question-text">
+                                            <span class="faq-question-number">04</span>
+                                            How long does an opportunity remain active?
+                                        </span>
+
+                                        <span class="faq-toggle"
+                                              aria-hidden="true">
+                                            <i class="fas fa-plus"></i>
+                                        </span>
+
+                                    </button>
+                                </h3>
+
+                                <div class="faq-answer"
+                                     id="faq-org-4"
+                                     role="region"
+                                     aria-labelledby="faq-question-org-4"
+                                     hidden>
+
+                                    <p>
+                                        Opportunity posts remain open for
+                                        90 days. Organizations can repost
+                                        their requirements when needed,
+                                        subject to the portal's posting
+                                        process and applicable conditions.
+                                    </p>
+
+                                </div>
+
+                            </article>
+
+
+                            <!-- Q5 -->
+                            <article class="faq-item">
+
+                                <h3 class="faq-question-heading">
+                                    <button class="faq-question"
+                                            type="button"
+                                            aria-expanded="false"
+                                            aria-controls="faq-org-5"
+                                            id="faq-question-org-5">
+
+                                        <span class="faq-question-text">
+                                            <span class="faq-question-number">05</span>
+                                            How can organizations review applicants?
+                                        </span>
+
+                                        <span class="faq-toggle"
+                                              aria-hidden="true">
+                                            <i class="fas fa-plus"></i>
+                                        </span>
+
+                                    </button>
+                                </h3>
+
+                                <div class="faq-answer"
+                                     id="faq-org-5"
+                                     role="region"
+                                     aria-labelledby="faq-question-org-5"
+                                     hidden>
+
+                                    <p>
+                                        Sign in to the organization dashboard
+                                        and open the relevant post or eligible
+                                        trainee section. Review candidate
+                                        profiles and the information provided
+                                        in applications, then follow your
+                                        organization's selection process to
+                                        contact and evaluate suitable candidates.
+                                    </p>
+
+                                </div>
+
+                            </article>
+
+
+                            <!-- Q6 -->
+                            <article class="faq-item">
+
+                                <h3 class="faq-question-heading">
+                                    <button class="faq-question"
+                                            type="button"
+                                            aria-expanded="false"
+                                            aria-controls="faq-org-6"
+                                            id="faq-question-org-6">
+
+                                        <span class="faq-question-text">
+                                            <span class="faq-question-number">06</span>
+                                            Can an organization update or repost a requirement?
+                                        </span>
+
+                                        <span class="faq-toggle"
+                                              aria-hidden="true">
+                                            <i class="fas fa-plus"></i>
+                                        </span>
+
+                                    </button>
+                                </h3>
+
+                                <div class="faq-answer"
+                                     id="faq-org-6"
+                                     role="region"
+                                     aria-labelledby="faq-question-org-6"
+                                     hidden>
+
+                                    <p>
+                                        Organizations should use the options
+                                        available in their dashboard to manage
+                                        posted requirements. Review a post's
+                                        current status before editing or
+                                        reposting it, and ensure that all
+                                        updated role information and
+                                        requirements are accurate.
+                                    </p>
+
+                                </div>
+
+                            </article>
+
+                        </div>
+                    </section>
+
+
+                    <!-- =================================================
+                         SECTION 3: INTERNATIONAL INTERNSHIPS
+                    ================================================== -->
+                    <section class="faq-section scroll-reveal">
+
+                        <div class="faq-section-heading">
+
+                            <div class="faq-heading-icon">
+                                <i class="fas fa-earth-americas"></i>
+                            </div>
+
+                            <div class="faq-heading-copy">
+                                <span class="faq-section-label">
+                                    GLOBAL OPPORTUNITIES
+                                </span>
+
+                                <h2>International Internships</h2>
+
+                                <p>
+                                    Eligibility, preparation, travel,
+                                    and international experience.
+                                </p>
+                            </div>
+
+                            <span class="faq-count">05 QUESTIONS</span>
+
+                        </div>
+
+
+                        <div class="faq-accordion">
+
+                            <!-- Q1 -->
+                            <article class="faq-item">
+
+                                <h3 class="faq-question-heading">
+                                    <button class="faq-question"
+                                            type="button"
+                                            aria-expanded="false"
+                                            aria-controls="faq-global-1"
+                                            id="faq-question-global-1">
+
+                                        <span class="faq-question-text">
+                                            <span class="faq-question-number">01</span>
+                                            What are international internships?
+                                        </span>
+
+                                        <span class="faq-toggle"
+                                              aria-hidden="true">
+                                            <i class="fas fa-plus"></i>
+                                        </span>
+
+                                    </button>
+                                </h3>
+
+                                <div class="faq-answer"
+                                     id="faq-global-1"
+                                     role="region"
+                                     aria-labelledby="faq-question-global-1"
+                                     hidden>
+
+                                    <p>
+                                        International internships provide
+                                        opportunities to gain professional
+                                        exposure with organizations operating
+                                        in another country. Depending on the
+                                        role, they may help trainees develop
+                                        practical skills, understand different
+                                        work environments, and build a broader
+                                        professional perspective.
+                                    </p>
+
+                                </div>
+
+                            </article>
+
+
+                            <!-- Q2 -->
+                            <article class="faq-item">
+
+                                <h3 class="faq-question-heading">
+                                    <button class="faq-question"
+                                            type="button"
+                                            aria-expanded="false"
+                                            aria-controls="faq-global-2"
+                                            id="faq-question-global-2">
+
+                                        <span class="faq-question-text">
+                                            <span class="faq-question-number">02</span>
+                                            What should I check before applying?
+                                        </span>
+
+                                        <span class="faq-toggle"
+                                              aria-hidden="true">
+                                            <i class="fas fa-plus"></i>
+                                        </span>
+
+                                    </button>
+                                </h3>
+
+                                <div class="faq-answer"
+                                     id="faq-global-2"
+                                     role="region"
+                                     aria-labelledby="faq-question-global-2"
+                                     hidden>
+
+                                    <p>
+                                        Carefully review the opportunity
+                                        details before submitting an
+                                        application. Check the following:
+                                    </p>
+
+                                    <ul class="faq-list">
+                                        <li>
+                                            <strong>Eligibility:</strong>
+                                            Required education, qualifications,
+                                            experience, and skills.
+                                        </li>
+
+                                        <li>
+                                            <strong>Location:</strong>
+                                            Country, city, work arrangement,
+                                            and relocation expectations.
+                                        </li>
+
+                                        <li>
+                                            <strong>Duration:</strong>
+                                            Start date, end date, working
+                                            hours, and schedule.
+                                        </li>
+
+                                        <li>
+                                            <strong>Financial conditions:</strong>
+                                            Compensation, charges, living
+                                            expenses, and other costs.
+                                        </li>
+
+                                        <li>
+                                            <strong>Travel requirements:</strong>
+                                            Visa, work authorization, travel,
+                                            and insurance requirements, where
+                                            applicable.
+                                        </li>
+                                    </ul>
+
+                                </div>
+
+                            </article>
+
+
+                            <!-- Q3 -->
+                            <article class="faq-item">
+
+                                <h3 class="faq-question-heading">
+                                    <button class="faq-question"
+                                            type="button"
+                                            aria-expanded="false"
+                                            aria-controls="faq-global-3"
+                                            id="faq-question-global-3">
+
+                                        <span class="faq-question-text">
+                                            <span class="faq-question-number">03</span>
+                                            How can I prepare for an international opportunity?
+                                        </span>
+
+                                        <span class="faq-toggle"
+                                              aria-hidden="true">
+                                            <i class="fas fa-plus"></i>
+                                        </span>
+
+                                    </button>
+                                </h3>
+
+                                <div class="faq-answer"
+                                     id="faq-global-3"
+                                     role="region"
+                                     aria-labelledby="faq-question-global-3"
+                                     hidden>
+
+                                    <p>
+                                        Keep your profile and resume updated,
+                                        prepare a clear summary of your
+                                        relevant skills, and collect any
+                                        documents requested by the organization.
+                                        Research the destination and review
+                                        eligibility, costs, travel requirements,
+                                        and the opportunity's terms before
+                                        making a commitment.
+                                    </p>
+
+                                </div>
+
+                            </article>
+
+
+                            <!-- Q4 -->
+                            <article class="faq-item">
+
+                                <h3 class="faq-question-heading">
+                                    <button class="faq-question"
+                                            type="button"
+                                            aria-expanded="false"
+                                            aria-controls="faq-global-4"
+                                            id="faq-question-global-4">
+
+                                        <span class="faq-question-text">
+                                            <span class="faq-question-number">04</span>
+                                            Are visa and travel arrangements included?
+                                        </span>
+
+                                        <span class="faq-toggle"
+                                              aria-hidden="true">
+                                            <i class="fas fa-plus"></i>
+                                        </span>
+
+                                    </button>
+                                </h3>
+
+                                <div class="faq-answer"
+                                     id="faq-global-4"
+                                     role="region"
+                                     aria-labelledby="faq-question-global-4"
+                                     hidden>
+
+                                    <p>
+                                        Visa, travel, accommodation, insurance,
+                                        and relocation arrangements depend on
+                                        the specific opportunity and the
+                                        organization. Do not assume these
+                                        expenses are included. Confirm the
+                                        details directly with the organization
+                                        and check the applicable official
+                                        immigration requirements before
+                                        travelling.
+                                    </p>
+
+                                </div>
+
+                            </article>
+
+
+                            <!-- Q5 -->
+                            <article class="faq-item">
+
+                                <h3 class="faq-question-heading">
+                                    <button class="faq-question"
+                                            type="button"
+                                            aria-expanded="false"
+                                            aria-controls="faq-global-5"
+                                            id="faq-question-global-5">
+
+                                        <span class="faq-question-text">
+                                            <span class="faq-question-number">05</span>
+                                            How can I verify an opportunity before accepting it?
+                                        </span>
+
+                                        <span class="faq-toggle"
+                                              aria-hidden="true">
+                                            <i class="fas fa-plus"></i>
+                                        </span>
+
+                                    </button>
+                                </h3>
+
+                                <div class="faq-answer"
+                                     id="faq-global-5"
+                                     role="region"
+                                     aria-labelledby="faq-question-global-5"
+                                     hidden>
+
+                                    <p>
+                                        Review the organization's identity,
+                                        role description, contact information,
+                                        selection process, and written terms.
+                                        Ask for clarification about any
+                                        compensation, fees, travel, or
+                                        accommodation arrangements. Avoid
+                                        sharing sensitive information or
+                                        making payments until you have
+                                        independently verified the legitimacy
+                                        of the opportunity.
+                                    </p>
+
+                                </div>
+
+                            </article>
+
+                        </div>
+                    </section>
+
+
+                    <!-- CLOSING SUPPORT CARD -->
+                    <section class="faq-support-card scroll-reveal">
+
+                        <div class="faq-support-icon">
+                            <i class="fas fa-headset"></i>
+                        </div>
+
+                        <div class="faq-support-copy">
+                            <span class="faq-section-label">
+                                STILL NEED HELP?
+                            </span>
+
+                            <h2>We are here to help</h2>
+
+                            <p>
+                                If your question is not covered here,
+                                contact the portal team for further
+                                assistance with your account or
+                                opportunity-related queries.
+                            </p>
+                        </div>
+
+                        <a asp-controller="Home"
+                           asp-action="Contact"
+                           class="faq-support-button">
+                            Contact Us
+                            <i class="fas fa-arrow-right"></i>
+                        </a>
+
+                    </section>
+
+                </main>
+
+
+                <!-- RIGHT SIDEBAR -->
+                <aside class="faq-right-content"
+                       aria-label="Career resources">
 
                     <div class="faq-sticky">
 
-                        <!-- IMAGE 1 -->
+                        <!-- IMAGE CARD 1 -->
                         <div class="faq-image-box scroll-right">
 
-                            <img src="~/img/5.jpg"
-                                 alt="Internship Information"
-                                 loading="lazy">
+                            <div class="faq-side-image">
+
+                                <img src="~/img/5.jpg"
+                                     alt="Students exploring career opportunities"
+                                     loading="lazy" />
+
+                                <div class="faq-image-overlay"></div>
+
+                                <div class="faq-image-caption">
+                                    <span>YOUR FUTURE STARTS HERE</span>
+                                    <h3>Discover Your Potential</h3>
+                                </div>
+
+                            </div>
 
                         </div>
 
@@ -672,137 +1045,241 @@
                         <!-- IMPORTANT INFORMATION -->
                         <div class="faq-important-box scroll-right">
 
-                            <div class="faq-important-content">
+                            <div class="faq-sidebar-title">
 
-                                <h2>
-                                    Important Information
-                                </h2>
+                                <span class="faq-sidebar-icon">
+                                    <i class="fas fa-circle-info"></i>
+                                </span>
 
-                                <p>
-                                    Stay updated on the latest internship
-                                    opportunities, interview tips and
-                                    career resources!
-                                </p>
+                                <h3>Important Information</h3>
 
                             </div>
+
+                            <p>
+                                Review eligibility, requirements, duration,
+                                location, and other conditions before applying
+                                for any opportunity.
+                            </p>
+
+                            <a asp-controller="Home"
+                               asp-action="Contact"
+                               class="faq-sidebar-link">
+
+                                Need assistance?
+                                <i class="fas fa-arrow-right"></i>
+
+                            </a>
 
                         </div>
 
 
-                        <!-- IMAGE 2 -->
+                        <!-- IMAGE CARD 2 -->
                         <div class="faq-image-box scroll-right">
 
-                            <img src="~/img/2 (1).jpg"
-                                 alt="Career Information"
-                                 loading="lazy">
+                            <div class="faq-side-image">
 
-                        </div>
+                                <img src="~/img/2 (1).jpg"
+                                     alt="Career development and learning"
+                                     loading="lazy" />
 
+                                <div class="faq-image-overlay"></div>
 
-                        <!-- IMPORTANT INFORMATION -->
-                        <div class="faq-important-box scroll-right">
-
-                            <div class="faq-important-content">
-
-                                <h2>
-                                    Internship Resources
-                                </h2>
-
-                                <p>
-                                    Explore opportunities and prepare
-                                    yourself for your next career step.
-                                </p>
+                                <div class="faq-image-caption">
+                                    <span>LEARN AND GROW</span>
+                                    <h3>Build Your Career</h3>
+                                </div>
 
                             </div>
 
                         </div>
 
 
-                        <!-- IMAGE 3 -->
-                        <div class="faq-image-box scroll-right">
+                        <!-- INTERNSHIP RESOURCES -->
+                        <div class="faq-important-box scroll-right">
 
-                            <img src="~/img/2 (1).jpg"
-                                 alt="Career Resources"
-                                 loading="lazy">
+                            <div class="faq-sidebar-title">
+
+                                <span class="faq-sidebar-icon">
+                                    <i class="fas fa-book-open"></i>
+                                </span>
+
+                                <h3>Internship Resources</h3>
+
+                            </div>
+
+                            <p>
+                                Explore opportunities and keep your candidate
+                                profile, skills, education, and resume updated.
+                            </p>
+
+                            <a asp-controller="Home"
+                               asp-action="Index"
+                               class="faq-sidebar-link">
+
+                                Explore 1Trainee
+                                <i class="fas fa-arrow-right"></i>
+
+                            </a>
 
                         </div>
 
 
-                        <!-- IMPORTANT INFORMATION -->
+                        <!-- CAREER HIGHLIGHT -->
+                        <div class="faq-career-highlight scroll-right">
+
+                            <span class="faq-highlight-icon">
+                                <i class="fas fa-briefcase"></i>
+                            </span>
+
+                            <span class="faq-highlight-label">
+                                TAKE THE NEXT STEP
+                            </span>
+
+                            <h3>Your Career Journey Matters</h3>
+
+                            <p>
+                                Discover opportunities to learn, grow,
+                                and gain practical experience.
+                            </p>
+
+                        </div>
+
+
+                        <!-- CAREER SUPPORT -->
                         <div class="faq-important-box scroll-right">
 
-                            <div class="faq-important-content">
+                            <div class="faq-sidebar-title">
 
-                                <h2>
-                                    Career Support
-                                </h2>
+                                <span class="faq-sidebar-icon">
+                                    <i class="fas fa-headset"></i>
+                                </span>
 
-                                <p>
-                                    Build your profile, improve your resume
-                                    and discover suitable opportunities.
-                                </p>
+                                <h3>Career Support</h3>
 
                             </div>
+
+                            <p>
+                                Need help with your account or an opportunity?
+                                Contact the portal team for guidance.
+                            </p>
+
+                            <a asp-controller="Home"
+                               asp-action="Contact"
+                               class="faq-sidebar-link">
+
+                                Contact Support
+                                <i class="fas fa-arrow-right"></i>
+
+                            </a>
 
                         </div>
 
                     </div>
 
-                </div>
+                </aside>
 
             </div>
-
         </div>
 
     </section>
 
-
-    <!-- =====================================================
-         BACK TO TOP
-         ===================================================== -->
-    <a href="#"
-       class="faq-back-to-top">
-
-        <i class="fa fa-angle-double-up"></i>
-
-    </a>
-
 </div>
 
-                                <!-- =========================================================
-     FAQ SCROLL REVEAL SCRIPT
-     ========================================================= -->
+
+<!-- ACCORDION + SCROLL REVEAL -->
 <script>
     document.addEventListener("DOMContentLoaded", function () {
 
-        const revealElements = document.querySelectorAll(
-            ".faq-page .scroll-reveal, " +
-            ".faq-page .scroll-right"
-        );
+        const faqPage = document.querySelector(".faq-page");
 
-        const observer = new IntersectionObserver(
-            function (entries) {
+        if (!faqPage) {
+            return;
+        }
 
-                entries.forEach(function (entry) {
+        /* =========================================
+           FAQ ACCORDION
+           Allows multiple answers to remain open.
+        ========================================= */
+        const faqQuestions = faqPage.querySelectorAll(".faq-question");
 
-                    if (entry.isIntersecting) {
-                        entry.target.classList.add("show");
-                    } 
-                    else {
-                        entry.target.classList.remove("show");
-                    }
+        faqQuestions.forEach(function (button) {
 
-                });
+            button.addEventListener("click", function () {
 
-            },
-            {
-                threshold: 0.15
-            }
-        );
+                const answerId = button.getAttribute("aria-controls");
+                const answer = document.getElementById(answerId);
+                const isExpanded =
+                    button.getAttribute("aria-expanded") === "true";
 
-        revealElements.forEach(function (element) {
-            observer.observe(element);
+                if (!answer) {
+                    return;
+                }
+
+                button.setAttribute(
+                    "aria-expanded",
+                    String(!isExpanded)
+                );
+
+                answer.hidden = isExpanded;
+
+                const icon = button.querySelector(".faq-toggle i");
+
+                if (icon) {
+                    icon.classList.toggle("fa-plus", isExpanded);
+                    icon.classList.toggle("fa-minus", !isExpanded);
+                }
+
+                const faqItem = button.closest(".faq-item");
+
+                if (faqItem) {
+                    faqItem.classList.toggle("is-open", !isExpanded);
+                }
+
+            });
+
         });
+
+
+        /* =========================================
+           SCROLL REVEAL
+        ========================================= */
+        const revealElements = faqPage.querySelectorAll(
+            ".scroll-reveal, .scroll-right"
+        );
+
+        if ("IntersectionObserver" in window) {
+
+            const observer = new IntersectionObserver(
+                function (entries) {
+
+                    entries.forEach(function (entry) {
+
+                        if (entry.isIntersecting) {
+                            entry.target.classList.add("show");
+                        } else {
+                            entry.target.classList.remove("show");
+                        }
+
+                    });
+
+                },
+                {
+                    threshold: 0.08,
+                    rootMargin: "0px 0px -25px 0px"
+                }
+            );
+
+            revealElements.forEach(function (element) {
+                observer.observe(element);
+            });
+
+        } else {
+
+            revealElements.forEach(function (element) {
+                element.classList.add("show");
+            });
+
+        }
 
     });
 </script>

@@ -1,10 +1,10 @@
+
 using ErJobPortal.Repositories;
 using ErJobPortal.Data;
 using ErJobPortal.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
 // MVC
 builder.Services.AddControllersWithViews();
 
@@ -33,6 +33,19 @@ builder.Services.AddSession(options =>
 });
 
 builder.Services.AddHttpContextAccessor();
+
+// Services
+builder.Services.AddScoped<EmailService>();
+builder.Services.AddScoped<VisitorTrackingService>();
+
+// Database
+builder.Services.AddScoped<DbConnection>();
+
+// Repositories
+builder.Services.AddScoped<AccountRepository>();
+builder.Services.AddScoped<CandidateProfileRepository>();
+builder.Services.AddScoped<OrgQuestionBankRepository>();
+builder.Services.AddScoped<TPOSchedulerRepository>();
 
 var app = builder.Build();
 

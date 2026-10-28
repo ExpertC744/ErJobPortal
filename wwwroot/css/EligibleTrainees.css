@@ -1,0 +1,120 @@
+﻿ 
+/* =========================================================
+   UPDATE STATUS BUTTON
+========================================================= */
+.master-action-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 90px;
+    height: 38px;
+    padding: 8px 18px;
+    background: #0d9488;
+    color: #ffffff;
+    border: 1px solid #0d9488;
+    border-radius: 6px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.master-action-btn:hover {
+    background: #0f766e;
+    border-color: #0f766e;
+    color: #ffffff;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 10px rgba(15, 118, 110, 0.18);
+}
+
+.master-action-btn:active {
+    background: #115e59;
+    border-color: #115e59;
+    transform: translateY(0);
+}
+
+.master-action-btn:focus {
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(13, 148, 136, 0.18);
+}
+
+/* =========================================================
+   FINAL RESULT & COMMENT SPACING
+========================================================= */
+
+.final-result-select,
+.comment-select {
+    min-width: 190px;
+    height: 40px;
+    padding: 7px 12px;
+    border: 1px solid #d1d5db;
+    border-radius: 6px;
+    font-size: 13px;
+    color: #334155;
+    background: #ffffff;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.final-result-select {
+    margin-right: 12px;
+}
+
+.comment-select {
+    margin-left: 4px;
+}
+
+    .final-result-select:focus,
+    .comment-select:focus {
+        border-color: #0d9488;
+        box-shadow: 0 0 0 3px rgba(13, 148, 136, 0.12);
+        outline: none;
+    }
+
+/* =========================================================
+   ELIGIBLE TRAINEES PAGE HEADER
+========================================================= */
+
+.eligible-page-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 30px;
+    margin-bottom: 24px;
+}
+
+    .eligible-page-header > div {
+        flex: 1;
+    }
+
+    .eligible-page-header h1 {
+        margin: 0;
+    }
+
+    .eligible-page-header p {
+        margin: 6px 0 0;
+    }
+
+/* Back Icon */
+.master-back-btn {
+    flex-shrink: 0;
+    width: 42px;
+    height: 42px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    margin-left: 30px;
+    background: #0d9488;
+    color: #ffffff;
+    border-radius: 7px;
+    text-decoration: none;
+    transition: all 0.2s ease;
+}
+
+    .master-back-btn:hover {
+        background: #0f766e;
+        color: #ffffff;
+        transform: translateX(-2px);
+        box-shadow: 0 4px 10px rgba(15, 118, 110, 0.18);
+    }
+
+ 

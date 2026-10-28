@@ -1,0 +1,704 @@
+﻿
+@model ErJobPortal.Models.EditTPORegistrationM
+
+@{
+    ViewData["Title"] = "Edit TPO Registration";
+    ViewData["Panel"] = "TPO";
+    ViewData["UserName"] =
+        Context.Session.GetString("TPOName") ?? "TPO";
+
+    Layout = "~/Views/Shared/_DashboardLayout.cshtml";
+}
+
+<link rel="stylesheet"
+      href="~/css/TPORegister.css"
+      asp-append-version="true" />
+
+<style>
+    .edit-tpo-actions {
+        display: flex;
+        gap: 15px;
+        margin-top: 25px;
+        flex-wrap: wrap;
+    }
+
+    .edit-tpo-actions .register-main-btn {
+        flex: 1;
+        min-width: 180px;
+    }
+
+    .edit-tpo-back-btn {
+        display: inline-flex;
+        justify-content: center;
+        align-items: center;
+        gap: 8px;
+        padding: 13px 25px;
+        border-radius: 8px;
+        background: #e5e7eb;
+        color: #374151;
+        text-decoration: none;
+        font-weight: 600;
+    }
+
+    .edit-tpo-back-btn:hover {
+        background: #d1d5db;
+        color: #111827;
+    }
+
+    .edit-tpo-file-info {
+        margin-top: 8px;
+        font-size: 13px;
+    }
+
+    .edit-tpo-file-info a {
+        color: #2563eb;
+        text-decoration: none;
+        font-weight: 600;
+    }
+
+    .edit-tpo-file-info a:hover {
+        text-decoration: underline;
+    }
+
+    .edit-tpo-notice {
+        margin-top: 20px;
+    }
+
+    .edit-tpo-photo {
+        width: 95px;
+        height: 95px;
+        object-fit: cover;
+        border-radius: 12px;
+        border: 2px solid #e5e7eb;
+        margin-top: 10px;
+    }
+</style>
+
+<div class="candidate-register-page">
+
+    <div class="candidate-register-card">
+
+        <!-- HEADER -->
+
+        <div class="register-icon">
+            <i class="fa-solid fa-user-pen"></i>
+        </div>
+
+        <div class="register-heading">
+            <h2>Edit TPO Registration</h2>
+            <p>Update your personal and college information</p>
+        </div>
+
+        <!-- SUCCESS MESSAGE -->
+
+        @if (TempData["Success"] != null)
+        {
+            <div class="alert alert-success register-alert">
+                @TempData["Success"]
+            </div>
+        }
+
+        @if (TempData["Error"] != null)
+        {
+            <div class="alert alert-danger register-alert">
+                @TempData["Error"]
+            </div>
+        }
+
+        <!-- EDIT FORM -->
+
+        <form asp-controller="TPO"
+              asp-action="EditTPORegistration"
+              method="post"
+              enctype="multipart/form-data"
+              id="editTPOForm">
+
+            @Html.AntiForgeryToken()
+
+            <div asp-validation-summary="All"
+                 class="text-danger register-summary">
+            </div>
+
+            <!-- FULL NAME / MOBILE -->
+
+            <div class="register-form-row">
+
+                <div class="register-form-group">
+
+                    <label asp-for="FullName"
+                           class="register-label">
+                        Full Name
+                    </label>
+
+                    <input asp-for="FullName"
+                           class="register-input"
+                           placeholder="Enter full name" />
+
+                    <span asp-validation-for="FullName"
+                          class="text-danger register-validation">
+                    </span>
+
+                </div>
+
+                <div class="register-form-group">
+
+                    <label asp-for="MobileNo"
+                           class="register-label">
+                        Mobile Number
+                    </label>
+
+                    <input asp-for="MobileNo"
+                           type="tel"
+                           maxlength="10"
+                           inputmode="numeric"
+                           class="register-input"
+                           placeholder="Enter mobile number" />
+
+                    <span asp-validation-for="MobileNo"
+                          class="text-danger register-validation">
+                    </span>
+
+                </div>
+
+            </div>
+
+            <!-- EMAIL / EMPLOYEE ID -->
+
+            <div class="register-form-row">
+
+                <div class="register-form-group">
+
+                    <label asp-for="CollegeMailID"
+                           class="register-label">
+                        College Mail ID
+                    </label>
+
+                    <input asp-for="CollegeMailID"
+                           type="email"
+                           class="register-input"
+                           placeholder="Enter college email" />
+
+                    <span asp-validation-for="CollegeMailID"
+                          class="text-danger register-validation">
+                    </span>
+
+                </div>
+
+                <div class="register-form-group">
+
+                    <label asp-for="CollegeEmployeeID"
+                           class="register-label">
+                        College Employee ID
+                    </label>
+
+                    <input asp-for="CollegeEmployeeID"
+                           class="register-input"
+                           placeholder="Enter employee ID" />
+
+                    <span asp-validation-for="CollegeEmployeeID"
+                          class="text-danger register-validation">
+                    </span>
+
+                </div>
+
+            </div>
+
+            <!-- COLLEGE NAME / COLLEGE CODE -->
+
+            <div class="register-form-row">
+
+                <div class="register-form-group">
+
+                    <label asp-for="CollegeName"
+                           class="register-label">
+                        College Name
+                    </label>
+
+                    <select asp-for="CollegeName"
+                            id="CollegeName"
+                            class="register-select">
+
+                        <option value="">
+                            -- Select College Name --
+                        </option>
+
+                    </select>
+
+                    <span asp-validation-for="CollegeName"
+                          class="text-danger register-validation">
+                    </span>
+
+                </div>
+
+                <div class="register-form-group">
+
+                    <label asp-for="CollegeCode"
+                           class="register-label">
+                        College Code
+                    </label>
+
+                    <select asp-for="CollegeCode"
+                            id="CollegeCode"
+                            class="register-select">
+
+                        <option value="">
+                            -- Select College Code --
+                        </option>
+
+                    </select>
+
+                    <span asp-validation-for="CollegeCode"
+                          class="text-danger register-validation">
+                    </span>
+
+                </div>
+
+            </div>
+
+            <!-- DESIGNATION / DEPARTMENT -->
+
+            <div class="register-form-row">
+
+                <div class="register-form-group">
+
+                    <label asp-for="Designation"
+                           class="register-label">
+                        Designation
+                    </label>
+
+                    <input asp-for="Designation"
+                           class="register-input"
+                           placeholder="Enter designation" />
+
+                    <span asp-validation-for="Designation"
+                          class="text-danger register-validation">
+                    </span>
+
+                </div>
+
+                <div class="register-form-group">
+
+                    <label asp-for="nDepartment"
+                           class="register-label">
+                        Department
+                    </label>
+
+                    <select asp-for="nDepartment"
+                            id="departmentSelect"
+                            class="register-select">
+
+                        <option value="">
+                            -- Select Department --
+                        </option>
+
+                    </select>
+
+                    <span asp-validation-for="nDepartment"
+                          class="text-danger register-validation">
+                    </span>
+
+                </div>
+
+            </div>
+
+            <!-- WEBSITE -->
+
+            <div class="register-form-row">
+
+                <div class="register-form-group">
+
+                    <label asp-for="OrganizationWebsiteURL"
+                           class="register-label">
+                        College Website URL
+                    </label>
+
+                    <input asp-for="OrganizationWebsiteURL"
+                           type="url"
+                           class="register-input"
+                           placeholder="https://www.examplecollege.ac.in" />
+
+                    <span asp-validation-for="OrganizationWebsiteURL"
+                          class="text-danger register-validation">
+                    </span>
+
+                </div>
+
+            </div>
+
+            <!-- COLLEGE ADDRESS -->
+
+            <div class="register-form-row full">
+
+                <div class="register-form-group">
+
+                    <label asp-for="CollegeAddress"
+                           class="register-label">
+                        College Address
+                    </label>
+
+                    <textarea asp-for="CollegeAddress"
+                              class="register-input"
+                              rows="3"
+                              placeholder="Enter college address"></textarea>
+
+                    <span asp-validation-for="CollegeAddress"
+                          class="text-danger register-validation">
+                    </span>
+
+                </div>
+
+            </div>
+
+            <!-- SUPPORTING DOCUMENTS -->
+
+            <div class="register-form-row">
+
+                <div class="register-form-group">
+
+                    <label asp-for="SupportingDocument1File"
+                           class="register-label">
+                        Change Supporting Document 1
+                    </label>
+
+                    <input asp-for="SupportingDocument1File"
+                           type="file"
+                           accept=".pdf,.jpg,.jpeg,.png"
+                           class="register-input register-file" />
+
+                    <span asp-validation-for="SupportingDocument1File"
+                          class="text-danger register-validation">
+                    </span>
+
+                    @if (!string.IsNullOrWhiteSpace(
+                        Model?.SupportingDocument1))
+                    {
+                        <div class="edit-tpo-file-info">
+
+                            <a href="@Url.Content("~/Uploads/TPO/" +
+                                System.IO.Path.GetFileName(
+                                    Model.SupportingDocument1))"
+                               target="_blank"
+                               rel="noopener noreferrer">
+
+                                <i class="fa-solid fa-file"></i>
+                                View Existing Document 1
+
+                            </a>
+
+                        </div>
+                    }
+
+                </div>
+
+                <div class="register-form-group">
+
+                    <label asp-for="SupportingDocument2File"
+                           class="register-label">
+                        Change Supporting Document 2
+                    </label>
+
+                    <input asp-for="SupportingDocument2File"
+                           type="file"
+                           accept=".pdf,.jpg,.jpeg,.png"
+                           class="register-input register-file" />
+
+                    <span asp-validation-for="SupportingDocument2File"
+                          class="text-danger register-validation">
+                    </span>
+
+                    @if (!string.IsNullOrWhiteSpace(
+                        Model?.SupportingDocument2))
+                    {
+                        <div class="edit-tpo-file-info">
+
+                            <a href="@Url.Content("~/Uploads/TPO/" +
+                                System.IO.Path.GetFileName(
+                                    Model.SupportingDocument2))"
+                               target="_blank"
+                               rel="noopener noreferrer">
+
+                                <i class="fa-solid fa-file"></i>
+                                View Existing Document 2
+
+                            </a>
+
+                        </div>
+                    }
+
+                </div>
+
+            </div>
+
+            <!-- PROFILE PHOTO -->
+
+            <div class="register-form-row">
+
+                <div class="register-form-group">
+
+                    <label asp-for="ProfilePhotoFile"
+                           class="register-label">
+                        Change Profile Photo
+                    </label>
+
+                    <input asp-for="ProfilePhotoFile"
+                           type="file"
+                           accept=".jpg,.jpeg,.png"
+                           class="register-input register-file" />
+
+                    <span asp-validation-for="ProfilePhotoFile"
+                          class="text-danger register-validation">
+                    </span>
+
+                    @if (!string.IsNullOrWhiteSpace(
+                        Model?.ProfilePhoto))
+                    {
+                        <div>
+
+                            <img class="edit-tpo-photo"
+                                 src="@Url.Content("~/Uploads/TPO/" +
+                                     System.IO.Path.GetFileName(
+                                         Model.ProfilePhoto))"
+                                 alt="Current TPO profile photo" />
+
+                        </div>
+                    }
+
+                </div>
+
+            </div>
+
+            <!-- INFORMATION NOTICE -->
+
+            <div class="alert alert-info edit-tpo-notice">
+
+                <i class="fa-solid fa-circle-info"></i>
+
+                Leave file inputs empty to keep your existing
+                documents and profile photo.
+
+                Password and approval details cannot be changed
+                from this page.
+
+            </div>
+
+            <!-- BUTTONS -->
+
+            <div class="edit-tpo-actions">
+
+                <button type="submit"
+                        class="register-main-btn">
+
+                    <i class="fa-solid fa-floppy-disk"></i>
+                    Update Profile
+
+                </button>
+
+                <button type="button"
+                        id="resetTPOChanges"
+                        class="edit-tpo-back-btn">
+
+                    <i class="fa-solid fa-rotate-left"></i>
+                    Reset Changes
+
+                </button>
+
+                <a asp-controller="TPO"
+                   asp-action="Dashboard"
+                   class="edit-tpo-back-btn">
+
+                    <i class="fa-solid fa-arrow-left"></i>
+                    Back
+
+                </a>
+
+            </div>
+
+        </form>
+
+    </div>
+
+</div>
+
+@section Scripts {
+
+    @{
+        await Html.RenderPartialAsync(
+            "_ValidationScriptsPartial");
+    }
+
+    <script>
+
+        $(function () {
+
+            // ============================================
+            // DROPDOWN REFERENCES
+            // ============================================
+
+            const collegeSelect = $('#CollegeName');
+            const codeSelect = $('#CollegeCode');
+            const departmentSelect = $('#departmentSelect');
+
+            // Saved values from database model.
+
+            const savedCollege =
+                @Html.Raw(System.Text.Json.JsonSerializer.Serialize(
+                    Model?.CollegeName));
+
+            const savedCollegeCode =
+                @Html.Raw(System.Text.Json.JsonSerializer.Serialize(
+                    Model?.CollegeCode));
+
+            const savedDepartment =
+                @Html.Raw(System.Text.Json.JsonSerializer.Serialize(
+                    Model?.nDepartment));
+
+
+            // ============================================
+            // LOAD COLLEGE CODES
+            // ============================================
+
+            function loadCollegeCodes(collegeId, selectedCode) {
+
+                codeSelect.empty().append(
+                    new Option('-- Select College Code --', '')
+                );
+
+                if (!collegeId || collegeId === '0') {
+                    return;
+                }
+
+                $.getJSON(
+                    '@Url.Action("GetCollegeCodes", "Account")',
+                    { collegeId: collegeId }
+                )
+                .done(function (data) {
+
+                    $.each(data || [], function (_, item) {
+
+                        codeSelect.append(
+                            new Option(item.nCode, item.nCode)
+                        );
+
+                    });
+
+                    if (selectedCode !== null &&
+                        selectedCode !== undefined) {
+
+                        codeSelect.val(String(selectedCode));
+                    }
+
+                })
+                .fail(function () {
+                    console.error('Unable to load college codes.');
+                });
+            }
+
+
+            // ============================================
+            // LOAD COLLEGES AND RESTORE SELECTION
+            // ============================================
+
+            $.getJSON(
+                '@Url.Action("GetColleges", "Account")'
+            )
+            .done(function (data) {
+
+                collegeSelect.empty().append(
+                    new Option('-- Select College Name --', '')
+                );
+
+                $.each(data || [], function (_, item) {
+
+                    collegeSelect.append(
+                        new Option(item.sCollegeName, item.nID)
+                    );
+
+                });
+
+                if (savedCollege !== null &&
+                    savedCollege !== undefined) {
+
+                    collegeSelect.val(String(savedCollege));
+                }
+
+                loadCollegeCodes(
+                    collegeSelect.val(),
+                    savedCollegeCode
+                );
+
+            })
+            .fail(function () {
+                console.error('Unable to load colleges.');
+            });
+
+
+            collegeSelect.on('change', function () {
+
+                loadCollegeCodes(this.value, null);
+
+            });
+
+
+            // ============================================
+            // LOAD DEPARTMENTS AND RESTORE SELECTION
+            // ============================================
+
+            $.getJSON(
+                '@Url.Action("GetDepartments", "Account")'
+            )
+            .done(function (data) {
+
+                departmentSelect.empty().append(
+                    new Option('-- Select Department --', '')
+                );
+
+                $.each(data || [], function (_, item) {
+
+                    departmentSelect.append(
+                        new Option(item.sDepartment, item.nID)
+                    );
+
+                });
+
+                if (savedDepartment !== null &&
+                    savedDepartment !== undefined) {
+
+                    departmentSelect.val(
+                        String(savedDepartment)
+                    );
+                }
+
+            })
+            .fail(function () {
+                console.error('Unable to load departments.');
+            });
+
+
+            // ============================================
+            // MOBILE NUMBER: DIGITS ONLY
+            // ============================================
+
+            $('input[name="MobileNo"]').on('input', function () {
+
+                this.value = this.value
+                    .replace(/\D/g, '')
+                    .substring(0, 10);
+
+            });
+
+
+            // ============================================
+            // RESET TO SAVED DATABASE VALUES
+            // ============================================
+
+            $('#resetTPOChanges').on('click', function () {
+
+                window.location.href =
+                    '@Url.Action("EditTPORegistration", "TPO")';
+
+            });
+
+        });
+
+    </script>
+}

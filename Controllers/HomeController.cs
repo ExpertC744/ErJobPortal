@@ -4,6 +4,7 @@ using ErJobPortal.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Configuration;
+using System.Data;
 using System.Diagnostics;
 
 namespace ErJobPortal.Controllers
@@ -28,16 +29,24 @@ namespace ErJobPortal.Controllers
         }
 
 
+
         //public IActionResult Index()
         //{
         //    List<HomeTraineeCardM> trainees = new List<HomeTraineeCardM>();
+        //    List<HomeFeedbackCardM> feedbacks = new List<HomeFeedbackCardM>();
 
         //    string connectionString =
         //        _configuration.GetConnectionString("DefaultConnection");
 
         //    using (SqlConnection cn = new SqlConnection(connectionString))
         //    {
-        //        string query = @"
+        //        cn.Open();
+
+        //        // ============================================================
+        //        // TRAINEE LIST
+        //        // ============================================================
+
+        //        string traineeQuery = @"
         //    SELECT 
         //        CR.nID AS CandidateID,
 
@@ -73,10 +82,9 @@ namespace ErJobPortal.Controllers
 
         //    ORDER BY CR.nID DESC";
 
-        //        using (SqlCommand cmd = new SqlCommand(query, cn))
-        //        {
-        //            cn.Open();
 
+        //        using (SqlCommand cmd = new SqlCommand(traineeQuery, cn))
+        //        {
         //            using (SqlDataReader dr = cmd.ExecuteReader())
         //            {
         //                while (dr.Read())
@@ -101,10 +109,106 @@ namespace ErJobPortal.Controllers
         //                }
         //            }
         //        }
+
+
+        //        // ============================================================
+        //        // CANDIDATE FEEDBACK
+        //        // ============================================================
+
+        //        string feedbackQuery = @"
+        //    SELECT
+        //        CF.nAdminID AS CandidateID,
+
+        //        LTRIM(RTRIM(
+        //            ISNULL(CR.sFName, '') + ' ' +
+        //            ISNULL(CR.sLName, '')
+        //        )) AS TraineeName,
+
+        //        CP.sPhoto AS ProfileImage,
+
+        //        '' AS Designation,
+
+        //        LTRIM(RTRIM(
+        //            ISNULL(CP.Preferred_City, '') +
+        //            CASE
+        //                WHEN CP.Preferred_City IS NOT NULL
+        //                     AND CP.Preferred_City <> ''
+        //                     AND CP.Preferred_State IS NOT NULL
+        //                     AND CP.Preferred_State <> ''
+        //                THEN ', '
+        //                ELSE ''
+        //            END +
+        //            ISNULL(CP.Preferred_State, '')
+        //        )) AS Location,
+
+        //        ISNULL(CF.sQue5, '') AS Feedback,
+
+        //        ISNULL(
+        //            TRY_CONVERT(INT, CF.sQue2),
+        //            0
+        //        ) AS Rating
+
+        //    FROM tblCandidateFeedback CF
+
+        //    INNER JOIN tblCandidateRegister CR
+        //        ON CR.nID = CF.nAdminID
+
+        //    INNER JOIN tblCandidateProfile CP
+        //        ON CP.CandidateID = CR.nID
+
+        //    WHERE ISNULL(CF.nSABit, 0) = 1
+
+        //      AND ISNULL(CR.nBit, 1) = 1
+
+        //      AND ISNULL(CP.nBit, 1) = 1
+
+        //      AND ISNULL(LTRIM(RTRIM(CF.sQue5)), '') <> ''
+
+        //    ORDER BY CF.nID DESC";
+
+
+        //        using (SqlCommand cmd = new SqlCommand(feedbackQuery, cn))
+        //        {
+        //            using (SqlDataReader dr = cmd.ExecuteReader())
+        //            {
+        //                while (dr.Read())
+        //                {
+        //                    feedbacks.Add(new HomeFeedbackCardM
+        //                    {
+        //                        CandidateID =
+        //                            Convert.ToInt32(dr["CandidateID"]),
+
+        //                        TraineeName =
+        //                            dr["TraineeName"]?.ToString(),
+
+        //                        ProfileImage =
+        //                            dr["ProfileImage"]?.ToString(),
+
+        //                        Designation =
+        //                            dr["Designation"]?.ToString(),
+
+        //                        Location =
+        //                            dr["Location"]?.ToString(),
+
+        //                        Feedback =
+        //                            dr["Feedback"]?.ToString(),
+
+        //                        Rating =
+        //                            dr["Rating"] == DBNull.Value
+        //                                ? 0
+        //                                : Convert.ToInt32(dr["Rating"])
+        //                    });
+        //                }
+        //            }
+        //        }
         //    }
+
+        //    // Send feedback to Home/Index.cshtml
+        //    ViewBag.Feedbacks = feedbacks;
 
         //    return View(trainees);
         //}
+
 
         public IActionResult Index()
         {
@@ -123,40 +227,40 @@ namespace ErJobPortal.Controllers
                 // ============================================================
 
                 string traineeQuery = @"
-            SELECT 
-                CR.nID AS CandidateID,
+         SELECT 
+             CR.nID AS CandidateID,
 
-                LTRIM(RTRIM(
-                    ISNULL(CR.sFName, '') + ' ' +
-                    ISNULL(CR.sLName, '')
-                )) AS TraineeName,
+             LTRIM(RTRIM(
+                 ISNULL(CR.sFName, '') + ' ' +
+                 ISNULL(CR.sLName, '')
+             )) AS TraineeName,
 
-                CP.sPhoto AS ProfileImage,
+             CP.sPhoto AS ProfileImage,
 
-                '' AS Designation,
+             '' AS Designation,
 
-                LTRIM(RTRIM(
-                    ISNULL(CP.Preferred_City, '') +
-                    CASE 
-                        WHEN CP.Preferred_City IS NOT NULL
-                             AND CP.Preferred_City <> ''
-                             AND CP.Preferred_State IS NOT NULL
-                             AND CP.Preferred_State <> ''
-                        THEN ', '
-                        ELSE ''
-                    END +
-                    ISNULL(CP.Preferred_State, '')
-                )) AS Location
+             LTRIM(RTRIM(
+                 ISNULL(CP.Preferred_City, '') +
+                 CASE 
+                     WHEN CP.Preferred_City IS NOT NULL
+                          AND CP.Preferred_City <> ''
+                          AND CP.Preferred_State IS NOT NULL
+                          AND CP.Preferred_State <> ''
+                     THEN ', '
+                     ELSE ''
+                 END +
+                 ISNULL(CP.Preferred_State, '')
+             )) AS Location
 
-            FROM tblCandidateRegister CR
+         FROM tblCandidateRegister CR
 
-            INNER JOIN tblCandidateProfile CP
-                ON CP.CandidateID = CR.nID
+         INNER JOIN tblCandidateProfile CP
+             ON CP.CandidateID = CR.nID
 
-            WHERE ISNULL(CR.nBit, 1) = 1
-              AND ISNULL(CP.nBit, 1) = 1
+         WHERE ISNULL(CR.nBit, 1) = 1
+           AND ISNULL(CP.nBit, 1) = 1
 
-            ORDER BY CR.nID DESC";
+         ORDER BY CR.nID DESC";
 
 
                 using (SqlCommand cmd = new SqlCommand(traineeQuery, cn))
@@ -192,55 +296,55 @@ namespace ErJobPortal.Controllers
                 // ============================================================
 
                 string feedbackQuery = @"
-            SELECT
-                CF.nAdminID AS CandidateID,
+         SELECT
+             CF.nAdminID AS CandidateID,
 
-                LTRIM(RTRIM(
-                    ISNULL(CR.sFName, '') + ' ' +
-                    ISNULL(CR.sLName, '')
-                )) AS TraineeName,
+             LTRIM(RTRIM(
+                 ISNULL(CR.sFName, '') + ' ' +
+                 ISNULL(CR.sLName, '')
+             )) AS TraineeName,
 
-                CP.sPhoto AS ProfileImage,
+             CP.sPhoto AS ProfileImage,
 
-                '' AS Designation,
+             '' AS Designation,
 
-                LTRIM(RTRIM(
-                    ISNULL(CP.Preferred_City, '') +
-                    CASE
-                        WHEN CP.Preferred_City IS NOT NULL
-                             AND CP.Preferred_City <> ''
-                             AND CP.Preferred_State IS NOT NULL
-                             AND CP.Preferred_State <> ''
-                        THEN ', '
-                        ELSE ''
-                    END +
-                    ISNULL(CP.Preferred_State, '')
-                )) AS Location,
+             LTRIM(RTRIM(
+                 ISNULL(CP.Preferred_City, '') +
+                 CASE
+                     WHEN CP.Preferred_City IS NOT NULL
+                          AND CP.Preferred_City <> ''
+                          AND CP.Preferred_State IS NOT NULL
+                          AND CP.Preferred_State <> ''
+                     THEN ', '
+                     ELSE ''
+                 END +
+                 ISNULL(CP.Preferred_State, '')
+             )) AS Location,
 
-                ISNULL(CF.sQue5, '') AS Feedback,
+             ISNULL(CF.sQue5, '') AS Feedback,
 
-                ISNULL(
-                    TRY_CONVERT(INT, CF.sQue2),
-                    0
-                ) AS Rating
+             ISNULL(
+                 TRY_CONVERT(INT, CF.sQue2),
+                 0
+             ) AS Rating
 
-            FROM tblCandidateFeedback CF
+         FROM tblCandidateFeedback CF
 
-            INNER JOIN tblCandidateRegister CR
-                ON CR.nID = CF.nAdminID
+         INNER JOIN tblCandidateRegister CR
+             ON CR.nID = CF.nAdminID
 
-            INNER JOIN tblCandidateProfile CP
-                ON CP.CandidateID = CR.nID
+         INNER JOIN tblCandidateProfile CP
+             ON CP.CandidateID = CR.nID
 
-            WHERE ISNULL(CF.nSABit, 0) = 1
+         WHERE ISNULL(CF.nSABit, 0) = 1
 
-              AND ISNULL(CR.nBit, 1) = 1
+           AND ISNULL(CR.nBit, 1) = 1
 
-              AND ISNULL(CP.nBit, 1) = 1
+           AND ISNULL(CP.nBit, 1) = 1
 
-              AND ISNULL(LTRIM(RTRIM(CF.sQue5)), '') <> ''
+           AND ISNULL(LTRIM(RTRIM(CF.sQue5)), '') <> ''
 
-            ORDER BY CF.nID DESC";
+         ORDER BY CF.nID DESC";
 
 
                 using (SqlCommand cmd = new SqlCommand(feedbackQuery, cn))
@@ -314,7 +418,7 @@ namespace ErJobPortal.Controllers
         {
             return View();
         }
-        public IActionResult TopCarriers()
+        public IActionResult TopCareers()
         {
             return View();
         }
@@ -545,6 +649,43 @@ namespace ErJobPortal.Controllers
         public IActionResult Error()
         {
             return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
+        }
+
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> TestEmail(string recipientEmail)
+        {
+            if (string.IsNullOrWhiteSpace(recipientEmail))
+                return BadRequest("Recipient email is required.");
+
+            try
+            {
+                await _emailService.SendContactThankYouEmailAsync(
+                    "ErJobPortal Test",
+                    recipientEmail.Trim(),
+                    "SMTP Delivery Test",
+                    "This is a test email from ErJobPortal.");
+
+                _logger.LogInformation(
+                    "SMTP accepted test email for {RecipientEmail}",
+                    recipientEmail);
+
+                return Ok(
+                    "SMTP accepted the test email. " +
+                    "Please verify delivery in the recipient mailbox.");
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(
+                    ex,
+                    "SMTP test failed for {RecipientEmail}",
+                    recipientEmail);
+
+                return StatusCode(
+                    500,
+                    "Email sending failed. Check application logs.");
+            }
         }
     }
 }

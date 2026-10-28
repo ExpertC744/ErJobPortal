@@ -3,6 +3,10 @@ using ErJobPortal.Repositories;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Data.SqlClient;
 using System.Data;
+using Microsoft.AspNetCore.Http;
+using System.Text.RegularExpressions;
+using System.Net;
+
 
 namespace ErJobPortal.Controllers
 {
@@ -10,13 +14,20 @@ namespace ErJobPortal.Controllers
     {
         private readonly AccountRepository _accountRepository;
         private readonly IConfiguration _configuration;
+        private readonly IWebHostEnvironment _environment;
+
+        private readonly TPOSchedulerRepository _schedulerRepository;
 
         public TPOController(
             AccountRepository accountRepository,
-            IConfiguration configuration)
+            IConfiguration configuration,
+            IWebHostEnvironment environment,
+            TPOSchedulerRepository schedulerRepository)
         {
             _accountRepository = accountRepository;
             _configuration = configuration;
+            _environment = environment;
+            _schedulerRepository = schedulerRepository;
         }
 
 
@@ -121,24 +132,32 @@ namespace ErJobPortal.Controllers
         [HttpGet]
         public IActionResult AddSubTPO()
         {
-            int? tpoId =
-                HttpContext.Session.GetInt32("TPOID");
+            int? tpoId = HttpContext.Session.GetInt32("TPOID");
 
-            if (tpoId == null)
+            if (!tpoId.HasValue || tpoId.Value <= 0)
             {
-                return RedirectToAction(
-                    "TPOLogin",
-                    "Account");
+                return RedirectToAction("TPOLogin", "Account");
+            }
+
+            // Only Main TPO can register Sub-TPO
+            string? subTpoBit =
+                HttpContext.Session.GetString("SubTpoBit");
+
+            if (subTpoBit == "1")
+            {
+                TempData["Error"] =
+                    "A Sub-TPO cannot register another Sub-TPO.";
+
+                // Replace TPODashboard if your dashboard action has another name.
+                return RedirectToAction("TPODashboard");
             }
 
             ViewData["Panel"] = "TPO";
 
             ViewData["UserName"] =
-                HttpContext.Session.GetString("TPOName")
-                ?? "TPO";
+                HttpContext.Session.GetString("TPOName") ?? "TPO";
 
-            ViewData["Title"] =
-                "Add Sub TPO";
+            ViewData["Title"] = "Add Sub TPO";
 
             return View();
         }
@@ -169,22 +188,36 @@ namespace ErJobPortal.Controllers
             IFormFile ProfilePhoto)
         {
             // =================================================
-            // CHECK LOGIN
+            // 1. CHECK LOGIN
             // =================================================
 
-            int? tpoId =
-                HttpContext.Session.GetInt32("TPOID");
+            int? tpoId = HttpContext.Session.GetInt32("TPOID");
 
-            if (tpoId == null)
+            if (!tpoId.HasValue || tpoId.Value <= 0)
             {
-                return RedirectToAction(
-                    "TPOLogin",
-                    "Account");
+                TempData["Error"] =
+                    "Your session has expired. Please log in again.";
+
+                return RedirectToAction("TPOLogin", "Account");
             }
 
+            // =================================================
+            // 2. CHECK MAIN TPO / SUB-TPO PERMISSION
+            // =================================================
+
+            string? subTpoBit =
+                HttpContext.Session.GetString("SubTpoBit");
+
+            if (subTpoBit == "1")
+            {
+                TempData["Error"] =
+                    "A Sub-TPO cannot register another Sub-TPO.";
+
+                return RedirectToAction("TPODashboard");
+            }
 
             // =================================================
-            // BASIC VALIDATION
+            // 3. BASIC VALIDATION
             // =================================================
 
             if (string.IsNullOrWhiteSpace(FullName) ||
@@ -197,16 +230,26 @@ namespace ErJobPortal.Controllers
                 string.IsNullOrWhiteSpace(Designation) ||
                 string.IsNullOrWhiteSpace(DepartmentName))
             {
-                TempData["Error"] =
-                    "Please fill all required fields.";
-
-                return RedirectToAction(
-                    "AddSubTPO");
+                TempData["Error"] = "Please fill all required fields.";
+                return RedirectToAction("AddSubTPO");
             }
 
+            // =================================================
+            // 4. VALIDATE COLLEGE ID
+            // CollegeName dropdown must submit numeric college ID
+            // =================================================
+
+            if (!int.TryParse(CollegeName, out int collegeId) ||
+                collegeId <= 0)
+            {
+                TempData["Error"] =
+                    "Please select a valid college from the dropdown.";
+
+                return RedirectToAction("AddSubTPO");
+            }
 
             // =================================================
-            // PASSWORD VALIDATION
+            // 5. PASSWORD VALIDATION
             // =================================================
 
             if (string.IsNullOrWhiteSpace(Password) ||
@@ -215,27 +258,24 @@ namespace ErJobPortal.Controllers
                 TempData["Error"] =
                     "Password and Confirm Password do not match.";
 
-                return RedirectToAction(
-                    "AddSubTPO");
+                return RedirectToAction("AddSubTPO");
             }
 
-
             // =================================================
-            // OTP
+            // 6. OTP VALIDATION
+            // IMPORTANT:
+            // This only checks whether a value was entered.
+            // Genuine OTP verification must be implemented server-side.
             // =================================================
 
             if (string.IsNullOrWhiteSpace(OTP))
             {
-                TempData["Error"] =
-                    "Please enter OTP.";
-
-                return RedirectToAction(
-                    "AddSubTPO");
+                TempData["Error"] = "Please enter OTP.";
+                return RedirectToAction("AddSubTPO");
             }
 
-
             // =================================================
-            // FILE VALIDATION
+            // 7. FILE VALIDATION
             // =================================================
 
             if (SupportingDocument1 == null ||
@@ -246,280 +286,272 @@ namespace ErJobPortal.Controllers
                 ProfilePhoto.Length == 0)
             {
                 TempData["Error"] =
-                    "Please upload all required documents and profile photo.";
+                    "Please upload both required documents and your profile photo.";
 
-                return RedirectToAction(
-                    "AddSubTPO");
+                return RedirectToAction("AddSubTPO");
             }
 
+            // Basic extension allowlist.
+            // Adjust this list if your application supports other document formats.
+            string[] documentExtensions =
+                { ".pdf", ".jpg", ".jpeg", ".png" };
+
+            string[] photoExtensions =
+                { ".jpg", ".jpeg", ".png" };
+
+            string doc1Extension =
+                Path.GetExtension(SupportingDocument1.FileName).ToLowerInvariant();
+
+            string doc2Extension =
+                Path.GetExtension(SupportingDocument2.FileName).ToLowerInvariant();
+
+            string photoExtension =
+                Path.GetExtension(ProfilePhoto.FileName).ToLowerInvariant();
+
+            if (!documentExtensions.Contains(doc1Extension) ||
+                !documentExtensions.Contains(doc2Extension))
+            {
+                TempData["Error"] =
+                    "Documents must be PDF, JPG, JPEG, or PNG files.";
+
+                return RedirectToAction("AddSubTPO");
+            }
+
+            if (!photoExtensions.Contains(photoExtension))
+            {
+                TempData["Error"] =
+                    "Profile photo must be JPG, JPEG, or PNG.";
+
+                return RedirectToAction("AddSubTPO");
+            }
+
+            // Optional size limit: 5 MB per uploaded file.
+            const long maxFileSize = 5 * 1024 * 1024;
+
+            if (SupportingDocument1.Length > maxFileSize ||
+                SupportingDocument2.Length > maxFileSize ||
+                ProfilePhoto.Length > maxFileSize)
+            {
+                TempData["Error"] =
+                    "Each uploaded file must be 5 MB or smaller.";
+
+                return RedirectToAction("AddSubTPO");
+            }
+
+            // =================================================
+            // 8. UPLOAD FILES AND INSERT
+            // =================================================
+
+            string? savedDoc1 = null;
+            string? savedDoc2 = null;
+            string? savedPhoto = null;
+
+            string uploadFolder = Path.Combine(
+                Directory.GetCurrentDirectory(),
+                "wwwroot",
+                "Uploads",
+                "TPO");
 
             try
             {
-                // =================================================
-                // UPLOAD FOLDER
-                // =================================================
+                Directory.CreateDirectory(uploadFolder);
 
-                string uploadFolder =
-                    Path.Combine(
-                        Directory.GetCurrentDirectory(),
-                        "wwwroot",
-                        "Uploads",
-                        "TPO");
+                // Generate server-side filenames.
+                savedDoc1 = "TPO_DOC1_" +
+                    Guid.NewGuid().ToString("N") + doc1Extension;
 
+                savedDoc2 = "TPO_DOC2_" +
+                    Guid.NewGuid().ToString("N") + doc2Extension;
 
-                if (!Directory.Exists(uploadFolder))
-                {
-                    Directory.CreateDirectory(
-                        uploadFolder);
-                }
+                savedPhoto = "TPO_PROFILE_" +
+                    Guid.NewGuid().ToString("N") + photoExtension;
 
+                // Save document 1.
+                string doc1Path = Path.Combine(uploadFolder, savedDoc1);
 
-                // =================================================
-                // DOCUMENT 1
-                // =================================================
-
-                string doc1Extension =
-                    Path.GetExtension(
-                        SupportingDocument1.FileName);
-
-                string doc1FileName =
-                    "TPO_DOC1_" +
-                    Guid.NewGuid().ToString("N") +
-                    doc1Extension;
-
-                string doc1Path =
-                    Path.Combine(
-                        uploadFolder,
-                        doc1FileName);
-
-                using (var stream =
-                       new FileStream(
-                           doc1Path,
-                           FileMode.Create))
+                using (var stream = new FileStream(doc1Path, FileMode.CreateNew))
                 {
                     SupportingDocument1.CopyTo(stream);
                 }
 
+                // Save document 2.
+                string doc2Path = Path.Combine(uploadFolder, savedDoc2);
 
-                // =================================================
-                // DOCUMENT 2
-                // =================================================
-
-                string doc2Extension =
-                    Path.GetExtension(
-                        SupportingDocument2.FileName);
-
-                string doc2FileName =
-                    "TPO_DOC2_" +
-                    Guid.NewGuid().ToString("N") +
-                    doc2Extension;
-
-                string doc2Path =
-                    Path.Combine(
-                        uploadFolder,
-                        doc2FileName);
-
-                using (var stream =
-                       new FileStream(
-                           doc2Path,
-                           FileMode.Create))
+                using (var stream = new FileStream(doc2Path, FileMode.CreateNew))
                 {
                     SupportingDocument2.CopyTo(stream);
                 }
 
+                // Save profile photo.
+                string photoPath = Path.Combine(uploadFolder, savedPhoto);
 
-                // =================================================
-                // PROFILE PHOTO
-                // =================================================
-
-                string photoExtension =
-                    Path.GetExtension(
-                        ProfilePhoto.FileName);
-
-                string photoFileName =
-                    "TPO_PROFILE_" +
-                    Guid.NewGuid().ToString("N") +
-                    photoExtension;
-
-                string photoPath =
-                    Path.Combine(
-                        uploadFolder,
-                        photoFileName);
-
-                using (var stream =
-                       new FileStream(
-                           photoPath,
-                           FileMode.Create))
+                using (var stream = new FileStream(photoPath, FileMode.CreateNew))
                 {
                     ProfilePhoto.CopyTo(stream);
                 }
 
+                // =================================================
+                // 9. CREATE SUB-TPO MODEL
+                // =================================================
+
+                TPORegistration subTPO = new TPORegistration
+                {
+                    FullName = FullName.Trim(),
+                    CollegeMailID = CollegeMailID.Trim(),
+                    MobileNo = MobileNo.Trim(),
+
+                    Password = Password,
+
+                    // Store the selected numeric college ID as text.
+                    // The repository validates it and stores its string form.
+                    CollegeName = collegeId.ToString(),
+
+                    CollegeCode = CollegeCode.Trim(),
+                    CollegeAddress = CollegeAddress.Trim(),
+
+                    OrganizationWebsiteURL =
+                        string.IsNullOrWhiteSpace(OrganizationWebsiteURL)
+                            ? null
+                            : OrganizationWebsiteURL.Trim(),
+
+                    Designation = Designation.Trim(),
+                    DepartmentName = DepartmentName.Trim(),
+                    CollegeEmployeeID = CollegeEmployeeID.Trim(),
+
+                    SupportingDocument1 = savedDoc1,
+                    SupportingDocument2 = savedDoc2,
+                    ProfilePhoto = savedPhoto,
+
+                    OTP = OTP.Trim(),
+
+                    // Do not treat OTP as verified just because a value was entered.
+                    // Set true only after actual server-side verification.
+                    OTPVerified = false,
+
+                    Status = "Pending",
+                    IsApproved = false,
+                    IsActive = false,
+
+                    CreatedDate = DateTime.Now,
+                    UpdatedDate = DateTime.Now,
+
+                    // FIX FOR YOUR ERROR:
+                    // Parent is the authenticated Main TPO from session.
+                    ParentTPOID = tpoId.Value
+                };
 
                 // =================================================
-                // CREATE SUB TPO MODEL
-                // =================================================
-
-                TPORegistration subTPO =
-                    new TPORegistration
-                    {
-                        FullName =
-                            FullName.Trim(),
-
-                        CollegeMailID =
-                            CollegeMailID.Trim(),
-
-                        MobileNo =
-                            MobileNo.Trim(),
-
-                        Password =
-                            Password,
-
-                        CollegeName =
-                            CollegeName.Trim(),
-
-                        CollegeCode =
-                            CollegeCode.Trim(),
-
-                        CollegeAddress =
-                            CollegeAddress.Trim(),
-
-                        OrganizationWebsiteURL =
-                            OrganizationWebsiteURL?.Trim(),
-
-                        Designation =
-                            Designation.Trim(),
-
-                        DepartmentName =
-                            DepartmentName.Trim(),
-
-                        CollegeEmployeeID =
-                            CollegeEmployeeID.Trim(),
-
-                        SupportingDocument1 =
-                            doc1FileName,
-
-                        SupportingDocument2 =
-                            doc2FileName,
-
-                        ProfilePhoto =
-                            photoFileName,
-
-                        OTP =
-                            OTP.Trim(),
-
-                        OTPVerified =
-                            true,
-
-                        Status =
-                            "Pending",
-
-                        IsApproved =
-                            false,
-
-                        IsActive =
-                            false,
-
-                        CreatedDate =
-                            DateTime.Now,
-
-                        UpdatedDate =
-                            DateTime.Now
-                    };
-
-
-                // =================================================
-                // INSERT
+                // 10. INSERT SUB-TPO
                 // =================================================
 
                 bool result =
-                    _accountRepository.InsertSubTPO(
-                        subTPO);
-
-
-                // =================================================
-                // INSERT FAILED
-                // =================================================
+                    _accountRepository.InsertSubTPO(subTPO);
 
                 if (!result)
                 {
                     TempData["Error"] =
-                        "Unable to register Sub TPO.";
+                        "Unable to register Sub-TPO.";
 
-                    return RedirectToAction(
-                        "AddSubTPO");
+                    return RedirectToAction("AddSubTPO");
                 }
 
-
                 // =================================================
-                // SUCCESS
+                // 11. SUCCESS
                 // =================================================
 
                 TempData["Success"] =
-                    "Sub TPO registered successfully. It is pending Super Admin approval.";
+                    "Sub-TPO registration submitted successfully. It is pending Super Admin approval.";
 
-                return RedirectToAction(
-                    "AddSubTPO");
+                return RedirectToAction("AddSubTPO");
             }
             catch (Exception ex)
             {
-                TempData["Error"] =
-                    "Error while registering Sub TPO: "
-                    + ex.Message;
+                // Delete uploaded files if registration fails.
+                DeleteUploadedFile(uploadFolder, savedDoc1);
+                DeleteUploadedFile(uploadFolder, savedDoc2);
+                DeleteUploadedFile(uploadFolder, savedPhoto);
 
-                return RedirectToAction(
-                    "AddSubTPO");
+                // Log the exception using your configured ILogger in production.
+                TempData["Error"] =
+                    "Error while registering Sub TPO: " + ex.Message;
+
+                return RedirectToAction("AddSubTPO");
             }
         }
 
 
-  
+        // =====================================================
+        // DELETE UPLOADED FILE IF INSERT FAILS
+        // =====================================================
 
-       //=============================================================
-       //TPO CREATE FEEDBACK - GET
-       //=============================================================
+        private static void DeleteUploadedFile(
+            string uploadFolder,
+            string? fileName)
+        {
+            if (string.IsNullOrWhiteSpace(fileName))
+                return;
 
-       [HttpGet]
-       public IActionResult CreateFeedback()
-       {
-           // ---------------------------------------------------------
-           // CHECK TPO LOGIN
-           // ---------------------------------------------------------
+            // Only permit deletion of files directly inside this upload folder.
+            if (Path.GetFileName(fileName) != fileName)
+                return;
 
-           int? tpoId =
-               HttpContext.Session.GetInt32("TPOID");
+            string fullPath = Path.Combine(uploadFolder, fileName);
 
-           if (tpoId == null || tpoId <= 0)
-           {
-               return RedirectToAction(
-                   "TPOLogin",
-                   "Account");
-           }
-
-
-           // ---------------------------------------------------------
-           // CREATE MODEL
-           // ---------------------------------------------------------
-
-           TPOFeedbackViewModel? model = null;
+            if (System.IO.File.Exists(fullPath))
+            {
+                System.IO.File.Delete(fullPath);
+            }
+        }
 
 
-           // ---------------------------------------------------------
-           // CONNECTION STRING
-           // ---------------------------------------------------------
-
-           string? connectionString =
-               _configuration.GetConnectionString(
-                   "DefaultConnection");
 
 
-           // ---------------------------------------------------------
-           // GET ACTIVE FEEDBACK QUESTIONS
-           // ---------------------------------------------------------
+        //=============================================================
+        //TPO CREATE FEEDBACK - GET
+        //=============================================================
 
-           using (SqlConnection con =
-                  new SqlConnection(connectionString))
-           {
-               string query = @"
+        [HttpGet]
+        public IActionResult CreateFeedback()
+        {
+            // ---------------------------------------------------------
+            // CHECK TPO LOGIN
+            // ---------------------------------------------------------
+
+            int? tpoId =
+                HttpContext.Session.GetInt32("TPOID");
+
+            if (tpoId == null || tpoId <= 0)
+            {
+                return RedirectToAction(
+                    "TPOLogin",
+                    "Account");
+            }
+
+
+            // ---------------------------------------------------------
+            // CREATE MODEL
+            // ---------------------------------------------------------
+
+            TPOFeedbackViewModel? model = null;
+
+
+            // ---------------------------------------------------------
+            // CONNECTION STRING
+            // ---------------------------------------------------------
+
+            string? connectionString =
+                _configuration.GetConnectionString(
+                    "DefaultConnection");
+
+
+            // ---------------------------------------------------------
+            // GET ACTIVE FEEDBACK QUESTIONS
+            // ---------------------------------------------------------
+
+            using (SqlConnection con =
+                   new SqlConnection(connectionString))
+            {
+                string query = @"
            SELECT
                nID,
                Que1,
@@ -534,104 +566,104 @@ namespace ErJobPortal.Controllers
              AND ISNULL(nBit, 1) = 1";
 
 
-               using (SqlCommand cmd =
-                      new SqlCommand(query, con))
-               {
-                   con.Open();
+                using (SqlCommand cmd =
+                       new SqlCommand(query, con))
+                {
+                    con.Open();
 
-                   using (SqlDataReader reader =
-                          cmd.ExecuteReader())
-                   {
-                       if (reader.Read())
-                       {
-                           model = new TPOFeedbackViewModel
-                           {
-                               nID =
-                                   reader["nID"] == DBNull.Value
-                                   ? 0
-                                   : Convert.ToInt32(
-                                       reader["nID"]),
+                    using (SqlDataReader reader =
+                           cmd.ExecuteReader())
+                    {
+                        if (reader.Read())
+                        {
+                            model = new TPOFeedbackViewModel
+                            {
+                                nID =
+                                    reader["nID"] == DBNull.Value
+                                    ? 0
+                                    : Convert.ToInt32(
+                                        reader["nID"]),
 
-                               Que1 =
-                                   reader["Que1"] == DBNull.Value
-                                   ? ""
-                                   : reader["Que1"].ToString(),
+                                Que1 =
+                                    reader["Que1"] == DBNull.Value
+                                    ? ""
+                                    : reader["Que1"].ToString(),
 
-                               Que2 =
-                                   reader["Que2"] == DBNull.Value
-                                   ? ""
-                                   : reader["Que2"].ToString(),
+                                Que2 =
+                                    reader["Que2"] == DBNull.Value
+                                    ? ""
+                                    : reader["Que2"].ToString(),
 
-                               Que3 =
-                                   reader["Que3"] == DBNull.Value
-                                   ? ""
-                                   : reader["Que3"].ToString(),
+                                Que3 =
+                                    reader["Que3"] == DBNull.Value
+                                    ? ""
+                                    : reader["Que3"].ToString(),
 
-                               Que4 =
-                                   reader["Que4"] == DBNull.Value
-                                   ? ""
-                                   : reader["Que4"].ToString(),
+                                Que4 =
+                                    reader["Que4"] == DBNull.Value
+                                    ? ""
+                                    : reader["Que4"].ToString(),
 
-                               Que5 =
-                                   reader["Que5"] == DBNull.Value
-                                   ? ""
-                                   : reader["Que5"].ToString(),
+                                Que5 =
+                                    reader["Que5"] == DBNull.Value
+                                    ? ""
+                                    : reader["Que5"].ToString(),
 
-                               // TPO answers initially empty
-                               sQue1 = "",
-                               sQue2 = "",
-                               sQue3 = "",
-                               sQue4 = "",
-                               sQue5 = "",
+                                // TPO answers initially empty
+                                sQue1 = "",
+                                sQue2 = "",
+                                sQue3 = "",
+                                sQue4 = "",
+                                sQue5 = "",
 
-                               TPOID = tpoId.Value,
+                                TPOID = tpoId.Value,
 
-                               nBit =
-                                   reader["nBit"] == DBNull.Value
-                                   ? 1
-                                   : Convert.ToInt32(
-                                       reader["nBit"]),
+                                nBit =
+                                    reader["nBit"] == DBNull.Value
+                                    ? 1
+                                    : Convert.ToInt32(
+                                        reader["nBit"]),
 
-                               nSABit =
-                                   reader["nSABit"] == DBNull.Value
-                                   ? 0
-                                   : Convert.ToInt32(
-                                       reader["nSABit"]),
+                                nSABit =
+                                    reader["nSABit"] == DBNull.Value
+                                    ? 0
+                                    : Convert.ToInt32(
+                                        reader["nSABit"]),
 
-                               nTPO = 1
-                           };
-                       }
-                   }
-               }
-           }
-
-
-           // ---------------------------------------------------------
-           // NO QUESTION FOUND
-           // ---------------------------------------------------------
-
-           if (model == null)
-           {
-               return NotFound(
-                   "TPO feedback questions were not found.");
-           }
+                                nTPO = 1
+                            };
+                        }
+                    }
+                }
+            }
 
 
-           // ---------------------------------------------------------
-           // VIEW DATA
-           // ---------------------------------------------------------
+            // ---------------------------------------------------------
+            // NO QUESTION FOUND
+            // ---------------------------------------------------------
 
-           ViewData["Panel"] = "TPO";
-
-           ViewData["UserName"] =
-               HttpContext.Session.GetString("TPOName")
-               ?? "TPO";
-
-           ViewData["Title"] = "Create Feedback";
+            if (model == null)
+            {
+                return NotFound(
+                    "TPO feedback questions were not found.");
+            }
 
 
-           return View(model);
-       }
+            // ---------------------------------------------------------
+            // VIEW DATA
+            // ---------------------------------------------------------
+
+            ViewData["Panel"] = "TPO";
+
+            ViewData["UserName"] =
+                HttpContext.Session.GetString("TPOName")
+                ?? "TPO";
+
+            ViewData["Title"] = "Create Feedback";
+
+
+            return View(model);
+        }
 
         // =============================================================
         // TPO CREATE FEEDBACK - POST
@@ -1066,6 +1098,7 @@ namespace ErJobPortal.Controllers
             return View(model);
         }
 
+
         [HttpGet]
         [Route("TPO/ViewProfile")]
         public IActionResult ViewProfile()
@@ -1077,6 +1110,7 @@ namespace ErJobPortal.Controllers
                 return RedirectToAction("TPOLogin", "Account");
             }
 
+
             TPORegistration? model =
                 _accountRepository.GetTPOById(tpoId.Value);
 
@@ -1084,6 +1118,20 @@ namespace ErJobPortal.Controllers
             {
                 TempData["Error"] = "TPO profile not found.";
                 return RedirectToAction("Dashboard", "TPO");
+            }
+
+            // Convert the stored College ID into the college name.
+            if (int.TryParse(model.CollegeName, out int collegeId))
+            {
+                var colleges = _accountRepository.GetColleges();
+
+                var selectedCollege = colleges
+                    .FirstOrDefault(c => c.nID == collegeId);
+
+                if (selectedCollege != null)
+                {
+                    model.CollegeName = selectedCollege.sCollegeName;
+                }
             }
 
             ViewData["Panel"] = "TPO";
@@ -1095,6 +1143,25 @@ namespace ErJobPortal.Controllers
 
             return View(model);
         }
+
+
+        //[HttpGet]
+        //[Route("TPO/CreateNotification")]
+        //public IActionResult CreateNotification()
+        //{
+
+
+        //    return View();
+        //}
+
+        //[HttpGet]
+        //[Route("TPO/SendNotification")]
+        //public IActionResult SendNotification()
+        //{
+
+
+        //    return View();
+        //}
 
 
         [HttpPost]
@@ -1378,5 +1445,4852 @@ namespace ErJobPortal.Controllers
                     "TPO");
             }
         }
+
+        // shrirang 06/10/26
+        // shrirang 07/10/26
+        // =====================================================
+        // TPO TRAINEE INFORMATION
+        // =====================================================
+
+        // ============================================================
+        // TPO - TRAINEE INFORMATION
+        // ============================================================
+
+        [HttpGet]
+        [Route("TPO/TraineesInfo")]
+        public IActionResult TraineesInfo(
+            string? searchText,
+            int? branchId,
+            int? currentYear,
+            int? admissionYear,
+            int? passoutYear,
+            int? gender)
+        {
+            // ========================================================
+            // CHECK TPO SESSION
+            // ========================================================
+
+            int? tpoId =
+                HttpContext.Session.GetInt32("TPOID");
+
+            if (tpoId == null)
+            {
+                return RedirectToAction(
+                    "TPOLogin",
+                    "Account");
+            }
+
+
+            // ========================================================
+            // GET LOGGED-IN TPO DETAILS
+            // ========================================================
+
+            TPORegistration? tpo =
+                _accountRepository.GetTPODetails(
+                    tpoId.Value);
+
+            if (tpo == null)
+            {
+                TempData["Error"] =
+                    "TPO details could not be found.";
+
+                return RedirectToAction(
+                    "TPOLogin",
+                    "Account");
+            }
+
+
+            // ========================================================
+            // COLLEGE ID
+            // ========================================================
+
+            int collegeId = 0;
+
+            if (tpo.CollegeName != null)
+            {
+                collegeId =
+                    Convert.ToInt32(tpo.CollegeName);
+            }
+
+
+            // ========================================================
+            // TPO DEPARTMENT
+            //
+            // IMPORTANT:
+            // We are NOT finding department ID from DepartmentName.
+            //
+            // Your TPO table already contains:
+            //
+            // nDepartment = 1
+            //
+            // Therefore directly use tpo.nDepartment.
+            // ========================================================
+
+            int? departmentId =
+                tpo.nDepartment;
+
+
+            // ========================================================
+            // GET BRANCHES FOR TPO DEPARTMENT
+            // ========================================================
+
+            //List<BranchM> branches =
+            //    new List<BranchM>();
+
+            //if (departmentId.HasValue &&
+            //    departmentId.Value > 0)
+            //{
+            //    branches =
+            //        _accountRepository.GetBranches(
+            //            departmentId.Value);
+            //}
+            //Sanidhya 08/10/26
+            List<BranchM> branches =
+                    _accountRepository.GetBranches();
+
+            // ========================================================
+            // VALIDATE SELECTED BRANCH
+            //
+            // A TPO should only be able to filter branches that
+            // belong to his/her department.
+            // ========================================================
+
+            //if (branchId.HasValue)
+            //{
+            //    bool branchBelongsToDepartment =
+            //        branches.Any(
+            //            x => x.nID == branchId.Value);
+
+            //    if (!branchBelongsToDepartment)
+            //    {
+            //        branchId = null;
+            //    }
+            //}
+
+
+            // ========================================================
+            // CREATE TRAINEE FILTER
+            // ========================================================
+
+            TPOTraineeFilterM filter =
+                new TPOTraineeFilterM
+                {
+                    CollegeId = collegeId,
+
+                    SearchText =
+                        string.IsNullOrWhiteSpace(searchText)
+                            ? null
+                            : searchText.Trim(),
+
+                    BranchId = branchId,
+
+                    CurrentYear = currentYear,
+
+                    AdmissionYear = admissionYear,
+
+                    PassoutYear = passoutYear,
+
+                    Gender = gender
+                };
+
+
+            // ========================================================
+            // GET TRAINEES
+            // ========================================================
+
+            List<TPOTraineeInfoM> trainees =
+                _accountRepository.GetTPOTraineesByCollege(
+                    filter);
+
+
+            // ========================================================
+            // VIEWBAG VALUES
+            // ========================================================
+
+            ViewBag.CollegeId =
+                collegeId;
+
+            ViewBag.CollegeName =
+                tpo.CollegeName;
+
+            ViewBag.DepartmentId =
+                departmentId;
+
+            ViewBag.DepartmentName =
+                tpo.DepartmentName;
+
+            ViewBag.Branches =
+                branches;
+
+            ViewBag.TraineeCount =
+                trainees.Count;
+
+
+            // ========================================================
+            // PRESERVE FILTER VALUES
+            // ========================================================
+
+            ViewBag.SearchText =
+                searchText;
+
+            ViewBag.BranchId =
+                branchId;
+
+            ViewBag.CurrentYear =
+                currentYear;
+
+            ViewBag.AdmissionYear =
+                admissionYear;
+
+            ViewBag.PassoutYear =
+                passoutYear;
+
+            ViewBag.Gender =
+                gender;
+
+
+            // ========================================================
+            // RETURN VIEW
+            // ========================================================
+
+            return View(
+                "TraineesInfo",
+                trainees);
+        }
+
+
+        // shrirang 08/10/26
+        [HttpGet]
+        [Route("TPO/CreateNotification")]
+        public IActionResult CreateNotification()
+        {
+            int? tpoId = HttpContext.Session.GetInt32("TPOID");
+
+            if (tpoId == null)
+            {
+                return RedirectToAction("TPOLogin", "Account");
+            }
+
+            return View();
+        }
+
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        [Route("TPO/CreateNotification")]
+        public async Task<IActionResult> CreateNotification(
+    string Title,
+    string Type,
+    string Audience,
+    DateTime? Date,
+    TimeSpan? Time,
+    string Content,
+    bool SendEmailNotification,
+    IFormFile? AttachFile1,
+    IFormFile? AttachFile2)
+        {
+            // =========================================================
+            // CHECK TPO LOGIN
+            // =========================================================
+
+            int? tpoId = HttpContext.Session.GetInt32("TPOID");
+
+            if (tpoId == null)
+            {
+                return RedirectToAction("TPOLogin", "Account");
+            }
+
+            string tpoName =
+                HttpContext.Session.GetString("TPOName") ?? "TPO";
+
+
+            // =========================================================
+            // SERVER-SIDE VALIDATION
+            // =========================================================
+
+            if (string.IsNullOrWhiteSpace(Title))
+            {
+                TempData["Error"] = "Title is required.";
+                return View();
+            }
+
+            if (string.IsNullOrWhiteSpace(Type))
+            {
+                TempData["Error"] = "Type is required.";
+                return View();
+            }
+
+            if (string.IsNullOrWhiteSpace(Audience))
+            {
+                TempData["Error"] = "Audience is required.";
+                return View();
+            }
+
+            if (string.IsNullOrWhiteSpace(Content))
+            {
+                TempData["Error"] = "Content is required.";
+                return View();
+            }
+
+
+            // =========================================================
+            // CONNECTION STRING
+            // =========================================================
+
+            string? connectionString =
+                _configuration.GetConnectionString("DefaultConnection");
+
+            if (string.IsNullOrWhiteSpace(connectionString))
+            {
+                TempData["Error"] = "Database connection string is not configured.";
+                return View();
+            }
+
+
+            // =========================================================
+            // FILE VARIABLES
+            // =========================================================
+
+            string? attachment1OriginalName = null;
+            string? attachment1FileName = null;
+            string? attachment1Path = null;
+            string? attachment1ContentType = null;
+            long? attachment1Size = null;
+
+            string? attachment2OriginalName = null;
+            string? attachment2FileName = null;
+            string? attachment2Path = null;
+            string? attachment2ContentType = null;
+            long? attachment2Size = null;
+
+
+            // =========================================================
+            // UPLOAD FOLDER
+            // =========================================================
+
+            string uploadFolder = Path.Combine(
+                _environment.WebRootPath,
+                "Uploads",
+                "TPO",
+                "Notifications"
+            );
+
+            if (!Directory.Exists(uploadFolder))
+            {
+                Directory.CreateDirectory(uploadFolder);
+            }
+
+
+            // =========================================================
+            // ALLOWED EXTENSIONS
+            // =========================================================
+
+            string[] allowedExtensions =
+            {
+        ".pdf",
+        ".doc",
+        ".docx",
+        ".jpg",
+        ".jpeg",
+        ".png"
+    };
+
+
+            // =========================================================
+            // MAX FILE SIZE
+            // 10 MB PER FILE
+            // =========================================================
+
+            const long maxFileSize = 10 * 1024 * 1024;
+
+
+            // =========================================================
+            // SAVE ATTACHMENT 1
+            // =========================================================
+
+            if (AttachFile1 != null && AttachFile1.Length > 0)
+            {
+                string extension =
+                    Path.GetExtension(AttachFile1.FileName).ToLowerInvariant();
+
+                if (!allowedExtensions.Contains(extension))
+                {
+                    TempData["Error"] =
+                        "Attachment 1 contains an invalid file type.";
+
+                    return View();
+                }
+
+                if (AttachFile1.Length > maxFileSize)
+                {
+                    TempData["Error"] =
+                        "Attachment 1 size cannot exceed 10 MB.";
+
+                    return View();
+                }
+
+
+                attachment1OriginalName =
+                    Path.GetFileName(AttachFile1.FileName);
+
+                attachment1FileName =
+                    "TPO_NOTIFICATION_1_" +
+                    Guid.NewGuid().ToString("N") +
+                    extension;
+
+                string physicalFilePath =
+                    Path.Combine(
+                        uploadFolder,
+                        attachment1FileName
+                    );
+
+
+                using (FileStream stream =
+                       new FileStream(
+                           physicalFilePath,
+                           FileMode.Create))
+                {
+                    await AttachFile1.CopyToAsync(stream);
+                }
+
+
+                attachment1Path =
+                    "/Uploads/TPO/Notifications/" +
+                    attachment1FileName;
+
+                attachment1ContentType =
+                    AttachFile1.ContentType;
+
+                attachment1Size =
+                    AttachFile1.Length;
+            }
+
+
+            // =========================================================
+            // SAVE ATTACHMENT 2
+            // =========================================================
+
+            if (AttachFile2 != null && AttachFile2.Length > 0)
+            {
+                string extension =
+                    Path.GetExtension(AttachFile2.FileName).ToLowerInvariant();
+
+                if (!allowedExtensions.Contains(extension))
+                {
+                    TempData["Error"] =
+                        "Attachment 2 contains an invalid file type.";
+
+                    return View();
+                }
+
+                if (AttachFile2.Length > maxFileSize)
+                {
+                    TempData["Error"] =
+                        "Attachment 2 size cannot exceed 10 MB.";
+
+                    return View();
+                }
+
+
+                attachment2OriginalName =
+                    Path.GetFileName(AttachFile2.FileName);
+
+                attachment2FileName =
+                    "TPO_NOTIFICATION_2_" +
+                    Guid.NewGuid().ToString("N") +
+                    extension;
+
+                string physicalFilePath =
+                    Path.Combine(
+                        uploadFolder,
+                        attachment2FileName
+                    );
+
+
+                using (FileStream stream =
+                       new FileStream(
+                           physicalFilePath,
+                           FileMode.Create))
+                {
+                    await AttachFile2.CopyToAsync(stream);
+                }
+
+
+                attachment2Path =
+                    "/Uploads/TPO/Notifications/" +
+                    attachment2FileName;
+
+                attachment2ContentType =
+                    AttachFile2.ContentType;
+
+                attachment2Size =
+                    AttachFile2.Length;
+            }
+
+
+            // =========================================================
+            // INSERT INTO DATABASE
+            // =========================================================
+
+            try
+            {
+                using (SqlConnection connection =
+                       new SqlConnection(connectionString))
+                {
+                    await connection.OpenAsync();
+
+
+                    string query = @"
+                INSERT INTO tblTPONotification
+                (
+                    Title,
+                    Type,
+                    Audience,
+                    NotificationDate,
+                    NotificationTime,
+                    Content,
+                    SendEmailNotification,
+
+                    Attachment1OriginalName,
+                    Attachment1FileName,
+                    Attachment1Path,
+                    Attachment1ContentType,
+                    Attachment1Size,
+
+                    Attachment2OriginalName,
+                    Attachment2FileName,
+                    Attachment2Path,
+                    Attachment2ContentType,
+                    Attachment2Size,
+
+                    CreatedBy,
+                    CreatedByName,
+
+                    IsActive,
+                    IsDeleted,
+                    CreatedDate
+                )
+                VALUES
+                (
+                    @Title,
+                    @Type,
+                    @Audience,
+                    @NotificationDate,
+                    @NotificationTime,
+                    @Content,
+                    @SendEmailNotification,
+
+                    @Attachment1OriginalName,
+                    @Attachment1FileName,
+                    @Attachment1Path,
+                    @Attachment1ContentType,
+                    @Attachment1Size,
+
+                    @Attachment2OriginalName,
+                    @Attachment2FileName,
+                    @Attachment2Path,
+                    @Attachment2ContentType,
+                    @Attachment2Size,
+
+                    @CreatedBy,
+                    @CreatedByName,
+
+                    1,
+                    0,
+                    GETDATE()
+                );
+
+                SELECT CAST(SCOPE_IDENTITY() AS INT);
+            ";
+
+
+                    using (SqlCommand command =
+                           new SqlCommand(query, connection))
+                    {
+                        command.Parameters.Add(
+                            "@Title",
+                            SqlDbType.NVarChar,
+                            250
+                        ).Value =
+                            Title.Trim();
+
+
+                        command.Parameters.Add(
+                            "@Type",
+                            SqlDbType.NVarChar,
+                            50
+                        ).Value =
+                            Type.Trim();
+
+
+                        command.Parameters.Add(
+                            "@Audience",
+                            SqlDbType.NVarChar,
+                            50
+                        ).Value =
+                            Audience.Trim();
+
+
+                        command.Parameters.Add(
+                            "@NotificationDate",
+                            SqlDbType.Date
+                        ).Value =
+                            Date.HasValue
+                                ? Date.Value.Date
+                                : (object)DBNull.Value;
+
+
+                        command.Parameters.Add(
+                            "@NotificationTime",
+                            SqlDbType.Time
+                        ).Value =
+                            Time.HasValue
+                                ? Time.Value
+                                : (object)DBNull.Value;
+
+
+                        command.Parameters.Add(
+                            "@Content",
+                            SqlDbType.NVarChar
+                        ).Value =
+                            Content.Trim();
+
+
+                        command.Parameters.Add(
+                            "@SendEmailNotification",
+                            SqlDbType.Bit
+                        ).Value =
+                            SendEmailNotification;
+
+
+                        // ============================================
+                        // ATTACHMENT 1
+                        // ============================================
+
+                        command.Parameters.Add(
+                            "@Attachment1OriginalName",
+                            SqlDbType.NVarChar,
+                            255
+                        ).Value =
+                            (object?)attachment1OriginalName
+                            ?? DBNull.Value;
+
+
+                        command.Parameters.Add(
+                            "@Attachment1FileName",
+                            SqlDbType.NVarChar,
+                            255
+                        ).Value =
+                            (object?)attachment1FileName
+                            ?? DBNull.Value;
+
+
+                        command.Parameters.Add(
+                            "@Attachment1Path",
+                            SqlDbType.NVarChar,
+                            500
+                        ).Value =
+                            (object?)attachment1Path
+                            ?? DBNull.Value;
+
+
+                        command.Parameters.Add(
+                            "@Attachment1ContentType",
+                            SqlDbType.NVarChar,
+                            100
+                        ).Value =
+                            (object?)attachment1ContentType
+                            ?? DBNull.Value;
+
+
+                        command.Parameters.Add(
+                            "@Attachment1Size",
+                            SqlDbType.BigInt
+                        ).Value =
+                            (object?)attachment1Size
+                            ?? DBNull.Value;
+
+
+                        // ============================================
+                        // ATTACHMENT 2
+                        // ============================================
+
+                        command.Parameters.Add(
+                            "@Attachment2OriginalName",
+                            SqlDbType.NVarChar,
+                            255
+                        ).Value =
+                            (object?)attachment2OriginalName
+                            ?? DBNull.Value;
+
+
+                        command.Parameters.Add(
+                            "@Attachment2FileName",
+                            SqlDbType.NVarChar,
+                            255
+                        ).Value =
+                            (object?)attachment2FileName
+                            ?? DBNull.Value;
+
+
+                        command.Parameters.Add(
+                            "@Attachment2Path",
+                            SqlDbType.NVarChar,
+                            500
+                        ).Value =
+                            (object?)attachment2Path
+                            ?? DBNull.Value;
+
+
+                        command.Parameters.Add(
+                            "@Attachment2ContentType",
+                            SqlDbType.NVarChar,
+                            100
+                        ).Value =
+                            (object?)attachment2ContentType
+                            ?? DBNull.Value;
+
+
+                        command.Parameters.Add(
+                            "@Attachment2Size",
+                            SqlDbType.BigInt
+                        ).Value =
+                            (object?)attachment2Size
+                            ?? DBNull.Value;
+
+
+                        // ============================================
+                        // CREATED BY
+                        // ============================================
+
+                        command.Parameters.Add(
+                            "@CreatedBy",
+                            SqlDbType.Int
+                        ).Value =
+                            tpoId.Value;
+
+
+                        command.Parameters.Add(
+                            "@CreatedByName",
+                            SqlDbType.NVarChar,
+                            200
+                        ).Value =
+                            tpoName;
+
+
+                        int notificationId =
+                            Convert.ToInt32(
+                                await command.ExecuteScalarAsync()
+                            );
+                    }
+                }
+
+
+                // =====================================================
+                // SUCCESS
+                // =====================================================
+
+                TempData["Success"] =
+                    "Notification created successfully.";
+
+                return RedirectToAction(
+                    "CreateNotification",
+                    "TPO"
+                );
+            }
+            catch (Exception ex)
+            {
+                // =====================================================
+                // DELETE UPLOADED FILES IF DATABASE INSERT FAILS
+                // =====================================================
+
+                try
+                {
+                    if (!string.IsNullOrWhiteSpace(attachment1FileName))
+                    {
+                        string filePath =
+                            Path.Combine(
+                                uploadFolder,
+                                attachment1FileName
+                            );
+
+                        if (System.IO.File.Exists(filePath))
+                        {
+                            System.IO.File.Delete(filePath);
+                        }
+                    }
+
+
+                    if (!string.IsNullOrWhiteSpace(attachment2FileName))
+                    {
+                        string filePath =
+                            Path.Combine(
+                                uploadFolder,
+                                attachment2FileName
+                            );
+
+                        if (System.IO.File.Exists(filePath))
+                        {
+                            System.IO.File.Delete(filePath);
+                        }
+                    }
+                }
+                catch
+                {
+                    // Ignore cleanup errors
+                }
+
+
+                TempData["Error"] =
+                    "Unable to create notification. " +
+                    ex.Message;
+
+                return View();
+            }
+        }
+
+        // shrirang 08/10/26
+        [HttpGet]
+        [Route("TPO/ViewNotificationEvent")]
+        public async Task<IActionResult> ViewNotificationEvent(
+    string? type,
+    string? audience,
+    DateTime? fromDate,
+    DateTime? toDate)
+        {
+            // ============================================================
+            // CHECK TPO LOGIN
+            // ============================================================
+
+            int? tpoId = HttpContext.Session.GetInt32("TPOID");
+
+            if (tpoId == null)
+            {
+                return RedirectToAction("TPOLogin", "Account");
+            }
+
+
+            // ============================================================
+            // VIEW DATA
+            // ============================================================
+
+            ViewData["Title"] = "View Notifications / Events";
+            ViewData["Panel"] = "TPO";
+
+            ViewData["UserName"] =
+                HttpContext.Session.GetString("TPOName") ?? "TPO";
+
+
+            // ============================================================
+            // MODEL
+            // ============================================================
+
+            List<TPOViewNotificationM> notifications =
+                new List<TPOViewNotificationM>();
+
+
+            // ============================================================
+            // CONNECTION
+            // ============================================================
+
+            string connectionString =
+                _configuration.GetConnectionString("DefaultConnection");
+
+
+            // ============================================================
+            // SQL
+            // ============================================================
+
+            string sql = @"
+    SELECT
+        N.NotificationID,
+        N.Title,
+        N.Type,
+        N.Audience,
+        N.NotificationDate,
+        N.NotificationTime,
+        N.Content,
+        N.SendEmailNotification,
+
+        N.Attachment1OriginalName,
+        N.Attachment1FileName,
+        N.Attachment1Path,
+        N.Attachment1ContentType,
+        N.Attachment1Size,
+
+        N.Attachment2OriginalName,
+        N.Attachment2FileName,
+        N.Attachment2Path,
+        N.Attachment2ContentType,
+        N.Attachment2Size,
+
+        N.IsActive,
+        N.IsDeleted,
+        N.CreatedDate,
+        N.CreatedBy,
+        N.CreatedByName,
+
+        -- =====================================================
+        -- NOTIFICATION TRACKING
+        -- =====================================================
+
+        ISNULL(T.TotalSent, 0) AS TotalSent,
+
+        ISNULL(T.TotalRead, 0) AS TotalRead,
+
+        ISNULL(T.TotalUnread, 0) AS TotalUnread
+
+    FROM tblTPONotification N
+
+    -- =========================================================
+    -- STUDENT NOTIFICATION TRACKING
+    -- =========================================================
+
+    OUTER APPLY
+    (
+        SELECT
+
+            COUNT(1) AS TotalSent,
+
+            SUM(
+                CASE
+                    WHEN R.IsRead = 1
+                    THEN 1
+                    ELSE 0
+                END
+            ) AS TotalRead,
+
+            SUM(
+                CASE
+                    WHEN R.IsRead = 0
+                    THEN 1
+                    ELSE 0
+                END
+            ) AS TotalUnread
+
+        FROM tblTPONotificationRecipient R
+
+        WHERE
+            R.NotificationID = N.NotificationID
+            AND R.IsActive = 1
+
+    ) T
+
+    WHERE
+        N.IsDeleted = 0
+        AND N.CreatedBy = @CreatedBy
+";
+
+            // ============================================================
+            // FILTER TYPE
+            // ============================================================
+
+            if (!string.IsNullOrWhiteSpace(type) &&
+                !type.Equals("All", StringComparison.OrdinalIgnoreCase))
+            {
+                sql += " AND Type = @Type ";
+            }
+
+
+            // ============================================================
+            // FILTER AUDIENCE
+            // ============================================================
+
+            if (!string.IsNullOrWhiteSpace(audience) &&
+                !audience.Equals("All", StringComparison.OrdinalIgnoreCase))
+            {
+                sql += " AND Audience = @Audience ";
+            }
+
+
+            // ============================================================
+            // FILTER FROM DATE
+            // ============================================================
+
+            if (fromDate.HasValue)
+            {
+                sql += " AND NotificationDate >= @FromDate ";
+            }
+
+
+            // ============================================================
+            // FILTER TO DATE
+            // ============================================================
+
+            if (toDate.HasValue)
+            {
+                sql += " AND NotificationDate <= @ToDate ";
+            }
+
+
+            // ============================================================
+            // ORDER
+            // ============================================================
+
+            sql += @"
+        ORDER BY
+            CASE
+                WHEN NotificationDate IS NULL THEN 1
+                ELSE 0
+            END,
+            NotificationDate DESC,
+            NotificationTime DESC,
+            NotificationID DESC
+    ";
+
+
+            // ============================================================
+            // EXECUTE
+            // ============================================================
+
+            using (SqlConnection connection =
+                   new SqlConnection(connectionString))
+            {
+                await connection.OpenAsync();
+
+                using (SqlCommand command =
+                       new SqlCommand(sql, connection))
+                {
+                    command.Parameters.Add(
+                        "@CreatedBy",
+                        SqlDbType.Int).Value = tpoId.Value;
+
+
+                    // Type
+                    if (!string.IsNullOrWhiteSpace(type) &&
+                        !type.Equals("All", StringComparison.OrdinalIgnoreCase))
+                    {
+                        command.Parameters.Add(
+                            "@Type",
+                            SqlDbType.NVarChar, 50).Value = type;
+                    }
+
+
+                    // Audience
+                    if (!string.IsNullOrWhiteSpace(audience) &&
+                        !audience.Equals("All", StringComparison.OrdinalIgnoreCase))
+                    {
+                        command.Parameters.Add(
+                            "@Audience",
+                            SqlDbType.NVarChar, 50).Value = audience;
+                    }
+
+
+                    // From Date
+                    if (fromDate.HasValue)
+                    {
+                        command.Parameters.Add(
+                            "@FromDate",
+                            SqlDbType.Date).Value = fromDate.Value.Date;
+                    }
+
+
+                    // To Date
+                    if (toDate.HasValue)
+                    {
+                        command.Parameters.Add(
+                            "@ToDate",
+                            SqlDbType.Date).Value = toDate.Value.Date;
+                    }
+
+
+                    using (SqlDataReader reader =
+                           await command.ExecuteReaderAsync())
+                    {
+                        while (await reader.ReadAsync())
+                        {
+                            TPOViewNotificationM item =
+                                new TPOViewNotificationM();
+
+                            item.NotificationID =
+                                Convert.ToInt32(
+                                    reader["NotificationID"]);
+
+                            item.Title =
+                                reader["Title"]?.ToString() ?? "";
+
+                            item.Type =
+                                reader["Type"]?.ToString() ?? "";
+
+                            item.Audience =
+                                reader["Audience"]?.ToString() ?? "";
+
+                            if (reader["NotificationDate"] != DBNull.Value)
+                            {
+                                item.NotificationDate =
+                                    Convert.ToDateTime(
+                                        reader["NotificationDate"]);
+                            }
+
+                            if (reader["NotificationTime"] != DBNull.Value)
+                            {
+                                item.NotificationTime =
+                                    (TimeSpan)reader["NotificationTime"];
+                            }
+
+                            item.Content =
+                                reader["Content"]?.ToString() ?? "";
+
+                            item.SendEmailNotification =
+                                reader["SendEmailNotification"] != DBNull.Value &&
+                                Convert.ToBoolean(
+                                    reader["SendEmailNotification"]);
+
+                            item.IsActive =
+                                reader["IsActive"] != DBNull.Value &&
+                                Convert.ToBoolean(
+                                    reader["IsActive"]);
+
+                            item.IsDeleted =
+                                reader["IsDeleted"] != DBNull.Value &&
+                                Convert.ToBoolean(
+                                    reader["IsDeleted"]);
+
+                            item.CreatedDate =
+                                reader["CreatedDate"] != DBNull.Value
+                                    ? Convert.ToDateTime(reader["CreatedDate"])
+                                    : DateTime.MinValue;
+
+                            if (reader["CreatedBy"] != DBNull.Value)
+                            {
+                                item.CreatedBy =
+                                    Convert.ToInt32(reader["CreatedBy"]);
+                            }
+
+                            item.CreatedByName =
+                                reader["CreatedByName"]?.ToString() ?? "";
+
+                            // ====================================================
+                            // NOTIFICATION TRACKING
+                            // ====================================================
+
+                            item.TotalSent =
+                                reader["TotalSent"] != DBNull.Value
+                                    ? Convert.ToInt32(reader["TotalSent"])
+                                    : 0;
+
+                            item.TotalRead =
+                                reader["TotalRead"] != DBNull.Value
+                                    ? Convert.ToInt32(reader["TotalRead"])
+                                    : 0;
+
+                            item.TotalUnread =
+                                reader["TotalUnread"] != DBNull.Value
+                                    ? Convert.ToInt32(reader["TotalUnread"])
+                                    : 0;
+
+
+                            // ====================================================
+                            // CALCULATE STATUS
+                            // ====================================================
+
+                            DateTime? notificationDateTime = null;
+
+                            if (item.NotificationDate.HasValue)
+                            {
+                                DateTime date = item.NotificationDate.Value.Date;
+
+                                if (item.NotificationTime.HasValue)
+                                {
+                                    notificationDateTime =
+                                        date.Add(item.NotificationTime.Value);
+                                }
+                                else
+                                {
+                                    // Date-only notification remains active
+                                    // for the complete day.
+                                    notificationDateTime =
+                                        date.AddDays(1).AddTicks(-1);
+                                }
+                            }
+
+                            if (!item.IsActive)
+                            {
+                                item.Status = "Inactive";
+                            }
+                            else if (notificationDateTime.HasValue &&
+                                     notificationDateTime.Value < DateTime.Now)
+                            {
+                                item.Status = "Completed";
+                            }
+                            else
+                            {
+                                item.Status = "Active";
+                            }
+
+                            // ====================================================
+                            // ATTACHMENT 1
+                            // ====================================================
+
+                            item.Attachment1OriginalName =
+                                reader["Attachment1OriginalName"] != DBNull.Value
+                                    ? reader["Attachment1OriginalName"].ToString()
+                                    : null;
+
+                            item.Attachment1FileName =
+                                reader["Attachment1FileName"] != DBNull.Value
+                                    ? reader["Attachment1FileName"].ToString()
+                                    : null;
+
+                            item.Attachment1Path =
+                                reader["Attachment1Path"] != DBNull.Value
+                                    ? reader["Attachment1Path"].ToString()
+                                    : null;
+
+                            item.Attachment1ContentType =
+                                reader["Attachment1ContentType"] != DBNull.Value
+                                    ? reader["Attachment1ContentType"].ToString()
+                                    : null;
+
+                            if (reader["Attachment1Size"] != DBNull.Value)
+                            {
+                                item.Attachment1Size =
+                                    Convert.ToInt64(reader["Attachment1Size"]);
+                            }
+
+
+                            // ====================================================
+                            // ATTACHMENT 2
+                            // ====================================================
+
+                            item.Attachment2OriginalName =
+                                reader["Attachment2OriginalName"] != DBNull.Value
+                                    ? reader["Attachment2OriginalName"].ToString()
+                                    : null;
+
+                            item.Attachment2FileName =
+                                reader["Attachment2FileName"] != DBNull.Value
+                                    ? reader["Attachment2FileName"].ToString()
+                                    : null;
+
+                            item.Attachment2Path =
+                                reader["Attachment2Path"] != DBNull.Value
+                                    ? reader["Attachment2Path"].ToString()
+                                    : null;
+
+                            item.Attachment2ContentType =
+                                reader["Attachment2ContentType"] != DBNull.Value
+                                    ? reader["Attachment2ContentType"].ToString()
+                                    : null;
+
+                            if (reader["Attachment2Size"] != DBNull.Value)
+                            {
+                                item.Attachment2Size =
+                                    Convert.ToInt64(reader["Attachment2Size"]);
+                            }
+
+                            notifications.Add(item);
+                        }
+                    }
+                }
+            }
+
+
+            // ============================================================
+            // FILTER VALUES FOR VIEW
+            // ============================================================
+
+            ViewBag.SelectedType = type ?? "All";
+            ViewBag.SelectedAudience = audience ?? "All";
+            ViewBag.FromDate = fromDate?.ToString("yyyy-MM-dd");
+            ViewBag.ToDate = toDate?.ToString("yyyy-MM-dd");
+
+            ViewBag.TotalNotifications = notifications.Count;
+
+
+            return View(notifications);
+        }
+
+
+        // shrirang 08/10/26
+        [HttpGet]
+        [Route("TPO/ViewNotificationDetails/{id:int}")]
+        public async Task<IActionResult> ViewNotificationDetails(int id)
+        {
+            // ============================================================
+            // CHECK TPO LOGIN
+            // ============================================================
+
+            int? tpoId = HttpContext.Session.GetInt32("TPOID");
+
+            if (tpoId == null)
+            {
+                return Unauthorized();
+            }
+
+            string connectionString =
+                _configuration.GetConnectionString("DefaultConnection");
+
+            TPOViewNotificationM? item = null;
+
+            string sql = @"
+        SELECT
+            NotificationID,
+            Title,
+            Type,
+            Audience,
+            NotificationDate,
+            NotificationTime,
+            Content,
+            SendEmailNotification,
+
+            Attachment1OriginalName,
+            Attachment1FileName,
+            Attachment1Path,
+            Attachment1ContentType,
+            Attachment1Size,
+
+            Attachment2OriginalName,
+            Attachment2FileName,
+            Attachment2Path,
+            Attachment2ContentType,
+            Attachment2Size,
+
+            CreatedBy,
+            CreatedByName,
+            IsActive,
+            IsDeleted,
+            CreatedDate,
+            UpdatedDate
+
+        FROM tblTPONotification
+
+        WHERE NotificationID = @NotificationID
+          AND CreatedBy = @CreatedBy
+          AND IsDeleted = 0
+    ";
+
+            using (SqlConnection connection =
+                   new SqlConnection(connectionString))
+            {
+                await connection.OpenAsync();
+
+                using (SqlCommand command =
+                       new SqlCommand(sql, connection))
+                {
+                    command.Parameters.Add(
+                        "@NotificationID",
+                        SqlDbType.Int).Value = id;
+
+                    command.Parameters.Add(
+                        "@CreatedBy",
+                        SqlDbType.Int).Value = tpoId.Value;
+
+                    using (SqlDataReader reader =
+                           await command.ExecuteReaderAsync())
+                    {
+                        if (await reader.ReadAsync())
+                        {
+                            item = new TPOViewNotificationM();
+
+                            item.NotificationID =
+                                Convert.ToInt32(
+                                    reader["NotificationID"]);
+
+                            item.Title =
+                                reader["Title"]?.ToString() ?? "";
+
+                            item.Type =
+                                reader["Type"]?.ToString() ?? "";
+
+                            item.Audience =
+                                reader["Audience"]?.ToString() ?? "";
+
+                            if (reader["NotificationDate"] != DBNull.Value)
+                            {
+                                item.NotificationDate =
+                                    Convert.ToDateTime(
+                                        reader["NotificationDate"]);
+                            }
+
+                            if (reader["NotificationTime"] != DBNull.Value)
+                            {
+                                item.NotificationTime =
+                                    (TimeSpan)reader["NotificationTime"];
+                            }
+
+                            item.Content =
+                                reader["Content"]?.ToString() ?? "";
+
+                            item.SendEmailNotification =
+                                reader["SendEmailNotification"] != DBNull.Value &&
+                                Convert.ToBoolean(
+                                    reader["SendEmailNotification"]);
+
+                            // ====================================================
+                            // ATTACHMENT 1
+                            // ====================================================
+
+                            item.Attachment1OriginalName =
+                                reader["Attachment1OriginalName"]?.ToString();
+
+                            item.Attachment1FileName =
+                                reader["Attachment1FileName"]?.ToString();
+
+                            item.Attachment1Path =
+                                reader["Attachment1Path"]?.ToString();
+
+                            // ====================================================
+                            // ATTACHMENT 2
+                            // ====================================================
+
+                            item.Attachment2OriginalName =
+                                reader["Attachment2OriginalName"]?.ToString();
+
+                            item.Attachment2FileName =
+                                reader["Attachment2FileName"]?.ToString();
+
+                            item.Attachment2Path =
+                                reader["Attachment2Path"]?.ToString();
+
+                            // ====================================================
+                            // CREATED BY
+                            // ====================================================
+
+                            if (reader["CreatedBy"] != DBNull.Value)
+                            {
+                                item.CreatedBy =
+                                    Convert.ToInt32(
+                                        reader["CreatedBy"]);
+                            }
+
+                            item.CreatedByName =
+                                reader["CreatedByName"]?.ToString() ?? "";
+
+                            item.IsActive =
+                                reader["IsActive"] != DBNull.Value &&
+                                Convert.ToBoolean(
+                                    reader["IsActive"]);
+
+                            item.IsDeleted =
+                                reader["IsDeleted"] != DBNull.Value &&
+                                Convert.ToBoolean(
+                                    reader["IsDeleted"]);
+
+                            if (reader["CreatedDate"] != DBNull.Value)
+                            {
+                                item.CreatedDate =
+                                    Convert.ToDateTime(
+                                        reader["CreatedDate"]);
+                            }
+
+                           
+                            // ====================================================
+                            // STATUS
+                            // ====================================================
+
+                            DateTime? notificationDateTime = null;
+
+                            if (item.NotificationDate.HasValue)
+                            {
+                                DateTime date =
+                                    item.NotificationDate.Value.Date;
+
+                                if (item.NotificationTime.HasValue)
+                                {
+                                    notificationDateTime =
+                                        date.Add(
+                                            item.NotificationTime.Value);
+                                }
+                                else
+                                {
+                                    notificationDateTime =
+                                        date.AddDays(1).AddTicks(-1);
+                                }
+                            }
+
+                            if (!item.IsActive)
+                            {
+                                item.Status = "Inactive";
+                            }
+                            else if (notificationDateTime.HasValue &&
+                                     notificationDateTime.Value < DateTime.Now)
+                            {
+                                item.Status = "Completed";
+                            }
+                            else
+                            {
+                                item.Status = "Active";
+                            }
+                        }
+                    }
+                }
+            }
+
+            if (item == null)
+            {
+                return NotFound();
+            }
+
+            return PartialView(
+                "_ViewNotificationDetails",
+                item);
+        }
+
+
+        // shrirang 08/10/26
+        // tpo send notification
+        // =====================================================
+        // SEND NOTIFICATION
+        // =====================================================
+
+        // shrirang 08/10/26
+        // tpo send notification
+        // =====================================================
+        // SEND NOTIFICATION
+        // =====================================================
+
+        [HttpGet]
+        [Route("TPO/SendNotification")]
+        public IActionResult SendNotification(
+            int? notificationId,
+            string? searchText,
+            int? departmentId,
+            int? branchId)
+        {
+            // =====================================================
+            // CHECK TPO LOGIN
+            // =====================================================
+
+            int? tpoId =
+                HttpContext.Session.GetInt32("TPOID");
+
+            if (tpoId == null)
+            {
+                return RedirectToAction(
+                    "TPOLogin",
+                    "Account");
+            }
+
+
+            // =====================================================
+            // GET TPO DETAILS
+            // =====================================================
+
+            TPORegistration? tpo =
+                _accountRepository.GetTPODetails(
+                    tpoId.Value);
+
+            if (tpo == null)
+            {
+                TempData["Error"] =
+                    "TPO details could not be found.";
+
+                return RedirectToAction(
+                    "TPOLogin",
+                    "Account");
+            }
+
+
+            // =====================================================
+            // GET TPO COLLEGE
+            // =====================================================
+
+            int collegeId = 0;
+
+            if (tpo.CollegeName != null)
+            {
+                collegeId =
+                    Convert.ToInt32(
+                        tpo.CollegeName);
+            }
+
+
+            if (collegeId <= 0)
+            {
+                TempData["Error"] =
+                    "College information is not available.";
+
+                return RedirectToAction(
+                    "TPODashboard");
+            }
+
+
+            // =====================================================
+            // GET DEPARTMENTS
+            // =====================================================
+
+            List<DepartmentM> departments =
+                _accountRepository.GetDepartments();
+
+
+            // =====================================================
+            // VALIDATE DEPARTMENT
+            // =====================================================
+
+            if (departmentId.HasValue)
+            {
+                bool departmentExists =
+                    departments.Any(
+                        x => x.nID == departmentId.Value);
+
+                if (!departmentExists)
+                {
+                    departmentId = null;
+                }
+            }
+
+
+            // =====================================================
+            // GET BRANCHES
+            // =====================================================
+
+            List<BranchM> branches =
+                new List<BranchM>();
+
+            if (departmentId.HasValue &&
+                departmentId.Value > 0)
+            {
+                branches =
+                    _accountRepository.GetBranches(
+                        departmentId.Value);
+            }
+
+
+            // =====================================================
+            // VALIDATE BRANCH
+            // =====================================================
+
+            if (branchId.HasValue)
+            {
+                bool branchExists =
+                    branches.Any(
+                        x => x.nID == branchId.Value);
+
+                if (!branchExists)
+                {
+                    branchId = null;
+                }
+            }
+
+
+            // =====================================================
+            // GET NOTIFICATIONS
+            // =====================================================
+
+            List<TPONotificationListM> notifications =
+                _accountRepository.GetTPONotificationsForSend(
+                    tpoId.Value);
+
+            // Sub-TPO: show only approved notifications.
+            // Main TPO: preserve the existing notification list.
+            bool isSubTpo =
+     HttpContext.Session.GetString("SubTpoBit") == "1";
+
+            if (isSubTpo)
+            {
+                notifications = notifications
+                    .Where(n => string.Equals(
+                        n.ApprovalStatus,
+                        "Approved",
+                        StringComparison.OrdinalIgnoreCase))
+                    .ToList();
+            }
+
+
+            // =====================================================
+            // GET STUDENTS
+            // =====================================================
+
+            TPOTraineeFilterM filter =
+                new TPOTraineeFilterM
+                {
+                    CollegeId = collegeId,
+
+                    SearchText =
+                        string.IsNullOrWhiteSpace(searchText)
+                        ? null
+                        : searchText.Trim(),
+
+                    DepartmentId =
+                        departmentId,
+
+                    BranchId =
+                        branchId
+                };
+
+
+            List<TPOTraineeInfoM> students =
+                _accountRepository.GetTPOTraineesByCollege(
+                    filter);
+
+
+            // =====================================================
+            // CREATE VIEW MODEL
+            // =====================================================
+
+            TPOSendNotificationM model =
+                new TPOSendNotificationM
+                {
+                    TPOID = tpoId.Value,
+
+                    CollegeCode =
+                        tpo.CollegeCode,
+
+                    Students =
+                        students,
+
+                    SelectedCandidateIDs =
+                        new List<int>()
+                };
+
+
+            // =====================================================
+            // SELECT NOTIFICATION
+            // =====================================================
+
+            if (notificationId.HasValue)
+            {
+                TPONotificationListM? selected =
+                    notifications.FirstOrDefault(
+                        x =>
+                            x.NotificationID ==
+                            notificationId.Value);
+
+                if (selected != null)
+                {
+                    model.NotificationID =
+                        selected.NotificationID;
+
+                    model.Title =
+                        selected.Title;
+
+                    model.Type =
+                        selected.Type;
+
+                    model.Audience =
+                        selected.Audience;
+
+                    model.NotificationDate =
+                        selected.NotificationDate;
+
+                    model.NotificationTime =
+                        selected.NotificationTime;
+
+                    model.Content =
+                        selected.Content;
+
+                    model.Attachment1OriginalName =
+                        selected.Attachment1OriginalName;
+
+                    model.Attachment1Path =
+                        selected.Attachment1Path;
+
+                    model.Attachment2OriginalName =
+                        selected.Attachment2OriginalName;
+
+                    model.Attachment2Path =
+                        selected.Attachment2Path;
+                }
+            }
+
+
+            // =====================================================
+            // VIEWBAG
+            // =====================================================
+
+            ViewBag.Notifications =
+                notifications;
+
+            ViewBag.Departments =
+                departments;
+
+            ViewBag.Branches =
+                branches;
+
+            ViewBag.CollegeId =
+                collegeId;
+
+            ViewBag.CollegeCode =
+                tpo.CollegeCode;
+
+            ViewBag.CollegeName =
+                tpo.CollegeName;
+
+            ViewBag.DepartmentId =
+                departmentId;
+
+            ViewBag.BranchId =
+                branchId;
+
+            ViewBag.SearchText =
+                searchText;
+
+            ViewBag.TraineeCount =
+                students.Count;
+
+
+            // =====================================================
+            // RETURN VIEW
+            // =====================================================
+
+            return View(
+                "SendNotification",
+                model);
+        }
+
+
+
+        // =====================================================
+        // SEND NOTIFICATION - POST
+        // =====================================================
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        [Route("TPO/SendNotification")]
+        public IActionResult SendNotification(
+            TPOSendNotificationM model)
+        {
+            // =====================================================
+            // CHECK TPO LOGIN
+            // =====================================================
+
+            int? tpoId =
+                HttpContext.Session.GetInt32("TPOID");
+
+            if (tpoId == null)
+            {
+                return RedirectToAction(
+                    "TPOLogin",
+                    "Account");
+            }
+
+
+            // =====================================================
+            // GET TPO DETAILS
+            // =====================================================
+
+            TPORegistration? tpo =
+                _accountRepository.GetTPODetails(
+                    tpoId.Value);
+
+            if (tpo == null)
+            {
+                TempData["Error"] =
+                    "TPO details could not be found.";
+
+                return RedirectToAction(
+                    "TPOLogin",
+                    "Account");
+            }
+
+
+            // =====================================================
+            // GET COLLEGE ID
+            // =====================================================
+
+            int collegeId = 0;
+
+            if (!string.IsNullOrWhiteSpace(
+                tpo.CollegeName))
+            {
+                if (!int.TryParse(
+                    tpo.CollegeName,
+                    out collegeId))
+                {
+                    collegeId = 0;
+                }
+            }
+
+
+            // =====================================================
+            // VALIDATE COLLEGE
+            // =====================================================
+
+            if (collegeId <= 0)
+            {
+                TempData["Error"] =
+                    "College information is not available.";
+
+                return RedirectToAction(
+                    "SendNotification");
+            }
+
+
+            // =====================================================
+            // VALIDATE NOTIFICATION
+            // =====================================================
+
+            if (model.NotificationID <= 0)
+            {
+                TempData["Error"] =
+                    "Please select a notification.";
+
+                return RedirectToAction(
+                    "SendNotification");
+            }
+
+
+            // =====================================================
+            // SUB-TPO APPROVAL VALIDATION
+            // Main TPO workflow remains unchanged.
+            // =====================================================
+
+            bool isSubTpo =
+                HttpContext.Session.GetString("SubTpoBit") == "1";
+
+            if (isSubTpo)
+            {
+                string connectionString =
+                    _configuration.GetConnectionString("DefaultConnection")
+                    ?? throw new InvalidOperationException(
+                        "DefaultConnection is not configured.");
+
+                using (var connection =
+                    new Microsoft.Data.SqlClient.SqlConnection(
+                        connectionString))
+                {
+                    connection.Open();
+
+                    const string sql = @"
+            SELECT COUNT(1)
+            FROM tblTPONotification
+            WHERE NotificationID = @NotificationID
+              AND CreatedBy = @TPOID
+              AND ApprovalStatus = 'Approved'
+              AND IsDeleted = 0
+              AND IsActive = 1;";
+
+                    using (var command =
+                        new Microsoft.Data.SqlClient.SqlCommand(
+                            sql, connection))
+                    {
+                        command.Parameters.Add(
+                            "@NotificationID",
+                            System.Data.SqlDbType.Int)
+                            .Value = model.NotificationID;
+
+                        command.Parameters.Add(
+                            "@TPOID",
+                            System.Data.SqlDbType.Int)
+                            .Value = tpoId.Value;
+
+                        int approved =
+                            Convert.ToInt32(command.ExecuteScalar());
+
+                        if (approved != 1)
+                        {
+                            TempData["Error"] =
+                                "This notification is not approved for sending, " +
+                                "is inactive, or does not belong to your account.";
+
+                            return RedirectToAction(
+                                "SendNotification",
+                                new
+                                {
+                                    notificationId = model.NotificationID
+                                });
+                        }
+                    }
+                }
+            }
+
+
+            // =====================================================
+            // VALIDATE STUDENTS
+            // =====================================================
+
+            if (model.SelectedCandidateIDs == null ||
+                model.SelectedCandidateIDs.Count == 0)
+            {
+                TempData["Error"] =
+                    "Please select at least one student.";
+
+                return RedirectToAction(
+                    "SendNotification",
+                    new
+                    {
+                        notificationId =
+                            model.NotificationID
+                    });
+            }
+
+
+            // =====================================================
+            // REMOVE DUPLICATE IDS
+            // =====================================================
+
+            model.SelectedCandidateIDs =
+                model.SelectedCandidateIDs
+                .Where(x => x > 0)
+                .Distinct()
+                .ToList();
+
+
+            if (model.SelectedCandidateIDs.Count == 0)
+            {
+                TempData["Error"] =
+                    "No valid students were selected.";
+
+                return RedirectToAction(
+                    "SendNotification",
+                    new
+                    {
+                        notificationId =
+                            model.NotificationID
+                    });
+            }
+
+
+            // =====================================================
+            // SEND NOTIFICATION
+            // =====================================================
+
+            try
+            {
+                int insertedCount =
+                    _accountRepository.SendTPONotificationToCandidates(
+                        tpoId.Value,
+                        model.NotificationID,
+                        collegeId,
+                        model.SelectedCandidateIDs);
+
+
+                // =================================================
+                // SUCCESS
+                // =================================================
+
+                if (insertedCount > 0)
+                {
+                    TempData["Success"] =
+                        "Notification sent successfully to "
+                        + insertedCount
+                        + " student(s).";
+                }
+                else
+                {
+                    TempData["Info"] =
+                        "No new recipients were added. "
+                        + "The selected student(s) may have already received this notification.";
+                }
+            }
+            catch (InvalidOperationException ex)
+            {
+                TempData["Error"] =
+                    ex.Message;
+            }
+            catch (Exception)
+            {
+                TempData["Error"] =
+                    "Unable to send notification. Please try again.";
+            }
+
+
+            // =====================================================
+            // REDIRECT BACK
+            // =====================================================
+
+            return RedirectToAction(
+                "SendNotification",
+                new
+                {
+                    notificationId =
+                        model.NotificationID
+                });
+        }
+
+
+        // =====================================================
+        // HELPER: RESOLVE THE TPO COLLEGE ID
+        // Supports either a numeric CollegeName value (legacy
+        // data) or an actual college name.
+        // =====================================================
+
+        private int ResolveTPOCollegeId(TPORegistration tpo)
+        {
+            string collegeName = tpo.CollegeName?.Trim() ?? "";
+
+            if (string.IsNullOrWhiteSpace(collegeName))
+            {
+                return 0;
+            }
+
+            List<CollegeM> colleges =
+                _accountRepository.GetColleges()
+                ?? new List<CollegeM>();
+
+            // Support legacy records where CollegeName contains
+            // the numeric college ID.
+            if (int.TryParse(collegeName, out int parsedCollegeId))
+            {
+                CollegeM? collegeById = colleges.FirstOrDefault(
+                    c => c.nID == parsedCollegeId);
+
+                if (collegeById != null)
+                {
+                    return collegeById.nID;
+                }
+            }
+
+            // Otherwise, resolve the ID using the actual college name.
+            CollegeM? collegeByName = colleges.FirstOrDefault(c =>
+                string.Equals(
+                    c.sCollegeName?.Trim(),
+                    collegeName,
+                    StringComparison.OrdinalIgnoreCase));
+
+            return collegeByName?.nID ?? 0;
+        }
+
+        // =====================================================
+        // GET BRANCHES BY DEPARTMENT
+        // =====================================================
+
+        [HttpGet]
+        [Route("TPO/GetBranchesByDepartment")]
+        public IActionResult GetBranchesByDepartment(int departmentId)
+        {
+            int? tpoId =
+                HttpContext.Session.GetInt32("TPOID");
+
+            if (tpoId == null)
+            {
+                return Unauthorized();
+            }
+
+            if (departmentId <= 0)
+            {
+                return Json(new List<object>());
+            }
+
+            List<BranchM> branches =
+                _accountRepository.GetBranches(departmentId);
+
+            var result =
+                branches.Select(x => new
+                {
+                    id = x.nID,
+                    name = x.sBranch
+                }).ToList();
+
+            return Json(result);
+        }
+
+
+        //shrirang 09/10/26
+
+        [HttpGet]
+        [Route("TPO/EditNotification/{id:int}")]
+        public IActionResult EditNotification(int id)
+        {
+            int? tpoId = HttpContext.Session.GetInt32("TPOID");
+
+            if (tpoId == null)
+                return RedirectToAction("TPOLogin", "Account");
+
+            TPOViewNotificationM? model = null;
+
+            using (SqlConnection cn = new SqlConnection(
+    _configuration.GetConnectionString("DefaultConnection")))
+            {
+                cn.Open();
+
+                string query = @"
+            SELECT *
+            FROM tblTPONotification
+            WHERE NotificationID = @NotificationID
+              AND CreatedBy = @TPOID
+              AND IsDeleted = 0";
+
+                using SqlCommand cmd = new SqlCommand(query, cn);
+
+                cmd.Parameters.Add("@NotificationID", SqlDbType.Int).Value = id;
+                cmd.Parameters.Add("@TPOID", SqlDbType.Int).Value = tpoId.Value;
+
+                using SqlDataReader reader = cmd.ExecuteReader();
+
+                if (reader.Read())
+                {
+                    model = new TPOViewNotificationM
+                    {
+                        NotificationID = Convert.ToInt32(reader["NotificationID"]),
+                        Title = reader["Title"]?.ToString() ?? "",
+                        Type = reader["Type"]?.ToString() ?? "",
+                        Audience = reader["Audience"]?.ToString() ?? "",
+                        NotificationDate = reader["NotificationDate"] == DBNull.Value
+                            ? null
+                            : Convert.ToDateTime(reader["NotificationDate"]),
+                        NotificationTime = reader["NotificationTime"] == DBNull.Value
+                            ? null
+                            : (TimeSpan?)reader["NotificationTime"],
+                        Content = WebUtility.HtmlDecode(
+    Regex.Replace(
+        reader["Content"]?.ToString() ?? "",
+        "<[^>]+>",
+        " "))
+    .Trim(),
+                        SendEmailNotification =
+                            reader["SendEmailNotification"] != DBNull.Value &&
+                            Convert.ToBoolean(reader["SendEmailNotification"]),
+
+                        Attachment1OriginalName =
+                            reader["Attachment1OriginalName"]?.ToString(),
+                        Attachment1FileName =
+                            reader["Attachment1FileName"]?.ToString(),
+                        Attachment1Path =
+                            reader["Attachment1Path"]?.ToString(),
+                        Attachment1ContentType =
+                            reader["Attachment1ContentType"]?.ToString(),
+                        Attachment1Size =
+                            reader["Attachment1Size"] == DBNull.Value
+                                ? null
+                                : Convert.ToInt64(reader["Attachment1Size"]),
+
+                        Attachment2OriginalName =
+                            reader["Attachment2OriginalName"]?.ToString(),
+                        Attachment2FileName =
+                            reader["Attachment2FileName"]?.ToString(),
+                        Attachment2Path =
+                            reader["Attachment2Path"]?.ToString(),
+                        Attachment2ContentType =
+                            reader["Attachment2ContentType"]?.ToString(),
+                        Attachment2Size =
+                            reader["Attachment2Size"] == DBNull.Value
+                                ? null
+                                : Convert.ToInt64(reader["Attachment2Size"]),
+
+                        IsActive = reader["IsActive"] != DBNull.Value &&
+                                   Convert.ToBoolean(reader["IsActive"]),
+
+                        IsDeleted = reader["IsDeleted"] != DBNull.Value &&
+                                    Convert.ToBoolean(reader["IsDeleted"]),
+
+                        CreatedDate = Convert.ToDateTime(reader["CreatedDate"]),
+
+                        CreatedBy = reader["CreatedBy"] == DBNull.Value
+                            ? null
+                            : Convert.ToInt32(reader["CreatedBy"]),
+
+                        CreatedByName = reader["CreatedByName"]?.ToString() ?? ""
+                    };
+                }
+            }
+
+            if (model == null)
+                return NotFound("Notification not found or you are not authorized to edit it.");
+
+            return View("EditNotification", model);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        [Route("TPO/EditNotification/{id:int}")]
+        public async Task<IActionResult> EditNotification(
+    int id,
+    TPOViewNotificationM model)
+        {
+            int? tpoId = HttpContext.Session.GetInt32("TPOID");
+
+            if (tpoId == null)
+                return RedirectToAction("TPOLogin", "Account");
+
+            if (id != model.NotificationID)
+                return BadRequest("Invalid notification ID.");
+
+            // Basic server-side validation
+            if (string.IsNullOrWhiteSpace(model.Title) ||
+                string.IsNullOrWhiteSpace(model.Type) ||
+                string.IsNullOrWhiteSpace(model.Audience) ||
+                string.IsNullOrWhiteSpace(model.Content))
+            {
+                ModelState.AddModelError("", "Please fill in all required fields.");
+                return await LoadEditNotificationView(id, tpoId.Value, model);
+            }
+
+            // Keep these values aligned with the options in your Create form.
+            if (model.Type != "Notification" && model.Type != "Event")
+            {
+                ModelState.AddModelError(nameof(model.Type), "Invalid notification type.");
+                return await LoadEditNotificationView(id, tpoId.Value, model);
+            }
+
+            if (model.Audience != "AllStudents")
+            {
+                ModelState.AddModelError(nameof(model.Audience), "Invalid audience.");
+                return await LoadEditNotificationView(id, tpoId.Value, model);
+            }
+
+            const long maxFileSize = 5 * 1024 * 1024; // 5 MB per attachment
+
+            string[] allowedExtensions =
+            {
+        ".pdf", ".doc", ".docx", ".xls", ".xlsx",
+        ".jpg", ".jpeg", ".png"
+    };
+
+            foreach (var file in new[] { model.AttachFile1, model.AttachFile2 })
+            {
+                if (file == null || file.Length == 0)
+                    continue;
+
+                string extension = Path.GetExtension(file.FileName);
+
+                if (file.Length > maxFileSize)
+                {
+                    ModelState.AddModelError("", "Each attachment must be 5 MB or smaller.");
+                }
+
+                if (!allowedExtensions.Contains(extension, StringComparer.OrdinalIgnoreCase))
+                {
+                    ModelState.AddModelError("", "Unsupported attachment type.");
+                }
+            }
+
+            if (!ModelState.IsValid)
+                return await LoadEditNotificationView(id, tpoId.Value, model);
+
+            // Load the existing record first and verify ownership.
+            TPOViewNotificationM? existing = null;
+
+            using (SqlConnection cn = new SqlConnection(
+    _configuration.GetConnectionString("DefaultConnection")))
+            {
+                await cn.OpenAsync();
+
+                const string selectSql = @"
+            SELECT *
+            FROM tblTPONotification
+            WHERE NotificationID = @NotificationID
+              AND CreatedBy = @TPOID
+              AND IsDeleted = 0;";
+
+                using SqlCommand cmd = new SqlCommand(selectSql, cn);
+
+                cmd.Parameters.Add("@NotificationID", SqlDbType.Int).Value = id;
+                cmd.Parameters.Add("@TPOID", SqlDbType.Int).Value = tpoId.Value;
+
+                using SqlDataReader reader = await cmd.ExecuteReaderAsync();
+
+                if (await reader.ReadAsync())
+                {
+                    existing = new TPOViewNotificationM
+                    {
+                        NotificationID = id,
+
+                        Attachment1OriginalName = reader["Attachment1OriginalName"] as string,
+                        Attachment1FileName = reader["Attachment1FileName"] as string,
+                        Attachment1Path = reader["Attachment1Path"] as string,
+                        Attachment1ContentType = reader["Attachment1ContentType"] as string,
+                        Attachment1Size = reader["Attachment1Size"] == DBNull.Value
+                            ? null : Convert.ToInt64(reader["Attachment1Size"]),
+
+                        Attachment2OriginalName = reader["Attachment2OriginalName"] as string,
+                        Attachment2FileName = reader["Attachment2FileName"] as string,
+                        Attachment2Path = reader["Attachment2Path"] as string,
+                        Attachment2ContentType = reader["Attachment2ContentType"] as string,
+                        Attachment2Size = reader["Attachment2Size"] == DBNull.Value
+                            ? null : Convert.ToInt64(reader["Attachment2Size"])
+                    };
+                }
+            }
+
+            if (existing == null)
+                return NotFound("Notification not found or you are not authorized to edit it.");
+
+            // Save replacement files using unique server-generated names.
+            string uploadFolder = Path.Combine(
+                _environment.WebRootPath,
+                "Uploads",
+                "TPO",
+                "Notifications");
+
+            Directory.CreateDirectory(uploadFolder);
+
+            async Task<(string OriginalName, string FileName, string WebPath,
+                string ContentType, long Size)> SaveAttachment(IFormFile file)
+            {
+                string originalName = Path.GetFileName(file.FileName);
+                string extension = Path.GetExtension(originalName).ToLowerInvariant();
+                string savedFileName = $"{Guid.NewGuid():N}{extension}";
+                string physicalPath = Path.Combine(uploadFolder, savedFileName);
+
+                await using (var stream = new FileStream(
+                    physicalPath, FileMode.CreateNew, FileAccess.Write))
+                {
+                    await file.CopyToAsync(stream);
+                }
+
+                string contentType = Path.GetExtension(originalName).ToLowerInvariant() switch
+                {
+                    ".pdf" => "application/pdf",
+                    ".doc" => "application/msword",
+                    ".docx" => "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+                    ".xls" => "application/vnd.ms-excel",
+                    ".xlsx" => "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                    ".jpg" or ".jpeg" => "image/jpeg",
+                    ".png" => "image/png",
+                    _ => "application/octet-stream"
+                };
+
+                return (
+                    originalName,
+                    savedFileName,
+                    "/Uploads/TPO/Notifications/" + savedFileName,
+                    contentType,
+                    file.Length
+                );
+            }
+
+            try
+            {
+                if (model.AttachFile1?.Length > 0)
+                {
+                    var file = await SaveAttachment(model.AttachFile1);
+
+                    existing.Attachment1OriginalName = file.OriginalName;
+                    existing.Attachment1FileName = file.FileName;
+                    existing.Attachment1Path = file.WebPath;
+                    existing.Attachment1ContentType = file.ContentType;
+                    existing.Attachment1Size = file.Size;
+                }
+
+                if (model.AttachFile2?.Length > 0)
+                {
+                    var file = await SaveAttachment(model.AttachFile2);
+
+                    existing.Attachment2OriginalName = file.OriginalName;
+                    existing.Attachment2FileName = file.FileName;
+                    existing.Attachment2Path = file.WebPath;
+                    existing.Attachment2ContentType = file.ContentType;
+                    existing.Attachment2Size = file.Size;
+                }
+
+                using SqlConnection cn = new SqlConnection(
+           _configuration.GetConnectionString("DefaultConnection"));
+
+                await cn.OpenAsync();
+
+                const string updateSql = @"
+            UPDATE tblTPONotification
+            SET
+                Title = @Title,
+                Type = @Type,
+                Audience = @Audience,
+                NotificationDate = @NotificationDate,
+                NotificationTime = @NotificationTime,
+                Content = @Content,
+                SendEmailNotification = @SendEmailNotification,
+
+                Attachment1OriginalName = @Attachment1OriginalName,
+                Attachment1FileName = @Attachment1FileName,
+                Attachment1Path = @Attachment1Path,
+                Attachment1ContentType = @Attachment1ContentType,
+                Attachment1Size = @Attachment1Size,
+
+                Attachment2OriginalName = @Attachment2OriginalName,
+                Attachment2FileName = @Attachment2FileName,
+                Attachment2Path = @Attachment2Path,
+                Attachment2ContentType = @Attachment2ContentType,
+                Attachment2Size = @Attachment2Size
+
+            WHERE NotificationID = @NotificationID
+              AND CreatedBy = @TPOID
+              AND IsDeleted = 0;";
+
+                using SqlCommand cmd = new SqlCommand(updateSql, cn);
+
+                cmd.Parameters.Add("@NotificationID", SqlDbType.Int).Value = id;
+                cmd.Parameters.Add("@TPOID", SqlDbType.Int).Value = tpoId.Value;
+
+                cmd.Parameters.Add("@Title", SqlDbType.NVarChar, 200).Value = model.Title.Trim();
+                cmd.Parameters.Add("@Type", SqlDbType.NVarChar, 50).Value = model.Type;
+                cmd.Parameters.Add("@Audience", SqlDbType.NVarChar, 100).Value = model.Audience;
+
+                cmd.Parameters.Add("@NotificationDate", SqlDbType.DateTime).Value =
+                    model.NotificationDate.HasValue
+                        ? model.NotificationDate.Value
+                        : DBNull.Value;
+
+                cmd.Parameters.Add("@NotificationTime", SqlDbType.Time).Value =
+                    model.NotificationTime.HasValue
+                        ? model.NotificationTime.Value
+                        : DBNull.Value;
+
+                cmd.Parameters.Add("@Content", SqlDbType.NVarChar, -1).Value = model.Content.Trim();
+
+                cmd.Parameters.Add("@SendEmailNotification", SqlDbType.Bit).Value =
+                    model.SendEmailNotification;
+
+                AddNullableParameter(cmd, "@Attachment1OriginalName", SqlDbType.NVarChar, 255, existing.Attachment1OriginalName);
+                AddNullableParameter(cmd, "@Attachment1FileName", SqlDbType.NVarChar, 255, existing.Attachment1FileName);
+                AddNullableParameter(cmd, "@Attachment1Path", SqlDbType.NVarChar, 500, existing.Attachment1Path);
+                AddNullableParameter(cmd, "@Attachment1ContentType", SqlDbType.NVarChar, 150, existing.Attachment1ContentType);
+                AddNullableParameter(cmd, "@Attachment1Size", SqlDbType.BigInt, 0, existing.Attachment1Size);
+
+                AddNullableParameter(cmd, "@Attachment2OriginalName", SqlDbType.NVarChar, 255, existing.Attachment2OriginalName);
+                AddNullableParameter(cmd, "@Attachment2FileName", SqlDbType.NVarChar, 255, existing.Attachment2FileName);
+                AddNullableParameter(cmd, "@Attachment2Path", SqlDbType.NVarChar, 500, existing.Attachment2Path);
+                AddNullableParameter(cmd, "@Attachment2ContentType", SqlDbType.NVarChar, 150, existing.Attachment2ContentType);
+                AddNullableParameter(cmd, "@Attachment2Size", SqlDbType.BigInt, 0, existing.Attachment2Size);
+
+                int rowsUpdated = await cmd.ExecuteNonQueryAsync();
+
+                if (rowsUpdated == 0)
+                    return NotFound("Notification could not be updated.");
+
+                TempData["SuccessMessage"] = "Notification updated successfully.";
+
+                return RedirectToAction(nameof(ViewNotificationEvent));
+            }
+            catch (Exception ex)
+            {
+                // Log the exception in your application's logger in production.
+                ModelState.AddModelError("", "Unable to update the notification. Please try again.");
+                return await LoadEditNotificationView(id, tpoId.Value, model);
+            }
+        }
+
+        private async Task<IActionResult> LoadEditNotificationView(
+    int id,
+    int tpoId,
+    TPOViewNotificationM model)
+        {
+            // Re-fetch the existing attachment links so they remain visible
+            // if the user submits the form with a validation error.
+            using SqlConnection cn = new SqlConnection(
+    _configuration.GetConnectionString("DefaultConnection"));
+
+            await cn.OpenAsync();
+
+            const string sql = @"
+        SELECT Attachment1OriginalName, Attachment1Path,
+               Attachment2OriginalName, Attachment2Path
+        FROM tblTPONotification
+        WHERE NotificationID = @ID
+          AND CreatedBy = @TPOID
+          AND IsDeleted = 0;";
+
+            using SqlCommand cmd = new SqlCommand(sql, cn);
+            cmd.Parameters.Add("@ID", SqlDbType.Int).Value = id;
+            cmd.Parameters.Add("@TPOID", SqlDbType.Int).Value = tpoId;
+
+            using SqlDataReader reader = await cmd.ExecuteReaderAsync();
+
+            if (!await reader.ReadAsync())
+                return NotFound();
+
+            model.Attachment1OriginalName =
+                reader["Attachment1OriginalName"] as string;
+            model.Attachment1Path =
+                reader["Attachment1Path"] as string;
+
+            model.Attachment2OriginalName =
+                reader["Attachment2OriginalName"] as string;
+            model.Attachment2Path =
+                reader["Attachment2Path"] as string;
+
+            return View("EditNotification", model);
+        }
+
+        private static void AddNullableParameter(
+            SqlCommand cmd,
+            string name,
+            SqlDbType type,
+            int size,
+            object? value)
+        {
+            SqlParameter parameter = size > 0
+                ? cmd.Parameters.Add(name, type, size)
+                : cmd.Parameters.Add(name, type);
+
+            parameter.Value = value ?? DBNull.Value;
+        }
+
+        // shriang 09/10/26
+        // tpo schedular
+        // =====================================================
+        // TPO SCHEDULER
+        // =====================================================
+
+        [HttpGet]
+        public IActionResult Scheduler()
+        {
+            int? tpoId = HttpContext.Session.GetInt32("TPOID");
+
+
+if (tpoId == null || tpoId <= 0)
+            {
+                return RedirectToAction("TPOLogin", "Account");
+            }
+
+            ViewData["Panel"] = "TPO";
+            ViewData["UserName"] =
+                HttpContext.Session.GetString("TPOName") ?? "TPO";
+
+            ViewData["Title"] = "TPO Scheduler";
+
+            // Load saved schedules for the logged-in TPO.
+            ViewBag.GeneralActivities =
+                _schedulerRepository.GetGeneralActivities(tpoId.Value);
+
+            ViewBag.PlacementDrives =
+                _schedulerRepository.GetPlacementDrives(tpoId.Value);
+
+            return View();
+
+
+}
+
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public IActionResult Scheduler(TPOSchedulerPageM model)
+        {
+            int? tpoId = HttpContext.Session.GetInt32("TPOID");
+
+            if (tpoId == null || tpoId <= 0)
+            {
+                return RedirectToAction("TPOLogin", "Account");
+            }
+
+            // Validate only the form the user selected.
+            if (model.ActivityType == "General")
+            {
+                foreach (var key in ModelState.Keys
+                             .Where(k => k.StartsWith(
+                                 "Placement.",
+                                 StringComparison.OrdinalIgnoreCase))
+                             .ToList())
+                {
+                    ModelState.Remove(key);
+                }
+            }
+            else if (model.ActivityType == "PlacementDrive")
+            {
+                foreach (var key in ModelState.Keys
+                             .Where(k => k.StartsWith(
+                                 "General.",
+                                 StringComparison.OrdinalIgnoreCase))
+                             .ToList())
+                {
+                    ModelState.Remove(key);
+                }
+            }
+            else
+            {
+                ModelState.AddModelError(
+                    "ActivityType", "Please select a valid activity type.");
+            }
+
+            if (ModelState.IsValid)
+            {
+                try
+                {
+                    if (model.ActivityType == "General")
+                    {
+                        var activity = model.General;
+
+                        if (activity.EndDate.Date < activity.StartDate.Date)
+                        {
+                            ModelState.AddModelError(
+                                "General.EndDate",
+                                "End date cannot be earlier than start date.");
+                        }
+                        else if (activity.EndDate.Date == activity.StartDate.Date
+                                 && activity.EndTime <= activity.StartTime)
+                        {
+                            ModelState.AddModelError(
+                                "General.EndTime",
+                                "End time must be later than start time.");
+                        }
+                        else
+                        {
+                            activity.TPOID = tpoId.Value;
+
+                            if (activity.ActivityID > 0)
+                            {
+                                bool updated = _schedulerRepository.UpdateGeneralActivity(
+                                    activity, tpoId.Value);
+
+                                if (!updated)
+                                {
+                                    ModelState.AddModelError(
+                                        string.Empty,
+                                        "Activity not found or you are not authorized to edit it.");
+                                }
+                                else
+                                {
+                                    TempData["SchedulerSuccess"] =
+                                        "General activity updated successfully.";
+
+                                    return RedirectToAction(nameof(Scheduler));
+                                }
+                            }
+                            else
+                            {
+                                _schedulerRepository.SaveGeneralActivity(
+                                    activity, tpoId.Value);
+
+                                TempData["SchedulerSuccess"] =
+                                    "General activity saved successfully.";
+
+                                return RedirectToAction(nameof(Scheduler));
+                            }
+                        }
+                    }
+                    else if (model.ActivityType == "PlacementDrive")
+                    {
+                        var drive = model.Placement;
+
+                        if (drive.EndDate.Date < drive.StartDate.Date)
+                        {
+                            ModelState.AddModelError(
+                                "Placement.EndDate",
+                                "End date cannot be earlier than start date.");
+                        }
+                        else if (drive.StartDate.Date == drive.EndDate.Date
+                                 && drive.StartTime.HasValue
+                                 && drive.EndTime.HasValue
+                                 && drive.EndTime.Value <= drive.StartTime.Value)
+                        {
+                            ModelState.AddModelError(
+                                "Placement.EndTime",
+                                "End time must be later than start time.");
+                        }
+                        else
+                        {
+                            drive.TPOID = tpoId.Value;
+
+                            if (drive.PlacementDriveID > 0)
+                            {
+                                bool updated = _schedulerRepository.UpdatePlacementDrive(
+                                    drive, tpoId.Value);
+
+                                if (!updated)
+                                {
+                                    ModelState.AddModelError(
+                                        string.Empty,
+                                        "Placement drive not found or you are not authorized to edit it.");
+                                }
+                                else
+                                {
+                                    TempData["SchedulerSuccess"] =
+                                        "Placement drive updated successfully.";
+
+                                    return RedirectToAction(nameof(Scheduler));
+                                }
+                            }
+                            else
+                            {
+                                _schedulerRepository.SavePlacementDrive(
+                                    drive, tpoId.Value);
+
+                                TempData["SchedulerSuccess"] =
+                                    "Placement drive saved successfully.";
+
+                                return RedirectToAction(nameof(Scheduler));
+                            }
+
+                            return RedirectToAction(nameof(Scheduler));
+                        }
+                    }
+                }
+                catch (Exception)
+                {
+                    // Log the exception using your application's logger.
+                    ModelState.AddModelError(
+                        string.Empty,
+                        "Unable to save the schedule. Please check the database configuration and try again.");
+                }
+            }
+
+            ViewData["Panel"] = "TPO";
+            ViewData["UserName"] =
+                HttpContext.Session.GetString("TPOName") ?? "TPO";
+            ViewData["Title"] = "TPO Scheduler";
+
+            ViewBag.GeneralActivities =
+                _schedulerRepository.GetGeneralActivities(tpoId.Value);
+
+            ViewBag.PlacementDrives =
+                _schedulerRepository.GetPlacementDrives(tpoId.Value);
+
+            return View(model);
+        }
+
+
+
+
+
+
+        // shrirang 10/10/26
+
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        [Route("TPO/CancelGeneralActivity")]
+        public IActionResult CancelGeneralActivity(int id)
+        {
+            int? tpoId = HttpContext.Session.GetInt32("TPOID");
+
+            if (tpoId == null || tpoId <= 0)
+                return Unauthorized("Your TPO session has expired.");
+
+            if (id <= 0)
+                return BadRequest("Invalid activity ID.");
+
+            try
+            {
+                bool result = _schedulerRepository.CancelGeneralActivity(id, tpoId.Value);
+
+                if (!result)
+                    return NotFound("Activity not found or already cancelled.");
+
+                return Ok("Activity cancelled successfully.");
+            }
+            catch (Exception ex)
+            {
+                // Log ex using your application's logger.
+                return StatusCode(500, "Unable to cancel the activity.");
+            }
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        [Route("TPO/UncancelGeneralActivity")]
+        public IActionResult UncancelGeneralActivity(int id)
+        {
+            int? tpoId = HttpContext.Session.GetInt32("TPOID");
+
+            if (tpoId == null || tpoId <= 0)
+                return Unauthorized("Your TPO session has expired.");
+
+            if (id <= 0)
+                return BadRequest("Invalid activity ID.");
+
+            try
+            {
+                bool result = _schedulerRepository.UncancelGeneralActivity(id, tpoId.Value);
+
+                if (!result)
+                    return NotFound("Activity not found or not eligible for restoration.");
+
+                return Ok("Activity restored successfully.");
+            }
+            catch (Exception ex)
+            {
+                // Log ex using your application's logger.
+                return StatusCode(500, "Unable to restore the activity.");
+            }
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        [Route("TPO/CancelPlacementDrive")]
+        public IActionResult CancelPlacementDrive(int id)
+        {
+            int? tpoId = HttpContext.Session.GetInt32("TPOID");
+
+            if (tpoId == null || tpoId <= 0)
+                return Unauthorized("Your TPO session has expired.");
+
+            if (id <= 0)
+                return BadRequest("Invalid placement drive ID.");
+
+            try
+            {
+                bool result = _schedulerRepository.CancelPlacementDrive(id, tpoId.Value);
+
+                if (!result)
+                    return NotFound("Placement drive not found or already cancelled.");
+
+                return Ok("Placement drive cancelled successfully.");
+            }
+            catch (Exception ex)
+            {
+                // Log ex using your application's logger.
+                return StatusCode(500, "Unable to cancel the placement drive.");
+            }
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        [Route("TPO/UncancelPlacementDrive")]
+        public IActionResult UncancelPlacementDrive(int id)
+        {
+            int? tpoId = HttpContext.Session.GetInt32("TPOID");
+
+            if (tpoId == null || tpoId <= 0)
+                return Unauthorized("Your TPO session has expired.");
+
+            if (id <= 0)
+                return BadRequest("Invalid placement drive ID.");
+
+            try
+            {
+                bool result = _schedulerRepository.UncancelPlacementDrive(id, tpoId.Value);
+
+                if (!result)
+                    return NotFound("Placement drive not found or not eligible for restoration.");
+
+                return Ok("Placement drive restored successfully.");
+            }
+            catch (Exception ex)
+            {
+                // Log ex using your application's logger.
+                return StatusCode(500, "Unable to restore the placement drive.");
+            }
+        }
+
+
+        [HttpGet]
+        [Route("TPO/GeneralActivityDetails")]
+        public IActionResult GeneralActivityDetails(int id)
+        {
+            int? tpoId = HttpContext.Session.GetInt32("TPOID");
+
+            if (tpoId == null || tpoId <= 0)
+                return RedirectToAction("TPOLogin", "Account");
+
+            var activity = _schedulerRepository
+                .GetGeneralActivities(tpoId.Value)
+                .FirstOrDefault(a => a.ActivityID == id);
+
+            if (activity == null)
+                return NotFound("Activity not found or you are not authorized to view it.");
+
+            return View("GeneralActivityDetails", activity);
+        }
+
+        // shrirang 14/10/26
+        // subtpo send ,add , view notification
+
+
+        // =========================================================
+        // SUB-TPO: VIEW NOTIFICATION / EVENT
+        // =========================================================
+
+        [HttpGet]
+        public IActionResult SubTPOViewNotificationEvent()
+        {
+            if (HttpContext.Session.GetInt32("TPOID") == null)
+                return RedirectToAction("TPOLogin", "Account");
+
+            if (HttpContext.Session.GetString("SubTpoBit") != "1")
+                return RedirectToAction("Dashboard", "TPO");
+
+            return View();
+        }
+
+        // =========================================================
+        // SUB-TPO: CREATE NOTIFICATION / EVENT
+        // =========================================================
+
+        [HttpGet]
+        [Route("TPO/SubTPOCreateNotification")]
+        public IActionResult SubTPOCreateNotification()
+        {
+            int? tpoId = HttpContext.Session.GetInt32("TPOID");
+
+            if (tpoId == null)
+                return RedirectToAction("TPOLogin", "Account");
+
+            if (HttpContext.Session.GetString("SubTpoBit") != "1")
+                return Forbid();
+
+            ViewData["Title"] = "Sub-TPO - Create Notification";
+            ViewData["Panel"] = "TPO";
+            ViewData["UserName"] =
+                HttpContext.Session.GetString("TPOName") ?? "Sub-TPO";
+
+            return View();
+        }
+
+        // =========================================================
+        // SUB-TPO: SEND NOTIFICATION / EVENT
+        // =========================================================
+
+        [HttpGet]
+        public IActionResult SubTPOSendNotification()
+        {
+            if (HttpContext.Session.GetInt32("TPOID") == null)
+                return RedirectToAction("TPOLogin", "Account");
+
+            if (HttpContext.Session.GetString("SubTpoBit") != "1")
+                return RedirectToAction("Dashboard", "TPO");
+
+            return View();
+        }
+
+
+        [HttpGet]
+        [Route("TPO/SubTPOViewNotificationEvent")]
+        public async Task<IActionResult> SubTPOViewNotificationEvent(
+    string? type,
+    string? audience,
+    DateTime? fromDate,
+    DateTime? toDate)
+        {
+            // ============================================================
+            // CHECK LOGIN
+            // ============================================================
+            int? tpoId = HttpContext.Session.GetInt32("TPOID");
+
+            if (tpoId == null)
+                return RedirectToAction("TPOLogin", "Account");
+
+            // ============================================================
+            // CHECK SUB-TPO ROLE
+            // ============================================================
+            if (HttpContext.Session.GetString("SubTpoBit") != "1")
+                return RedirectToAction("Dashboard", "TPO");
+
+            // ============================================================
+            // VIEW DATA
+            // ============================================================
+            ViewData["Title"] = "Sub-TPO Notifications / Events";
+            ViewData["Panel"] = "TPO";
+            ViewData["UserName"] =
+                HttpContext.Session.GetString("TPOName") ?? "Sub-TPO";
+
+            var notifications = new List<TPOViewNotificationM>();
+
+            // ============================================================
+            // CONNECTION STRING
+            // ============================================================
+            string connectionString =
+                _configuration.GetConnectionString("DefaultConnection")
+                ?? throw new InvalidOperationException(
+                    "DefaultConnection is not configured.");
+
+            // ============================================================
+            // SQL QUERY
+            // Added:
+            //     N.ApprovalStatus
+            //     N.RejectionReason
+            // ============================================================
+            string sql = @"
+SELECT
+    N.NotificationID,
+    N.Title,
+    N.Type,
+    N.Audience,
+    N.NotificationDate,
+    N.NotificationTime,
+    N.Content,
+    N.SendEmailNotification,
+    N.IsActive,
+    N.IsDeleted,
+    N.CreatedDate,
+    N.CreatedBy,
+    N.CreatedByName,
+
+    -- NEW: Approval workflow fields
+    N.ApprovalStatus,
+    N.RejectionReason,
+
+    -- Existing recipient counts
+    ISNULL(T.TotalSent, 0) AS TotalSent,
+    ISNULL(T.TotalRead, 0) AS TotalRead,
+    ISNULL(T.TotalUnread, 0) AS TotalUnread
+
+FROM tblTPONotification N
+
+OUTER APPLY
+(
+    SELECT
+        COUNT(1) AS TotalSent,
+        SUM(CASE WHEN R.IsRead = 1 THEN 1 ELSE 0 END) AS TotalRead,
+        SUM(CASE WHEN R.IsRead = 0 THEN 1 ELSE 0 END) AS TotalUnread
+    FROM tblTPONotificationRecipient R
+    WHERE R.NotificationID = N.NotificationID
+      AND R.IsActive = 1
+) T
+
+WHERE N.IsDeleted = 0
+  AND N.CreatedBy = @CreatedBy ";
+
+            // ============================================================
+            // EXISTING TYPE FILTER
+            // ============================================================
+            if (!string.IsNullOrWhiteSpace(type) &&
+                !type.Equals("All", StringComparison.OrdinalIgnoreCase))
+            {
+                sql += " AND N.Type = @Type ";
+            }
+
+            // ============================================================
+            // EXISTING AUDIENCE FILTER
+            // ============================================================
+            if (!string.IsNullOrWhiteSpace(audience) &&
+                !audience.Equals("All", StringComparison.OrdinalIgnoreCase))
+            {
+                sql += " AND N.Audience = @Audience ";
+            }
+
+            // ============================================================
+            // EXISTING FROM DATE FILTER
+            // ============================================================
+            if (fromDate.HasValue)
+            {
+                sql += " AND N.NotificationDate >= @FromDate ";
+            }
+
+            // ============================================================
+            // EXISTING TO DATE FILTER
+            // ============================================================
+            if (toDate.HasValue)
+            {
+                sql += " AND N.NotificationDate < @ToDateExclusive ";
+            }
+
+            // ============================================================
+            // EXISTING ORDERING
+            // ============================================================
+            sql += @"
+ORDER BY
+    CASE WHEN N.NotificationDate IS NULL THEN 1 ELSE 0 END,
+    N.NotificationDate DESC,
+    N.NotificationTime DESC,
+    N.NotificationID DESC;";
+
+            // ============================================================
+            // EXECUTE QUERY
+            // ============================================================
+            using (var connection = new SqlConnection(connectionString))
+            {
+                await connection.OpenAsync();
+
+                using var command = new SqlCommand(sql, connection);
+
+                command.Parameters.Add("@CreatedBy", SqlDbType.Int).Value =
+                    tpoId.Value;
+
+                if (!string.IsNullOrWhiteSpace(type) &&
+                    !type.Equals("All", StringComparison.OrdinalIgnoreCase))
+                {
+                    command.Parameters.Add("@Type", SqlDbType.NVarChar, 50).Value =
+                        type.Trim();
+                }
+
+                if (!string.IsNullOrWhiteSpace(audience) &&
+                    !audience.Equals("All", StringComparison.OrdinalIgnoreCase))
+                {
+                    command.Parameters.Add("@Audience", SqlDbType.NVarChar, 50).Value =
+                        audience.Trim();
+                }
+
+                if (fromDate.HasValue)
+                {
+                    command.Parameters.Add("@FromDate", SqlDbType.Date).Value =
+                        fromDate.Value.Date;
+                }
+
+                if (toDate.HasValue)
+                {
+                    command.Parameters.Add("@ToDateExclusive", SqlDbType.Date).Value =
+                        toDate.Value.Date.AddDays(1);
+                }
+
+                using var reader = await command.ExecuteReaderAsync();
+
+                while (await reader.ReadAsync())
+                {
+                    // ====================================================
+                    // MAP NOTIFICATION DATA
+                    // ====================================================
+                    var item = new TPOViewNotificationM
+                    {
+                        NotificationID =
+                            Convert.ToInt32(reader["NotificationID"]),
+
+                        Title =
+                            reader["Title"]?.ToString() ?? "",
+
+                        Type =
+                            reader["Type"]?.ToString() ?? "",
+
+                        Audience =
+                            reader["Audience"]?.ToString() ?? "",
+
+                        Content =
+                            reader["Content"]?.ToString() ?? "",
+
+                        SendEmailNotification =
+                            reader["SendEmailNotification"] != DBNull.Value &&
+                            Convert.ToBoolean(reader["SendEmailNotification"]),
+
+                        IsActive =
+                            reader["IsActive"] != DBNull.Value &&
+                            Convert.ToBoolean(reader["IsActive"]),
+
+                        IsDeleted =
+                            reader["IsDeleted"] != DBNull.Value &&
+                            Convert.ToBoolean(reader["IsDeleted"]),
+
+                        CreatedDate =
+                            reader["CreatedDate"] != DBNull.Value
+                                ? Convert.ToDateTime(reader["CreatedDate"])
+                                : DateTime.MinValue,
+
+                        CreatedBy =
+                            reader["CreatedBy"] != DBNull.Value
+                                ? Convert.ToInt32(reader["CreatedBy"])
+                                : 0,
+
+                        CreatedByName =
+                            reader["CreatedByName"]?.ToString() ?? "",
+
+                        TotalSent =
+                            Convert.ToInt32(reader["TotalSent"]),
+
+                        TotalRead =
+                            Convert.ToInt32(reader["TotalRead"]),
+
+                        TotalUnread =
+                            Convert.ToInt32(reader["TotalUnread"]),
+
+                        // =================================================
+                        // NEW: APPROVAL STATUS
+                        // =================================================
+                        ApprovalStatus =
+                            reader["ApprovalStatus"] == DBNull.Value
+                                ? "Pending"
+                                : reader["ApprovalStatus"]?.ToString() ?? "Pending",
+
+                        // =================================================
+                        // NEW: REJECTION REASON
+                        // =================================================
+                        RejectionReason =
+                            reader["RejectionReason"] == DBNull.Value
+                                ? null
+                                : reader["RejectionReason"]?.ToString()
+                    };
+
+                    // ====================================================
+                    // MAP NOTIFICATION DATE
+                    // ====================================================
+                    if (reader["NotificationDate"] != DBNull.Value)
+                    {
+                        item.NotificationDate =
+                            Convert.ToDateTime(reader["NotificationDate"]);
+                    }
+
+                    // ====================================================
+                    // MAP NOTIFICATION TIME
+                    // ====================================================
+                    if (reader["NotificationTime"] != DBNull.Value)
+                    {
+                        item.NotificationTime =
+                            (TimeSpan)reader["NotificationTime"];
+                    }
+
+                    // ====================================================
+                    // CALCULATE EXISTING NOTIFICATION STATUS
+                    // ====================================================
+                    DateTime? scheduledDateTime = null;
+
+                    if (item.NotificationDate.HasValue)
+                    {
+                        scheduledDateTime = item.NotificationDate.Value.Date
+                            .Add(item.NotificationTime ?? TimeSpan.FromDays(1))
+                            .AddTicks(item.NotificationTime.HasValue ? 0 : -1);
+                    }
+
+                    item.Status = !item.IsActive
+                        ? "Inactive"
+                        : scheduledDateTime.HasValue &&
+                          scheduledDateTime.Value < DateTime.Now
+                            ? "Completed"
+                            : "Active";
+
+                    notifications.Add(item);
+                }
+            }
+
+            // ============================================================
+            // EXISTING FILTER VALUES
+            // ============================================================
+            ViewBag.SelectedType = type ?? "All";
+            ViewBag.SelectedAudience = audience ?? "All";
+            ViewBag.FromDate = fromDate?.ToString("yyyy-MM-dd");
+            ViewBag.ToDate = toDate?.ToString("yyyy-MM-dd");
+            ViewBag.TotalNotifications = notifications.Count;
+
+            // ============================================================
+            // RETURN VIEW
+            // ============================================================
+            return View("SubTPOViewNotificationEvent", notifications);
+        }
+
+
+        [HttpGet]
+        [Route("TPO/SubTPOViewNotificationDetails/{id:int}")]
+        public async Task<IActionResult> SubTPOViewNotificationDetails(int id)
+        {
+            // ============================================================
+            // CHECK LOGIN
+            // ============================================================
+
+            int? tpoId = HttpContext.Session.GetInt32("TPOID");
+
+            if (tpoId == null)
+                return Unauthorized();
+
+            // ============================================================
+            // CHECK SUB-TPO ROLE
+            // ============================================================
+
+            if (HttpContext.Session.GetString("SubTpoBit") != "1")
+                return Forbid();
+
+            // ============================================================
+            // CONNECTION STRING
+            // ============================================================
+
+            string? connectionString =
+                _configuration.GetConnectionString("DefaultConnection");
+
+            if (string.IsNullOrWhiteSpace(connectionString))
+                return StatusCode(500, "Database connection string is not configured.");
+
+            TPOViewNotificationM? item = null;
+
+            // ============================================================
+            // FETCH ONLY THE LOGGED-IN SUB-TPO'S NOTIFICATION
+            // ============================================================
+
+            string sql = @"
+        SELECT
+            NotificationID,
+            Title,
+            Type,
+            Audience,
+            NotificationDate,
+            NotificationTime,
+            Content,
+            SendEmailNotification,
+
+            Attachment1OriginalName,
+            Attachment1FileName,
+            Attachment1Path,
+            Attachment1ContentType,
+            Attachment1Size,
+
+            Attachment2OriginalName,
+            Attachment2FileName,
+            Attachment2Path,
+            Attachment2ContentType,
+            Attachment2Size,
+
+            CreatedBy,
+            CreatedByName,
+            IsActive,
+            IsDeleted,
+            CreatedDate,
+            UpdatedDate
+        FROM tblTPONotification
+        WHERE NotificationID = @NotificationID
+          AND CreatedBy = @CreatedBy
+          AND IsDeleted = 0;";
+
+            using (SqlConnection connection = new SqlConnection(connectionString))
+            {
+                await connection.OpenAsync();
+
+                using (SqlCommand command = new SqlCommand(sql, connection))
+                {
+                    command.Parameters.Add("@NotificationID", SqlDbType.Int)
+                        .Value = id;
+
+                    command.Parameters.Add("@CreatedBy", SqlDbType.Int)
+                        .Value = tpoId.Value;
+
+                    using (SqlDataReader reader = await command.ExecuteReaderAsync())
+                    {
+                        if (await reader.ReadAsync())
+                        {
+                            item = new TPOViewNotificationM
+                            {
+                                NotificationID =
+                                    Convert.ToInt32(reader["NotificationID"]),
+
+                                Title = reader["Title"]?.ToString() ?? "",
+                                Type = reader["Type"]?.ToString() ?? "",
+                                Audience = reader["Audience"]?.ToString() ?? "",
+                                Content = reader["Content"]?.ToString() ?? "",
+
+                                SendEmailNotification =
+                                    reader["SendEmailNotification"] != DBNull.Value &&
+                                    Convert.ToBoolean(reader["SendEmailNotification"]),
+
+                                CreatedBy =
+                                    reader["CreatedBy"] != DBNull.Value
+                                        ? Convert.ToInt32(reader["CreatedBy"])
+                                        : 0,
+
+                                CreatedByName =
+                                    reader["CreatedByName"]?.ToString() ?? "",
+
+                                IsActive =
+                                    reader["IsActive"] != DBNull.Value &&
+                                    Convert.ToBoolean(reader["IsActive"]),
+
+                                IsDeleted =
+                                    reader["IsDeleted"] != DBNull.Value &&
+                                    Convert.ToBoolean(reader["IsDeleted"]),
+
+                                CreatedDate =
+                                    reader["CreatedDate"] != DBNull.Value
+                                        ? Convert.ToDateTime(reader["CreatedDate"])
+                                        : DateTime.MinValue,
+
+                                Attachment1OriginalName =
+                                    reader["Attachment1OriginalName"]?.ToString(),
+
+                                Attachment1FileName =
+                                    reader["Attachment1FileName"]?.ToString(),
+
+                                Attachment1Path =
+                                    reader["Attachment1Path"]?.ToString(),
+
+                                Attachment1ContentType =
+                                    reader["Attachment1ContentType"]?.ToString(),
+
+                                Attachment2OriginalName =
+                                    reader["Attachment2OriginalName"]?.ToString(),
+
+                                Attachment2FileName =
+                                    reader["Attachment2FileName"]?.ToString(),
+
+                                Attachment2Path =
+                                    reader["Attachment2Path"]?.ToString(),
+
+                                Attachment2ContentType =
+                                    reader["Attachment2ContentType"]?.ToString()
+                            };
+
+                            if (reader["NotificationDate"] != DBNull.Value)
+                            {
+                                item.NotificationDate =
+                                    Convert.ToDateTime(reader["NotificationDate"]);
+                            }
+
+                            if (reader["NotificationTime"] != DBNull.Value)
+                            {
+                                item.NotificationTime =
+                                    (TimeSpan)reader["NotificationTime"];
+                            }
+
+                            if (reader["Attachment1Size"] != DBNull.Value)
+                            {
+                                item.Attachment1Size =
+                                    Convert.ToInt64(reader["Attachment1Size"]);
+                            }
+
+                            if (reader["Attachment2Size"] != DBNull.Value)
+                            {
+                                item.Attachment2Size =
+                                    Convert.ToInt64(reader["Attachment2Size"]);
+                            }
+
+                            // ====================================================
+                            // CALCULATE STATUS
+                            // ====================================================
+
+                            DateTime? notificationDateTime = null;
+
+                            if (item.NotificationDate.HasValue)
+                            {
+                                DateTime date = item.NotificationDate.Value.Date;
+
+                                notificationDateTime = item.NotificationTime.HasValue
+                                    ? date.Add(item.NotificationTime.Value)
+                                    : date.AddDays(1).AddTicks(-1);
+                            }
+
+                            if (!item.IsActive)
+                            {
+                                item.Status = "Inactive";
+                            }
+                            else if (notificationDateTime.HasValue &&
+                                     notificationDateTime.Value < DateTime.Now)
+                            {
+                                item.Status = "Completed";
+                            }
+                            else
+                            {
+                                item.Status = "Active";
+                            }
+                        }
+                    }
+                }
+            }
+
+            // ============================================================
+            // RETURN DETAILS OR NOT FOUND
+            // ============================================================
+
+            if (item == null)
+                return NotFound();
+
+            return PartialView("_ViewNotificationDetails", item);
+        }
+
+
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        [Route("TPO/SubTPOCreateNotification")]
+        public async Task<IActionResult> SubTPOCreateNotification(
+    string Title,
+    string Type,
+    string Audience,
+    DateTime? Date,
+    TimeSpan? Time,
+    string Content,
+    bool SendEmailNotification,
+    IFormFile? AttachFile1,
+    IFormFile? AttachFile2,
+    IFormFile? AttachFile)
+        {
+            int? tpoId = HttpContext.Session.GetInt32("TPOID");
+
+            if (tpoId == null)
+                return RedirectToAction("TPOLogin", "Account");
+
+            if (HttpContext.Session.GetString("SubTpoBit") != "1")
+                return Forbid();
+
+            string tpoName =
+                HttpContext.Session.GetString("TPOName") ?? "Sub-TPO";
+
+            ViewData["Title"] = "Sub-TPO - Create Notification";
+            ViewData["Panel"] = "TPO";
+            ViewData["UserName"] = tpoName;
+
+            // Support the third file input if the view uses AttachFile.
+            if ((AttachFile2 == null || AttachFile2.Length == 0) &&
+                AttachFile != null && AttachFile.Length > 0)
+            {
+                AttachFile2 = AttachFile;
+            }
+
+            // Server-side validation.
+            if (string.IsNullOrWhiteSpace(Title) ||
+                string.IsNullOrWhiteSpace(Type) ||
+                string.IsNullOrWhiteSpace(Audience) ||
+                string.IsNullOrWhiteSpace(Content))
+            {
+                TempData["Error"] =
+                    "Title, Type, Audience, and Content are required.";
+
+                return View();
+            }
+
+            string? connectionString =
+                _configuration.GetConnectionString("DefaultConnection");
+
+            if (string.IsNullOrWhiteSpace(connectionString))
+            {
+                TempData["Error"] =
+                    "Database connection string is not configured.";
+
+                return View();
+            }
+
+            string? attachment1OriginalName = null;
+            string? attachment1FileName = null;
+            string? attachment1Path = null;
+            string? attachment1ContentType = null;
+            long? attachment1Size = null;
+
+            string? attachment2OriginalName = null;
+            string? attachment2FileName = null;
+            string? attachment2Path = null;
+            string? attachment2ContentType = null;
+            long? attachment2Size = null;
+
+            string uploadFolder = Path.Combine(
+                _environment.WebRootPath,
+                "Uploads",
+                "TPO",
+                "Notifications");
+
+            Directory.CreateDirectory(uploadFolder);
+
+            string[] allowedExtensions =
+            {
+        ".pdf", ".doc", ".docx", ".jpg", ".jpeg", ".png"
+    };
+
+            const long maxFileSize = 10 * 1024 * 1024;
+
+            // Validate both files before saving either one.
+            IFormFile?[] files = { AttachFile1, AttachFile2 };
+
+            for (int i = 0; i < files.Length; i++)
+            {
+                IFormFile? file = files[i];
+
+                if (file == null || file.Length == 0)
+                    continue;
+
+                string extension =
+                    Path.GetExtension(file.FileName).ToLowerInvariant();
+
+                if (!allowedExtensions.Contains(extension))
+                {
+                    TempData["Error"] =
+                        $"Attachment {i + 1} has an invalid file type.";
+
+                    return View();
+                }
+
+                if (file.Length > maxFileSize)
+                {
+                    TempData["Error"] =
+                        $"Attachment {i + 1} cannot exceed 10 MB.";
+
+                    return View();
+                }
+            }
+
+            try
+            {
+                // Save Attachment 1.
+                if (AttachFile1 != null && AttachFile1.Length > 0)
+                {
+                    string extension =
+                        Path.GetExtension(AttachFile1.FileName)
+                            .ToLowerInvariant();
+
+                    attachment1OriginalName =
+                        Path.GetFileName(AttachFile1.FileName);
+
+                    attachment1FileName =
+                        "SUBTPO_NOTIFICATION_1_" +
+                        Guid.NewGuid().ToString("N") + extension;
+
+                    string physicalPath =
+                        Path.Combine(uploadFolder, attachment1FileName);
+
+                    await using (FileStream stream = new FileStream(
+                        physicalPath, FileMode.CreateNew, FileAccess.Write))
+                    {
+                        await AttachFile1.CopyToAsync(stream);
+                    }
+
+                    attachment1Path =
+                        "/Uploads/TPO/Notifications/" + attachment1FileName;
+
+                    attachment1ContentType = AttachFile1.ContentType;
+                    attachment1Size = AttachFile1.Length;
+                }
+
+                // Save Attachment 2.
+                if (AttachFile2 != null && AttachFile2.Length > 0)
+                {
+                    string extension =
+                        Path.GetExtension(AttachFile2.FileName)
+                            .ToLowerInvariant();
+
+                    attachment2OriginalName =
+                        Path.GetFileName(AttachFile2.FileName);
+
+                    attachment2FileName =
+                        "SUBTPO_NOTIFICATION_2_" +
+                        Guid.NewGuid().ToString("N") + extension;
+
+                    string physicalPath =
+                        Path.Combine(uploadFolder, attachment2FileName);
+
+                    await using (FileStream stream = new FileStream(
+                        physicalPath, FileMode.CreateNew, FileAccess.Write))
+                    {
+                        await AttachFile2.CopyToAsync(stream);
+                    }
+
+                    attachment2Path =
+                        "/Uploads/TPO/Notifications/" + attachment2FileName;
+
+                    attachment2ContentType = AttachFile2.ContentType;
+                    attachment2Size = AttachFile2.Length;
+                }
+
+                const string query = @"
+            INSERT INTO tblTPONotification
+            (
+                Title,
+                Type,
+                Audience,
+                NotificationDate,
+                NotificationTime,
+                Content,
+                SendEmailNotification,
+
+                Attachment1OriginalName,
+                Attachment1FileName,
+                Attachment1Path,
+                Attachment1ContentType,
+                Attachment1Size,
+
+                Attachment2OriginalName,
+                Attachment2FileName,
+                Attachment2Path,
+                Attachment2ContentType,
+                Attachment2Size,
+
+                CreatedBy,
+                CreatedByName,
+                IsActive,
+                IsDeleted,
+                CreatedDate,
+
+                ApprovalStatus,
+                ApprovedByTPOID,
+                ApprovalDate,
+                RejectionReason
+            )
+            VALUES
+            (
+                @Title,
+                @Type,
+                @Audience,
+                @NotificationDate,
+                @NotificationTime,
+                @Content,
+                @SendEmailNotification,
+
+                @Attachment1OriginalName,
+                @Attachment1FileName,
+                @Attachment1Path,
+                @Attachment1ContentType,
+                @Attachment1Size,
+
+                @Attachment2OriginalName,
+                @Attachment2FileName,
+                @Attachment2Path,
+                @Attachment2ContentType,
+                @Attachment2Size,
+
+                @CreatedBy,
+                @CreatedByName,
+                1,
+                0,
+                GETDATE(),
+
+                N'Pending',
+                NULL,
+                NULL,
+                NULL
+            );
+
+            SELECT CAST(SCOPE_IDENTITY() AS INT);";
+
+                using (SqlConnection connection =
+                       new SqlConnection(connectionString))
+                {
+                    await connection.OpenAsync();
+
+                    using (SqlCommand command =
+                           new SqlCommand(query, connection))
+                    {
+                        command.Parameters.Add(
+                            "@Title", SqlDbType.NVarChar, 250)
+                            .Value = Title.Trim();
+
+                        command.Parameters.Add(
+                            "@Type", SqlDbType.NVarChar, 50)
+                            .Value = Type.Trim();
+
+                        command.Parameters.Add(
+                            "@Audience", SqlDbType.NVarChar, 50)
+                            .Value = Audience.Trim();
+
+                        command.Parameters.Add(
+                            "@NotificationDate", SqlDbType.Date)
+                            .Value = Date.HasValue
+                                ? Date.Value.Date
+                                : (object)DBNull.Value;
+
+                        command.Parameters.Add(
+                            "@NotificationTime", SqlDbType.Time)
+                            .Value = Time.HasValue
+                                ? Time.Value
+                                : (object)DBNull.Value;
+
+                        command.Parameters.Add(
+                            "@Content", SqlDbType.NVarChar, -1)
+                            .Value = Content.Trim();
+
+                        command.Parameters.Add(
+                            "@SendEmailNotification", SqlDbType.Bit)
+                            .Value = SendEmailNotification;
+
+                        command.Parameters.Add(
+                            "@Attachment1OriginalName",
+                            SqlDbType.NVarChar, 255)
+                            .Value = (object?)attachment1OriginalName
+                                ?? DBNull.Value;
+
+                        command.Parameters.Add(
+                            "@Attachment1FileName",
+                            SqlDbType.NVarChar, 255)
+                            .Value = (object?)attachment1FileName
+                                ?? DBNull.Value;
+
+                        command.Parameters.Add(
+                            "@Attachment1Path",
+                            SqlDbType.NVarChar, 500)
+                            .Value = (object?)attachment1Path
+                                ?? DBNull.Value;
+
+                        command.Parameters.Add(
+                            "@Attachment1ContentType",
+                            SqlDbType.NVarChar, 100)
+                            .Value = (object?)attachment1ContentType
+                                ?? DBNull.Value;
+
+                        command.Parameters.Add(
+                            "@Attachment1Size", SqlDbType.BigInt)
+                            .Value = (object?)attachment1Size
+                                ?? DBNull.Value;
+
+                        command.Parameters.Add(
+                            "@Attachment2OriginalName",
+                            SqlDbType.NVarChar, 255)
+                            .Value = (object?)attachment2OriginalName
+                                ?? DBNull.Value;
+
+                        command.Parameters.Add(
+                            "@Attachment2FileName",
+                            SqlDbType.NVarChar, 255)
+                            .Value = (object?)attachment2FileName
+                                ?? DBNull.Value;
+
+                        command.Parameters.Add(
+                            "@Attachment2Path",
+                            SqlDbType.NVarChar, 500)
+                            .Value = (object?)attachment2Path
+                                ?? DBNull.Value;
+
+                        command.Parameters.Add(
+                            "@Attachment2ContentType",
+                            SqlDbType.NVarChar, 100)
+                            .Value = (object?)attachment2ContentType
+                                ?? DBNull.Value;
+
+                        command.Parameters.Add(
+                            "@Attachment2Size", SqlDbType.BigInt)
+                            .Value = (object?)attachment2Size
+                                ?? DBNull.Value;
+
+                        command.Parameters.Add(
+                            "@CreatedBy", SqlDbType.Int)
+                            .Value = tpoId.Value;
+
+                        command.Parameters.Add(
+                            "@CreatedByName", SqlDbType.NVarChar, 200)
+                            .Value = tpoName;
+
+                        await command.ExecuteScalarAsync();
+                    }
+                }
+
+                TempData["Success"] =
+                    "Notification submitted successfully and is Pending Main TPO approval.";
+
+                return RedirectToAction(
+                    "SubTPOCreateNotification", "TPO");
+            }
+            catch (Exception ex)
+            {
+                // Clean up uploaded files if saving or inserting fails.
+                try
+                {
+                    foreach (string? fileName in new[]
+                    {
+                attachment1FileName,
+                attachment2FileName
+            })
+                    {
+                        if (!string.IsNullOrWhiteSpace(fileName))
+                        {
+                            string filePath =
+                                Path.Combine(uploadFolder, fileName);
+
+                            if (System.IO.File.Exists(filePath))
+                                System.IO.File.Delete(filePath);
+                        }
+                    }
+                }
+                catch
+                {
+                    // Do not mask the original error.
+                }
+
+                // Log the full exception on the server.
+                System.Diagnostics.Debug.WriteLine(
+     $"Failed to create Sub-TPO notification for TPOID {tpoId.Value}: {ex}");
+
+                TempData["Error"] =
+                    "Unable to create notification. Please try again.";
+
+                return View();
+            }
+        }
+
+
+
+        [HttpGet]
+        [Route("TPO/NotificationApprovals")]
+        public async Task<IActionResult> NotificationApprovals()
+        {
+            int? tpoId = HttpContext.Session.GetInt32("TPOID");
+
+            if (tpoId == null)
+                return RedirectToAction("TPOLogin", "Account");
+
+            // Only Main TPO can access this page.
+            if (HttpContext.Session.GetString("SubTpoBit") == "1")
+                return Forbid();
+
+            string? connectionString =
+                _configuration.GetConnectionString("DefaultConnection");
+
+            if (string.IsNullOrWhiteSpace(connectionString))
+                return StatusCode(500, "Database connection string is not configured.");
+
+            var notifications = new List<Dictionary<string, object?>>();
+
+            const string query = @"
+        SELECT
+            NotificationID,
+            Title,
+            Type,
+            Audience,
+            NotificationDate,
+            NotificationTime,
+            Content,
+            CreatedBy,
+            CreatedByName,
+            CreatedDate,
+            Attachment1OriginalName,
+            Attachment1Path,
+            Attachment2OriginalName,
+            Attachment2Path,
+            ApprovalStatus
+        FROM tblTPONotification
+        WHERE IsDeleted = 0
+          AND CreatedBy IS NOT NULL
+          AND ApprovalStatus = N'Pending'
+        ORDER BY CreatedDate DESC;";
+
+            using (var connection = new SqlConnection(connectionString))
+            using (var command = new SqlCommand(query, connection))
+            {
+                await connection.OpenAsync();
+
+                using (var reader = await command.ExecuteReaderAsync())
+                {
+                    while (await reader.ReadAsync())
+                    {
+                        var item = new Dictionary<string, object?>();
+
+                        for (int i = 0; i < reader.FieldCount; i++)
+                        {
+                            item[reader.GetName(i)] =
+                                await reader.IsDBNullAsync(i)
+                                    ? null
+                                    : reader.GetValue(i);
+                        }
+
+                        notifications.Add(item);
+                    }
+                }
+            }
+
+            ViewData["Title"] = "Approve Sub-TPO Notifications";
+            ViewData["Panel"] = "TPO";
+            ViewData["UserName"] =
+                HttpContext.Session.GetString("TPOName") ?? "TPO";
+
+            return View(notifications);
+        }
+
+
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        [Route("TPO/ApproveSubTPONotification")]
+        public async Task<IActionResult> ApproveSubTPONotification(int id)
+        {
+            int? tpoId = HttpContext.Session.GetInt32("TPOID");
+
+            if (tpoId == null)
+                return RedirectToAction("TPOLogin", "Account");
+
+            if (HttpContext.Session.GetString("SubTpoBit") != "0")
+                return Forbid();
+
+            string? connectionString =
+                _configuration.GetConnectionString("DefaultConnection");
+
+            if (string.IsNullOrWhiteSpace(connectionString))
+            {
+                TempData["Error"] = "Database connection is not configured.";
+                return RedirectToAction(nameof(NotificationApprovals));
+            }
+
+            const string query = @"
+        UPDATE tblTPONotification
+        SET
+            ApprovalStatus = N'Approved',
+            ApprovedByTPOID = @TPOID,
+            ApprovalDate = GETDATE(),
+            RejectionReason = NULL,
+            UpdatedDate = GETDATE()
+        WHERE NotificationID = @NotificationID
+          AND IsDeleted = 0
+          AND ApprovalStatus = N'Pending'
+          AND CreatedBy IS NOT NULL
+          AND CreatedBy <> @TPOID;";
+
+            try
+            {
+                using var connection = new SqlConnection(connectionString);
+                using var command = new SqlCommand(query, connection);
+
+                command.Parameters.Add("@NotificationID", SqlDbType.Int).Value = id;
+                command.Parameters.Add("@TPOID", SqlDbType.Int).Value = tpoId.Value;
+
+                await connection.OpenAsync();
+                int rowsAffected = await command.ExecuteNonQueryAsync();
+
+                if (rowsAffected == 1)
+                {
+                    TempData["Success"] =
+                        "Notification approved successfully.";
+                }
+                else
+                {
+                    TempData["Error"] =
+                        "Notification was not found, is not pending, or cannot be approved.";
+                }
+            }
+            catch (Exception)
+            {
+                TempData["Error"] = "Unable to approve the notification.";
+            }
+
+            return RedirectToAction(nameof(NotificationApprovals));
+        }
+
+
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        [Route("TPO/RejectSubTPONotification")]
+        public async Task<IActionResult> RejectSubTPONotification(
+            int id,
+            string rejectionReason)
+        {
+            int? tpoId = HttpContext.Session.GetInt32("TPOID");
+
+            if (tpoId == null)
+                return RedirectToAction("TPOLogin", "Account");
+
+            if (HttpContext.Session.GetString("SubTpoBit") != "0")
+                return Forbid();
+
+            if (string.IsNullOrWhiteSpace(rejectionReason))
+            {
+                TempData["Error"] = "Please enter a rejection reason.";
+                return RedirectToAction(nameof(NotificationApprovals));
+            }
+
+            rejectionReason = rejectionReason.Trim();
+
+            if (rejectionReason.Length > 1000)
+            {
+                TempData["Error"] =
+                    "Rejection reason cannot exceed 1000 characters.";
+
+                return RedirectToAction(nameof(NotificationApprovals));
+            }
+
+            string? connectionString =
+                _configuration.GetConnectionString("DefaultConnection");
+
+            if (string.IsNullOrWhiteSpace(connectionString))
+            {
+                TempData["Error"] = "Database connection is not configured.";
+                return RedirectToAction(nameof(NotificationApprovals));
+            }
+
+            const string query = @"
+        UPDATE tblTPONotification
+        SET
+            ApprovalStatus = N'Rejected',
+            ApprovedByTPOID = @TPOID,
+            ApprovalDate = GETDATE(),
+            RejectionReason = @RejectionReason,
+            UpdatedDate = GETDATE()
+        WHERE NotificationID = @NotificationID
+          AND IsDeleted = 0
+          AND ApprovalStatus = N'Pending'
+          AND CreatedBy IS NOT NULL
+          AND CreatedBy <> @TPOID;";
+
+            try
+            {
+                using var connection = new SqlConnection(connectionString);
+                using var command = new SqlCommand(query, connection);
+
+                command.Parameters.Add("@NotificationID", SqlDbType.Int).Value = id;
+                command.Parameters.Add("@TPOID", SqlDbType.Int).Value = tpoId.Value;
+                command.Parameters.Add(
+                    "@RejectionReason", SqlDbType.NVarChar, 1000)
+                    .Value = rejectionReason;
+
+                await connection.OpenAsync();
+                int rowsAffected = await command.ExecuteNonQueryAsync();
+
+                if (rowsAffected == 1)
+                {
+                    TempData["Success"] =
+                        "Notification rejected successfully.";
+                }
+                else
+                {
+                    TempData["Error"] =
+                        "Notification was not found, is not pending, or cannot be rejected.";
+                }
+            }
+            catch (Exception)
+            {
+                TempData["Error"] = "Unable to reject the notification.";
+            }
+
+            return RedirectToAction(nameof(NotificationApprovals));
+        }
+
+
+
+        // =====================================================
+        // SUB-TPO SEND NOTIFICATION - GET
+        // =====================================================
+        [HttpGet]
+        [Route("TPO/SubTPOSendNotification")]
+        public IActionResult SubTPOSendNotification(
+            int? notificationId,
+            string? searchText,
+            int? departmentId,
+            int? branchId)
+        {
+            // 1. Verify login
+            int? tpoId = HttpContext.Session.GetInt32("TPOID");
+
+            if (tpoId == null)
+            {
+                return RedirectToAction("TPOLogin", "Account");
+            }
+
+            // 2. Allow only Sub-TPO accounts
+            string? subTpoBit =
+                HttpContext.Session.GetString("SubTpoBit");
+
+            if (subTpoBit != "1")
+            {
+                // Avoid redirecting to another action that may redirect here.
+                return Forbid();
+            }
+
+            // 3. Get Sub-TPO details
+            TPORegistration? tpo =
+                _accountRepository.GetTPODetails(tpoId.Value);
+
+            if (tpo == null)
+            {
+                HttpContext.Session.Clear();
+                return RedirectToAction("TPOLogin", "Account");
+            }
+
+            // 4. Validate college ID without redirecting to this same action
+            if (!int.TryParse(tpo.CollegeName, out int collegeId) ||
+                collegeId <= 0)
+            {
+                return BadRequest("Unable to identify your college.");
+            }
+
+            // 5. Get approved notifications available to this Sub-TPO
+            List<TPONotificationListM> notifications =
+                _accountRepository.GetTPONotificationsForSend(tpoId.Value);
+
+            // 6. Load departments
+            List<DepartmentM> departments =
+                _accountRepository.GetDepartments();
+
+            // 7. Validate department
+            if (departmentId.HasValue &&
+                !departments.Any(x => x.nID == departmentId.Value))
+            {
+                departmentId = null;
+                branchId = null;
+            }
+
+            // 8. Load branches for selected department
+            List<BranchM> branches = new List<BranchM>();
+
+            if (departmentId.HasValue && departmentId.Value > 0)
+            {
+                branches = _accountRepository.GetBranches(
+                    departmentId.Value);
+            }
+
+            // 9. Validate branch
+            if (branchId.HasValue &&
+                !branches.Any(x => x.nID == branchId.Value))
+            {
+                branchId = null;
+            }
+
+            // 10. Build candidate filter
+            TPOTraineeFilterM filter = new TPOTraineeFilterM
+            {
+                CollegeId = collegeId,
+
+                SearchText = string.IsNullOrWhiteSpace(searchText)
+                    ? null
+                    : searchText.Trim(),
+
+                DepartmentId = departmentId,
+                BranchId = branchId
+            };
+
+            // 11. Load candidates using the existing repository method
+            List<TPOTraineeInfoM> students =
+                _accountRepository.GetTPOTraineesByCollege(filter);
+
+            // 12. Build page model
+            var model = new TPOSendNotificationM
+            {
+                TPOID = tpoId.Value,
+                CollegeCode = tpo.CollegeCode,
+                DepartmentID = departmentId,
+                BranchID = branchId,
+                SearchText = filter.SearchText,
+                Students = students,
+                SelectedCandidateIDs = new List<int>()
+            };
+
+            // 13. Populate details only for an available approved notification
+            if (notificationId.HasValue && notificationId.Value > 0)
+            {
+                TPONotificationListM? selected =
+                    notifications.FirstOrDefault(
+                        n => n.NotificationID == notificationId.Value);
+
+                if (selected != null)
+                {
+                    model.NotificationID = selected.NotificationID;
+                    model.Title = selected.Title;
+                    model.Type = selected.Type;
+                    model.Audience = selected.Audience;
+                    model.NotificationDate = selected.NotificationDate;
+                    model.NotificationTime = selected.NotificationTime;
+                    model.Content = selected.Content;
+
+                    model.Attachment1OriginalName =
+                        selected.Attachment1OriginalName;
+                    model.Attachment1Path =
+                        selected.Attachment1Path;
+
+                    model.Attachment2OriginalName =
+                        selected.Attachment2OriginalName;
+                    model.Attachment2Path =
+                        selected.Attachment2Path;
+                }
+            }
+
+            // 14. Populate view data
+            ViewBag.Notifications = notifications;
+            ViewBag.Departments = departments;
+            ViewBag.Branches = branches;
+            ViewBag.CollegeId = collegeId;
+            ViewBag.CollegeCode = tpo.CollegeCode;
+            ViewBag.CollegeName = tpo.CollegeName;
+            ViewBag.DepartmentId = departmentId;
+            ViewBag.BranchId = branchId;
+            ViewBag.SearchText = filter.SearchText;
+            ViewBag.TraineeCount = students.Count;
+
+            return View("SubTPOSendNotification", model);
+        }
+
+
+        // =====================================================
+        // SUB-TPO SEND NOTIFICATION - POST
+        // =====================================================
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        [Route("TPO/SubTPOSendNotification")]
+        public IActionResult SubTPOSendNotification(
+            TPOSendNotificationM model)
+        {
+            // 1. Verify login
+            int? tpoId = HttpContext.Session.GetInt32("TPOID");
+
+            if (tpoId == null)
+            {
+                return RedirectToAction("TPOLogin", "Account");
+            }
+
+            // 2. Allow only Sub-TPO accounts
+            string? subTpoBit =
+                HttpContext.Session.GetString("SubTpoBit");
+
+            if (subTpoBit != "1")
+            {
+                return Forbid();
+            }
+
+            // 3. Get Sub-TPO details
+            TPORegistration? tpo =
+                _accountRepository.GetTPODetails(tpoId.Value);
+
+            if (tpo == null)
+            {
+                HttpContext.Session.Clear();
+                return RedirectToAction("TPOLogin", "Account");
+            }
+
+            // 4. Validate college ID
+            if (!int.TryParse(tpo.CollegeName, out int collegeId) ||
+                collegeId <= 0)
+            {
+                return BadRequest(
+                    "Unable to identify your college. " +
+                    "Verify the CollegeName value in TPORegistration.");
+            }
+
+            // 5. Require an approved notification selection
+            if (model.NotificationID <= 0)
+            {
+                TempData["Error"] =
+                    "Please select an approved notification.";
+
+                return RedirectToAction(
+                    nameof(SubTPOSendNotification),
+                    new { notificationId = (int?)null });
+            }
+
+            try
+            {
+                // 6. Repository validates notification ownership and
+                // approval status before inserting recipients.
+                int insertedCount =
+                    _accountRepository.SendTPONotificationToCandidates(
+                        tpoId.Value,
+                        model.NotificationID,
+                        collegeId,
+                        model.SelectedCandidateIDs ?? new List<int>());
+
+                if (insertedCount > 0)
+                {
+                    TempData["Success"] =
+                        $"Notification sent to {insertedCount} candidate(s).";
+                }
+                else
+                {
+                    TempData["Info"] =
+                        "No new recipients were added. Check candidate eligibility " +
+                        "or whether they already received this notification.";
+                }
+            }
+            catch (InvalidOperationException ex)
+            {
+                TempData["Error"] = ex.Message;
+            }
+            catch (Exception)
+            {
+                TempData["Error"] =
+                    "Unable to send notification. Please try again.";
+            }
+
+            // 7. Return to the selected notification
+            return RedirectToAction(
+                nameof(SubTPOSendNotification),
+                new { notificationId = model.NotificationID });
+        }
+
+        // shrirang 19/10/26
+        [HttpGet]
+        public IActionResult UploadQuestionBank()
+        {
+            return View();
+        }
+
+        [HttpGet]
+        public IActionResult ViewQuestionBank()
+        {
+            return View();
+        }
+
+        public IActionResult Pipeline() => View();
+
+        public IActionResult TpoAnalytics() => View();
+
+        public IActionResult Alumni() => View();
+        public IActionResult Community() => View();
+
+        public IActionResult GradeNormalization() => View();
+        public IActionResult DriveTracking() => View();
+        public IActionResult SharedData() => View();
+        public IActionResult EditTPORegistration() => View();
+
+
+        [HttpGet]
+        [ResponseCache(
+            NoStore = true,
+            Location = ResponseCacheLocation.None)]
+        public async Task<IActionResult> ActivityLog()
+        {
+            // Verify TPO login
+            int? tpoId = HttpContext.Session.GetInt32("TPOID");
+
+            if (tpoId == null)
+            {
+                return RedirectToAction("TPOLogin", "Account");
+            }
+
+            var activities =
+                new List<CandidateActivityLogViewModel>();
+
+            string connectionString =
+                _configuration.GetConnectionString("DefaultConnection")
+                ?? throw new InvalidOperationException(
+                    "DefaultConnection is missing from configuration.");
+
+            const string query = @"
+        SELECT
+            VisitID,
+            IPAddress,
+            ISP,
+            Country,
+            Region,
+            City,
+            TimeZone,
+            BrowserName,
+            BrowserVersion,
+            OperatingSystem,
+            DeviceType,
+            RequestPath,
+            PageName,
+            ReferrerUrl,
+            VisitDateTime,
+            IsLoggedIn
+        FROM dbo.tblLoginPageVisits
+        WHERE UserID = @TPOID
+          AND UserType = @UserType
+          AND PanelType = @PanelType
+        ORDER BY VisitDateTime DESC;";
+
+            await using var connection =
+                new Microsoft.Data.SqlClient.SqlConnection(connectionString);
+
+            await using var command =
+                new Microsoft.Data.SqlClient.SqlCommand(query, connection);
+
+            command.Parameters.Add("@TPOID", System.Data.SqlDbType.Int)
+                .Value = tpoId.Value;
+
+            command.Parameters.Add("@UserType", System.Data.SqlDbType.NVarChar, 30)
+                .Value = "TPO";
+
+            command.Parameters.Add("@PanelType", System.Data.SqlDbType.NVarChar, 30)
+                .Value = "TPO";
+
+            await connection.OpenAsync();
+
+            await using (var reader = await command.ExecuteReaderAsync())
+            {
+                while (await reader.ReadAsync())
+                {
+                    activities.Add(new CandidateActivityLogViewModel
+                    {
+                        VisitID = Convert.ToInt64(reader["VisitID"]),
+                        IPAddress = reader["IPAddress"] as string,
+                        ISP = reader["ISP"] as string,
+                        Country = reader["Country"] as string,
+                        Region = reader["Region"] as string,
+                        City = reader["City"] as string,
+                        TimeZone = reader["TimeZone"] as string,
+                        BrowserName = reader["BrowserName"] as string,
+                        BrowserVersion = reader["BrowserVersion"] as string,
+                        OperatingSystem = reader["OperatingSystem"] as string,
+                        DeviceType = reader["DeviceType"] as string,
+                        RequestPath = reader["RequestPath"] as string,
+                        PageName = reader["PageName"] as string,
+                        ReferrerUrl = reader["ReferrerUrl"] as string,
+                        VisitDateTime = Convert.ToDateTime(
+                            reader["VisitDateTime"]),
+                        IsLoggedIn = Convert.ToBoolean(
+                            reader["IsLoggedIn"])
+                    });
+                }
+            }
+
+            return View("ActivityLog", activities);
+        }
+
+
+
+        #region Edit TPO Registration
+
+        // ============================================================
+        // EDIT TPO REGISTRATION - GET
+        // ============================================================
+
+        //[HttpGet]
+        //[ResponseCache(NoStore = true, Location = ResponseCacheLocation.None)]
+        //public IActionResult EditTPORegistration()
+        //{
+        //    int? tpoId = HttpContext.Session.GetInt32("TPOID");
+
+        //    if (!tpoId.HasValue || tpoId.Value <= 0)
+        //    {
+        //        return RedirectToAction("TPOLogin", "Account");
+        //    }
+
+        //    try
+        //    {
+        //        EditTPORegistrationM? model =
+        //            _accountRepository.GetTPORegistrationForEdit(tpoId.Value);
+
+        //        if (model == null)
+        //        {
+        //            return NotFound("TPO registration details not found.");
+        //        }
+
+        //        ViewData["Title"] = "Edit TPO Registration";
+        //        ViewData["Panel"] = "TPO";
+        //        ViewData["UserName"] =
+        //            HttpContext.Session.GetString("TPOName") ?? "TPO";
+
+        //        return View("EditTPORegistration", model);
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        Console.Error.WriteLine(
+        //            "Edit TPO Registration GET Error: " + ex);
+
+        //        TempData["Error"] =
+        //            "Unable to load TPO registration details.";
+
+        //        return RedirectToAction("Dashboard", "TPO");
+        //    }
+        //}
+
+
+        // ============================================================
+        // EDIT TPO REGISTRATION - POST
+        // ============================================================
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> EditTPORegistration(
+            EditTPORegistrationM model)
+        {
+            int? tpoId = HttpContext.Session.GetInt32("TPOID");
+
+            if (!tpoId.HasValue || tpoId.Value <= 0)
+            {
+                return RedirectToAction("TPOLogin", "Account");
+            }
+
+            ViewData["Title"] = "Edit TPO Registration";
+            ViewData["Panel"] = "TPO";
+            ViewData["UserName"] =
+                HttpContext.Session.GetString("TPOName") ?? "TPO";
+
+            // Always fetch the existing record from the database.
+            // Do not trust saved file paths submitted by the browser.
+            EditTPORegistrationM? existing;
+
+            try
+            {
+                existing = _accountRepository
+                    .GetTPORegistrationForEdit(tpoId.Value);
+            }
+            catch (Exception ex)
+            {
+                Console.Error.WriteLine(
+                    "Edit TPO Registration lookup error: " + ex);
+
+                ModelState.AddModelError(
+                    "",
+                    "Unable to load the current registration details.");
+
+                return View("EditTPORegistration", model);
+            }
+
+            if (existing == null)
+            {
+                return NotFound("TPO registration details not found.");
+            }
+
+            // Keep the existing files available for display
+            // when validation fails.
+            model.SupportingDocument1 = existing.SupportingDocument1;
+            model.SupportingDocument2 = existing.SupportingDocument2;
+            model.ProfilePhoto = existing.ProfilePhoto;
+
+            // DepartmentName is not a user-editable text field.
+            // Resolve it from the selected department ID.
+            if (model.nDepartment.HasValue &&
+                model.nDepartment.Value > 0)
+            {
+                var department = _accountRepository
+                    .GetDepartments()
+                    .FirstOrDefault(d =>
+                        d.nID == model.nDepartment.Value);
+
+                if (department == null)
+                {
+                    ModelState.AddModelError(
+                        nameof(model.nDepartment),
+                        "Please select a valid department.");
+                }
+                else
+                {
+                    model.DepartmentName = department.sDepartment;
+                }
+            }
+
+            // Validate the college ID against existing college records.
+            if (!int.TryParse(model.CollegeName, out int collegeId) ||
+                collegeId <= 0 ||
+                !_accountRepository.GetColleges()
+                    .Any(c => c.nID == collegeId))
+            {
+                ModelState.AddModelError(
+                    nameof(model.CollegeName),
+                    "Please select a valid college.");
+            }
+
+            // Validate new uploads before saving any files.
+            ValidateTPOEditUpload(
+                model.SupportingDocument1File,
+                nameof(model.SupportingDocument1File),
+                false);
+
+            ValidateTPOEditUpload(
+                model.SupportingDocument2File,
+                nameof(model.SupportingDocument2File),
+                false);
+
+            ValidateTPOEditUpload(
+                model.ProfilePhotoFile,
+                nameof(model.ProfilePhotoFile),
+                true);
+
+            if (!ModelState.IsValid)
+            {
+                return View("EditTPORegistration", model);
+            }
+
+            string uploadFolder = Path.Combine(
+                _environment.WebRootPath,
+                "Uploads",
+                "TPO");
+
+            string? savedDoc1 = null;
+            string? savedDoc2 = null;
+            string? savedPhoto = null;
+
+            var newlyCreatedFiles = new List<string>();
+
+            try
+            {
+                Directory.CreateDirectory(uploadFolder);
+
+                // Save only files selected by the user.
+                savedDoc1 = await SaveTPOEditUploadAsync(
+                    model.SupportingDocument1File,
+                    uploadFolder,
+                    "TPO_DOC1",
+                    newlyCreatedFiles);
+
+                savedDoc2 = await SaveTPOEditUploadAsync(
+                    model.SupportingDocument2File,
+                    uploadFolder,
+                    "TPO_DOC2",
+                    newlyCreatedFiles);
+
+                savedPhoto = await SaveTPOEditUploadAsync(
+                    model.ProfilePhotoFile,
+                    uploadFolder,
+                    "TPO_PROFILE",
+                    newlyCreatedFiles);
+
+                bool updated = _accountRepository.UpdateTPORegistration(
+                    tpoId.Value,
+                    model,
+                    savedDoc1,
+                    savedDoc2,
+                    savedPhoto);
+
+                if (!updated)
+                {
+                    DeleteNewTPOEditFiles(newlyCreatedFiles);
+
+                    ModelState.AddModelError(
+                        "",
+                        "TPO registration could not be updated.");
+
+                    return View("EditTPORegistration", model);
+                }
+
+                // Refresh session values after a successful update.
+                HttpContext.Session.SetString(
+                    "TPOName", model.FullName.Trim());
+
+                HttpContext.Session.SetString(
+                    "TPOEmail", model.CollegeMailID.Trim());
+
+                TempData["Success"] =
+                    "TPO registration updated successfully.";
+
+                return RedirectToAction(nameof(EditTPORegistration));
+            }
+            catch (InvalidOperationException ex)
+            {
+                DeleteNewTPOEditFiles(newlyCreatedFiles);
+
+                ModelState.AddModelError("", ex.Message);
+
+                return View("EditTPORegistration", model);
+            }
+            catch (Exception ex)
+            {
+                DeleteNewTPOEditFiles(newlyCreatedFiles);
+
+                Console.Error.WriteLine(
+                    "Edit TPO Registration POST Error: " + ex);
+
+                ModelState.AddModelError(
+                    "",
+                    "Unable to update TPO registration. Please try again.");
+
+                return View("EditTPORegistration", model);
+            }
+        }
+
+
+        // ============================================================
+        // VALIDATE OPTIONAL FILE UPLOAD
+        // ============================================================
+
+        private void ValidateTPOEditUpload(
+            IFormFile? file,
+            string fieldName,
+            bool isPhoto)
+        {
+            if (file == null || file.Length == 0)
+            {
+                return;
+            }
+
+            const long maxFileSize = 5 * 1024 * 1024;
+
+            if (file.Length > maxFileSize)
+            {
+                ModelState.AddModelError(
+                    fieldName,
+                    "File size must not exceed 5 MB.");
+
+                return;
+            }
+
+            string extension = Path.GetExtension(
+                file.FileName).ToLowerInvariant();
+
+            string[] allowedExtensions = isPhoto
+                ? new[] { ".jpg", ".jpeg", ".png" }
+                : new[] { ".pdf", ".jpg", ".jpeg", ".png" };
+
+            if (!allowedExtensions.Contains(extension))
+            {
+                ModelState.AddModelError(
+                    fieldName,
+                    isPhoto
+                        ? "Only JPG, JPEG and PNG photos are allowed."
+                        : "Only PDF, JPG, JPEG and PNG documents are allowed.");
+            }
+        }
+
+
+        // ============================================================
+        // SAVE OPTIONAL NEW FILE
+        // ============================================================
+
+        private static async Task<string?> SaveTPOEditUploadAsync(
+            IFormFile? file,
+            string uploadFolder,
+            string prefix,
+            List<string> newlyCreatedFiles)
+        {
+            if (file == null || file.Length == 0)
+            {
+                return null;
+            }
+
+            string extension = Path.GetExtension(
+                file.FileName).ToLowerInvariant();
+
+            string fileName =
+                prefix + "_" + Guid.NewGuid().ToString("N") + extension;
+
+            string fullPath = Path.Combine(uploadFolder, fileName);
+
+            // Register the new path for cleanup if saving fails.
+            newlyCreatedFiles.Add(fullPath);
+
+            using (FileStream stream = new FileStream(
+                fullPath,
+                FileMode.CreateNew))
+            {
+                await file.CopyToAsync(stream);
+            }
+
+            return fileName;
+        }
+
+
+        // ============================================================
+        // DELETE ONLY NEWLY CREATED FILES IF UPDATE FAILS
+        // ============================================================
+
+        private static void DeleteNewTPOEditFiles(
+            IEnumerable<string> filePaths)
+        {
+            foreach (string path in filePaths)
+            {
+                try
+                {
+                    if (System.IO.File.Exists(path))
+                    {
+                        System.IO.File.Delete(path);
+                    }
+                }
+                catch (IOException ex)
+                {
+                    Console.Error.WriteLine(
+                        "TPO upload cleanup failed: " + ex);
+                }
+                catch (UnauthorizedAccessException ex)
+                {
+                    Console.Error.WriteLine(
+                        "TPO upload cleanup failed: " + ex);
+                }
+            }
+        }
+
+        #endregion
+
+
+
     }
 }

@@ -1,0 +1,872 @@
+﻿@model List<Dictionary<string, object?>>
+
+@{
+    ViewData["Title"] = "Approve Sub-TPO Notifications";
+    Layout = "~/Views/Shared/_DashboardLayout.cshtml";
+}
+
+<style>
+    .notification-page {
+        --nt-ink: #102d43;
+        --nt-muted: #71869a;
+        --nt-teal: #078b89;
+        --nt-line: #dce9eb;
+        width: 100%;
+        min-width: 0;
+        padding: 22px;
+        box-sizing: border-box;
+        background: #f2f7f8;
+        color: var(--nt-ink);
+        font-family: "Segoe UI", Arial, sans-serif;
+    }
+
+        .notification-page *,
+        .notification-page *::before,
+        .notification-page *::after {
+            box-sizing: border-box;
+        }
+
+    .notification-panel {
+        width: 100%;
+        overflow: hidden;
+        background: #fff;
+        border: 1px solid var(--nt-line);
+        border-radius: 15px;
+        box-shadow: 0 5px 22px rgba(17, 55, 72, .045);
+    }
+
+    /* Header */
+
+    .notification-panel__header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 18px;
+        padding: 20px 25px;
+        border-bottom: 1px solid var(--nt-line);
+    }
+
+    .notification-heading {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        min-width: 0;
+    }
+
+    .notification-heading__icon {
+        width: 48px;
+        height: 48px;
+        flex: 0 0 48px;
+        display: grid;
+        place-items: center;
+        border-radius: 13px;
+        background: #effbf9;
+        color: var(--nt-teal);
+    }
+
+        .notification-heading__icon svg {
+            width: 24px;
+            height: 24px;
+            fill: none;
+            stroke: currentColor;
+            stroke-width: 2.2;
+            stroke-linecap: round;
+        }
+
+    .notification-heading h1 {
+        margin: 0 0 5px;
+        font-size: 19px;
+        font-weight: 750;
+        line-height: 1.35;
+        color: var(--nt-ink);
+    }
+
+    .notification-heading p {
+        margin: 0;
+        font-size: 13px;
+        line-height: 1.5;
+        color: var(--nt-muted);
+    }
+
+    .notification-count {
+        display: inline-flex;
+        align-items: center;
+        gap: 7px;
+        padding: 12px 15px;
+        flex-shrink: 0;
+        border: 1px solid #c5eeea;
+        border-radius: 9px;
+        background: #effbf9;
+        color: #067673;
+        font-size: 13px;
+        white-space: nowrap;
+    }
+
+        .notification-count strong {
+            font-size: 16px;
+            font-weight: 800;
+        }
+
+    /* Alerts */
+
+    .notification-alert {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        margin: 18px 22px 0;
+        padding: 12px 15px;
+        border: 1px solid transparent;
+        border-radius: 9px;
+        font-size: 13px;
+    }
+
+    .notification-alert--success {
+        color: #087447;
+        background: #ecf9f1;
+        border-color: #c9eed9;
+    }
+
+    .notification-alert--error {
+        color: #a52e36;
+        background: #fff1f1;
+        border-color: #f3d0d2;
+    }
+
+    .notification-alert__close {
+        border: 0;
+        background: transparent;
+        color: currentColor;
+        font-size: 22px;
+        cursor: pointer;
+    }
+
+    /* Table */
+
+    .notification-table-wrap {
+        width: 100%;
+        overflow-x: auto;
+    }
+
+    .notification-table {
+        width: 100%;
+        min-width: 1180px;
+        margin: 0;
+        border-collapse: separate;
+        border-spacing: 0;
+        color: #28475b;
+        font-size: 13px;
+    }
+
+        .notification-table thead th {
+            padding: 16px 13px;
+            border-bottom: 1px solid #d9e8e9;
+            background: #f0f8f7;
+            color: #4b6a7a;
+            font-size: 11px;
+            font-weight: 800;
+            letter-spacing: .35px;
+            text-align: left;
+            white-space: nowrap;
+        }
+
+        .notification-table tbody td {
+            padding: 17px 13px;
+            border-bottom: 1px solid #e8eff1;
+            background: #fff;
+            vertical-align: middle;
+        }
+
+        .notification-table tbody tr:last-child td {
+            border-bottom: 0;
+        }
+
+        .notification-table tbody tr:hover td {
+            background: #fbfefe;
+        }
+
+    .notification-table__number {
+        width: 48px;
+        padding-left: 25px !important;
+        color: #71889a;
+        font-weight: 700;
+    }
+
+    .notification-title-cell {
+        min-width: 205px;
+    }
+
+    .notification-title {
+        max-width: 260px;
+        overflow-wrap: anywhere;
+        color: #132f44;
+        font-size: 13px;
+        font-weight: 750;
+        line-height: 1.45;
+    }
+
+    /* Expandable content */
+
+    .notification-content {
+        margin-top: 7px;
+        font-size: 12px;
+    }
+
+        .notification-content summary {
+            display: inline-block;
+            color: #0b7eaa;
+            cursor: pointer;
+            font-weight: 600;
+        }
+
+            .notification-content summary:hover {
+                text-decoration: underline;
+            }
+
+    .notification-content__body {
+        max-width: 280px;
+        margin-top: 8px;
+        padding: 10px 12px;
+        border: 1px solid var(--nt-line);
+        border-radius: 8px;
+        background: #f8fbfc;
+        color: #486173;
+        line-height: 1.55;
+        white-space: pre-wrap;
+        overflow-wrap: anywhere;
+    }
+
+    /* Type */
+
+    .notification-type {
+        display: inline-flex;
+        align-items: center;
+        gap: 7px;
+        padding: 9px 11px;
+        border: 1px solid #c4eee8;
+        border-radius: 8px;
+        background: #eaf8f6;
+        color: #087d7b;
+        font-size: 12px;
+        font-weight: 700;
+        white-space: nowrap;
+    }
+
+    /* Audience */
+
+    .notification-audience {
+        display: inline-flex;
+        align-items: center;
+        gap: 7px;
+        white-space: nowrap;
+    }
+
+        .notification-audience svg {
+            width: 18px;
+            height: 18px;
+            flex-shrink: 0;
+            fill: #0a9692;
+        }
+
+    /* Creator */
+
+    .notification-created-by {
+        display: flex;
+        align-items: flex-start;
+        gap: 6px;
+        min-width: 105px;
+        color: #73899b;
+        font-size: 12px;
+        line-height: 1.45;
+    }
+
+    .notification-created-by__icon {
+        color: #8ba0ae;
+    }
+
+    /* Notification date */
+
+    .notification-date {
+        min-width: 150px;
+        white-space: nowrap;
+    }
+
+    .notification-date__main {
+        display: inline-flex;
+        align-items: center;
+        gap: 7px;
+        color: #28475b;
+        font-size: 12px;
+        font-weight: 700;
+        white-space: nowrap;
+    }
+
+        .notification-date__main svg {
+            display: block;
+            width: 16px;
+            height: 16px;
+            flex: 0 0 16px;
+            fill: none;
+            stroke: #079b98;
+            stroke-width: 2;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+        }
+
+    /* Attachments */
+
+    .notification-attachments {
+        min-width: 120px;
+        max-width: 190px;
+        overflow-wrap: anywhere;
+    }
+
+        .notification-attachments a {
+            display: block;
+            width: fit-content;
+            max-width: 180px;
+            margin: 3px 0;
+            color: #087da5;
+            text-decoration: none;
+            line-height: 1.45;
+        }
+
+            .notification-attachments a:hover {
+                text-decoration: underline;
+            }
+
+    .notification-muted {
+        color: #91a1ad;
+    }
+
+    /* Status */
+
+    .notification-status {
+        display: inline-flex;
+        align-items: center;
+        gap: 7px;
+        padding: 9px 11px;
+        border: 1px solid transparent;
+        border-radius: 8px;
+        font-size: 12px;
+        font-weight: 750;
+        white-space: nowrap;
+    }
+
+    .notification-status__dot {
+        width: 8px;
+        height: 8px;
+        flex: 0 0 8px;
+        border-radius: 50%;
+        background: currentColor;
+    }
+
+    .notification-status--pending {
+        color: #9a6500;
+        background: #fff7e7;
+        border-color: #ffe4a8;
+    }
+
+    .notification-status--approved {
+        color: #078251;
+        background: #eaf8f0;
+        border-color: #c9efd9;
+    }
+
+    .notification-status--other {
+        color: #637888;
+        background: #f0f4f6;
+        border-color: #dce5e9;
+    }
+
+    /* Actions */
+
+    .notification-table__actions,
+    .notification-action-cell {
+        min-width: 205px;
+    }
+
+    .notification-actions {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        min-width: 175px;
+    }
+
+        .notification-actions form {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 7px;
+            margin: 0;
+        }
+
+    .notification-action-button {
+        min-height: 34px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 6px;
+        padding: 7px 10px;
+        border: 1px solid transparent;
+        border-radius: 7px;
+        font: inherit;
+        font-size: 12px;
+        font-weight: 750;
+        line-height: 1.2;
+        cursor: pointer;
+        transition: background-color .15s ease;
+    }
+
+        .notification-action-button svg {
+            width: 15px;
+            height: 15px;
+            flex: 0 0 15px;
+            fill: none;
+            stroke: currentColor;
+            stroke-width: 2.2;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+        }
+
+    .notification-action-button--approve {
+        flex: 1;
+        color: #087d51;
+        background: #eaf8f0;
+        border-color: #c9eed9;
+    }
+
+        .notification-action-button--approve:hover {
+            background: #d9f3e5;
+        }
+
+    .notification-action-button--reject {
+        flex: 0 0 auto;
+        color: #b52c39;
+        background: #fff0f1;
+        border-color: #f3d0d3;
+    }
+
+        .notification-action-button--reject:hover {
+            background: #ffe2e4;
+        }
+
+    .notification-rejection-input {
+        width: 100%;
+        min-width: 0;
+        padding: 8px 10px;
+        border: 1px solid #dbe6e9;
+        border-radius: 7px;
+        outline: none;
+        color: #28475b;
+        background: #fff;
+        font: inherit;
+        font-size: 12px;
+    }
+
+        .notification-rejection-input:focus {
+            border-color: #0a9c98;
+            box-shadow: 0 0 0 3px rgba(10, 156, 152, .12);
+        }
+
+    .notification-readonly {
+        color: #8495a1;
+        font-size: 12px;
+    }
+
+    /* Empty state */
+
+    .notification-empty {
+        padding: 65px 20px;
+        text-align: center;
+    }
+
+    .notification-empty__icon {
+        width: 52px;
+        height: 52px;
+        display: grid;
+        place-items: center;
+        margin: 0 auto 15px;
+        border-radius: 15px;
+        background: #effbf9;
+        color: var(--nt-teal);
+        font-size: 27px;
+    }
+
+    .notification-empty h2 {
+        margin: 0 0 7px;
+        color: var(--nt-ink);
+        font-size: 18px;
+        font-weight: 750;
+    }
+
+    .notification-empty p {
+        margin: 0;
+        color: var(--nt-muted);
+        font-size: 13px;
+    }
+
+    /* Responsive */
+
+    @@media (max-width: 768px) {
+        .notification-page
+
+    {
+        padding: 12px;
+    }
+
+    .notification-panel__header {
+        align-items: flex-start;
+        flex-direction: column;
+        padding: 18px;
+    }
+
+    .notification-heading h1 {
+        font-size: 17px;
+    }
+
+    .notification-count {
+        margin-left: 62px;
+    }
+
+    .notification-table {
+        min-width: 1180px;
+    }
+
+    }
+
+    @@media (max-width: 480px) {
+        .notification-page
+
+    {
+        padding: 8px;
+    }
+
+    .notification-heading {
+        align-items: flex-start;
+        gap: 10px;
+    }
+
+    .notification-heading__icon {
+        width: 42px;
+        height: 42px;
+        flex-basis: 42px;
+    }
+
+    .notification-heading h1 {
+        font-size: 16px;
+    }
+
+    .notification-heading p {
+        font-size: 12px;
+    }
+
+    .notification-count {
+        margin-left: 52px;
+    }
+
+    }
+</style>
+
+<div class="notification-page">
+    <section class="notification-panel">
+
+        <header class="notification-panel__header">
+            <div class="notification-heading">
+                <div class="notification-heading__icon">
+                    <svg viewBox="0 0 24 24" aria-hidden="true">
+                        <path d="M9 6h12M9 12h12M9 18h12M4 6h.01M4 12h.01M4 18h.01" />
+                    </svg>
+                </div>
+
+                <div>
+                    <h1>Approve Sub-TPO Notifications</h1>
+                    <p>Review Sub-TPO notifications before they can be sent.</p>
+                </div>
+            </div>
+
+            <div class="notification-count">
+                <strong>@(Model?.Count ?? 0)</strong>
+                <span>pending record(s)</span>
+            </div>
+        </header>
+
+        @if (TempData["Success"] != null)
+        {
+            <div class="notification-alert notification-alert--success" role="status">
+                <span>@TempData["Success"]</span>
+                <button type="button"
+                        class="notification-alert__close"
+                        onclick="this.parentElement.remove()"
+                        aria-label="Dismiss">
+                    ×
+                </button>
+            </div>
+        }
+
+        @if (TempData["Error"] != null)
+        {
+            <div class="notification-alert notification-alert--error" role="alert">
+                <span>@TempData["Error"]</span>
+                <button type="button"
+                        class="notification-alert__close"
+                        onclick="this.parentElement.remove()"
+                        aria-label="Dismiss">
+                    ×
+                </button>
+            </div>
+        }
+
+        @if (Model == null || !Model.Any())
+        {
+            <div class="notification-empty">
+                <div class="notification-empty__icon">♧</div>
+                <h2>No pending notifications</h2>
+                <p>New Sub-TPO notifications awaiting approval will appear here.</p>
+            </div>
+        }
+        else
+        {
+            <div class="notification-table-wrap">
+                <table class="notification-table">
+                    <thead>
+                        <tr>
+                            <th class="notification-table__number">#</th>
+                            <th>NOTIFICATION</th>
+                            <th>TYPE</th>
+                            <th>AUDIENCE</th>
+                            <th>CREATED BY</th>
+                            <th>NOTIFICATION DATE</th>
+                            <th>ATTACHMENTS</th>
+                            <th>STATUS</th>
+                            <th class="notification-table__actions">ACTIONS</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                        @for (int i = 0; i < Model.Count; i++)
+                        {
+                            var item = Model[i];
+
+                            int notificationId =
+                            Convert.ToInt32(item["NotificationID"]);
+
+                            string title =
+                            Convert.ToString(item["Title"]) ?? "";
+
+                            string type =
+                            Convert.ToString(item["Type"]) ?? "";
+
+                            string audience =
+                            Convert.ToString(item["Audience"]) ?? "";
+
+                            string createdByName =
+                            Convert.ToString(item["CreatedByName"]) ?? "Sub-TPO";
+
+                            string approvalStatus =
+                            Convert.ToString(item["ApprovalStatus"]) ?? "Pending";
+
+                            string content =
+                            Convert.ToString(item["Content"]) ?? "";
+
+                            object? notificationDate =
+                            item.ContainsKey("NotificationDate")
+                            ? item["NotificationDate"]
+                            : null;
+
+                            DateTime parsedDate = default;
+
+                            bool hasDate =
+                            notificationDate != null &&
+                            notificationDate != DBNull.Value &&
+                            DateTime.TryParse(
+                            Convert.ToString(notificationDate),
+                            out parsedDate);
+
+                            string? attachment1 =
+                            item.ContainsKey("Attachment1Path")
+                            ? Convert.ToString(item["Attachment1Path"])
+                            : null;
+
+                            string? attachment1Name =
+                            item.ContainsKey("Attachment1OriginalName")
+                            ? Convert.ToString(item["Attachment1OriginalName"])
+                            : null;
+
+                            string? attachment2 =
+                            item.ContainsKey("Attachment2Path")
+                            ? Convert.ToString(item["Attachment2Path"])
+                            : null;
+
+                            string? attachment2Name =
+                            item.ContainsKey("Attachment2OriginalName")
+                            ? Convert.ToString(item["Attachment2OriginalName"])
+                            : null;
+
+                            bool isPending = approvalStatus.Equals(
+                            "Pending",
+                            StringComparison.OrdinalIgnoreCase);
+
+                            bool isApproved = approvalStatus.Equals(
+                            "Approved",
+                            StringComparison.OrdinalIgnoreCase);
+
+                            <tr>
+                                <td class="notification-table__number">
+                                    @(i + 1)
+                                </td>
+
+                                <td class="notification-title-cell">
+                                    <div class="notification-title">@title</div>
+
+                                    <details class="notification-content">
+                                        <summary>View content</summary>
+                                        <div class="notification-content__body">@content</div>
+                                    </details>
+                                </td>
+
+                                <td>
+                                    <span class="notification-type">
+                                        <span class="notification-type__icon">♟</span>
+                                        @type
+                                    </span>
+                                </td>
+
+                                <td>
+                                    <span class="notification-audience">
+                                        <svg viewBox="0 0 24 24" aria-hidden="true">
+                                            <path d="M16 11a3 3 0 1 0-2.8-4M8 11a3 3 0 1 0 0-6 3 3 0 0 0 0 6Zm0 2c-3 0-5 1.5-5 3.5V19h10v-2.5C13 14.5 11 13 8 13Zm8 0c-.5 0-1 .05-1.45.14 1.5.85 2.45 2.15 2.45 3.86V19h4v-2.5c0-2-2-3.5-5-3.5Z" />
+                                        </svg>
+                                        <span>@audience</span>
+                                    </span>
+                                </td>
+
+                                <td>
+                                    <div class="notification-created-by">
+                                        <span class="notification-created-by__icon">♟</span>
+                                        <span>@createdByName</span>
+                                    </div>
+                                </td>
+
+                                <td class="notification-date">
+                                    <span class="notification-date__main">
+                                        <svg viewBox="0 0 24 24" aria-hidden="true">
+                                            <rect x="4" y="5" width="16" height="15" rx="2" />
+                                            <path d="M8 3v4M16 3v4M4 10h16" />
+                                        </svg>
+
+                                        @if (hasDate)
+                                        {
+                                            <span>@(parsedDate.ToString("dd MMM yyyy"))</span>
+                                        }
+                                        else
+                                        {
+                                            <span>—</span>
+                                        }
+                                    </span>
+                                </td>
+
+                                <td class="notification-attachments">
+                                    @if (!string.IsNullOrWhiteSpace(attachment1))
+                                    {
+                                        <a href="@attachment1"
+                                           target="_blank"
+                                           rel="noopener noreferrer">
+                                            @(string.IsNullOrWhiteSpace(attachment1Name)
+                                                ? "Attachment 1"
+                                                : attachment1Name)
+                                        </a>
+                                    }
+
+                                    @if (!string.IsNullOrWhiteSpace(attachment2))
+                                    {
+                                        <a href="@attachment2"
+                                           target="_blank"
+                                           rel="noopener noreferrer">
+                                            @(string.IsNullOrWhiteSpace(attachment2Name)
+                                                ? "Attachment 2"
+                                                : attachment2Name)
+                                        </a>
+                                    }
+
+                                    @if (string.IsNullOrWhiteSpace(attachment1) &&
+                                   string.IsNullOrWhiteSpace(attachment2))
+                                    {
+                                        <span class="notification-muted">None</span>
+                                    }
+                                </td>
+
+                                <td>
+                                    <span class="notification-status @(isPending
+                                        ? "notification-status--pending"
+                                        : isApproved
+                                            ? "notification-status--approved"
+                                            : "notification-status--other")">
+                                        <span class="notification-status__dot"></span>
+                                        @approvalStatus
+                                    </span>
+                                </td>
+
+                                <td class="notification-action-cell">
+                                    @if (isPending)
+                                    {
+                                        <div class="notification-actions">
+                                            <form asp-controller="TPO"
+                                                  asp-action="ApproveSubTPONotification"
+                                                  method="post">
+                                                @Html.AntiForgeryToken()
+
+                                                <input type="hidden"
+                                                       name="id"
+                                                       value="@notificationId" />
+
+                                                <button type="submit"
+                                                        class="notification-action-button notification-action-button--approve">
+                                                    <svg viewBox="0 0 24 24" aria-hidden="true">
+                                                        <path d="m5 12 4 4L19 6" />
+                                                    </svg>
+                                                    <span>Approve</span>
+                                                </button>
+                                            </form>
+
+                                            <form asp-controller="TPO"
+                                                  asp-action="RejectSubTPONotification"
+                                                  method="post">
+                                                @Html.AntiForgeryToken()
+
+                                                <input type="hidden"
+                                                       name="id"
+                                                       value="@notificationId" />
+
+                                                <input type="text"
+                                                       name="rejectionReason"
+                                                       class="notification-rejection-input"
+                                                       placeholder="Reason for rejection"
+                                                       maxlength="1000"
+                                                       required
+                                                       aria-label="Reason for rejection" />
+
+                                                <button type="submit"
+                                                        class="notification-action-button notification-action-button--reject">
+                                                    <svg viewBox="0 0 24 24" aria-hidden="true">
+                                                        <path d="M6 6l12 12M18 6 6 18" />
+                                                    </svg>
+                                                    <span>Reject</span>
+                                                </button>
+                                            </form>
+                                        </div>
+                                    }
+                                    else
+                                    {
+                                        <span class="notification-readonly">
+                                            No action required
+                                        </span>
+                                    }
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        }
+    </section>
+</div>
