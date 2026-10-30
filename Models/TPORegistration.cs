@@ -46,8 +46,7 @@ namespace ErJobPortal.Models
     ErrorMessage = "This mobile number is already registered."
 )]
         public string MobileNo { get; set; }
-        public int? nDepartment { get; set; }
-
+      
         // =========================================================
         // PASSWORD
         // =========================================================

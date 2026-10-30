@@ -593,6 +593,313 @@ Er Job Portal Team
             await smtp.SendMailAsync(message);
         }
 
+        // shrirang 10/10/26
+
+        public async Task SendSchedulerReminderEmailAsync(
+            string email,
+            string tpoName,
+            string activityTitle,
+            DateTime startDate,
+            TimeSpan startTime,
+            string? location)
+        {
+            if (string.IsNullOrWhiteSpace(email))
+                throw new ArgumentException("TPO email is required.", nameof(email));
+
+            string smtpServer = _configuration["EmailSettings:SmtpServer"] ?? "";
+            int port = Convert.ToInt32(_configuration["EmailSettings:Port"] ?? "587");
+            string username = _configuration["EmailSettings:Username"] ?? "";
+            string smtpPassword = _configuration["EmailSettings:Password"] ?? "";
+            string fromEmail = _configuration["EmailSettings:FromEmail"] ?? username;
+            string fromName = _configuration["EmailSettings:FromName"] ?? "Er Job Portal";
+
+            using var message = new MailMessage();
+            message.From = new MailAddress(fromEmail, fromName);
+            message.To.Add(email.Trim());
+            message.Subject = "Upcoming TPO Scheduler Activity Reminder";
+
+            message.Body =
+                $"Dear {tpoName},\r\n\r\n" +
+                "This is a reminder for your upcoming scheduled activity.\r\n\r\n" +
+                $"Activity: {activityTitle}\r\n" +
+                $"Date: {startDate:dd MMM yyyy}\r\n" +
+                $"Time: {startTime:hh\\:mm}\r\n" +
+                $"Location: {location ?? "Not specified"}\r\n\r\n" +
+                "Please check your TPO Scheduler for details.\r\n\r\n" +
+                "Regards,\r\nEr Job Portal Team";
+
+            message.IsBodyHtml = false;
+
+            using var smtp = new SmtpClient(smtpServer, port)
+            {
+                EnableSsl = true,
+                Credentials = new NetworkCredential(username, smtpPassword)
+            };
+
+            await smtp.SendMailAsync(message);
+        }
+
+
+        // shrirang 15/10/26
+        // send email to candidate and org for applied post 
+
+        // =========================================================
+        // INTERNSHIP APPLICATION EMAILS
+        // =========================================================
+
+        public async Task SendCandidateApplicationConfirmationAsync(
+            string candidateEmail,
+            string candidateName,
+            string organizationName,
+            string positionName)
+        {
+            string body = $@"
+<html>
+<body style='font-family:Arial,sans-serif;'>
+    <h2>Application Submitted Successfully</h2>
+    <p>Dear {WebUtility.HtmlEncode(candidateName)},</p>
+    <p>You have successfully applied for this internship.</p>
+    <p><b>Organization:</b>
+       {WebUtility.HtmlEncode(organizationName)}</p>
+    <p><b>Position:</b>
+       {WebUtility.HtmlEncode(positionName)}</p>
+    <p>Your application has been recorded successfully.</p>
+    <p>Regards,<br/>Er Job Portal Team</p>
+</body>
+</html>";
+
+            await SendApplicationEmailAsync(
+                candidateEmail,
+                "Internship Application Submitted Successfully",
+                body);
+        }
+
+
+        public async Task SendOrganizationApplicationNotificationAsync(
+            string organizationEmail,
+            string organizationName,
+            string candidateName,
+            string candidateEmail,
+            string positionName)
+        {
+            string body = $@"
+<html>
+<body style='font-family:Arial,sans-serif;'>
+    <h2>New Internship Application Received</h2>
+    <p>Dear {WebUtility.HtmlEncode(organizationName)},</p>
+    <p>A candidate has applied for your internship.</p>
+    <p><b>Candidate Name:</b>
+       {WebUtility.HtmlEncode(candidateName)}</p>
+    <p><b>Candidate Email:</b>
+       {WebUtility.HtmlEncode(candidateEmail)}</p>
+    <p><b>Internship Position:</b>
+       {WebUtility.HtmlEncode(positionName)}</p>
+    <p>Please log in to ErJobPortal to review the application.</p>
+    <p>Regards,<br/>Er Job Portal Team</p>
+</body>
+</html>";
+
+            await SendApplicationEmailAsync(
+                organizationEmail,
+                "New Candidate Applied for Your Internship",
+                body);
+        }
+
+
+        // =========================================================
+        // COMMON EMAIL SENDER — USES YOUR EXISTING CONFIGURATION
+        // =========================================================
+
+
+        private async Task SendApplicationEmailAsync(
+            string recipientEmail,
+            string subject,
+            string htmlBody)
+        {
+            if (string.IsNullOrWhiteSpace(recipientEmail))
+            {
+                throw new ArgumentException(
+                    "Recipient email is required.",
+                    nameof(recipientEmail));
+            }
+
+            string smtpServer =
+                _configuration["EmailSettings:SmtpServer"] ?? "";
+
+            int port = Convert.ToInt32(
+                _configuration["EmailSettings:Port"] ?? "587");
+
+            string username =
+                _configuration["EmailSettings:Username"] ?? "";
+
+            string smtpPassword =
+                _configuration["EmailSettings:Password"] ?? "";
+
+            string fromEmail =
+                _configuration["EmailSettings:FromEmail"] ?? username;
+
+            string fromName =
+                _configuration["EmailSettings:FromName"] ?? "Er Job Portal";
+
+            if (string.IsNullOrWhiteSpace(smtpServer) ||
+                string.IsNullOrWhiteSpace(username) ||
+                string.IsNullOrWhiteSpace(smtpPassword) ||
+                string.IsNullOrWhiteSpace(fromEmail))
+            {
+                throw new InvalidOperationException(
+                    "Email SMTP settings are missing or incomplete.");
+            }
+
+            using var message = new MailMessage();
+            message.From = new MailAddress(fromEmail, fromName);
+            message.To.Add(new MailAddress(recipientEmail.Trim()));
+            message.Subject = subject;
+            message.Body = htmlBody;
+            message.IsBodyHtml = true;
+
+            using var smtp = new SmtpClient(smtpServer, port)
+            {
+                EnableSsl = true,
+                UseDefaultCredentials = false,
+                Credentials = new NetworkCredential(username, smtpPassword),
+                DeliveryMethod = SmtpDeliveryMethod.Network,
+                Timeout = 30000
+            };
+
+            await smtp.SendMailAsync(message);
+
+            _logger.LogInformation(
+                "Application email sent to {Email} with subject {Subject}.",
+                recipientEmail,
+                subject);
+        }
+
+        public async Task SendCandidateStatusEmailAsync(string email, string candidateName, bool isEnabled)
+        {
+            if (string.IsNullOrWhiteSpace(email))
+                throw new ArgumentException("Candidate email is required.", nameof(email));
+
+            string smtpServer = _configuration["EmailSettings:SmtpServer"] ?? "";
+            int port = Convert.ToInt32(_configuration["EmailSettings:Port"] ?? "587");
+            string username = _configuration["EmailSettings:Username"] ?? "";
+            string smtpPassword = _configuration["EmailSettings:Password"] ?? "";
+            string fromEmail = _configuration["EmailSettings:FromEmail"] ?? username;
+            string fromName = _configuration["EmailSettings:FromName"] ?? "Er Job Portal";
+
+            string subject = isEnabled
+                ? "Your Er Job Portal Registration Has Been Enabled"
+                : "Your Er Job Portal Registration Has Been Disabled";
+
+            string safeName = WebUtility.HtmlEncode(candidateName ?? "Candidate");
+
+            string statusMessage = isEnabled
+                ? "Your candidate registration has been enabled by the Super Admin. You can now access your Er Job Portal account."
+                : "Your candidate registration has been disabled by the Super Admin. Access to your candidate account may be restricted.";
+
+            string safeMessage = WebUtility.HtmlEncode(statusMessage);
+
+            string additionalMessage = isEnabled
+                ? "Thank you for being part of Er Job Portal."
+                : "If you believe this action was taken by mistake, please contact the Er Job Portal administration team.";
+
+            string safeAdditionalMessage = WebUtility.HtmlEncode(additionalMessage);
+
+            using var message = new MailMessage();
+
+            message.From = new MailAddress(fromEmail, fromName);
+            message.To.Add(email.Trim());
+            message.Subject = subject;
+            message.IsBodyHtml = true;
+
+            message.Body = $@"
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset='UTF-8'>
+</head>
+<body style='margin:0;padding:20px;background:#f5f7fa;
+             font-family:Arial,Helvetica,sans-serif;'>
+    <div style='max-width:600px;margin:auto;background:#fff;
+                border:1px solid #e2e8f0;border-radius:10px;overflow:hidden;'>
+        <div style='background:#0d9488;padding:22px;text-align:center;'>
+            <h2 style='color:#fff;margin:0;'>Er Job Portal</h2>
+        </div>
+
+        <div style='padding:28px;'>
+            <p>Dear <strong>{safeName}</strong>,</p>
+
+            <h3 style='color:{(isEnabled ? "#198754" : "#dc3545")};'>
+                Registration {(isEnabled ? "Enabled" : "Disabled")}
+            </h3>
+
+            <p style='color:#555;font-size:14px;line-height:1.8;'>
+                {safeMessage}
+            </p>
+
+            <p style='color:#555;font-size:14px;line-height:1.8;'>
+                {safeAdditionalMessage}
+            </p>
+
+            <p>Regards,<br><strong>Er Job Portal Team</strong></p>
+        </div>
+
+        <div style='background:#f8fafc;padding:14px;text-align:center;'>
+            <p style='margin:0;color:#888;font-size:12px;'>
+                This is an automated email. Please do not reply directly.
+            </p>
+        </div>
+    </div>
+</body>
+</html>";
+
+
+            try
+            {
+                using var smtp = new SmtpClient(smtpServer, port)
+                {
+                    EnableSsl = bool.TryParse(
+                        _configuration["EmailSettings:EnableSsl"],
+                        out bool enableSsl) && enableSsl,
+
+                    UseDefaultCredentials = false,
+                    Credentials = new NetworkCredential(username, smtpPassword),
+                    DeliveryMethod = SmtpDeliveryMethod.Network,
+                    Timeout = 30000
+                };
+
+                await smtp.SendMailAsync(message);
+
+                _logger.LogInformation(
+                    "Status email accepted by SMTP for recipient {Email}.",
+                    email);
+            }
+            catch (SmtpException ex)
+            {
+                _logger.LogError(
+                    ex,
+                    "SMTP error sending candidate status email to {Email}. " +
+                    "StatusCode: {StatusCode}; Details: {Details}",
+                    email,
+                    ex.StatusCode,
+                    ex.Message);
+
+                throw;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(
+                    ex,
+                    "Unexpected error sending candidate status email to {Email}.",
+                    email);
+
+                throw;
+            }
+
+
+            //await smtp.SendMailAsync(message);
+        }
+
+
         public async Task SendOrganizationProfileStatusEmailAsync(
 string email,
 string organizationName,
@@ -728,7 +1035,7 @@ bool isEnabled)
 
             message.From = new MailAddress(fromEmail, fromName);
             message.To.Add(new MailAddress(email.Trim()));
-            message.Subject = "Your Er Job Portal OTP";
+           message.Subject = "Your Er Job Portal OTP";
 
             bool isPasswordReset = string.Equals(
             purpose,
@@ -1061,6 +1368,389 @@ bool isEnabled)
                 throw;
             }
         }
+
+
+
+
+
+
+
+
+
+        // =========================================================
+        // TPO / SUB-TPO APPROVAL EMAIL
+        // =========================================================
+        public async Task SendTPOApprovalEmailAsync(
+            string email,
+            string fullName,
+            string tpoType)
+        {
+            ValidateTPOEmailInputs(email, tpoType);
+
+            string safeName =
+                WebUtility.HtmlEncode(
+                    string.IsNullOrWhiteSpace(fullName)
+                        ? "TPO"
+                        : fullName.Trim());
+
+            string safeType =
+                WebUtility.HtmlEncode(tpoType);
+
+            using var message = new MailMessage();
+
+            message.From = GetConfiguredFromAddress();
+            message.To.Add(new MailAddress(email.Trim()));
+            message.Subject =
+                $"Your Er Job Portal {tpoType} Registration Is Approved";
+            message.IsBodyHtml = true;
+
+            message.Body = $@"
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset='UTF-8'>
+</head>
+<body style='margin:0;padding:20px;background:#f5f7fa;
+             font-family:Arial,Helvetica,sans-serif;'>
+    <div style='max-width:600px;margin:auto;background:#fff;
+                border:1px solid #e2e8f0;border-radius:10px;overflow:hidden;'>
+
+        <div style='background:#0d9488;padding:22px;text-align:center;'>
+            <h2 style='color:#fff;margin:0;'>Er Job Portal</h2>
+        </div>
+
+        <div style='padding:28px;'>
+            <p>Dear <strong>{safeName}</strong>,</p>
+
+            <h3 style='color:#198754;'>
+                {safeType} Registration Approved!
+            </h3>
+
+            <p style='color:#555;font-size:14px;line-height:1.8;'>
+                Congratulations! Your {safeType} registration
+                has been approved by the Super Admin.
+                You can now log in to Er Job Portal using
+                your registered credentials.
+            </p>
+
+            <p>Regards,<br>
+                <strong>Er Job Portal Team</strong>
+            </p>
+        </div>
+
+        <div style='background:#f8fafc;padding:14px;text-align:center;'>
+            <p style='margin:0;color:#888;font-size:12px;'>
+                This is an automated email. Please do not reply directly.
+            </p>
+        </div>
+    </div>
+</body>
+</html>";
+
+            await SendTPOEmailMessageAsync(message, email);
+        }
+
+
+        // =========================================================
+        // TPO / SUB-TPO REJECTION EMAIL
+        // =========================================================
+        public async Task SendTPORejectionEmailAsync(
+            string email,
+            string fullName,
+            string tpoType,
+            string rejectionReason)
+        {
+            ValidateTPOEmailInputs(email, tpoType);
+
+            if (string.IsNullOrWhiteSpace(rejectionReason))
+            {
+                throw new ArgumentException(
+                    "Rejection reason is required.",
+                    nameof(rejectionReason));
+            }
+
+            string safeName =
+                WebUtility.HtmlEncode(
+                    string.IsNullOrWhiteSpace(fullName)
+                        ? "TPO"
+                        : fullName.Trim());
+
+            string safeType =
+                WebUtility.HtmlEncode(tpoType);
+
+            string safeReason =
+                WebUtility.HtmlEncode(rejectionReason.Trim());
+
+            using var message = new MailMessage();
+
+            message.From = GetConfiguredFromAddress();
+            message.To.Add(new MailAddress(email.Trim()));
+            message.Subject =
+                $"Your Er Job Portal {tpoType} Registration Update";
+            message.IsBodyHtml = true;
+
+            message.Body = $@"
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset='UTF-8'>
+</head>
+<body style='margin:0;padding:20px;background:#f5f7fa;
+             font-family:Arial,Helvetica,sans-serif;'>
+    <div style='max-width:600px;margin:auto;background:#fff;
+                border:1px solid #e2e8f0;border-radius:10px;overflow:hidden;'>
+
+        <div style='background:#0d9488;padding:22px;text-align:center;'>
+            <h2 style='color:#fff;margin:0;'>Er Job Portal</h2>
+        </div>
+
+        <div style='padding:28px;'>
+            <p>Dear <strong>{safeName}</strong>,</p>
+
+            <h3 style='color:#dc3545;'>
+                {safeType} Registration Not Approved
+            </h3>
+
+            <p style='color:#555;font-size:14px;line-height:1.8;'>
+                We regret to inform you that your {safeType}
+                registration has been rejected by the Super Admin.
+            </p>
+
+            <div style='background:#fff5f5;border-left:4px solid #dc3545;
+                        padding:15px;margin:20px 0;'>
+                <strong>Reason for rejection:</strong>
+                <p style='color:#555;font-size:14px;line-height:1.8;'>
+                    {safeReason}
+                </p>
+            </div>
+
+            <p style='color:#555;font-size:14px;line-height:1.8;'>
+                If you have questions about this decision, please
+                contact the Er Job Portal administration team.
+            </p>
+
+            <p>Regards,<br>
+                <strong>Er Job Portal Team</strong>
+            </p>
+        </div>
+
+        <div style='background:#f8fafc;padding:14px;text-align:center;'>
+            <p style='margin:0;color:#888;font-size:12px;'>
+                This is an automated email. Please do not reply directly.
+            </p>
+        </div>
+    </div>
+</body>
+</html>";
+
+            await SendTPOEmailMessageAsync(message, email);
+        }
+
+
+        // =========================================================
+        // VALIDATE TPO EMAIL INPUTS
+        // =========================================================
+        private static void ValidateTPOEmailInputs(
+            string email,
+            string tpoType)
+        {
+            if (string.IsNullOrWhiteSpace(email))
+            {
+                throw new ArgumentException(
+                    "TPO email address is required.",
+                    nameof(email));
+            }
+
+            if (string.IsNullOrWhiteSpace(tpoType))
+            {
+                throw new ArgumentException(
+                    "TPO type is required.",
+                    nameof(tpoType));
+            }
+
+            // Only these two types are expected from the controller.
+            if (!string.Equals(tpoType, "TPO",
+                    StringComparison.OrdinalIgnoreCase) &&
+                !string.Equals(tpoType, "Sub-TPO",
+                    StringComparison.OrdinalIgnoreCase))
+            {
+                throw new ArgumentException(
+                    "TPO type must be TPO or Sub-TPO.",
+                    nameof(tpoType));
+            }
+        }
+
+
+        // =========================================================
+        // CONFIGURED SENDER ADDRESS
+        // =========================================================
+        private MailAddress GetConfiguredFromAddress()
+        {
+            string username =
+                _configuration["EmailSettings:Username"] ?? "";
+
+            string fromEmail =
+                _configuration["EmailSettings:FromEmail"] ?? username;
+
+            string fromName =
+                _configuration["EmailSettings:FromName"] ?? "Er Job Portal";
+
+            if (string.IsNullOrWhiteSpace(fromEmail))
+            {
+                throw new InvalidOperationException(
+                    "EmailSettings:FromEmail is missing.");
+            }
+
+            return new MailAddress(fromEmail, fromName);
+        }
+
+
+        // =========================================================
+        // COMMON SMTP SENDER FOR TPO EMAILS
+        // =========================================================
+        private async Task SendTPOEmailMessageAsync(
+            MailMessage message,
+            string recipientEmail)
+        {
+            string smtpServer =
+                _configuration["EmailSettings:SmtpServer"] ?? "";
+
+            string username =
+                _configuration["EmailSettings:Username"] ?? "";
+
+            string smtpPassword =
+                _configuration["EmailSettings:Password"] ?? "";
+
+            string portValue =
+                _configuration["EmailSettings:Port"] ?? "587";
+
+            bool enableSsl = bool.TryParse(
+                _configuration["EmailSettings:EnableSsl"],
+                out bool configuredSsl)
+                ? configuredSsl
+                : true;
+
+            if (string.IsNullOrWhiteSpace(smtpServer) ||
+                string.IsNullOrWhiteSpace(username) ||
+                string.IsNullOrWhiteSpace(smtpPassword))
+            {
+                throw new InvalidOperationException(
+                    "SMTP settings are missing. Check EmailSettings in configuration.");
+            }
+
+            if (!int.TryParse(portValue, out int port) ||
+                port < 1 || port > 65535)
+            {
+                throw new InvalidOperationException(
+                    "EmailSettings:Port must be a valid port number.");
+            }
+
+            using var smtpClient = new SmtpClient(smtpServer, port)
+            {
+                EnableSsl = enableSsl,
+                UseDefaultCredentials = false,
+                Credentials = new NetworkCredential(
+                    username,
+                    smtpPassword),
+                DeliveryMethod = SmtpDeliveryMethod.Network,
+                Timeout = 30000
+            };
+
+            try
+            {
+                await smtpClient.SendMailAsync(message);
+
+                _logger.LogInformation(
+                    "TPO notification email sent to {RecipientEmail}.",
+                    recipientEmail);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(
+                    ex,
+                    "Failed to send TPO notification email to {RecipientEmail}.",
+                    recipientEmail);
+
+                throw;
+            }
+        }
+
+
+
+        //private async Task SendTPOEmailMessageAsync(
+        //    MailMessage message,
+        //    string recipientEmail)
+        //{
+        //    string smtpServer =
+        //        _configuration["EmailSettings:SmtpServer"] ?? "";
+
+        //    int port = int.TryParse(
+        //        _configuration["EmailSettings:Port"],
+        //        out int configuredPort)
+        //        ? configuredPort
+        //        : 587;
+
+        //    string username =
+        //        _configuration["EmailSettings:Username"] ?? "";
+
+        //    string smtpPassword =
+        //        _configuration["EmailSettings:Password"] ?? "";
+
+        //    bool enableSsl = bool.TryParse(
+        //        _configuration["EmailSettings:EnableSsl"],
+        //        out bool configuredSsl)
+        //        ? configuredSsl
+        //        : true;
+
+        //    string fromEmail =
+        //        _configuration["EmailSettings:FromEmail"] ?? username;
+
+        //    if (string.IsNullOrWhiteSpace(smtpServer))
+        //        throw new InvalidOperationException(
+        //            "EmailSettings:SmtpServer is missing.");
+
+        //    if (string.IsNullOrWhiteSpace(username))
+        //        throw new InvalidOperationException(
+        //            "EmailSettings:Username is missing.");
+
+        //    if (string.IsNullOrWhiteSpace(smtpPassword))
+        //        throw new InvalidOperationException(
+        //            "EmailSettings:Password is missing.");
+
+        //    if (string.IsNullOrWhiteSpace(fromEmail))
+        //        throw new InvalidOperationException(
+        //            "EmailSettings:FromEmail is missing.");
+
+        //    using var smtpClient = new SmtpClient(smtpServer, port)
+        //    {
+        //        EnableSsl = enableSsl,
+        //        UseDefaultCredentials = false,
+        //        Credentials = new NetworkCredential(
+        //            username,
+        //            smtpPassword),
+        //        DeliveryMethod = SmtpDeliveryMethod.Network,
+        //        Timeout = 30000
+        //    };
+
+        //    try
+        //    {
+        //        await smtpClient.SendMailAsync(message);
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        _logger.LogError(
+        //            ex,
+        //            "Failed to send TPO email to {RecipientEmail}. SMTP server: {SmtpServer}, port: {Port}",
+        //            recipientEmail,
+        //            smtpServer,
+        //            port);
+
+        //        throw;
+        //    }
+        //}
+
+
+
 
     }
 }

@@ -16,6 +16,7 @@ namespace ErJobPortal.Controllers
         private readonly IWebHostEnvironment _environment;
         private readonly OrgQuestionBankRepository _questionBankRepository;
 
+
         public OrganizationController(
             IConfiguration configuration,
             AccountRepository repository,
@@ -1664,125 +1665,172 @@ string nameColumn)
 
 
 
-        //khushi 26-10
         // =========================================================
-        // ORGANIZATION CREATE FEEDBACK - GET
+        // CANDIDATE CREATE FEEDBACK - GET
         // =========================================================
         [HttpGet]
         [Route("Organization/CreateFeedback/{id}")]
         public IActionResult CreateFeedback(string id)
         {
-            int? sessionOrgID = HttpContext.Session.GetInt32("OrgID");
+            // =====================================================
+            // GET CANDIDATE ID
+            // =====================================================
 
-            if (!sessionOrgID.HasValue || sessionOrgID.Value <= 0)
+            int? OrgID =
+                HttpContext.Session.GetInt32("OrgID");
+
+            if (OrgID == null || OrgID <= 0)
             {
-                return RedirectToAction("OrganizationLogin", "Account");
+                return RedirectToAction("CreateFeedback", "Organization");
             }
 
-            string? orgCode = GetOrganizationCode();
+            CandidateFeedbackViewModel feedback = null;
 
-            if (string.IsNullOrWhiteSpace(orgCode))
+            string connectionString = _configuration.GetConnectionString("DefaultConnection");
+
+            using (SqlConnection con =
+                   new SqlConnection(connectionString))
             {
-                return RedirectToAction("OrganizationLogin", "Account");
-            }
+                con.Open();
 
-            // Validate the URL organization code against the logged-in organization.
-            if (!string.Equals(id, orgCode, StringComparison.OrdinalIgnoreCase))
-            {
-                return NotFound("Invalid organization code.");
-            }
+                string query = @"
+            SELECT
+                nID,
+                Que1,
+                Que2,
+                Que3,
+                Que4,
+                Que5,
+                nBit,
+                nSABit
+            FROM tblSAOrgFeedback
+            WHERE nID = 1
+              AND ISNULL(nBit, 1) = 1";
 
-            CandidateFeedbackViewModel? feedback =
-                LoadOrganizationFeedbackQuestions(sessionOrgID.Value);
+                using (SqlCommand cmd =
+                       new SqlCommand(query, con))
+                {
+                    using (SqlDataReader dr =
+                           cmd.ExecuteReader())
+                    {
+                        if (dr.Read())
+                        {
+                            feedback = new CandidateFeedbackViewModel
+                            {
+                                nID = Convert.ToInt32(dr["nID"]),
+
+                                Que1 = dr["Que1"] != DBNull.Value
+                                    ? dr["Que1"].ToString()
+                                    : "",
+
+                                Que2 = dr["Que2"] != DBNull.Value
+                                    ? dr["Que2"].ToString()
+                                    : "",
+
+                                Que3 = dr["Que3"] != DBNull.Value
+                                    ? dr["Que3"].ToString()
+                                    : "",
+
+                                Que4 = dr["Que4"] != DBNull.Value
+                                    ? dr["Que4"].ToString()
+                                    : "",
+
+                                Que5 = dr["Que5"] != DBNull.Value
+                                    ? dr["Que5"].ToString()
+                                    : "",
+
+                                sQue1 = "",
+                                sQue2 = "",
+                                sQue3 = "",
+                                sQue4 = "",
+                                sQue5 = "",
+
+                                nOrgID = OrgID.Value,
+
+                                nBit = dr["nBit"] != DBNull.Value
+                                    ? Convert.ToBoolean(dr["nBit"])
+                                    : true,
+
+                                nSABit = dr["nSABit"] != DBNull.Value
+                                    ? Convert.ToBoolean(dr["nSABit"])
+                                    : true
+                            };
+                        }
+                    }
+                }
+            }
 
             if (feedback == null)
             {
-                TempData["Error"] = "Feedback questions not found.";
-                return RedirectToAction(
-                    "Dashboard", "Organization", new { id = orgCode });
+                return NotFound("Feedback questions not found.");
             }
-
-            ViewBag.OrgCode = orgCode;
-
+            ViewBag.OrgCode = id;
             return View(feedback);
         }
 
-        //khushi 26-10
+
+
         // =========================================================
-        // ORGANIZATION CREATE FEEDBACK - POST
+        // CANDIDATE FEEDBACK - CREATE - POST
         // =========================================================
         [HttpPost]
-        [Route("Organization/CreateFeedback/{id}")]
         [ValidateAntiForgeryToken]
         public IActionResult CreateFeedback(
-            string id,
             CandidateFeedbackViewModel model)
         {
-            int? sessionOrgID = HttpContext.Session.GetInt32("OrgID");
+            // =====================================================
+            // GET CANDIDATE ID FROM SESSION
+            // =====================================================
 
-            if (!sessionOrgID.HasValue || sessionOrgID.Value <= 0)
+            int? OrgID =
+                HttpContext.Session.GetInt32("OrgID");
+
+            if (OrgID == null || OrgID <= 0)
             {
                 TempData["Error"] =
-                    "Organization session expired. Please login again.";
+    "Organization session expired. Please login again.";
 
-                return RedirectToAction("OrganizationLogin", "Account");
+                return RedirectToAction("CreateFeedback", "Organization");
             }
 
-            int orgID = sessionOrgID.Value;
-            string? orgCode = GetOrganizationCode();
+            // =====================================================
+            // VALIDATION
+            // =====================================================
 
-            if (string.IsNullOrWhiteSpace(orgCode))
+            if (string.IsNullOrEmpty(model.sQue1))
+                ModelState.AddModelError(
+                    "sQue1",
+                    "Please select an answer.");
+
+            if (string.IsNullOrEmpty(model.sQue2))
+                ModelState.AddModelError(
+                    "sQue2",
+                    "Please select a rating.");
+
+            if (string.IsNullOrEmpty(model.sQue3))
+                ModelState.AddModelError(
+                    "sQue3",
+                    "Please select an answer.");
+
+            if (string.IsNullOrEmpty(model.sQue4))
+                ModelState.AddModelError(
+                    "sQue4",
+                    "Please select an emoji.");
+
+            if (!ModelState.IsValid)
             {
-                return RedirectToAction("OrganizationLogin", "Account");
+                // IMPORTANT:
+                // model is now CandidateFeedbackViewModel,
+                // same type required by the View.
+                return View(model);
             }
 
-            // Validate organization code on POST too.
-            if (!string.Equals(id, orgCode, StringComparison.OrdinalIgnoreCase))
-            {
-                return NotFound("Invalid organization code.");
-            }
+            // =====================================================
+            // QUESTION 1
+            // =====================================================
 
-            // Reload question text so it remains visible after validation errors.
-            CandidateFeedbackViewModel? questions =
-                LoadOrganizationFeedbackQuestions(orgID);
+            int sQue1;
 
-            if (questions == null)
-            {
-                TempData["Error"] = "Feedback questions not found.";
-
-                return RedirectToAction(
-                    "Dashboard", "Organization", new { id = orgCode });
-            }
-
-            model.Que1 = questions.Que1;
-            model.Que2 = questions.Que2;
-            model.Que3 = questions.Que3;
-            model.Que4 = questions.Que4;
-            model.Que5 = questions.Que5;
-            model.nID = questions.nID;
-            model.nOrgID = orgID;
-
-            ViewBag.OrgCode = orgCode;
-
-            // Validate required answers.
-            if (string.IsNullOrWhiteSpace(model.sQue1))
-                ModelState.AddModelError("sQue1", "Please select an answer.");
-
-            if (string.IsNullOrWhiteSpace(model.sQue2))
-                ModelState.AddModelError("sQue2", "Please select a rating.");
-
-            if (string.IsNullOrWhiteSpace(model.sQue3))
-                ModelState.AddModelError("sQue3", "Please select an answer.");
-
-            if (string.IsNullOrWhiteSpace(model.sQue4))
-                ModelState.AddModelError("sQue4", "Please select an emoji.");
-
-            int sQue1 = 0;
-            int sQue2 = 0;
-            int sQue3 = 0;
-            int sQue4 = 0;
-
-            // Question 1: True / False
             if (model.sQue1 == "True")
             {
                 sQue1 = 1;
@@ -1791,23 +1839,36 @@ string nameColumn)
             {
                 sQue1 = 0;
             }
-            else if (!string.IsNullOrWhiteSpace(model.sQue1))
+            else
             {
-                ModelState.AddModelError("sQue1", "Invalid answer.");
+                ModelState.AddModelError(
+                    "sQue1",
+                    "Invalid answer.");
+
+                return View(model);
             }
 
-            // Question 2: Rating 1-5
-            if (!string.IsNullOrWhiteSpace(model.sQue2))
+            // =====================================================
+            // QUESTION 2
+            // =====================================================
+
+            if (!int.TryParse(
+                model.sQue2,
+                out int sQue2))
             {
-                if (!int.TryParse(model.sQue2, out sQue2) ||
-                    sQue2 < 1 || sQue2 > 5)
-                {
-                    ModelState.AddModelError(
-                        "sQue2", "Please select a valid rating.");
-                }
+                ModelState.AddModelError(
+                    "sQue2",
+                    "Invalid rating.");
+
+                return View(model);
             }
 
-            // Question 3: Yes / No
+            // =====================================================
+            // QUESTION 3
+            // =====================================================
+
+            int sQue3;
+
             if (model.sQue3 == "Yes")
             {
                 sQue3 = 1;
@@ -1816,179 +1877,132 @@ string nameColumn)
             {
                 sQue3 = 0;
             }
-            else if (!string.IsNullOrWhiteSpace(model.sQue3))
+            else
             {
-                ModelState.AddModelError("sQue3", "Invalid answer.");
-            }
+                ModelState.AddModelError(
+                    "sQue3",
+                    "Invalid answer.");
 
-            // Question 4: Emoji rating 1-5
-            if (!string.IsNullOrWhiteSpace(model.sQue4))
-            {
-                if (!int.TryParse(model.sQue4, out sQue4) ||
-                    sQue4 < 1 || sQue4 > 5)
-                {
-                    ModelState.AddModelError(
-                        "sQue4", "Please select a valid emoji rating.");
-                }
-            }
-
-            if (!ModelState.IsValid)
-            {
                 return View(model);
             }
 
-            try
+            // =====================================================
+            // QUESTION 4
+            // =====================================================
+
+            if (!int.TryParse(
+                model.sQue4,
+                out int sQue4))
             {
-                string connectionString =
-                    _configuration.GetConnectionString("DefaultConnection")
-                    ?? throw new InvalidOperationException(
-                        "DefaultConnection is not configured.");
+                ModelState.AddModelError(
+                    "sQue4",
+                    "Invalid emoji rating.");
 
-                using (SqlConnection con = new SqlConnection(connectionString))
-                using (SqlCommand cmd = new SqlCommand(@"
-          INSERT INTO tblOrgFeedback
-          (
-              sQue1,
-              sQue2,
-              sQue3,
-              sQue4,
-              sQue5,
-              nAdminID,
-              RegDate,
-              ModDate,
-              nBit,
-              nSABit
-          )
-          VALUES
-          (
-              @sQue1,
-              @sQue2,
-              @sQue3,
-              @sQue4,
-              @sQue5,
-              @nAdminID,
-              GETDATE(),
-              GETDATE(),
-              1,
-              0
-          );", con))
+                return View(model);
+            }
+
+            // =====================================================
+            // QUESTION 5
+            // =====================================================
+
+            string sQue5 =
+                model.sQue5 ?? "";
+
+            // =====================================================
+            // DATABASE
+            // =====================================================
+
+            string connectionString =
+                _configuration.GetConnectionString(
+                    "DefaultConnection");
+
+            using (SqlConnection con =
+                   new SqlConnection(connectionString))
+            {
+                string query = @"
+            INSERT INTO tblOrgFeedback
+            (
+                sQue1,
+                sQue2,
+                sQue3,
+                sQue4,
+                sQue5,
+                nAdminID,
+                RegDate,
+                ModDate,
+                nBit,
+                nSABit
+            )
+            VALUES
+            (
+                @sQue1,
+                @sQue2,
+                @sQue3,
+                @sQue4,
+                @sQue5,
+                @nAdminID,
+                GETDATE(),
+                GETDATE(),
+                1,
+                0
+            )";
+
+                using (SqlCommand cmd =
+                       new SqlCommand(query, con))
                 {
-                    cmd.Parameters.Add("@sQue1", SqlDbType.Int).Value = sQue1;
-                    cmd.Parameters.Add("@sQue2", SqlDbType.Int).Value = sQue2;
-                    cmd.Parameters.Add("@sQue3", SqlDbType.Int).Value = sQue3;
-                    cmd.Parameters.Add("@sQue4", SqlDbType.Int).Value = sQue4;
+                    cmd.Parameters.Add(
+                        "@sQue1",
+                        SqlDbType.Int).Value = sQue1;
 
-                    cmd.Parameters.Add("@sQue5", SqlDbType.NVarChar, 200).Value =
-                        string.IsNullOrWhiteSpace(model.sQue5)
+                    cmd.Parameters.Add(
+                        "@sQue2",
+                        SqlDbType.Int).Value = sQue2;
+
+                    cmd.Parameters.Add(
+                        "@sQue3",
+                        SqlDbType.Int).Value = sQue3;
+
+                    cmd.Parameters.Add(
+                        "@sQue4",
+                        SqlDbType.Int).Value = sQue4;
+
+                    cmd.Parameters.Add(
+                        "@sQue5",
+                        SqlDbType.NVarChar,
+                        200).Value =
+                            string.IsNullOrWhiteSpace(sQue5)
                             ? DBNull.Value
-                            : model.sQue5.Trim();
+                            : sQue5;
 
-                    // Preserve the existing database column mapping.
-                    cmd.Parameters.Add("@nAdminID", SqlDbType.Int).Value = orgID;
+                    // Candidate ID
+                    cmd.Parameters.Add(
+                        "@nAdminID",
+                        SqlDbType.Int).Value =
+                            OrgID.Value;
 
                     con.Open();
 
-                    int rows = cmd.ExecuteNonQuery();
+                    int rows =
+                        cmd.ExecuteNonQuery();
 
                     if (rows <= 0)
                     {
-                        ModelState.AddModelError(
-                            string.Empty, "Feedback was not saved.");
+                        TempData["Error"] =
+                            "Feedback was not saved.";
 
                         return View(model);
                     }
                 }
-
-                TempData["Success"] = "Feedback submitted successfully.";
-
-                return RedirectToAction(
-                    "CreateFeedback",
-                    "Organization",
-                    new { id = orgCode });
             }
-            catch (Exception ex)
-            {
-                System.Diagnostics.Debug.WriteLine(ex.ToString());
 
-                ModelState.AddModelError(
-                    string.Empty,
-                    "An error occurred while saving feedback. Please try again.");
+            TempData["Success"] = "Feedback submitted successfully.";
 
-                return View(model);
-            }
+            return RedirectToAction(
+                "CreateFeedback",
+                "Organization");
         }
 
-        //khushi 26-10
-        // =========================================================
-        // LOAD ACTIVE FEEDBACK QUESTIONS
-        // =========================================================
-        private CandidateFeedbackViewModel? LoadOrganizationFeedbackQuestions(
-            int orgID)
-        {
-            string connectionString =
-                _configuration.GetConnectionString("DefaultConnection")
-                ?? throw new InvalidOperationException(
-                    "DefaultConnection is not configured.");
-
-            using (SqlConnection con = new SqlConnection(connectionString))
-            using (SqlCommand cmd = new SqlCommand(@"
-      SELECT
-          nID,
-          Que1,
-          Que2,
-          Que3,
-          Que4,
-          Que5,
-          nBit,
-          nSABit
-      FROM tblSAOrgFeedback
-      WHERE nID = 1
-        AND ISNULL(nBit, 1) = 1;", con))
-            {
-                con.Open();
-
-                using (SqlDataReader dr = cmd.ExecuteReader())
-                {
-                    if (!dr.Read())
-                        return null;
-
-                    return new CandidateFeedbackViewModel
-                    {
-                        nID = Convert.ToInt32(dr["nID"]),
-
-                        Que1 = dr["Que1"] == DBNull.Value
-                            ? "" : dr["Que1"].ToString() ?? "",
-
-                        Que2 = dr["Que2"] == DBNull.Value
-                            ? "" : dr["Que2"].ToString() ?? "",
-
-                        Que3 = dr["Que3"] == DBNull.Value
-                            ? "" : dr["Que3"].ToString() ?? "",
-
-                        Que4 = dr["Que4"] == DBNull.Value
-                            ? "" : dr["Que4"].ToString() ?? "",
-
-                        Que5 = dr["Que5"] == DBNull.Value
-                            ? "" : dr["Que5"].ToString() ?? "",
-
-                        sQue1 = "",
-                        sQue2 = "",
-                        sQue3 = "",
-                        sQue4 = "",
-                        sQue5 = "",
-
-                        nOrgID = orgID,
-
-                        nBit = dr["nBit"] != DBNull.Value &&
-                               Convert.ToBoolean(dr["nBit"]),
-
-                        nSABit = dr["nSABit"] != DBNull.Value &&
-                                 Convert.ToBoolean(dr["nSABit"])
-                    };
-                }
-            }
-        }
-
+        // Create Post
         // Create Post
         [HttpGet]
         [Route("Organization/CreatePostNew/{id}")]
@@ -4861,184 +4875,261 @@ WHERE nID = @nID
             }
         }
 
-        //khushi 26-10
+        //khushi 01-10-26
         [HttpGet]
         [Route("Organization/OrgPreviousPost/{id}")]
         public IActionResult OrgPreviousPost(string? id)
         {
             int? sessionOrgID = HttpContext.Session.GetInt32("OrgID");
 
-            if (!sessionOrgID.HasValue || sessionOrgID.Value <= 0)
+            if (!sessionOrgID.HasValue)
             {
                 return RedirectToAction("OrganizationLogin", "Account");
             }
 
             int orgID = sessionOrgID.Value;
+
             string? orgCode = GetOrganizationCode();
 
-            if (string.IsNullOrWhiteSpace(orgCode))
-            {
-                return RedirectToAction("OrganizationLogin", "Account");
-            }
-
-            if (!string.Equals(id, orgCode, StringComparison.OrdinalIgnoreCase))
-            {
-                return NotFound("Invalid organization code.");
-            }
-
-            List<OrgPostM> posts = new List<OrgPostM>();
+            OrgPostM item = null;
 
             try
             {
                 using (SqlConnection con = new SqlConnection(
                     _configuration.GetConnectionString("DefaultConnection")))
-                using (SqlCommand cmd = new SqlCommand(
-                    "SP_GetOrganizationRepostList", con))
                 {
-                    cmd.CommandType = CommandType.StoredProcedure;
-                    cmd.Parameters.Add("@nOrgID", SqlDbType.Int).Value = orgID;
-
-                    con.Open();
-
-                    using (SqlDataReader dr = cmd.ExecuteReader())
+                    using (SqlCommand cmd = new SqlCommand("SP_GetOrganizationRepostList", con))
                     {
-                        while (dr.Read())
+                        cmd.CommandType = CommandType.StoredProcedure;
+
+                        cmd.Parameters.Add("@nOrgID", SqlDbType.Int).Value = orgID;
+                        //cmd.Parameters.Add("@nID", SqlDbType.Int).Value = id;
+
+                        con.Open();
+
+                        using (SqlDataReader dr = cmd.ExecuteReader())
                         {
-                            OrgPostM post = new OrgPostM
+                            if (dr.Read())
                             {
-                                nID = Convert.ToInt32(dr["nID"]),
+                                item = new OrgPostM();
 
-                                nPositionID = dr["nPositionID"] == DBNull.Value
-                                    ? 0 : Convert.ToInt32(dr["nPositionID"]),
+                                item.nID = dr["nID"] == DBNull.Value
+                                    ? 0
+                                    : Convert.ToInt32(dr["nID"]);
 
-                                sPositionName = dr["sPositionName"]?.ToString() ?? "",
+                                item.nPositionID = dr["nPositionID"] == DBNull.Value
+                                    ? 0
+                                    : Convert.ToInt32(dr["nPositionID"]);
 
-                                nRequiredTrainees =
+                                item.sPositionName =
+                                    dr["sPositionName"]?.ToString() ?? "";
+
+                                item.nRequiredTrainees =
                                     dr["nRequiredTrainees"] == DBNull.Value
-                                    ? 0 : Convert.ToInt32(dr["nRequiredTrainees"]),
+                                    ? 0
+                                    : Convert.ToInt32(dr["nRequiredTrainees"]);
 
-                                nGenderID = dr["nGenderID"] == DBNull.Value
-                                    ? 0 : Convert.ToInt32(dr["nGenderID"]),
+                                item.nGenderID =
+                                    dr["nGenderID"] == DBNull.Value
+                                    ? 0
+                                    : Convert.ToInt32(dr["nGenderID"]);
 
-                                sGenderName = dr["sGenderName"]?.ToString() ?? "",
+                                item.sGenderName =
+                                    dr["sGenderName"]?.ToString() ?? "";
 
-                                nMinimumQualificationID =
+                                item.nMinimumQualificationID =
                                     dr["nMinimumQualificationID"] == DBNull.Value
-                                    ? 0 : Convert.ToInt32(
-                                        dr["nMinimumQualificationID"]),
+                                    ? 0
+                                    : Convert.ToInt32(
+                                        dr["nMinimumQualificationID"]);
 
-                                sMinimumQualificationName =
-                                    dr["sMinimumQualificationName"]?.ToString() ?? "",
+                                item.sMinimumQualificationName =
+                                    dr["sMinimumQualificationName"]?.ToString() ?? "";
 
-                                sCountryName = dr["sCountryName"]?.ToString() ?? "",
-                                sStateName = dr["sStateName"]?.ToString() ?? "",
+                                item.sCountryName =
+                                    dr["sCountryName"]?.ToString() ?? "";
 
-                                // Your model has both city properties.
-                                nCityName = dr["nCityName"]?.ToString() ?? "",
-                                sCityName = dr["nCityName"]?.ToString() ?? "",
+                                item.sStateName =
+                                    dr["sStateName"]?.ToString() ?? "";
 
-                                sWorkingHours = dr["sWorkingHours"]?.ToString() ?? "",
+                                item.nCityName =
+                                    dr["nCityName"]?.ToString() ?? "";
 
-                                nInternshipTypeID =
+                                item.sWorkingHours =
+                                    dr["sWorkingHours"]?.ToString() ?? "";
+
+                                item.nInternshipTypeID =
                                     dr["nInternshipTypeID"] == DBNull.Value
-                                    ? 0 : Convert.ToInt32(dr["nInternshipTypeID"]),
+                                    ? 0
+                                    : Convert.ToInt32(
+                                        dr["nInternshipTypeID"]);
 
-                                sInternshipTypeName =
-                                    dr["sInternshipTypeName"]?.ToString() ?? "",
+                                item.sInternshipTypeName =
+                                    dr["sInternshipTypeName"]?.ToString() ?? "";
 
-                                sWorkingShift = dr["sWorkingShift"]?.ToString() ?? "",
+                                item.sWorkingShift =
+                                    dr["sWorkingShift"]?.ToString() ?? "";
 
-                                nInternshipFellowshipTypeID =
+                                item.nInternshipFellowshipTypeID =
                                     dr["nInternshipFellowshipTypeID"] == DBNull.Value
-                                    ? 0 : Convert.ToInt32(
-                                        dr["nInternshipFellowshipTypeID"]),
+                                    ? 0
+                                    : Convert.ToInt32(
+                                        dr["nInternshipFellowshipTypeID"]);
 
-                                sInternshipFellowshipTypeName =
-                                    dr["sInternshipFellowshipTypeName"]?.ToString() ?? "",
+                                item.sInternshipFellowshipTypeName =
+                                    dr["sInternshipFellowshipTypeName"]?.ToString() ?? "";
 
-                                sTotalCharges = dr["sTotalCharges"] == DBNull.Value
-                                    ? null : Convert.ToDecimal(dr["sTotalCharges"]),
+                                item.sTotalCharges =
+                                    dr["sTotalCharges"] == DBNull.Value
+                                    ? null
+                                    : Convert.ToDecimal(dr["sTotalCharges"]);
 
-                                sCurrency = dr["sCurrency"]?.ToString() ?? "",
+                                item.sCurrency =
+                                    dr["sCurrency"]?.ToString() ?? "";
 
-                                nTrainingInvolvedID =
+                                item.nTrainingInvolvedID =
                                     dr["nTrainingInvolvedID"] == DBNull.Value
-                                    ? 0 : Convert.ToInt32(dr["nTrainingInvolvedID"]),
+                                    ? 0
+                                    : Convert.ToInt32(
+                                        dr["nTrainingInvolvedID"]);
 
-                                sTrainingInvolvedName =
-                                    dr["sTrainingInvolvedName"]?.ToString() ?? "",
+                                item.sTrainingInvolvedName =
+                                    dr["sTrainingInvolvedName"]?.ToString() ?? "";
 
-                                nInternshipDurationID =
+                                item.nInternshipDurationID =
                                     dr["nInternshipDurationID"] == DBNull.Value
-                                    ? 0 : Convert.ToInt32(
-                                        dr["nInternshipDurationID"]),
+                                    ? 0
+                                    : Convert.ToInt32(
+                                        dr["nInternshipDurationID"]);
 
-                                sInternshipDurationName =
-                                    dr["sInternshipDurationName"]?.ToString() ?? "",
+                                item.sInternshipDurationName =
+                                    dr["sInternshipDurationName"]?.ToString() ?? "";
 
-                                dStartDate = dr["dStartDate"] == DBNull.Value
-                                    ? null : Convert.ToDateTime(dr["dStartDate"]),
-
-                                dCompletionDate = dr["dCompletionDate"] == DBNull.Value
+                                item.dStartDate =
+                                    dr["dStartDate"] == DBNull.Value
                                     ? DateTime.MinValue
-                                    : Convert.ToDateTime(dr["dCompletionDate"]),
+                                    : Convert.ToDateTime(dr["dStartDate"]);
 
-                                nInternshipModeID =
+                                item.dCompletionDate =
+                                    dr["dCompletionDate"] == DBNull.Value
+                                    ? DateTime.MinValue
+                                    : Convert.ToDateTime(dr["dCompletionDate"]);
+
+                                item.nInternshipModeID =
                                     dr["nInternshipModeID"] == DBNull.Value
-                                    ? 0 : Convert.ToInt32(dr["nInternshipModeID"]),
+                                    ? 0
+                                    : Convert.ToInt32(
+                                        dr["nInternshipModeID"]);
 
-                                sInternshipModeName =
-                                    dr["sInternshipModeName"]?.ToString() ?? "",
+                                item.sInternshipModeName =
+                                    dr["sInternshipModeName"]?.ToString() ?? "";
 
-                                sDivyang = dr["sDivyang"]?.ToString() ?? "",
-                                sLanguageKnown = dr["sLanguageKnown"]?.ToString() ?? "",
-                                sWorkingDays = dr["sWorkingDays"]?.ToString(),
-                                sFacilities = dr["sFacilities"]?.ToString(),
-                                sTechnicalSkills = dr["sTechnicalSkills"]?.ToString(),
-                                sMedicalSkills = dr["sMedicalSkills"]?.ToString(),
-                                sNonTechnicalSkills =
-                                    dr["sNonTechnicalSkills"]?.ToString(),
+                                item.sDivyang =
+                                    dr["sDivyang"]?.ToString() ?? "";
 
-                                dRegisterDate = dr["dRegisterDate"] == DBNull.Value
-                                    ? null : Convert.ToDateTime(dr["dRegisterDate"]),
+                                item.sLanguageKnown =
+                                    dr["sLanguageKnown"]?.ToString() ?? "";
 
-                                dModDate = dr["dModDate"] == DBNull.Value
-                                    ? null : Convert.ToDateTime(dr["dModDate"]),
+                                item.sWorkingDays =
+                                    dr["sWorkingDays"]?.ToString() ?? "";
 
-                                nBit = dr["nBit"] != DBNull.Value &&
-                                       Convert.ToBoolean(dr["nBit"]),
+                                item.sFacilities =
+                                    dr["sFacilities"]?.ToString() ?? "";
 
-                                nSABit = dr["nSABit"] != DBNull.Value &&
-                                         Convert.ToBoolean(dr["nSABit"]),
+                                item.sTechnicalSkills =
+                                    dr["sTechnicalSkills"]?.ToString() ?? "";
 
-                                nOrgID = dr["nOrgID"] == DBNull.Value
-                                    ? 0 : Convert.ToInt32(dr["nOrgID"]),
+                                item.sMedicalSkills =
+                                    dr["sMedicalSkills"]?.ToString() ?? "";
 
-                                sOrgCode = orgCode
-                            };
+                                item.sNonTechnicalSkills =
+                                    dr["sNonTechnicalSkills"]?.ToString() ?? "";
 
-                            // Only include this organization's expired posts.
-                            if (post.nOrgID == orgID)
-                            {
-                                posts.Add(post);
+                                item.dRegisterDate =
+                                    dr["dRegisterDate"] == DBNull.Value
+                                    ? null
+                                    : Convert.ToDateTime(dr["dRegisterDate"]);
+
+                                item.dModDate =
+                                    dr["dModDate"] == DBNull.Value
+                                    ? null
+                                    : Convert.ToDateTime(dr["dModDate"]);
+
+                                item.nBit =
+                                    dr["nBit"] != DBNull.Value &&
+                                    Convert.ToBoolean(dr["nBit"]);
+
+                                item.nSABit =
+                                    dr["nSABit"] != DBNull.Value &&
+                                    Convert.ToBoolean(dr["nSABit"]);
+
+                                item.nOrgID =
+                                    dr["nOrgID"] == DBNull.Value
+                                    ? 0
+                                    : Convert.ToInt32(dr["nOrgID"]);
                             }
                         }
                     }
                 }
 
-                ViewBag.OrganizationCode = orgCode;
+                // =====================================================
+                // POST NOT FOUND / NOT EXPIRED
+                // =====================================================
 
-                return View(posts);
+                if (item == null)
+                {
+                    TempData["Error"] = "Post not found or this post has not expired yet.";
+
+                    return RedirectToAction(
+       "OrgPreviousPost",
+       "Organization",
+       new { id = GetOrganizationCode() });
+                }
+
+                // =====================================================
+                // ORGANIZATION SECURITY
+                // =====================================================
+
+                if (item.nOrgID != orgID)
+                {
+                    TempData["Error"] =
+                        "You are not authorized to repost this post.";
+
+                    return RedirectToAction(
+       "OrgPreviousPost",
+       "Organization",
+       new { id = GetOrganizationCode() });
+                }
+
+                // =====================================================
+                // REPOST INFORMATION
+                // =====================================================
+
+                ViewBag.RepostPostID = item.nID;
+
+                ViewBag.ExpiryDate =
+                    item.dRegisterDate.HasValue
+                    ? item.dRegisterDate.Value.AddMonths(3)
+                    : (DateTime?)null;
+
+                ViewBag.IsRepost = true;
+
+                // =====================================================
+                // IMPORTANT
+                // GO TO REPOST VIEW
+                // NOT CreatePostNew
+                // =====================================================
+
+                return View(item);
             }
             catch (Exception ex)
             {
-                System.Diagnostics.Debug.WriteLine(ex.ToString());
-
-                TempData["Error"] =
-                    "Unable to load previous posts. Please try again.";
+                TempData["Error"] = ex.Message;
 
                 return RedirectToAction(
-                    "Dashboard", "Organization", new { id = orgCode });
+       "OrgPreviousPost",
+       "Organization",
+       new { id = GetOrganizationCode() });
             }
         }
 
@@ -6060,7 +6151,7 @@ WHERE nID = @nID
         public IActionResult DriveTracking() => View();
         public IActionResult SharedData() => View();
         public IActionResult History() => View();
-        //public IActionResult EditOrganizationRegistration() => View();
+        public IActionResult EditOrganizationRegistration() => View();
         public IActionResult CreateDrive() => View();
 
 
@@ -6160,132 +6251,6 @@ WHERE nID = @nID
             // 4. Return the organization activity view
             return View("ActivityLog", activities);
         }
-
-
-
-        #region Edit Organization Registration
-
-        // ============================================================
-        // GET - LOAD EXISTING ORGANIZATION REGISTRATION DETAILS
-        // ============================================================
-
-        [HttpGet]
-        [ResponseCache(
-            NoStore = true,
-            Location = ResponseCacheLocation.None)]
-        public IActionResult EditOrganizationRegistration()
-        {
-            int? orgId = HttpContext.Session.GetInt32("OrgID");
-
-            if (!orgId.HasValue || orgId.Value <= 0)
-            {
-                return RedirectToAction(
-                    "OrganizationLogin",
-                    "Account");
-            }
-
-            try
-            {
-                // Fetch saved details using existing repository
-                EditOrganizationRegistrationM? model =
-                    _repository.GetOrganizationRegistrationForEdit(
-                        orgId.Value);
-
-                if (model == null)
-                {
-                    return NotFound(
-                        "Organization registration details not found.");
-                }
-
-                return View("EditOrganizationRegistration", model);
-            }
-            catch (Exception ex)
-            {
-                Console.Error.WriteLine(
-                    "Edit Organization Registration GET Error: " + ex);
-
-                TempData["Error"] =
-                    "Unable to load organization registration details.";
-
-                return RedirectToAction("Dashboard", "Organization");
-            }
-        }
-
-
-        // ============================================================
-        // POST - UPDATE ORGANIZATION REGISTRATION DETAILS
-        // ============================================================
-
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public IActionResult EditOrganizationRegistration(
-            EditOrganizationRegistrationM model)
-        {
-            int? orgId = HttpContext.Session.GetInt32("OrgID");
-
-            if (!orgId.HasValue || orgId.Value <= 0)
-            {
-                return RedirectToAction(
-                    "OrganizationLogin",
-                    "Account");
-            }
-
-            if (!ModelState.IsValid)
-            {
-                return View("EditOrganizationRegistration", model);
-            }
-
-            try
-            {
-                bool updated =
-                    _repository.UpdateOrganizationRegistration(
-                        orgId.Value,
-                        model);
-
-                if (updated)
-                {
-                    HttpContext.Session.SetString(
-                        "OrgName",
-                        model.sOrgName?.Trim() ?? "");
-
-                    HttpContext.Session.SetString(
-                        "OrgEmail",
-                        model.sEmail?.Trim() ?? "");
-
-                    TempData["Success"] =
-                        "Organization registration updated successfully.";
-
-                    return RedirectToAction(
-                        nameof(EditOrganizationRegistration));
-                }
-
-                ModelState.AddModelError(
-                    "",
-                    "Organization registration could not be updated.");
-
-                return View("EditOrganizationRegistration", model);
-            }
-            catch (InvalidOperationException ex)
-            {
-                ModelState.AddModelError("", ex.Message);
-
-                return View("EditOrganizationRegistration", model);
-            }
-            catch (Exception ex)
-            {
-                Console.Error.WriteLine(
-                    "Edit Organization Registration POST Error: " + ex);
-
-                ModelState.AddModelError(
-                    "",
-                    "Unable to update organization registration. Please try again.");
-
-                return View("EditOrganizationRegistration", model);
-            }
-        }
-
-        #endregion
-
 
 
 
