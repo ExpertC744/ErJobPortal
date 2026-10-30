@@ -221,7 +221,64 @@ namespace ErJobPortal.Controllers
             using (SqlConnection cn = new SqlConnection(connectionString))
             {
                 cn.Open();
+         
+                // ============================================================
+                // DYNAMIC DASHBOARD COUNTS
+                // ============================================================
 
+                // 1. Total active trainees with profiles
+                string traineeCountQuery = @"
+    SELECT COUNT(DISTINCT nID)
+    FROM tblCandidateRegister";
+
+                using (SqlCommand cmd = new SqlCommand(traineeCountQuery, cn))
+                {
+                    ViewBag.TraineeCount = Convert.ToInt32(cmd.ExecuteScalar());
+                }
+
+                // 2. Total active organizations
+                string organizationCountQuery = @"
+    SELECT COUNT(DISTINCT nID)
+    FROM tblOrgRegistration
+    WHERE ISNULL(nBit, 1) = 1";
+
+                using (SqlCommand cmd = new SqlCommand(organizationCountQuery, cn))
+                {
+                    ViewBag.OrganizationCount = Convert.ToInt32(cmd.ExecuteScalar());
+                }
+
+                // 3. Total active job/internship posts
+                string postCountQuery = @"
+    SELECT COUNT(*)
+    FROM tblPost
+    WHERE ISNULL(nBit, 1) = 1";
+
+                using (SqlCommand cmd = new SqlCommand(postCountQuery, cn))
+                {
+                    ViewBag.PostCount = Convert.ToInt32(cmd.ExecuteScalar());
+                }
+
+                // 4. Total distinct states in job/internship posts
+                string stateCountQuery = @"
+    SELECT COUNT(DISTINCT NULLIF(LTRIM(RTRIM(sStateName)), ''))
+    FROM tblPost
+    WHERE ISNULL(nBit, 1) = 1";
+
+                using (SqlCommand cmd = new SqlCommand(stateCountQuery, cn))
+                {
+                    ViewBag.StateCount = Convert.ToInt32(cmd.ExecuteScalar());
+                }
+
+                // 5. Total distinct countries in job/internship posts
+                string countryCountQuery = @"
+    SELECT COUNT(DISTINCT NULLIF(LTRIM(RTRIM(sCountryName)), ''))
+    FROM tblPost
+    WHERE ISNULL(nBit, 1) = 1";
+
+                using (SqlCommand cmd = new SqlCommand(countryCountQuery, cn))
+                {
+                    ViewBag.CountryCount = Convert.ToInt32(cmd.ExecuteScalar());
+                }
                 // ============================================================
                 // TRAINEE LIST
                 // ============================================================

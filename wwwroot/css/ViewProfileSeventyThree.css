@@ -385,10 +385,10 @@ html, body {
         font-size: .95em;
         color: var(--c)
     }
-
     .achievement-item span {
+        color: black;
         min-width: 0;
-        word-break: break-word
+        word-break: break-word;
     }
 
 .reference-grid {
@@ -423,12 +423,12 @@ html, body {
         width: 1.3em;
         color: var(--muted)
     }
-
 .preference-item {
     font-size: 1.05em;
+    color: black;
     line-height: 1.5;
     margin-bottom: .4em;
-    word-break: break-word
+    word-break: break-word;
 }
 
     .preference-item:last-child {
@@ -442,6 +442,14 @@ html, body {
 
 .resume-footer {
     flex: 0 0 auto
+}
+.resume-footer-row {
+    color: black;
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 25px;
+    width: 100%;
 }
 
 .resume-header {

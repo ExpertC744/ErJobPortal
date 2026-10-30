@@ -1734,6 +1734,7 @@ namespace ErJobPortal.Controllers
         // ==========================================================
         // shrirang 22/10/26
 
+
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> TPORegister(TPORegistration model)
@@ -1783,19 +1784,16 @@ namespace ErJobPortal.Controllers
                 // 3. REQUIRED FILES
                 // ============================================
 
-                if (!string.IsNullOrWhiteSpace(model.MobileNo) &&
-                    _accountRepository.TPOMobileExists(model.MobileNo.Trim()))
+                if (model.SupportingDocument1File == null ||
+                    model.SupportingDocument1File.Length == 0)
                 {
                     ModelState.AddModelError(
                         nameof(model.SupportingDocument1File),
                         "Supporting Document 1 is required.");
                 }
 
-                // ==========================================================
-                // 3. STATIC OTP VALIDATION
-                // ==========================================================
-
-                if (model.OTP != "123456")
+                if (model.SupportingDocument2File == null ||
+                    model.SupportingDocument2File.Length == 0)
                 {
                     ModelState.AddModelError(
                         nameof(model.SupportingDocument2File),
@@ -1897,8 +1895,6 @@ namespace ErJobPortal.Controllers
                         nameof(model.OTP),
                         "Please verify your college email using OTP before registering.");
 
-                if (!ModelState.IsValid)
-                {
                     return View(model);
                 }
 
@@ -2026,7 +2022,6 @@ namespace ErJobPortal.Controllers
                 return View(model);
             }
         }
-
         // ==========================================================
         // HELPER: DELETE UPLOADED FILE IF REGISTRATION FAILS
         // ==========================================================

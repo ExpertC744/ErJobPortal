@@ -12,14 +12,23 @@ namespace ErJobPortal.Controllers
         private readonly IConfiguration _configuration;
         private readonly AccountRepository _repository;
         private readonly EmailService _emailService;
+        private readonly ILogger<SuperAdminController> _logger;
 
-        public SuperAdminController(IConfiguration configuration, AccountRepository repository, EmailService emailService)
+        public SuperAdminController(
+            IConfiguration configuration,
+            AccountRepository repository,
+            EmailService emailService,
+            ILogger<SuperAdminController> logger)
         {
             _configuration = configuration;
             _repository = repository;
             _emailService = emailService;
+            _logger = logger;
         }
+
+
         //sanidhya 08/10/26
+
         [HttpGet]
         [Route("SuperAdmin/Dashboard/{id:int}")]
         public IActionResult Dashboard(int id)
@@ -4540,54 +4549,249 @@ ORDER BY SAF.nID DESC, OFB.nID DESC;
         }
 
 
+        //[HttpPost]
+        //[ValidateAntiForgeryToken]
+        //[Route("SuperAdmin/ApproveTPO/{id:int}")]
+        //public IActionResult ApproveTPO(int id)
+        //{
+        //    string? saId = HttpContext.Session.GetString("SAID");
+        //    string? saRole = HttpContext.Session.GetString("SARole");
+
+        //    if (string.IsNullOrEmpty(saId) ||
+        //        !int.TryParse(saId, out int superAdminId) ||
+        //        superAdminId != 1 ||
+        //        !string.Equals(
+        //            saRole, "SuperAdmin",
+        //            StringComparison.OrdinalIgnoreCase))
+        //    {
+        //        return RedirectToAction("Index", "SALogin");
+        //    }
+
+        //    bool approved =
+        //        _repository.ApproveTPORegistration(id, superAdminId);
+
+        //    TempData[approved ? "SuccessMessage" : "ErrorMessage"] =
+        //        approved
+        //            ? "TPO registration approved successfully."
+        //            : "Approval failed. The registration may no longer be pending.";
+
+        //    return RedirectToAction(
+        //        nameof(TPOVerification),
+        //        new { id = superAdminId });
+        //}
+
+        //[HttpPost]
+        //[ValidateAntiForgeryToken]
+        //[Route("SuperAdmin/RejectTPO/{id:int}")]
+        //public IActionResult RejectTPO(int id, string rejectionReason)
+        //{
+        //    string? saId = HttpContext.Session.GetString("SAID");
+        //    string? saRole = HttpContext.Session.GetString("SARole");
+
+        //    if (string.IsNullOrEmpty(saId) ||
+        //        !int.TryParse(saId, out int superAdminId) ||
+        //        superAdminId != 1 ||
+        //        !string.Equals(
+        //            saRole, "SuperAdmin",
+        //            StringComparison.OrdinalIgnoreCase))
+        //    {
+        //        return RedirectToAction("Index", "SALogin");
+        //    }
+
+        //    if (string.IsNullOrWhiteSpace(rejectionReason))
+        //    {
+        //        TempData["ErrorMessage"] =
+        //            "Please enter a reason for rejection.";
+
+        //        return RedirectToAction(
+        //            nameof(TPOVerification),
+        //            new { id = superAdminId });
+        //    }
+
+        //    if (rejectionReason.Trim().Length > 1000)
+        //    {
+        //        TempData["ErrorMessage"] =
+        //            "The rejection reason cannot exceed 1000 characters.";
+
+        //        return RedirectToAction(
+        //            nameof(TPOVerification),
+        //            new { id = superAdminId });
+        //    }
+
+        //    bool rejected = _repository.RejectTPORegistration(
+        //        id, superAdminId, rejectionReason);
+
+        //    TempData[rejected ? "SuccessMessage" : "ErrorMessage"] =
+        //        rejected
+        //            ? "TPO registration rejected."
+        //            : "Rejection failed. The registration may no longer be pending.";
+
+        //    return RedirectToAction(
+        //        nameof(TPOVerification),
+        //        new { id = superAdminId });
+        //}
+
+
+
+
+        // 28/10/26
+        // ==========================================================
+        // APPROVE TPO / SUB-TPO + SEND EMAIL
+        // ==========================================================
+
         [HttpPost]
         [ValidateAntiForgeryToken]
         [Route("SuperAdmin/ApproveTPO/{id:int}")]
-        public IActionResult ApproveTPO(int id)
+        public async Task<IActionResult> ApproveTPO(int id)
         {
+            // ------------------------------------------------------
+            // 1. Validate Super Admin session
+            // ------------------------------------------------------
+
             string? saId = HttpContext.Session.GetString("SAID");
             string? saRole = HttpContext.Session.GetString("SARole");
 
-            if (string.IsNullOrEmpty(saId) ||
+            if (string.IsNullOrWhiteSpace(saId) ||
                 !int.TryParse(saId, out int superAdminId) ||
                 superAdminId != 1 ||
                 !string.Equals(
-                    saRole, "SuperAdmin",
+                    saRole,
+                    "SuperAdmin",
                     StringComparison.OrdinalIgnoreCase))
             {
                 return RedirectToAction("Index", "SALogin");
             }
 
-            bool approved =
-                _repository.ApproveTPORegistration(id, superAdminId);
+            // ------------------------------------------------------
+            // 2. Approve registration in database
+            // ------------------------------------------------------
 
-            TempData[approved ? "SuccessMessage" : "ErrorMessage"] =
-                approved
-                    ? "TPO registration approved successfully."
-                    : "Approval failed. The registration may no longer be pending.";
+            try
+            {
+                var approvalResult =
+    _repository.ApproveTPORegistrationWithResult(id, superAdminId);
+
+                if (!approvalResult.Success)
+                {
+                    TempData["ErrorMessage"] = approvalResult.Message;
+
+                    return RedirectToAction(
+                        nameof(TPOVerification),
+                        new { id = superAdminId });
+                }
+
+                // Database approval succeeded.
+                TempData["SuccessMessage"] =
+                    "Registration approved successfully.";
+
+                // --------------------------------------------------
+                // 3. Retrieve registered TPO / Sub-TPO details
+                // --------------------------------------------------
+
+                try
+                {
+                    var tpo = _repository.GetTPOById(id);
+
+                    if (tpo == null)
+                    {
+                        TempData["EmailWarning"] =
+                            "Registration approved successfully, but the registered details could not be retrieved for email notification.";
+
+                        return RedirectToAction(
+                            nameof(TPOVerification),
+                            new { id = superAdminId });
+                    }
+
+                    if (string.IsNullOrWhiteSpace(tpo.CollegeMailID))
+                    {
+                        TempData["EmailWarning"] =
+                            "Registration approved successfully, but the registered email address is missing.";
+
+                        return RedirectToAction(
+                            nameof(TPOVerification),
+                            new { id = superAdminId });
+                    }
+
+                    string tpoType =
+                        tpo.SubTpoBit == true ? "Sub-TPO" : "TPO";
+
+                    string fullName =
+                        string.IsNullOrWhiteSpace(tpo.FullName)
+                            ? tpoType
+                            : tpo.FullName;
+
+                    // ----------------------------------------------
+                    // 4. Send approval notification
+                    // ----------------------------------------------
+
+                    await _emailService.SendTPOApprovalEmailAsync(
+                        tpo.CollegeMailID,
+                        fullName,
+                        tpoType);
+
+                    TempData["SuccessMessage"] =
+                        $"{tpoType} registration approved successfully. Notification email sent.";
+                }
+                catch (Exception emailEx)
+                {
+                    _logger.LogError(
+                        emailEx,
+                        "Failed to send approval email for TPOID {TPOID}",
+                        id);
+
+                    TempData["EmailWarning"] =
+                        "Registration approved successfully, but the notification email could not be sent. Please check the application logs and SMTP configuration.";
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(
+                    ex,
+                    "Error approving TPO registration {TPOID}",
+                    id);
+
+                TempData["ErrorMessage"] =
+                    "An error occurred while approving the registration.";
+            }
 
             return RedirectToAction(
                 nameof(TPOVerification),
                 new { id = superAdminId });
         }
 
+
+        // ==========================================================
+        // REJECT TPO / SUB-TPO + SEND EMAIL
+        // ==========================================================
+
         [HttpPost]
         [ValidateAntiForgeryToken]
         [Route("SuperAdmin/RejectTPO/{id:int}")]
-        public IActionResult RejectTPO(int id, string rejectionReason)
+        public async Task<IActionResult> RejectTPO(
+            int id,
+            string rejectionReason)
         {
+            // ------------------------------------------------------
+            // 1. Validate Super Admin session
+            // ------------------------------------------------------
+
             string? saId = HttpContext.Session.GetString("SAID");
             string? saRole = HttpContext.Session.GetString("SARole");
 
-            if (string.IsNullOrEmpty(saId) ||
+            if (string.IsNullOrWhiteSpace(saId) ||
                 !int.TryParse(saId, out int superAdminId) ||
                 superAdminId != 1 ||
                 !string.Equals(
-                    saRole, "SuperAdmin",
+                    saRole,
+                    "SuperAdmin",
                     StringComparison.OrdinalIgnoreCase))
             {
                 return RedirectToAction("Index", "SALogin");
             }
+
+            // ------------------------------------------------------
+            // 2. Validate rejection reason
+            // ------------------------------------------------------
 
             if (string.IsNullOrWhiteSpace(rejectionReason))
             {
@@ -4599,7 +4803,9 @@ ORDER BY SAF.nID DESC, OFB.nID DESC;
                     new { id = superAdminId });
             }
 
-            if (rejectionReason.Trim().Length > 1000)
+            rejectionReason = rejectionReason.Trim();
+
+            if (rejectionReason.Length > 1000)
             {
                 TempData["ErrorMessage"] =
                     "The rejection reason cannot exceed 1000 characters.";
@@ -4609,21 +4815,109 @@ ORDER BY SAF.nID DESC, OFB.nID DESC;
                     new { id = superAdminId });
             }
 
-            bool rejected = _repository.RejectTPORegistration(
-                id, superAdminId, rejectionReason);
+            // ------------------------------------------------------
+            // 3. Reject registration in database
+            // ------------------------------------------------------
 
-            TempData[rejected ? "SuccessMessage" : "ErrorMessage"] =
-                rejected
-                    ? "TPO registration rejected."
-                    : "Rejection failed. The registration may no longer be pending.";
+            try
+            {
+                bool rejected = _repository.RejectTPORegistration(
+                    id,
+                    superAdminId,
+                    rejectionReason);
+
+                if (!rejected)
+                {
+                    TempData["ErrorMessage"] =
+                        "Rejection failed. The registration may no longer be pending.";
+
+                    return RedirectToAction(
+                        nameof(TPOVerification),
+                        new { id = superAdminId });
+                }
+
+                // Database rejection succeeded.
+                TempData["SuccessMessage"] =
+                    "Registration rejected successfully.";
+
+                // --------------------------------------------------
+                // 4. Retrieve registered TPO / Sub-TPO details
+                // --------------------------------------------------
+
+                try
+                {
+                    var tpo = _repository.GetTPOById(id);
+
+                    if (tpo == null)
+                    {
+                        TempData["EmailWarning"] =
+                            "Registration rejected successfully, but the registered details could not be retrieved for email notification.";
+
+                        return RedirectToAction(
+                            nameof(TPOVerification),
+                            new { id = superAdminId });
+                    }
+
+                    if (string.IsNullOrWhiteSpace(tpo.CollegeMailID))
+                    {
+                        TempData["EmailWarning"] =
+                            "Registration rejected successfully, but the registered email address is missing.";
+
+                        return RedirectToAction(
+                            nameof(TPOVerification),
+                            new { id = superAdminId });
+                    }
+
+                    string tpoType =
+                        tpo.SubTpoBit == true ? "Sub-TPO" : "TPO";
+
+                    string fullName =
+                        string.IsNullOrWhiteSpace(tpo.FullName)
+                            ? tpoType
+                            : tpo.FullName;
+
+                    // ----------------------------------------------
+                    // 5. Send rejection notification with reason
+                    // ----------------------------------------------
+
+                    await _emailService.SendTPORejectionEmailAsync(
+                        tpo.CollegeMailID,
+                        fullName,
+                        tpoType,
+                        rejectionReason);
+
+                    TempData["SuccessMessage"] =
+                        $"{tpoType} registration rejected successfully. Notification email sent.";
+                }
+                catch (Exception emailEx)
+                {
+                    _logger.LogError(
+                        emailEx,
+                        "Failed to send rejection email for TPOID {TPOID}",
+                        id);
+
+                    TempData["EmailWarning"] =
+                        "Registration rejected successfully, but the notification email could not be sent. Please check the application logs and SMTP configuration.";
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(
+                    ex,
+                    "Error rejecting TPO registration {TPOID}",
+                    id);
+
+                TempData["ErrorMessage"] =
+                    "An error occurred while rejecting the registration.";
+            }
 
             return RedirectToAction(
                 nameof(TPOVerification),
                 new { id = superAdminId });
         }
 
+        //end 28/10/26
 
-       
         // =====================================================
         // TPO AND SUB-TPO APPROVED / REJECTED LIST
         // =====================================================
@@ -4672,7 +4966,7 @@ ORDER BY SAF.nID DESC, OFB.nID DESC;
 
             return View(statusList);
         }
-
+     
        
         [HttpPost]
         [ValidateAntiForgeryToken]
