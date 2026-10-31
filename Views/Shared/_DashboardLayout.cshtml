@@ -2762,6 +2762,17 @@
 				font-size: 16px;
 				line-height: 1;
 			}
+
+		.dropdown-avatar img {
+			width: 100%;
+			height: 100%;
+			object-fit: contain;
+			border-radius: 50%;
+		}
+
+		.dropdown-avatar {
+			overflow: hidden;
+		}
 	</style>
 
 	@* data-table css *@
@@ -4963,13 +4974,24 @@ else
 							<div class="dropdown-user-header">
 
 								<div class="dropdown-avatar">
-									<i class="fas fa-user"></i>
+									@if (!string.IsNullOrWhiteSpace(ViewData["OrganizationLogo"]?.ToString()))
+									{
+										<img src="~/uploads/organization/@ViewData["OrganizationLogo"]"
+											 alt="Organization Logo"
+											 onerror="this.style.display='none'; this.nextElementSibling.style.display='inline-block';" />
+
+										<i class="fas fa-user" style="display:none;"></i>
+									}
+									else
+									{
+										<i class="fas fa-user"></i>
+									}
 								</div>
 
 								<div>
 
 									<strong>
-										@ViewData["UserName"]
+										@ViewData["sOrgName"]
 									</strong>
 
 									<small>
