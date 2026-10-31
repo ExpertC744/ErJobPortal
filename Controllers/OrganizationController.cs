@@ -618,6 +618,7 @@ namespace ErJobPortal.Controllers
         // EDIT PROFILE - GET
         // =========================================================
 
+        //khushi 28-10
         [HttpGet]
         [Route("Organization/EditProfile/{id}")]
         public IActionResult EditProfile(string id)
@@ -661,8 +662,8 @@ namespace ErJobPortal.Controllers
                             model.nOrgID = dr["nOrgID"] != DBNull.Value ? Convert.ToInt32(dr["nOrgID"]) : orgId.Value;
 
                             model.sOrganizationName =
-                                dr["sName"] != DBNull.Value
-                                    ? dr["sName"].ToString()!
+                                dr["sOrgName"] != DBNull.Value
+                                    ? dr["sOrgName"].ToString()!
                                     : string.Empty;
 
                             model.sOrganizationEmail =
