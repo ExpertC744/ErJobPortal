@@ -5,6 +5,8 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Data.SqlClient;
 using System.Data;
 
+
+
 namespace ErJobPortal.Controllers
 {
     public class SuperAdminController : Controller
@@ -12,23 +14,14 @@ namespace ErJobPortal.Controllers
         private readonly IConfiguration _configuration;
         private readonly AccountRepository _repository;
         private readonly EmailService _emailService;
-        private readonly ILogger<SuperAdminController> _logger;
 
-        public SuperAdminController(
-            IConfiguration configuration,
-            AccountRepository repository,
-            EmailService emailService,
-            ILogger<SuperAdminController> logger)
+        public SuperAdminController(IConfiguration configuration, AccountRepository repository, EmailService emailService)
         {
             _configuration = configuration;
             _repository = repository;
             _emailService = emailService;
-            _logger = logger;
         }
-
-
         //sanidhya 08/10/26
-
         [HttpGet]
         [Route("SuperAdmin/Dashboard/{id:int}")]
         public IActionResult Dashboard(int id)
@@ -4486,10 +4479,259 @@ ORDER BY SAF.nID DESC, OFB.nID DESC;
 
 
         //radhika07
+        //[HttpGet]
+        //public IActionResult SuperAdminTopSkills()
+        //{
+        //    return View();
+        //}
+        //Anam
+
         [HttpGet]
-        public IActionResult SuperAdminTopSkills()
+        [Route("SuperAdmin/SuperAdminTopSkills/{id:int}")]
+        public IActionResult SuperAdminTopSkills(int id)
         {
-            return View();
+            if (id != 1)
+                return NotFound();
+
+            var model = new SATopStatisticsVM();
+
+            string connectionString =
+                _configuration.GetConnectionString("DefaultConnection");
+
+            using (SqlConnection con = new SqlConnection(connectionString))
+            {
+                con.Open();
+
+                // ==========================================
+                // 1. TOP SKILLS
+                // ==========================================
+
+                string skillsQuery = @"
+            WITH SkillSelections AS
+            (
+                SELECT DISTINCT
+                    CP.CandidateID,
+                    TRY_CONVERT(int, LTRIM(RTRIM(S.value))) AS SkillID,
+                    'Technical' AS SkillType
+                FROM tblCandidateProfile CP
+                CROSS APPLY STRING_SPLIT(
+                    ISNULL(CP.sTechnicalSkillIDs, ''), ','
+                ) S
+                WHERE CP.nBit = 1 AND CP.nSABit = 1
+
+                UNION ALL
+
+                SELECT DISTINCT
+                    CP.CandidateID,
+                    TRY_CONVERT(int, LTRIM(RTRIM(S.value))),
+                    'Medical'
+                FROM tblCandidateProfile CP
+                CROSS APPLY STRING_SPLIT(
+                    ISNULL(CP.sMedicalSkillIDs, ''), ','
+                ) S
+                WHERE CP.nBit = 1 AND CP.nSABit = 1
+
+                UNION ALL
+
+                SELECT DISTINCT
+                    CP.CandidateID,
+                    TRY_CONVERT(int, LTRIM(RTRIM(S.value))),
+                    'NonTechnical'
+                FROM tblCandidateProfile CP
+                CROSS APPLY STRING_SPLIT(
+                    ISNULL(CP.sNonTechnicalSkillIDs, ''), ','
+                ) S
+                WHERE CP.nBit = 1 AND CP.nSABit = 1
+            ),
+            SkillNames AS
+            (
+                SELECT
+                    SS.CandidateID,
+                    TS.sTechnicalSkillName AS SkillName
+                FROM SkillSelections SS
+                INNER JOIN tblTechnicalSkills TS
+                    ON SS.SkillID = TS.nTechnicalSkillID
+                WHERE SS.SkillType = 'Technical'
+
+                UNION ALL
+
+                SELECT
+                    SS.CandidateID,
+                    MS.sMedicalSkillName
+                FROM SkillSelections SS
+                INNER JOIN tblMedicalSkills MS
+                    ON SS.SkillID = MS.nMedicalSkillID
+                WHERE SS.SkillType = 'Medical'
+
+                UNION ALL
+
+                SELECT
+                    SS.CandidateID,
+                    NS.sNonTechnicalSkillName
+                FROM SkillSelections SS
+                INNER JOIN tblNonTechnicalSkills NS
+                    ON SS.SkillID = NS.nNonTechnicalSkillID
+                WHERE SS.SkillType = 'NonTechnical'
+            ),
+            SkillCounts AS
+            (
+                SELECT
+                    SkillName,
+                    COUNT(DISTINCT CandidateID) AS Total
+                FROM SkillNames
+                WHERE NULLIF(LTRIM(RTRIM(SkillName)), '') IS NOT NULL
+                GROUP BY SkillName
+            ),
+            CandidateTotal AS
+            (
+                SELECT COUNT(DISTINCT CandidateID) AS Total
+                FROM tblCandidateProfile
+                WHERE nBit = 1 AND nSABit = 1
+            )
+            SELECT TOP 3
+                SC.SkillName AS Name,
+                CAST(
+                    100.0 * SC.Total /
+                    NULLIF(CT.Total, 0)
+                    AS DECIMAL(6,2)
+                ) AS Percentage
+            FROM SkillCounts SC
+            CROSS JOIN CandidateTotal CT
+            ORDER BY SC.Total DESC, SC.SkillName;";
+
+                using (SqlCommand cmd = new SqlCommand(skillsQuery, con))
+                using (SqlDataReader reader = cmd.ExecuteReader())
+                {
+                    while (reader.Read())
+                    {
+                        model.TopSkills.Add(new SAChartItemM
+                        {
+                            Name = reader["Name"].ToString() ?? "",
+                            Percentage = Convert.ToDecimal(
+                                reader["Percentage"])
+                        });
+                    }
+                }
+
+                // ==========================================
+                // 2. TOP CITIES
+                // ==========================================
+
+                string citiesQuery = @"
+            WITH CityCounts AS
+            (
+                SELECT
+                    LTRIM(RTRIM(Preferred_City)) AS Name,
+                    COUNT(DISTINCT CandidateID) AS Total
+                FROM tblCandidateProfile
+                WHERE nBit = 1
+                  AND nSABit = 1
+                  AND NULLIF(
+                      LTRIM(RTRIM(Preferred_City)), ''
+                  ) IS NOT NULL
+                GROUP BY LTRIM(RTRIM(Preferred_City))
+            ),
+            CityTotal AS
+            (
+                SELECT SUM(Total) AS Total
+                FROM CityCounts
+            )
+            SELECT TOP 3
+                CC.Name,
+                CAST(
+                    100.0 * CC.Total /
+                    NULLIF(CT.Total, 0)
+                    AS DECIMAL(6,2)
+                ) AS Percentage
+            FROM CityCounts CC
+            CROSS JOIN CityTotal CT
+            ORDER BY CC.Total DESC, CC.Name;";
+
+                using (SqlCommand cmd = new SqlCommand(citiesQuery, con))
+                using (SqlDataReader reader = cmd.ExecuteReader())
+                {
+                    while (reader.Read())
+                    {
+                        model.TopCities.Add(new SAChartItemM
+                        {
+                            Name = reader["Name"].ToString() ?? "",
+                            Percentage = Convert.ToDecimal(
+                                reader["Percentage"])
+                        });
+                    }
+                }
+
+                // ==========================================
+                // 3. TOP FIELDS
+                // ==========================================
+
+                string fieldsQuery = @"
+            WITH FieldCounts AS
+            (
+                SELECT
+                    'Technical Skill' AS Name,
+                    COUNT(DISTINCT CandidateID) AS Total
+                FROM tblCandidateProfile
+                WHERE nBit = 1 AND nSABit = 1
+                  AND NULLIF(
+                      LTRIM(RTRIM(sTechnicalSkillIDs)), ''
+                  ) IS NOT NULL
+
+                UNION ALL
+
+                SELECT
+                    'Non-Technical Skill',
+                    COUNT(DISTINCT CandidateID)
+                FROM tblCandidateProfile
+                WHERE nBit = 1 AND nSABit = 1
+                  AND NULLIF(
+                      LTRIM(RTRIM(sNonTechnicalSkillIDs)), ''
+                  ) IS NOT NULL
+
+                UNION ALL
+
+                SELECT
+                    'Medical Skill',
+                    COUNT(DISTINCT CandidateID)
+                FROM tblCandidateProfile
+                WHERE nBit = 1 AND nSABit = 1
+                  AND NULLIF(
+                      LTRIM(RTRIM(sMedicalSkillIDs)), ''
+                  ) IS NOT NULL
+            ),
+            CandidateTotal AS
+            (
+                SELECT COUNT(DISTINCT CandidateID) AS Total
+                FROM tblCandidateProfile
+                WHERE nBit = 1 AND nSABit = 1
+            )
+            SELECT
+                FC.Name,
+                CAST(
+                    100.0 * FC.Total /
+                    NULLIF(CT.Total, 0)
+                    AS DECIMAL(6,2)
+                ) AS Percentage
+            FROM FieldCounts FC
+            CROSS JOIN CandidateTotal CT
+            ORDER BY FC.Total DESC, FC.Name;";
+
+                using (SqlCommand cmd = new SqlCommand(fieldsQuery, con))
+                using (SqlDataReader reader = cmd.ExecuteReader())
+                {
+                    while (reader.Read())
+                    {
+                        model.TopFields.Add(new SAChartItemM
+                        {
+                            Name = reader["Name"].ToString() ?? "",
+                            Percentage = Convert.ToDecimal(
+                                reader["Percentage"])
+                        });
+                    }
+                }
+            }
+
+            return View(model);
         }
 
         // View Organization Profile - Master
@@ -4549,249 +4791,54 @@ ORDER BY SAF.nID DESC, OFB.nID DESC;
         }
 
 
-        //[HttpPost]
-        //[ValidateAntiForgeryToken]
-        //[Route("SuperAdmin/ApproveTPO/{id:int}")]
-        //public IActionResult ApproveTPO(int id)
-        //{
-        //    string? saId = HttpContext.Session.GetString("SAID");
-        //    string? saRole = HttpContext.Session.GetString("SARole");
-
-        //    if (string.IsNullOrEmpty(saId) ||
-        //        !int.TryParse(saId, out int superAdminId) ||
-        //        superAdminId != 1 ||
-        //        !string.Equals(
-        //            saRole, "SuperAdmin",
-        //            StringComparison.OrdinalIgnoreCase))
-        //    {
-        //        return RedirectToAction("Index", "SALogin");
-        //    }
-
-        //    bool approved =
-        //        _repository.ApproveTPORegistration(id, superAdminId);
-
-        //    TempData[approved ? "SuccessMessage" : "ErrorMessage"] =
-        //        approved
-        //            ? "TPO registration approved successfully."
-        //            : "Approval failed. The registration may no longer be pending.";
-
-        //    return RedirectToAction(
-        //        nameof(TPOVerification),
-        //        new { id = superAdminId });
-        //}
-
-        //[HttpPost]
-        //[ValidateAntiForgeryToken]
-        //[Route("SuperAdmin/RejectTPO/{id:int}")]
-        //public IActionResult RejectTPO(int id, string rejectionReason)
-        //{
-        //    string? saId = HttpContext.Session.GetString("SAID");
-        //    string? saRole = HttpContext.Session.GetString("SARole");
-
-        //    if (string.IsNullOrEmpty(saId) ||
-        //        !int.TryParse(saId, out int superAdminId) ||
-        //        superAdminId != 1 ||
-        //        !string.Equals(
-        //            saRole, "SuperAdmin",
-        //            StringComparison.OrdinalIgnoreCase))
-        //    {
-        //        return RedirectToAction("Index", "SALogin");
-        //    }
-
-        //    if (string.IsNullOrWhiteSpace(rejectionReason))
-        //    {
-        //        TempData["ErrorMessage"] =
-        //            "Please enter a reason for rejection.";
-
-        //        return RedirectToAction(
-        //            nameof(TPOVerification),
-        //            new { id = superAdminId });
-        //    }
-
-        //    if (rejectionReason.Trim().Length > 1000)
-        //    {
-        //        TempData["ErrorMessage"] =
-        //            "The rejection reason cannot exceed 1000 characters.";
-
-        //        return RedirectToAction(
-        //            nameof(TPOVerification),
-        //            new { id = superAdminId });
-        //    }
-
-        //    bool rejected = _repository.RejectTPORegistration(
-        //        id, superAdminId, rejectionReason);
-
-        //    TempData[rejected ? "SuccessMessage" : "ErrorMessage"] =
-        //        rejected
-        //            ? "TPO registration rejected."
-        //            : "Rejection failed. The registration may no longer be pending.";
-
-        //    return RedirectToAction(
-        //        nameof(TPOVerification),
-        //        new { id = superAdminId });
-        //}
-
-
-
-
-        // 28/10/26
-        // ==========================================================
-        // APPROVE TPO / SUB-TPO + SEND EMAIL
-        // ==========================================================
-
         [HttpPost]
         [ValidateAntiForgeryToken]
         [Route("SuperAdmin/ApproveTPO/{id:int}")]
-        public async Task<IActionResult> ApproveTPO(int id)
+        public IActionResult ApproveTPO(int id)
         {
-            // ------------------------------------------------------
-            // 1. Validate Super Admin session
-            // ------------------------------------------------------
-
             string? saId = HttpContext.Session.GetString("SAID");
             string? saRole = HttpContext.Session.GetString("SARole");
 
-            if (string.IsNullOrWhiteSpace(saId) ||
+            if (string.IsNullOrEmpty(saId) ||
                 !int.TryParse(saId, out int superAdminId) ||
                 superAdminId != 1 ||
                 !string.Equals(
-                    saRole,
-                    "SuperAdmin",
+                    saRole, "SuperAdmin",
                     StringComparison.OrdinalIgnoreCase))
             {
                 return RedirectToAction("Index", "SALogin");
             }
 
-            // ------------------------------------------------------
-            // 2. Approve registration in database
-            // ------------------------------------------------------
+            bool approved =
+                _repository.ApproveTPORegistration(id, superAdminId);
 
-            try
-            {
-                var approvalResult =
-    _repository.ApproveTPORegistrationWithResult(id, superAdminId);
-
-                if (!approvalResult.Success)
-                {
-                    TempData["ErrorMessage"] = approvalResult.Message;
-
-                    return RedirectToAction(
-                        nameof(TPOVerification),
-                        new { id = superAdminId });
-                }
-
-                // Database approval succeeded.
-                TempData["SuccessMessage"] =
-                    "Registration approved successfully.";
-
-                // --------------------------------------------------
-                // 3. Retrieve registered TPO / Sub-TPO details
-                // --------------------------------------------------
-
-                try
-                {
-                    var tpo = _repository.GetTPOById(id);
-
-                    if (tpo == null)
-                    {
-                        TempData["EmailWarning"] =
-                            "Registration approved successfully, but the registered details could not be retrieved for email notification.";
-
-                        return RedirectToAction(
-                            nameof(TPOVerification),
-                            new { id = superAdminId });
-                    }
-
-                    if (string.IsNullOrWhiteSpace(tpo.CollegeMailID))
-                    {
-                        TempData["EmailWarning"] =
-                            "Registration approved successfully, but the registered email address is missing.";
-
-                        return RedirectToAction(
-                            nameof(TPOVerification),
-                            new { id = superAdminId });
-                    }
-
-                    string tpoType =
-                        tpo.SubTpoBit == true ? "Sub-TPO" : "TPO";
-
-                    string fullName =
-                        string.IsNullOrWhiteSpace(tpo.FullName)
-                            ? tpoType
-                            : tpo.FullName;
-
-                    // ----------------------------------------------
-                    // 4. Send approval notification
-                    // ----------------------------------------------
-
-                    await _emailService.SendTPOApprovalEmailAsync(
-                        tpo.CollegeMailID,
-                        fullName,
-                        tpoType);
-
-                    TempData["SuccessMessage"] =
-                        $"{tpoType} registration approved successfully. Notification email sent.";
-                }
-                catch (Exception emailEx)
-                {
-                    _logger.LogError(
-                        emailEx,
-                        "Failed to send approval email for TPOID {TPOID}",
-                        id);
-
-                    TempData["EmailWarning"] =
-                        "Registration approved successfully, but the notification email could not be sent. Please check the application logs and SMTP configuration.";
-                }
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(
-                    ex,
-                    "Error approving TPO registration {TPOID}",
-                    id);
-
-                TempData["ErrorMessage"] =
-                    "An error occurred while approving the registration.";
-            }
+            TempData[approved ? "SuccessMessage" : "ErrorMessage"] =
+                approved
+                    ? "TPO registration approved successfully."
+                    : "Approval failed. The registration may no longer be pending.";
 
             return RedirectToAction(
                 nameof(TPOVerification),
                 new { id = superAdminId });
         }
 
-
-        // ==========================================================
-        // REJECT TPO / SUB-TPO + SEND EMAIL
-        // ==========================================================
-
         [HttpPost]
         [ValidateAntiForgeryToken]
         [Route("SuperAdmin/RejectTPO/{id:int}")]
-        public async Task<IActionResult> RejectTPO(
-            int id,
-            string rejectionReason)
+        public IActionResult RejectTPO(int id, string rejectionReason)
         {
-            // ------------------------------------------------------
-            // 1. Validate Super Admin session
-            // ------------------------------------------------------
-
             string? saId = HttpContext.Session.GetString("SAID");
             string? saRole = HttpContext.Session.GetString("SARole");
 
-            if (string.IsNullOrWhiteSpace(saId) ||
+            if (string.IsNullOrEmpty(saId) ||
                 !int.TryParse(saId, out int superAdminId) ||
                 superAdminId != 1 ||
                 !string.Equals(
-                    saRole,
-                    "SuperAdmin",
+                    saRole, "SuperAdmin",
                     StringComparison.OrdinalIgnoreCase))
             {
                 return RedirectToAction("Index", "SALogin");
             }
-
-            // ------------------------------------------------------
-            // 2. Validate rejection reason
-            // ------------------------------------------------------
 
             if (string.IsNullOrWhiteSpace(rejectionReason))
             {
@@ -4803,9 +4850,7 @@ ORDER BY SAF.nID DESC, OFB.nID DESC;
                     new { id = superAdminId });
             }
 
-            rejectionReason = rejectionReason.Trim();
-
-            if (rejectionReason.Length > 1000)
+            if (rejectionReason.Trim().Length > 1000)
             {
                 TempData["ErrorMessage"] =
                     "The rejection reason cannot exceed 1000 characters.";
@@ -4815,109 +4860,21 @@ ORDER BY SAF.nID DESC, OFB.nID DESC;
                     new { id = superAdminId });
             }
 
-            // ------------------------------------------------------
-            // 3. Reject registration in database
-            // ------------------------------------------------------
+            bool rejected = _repository.RejectTPORegistration(
+                id, superAdminId, rejectionReason);
 
-            try
-            {
-                bool rejected = _repository.RejectTPORegistration(
-                    id,
-                    superAdminId,
-                    rejectionReason);
-
-                if (!rejected)
-                {
-                    TempData["ErrorMessage"] =
-                        "Rejection failed. The registration may no longer be pending.";
-
-                    return RedirectToAction(
-                        nameof(TPOVerification),
-                        new { id = superAdminId });
-                }
-
-                // Database rejection succeeded.
-                TempData["SuccessMessage"] =
-                    "Registration rejected successfully.";
-
-                // --------------------------------------------------
-                // 4. Retrieve registered TPO / Sub-TPO details
-                // --------------------------------------------------
-
-                try
-                {
-                    var tpo = _repository.GetTPOById(id);
-
-                    if (tpo == null)
-                    {
-                        TempData["EmailWarning"] =
-                            "Registration rejected successfully, but the registered details could not be retrieved for email notification.";
-
-                        return RedirectToAction(
-                            nameof(TPOVerification),
-                            new { id = superAdminId });
-                    }
-
-                    if (string.IsNullOrWhiteSpace(tpo.CollegeMailID))
-                    {
-                        TempData["EmailWarning"] =
-                            "Registration rejected successfully, but the registered email address is missing.";
-
-                        return RedirectToAction(
-                            nameof(TPOVerification),
-                            new { id = superAdminId });
-                    }
-
-                    string tpoType =
-                        tpo.SubTpoBit == true ? "Sub-TPO" : "TPO";
-
-                    string fullName =
-                        string.IsNullOrWhiteSpace(tpo.FullName)
-                            ? tpoType
-                            : tpo.FullName;
-
-                    // ----------------------------------------------
-                    // 5. Send rejection notification with reason
-                    // ----------------------------------------------
-
-                    await _emailService.SendTPORejectionEmailAsync(
-                        tpo.CollegeMailID,
-                        fullName,
-                        tpoType,
-                        rejectionReason);
-
-                    TempData["SuccessMessage"] =
-                        $"{tpoType} registration rejected successfully. Notification email sent.";
-                }
-                catch (Exception emailEx)
-                {
-                    _logger.LogError(
-                        emailEx,
-                        "Failed to send rejection email for TPOID {TPOID}",
-                        id);
-
-                    TempData["EmailWarning"] =
-                        "Registration rejected successfully, but the notification email could not be sent. Please check the application logs and SMTP configuration.";
-                }
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(
-                    ex,
-                    "Error rejecting TPO registration {TPOID}",
-                    id);
-
-                TempData["ErrorMessage"] =
-                    "An error occurred while rejecting the registration.";
-            }
+            TempData[rejected ? "SuccessMessage" : "ErrorMessage"] =
+                rejected
+                    ? "TPO registration rejected."
+                    : "Rejection failed. The registration may no longer be pending.";
 
             return RedirectToAction(
                 nameof(TPOVerification),
                 new { id = superAdminId });
         }
 
-        //end 28/10/26
 
+       
         // =====================================================
         // TPO AND SUB-TPO APPROVED / REJECTED LIST
         // =====================================================
@@ -4966,7 +4923,7 @@ ORDER BY SAF.nID DESC, OFB.nID DESC;
 
             return View(statusList);
         }
-     
+
        
         [HttpPost]
         [ValidateAntiForgeryToken]

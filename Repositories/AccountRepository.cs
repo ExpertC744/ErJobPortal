@@ -841,8 +841,8 @@ public List<BranchM> GetBranches(int departmentId)
                             nCollegeCode = dr["nCollegeCode"] == DBNull.Value
                                 ? null : Convert.ToInt32(dr["nCollegeCode"]),
 
-                            nCollegeName = dr["nCollegeName"] == DBNull.Value
-                                ? null : Convert.ToInt32(dr["nCollegeName"]),
+                            //nCollegeName = dr["nCollegeName"] == DBNull.Value
+                            //    ? null : Convert.ToInt32(dr["nCollegeName"]),
 
                             // Retrieve the stored hash
                             sPassword = dr["sPassword"] == DBNull.Value
@@ -1529,28 +1529,41 @@ public List<BranchM> GetBranches(int departmentId)
             {
                 string query = @"
             SELECT
-                nID,
-                sFName,
-                sLName,
-                sMobile,
-                sEmail,
-                DOB,
-                nGender,
-                sProfileImage,
-                nCollegeCode,
-                sCollegeName,
-                sPassword,
-                RegDate,
-                ModDate,
-                nBit,
-                nSABit,
-                sOTP,
-                nBranch,
-                nPassoutYear,
-                nDepartment
-            FROM tblCandidateRegister
-            WHERE nSABit = 1
-            ORDER BY nID DESC";
+                c.nID,
+                c.sFName,
+                c.sLName,
+                c.sMobile,
+                c.sEmail,
+                c.DOB,
+                c.nGender,
+                c.sProfileImage,
+                c.nCollegeCode,
+
+                ISNULL(col.sCollegeName, 'N/A') AS CollegeName,
+                ISNULL(br.sBranch, 'N/A') AS BranchName,
+                ISNULL(dep.sDepartment, 'N/A') AS DepartmentName,
+
+                c.nPassoutYear,
+                c.RegDate,
+                c.ModDate,
+                c.nBit,
+                c.nSABit
+
+            FROM tblCandidateRegister c
+
+            LEFT JOIN tblCollege col
+                ON c.sCollegeName = col.nID
+
+            LEFT JOIN tblBranch br
+                ON c.nBranch = br.nID
+
+            LEFT JOIN tblDepartment dep
+                ON c.nDepartment = dep.nID
+
+            WHERE c.nSABit = 1
+
+            ORDER BY c.nID DESC;
+        ";
 
                 using (SqlCommand cmd = new SqlCommand(query, cn))
                 {
@@ -1568,22 +1581,22 @@ public List<BranchM> GetBranches(int departmentId)
 
                                 sFName = dr["sFName"] == DBNull.Value
                                     ? ""
-                                    : dr["sFName"].ToString(),
+                                    : Convert.ToString(dr["sFName"]),
 
                                 sLName = dr["sLName"] == DBNull.Value
                                     ? ""
-                                    : dr["sLName"].ToString(),
+                                    : Convert.ToString(dr["sLName"]),
 
                                 sMobile = dr["sMobile"] == DBNull.Value
                                     ? ""
-                                    : dr["sMobile"].ToString(),
+                                    : Convert.ToString(dr["sMobile"]),
 
                                 sEmail = dr["sEmail"] == DBNull.Value
                                     ? ""
-                                    : dr["sEmail"].ToString(),
+                                    : Convert.ToString(dr["sEmail"]),
 
                                 DOB = dr["DOB"] == DBNull.Value
-                                    ? null
+                                    ? (DateTime?)null
                                     : Convert.ToDateTime(dr["DOB"]),
 
                                 nGender = dr["nGender"] == DBNull.Value
@@ -1592,49 +1605,34 @@ public List<BranchM> GetBranches(int departmentId)
 
                                 sProfileImage = dr["sProfileImage"] == DBNull.Value
                                     ? ""
-                                    : dr["sProfileImage"].ToString(),
+                                    : Convert.ToString(dr["sProfileImage"]),
 
                                 nCollegeCode = dr["nCollegeCode"] == DBNull.Value
                                     ? 0
                                     : Convert.ToInt32(dr["nCollegeCode"]),
 
-                                sCollegeName = dr["sCollegeName"] == DBNull.Value
-                                    ? 0
-                                    : Convert.ToInt32(dr["sCollegeName"]),
+                                // Actual names from master tables
+                                sCollegeName = Convert.ToString(dr["CollegeName"]),
+                                BranchName = Convert.ToString(dr["BranchName"]),
+                                DepartmentName = Convert.ToString(dr["DepartmentName"]),
 
-                                sPassword = dr["sPassword"] == DBNull.Value
-                                    ? ""
-                                    : dr["sPassword"].ToString(),
+                                nPassoutYear = dr["nPassoutYear"] == DBNull.Value
+                                    ? (int?)null
+                                    : Convert.ToInt32(dr["nPassoutYear"]),
 
                                 RegDate = dr["RegDate"] == DBNull.Value
-                                    ? null
+                                    ? (DateTime?)null
                                     : Convert.ToDateTime(dr["RegDate"]),
 
                                 ModDate = dr["ModDate"] == DBNull.Value
-                                    ? null
+                                    ? (DateTime?)null
                                     : Convert.ToDateTime(dr["ModDate"]),
 
                                 nBit = dr["nBit"] != DBNull.Value &&
                                        Convert.ToBoolean(dr["nBit"]),
 
                                 nSABit = dr["nSABit"] != DBNull.Value &&
-                                         Convert.ToBoolean(dr["nSABit"]),
-
-                                sOTP = dr["sOTP"] == DBNull.Value
-                                    ? ""
-                                    : dr["sOTP"].ToString(),
-
-                                nBranch = dr["nBranch"] == DBNull.Value
-                                    ? null
-                                    : Convert.ToInt32(dr["nBranch"]),
-
-                                nPassoutYear = dr["nPassoutYear"] == DBNull.Value
-                                    ? null
-                                    : Convert.ToInt32(dr["nPassoutYear"]),
-
-                                nDepartment = dr["nDepartment"] == DBNull.Value
-                                    ? null
-                                    : Convert.ToInt32(dr["nDepartment"])
+                                         Convert.ToBoolean(dr["nSABit"])
                             };
 
                             list.Add(model);
@@ -1706,6 +1704,57 @@ public List<BranchM> GetBranches(int departmentId)
 
         #region Super Admin Organization List
 
+
+        public List<TPOListViewModel> GetTPOListByCollege(int collegeCode)
+        {
+            var list = new List<TPOListViewModel>();
+
+            using (SqlConnection cn = _db.GetConnection())
+            {
+                string query = @"
+            SELECT
+                TPOID,
+                FullName,
+                CollegeMailID,
+                MobileNo,
+                CollegeName,
+                CollegeCode,
+                Status
+            FROM tblTPORegistration
+            WHERE TRY_CONVERT(INT, CollegeCode) = @CollegeCode
+            ORDER BY TPOID DESC";
+
+                using (SqlCommand cmd = new SqlCommand(query, cn))
+                {
+                    cmd.Parameters.Add("@CollegeCode", SqlDbType.Int).Value =
+                        collegeCode;
+
+                    cn.Open();
+
+                    using (SqlDataReader dr = cmd.ExecuteReader())
+                    {
+                        while (dr.Read())
+                        {
+                            list.Add(new TPOListViewModel
+                            {
+                                TPOID = Convert.ToInt32(dr["TPOID"]),
+                                FullName = dr["FullName"]?.ToString() ?? "",
+                                CollegeMailID = dr["CollegeMailID"]?.ToString() ?? "",
+                                MobileNo = dr["MobileNo"]?.ToString() ?? "",
+                                CollegeName = dr["CollegeName"]?.ToString() ?? "",
+                                CollegeCode = dr["CollegeCode"]?.ToString() ?? "",
+                                Status = dr["Status"]?.ToString() ?? ""
+                            });
+                        }
+                    }
+                }
+            }
+
+            return list;
+        }
+
+
+        //Sanidhya 30-10-2026
         public List<OrganizationUser> GetAllOrganizationList()
         {
             List<OrganizationUser> list = new List<OrganizationUser>();
@@ -1714,22 +1763,36 @@ public List<BranchM> GetBranches(int departmentId)
             {
                 string query = @"
             SELECT
-                nID,
-                sOrgName,
-                sOrgUrl,
-                sName,
-                sDesignation,
-                sMobile,
-                sEmail,
-                nCollegeCode,
-                nCollegeName,
-                sPassword,
-                RegDate,
-                ModDate,
-                nBit,
-                nSABit
-            FROM tblOrgRegistration
-            ORDER BY nID DESC";
+                o.nID,
+                o.sOrgName,
+                o.sOrgUrl,
+                o.sName,
+                o.sDesignation,
+                o.sMobile,
+                o.sEmail,
+                o.nCollegeCode,
+               
+
+                ISNULL(col.sCollegeName, 'N/A') AS CollegeName,
+
+                o.RegDate,
+                o.ModDate,
+                o.nBit,
+                o.nSABit,
+
+                (
+                    SELECT COUNT(*)
+                    FROM tblTPORegistration t
+                    WHERE TRY_CONVERT(INT, t.CollegeCode) = o.nCollegeCode
+                ) AS TPOCount
+
+            FROM tblOrgRegistration o
+
+            LEFT JOIN tblCollege col
+                ON o.nCollegeName = col.nID
+
+            ORDER BY o.nID DESC;
+        ";
 
                 using (SqlCommand cmd =
                        new SqlCommand(query, cn))
@@ -1741,63 +1804,64 @@ public List<BranchM> GetBranches(int departmentId)
                     {
                         while (dr.Read())
                         {
-                            OrganizationUser model =
-                                new OrganizationUser
-                                {
-                                    nID = dr["nID"] == DBNull.Value
-                                        ? 0
-                                        : Convert.ToInt32(dr["nID"]),
+                            OrganizationUser model = new OrganizationUser
+                            {
+                                nID = dr["nID"] == DBNull.Value
+                                    ? 0
+                                    : Convert.ToInt32(dr["nID"]),
 
-                                    sOrgName = dr["sOrgName"] == DBNull.Value
-                                        ? ""
-                                        : dr["sOrgName"].ToString(),
+                                sOrgName = dr["sOrgName"] == DBNull.Value
+                                    ? ""
+                                    : dr["sOrgName"].ToString(),
 
-                                    sOrgUrl = dr["sOrgUrl"] == DBNull.Value
-                                        ? ""
-                                        : dr["sOrgUrl"].ToString(),
+                                sOrgUrl = dr["sOrgUrl"] == DBNull.Value
+                                    ? ""
+                                    : dr["sOrgUrl"].ToString(),
 
-                                    sName = dr["sName"] == DBNull.Value
-                                        ? ""
-                                        : dr["sName"].ToString(),
+                                sName = dr["sName"] == DBNull.Value
+                                    ? ""
+                                    : dr["sName"].ToString(),
 
-                                    sDesignation = dr["sDesignation"] == DBNull.Value
-                                        ? ""
-                                        : dr["sDesignation"].ToString(),
+                                sDesignation = dr["sDesignation"] == DBNull.Value
+                                    ? ""
+                                    : dr["sDesignation"].ToString(),
 
-                                    sMobile = dr["sMobile"] == DBNull.Value
-                                        ? ""
-                                        : dr["sMobile"].ToString(),
+                                sMobile = dr["sMobile"] == DBNull.Value
+                                    ? ""
+                                    : dr["sMobile"].ToString(),
 
-                                    sEmail = dr["sEmail"] == DBNull.Value
-                                        ? ""
-                                        : dr["sEmail"].ToString(),
+                                sEmail = dr["sEmail"] == DBNull.Value
+                                    ? ""
+                                    : dr["sEmail"].ToString(),
 
-                                    nCollegeCode = dr["nCollegeCode"] == DBNull.Value
-                                        ? null
-                                        : Convert.ToInt32(dr["nCollegeCode"]),
+                                nCollegeCode = dr["nCollegeCode"] == DBNull.Value
+                                    ? (int?)null
+                                    : Convert.ToInt32(dr["nCollegeCode"]),
 
-                                    nCollegeName = dr["nCollegeName"] == DBNull.Value
-                                        ? null
-                                        : Convert.ToInt32(dr["nCollegeName"]),
+                                
+                                // Actual college name from tblCollege
+                                CollegeName = dr["CollegeName"] == DBNull.Value
+                                    ? "N/A"
+                                    : dr["CollegeName"].ToString(),
 
-                                    sPassword = dr["sPassword"] == DBNull.Value
-                                        ? ""
-                                        : dr["sPassword"].ToString(),
+                                RegDate = dr["RegDate"] == DBNull.Value
+                                    ? (DateTime?)null
+                                    : Convert.ToDateTime(dr["RegDate"]),
 
-                                    RegDate = dr["RegDate"] == DBNull.Value
-                                        ? null
-                                        : Convert.ToDateTime(dr["RegDate"]),
-
-                                    ModDate = dr["ModDate"] == DBNull.Value
-                                        ? null
-                                        : Convert.ToDateTime(dr["ModDate"]),
+                                ModDate = dr["ModDate"] == DBNull.Value
+                                    ? (DateTime?)null
+                                    : Convert.ToDateTime(dr["ModDate"]),
 
                                     nBit = dr["nBit"] != DBNull.Value &&
                                            Convert.ToBoolean(dr["nBit"]),
 
-                                    nSABit = dr["nSABit"] != DBNull.Value &&
-                                             Convert.ToBoolean(dr["nSABit"])
-                                };
+                                nSABit = dr["nSABit"] != DBNull.Value &&
+                                         Convert.ToBoolean(dr["nSABit"]),
+
+                                TPOCount = dr["TPOCount"] == DBNull.Value
+                                    ? 0
+                                    : Convert.ToInt32(dr["TPOCount"])
+                            };
 
                             list.Add(model);
                         }

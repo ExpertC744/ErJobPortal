@@ -313,251 +313,65 @@ table.master-data-table {
 
 
 /* =========================================================
-   MORE THAN 5 COLUMNS
-   SCROLLING AREA
+   MORE THAN 5 COLUMNS - VISIBLE HORIZONTAL SCROLLBAR
    ========================================================= */
 
-.master-table-container.master-table-scrollable
-.dt-layout-table {
+.master-table-container.master-table-scrollable .dt-layout-table {
     width: 100% !important;
     max-width: 100% !important;
     overflow: hidden !important;
 }
 
-.master-table-container.master-table-scrollable
-.dt-scroll {
+.master-table-container.master-table-scrollable .dt-scroll {
     width: 100% !important;
     max-width: 100% !important;
-    overflow: hidden !important;
-    scrollbar-width: none !important;
-    -ms-overflow-style: none !important;
+    overflow: visible !important;
 }
 
-.master-table-container.master-table-scrollable
-.dt-scroll-body {
+.master-table-container.master-table-scrollable .dt-scroll-body {
     width: 100% !important;
     max-width: 100% !important;
     overflow-x: auto !important;
     overflow-y: hidden !important;
-    scrollbar-width: none !important;
-    -ms-overflow-style: none !important;
+    /* Make scrollbar visible */
+    scrollbar-width: auto !important;
+    scrollbar-color: #1e7b67 #e8f4f1;
+    -ms-overflow-style: auto !important;
     scroll-behavior: smooth;
 }
 
-
-    /* =========================================================
-   HIDE SCROLLBAR
-   CHROME / EDGE / SAFARI
-   ========================================================= */
-
+    /* Chrome, Edge and Safari */
     .master-table-container.master-table-scrollable
     .dt-scroll-body::-webkit-scrollbar {
-        display: none !important;
-        width: 0 !important;
-        height: 0 !important;
+        display: block !important;
+        width: 16px !important;
+        height: 16px !important;
     }
 
+    .master-table-container.master-table-scrollable
+    .dt-scroll-body::-webkit-scrollbar-track {
+        background: #e8f4f1 !important;
+        border-radius: 10px;
+    }
+
+    .master-table-container.master-table-scrollable
+    .dt-scroll-body::-webkit-scrollbar-thumb {
+        background: #1e7b67 !important;
+        border: 2px solid #e8f4f1;
+        border-radius: 10px;
+    }
+
+        .master-table-container.master-table-scrollable
+        .dt-scroll-body::-webkit-scrollbar-thumb:hover {
+            background: #155d4e !important;
+        }
+
+/* Do not hide the scrollbar */
 .master-table-container.master-table-scrollable
 .dt-scroll::-webkit-scrollbar {
-    display: none !important;
-    width: 0 !important;
-    height: 0 !important;
+    display: initial !important;
 }
 
-
-/* =========================================================
-   WIDE TABLE
-   ACTUAL TABLE IS WIDER THAN VIEW
-   ========================================================= */
-
-.master-table-container.master-table-scrollable
-table.master-data-table {
-    width: max-content !important;
-    min-width: 100% !important;
-    max-width: none !important;
-    table-layout: auto !important;
-}
-
-
-    /* =========================================================
-   MORE THAN 5 COLUMNS
-   GENERAL COLUMN SIZE
-   ========================================================= */
-
-    .master-table-container.master-table-scrollable
-    table.master-data-table th,
-    .master-table-container.master-table-scrollable
-    table.master-data-table td {
-        box-sizing: border-box !important;
-        min-width: 145px !important;
-    }
-
-
-    /* =========================================================
-   HEADER NATURAL SPACE
-   ========================================================= */
-
-    .master-table-container.master-table-scrollable
-    table.master-data-table thead th {
-        white-space: nowrap !important;
-        padding-left: 14px !important;
-        padding-right: 14px !important;
-    }
-
-
-    /* =========================================================
-   BODY NATURAL SPACE
-   ========================================================= */
-
-    .master-table-container.master-table-scrollable
-    table.master-data-table tbody td {
-        padding-left: 14px !important;
-        padding-right: 14px !important;
-        overflow-wrap: anywhere !important;
-        word-break: break-word !important;
-    }
-
-
-    /* =========================================================
-   COLUMN 1 - ID
-   ========================================================= */
-
-    .master-table-container.master-table-scrollable
-    table.master-data-table th:nth-child(1),
-    .master-table-container.master-table-scrollable
-    table.master-data-table td:nth-child(1) {
-        min-width: 75px !important;
-        width: 75px !important;
-        max-width: 75px !important;
-        white-space: nowrap !important;
-    }
-
-
-    /* =========================================================
-   COLUMN 2 - ORGANIZATION
-   ========================================================= */
-
-    .master-table-container.master-table-scrollable
-    table.master-data-table th:nth-child(2),
-    .master-table-container.master-table-scrollable
-    table.master-data-table td:nth-child(2) {
-        min-width: 160px !important;
-    }
-
-
-    /* =========================================================
-   COLUMN 3 - URL
-   ========================================================= */
-
-    .master-table-container.master-table-scrollable
-    table.master-data-table th:nth-child(3),
-    .master-table-container.master-table-scrollable
-    table.master-data-table td:nth-child(3) {
-        min-width: 100px !important;
-        width: 100px !important;
-    }
-
-
-    /* =========================================================
-   COLUMN 4 - NAME
-   ========================================================= */
-
-    .master-table-container.master-table-scrollable
-    table.master-data-table th:nth-child(4),
-    .master-table-container.master-table-scrollable
-    table.master-data-table td:nth-child(4) {
-        min-width: 150px !important;
-    }
-
-
-    /* =========================================================
-   COLUMN 5 - DESIGNATION
-   ========================================================= */
-
-    .master-table-container.master-table-scrollable
-    table.master-data-table th:nth-child(5),
-    .master-table-container.master-table-scrollable
-    table.master-data-table td:nth-child(5) {
-        min-width: 160px !important;
-    }
-
-
-    /* =========================================================
-   COLUMN 6 - MOBILE
-   ========================================================= */
-
-    .master-table-container.master-table-scrollable
-    table.master-data-table th:nth-child(6),
-    .master-table-container.master-table-scrollable
-    table.master-data-table td:nth-child(6) {
-        min-width: 125px !important;
-        width: 125px !important;
-        white-space: nowrap !important;
-    }
-
-
-    /* =========================================================
-   COLUMN 7 - EMAIL
-   ========================================================= */
-
-    .master-table-container.master-table-scrollable
-    table.master-data-table th:nth-child(7),
-    .master-table-container.master-table-scrollable
-    table.master-data-table td:nth-child(7) {
-        min-width: 220px !important;
-    }
-
-
-    /* =========================================================
-   COLUMN 8 - COLLEGE CODE
-   ========================================================= */
-
-    .master-table-container.master-table-scrollable
-    table.master-data-table th:nth-child(8),
-    .master-table-container.master-table-scrollable
-    table.master-data-table td:nth-child(8) {
-        min-width: 125px !important;
-    }
-
-
-    /* =========================================================
-   COLUMN 9 - COLLEGE NAME
-   ========================================================= */
-
-    .master-table-container.master-table-scrollable
-    table.master-data-table th:nth-child(9),
-    .master-table-container.master-table-scrollable
-    table.master-data-table td:nth-child(9) {
-        min-width: 190px !important;
-    }
-
-
-    /* =========================================================
-   COLUMN 10 - REGISTRATION DATE
-   ========================================================= */
-
-    .master-table-container.master-table-scrollable
-    table.master-data-table th:nth-child(10),
-    .master-table-container.master-table-scrollable
-    table.master-data-table td:nth-child(10) {
-        min-width: 165px !important;
-        width: 165px !important;
-        white-space: nowrap !important;
-    }
-
-
-    /* =========================================================
-   COLUMN 11 - ACTION
-   ========================================================= */
-
-    .master-table-container.master-table-scrollable
-    table.master-data-table th:nth-child(11),
-    .master-table-container.master-table-scrollable
-    table.master-data-table td:nth-child(11) {
-        min-width: 105px !important;
-        width: 105px !important;
-        white-space: nowrap !important;
-    }
 
 
 /* =========================================================
@@ -802,7 +616,7 @@ table.master-data-table {
         line-height: 1;
     }
 
-.master-status {
+/*.master-status {
     border: none;
     outline: none;
     padding: 7px 16px;
@@ -813,17 +627,17 @@ table.master-data-table {
     min-width: 82px;
     text-align: center;
     transition: all 0.2s ease;
-}
+}*/
 
     /* Enabled - Teal Green */
-    .master-status.enabled {
+    /*.master-status.enabled {
         background: #198f7a;
         color: #fff;
         border: 1px solid #198f7a;
-    }
+    }*/
 
     /* Disabled - Red */
-    .master-status.disabled {
+    /*.master-status.disabled {
         background: #dc3545;
         color: #fff;
         border: 1px solid #dc3545;
@@ -831,4 +645,102 @@ table.master-data-table {
 
     .master-status:hover {
         opacity: 0.9;
+    }*/
+
+/* =========================================================
+   STATUS BUTTON - MATCH DASHBOARD THEME
+   ========================================================= */
+
+/*.status {
+    min-width: 82px;
+    padding: 7px 14px;
+    border: none;
+    border-radius: 6px;
+    font-size: 13px;
+    font-weight: 600;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.25s ease;
+}*/
+
+    /* Enabled */
+    /*.status.enabled {
+        background: #1e7b67;
+        color: #ffffff;
+    }
+
+        .status.enabled:hover {
+            background: #155d4e;
+        }*/
+
+    /* Disabled */
+    /*.status.disabled {
+        background: #dc3545;
+        color: #ffffff;
+        border: 1px solid #dc3545;
+    }
+
+        .status.disabled:hover {
+            background: #dc3545;
+            color: #ffffff;
+        }*/
+
+    /* Loading */
+    /*.status:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+    }*/
+/* =========================================================
+   STATUS BUTTON - ENABLE / DISABLE
+   ========================================================= */
+
+.master-table-container .status {
+    display: inline-block !important;
+    min-width: 82px;
+    padding: 7px 14px;
+    border: 1px solid transparent !important;
+    border-radius: 6px;
+    font-size: 13px;
+    font-weight: 600;
+    line-height: 1.4;
+    text-align: center;
+    white-space: nowrap !important;
+    cursor: pointer;
+    transition: background-color 0.25s ease, border-color 0.25s ease;
+    box-sizing: border-box;
+}
+
+    /* Enabled - Green */
+
+    .master-table-container .status.enabled {
+        background-color: #1e7b67 !important;
+        color: #ffffff !important;
+        border-color: #1e7b67 !important;
+    }
+
+        .master-table-container .status.enabled:hover {
+            background-color: #155d4e !important;
+            border-color: #155d4e !important;
+            color: #ffffff !important;
+        }
+
+    /* Disabled - Red */
+
+    .master-table-container .status.disabled {
+        background-color: #dc3545 !important;
+        color: #ffffff !important;
+        border-color: #dc3545 !important;
+    }
+
+        .master-table-container .status.disabled:hover {
+            background-color: #bb2d3b !important;
+            border-color: #bb2d3b !important;
+            color: #ffffff !important;
+        }
+
+    /* Loading / Processing */
+
+    .master-table-container .status:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
     }
