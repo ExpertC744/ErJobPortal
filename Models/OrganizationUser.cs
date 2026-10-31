@@ -32,6 +32,7 @@
 
         public bool nSABit { get; set; }
 
-        public string? orgCode {get; set; } 
+        public string? orgCode {get; set; }
+        public int TPOCount { get; set; }
     }
 }

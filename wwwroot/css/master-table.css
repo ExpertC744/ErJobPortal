@@ -651,7 +651,7 @@ table.master-data-table {
    STATUS BUTTON - MATCH DASHBOARD THEME
    ========================================================= */
 
-/*.status {
+.status {
     min-width: 82px;
     padding: 7px 14px;
     border: none;
@@ -661,7 +661,7 @@ table.master-data-table {
     text-align: center;
     cursor: pointer;
     transition: all 0.25s ease;
-}*/
+}
 
     /* Enabled */
     /*.status.enabled {
@@ -690,6 +690,7 @@ table.master-data-table {
         opacity: 0.6;
         cursor: not-allowed;
     }*/
+
 /* =========================================================
    STATUS BUTTON - ENABLE / DISABLE
    ========================================================= */
@@ -744,3 +745,115 @@ table.master-data-table {
         opacity: 0.6;
         cursor: not-allowed;
     }
+
+/* =========================================================
+   CANDIDATE REGISTRATION TABLE - COLUMN WIDTH
+   ========================================================= */
+
+/* Horizontal scrolling */
+.master-table-container.master-table-scrollable .table-responsive {
+    width: 100% !important;
+    max-width: 100% !important;
+    overflow-x: auto !important;
+    overflow-y: hidden !important;
+}
+
+/* Table width */
+.master-table-container.master-table-scrollable table#candidateTable {
+    width: 1860px !important;
+    min-width: 1860px !important;
+    max-width: none !important;
+    table-layout: fixed !important;
+}
+
+/* Individual column widths */
+
+/* ID */
+#candidateTable th:nth-child(1),
+#candidateTable td:nth-child(1) {
+    width: 70px !important;
+}
+
+/* First Name */
+#candidateTable th:nth-child(2),
+#candidateTable td:nth-child(2) {
+    width: 120px !important;
+}
+
+/* Last Name */
+#candidateTable th:nth-child(3),
+#candidateTable td:nth-child(3) {
+    width: 120px !important;
+}
+
+/* Mobile */
+#candidateTable th:nth-child(4),
+#candidateTable td:nth-child(4) {
+    width: 130px !important;
+}
+
+/* Email */
+#candidateTable th:nth-child(5),
+#candidateTable td:nth-child(5) {
+    width: 220px !important;
+}
+
+/* Date of Birth */
+#candidateTable th:nth-child(6),
+#candidateTable td:nth-child(6) {
+    width: 125px !important;
+}
+
+/* Gender */
+#candidateTable th:nth-child(7),
+#candidateTable td:nth-child(7) {
+    width: 90px !important;
+}
+
+/* College Code */
+#candidateTable th:nth-child(8),
+#candidateTable td:nth-child(8) {
+    width: 120px !important;
+}
+
+/* College Name */
+#candidateTable th:nth-child(9),
+#candidateTable td:nth-child(9) {
+    width: 220px !important;
+}
+
+/* Branch */
+#candidateTable th:nth-child(10),
+#candidateTable td:nth-child(10) {
+    width: 120px !important;
+}
+
+/* Passout Year */
+#candidateTable th:nth-child(11),
+#candidateTable td:nth-child(11) {
+    width: 110px !important;
+}
+
+/* Department */
+#candidateTable th:nth-child(12),
+#candidateTable td:nth-child(12) {
+    width: 140px !important;
+}
+
+/* Registration Date */
+#candidateTable th:nth-child(13),
+#candidateTable td:nth-child(13) {
+    width: 180px !important;
+}
+
+/* Status */
+#candidateTable th:nth-child(14),
+#candidateTable td:nth-child(14) {
+    width: 120px !important;
+}
+
+/* Action */
+#candidateTable th:nth-child(15),
+#candidateTable td:nth-child(15) {
+    width: 90px !important;
+}
