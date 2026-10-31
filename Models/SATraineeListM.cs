@@ -20,7 +20,10 @@
 
         public int nCollegeCode { get; set; }
 
-        public int sCollegeName { get; set; }
+        // Display names
+        public string sCollegeName { get; set; }
+        public string BranchName { get; set; }
+        public string DepartmentName { get; set; }
 
         public string? sPassword { get; set; }
 
@@ -34,10 +37,10 @@
 
         public string? sOTP { get; set; }
 
-        public int? nBranch { get; set; }
+        //public int? nBranch { get; set; }
 
         public int? nPassoutYear { get; set; }
 
-        public int? nDepartment { get; set; }
+        //public int? nDepartment { get; set; }
     }
 }

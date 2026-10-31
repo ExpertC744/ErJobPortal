@@ -885,3 +885,44 @@ body {
 .profile-section-card .resume-option.is-hidden {
     display: none;
 }
+/*anam*/
+/* Keep required star on the same line */
+#section-preference label[for="Profile_Internship_FellowshipType"] {
+    white-space: nowrap;
+}
+
+    #section-preference label[for="Profile_Internship_FellowshipType"] .text-danger {
+        display: inline;
+        white-space: nowrap;
+    }
+/* HSC Percentage label - match other education labels */
+#section-education label[for="Profile_dHSC"] {
+    font-size: 14px !important;
+    font-weight: 600 !important;
+    color: #23344d !important;
+    white-space: nowrap;
+    line-height: normal;
+}
+
+
+/*anam BACK BUTTON STYLE */
+.profile-back-button {
+    position: absolute;
+    top: 58px;
+    right: 20px;
+    width: 53px;
+    height: 52px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #147f6b;
+    color: #fff;
+    border: 1px solid #096b59;
+    border-radius: 10px;
+    padding: 0;
+    cursor: pointer;
+}
+
+    .profile-back-button:hover {
+        background: #116f5e;
+    }
