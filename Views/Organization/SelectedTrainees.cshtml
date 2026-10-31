@@ -13,21 +13,38 @@
 
     <div class="master-table-container">
 
-        <!-- TABLE AREA -->
-        <div class="table-responsive">
+        <!-- MASTER TABLE HEADER -->
+        <div class="master-table-title">
 
-            <!-- PAGE TITLE -->
-            <div class="page-header">
-
-                <h1>
+            <div>
+                <h2>
                     Selected Trainees
-                </h1>
+                </h2>
 
                 <p>
                     @orgCode
                 </p>
-
             </div>
+
+            <a asp-controller="Organization"
+               asp-action="Dashboard"
+               asp-route-id="@orgCode"
+               class="master-back-btn"
+               title="Back to Dashboard">
+                <i class="fas fa-arrow-left"></i>
+            </a>
+
+        </div>
+
+        <!-- TABLE AREA -->
+        <div class="table-responsive">
+
+            <!-- Your existing table code here -->
+
+
+    
+
+
 
 
             <!-- TABLE -->

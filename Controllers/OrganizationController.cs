@@ -520,6 +520,8 @@ namespace ErJobPortal.Controllers
                     }
                 }
 
+                ViewBag.TraineesApplied =
+appliedTraineePosts.Sum(x => x.MatchingTraineeCount);
                 ViewBag.AppliedTraineePosts = appliedTraineePosts;
             }
 
@@ -3627,7 +3629,7 @@ WHERE nID = @nID
 
         [HttpGet]
         [Route("Organization/AppliedTrainees/{id}")]
-        public IActionResult AppliedTrainees(string id)
+        public IActionResult AppliedTrainees(string? id)
         {
             int? sessionOrgID = HttpContext.Session.GetInt32("OrgID");
 
@@ -3639,6 +3641,9 @@ WHERE nID = @nID
             int orgID = sessionOrgID.Value;
 
             List<OrgPostM> posts = new List<OrgPostM>();
+
+            // Total Applied Trainees Count
+            int totalAppliedTrainees = 0;
 
             string connectionString =
                 _configuration.GetConnectionString("DefaultConnection");
@@ -3667,23 +3672,30 @@ WHERE nID = @nID
                                 : Convert.ToInt32(dr["PostId"]);
 
                             // Position Name
-                            item.sPositionName = dr["PositionName"] == DBNull.Value ? "" : dr["PositionName"].ToString();
+                            item.sPositionName =
+                                dr["PositionName"] == DBNull.Value
+                                    ? ""
+                                    : dr["PositionName"].ToString();
 
                             // Position ID
                             item.nPositionID = dr["PositionId"] == DBNull.Value
                                 ? 0
                                 : Convert.ToInt32(dr["PositionId"]);
 
-                            // Number of applied/final selected trainees
+                            // Number of applied trainees
                             item.MatchingTraineeCount =
                                 dr["CandidateCount"] == DBNull.Value
                                     ? 0
                                     : Convert.ToInt32(dr["CandidateCount"]);
 
+                            // ADD TOTAL APPLIED TRAINEES
+                            totalAppliedTrainees += item.MatchingTraineeCount;
+
                             // Actual post creation/start date
                             if (dr["PostCreationDate"] != DBNull.Value)
                             {
-                                item.dStartDate = Convert.ToDateTime(dr["PostCreationDate"]);
+                                item.dStartDate =
+                                    Convert.ToDateTime(dr["PostCreationDate"]);
                             }
                             else
                             {
@@ -3699,10 +3711,95 @@ WHERE nID = @nID
                 }
             }
 
+            // =====================================================
+            // TOTAL APPLIED TRAINEES
+            // =====================================================
+
+            ViewBag.TraineesApplied = totalAppliedTrainees;
+
+            // Organization Code
             ViewBag.OrgCode = id;
 
             return View(posts);
         }
+        //[HttpGet]
+        //[Route("Organization/AppliedTrainees/{id}")]
+        //public IActionResult AppliedTrainees(string id)
+        //{
+        //    int? sessionOrgID = HttpContext.Session.GetInt32("OrgID");
+
+        //    if (sessionOrgID == null)
+        //    {
+        //        return RedirectToAction("OrganizationLogin", "Account");
+        //    }
+
+        //    int orgID = sessionOrgID.Value;
+
+        //    List<OrgPostM> posts = new List<OrgPostM>();
+
+        //    string connectionString =
+        //        _configuration.GetConnectionString("DefaultConnection");
+
+        //    using (SqlConnection con = new SqlConnection(connectionString))
+        //    {
+        //        using (SqlCommand cmd = new SqlCommand(
+        //            "SP_BrowseTRApplyForAllPost", con))
+        //        {
+        //            cmd.CommandType = CommandType.StoredProcedure;
+
+        //            cmd.Parameters.Add("@OrganizationID", SqlDbType.Int)
+        //                          .Value = orgID;
+
+        //            con.Open();
+
+        //            using (SqlDataReader dr = cmd.ExecuteReader())
+        //            {
+        //                while (dr.Read())
+        //                {
+        //                    OrgPostM item = new OrgPostM();
+
+        //                    // Post ID
+        //                    item.nID = dr["PostId"] == DBNull.Value
+        //                        ? 0
+        //                        : Convert.ToInt32(dr["PostId"]);
+
+        //                    // Position Name
+        //                    item.sPositionName = dr["PositionName"] == DBNull.Value ? "" : dr["PositionName"].ToString();
+
+        //                    // Position ID
+        //                    item.nPositionID = dr["PositionId"] == DBNull.Value
+        //                        ? 0
+        //                        : Convert.ToInt32(dr["PositionId"]);
+
+        //                    // Number of applied/final selected trainees
+        //                    item.MatchingTraineeCount =
+        //                        dr["CandidateCount"] == DBNull.Value
+        //                            ? 0
+        //                            : Convert.ToInt32(dr["CandidateCount"]);
+
+        //                    // Actual post creation/start date
+        //                    if (dr["PostCreationDate"] != DBNull.Value)
+        //                    {
+        //                        item.dStartDate = Convert.ToDateTime(dr["PostCreationDate"]);
+        //                    }
+        //                    else
+        //                    {
+        //                        item.dStartDate = DateTime.MinValue;
+        //                    }
+
+        //                    // Organization ID
+        //                    item.nOrgID = orgID;
+
+        //                    posts.Add(item);
+        //                }
+        //            }
+        //        }
+        //    }
+
+        //    ViewBag.OrgCode = id;
+
+        //    return View(posts);
+        //}
 
         //khushi -- 29-09-2026
 
