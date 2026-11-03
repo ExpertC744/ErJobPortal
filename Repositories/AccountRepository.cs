@@ -1529,41 +1529,28 @@ public List<BranchM> GetBranches(int departmentId)
             {
                 string query = @"
             SELECT
-                c.nID,
-                c.sFName,
-                c.sLName,
-                c.sMobile,
-                c.sEmail,
-                c.DOB,
-                c.nGender,
-                c.sProfileImage,
-                c.nCollegeCode,
-
-                ISNULL(col.sCollegeName, 'N/A') AS CollegeName,
-                ISNULL(br.sBranch, 'N/A') AS BranchName,
-                ISNULL(dep.sDepartment, 'N/A') AS DepartmentName,
-
-                c.nPassoutYear,
-                c.RegDate,
-                c.ModDate,
-                c.nBit,
-                c.nSABit
-
-            FROM tblCandidateRegister c
-
-            LEFT JOIN tblCollege col
-                ON c.sCollegeName = col.nID
-
-            LEFT JOIN tblBranch br
-                ON c.nBranch = br.nID
-
-            LEFT JOIN tblDepartment dep
-                ON c.nDepartment = dep.nID
-
-            WHERE c.nSABit = 1
-
-            ORDER BY c.nID DESC;
-        ";
+                nID,
+                sFName,
+                sLName,
+                sMobile,
+                sEmail,
+                DOB,
+                nGender,
+                sProfileImage,
+                nCollegeCode,
+                sCollegeName,
+                sPassword,
+                RegDate,
+                ModDate,
+                nBit,
+                nSABit,
+                sOTP,
+                nBranch,
+                nPassoutYear,
+                nDepartment
+            FROM tblCandidateRegister
+            
+            ORDER BY nID DESC";
 
                 using (SqlCommand cmd = new SqlCommand(query, cn))
                 {

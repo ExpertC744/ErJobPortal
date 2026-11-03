@@ -18,7 +18,16 @@
     <!-- =====================================================
          PAGE HEADING
     ====================================================== -->
-
+    <!-- BACK TO CANDIDATE DASHBOARD -->
+  <!-- BACK TO CANDIDATE DASHBOARD -->
+<div style="text-align: right; margin-bottom: 15px;">
+    <a href="@Url.Action("Dashboard", "Candidate", new { id = ViewBag.CandidateCode })"
+       class="master-back-btn"
+       title="Back to Candidate Dashboard"
+       aria-label="Back to Candidate Dashboard">
+        <i class="fas fa-arrow-left"></i>
+    </a>
+</div>
     <div class="charts-heading">
 
         <h1>Charts</h1>

@@ -1,5 +1,4 @@
-﻿```cshtml
-@model IEnumerable<ErJobPortal.Models.SACandidateFeedbackM>
+﻿@model IEnumerable<ErJobPortal.Models.SACandidateFeedbackM>
 
 <link rel="stylesheet"
       href="~/css/SACandidateFeedback.css"
@@ -21,28 +20,33 @@
         <!-- PAGE HEADER -->
         <!-- ========================================================= -->
 
-        <div class="feedback-title-row">
+        
+<!-- PAGE HEADER -->
+<div class="feedback-title-row">
 
-            <div>
-                <h1 class="feedback-title">
-                    Trainee Feedback Details
-                </h1>
+    <div>
+        <h1 class="feedback-title">
+            Trainee Feedback Details
+        </h1>
 
-                <div class="feedback-subtitle">
-                    ItNetworkZ
-                </div>
-            </div>
-
-            <!-- BACK BUTTON -->
-            <a href="javascript:history.back();"
-               class="back-button"
-               title="Back">
-
-                <i class="fas fa-arrow-left"></i>
-
-            </a>
-
+        <div class="feedback-subtitle">
+            ItNetworkZ
         </div>
+    </div>
+
+    <a asp-controller="SuperAdmin"
+       asp-action="Dashboard"
+       asp-route-id="1"
+       class="master-back-btn"
+       title="Back to SuperAdmin Dashboard">
+
+        <i class="fas fa-arrow-left"></i>
+        
+
+    </a>
+
+</div>
+
 
 
         <!-- ========================================================= -->
@@ -307,4 +311,4 @@
     });
 
 </script>
-```
+

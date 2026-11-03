@@ -570,6 +570,9 @@ namespace ErJobPortal.Models
             ErrorMessage = "PhD percentage must be between 0 and 100.")]
         public decimal? dPhD { get; set; }
 
+        public string? CityName { get; set; }
+
+
 
     }
 }

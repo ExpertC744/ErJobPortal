@@ -1,7 +1,8 @@
 ﻿
 @model ErJobPortal.Models.CandidateRegister
 @{
-    ViewData["Title"] = "Edit Candidate Registration";
+    Layout = "~/Views/Shared/_DashboardLayout.cshtml";
+    ViewData["Title"] = "Edit Candidate Profile";
     ViewData["Panel"] = "Candidate";
 
     ViewData["UserName"] =
@@ -118,13 +119,19 @@
 </style>
 
 <div class="candidate-register-page">
-
+     <!-- Back Button - Top Right -->
+    
     <div class="candidate-register-card">
+    
 
-        <!-- ========================================= -->
-        <!-- PAGE HEADER -->
-        <!-- ========================================= -->
-
+        <div style="text-align: right; margin-bottom: 15px;">
+        <a asp-controller="Candidate"
+           asp-action="Dashboard"
+           class="master-back-btn"
+           title="Back to Candidate Dashboard">
+            <i class="fas fa-arrow-left"></i>
+        </a>
+         </div>
         <div class="register-icon">
             <i class="fa-solid fa-user-pen"></i>
         </div>

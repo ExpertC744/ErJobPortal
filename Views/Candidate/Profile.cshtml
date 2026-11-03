@@ -15,6 +15,16 @@
 
 <div class="candidate-profile-page">
 
+    <input asp-for="Profile.CityName" type="hidden" />
+<div style="text-align: right; margin-bottom: 15px;">
+    <a asp-controller="Candidate"
+       asp-action="Dashboard"
+       class="master-back-btn"
+       title="Back to Candidate Dashboard">
+        <i class="fas fa-arrow-left"></i>
+    </a>
+</div>
+
     <!-- ========================= PROFILE HERO ========================= -->
     <div class="candidate-profile-hero">
         <div class="candidate-profile-brand">
@@ -2376,6 +2386,17 @@
             });
 
         });
+        $(document).ready(function () {
+
+    $('#Profile_CityID').on('change', function () {
+
+        var cityName = $('#Profile_CityID option:selected').text();
+
+        $('#Profile_CityName').val(cityName);
+
+    });
+
+});
 
     </script>
 

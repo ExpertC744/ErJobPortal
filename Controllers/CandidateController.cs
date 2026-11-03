@@ -112,8 +112,9 @@ namespace ErJobPortal.Controllers
             // =========================================================
 
             string candidateCode = "CD" +
-                candidate.Value.DOB.Value.ToString("ddMMyy") + 
-                candidate.Value.CandidateID.ToString("D2");
+     candidate.Value.DOB.Value.ToString("ddMMyy") +
+     candidate.Value.RegDate.Value.ToString("MMdd") +
+     candidate.Value.CandidateID.ToString("D2");
 
             // =========================================================
             // IF NORMAL URL IS OPENED
@@ -841,12 +842,13 @@ namespace ErJobPortal.Controllers
             }
 
             _repo.UpdateAddress(
-                candidateId.Value,
-                model.Profile.CountryID,
-                model.Profile.StateID,
-                model.Profile.CityID,
-                model.Profile.Pincode
-            );
+    candidateId.Value,
+    model.Profile.CountryID,
+    model.Profile.StateID,
+    model.Profile.CityID,
+    model.Profile.Pincode,
+    model.Profile.CityName
+);
             TempData["Success"] = "Address updated successfully.";
             return RedirectToAction("Profile");
         }
@@ -3369,13 +3371,17 @@ namespace ErJobPortal.Controllers
         // =========================================================
 
         //khushi 02-10
+        // =========================================================
+        // CANDIDATE CHARTS
+        // =========================================================
+
         [HttpGet]
         [Route("Candidate/Charts/{id?}")]
         public IActionResult Charts(string? id)
         {
-            // =========================================================
-            // CHECK CANDIDATE SESSION
-            // =========================================================
+            // =========================================
+            // CHECK LOGIN
+            // =========================================
 
             int? candidateId =
                 HttpContext.Session.GetInt32("CandidateID");
@@ -3387,10 +3393,9 @@ namespace ErJobPortal.Controllers
                     "Account");
             }
 
-
-            // =========================================================
+            // =========================================
             // GET CANDIDATE CODE
-            // =========================================================
+            // =========================================
 
             string? candidateCode = GetCandidateCode();
 
@@ -3400,194 +3405,54 @@ namespace ErJobPortal.Controllers
                     "Candidate code could not be generated.");
             }
 
-
-            // =========================================================
-            // IF ID IS MISSING FROM URL
-            // =========================================================
+            // =========================================
+            // REDIRECT IF CODE IS MISSING
+            // =========================================
 
             if (string.IsNullOrEmpty(id))
             {
                 return RedirectToAction(
                     "Charts",
                     "Candidate",
-                    new
-                    {
-                        id = candidateCode
-                    });
+                    new { id = candidateCode });
             }
 
-
-            // =========================================================
+            // =========================================
             // VALIDATE CANDIDATE CODE
-            // =========================================================
+            // =========================================
 
-            if (id != candidateCode)
+            if (!string.Equals(
+                id,
+                candidateCode,
+                StringComparison.OrdinalIgnoreCase))
             {
                 return NotFound();
             }
 
+            // =========================================
+            // LOAD DYNAMIC CHART DATA
+            // =========================================
 
-            // =========================================================
-            // GET MATCHING / SUITABLE JOBS
-            // =========================================================
-
-            List<OrgPostM> matchingJobs =
-                GetMatchingJobsForCandidate(candidateId.Value);
-
-
-            // =========================================================
-            // MONTHLY SUITABLE OPENINGS
-            // =========================================================
-
-            int currentYear = DateTime.Now.Year;
-
-            int[] suitableOpeningsMonthly =
-                new int[12];
-
-
-            foreach (var job in matchingJobs)
-            {
-                if (!job.dStartDate.HasValue)
-                    continue;
-
-
-                DateTime startDate =
-                    job.dStartDate.Value;
-
-
-                // Only current year's jobs
-                if (startDate.Year != currentYear)
-                    continue;
-
-
-                int monthIndex =
-                    startDate.Month - 1;
-
-
-                int requiredTrainees =
-                    job.nRequiredTrainees;
-
-
-                if (requiredTrainees < 0)
-                    requiredTrainees = 0;
-
-
-                suitableOpeningsMonthly[monthIndex] +=
-                    requiredTrainees;
-            }
-
-
-            // =========================================================
-            // GET INTERNSHIP POST DATA
-            // FROM SP_GetSACharts
-            // =========================================================
-
-            SAChartsViewModel model =
-                new SAChartsViewModel();
-
-
-            string connectionString =
-                _configuration.GetConnectionString(
-                    "DefaultConnection");
-
-
-            using (SqlConnection con =
-                   new SqlConnection(connectionString))
-            {
-                using (SqlCommand cmd =
-                       new SqlCommand(
-                           "SP_GetSACharts",
-                           con))
+            CandidateChartsViewModel model =
+                new CandidateChartsViewModel
                 {
-                    cmd.CommandType =
-                        CommandType.StoredProcedure;
+                    TopSkills = _repo.GetTopCandidateSkills(),
 
+                    TopCities = _repo.GetTopCandidateCities(),
 
-                    con.Open();
+                    TopFields = _repo.GetTopCandidateFields()
+                };
 
+            // =========================================
+            // VIEW DATA
+            // =========================================
 
-                    using (SqlDataReader reader =
-                           cmd.ExecuteReader())
-                    {
-                        // =================================================
-                        // 1. CANDIDATE DATA
-                        // =================================================
+            ViewBag.CandidateCode = candidateCode;
 
-                        while (reader.Read())
-                        {
-                            model.CandidateData.Add(
-                                new SAChartData
-                                {
-                                    Year =
-                                        Convert.ToInt32(
-                                            reader["Year"]),
-
-                                    Month =
-                                        Convert.ToInt32(
-                                            reader["Month"]),
-
-                                    TotalCount =
-                                        Convert.ToInt32(
-                                            reader["TotalCount"])
-                                });
-                        }
-
-
-                        // =================================================
-                        // 2. INTERNSHIP POST DATA
-                        // =================================================
-
-                        if (reader.NextResult())
-                        {
-                            while (reader.Read())
-                            {
-                                model.InternshipPostData.Add(
-                                    new SAChartData
-                                    {
-                                        Year =
-                                            Convert.ToInt32(
-                                                reader["Year"]),
-
-                                        Month =
-                                            Convert.ToInt32(
-                                                reader["Month"]),
-
-                                        TotalCount =
-                                            Convert.ToInt32(
-                                                reader["TotalCount"])
-                                    });
-                            }
-                        }
-                    }
-                }
-            }
-
-
-            // =========================================================
-            // SEND CANDIDATE DATA TO VIEW
-            // =========================================================
-
-            ViewBag.CandidateCode =
-                candidateCode;
-
-            ViewBag.CandidateID =
-                candidateId.Value;
-
-            ViewBag.ChartYear =
-                currentYear;
-
-            ViewBag.SuitableOpeningsMonthly =
-                suitableOpeningsMonthly;
-
-
-            // =========================================================
-            // RETURN SAME VIEW WITH MODEL
-            // =========================================================
+            ViewBag.CandidateID = candidateId.Value;
 
             return View(model);
         }
-
-
 
         // shrirang 29/09/26
         // =========================================================
@@ -6110,7 +5975,23 @@ ORDER BY
         [HttpGet]
         public IActionResult TopSearch()
         {
-            return View();
+            // Check candidate session
+            int? candidateId = HttpContext.Session.GetInt32("CandidateID");
+
+            if (candidateId == null || candidateId <= 0)
+            {
+                return RedirectToAction("CandidateLogin", "Account");
+            }
+
+            // Load dynamic chart data
+            CandidateChartsViewModel model = new CandidateChartsViewModel
+            {
+                TopSkills = _repo.GetTopCandidateSkills(),
+                TopCities = _repo.GetTopCandidateCities(),
+                TopFields = _repo.GetTopCandidateFields()
+            };
+
+            return View(model);
         }
 
         [HttpGet]

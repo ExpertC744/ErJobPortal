@@ -233,6 +233,105 @@
     <title>Resume Builder - 1Trainee</title>
 
     <style>
+
+        .resume-back-btn span {
+    color: #ffffff;
+    font-size: 25px;
+    font-weight: 700;
+    line-height: 1;
+}
+/* Back button */
+.resume-back-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 10px;
+    flex-shrink: 0;
+}
+
+.resume-back-btn {
+    width: 40px;
+    height: 40px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background-color: #0d9488;
+    color: #ffffff !important;
+    border: none;
+    border-radius: 8px;
+    text-decoration: none !important;
+    cursor: pointer;
+    flex-shrink: 0;
+}
+
+.resume-back-btn i {
+    display: inline-block;
+    color: #ffffff !important;
+    font-size: 18px;
+    line-height: 1;
+    visibility: visible;
+    opacity: 1;
+}
+
+.resume-back-btn:hover {
+    background-color: #0f766e;
+    color: #ffffff !important;
+}
+
+/* Save Layout button */
+#btnSaveLayout {
+    display: inline-flex !important;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    min-height: 40px;
+    padding: 9px 18px;
+    background-color: #198754 !important;
+    color: #ffffff !important;
+    border: 1px solid #198754 !important;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 600;
+    line-height: 1.4;
+    white-space: nowrap;
+    cursor: pointer;
+    box-sizing: border-box;
+    box-shadow: none;
+}
+
+#btnSaveLayout i {
+    color: #ffffff !important;
+    font-size: 14px;
+}
+
+#btnSaveLayout:hover {
+    background-color: #157347 !important;
+    border-color: #146c43 !important;
+}
+
+#btnSaveLayout:focus {
+    outline: 3px solid rgba(25, 135, 84, 0.25);
+    outline-offset: 2px;
+}
+
+#btnSaveLayout:disabled {
+    opacity: 0.65;
+    cursor: not-allowed;
+}
+
+/* Keep toolbar items aligned */
+.toolbar-right {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+@@media print {
+    .resume-back-container {
+        display: none !important;
+    }
+}
         /* =========================================================
                            ROOT & COLOR SCHEME
                         ========================================================= */
@@ -1346,7 +1445,16 @@
                 </div>
             </div>
 
+
             <div class="toolbar-right">
+<div class="resume-back-container">
+    <a href="@Url.Action("Dashboard", "Candidate", new { id = candidateCode })"
+       class="resume-back-btn"
+       title="Back to Dashboard"
+       aria-label="Back to Dashboard">
+        <span aria-hidden="true">←</span>
+    </a>
+</div>
                 <button type="button" class="toolbar-btn" id="orientationBtn">↕ <span id="orientationText">Portrait</span></button>
                 <button type="button" class="toolbar-btn" id="gridBtn"># <span>Grid</span></button>
                 <button type="button" class="toolbar-btn" id="previewBtn">▣ <span>Preview</span></button>
