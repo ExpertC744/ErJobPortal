@@ -1,0 +1,73 @@
+﻿@model List<TPOListViewModel>
+
+@{
+    Layout = "~/Views/Shared/_DashboardLayout.cshtml";
+    ViewData["Title"] = "TPO List";
+    ViewData["Panel"] = "Organization";
+    ViewData["UserName"] = "Organization";
+}
+
+<div class="container-fluid">
+    <div class="master-table-container">
+
+        <div class="master-table-title">
+            <div>
+                <h2>TPO Registration List</h2>
+                <p>
+                    TPOs registered under College Code:
+                    <strong>@ViewBag.CollegeCode</strong>
+                </p>
+            </div>
+
+            <a asp-controller="Organization"
+               asp-action="OrgList"
+               asp-route-id="@ViewBag.OrgCode"
+               class="master-back-btn"
+               title="Back to Organization List">
+                <i class="fas fa-arrow-left"></i>
+            </a>
+        </div>
+
+        <div class="table-responsive">
+            <table class="master-data-table" id="tpoTable">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>TPO Name</th>
+                        <th>Email</th>
+                        <th>Mobile</th>
+                        <th>College Name</th>
+                        <th>College Code</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    @if (Model != null && Model.Count > 0)
+                    {
+                        foreach (var tpo in Model)
+                        {
+                            <tr>
+                                <td class="master-id">@tpo.TPOID</td>
+                                <td>@tpo.FullName</td>
+                                <td>@tpo.CollegeMailID</td>
+                                <td>@tpo.MobileNo</td>
+                                <td>@tpo.CollegeName</td>
+                                <td>@tpo.CollegeCode</td>
+                                <td>@tpo.Status</td>
+                            </tr>
+                        }
+                    }
+                    else
+                    {
+                        <tr>
+                            <td colspan="7" class="text-center">
+                                No TPO registrations found for this college.
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
