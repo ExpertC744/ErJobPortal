@@ -1549,7 +1549,7 @@ public List<BranchM> GetBranches(int departmentId)
                 nPassoutYear,
                 nDepartment
             FROM tblCandidateRegister
-            WHERE nSABit = 1
+            
             ORDER BY nID DESC";
 
                 using (SqlCommand cmd = new SqlCommand(query, cn))

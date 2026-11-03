@@ -527,11 +527,12 @@ WHERE CandidateID = @CandidateID
         // =========================================================
 
         public void UpdateAddress(
-            int candidateId,
-            string? countryId,
-            string? stateId,
-            string? cityId,
-            string? pincode)
+    int candidateId,
+    string? countryId,
+    string? stateId,
+    string? cityId,
+    string? pincode,
+    string? cityName = null)
         {
             using SqlConnection con = _db.GetConnection();
 
@@ -545,41 +546,30 @@ WHERE CandidateID = @CandidateID
             CountryID = @CountryID,
             StateID = @StateID,
             CityID = @CityID,
+            CityName = @CityName,
             Pincode = @Pincode,
             ModDate = GETDATE()
-        WHERE CandidateID = @CandidateID";
+        WHERE CandidateID = @CandidateID;";
 
-            using SqlCommand cmd =
-                new SqlCommand(sql, con);
+            using SqlCommand cmd = new SqlCommand(sql, con);
 
-            cmd.Parameters.Add(
-                "@CandidateID",
-                SqlDbType.Int
-            ).Value = candidateId;
+            cmd.Parameters.Add("@CandidateID", SqlDbType.Int)
+                .Value = candidateId;
 
-            cmd.Parameters.Add(
-                "@CountryID",
-                SqlDbType.NVarChar,
-                100
-            ).Value = (object?)countryId ?? DBNull.Value;
+            cmd.Parameters.Add("@CountryID", SqlDbType.NVarChar, 100)
+                .Value = (object?)countryId ?? DBNull.Value;
 
-            cmd.Parameters.Add(
-                "@StateID",
-                SqlDbType.NVarChar,
-                100
-            ).Value = (object?)stateId ?? DBNull.Value;
+            cmd.Parameters.Add("@StateID", SqlDbType.NVarChar, 100)
+                .Value = (object?)stateId ?? DBNull.Value;
 
-            cmd.Parameters.Add(
-                "@CityID",
-                SqlDbType.NVarChar,
-                100
-            ).Value = (object?)cityId ?? DBNull.Value;
+            cmd.Parameters.Add("@CityID", SqlDbType.NVarChar, 100)
+                .Value = (object?)cityId ?? DBNull.Value;
 
-            cmd.Parameters.Add(
-                "@Pincode",
-                SqlDbType.NVarChar,
-                20
-            ).Value = (object?)pincode ?? DBNull.Value;
+            cmd.Parameters.Add("@CityName", SqlDbType.NVarChar, 150)
+                .Value = (object?)cityName ?? DBNull.Value;
+
+            cmd.Parameters.Add("@Pincode", SqlDbType.NVarChar, 20)
+                .Value = (object?)pincode ?? DBNull.Value;
 
             cmd.ExecuteNonQuery();
         }
@@ -1901,6 +1891,455 @@ WHERE CandidateID = @CandidateID";
 
             cmd.ExecuteNonQuery();
         }
+
+        // =========================================================
+        // GET TOP SKILLS
+        // =========================================================
+
+        public List<CandidateChartItem> GetTopCandidateSkills()
+        {
+            List<CandidateChartItem> list = new();
+
+            string sql = @"
+        ;WITH CandidateSkills AS
+        (
+            SELECT
+                CP.CandidateID,
+                TS.sTechnicalSkillName AS SkillName
+            FROM tblCandidateProfile CP
+            CROSS APPLY STRING_SPLIT(
+                ISNULL(CP.sTechnicalSkillIDs, ''), ','
+            ) S
+            INNER JOIN tblTechnicalSkills TS
+                ON TS.nTechnicalSkillID =
+                   TRY_CONVERT(INT, LTRIM(RTRIM(S.value)))
+            WHERE (CP.nBit = 1 OR CP.nBit IS NULL)
+
+            UNION
+
+            SELECT
+                CP.CandidateID,
+                MS.sMedicalSkillName AS SkillName
+            FROM tblCandidateProfile CP
+            CROSS APPLY STRING_SPLIT(
+                ISNULL(CP.sMedicalSkillIDs, ''), ','
+            ) S
+            INNER JOIN tblMedicalSkills MS
+                ON MS.nMedicalSkillID =
+                   TRY_CONVERT(INT, LTRIM(RTRIM(S.value)))
+            WHERE (CP.nBit = 1 OR CP.nBit IS NULL)
+
+            UNION
+
+            SELECT
+                CP.CandidateID,
+                NS.sNonTechnicalSkillName AS SkillName
+            FROM tblCandidateProfile CP
+            CROSS APPLY STRING_SPLIT(
+                ISNULL(CP.sNonTechnicalSkillIDs, ''), ','
+            ) S
+            INNER JOIN tblNonTechnicalSkills NS
+                ON NS.nNonTechnicalSkillID =
+                   TRY_CONVERT(INT, LTRIM(RTRIM(S.value)))
+            WHERE (CP.nBit = 1 OR CP.nBit IS NULL)
+        ),
+        SkillCounts AS
+        (
+            SELECT
+                SkillName,
+                COUNT(DISTINCT CandidateID) AS TotalCandidates
+            FROM CandidateSkills
+            WHERE NULLIF(LTRIM(RTRIM(SkillName)), '') IS NOT NULL
+            GROUP BY SkillName
+        )
+        SELECT TOP 10
+            SkillName,
+            TotalCandidates,
+            CAST(
+                TotalCandidates * 100.0 /
+                NULLIF(SUM(TotalCandidates) OVER(), 0)
+                AS DECIMAL(10,2)
+            ) AS Percentage
+        FROM SkillCounts
+        ORDER BY TotalCandidates DESC, SkillName;";
+
+            using SqlConnection con = _db.GetConnection();
+            using SqlCommand cmd = new SqlCommand(sql, con);
+
+            con.Open();
+
+            using SqlDataReader reader = cmd.ExecuteReader();
+
+            while (reader.Read())
+            {
+                list.Add(new CandidateChartItem
+                {
+                    Name = reader["SkillName"]?.ToString() ?? "",
+                    Count = Convert.ToInt32(reader["TotalCandidates"]),
+                    Percentage = Convert.ToDecimal(reader["Percentage"])
+                });
+            }
+
+            return list;
+        }
+
+
+        // =========================================================
+        // GET TOP CITIES
+        // =========================================================
+
+
+
+        public List<CandidateChartItem> GetTopCandidateCities()
+        {
+            List<CandidateChartItem> result = new List<CandidateChartItem>();
+
+            string sql = @"
+        WITH CandidateCityList AS
+        (
+            SELECT
+                CP.CandidateID,
+                LTRIM(RTRIM(S.value)) AS CityName
+            FROM tblCandidateProfile CP
+            CROSS APPLY STRING_SPLIT(CP.Preferred_City, ',') S
+            WHERE
+                (CP.nBit = 1 OR CP.nBit IS NULL)
+                AND CP.Preferred_City IS NOT NULL
+                AND LTRIM(RTRIM(S.value)) <> ''
+        ),
+        CityCounts AS
+        (
+            SELECT
+                UPPER(CityName) AS CityKey,
+                MIN(CityName) AS CityName,
+                COUNT(DISTINCT CandidateID) AS TotalCandidates
+            FROM CandidateCityList
+            GROUP BY UPPER(CityName)
+        )
+        SELECT TOP 10
+            CityName,
+            TotalCandidates,
+            CAST(
+                TotalCandidates * 100.0 /
+                NULLIF(SUM(TotalCandidates) OVER(), 0)
+                AS DECIMAL(10,2)
+            ) AS Percentage
+        FROM CityCounts
+        ORDER BY TotalCandidates DESC;";
+
+            using (SqlConnection con = _db.GetConnection())
+            using (SqlCommand cmd = new SqlCommand(sql, con))
+            {
+                con.Open();
+
+                using (SqlDataReader dr = cmd.ExecuteReader())
+                {
+                    while (dr.Read())
+                    {
+                        result.Add(new CandidateChartItem
+                        {
+                            Name = dr["CityName"].ToString() ?? "",
+                            Count = Convert.ToInt32(dr["TotalCandidates"]),
+                            Percentage = Convert.ToDecimal(dr["Percentage"])
+                        });
+                    }
+                }
+            }
+
+            return result;
+        }
+
+
+
+
+        // =========================================================
+        // GET TOP FIELDS
+        // =========================================================
+
+        public List<CandidateChartItem> GetTopCandidateFields()
+        {
+            List<CandidateChartItem> list = new();
+
+            string sql = @"
+        ;WITH FieldCounts AS
+        (
+            SELECT
+                'Technical Skill' AS FieldName,
+                COUNT(DISTINCT CandidateID) AS TotalCandidates
+            FROM tblCandidateProfile
+            WHERE
+                (nBit = 1 OR nBit IS NULL)
+                AND NULLIF(
+                    LTRIM(RTRIM(sTechnicalSkillIDs)), ''
+                ) IS NOT NULL
+
+            UNION ALL
+
+            SELECT
+                'Non-Technical Skill',
+                COUNT(DISTINCT CandidateID)
+            FROM tblCandidateProfile
+            WHERE
+                (nBit = 1 OR nBit IS NULL)
+                AND NULLIF(
+                    LTRIM(RTRIM(sNonTechnicalSkillIDs)), ''
+                ) IS NOT NULL
+
+            UNION ALL
+
+            SELECT
+                'Medical Skill',
+                COUNT(DISTINCT CandidateID)
+            FROM tblCandidateProfile
+            WHERE
+                (nBit = 1 OR nBit IS NULL)
+                AND NULLIF(
+                    LTRIM(RTRIM(sMedicalSkillIDs)), ''
+                ) IS NOT NULL
+        )
+        SELECT
+            FieldName,
+            TotalCandidates,
+            CAST(
+                TotalCandidates * 100.0 /
+                NULLIF(SUM(TotalCandidates) OVER(), 0)
+                AS DECIMAL(10,2)
+            ) AS Percentage
+        FROM FieldCounts
+        WHERE TotalCandidates > 0
+        ORDER BY TotalCandidates DESC;";
+
+            using SqlConnection con = _db.GetConnection();
+            using SqlCommand cmd = new SqlCommand(sql, con);
+
+            con.Open();
+
+            using SqlDataReader reader = cmd.ExecuteReader();
+
+            while (reader.Read())
+            {
+                list.Add(new CandidateChartItem
+                {
+                    Name = reader["FieldName"]?.ToString() ?? "",
+                    Count = Convert.ToInt32(reader["TotalCandidates"]),
+                    Percentage = Convert.ToDecimal(reader["Percentage"])
+                });
+            }
+
+            return list;
+        }
+
+
+
+        //// ============================================
+        //// TOP SKILLS
+        //// ============================================
+        //public List<CandidateChartItem> GetTopCandidateSkills()
+        //{
+        //    List<CandidateChartItem> result = new List<CandidateChartItem>();
+
+        //    string sql = @"
+        //WITH CandidateSkills AS
+        //(
+        //    SELECT CP.CandidateID, TS.sTechnicalSkillName AS SkillName
+        //    FROM tblCandidateProfile CP
+        //    CROSS APPLY STRING_SPLIT(CP.sTechnicalSkillIDs, ',') S
+        //    INNER JOIN tblTechnicalSkills TS
+        //        ON TS.nTechnicalSkillID = TRY_CONVERT(INT, LTRIM(RTRIM(S.value)))
+        //    WHERE CP.nBit = 1 OR CP.nBit IS NULL
+
+        //    UNION
+
+        //    SELECT CP.CandidateID, MS.sMedicalSkillName
+        //    FROM tblCandidateProfile CP
+        //    CROSS APPLY STRING_SPLIT(CP.sMedicalSkillIDs, ',') S
+        //    INNER JOIN tblMedicalSkills MS
+        //        ON MS.nMedicalSkillID = TRY_CONVERT(INT, LTRIM(RTRIM(S.value)))
+        //    WHERE CP.nBit = 1 OR CP.nBit IS NULL
+
+        //    UNION
+
+        //    SELECT CP.CandidateID, NS.sNonTechnicalSkillName
+        //    FROM tblCandidateProfile CP
+        //    CROSS APPLY STRING_SPLIT(CP.sNonTechnicalSkillIDs, ',') S
+        //    INNER JOIN tblNonTechnicalSkills NS
+        //        ON NS.nNonTechnicalSkillID = TRY_CONVERT(INT, LTRIM(RTRIM(S.value)))
+        //    WHERE CP.nBit = 1 OR CP.nBit IS NULL
+        //),
+        //SkillCounts AS
+        //(
+        //    SELECT SkillName, COUNT(DISTINCT CandidateID) AS TotalCandidates
+        //    FROM CandidateSkills
+        //    GROUP BY SkillName
+        //)
+        //SELECT TOP 10
+        //    SkillName,
+        //    TotalCandidates,
+        //    CAST(
+        //        TotalCandidates * 100.0 /
+        //        NULLIF(SUM(TotalCandidates) OVER(), 0)
+        //        AS DECIMAL(10,2)
+        //    ) AS Percentage
+        //FROM SkillCounts
+        //ORDER BY TotalCandidates DESC;";
+
+        //    using (SqlConnection con = _db.GetConnection())
+        //    using (SqlCommand cmd = new SqlCommand(sql, con))
+        //    {
+        //        con.Open();
+
+        //        using (SqlDataReader dr = cmd.ExecuteReader())
+        //        {
+        //            while (dr.Read())
+        //            {
+        //                result.Add(new CandidateChartItem
+        //                {
+        //                    Name = dr["SkillName"].ToString() ?? "",
+        //                    Count = Convert.ToInt32(dr["TotalCandidates"]),
+        //                    Percentage = Convert.ToDecimal(dr["Percentage"])
+        //                });
+        //            }
+        //        }
+        //    }
+
+        //    return result;
+        //}
+
+
+        //// ============================================
+        //// TOP CITIES
+        //// ============================================
+        //public List<CandidateChartItem> GetTopCandidateCities()
+        //{
+        //    List<CandidateChartItem> result = new List<CandidateChartItem>();
+
+        //    string sql = @"
+        //WITH CityCounts AS
+        //(
+        //    SELECT
+        //        CASE
+        //            WHEN CityName IS NOT NULL AND LTRIM(RTRIM(CityName)) <> ''
+        //            THEN CityName
+        //            ELSE 'City ID: ' + ISNULL(CityID, '')
+        //        END AS CityName,
+        //        COUNT(DISTINCT CandidateID) AS TotalCandidates
+        //    FROM tblCandidateProfile
+        //    WHERE
+        //        (nBit = 1 OR nBit IS NULL)
+        //        AND CityID IS NOT NULL
+        //        AND LTRIM(RTRIM(CityID)) <> ''
+        //    GROUP BY
+        //        CASE
+        //            WHEN CityName IS NOT NULL AND LTRIM(RTRIM(CityName)) <> ''
+        //            THEN CityName
+        //            ELSE 'City ID: ' + ISNULL(CityID, '')
+        //        END
+        //)
+        //SELECT TOP 10
+        //    CityName,
+        //    TotalCandidates,
+        //    CAST(
+        //        TotalCandidates * 100.0 /
+        //        NULLIF(SUM(TotalCandidates) OVER(), 0)
+        //        AS DECIMAL(10,2)
+        //    ) AS Percentage
+        //FROM CityCounts
+        //ORDER BY TotalCandidates DESC;";
+
+        //    using (SqlConnection con = _db.GetConnection())
+        //    using (SqlCommand cmd = new SqlCommand(sql, con))
+        //    {
+        //        con.Open();
+
+        //        using (SqlDataReader dr = cmd.ExecuteReader())
+        //        {
+        //            while (dr.Read())
+        //            {
+        //                result.Add(new CandidateChartItem
+        //                {
+        //                    Name = dr["CityName"].ToString() ?? "",
+        //                    Count = Convert.ToInt32(dr["TotalCandidates"]),
+        //                    Percentage = Convert.ToDecimal(dr["Percentage"])
+        //                });
+        //            }
+        //        }
+        //    }
+
+        //    return result;
+        //}
+
+
+        //// ============================================
+        //// TOP FIELDS
+        //// ============================================
+        //public List<CandidateChartItem> GetTopCandidateFields()
+        //{
+        //    List<CandidateChartItem> result = new List<CandidateChartItem>();
+
+        //    string sql = @"
+        //WITH FieldCounts AS
+        //(
+        //    SELECT 'Technical Skill' AS FieldName,
+        //           COUNT(DISTINCT CandidateID) AS TotalCandidates
+        //    FROM tblCandidateProfile
+        //    WHERE
+        //        (nBit = 1 OR nBit IS NULL)
+        //        AND sTechnicalSkillIDs IS NOT NULL
+        //        AND LTRIM(RTRIM(sTechnicalSkillIDs)) <> ''
+
+        //    UNION ALL
+
+        //    SELECT 'Non-Technical Skill',
+        //           COUNT(DISTINCT CandidateID)
+        //    FROM tblCandidateProfile
+        //    WHERE
+        //        (nBit = 1 OR nBit IS NULL)
+        //        AND sNonTechnicalSkillIDs IS NOT NULL
+        //        AND LTRIM(RTRIM(sNonTechnicalSkillIDs)) <> ''
+
+        //    UNION ALL
+
+        //    SELECT 'Medical Skill',
+        //           COUNT(DISTINCT CandidateID)
+        //    FROM tblCandidateProfile
+        //    WHERE
+        //        (nBit = 1 OR nBit IS NULL)
+        //        AND sMedicalSkillIDs IS NOT NULL
+        //        AND LTRIM(RTRIM(sMedicalSkillIDs)) <> ''
+        //)
+        //SELECT
+        //    FieldName,
+        //    TotalCandidates,
+        //    CAST(
+        //        TotalCandidates * 100.0 /
+        //        NULLIF(SUM(TotalCandidates) OVER(), 0)
+        //        AS DECIMAL(10,2)
+        //    ) AS Percentage
+        //FROM FieldCounts
+        //ORDER BY TotalCandidates DESC;";
+
+        //    using (SqlConnection con = _db.GetConnection())
+        //    using (SqlCommand cmd = new SqlCommand(sql, con))
+        //    {
+        //        con.Open();
+
+        //        using (SqlDataReader dr = cmd.ExecuteReader())
+        //        {
+        //            while (dr.Read())
+        //            {
+        //                result.Add(new CandidateChartItem
+        //                {
+        //                    Name = dr["FieldName"].ToString() ?? "",
+        //                    Count = Convert.ToInt32(dr["TotalCandidates"]),
+        //                    Percentage = Convert.ToDecimal(dr["Percentage"])
+        //                });
+        //            }
+        //        }
+        //    }
+
+        //    return result;
+        //}
+
 
     }
 }

@@ -21,13 +21,15 @@ namespace ErJobPortal.Controllers
         }
         //sanidhya 08/10/26
         [HttpGet]
+        [Route("SuperAdmin/Dashboard")]
         [Route("SuperAdmin/Dashboard/{id:int}")]
-        public IActionResult Dashboard(int id)
+        public IActionResult Dashboard(int id = 1)
         {
             if (id != 1)
             {
                 return NotFound();
             }
+
 
             int traineeRegistrationCount = 0;
             int organizationRegistrationCount = 0;
@@ -44,23 +46,23 @@ namespace ErJobPortal.Controllers
                 con.Open();
 
                 string query = @"
-   SELECT
+SELECT
 
-      -- TRAINEE REGISTRATION COUNT
-      (SELECT COUNT(nID)
-       FROM tblCandidateRegister) AS CandidateCount,
+   -- TRAINEE REGISTRATION COUNT
+   (SELECT COUNT(nID)
+    FROM tblCandidateRegister) AS CandidateCount,
 
-      -- ORGANIZATION REGISTRATION COUNT
-      (SELECT COUNT(nID)
-       FROM tblOrgRegistration) AS OrganizationCount,
+   -- ORGANIZATION REGISTRATION COUNT
+   (SELECT COUNT(nID)
+    FROM tblOrgRegistration) AS OrganizationCount,
 
-      -- TRAINEE PROFILE COUNT
-      (SELECT COUNT(nID)
-       FROM tblCandidateProfile) AS TraineeProfileCount,
+   -- TRAINEE PROFILE COUNT
+   (SELECT COUNT(nID)
+    FROM tblCandidateProfile) AS TraineeProfileCount,
 
-      -- ORGANIZATION PROFILE COUNT
-      (SELECT COUNT(nID)
-       FROM tblOrgProfile) AS OrganizationProfileCount;";
+   -- ORGANIZATION PROFILE COUNT
+   (SELECT COUNT(nID)
+    FROM tblOrgProfile) AS OrganizationProfileCount;";
 
                 using (SqlCommand cmd = new SqlCommand(query, con))
                 using (SqlDataReader dr = cmd.ExecuteReader())

@@ -3,6 +3,71 @@
 @model ResumeViewModel
 
 <style>
+
+    /* Back to Dashboard Button */
+.resume-back-container {
+    position: fixed;
+    top: 12px;
+    right: 20px;
+    z-index: 100000;
+}
+
+.resume-back-btn {
+    width: 42px;
+    height: 42px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background-color: #0d9488;
+    color: #ffffff;
+    border: 1px solid #0d9488;
+    border-radius: 8px;
+    text-decoration: none;
+    box-shadow: 0 4px 12px rgba(15, 23, 42, 0.15);
+    transition: all 0.2s ease-in-out;
+    cursor: pointer;
+}
+
+.resume-back-btn i {
+    font-size: 16px;
+}
+
+.resume-back-btn:hover {
+    background-color: #0f766e;
+    border-color: #0f766e;
+    color: #ffffff;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 15px rgba(15, 23, 42, 0.2);
+}
+
+.resume-back-btn:active {
+    transform: translateY(0);
+}
+
+/* Mobile Responsive */
+@@media (max-width: 700px) {
+    .resume-back-container {
+        top: 8px;
+        right: 8px;
+    }
+
+    .resume-back-btn {
+        width: 36px;
+        height: 36px;
+        border-radius: 6px;
+    }
+
+    .resume-back-btn i {
+        font-size: 14px;
+    }
+}
+
+/* Hide Back Button when Printing */
+@@media print {
+    .resume-back-container {
+        display: none !important;
+    }
+}
     /* ============================================================
            CANDIDATE RESUME NAVIGATION
            Previous Candidate  <-  Resume  ->  Next Candidate
@@ -1211,6 +1276,43 @@
 </head>
 
 <body>
+
+    @{
+    string dashboardUrl = Url.Action("Index", "Home") ?? "/";
+
+    if (Context.Session.GetInt32("SAID") == 1)
+    {
+        dashboardUrl = Url.Action("Dashboard", "SuperAdmin") ?? "/";
+    }
+    else if (Context.Session.GetInt32("CandidateID") is int candidateId
+             && candidateId > 0)
+    {
+        dashboardUrl = Url.Action(
+            "Dashboard",
+            "Candidate",
+            new { id = ViewBag.CandidateCode }
+        ) ?? "/";
+    }
+    else if (Context.Session.GetInt32("OrgID") is int orgId
+             && orgId > 0)
+    {
+        dashboardUrl = Url.Action("Dashboard", "Organization") ?? "/";
+    }
+    else if (Context.Session.GetInt32("TPOID") is int tpoId
+             && tpoId > 0)
+    {
+        dashboardUrl = Url.Action("Dashboard", "TPO") ?? "/";
+    }
+}
+
+<div class="resume-back-container">
+    <a href="@dashboardUrl"
+       class="resume-back-btn"
+       title="Back to Dashboard"
+       aria-label="Back to Dashboard">
+        <i class="fa-solid fa-arrow-left"></i>
+    </a>
+</div>
 
     <!-- =========================================================
          RESUME PAGE

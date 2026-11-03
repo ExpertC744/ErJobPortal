@@ -20,13 +20,22 @@
         <!-- TABLE -->
         <div class="table-responsive">
              <!-- PAGE HEADER -->
-    <div class="mb-4">
+    <!-- PAGE HEADER -->
+<div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-3">
+    <div>
         <h1 class="mb-2">Trainee Selection</h1>
-
-        <p class="mb-0 text-muted">
-            ItNetworkZ
-        </p>
+        <p class="mb-0 text-muted">ItNetworkZ</p>
     </div>
+
+    <a asp-controller="SuperAdmin"
+       asp-action="Dashboard"
+       asp-route-id="1"
+       class="master-back-btn"
+       title="Back to SuperAdmin Dashboard">
+        <i class="fas fa-arrow-left"></i>
+  
+    </a>
+</div>
             <table id="traineeSelectionTable"
                    class="master-data-table">
 

@@ -47,9 +47,13 @@
             </p>
         </div>
 
-        <a href="/SuperAdmin/Dashboard/1" class="tpo-back-button">
-            <i class="bi bi-arrow-left"></i>
-            <span>Back to Dashboard</span>
+        <a asp-controller="SuperAdmin"
+           asp-action="Dashboard"
+           asp-route-id="1"
+           class="master-back-btn"
+           title="Back to SuperAdmin Dashboard">
+            <i class="fas fa-arrow-left"></i>
+
         </a>
     </div>
 

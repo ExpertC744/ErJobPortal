@@ -10,7 +10,15 @@
     string candidateCode = ViewBag.CandidateCode?.ToString() ?? "";
 }
 <div class="master-table-container">
-
+     <!-- BACK BUTTON - TOP RIGHT -->
+    <div style="text-align: right; margin-bottom: 15px;">
+        <a asp-controller="Candidate"
+           asp-action="Dashboard"
+           class="master-back-btn"
+           title="Back to Candidate Dashboard">
+            <i class="fas fa-arrow-left"></i>
+        </a>
+    </div>
     <!-- HEADER -->
 
     <div class="feedback-title-row">
