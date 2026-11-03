@@ -1,4 +1,4 @@
-﻿@model ErJobPortal.Models.OrganizationRegister
+﻿@model ErJobPortal.Models.EditOrganizationRegistrationM
 
 @{
     ViewData["Title"] = "Edit Organization Profile";
@@ -36,10 +36,10 @@
             </div>
         }
 
-        <form asp-controller="Account"
-              asp-action="EditOrganizationRegistration"
-              method="post"
-              id="editOrganizationForm">
+        <form asp-controller="Organization"
+      asp-action="EditOrganizationRegistration"
+      method="post"
+      id="editOrganizationForm">
 
             @Html.AntiForgeryToken()
 
@@ -220,7 +220,7 @@
             </div>
 
             <!-- OPTIONAL PASSWORD CHANGE -->
-            <div class="edit-org-section">
+            @* <div class="edit-org-section">
               
 
                 <div class="register-form-row">
@@ -240,7 +240,7 @@
                     </div>
                 </div>
 
-            </div>
+            </div> *@
 
             <!-- ACTION BUTTONS -->
             <div class="edit-org-actions">
