@@ -14,11 +14,19 @@
 
     <!-- MASTER TABLE -->
     <div class="master-table-container">
+        <div class="master-table-title">
+            <!-- PAGE HEADER -->
+            <div class="page-header mb-4">
+                <h1>Trainee Profiles List</h1>
+                <p>Total Trainees : @Model.Count</p>
+            </div>
 
-        <!-- PAGE HEADER -->
-        <div class="page-header mb-4">
-            <h1>Trainee Profiles List</h1>
-            <p>Total Trainees : @Model.Count</p>
+            <a asp-controller="Organization"
+               asp-action="Dashboard"
+               class="master-back-btn"
+               title="Back to Dashboard">
+                <i class="fas fa-arrow-left"></i>
+            </a>
         </div>
 
         <div class="table-responsive">

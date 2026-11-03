@@ -909,6 +909,7 @@ body.site-modern {
         overflow: hidden;
         border-radius: 0 !important;
         color: #fff;
+        width:100vw
     }
 
         body.site-modern .footer::before {

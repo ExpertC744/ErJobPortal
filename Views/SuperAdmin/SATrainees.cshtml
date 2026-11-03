@@ -221,35 +221,29 @@
                                     @item.nCollegeCode
                                 </td>
 
+                                @* Sanidhya 30-10-2026 *@
 
-                                <!-- COLLEGE NAME -->
-                                <td>
-                                    @item.sCollegeName
-                                </td>
+                        <!-- COLLEGE NAME -->
+                        <td>
+                            @item.sCollegeName
+                        </td>
 
+                        <!-- BRANCH NAME -->
+                        <td>
+                            @item.BranchName
+                        </td>
 
-                                <!-- BRANCH -->
-                                <td>
-                                    @(item.nBranch.HasValue
-                                        ? item.nBranch.Value.ToString()
-                                        : "-")
-                                </td>
+                        <!-- PASSOUT YEAR -->
+                        <td>
+                            @(item.nPassoutYear.HasValue
+                                                        ? item.nPassoutYear.Value.ToString()
+                                                        : "-")
+                                                          </td>
 
-
-                                <!-- PASSOUT YEAR -->
-                                <td>
-                                    @(item.nPassoutYear.HasValue
-                                        ? item.nPassoutYear.Value.ToString()
-                                        : "-")
-                                </td>
-
-
-                                <!-- DEPARTMENT -->
-                                <td>
-                                    @(item.nDepartment.HasValue
-                                        ? item.nDepartment.Value.ToString()
-                                        : "-")
-                                </td>
+                        <!-- DEPARTMENT NAME -->
+                        <td>
+                            @item.DepartmentName
+                        </td>
 
 
                                 <!-- REGISTRATION DATE -->
@@ -274,6 +268,7 @@
 
                                 </td>
 
+                                @* Sanidhya End 30-10-2026 *@
 
                                 <!-- ACTION -->
                                 <td>

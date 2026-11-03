@@ -37,6 +37,23 @@
             <span>Edit Candidate Profile</span>
         </div>
 
+        <!-- BACK BUTTON anam-->
+        <button type="button"
+                class="profile-back-button"
+                onclick="window.history.back()"
+                title="Go Back"
+                aria-label="Go Back">
+
+            <svg width="25" height="25" viewBox="0 0 24 24"
+                 fill="none" stroke="currentColor"
+                 stroke-width="2.5"
+                 stroke-linecap="round"
+                 stroke-linejoin="round">
+                <path d="M19 12H5" />
+                <path d="M11 6L5 12L11 18" />
+            </svg>
+            @*    end anam*@
+
         <div class="hero-content">
             <div class="hero-kicker">CANDIDATE PROFILE</div>
             <h1>Edit your profile</h1>
@@ -250,38 +267,48 @@
                         <h5>HSC / Diploma</h5>
 
                         <div class="row">
-                            <div class="col-md-3 mb-3">
-                                <label asp-for="Profile.HSC_DIPLOMA_YEAR" class="form-label">HSC / Diploma Year</label>
-                                <input asp-for="Profile.HSC_DIPLOMA_YEAR" type="number" class="form-control education-year" min="1950" max="2099" placeholder="YYYY" />
-                                <span asp-validation-for="Profile.HSC_DIPLOMA_YEAR" class="text-danger"></span>
+                            <div class="col-md-4 mb-3">
+                                <label asp-for="Profile.HSC_DIPLOMA_YEAR" class="form-label">
+                                    HSC / Diploma Year
+                                </label>
+                                <input asp-for="Profile.HSC_DIPLOMA_YEAR"
+                                       type="number"
+                                       class="form-control education-year"
+                                       min="1950"
+                                       max="2099"
+                                       placeholder="YYYY" />
+                                <span asp-validation-for="Profile.HSC_DIPLOMA_YEAR"
+                                      class="text-danger"></span>
                             </div>
 
-                            <div class="col-md-3 mb-3">
-                                <label asp-for="Profile.HSC_DIPLOMA_DIVISION" class="form-label">HSC / Diploma Division</label>
-                                <select asp-for="Profile.HSC_DIPLOMA_DIVISION" class="form-control"
+                            <div class="col-md-4 mb-3"> 
+                                <label asp-for="Profile.HSC_DIPLOMA_DIVISION" class="form-label text-nowrap">
+                                    HSC / Diploma Division
+                                </label>
+                                <select asp-for="Profile.HSC_DIPLOMA_DIVISION"
+                                        class="form-control"
                                         asp-items="@(new SelectList(Model.Divisions, "ID", "Name"))">
                                     <option value="">-- Select Division --</option>
                                 </select>
-                                <span asp-validation-for="Profile.HSC_DIPLOMA_DIVISION" class="text-danger"></span>
+                                <span asp-validation-for="Profile.HSC_DIPLOMA_DIVISION"
+                                      class="text-danger"></span>
                             </div>
 
-                            <div class="col-md-3 mb-3">
-    <label asp-for="Profile.dHSC" class="form-label">
-        HSC / Diploma Percentage (%)
-    </label>
-    <input asp-for="Profile.dHSC"
-           type="number"
-           class="form-control"
-           min="0"
-           max="100"
-           step="0.01"
-           placeholder="Enter percentage" />
-    <span asp-validation-for="Profile.dHSC"
-          class="text-danger"></span>
-</div>
+                            <div class="col-md-4 mb-3">
+                                <label asp-for="Profile.dHSC" class="form-label">
+                                    HSC / Diploma Percentage (%)
+                                </label>
+                                <input asp-for="Profile.dHSC"
+                                       type="number"
+                                       class="form-control"
+                                       min="0"
+                                       max="100"
+                                       step="0.01"
+                                       placeholder="Enter percentage" />
+                                <span asp-validation-for="Profile.dHSC"
+                                      class="text-danger"></span>
+                            </div>
                         </div>
-
-                        <hr />
 
                         <!-- GRADUATION -->
                         <h5>Graduation</h5>
@@ -332,7 +359,6 @@
 </div>
                         </div>
 
-                        <hr />
 
                         <!-- PG -->
                         <h5>Post Graduation</h5>
@@ -444,6 +470,7 @@
             </div>
 
 
+
             <!-- ============ INTERNSHIP / FELLOWSHIP PREFERENCE ============ -->
             <div class="card mb-4 profile-section-card" id="section-preference">
 
@@ -453,47 +480,86 @@
 
                 <div class="card-body">
 
-                    <form id="preferenceForm" asp-action="UpdateInternshipPreference" asp-controller="Candidate" method="post">
+                    <form id="preferenceForm"
+                          asp-action="UpdateInternshipPreference"
+                          asp-controller="Candidate"
+                          method="post">
 
                         @Html.AntiForgeryToken()
 
                         <div class="row">
 
+                            <!-- Internship / Fellowship Type -->
                             <div class="col-md-3 mb-3">
-                                <label asp-for="Profile.Internship_FellowshipType" class="form-label">
-                                    Internship / Fellowship Type <span class="text-danger">*</span>
+                                <label asp-for="Profile.Internship_FellowshipType"
+                                       class="form-label text-nowrap">
+                                    Internship / Fellowship Type
+                                    <span class="text-danger">*</span>
                                 </label>
+
                                 <select asp-for="Profile.Internship_FellowshipType"
                                         class="form-control"
                                         asp-items="@(new SelectList(Model.InternshipFellowshipType, "ID", "Name"))"
                                         required>
                                     <option value="">-- Select Type --</option>
                                 </select>
-                                <span asp-validation-for="Profile.Internship_FellowshipType" class="text-danger"></span>
+
+                                <span asp-validation-for="Profile.Internship_FellowshipType"
+                                      class="text-danger"></span>
                             </div>
 
+                            <!-- Preferred Country -->
                             <div class="col-md-3 mb-3">
-                                <label asp-for="Profile.Preferred_Country" class="form-label">Preferred Country</label>
-                                <input asp-for="Profile.Preferred_Country" class="form-control" maxlength="100" />
-                                <span asp-validation-for="Profile.Preferred_Country" class="text-danger"></span>
+                                <label asp-for="Profile.Preferred_Country"
+                                       class="form-label">
+                                    Preferred Country
+                                </label>
+
+                                <input asp-for="Profile.Preferred_Country"
+                                       class="form-control"
+                                       maxlength="100" />
+
+                                <span asp-validation-for="Profile.Preferred_Country"
+                                      class="text-danger"></span>
                             </div>
 
+                            <!-- Preferred State -->
                             <div class="col-md-3 mb-3">
-                                <label asp-for="Profile.Preferred_State" class="form-label">Preferred State</label>
-                                <input asp-for="Profile.Preferred_State" class="form-control" maxlength="100" />
-                                <span asp-validation-for="Profile.Preferred_State" class="text-danger"></span>
+                                <label asp-for="Profile.Preferred_State"
+                                       class="form-label">
+                                    Preferred State
+                                </label>
+
+                                <input asp-for="Profile.Preferred_State"
+                                       class="form-control"
+                                       maxlength="100" />
+
+                                <span asp-validation-for="Profile.Preferred_State"
+                                      class="text-danger"></span>
                             </div>
 
+                            <!-- Preferred City -->
                             <div class="col-md-3 mb-3">
-                                <label asp-for="Profile.Preferred_City" class="form-label">Preferred City</label>
-                                <input asp-for="Profile.Preferred_City" class="form-control" maxlength="100" />
-                                <span asp-validation-for="Profile.Preferred_City" class="text-danger"></span>
+                                <label asp-for="Profile.Preferred_City"
+                                       class="form-label">
+                                    Preferred City
+                                </label>
+
+                                <input asp-for="Profile.Preferred_City"
+                                       class="form-control"
+                                       maxlength="100" />
+
+                                <span asp-validation-for="Profile.Preferred_City"
+                                      class="text-danger"></span>
                             </div>
 
                         </div>
 
+                        <!-- Update Button -->
                         <div class="text-end">
-                            <button type="submit" class="btn btn-primary">Update Preference</button>
+                            <button type="submit" class="btn btn-primary">
+                                Update Preference
+                            </button>
                         </div>
 
                     </form>
@@ -527,8 +593,11 @@
 
                                 <label for="ResumeFile" class="form-label fw-bold">Resume</label>
 
-                                <input type="file" name="ResumeFile" id="ResumeFile" class="form-control" accept=".pdf,.doc,.docx" />
-
+                                <input type="file"
+                                       name="ResumeFile"
+                                       id="ResumeFile"
+                                       class="form-control form-control-sm"
+                                       accept=".pdf,.doc,.docx" />
                                 <small class="text-muted d-block mt-1">
                                     Allowed: PDF, DOC, DOCX. Maximum 5 MB.
                                 </small>
@@ -557,8 +626,11 @@
 
                                 <label for="PhotoFile" class="form-label fw-bold">Photo</label>
 
-                                <input type="file" name="PhotoFile" id="PhotoFile" class="form-control" accept=".jpg,.jpeg,.png" />
-
+                                <input type="file"
+                                       name="PhotoFile"
+                                       id="PhotoFile"
+                                       class="form-control form-control-sm"
+                                         accept=".jpg,.jpeg,.png" />
                                 <small class="text-muted d-block mt-1">
                                     Allowed: JPG, JPEG, PNG. Maximum 5 MB.
                                 </small>
@@ -593,8 +665,11 @@
 
                                 <label for="SignatureFile" class="form-label fw-bold">Signature</label>
 
-                                <input type="file" name="SignatureFile" id="SignatureFile" class="form-control" accept=".jpg,.jpeg,.png" />
-
+                                <input type="file"
+                                       name="SignatureFile"
+                                       id="SignatureFile"
+                                       class="form-control form-control-sm"
+                                       accept=".jpg,.jpeg,.png" />
                                 <small class="text-muted d-block mt-1">
                                     Allowed: JPG, JPEG, PNG. Maximum 5 MB.
                                 </small>

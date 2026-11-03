@@ -16,6 +16,7 @@ namespace ErJobPortal.Controllers
         private readonly IWebHostEnvironment _environment;
         private readonly OrgQuestionBankRepository _questionBankRepository;
 
+
         public OrganizationController(
             IConfiguration configuration,
             AccountRepository repository,
@@ -519,6 +520,8 @@ namespace ErJobPortal.Controllers
                     }
                 }
 
+                ViewBag.TraineesApplied =
+appliedTraineePosts.Sum(x => x.MatchingTraineeCount);
                 ViewBag.AppliedTraineePosts = appliedTraineePosts;
             }
 
@@ -617,6 +620,7 @@ namespace ErJobPortal.Controllers
         // EDIT PROFILE - GET
         // =========================================================
 
+        //khushi 28-10
         [HttpGet]
         [Route("Organization/EditProfile/{id}")]
         public IActionResult EditProfile(string id)
@@ -660,8 +664,8 @@ namespace ErJobPortal.Controllers
                             model.nOrgID = dr["nOrgID"] != DBNull.Value ? Convert.ToInt32(dr["nOrgID"]) : orgId.Value;
 
                             model.sOrganizationName =
-                                dr["sName"] != DBNull.Value
-                                    ? dr["sName"].ToString()!
+                                dr["sOrgName"] != DBNull.Value
+                                    ? dr["sOrgName"].ToString()!
                                     : string.Empty;
 
                             model.sOrganizationEmail =
@@ -3625,7 +3629,7 @@ WHERE nID = @nID
 
         [HttpGet]
         [Route("Organization/AppliedTrainees/{id}")]
-        public IActionResult AppliedTrainees(string id)
+        public IActionResult AppliedTrainees(string? id)
         {
             int? sessionOrgID = HttpContext.Session.GetInt32("OrgID");
 
@@ -3637,6 +3641,9 @@ WHERE nID = @nID
             int orgID = sessionOrgID.Value;
 
             List<OrgPostM> posts = new List<OrgPostM>();
+
+            // Total Applied Trainees Count
+            int totalAppliedTrainees = 0;
 
             string connectionString =
                 _configuration.GetConnectionString("DefaultConnection");
@@ -3665,23 +3672,30 @@ WHERE nID = @nID
                                 : Convert.ToInt32(dr["PostId"]);
 
                             // Position Name
-                            item.sPositionName = dr["PositionName"] == DBNull.Value ? "" : dr["PositionName"].ToString();
+                            item.sPositionName =
+                                dr["PositionName"] == DBNull.Value
+                                    ? ""
+                                    : dr["PositionName"].ToString();
 
                             // Position ID
                             item.nPositionID = dr["PositionId"] == DBNull.Value
                                 ? 0
                                 : Convert.ToInt32(dr["PositionId"]);
 
-                            // Number of applied/final selected trainees
+                            // Number of applied trainees
                             item.MatchingTraineeCount =
                                 dr["CandidateCount"] == DBNull.Value
                                     ? 0
                                     : Convert.ToInt32(dr["CandidateCount"]);
 
+                            // ADD TOTAL APPLIED TRAINEES
+                            totalAppliedTrainees += item.MatchingTraineeCount;
+
                             // Actual post creation/start date
                             if (dr["PostCreationDate"] != DBNull.Value)
                             {
-                                item.dStartDate = Convert.ToDateTime(dr["PostCreationDate"]);
+                                item.dStartDate =
+                                    Convert.ToDateTime(dr["PostCreationDate"]);
                             }
                             else
                             {
@@ -3697,10 +3711,95 @@ WHERE nID = @nID
                 }
             }
 
+            // =====================================================
+            // TOTAL APPLIED TRAINEES
+            // =====================================================
+
+            ViewBag.TraineesApplied = totalAppliedTrainees;
+
+            // Organization Code
             ViewBag.OrgCode = id;
 
             return View(posts);
         }
+        //[HttpGet]
+        //[Route("Organization/AppliedTrainees/{id}")]
+        //public IActionResult AppliedTrainees(string id)
+        //{
+        //    int? sessionOrgID = HttpContext.Session.GetInt32("OrgID");
+
+        //    if (sessionOrgID == null)
+        //    {
+        //        return RedirectToAction("OrganizationLogin", "Account");
+        //    }
+
+        //    int orgID = sessionOrgID.Value;
+
+        //    List<OrgPostM> posts = new List<OrgPostM>();
+
+        //    string connectionString =
+        //        _configuration.GetConnectionString("DefaultConnection");
+
+        //    using (SqlConnection con = new SqlConnection(connectionString))
+        //    {
+        //        using (SqlCommand cmd = new SqlCommand(
+        //            "SP_BrowseTRApplyForAllPost", con))
+        //        {
+        //            cmd.CommandType = CommandType.StoredProcedure;
+
+        //            cmd.Parameters.Add("@OrganizationID", SqlDbType.Int)
+        //                          .Value = orgID;
+
+        //            con.Open();
+
+        //            using (SqlDataReader dr = cmd.ExecuteReader())
+        //            {
+        //                while (dr.Read())
+        //                {
+        //                    OrgPostM item = new OrgPostM();
+
+        //                    // Post ID
+        //                    item.nID = dr["PostId"] == DBNull.Value
+        //                        ? 0
+        //                        : Convert.ToInt32(dr["PostId"]);
+
+        //                    // Position Name
+        //                    item.sPositionName = dr["PositionName"] == DBNull.Value ? "" : dr["PositionName"].ToString();
+
+        //                    // Position ID
+        //                    item.nPositionID = dr["PositionId"] == DBNull.Value
+        //                        ? 0
+        //                        : Convert.ToInt32(dr["PositionId"]);
+
+        //                    // Number of applied/final selected trainees
+        //                    item.MatchingTraineeCount =
+        //                        dr["CandidateCount"] == DBNull.Value
+        //                            ? 0
+        //                            : Convert.ToInt32(dr["CandidateCount"]);
+
+        //                    // Actual post creation/start date
+        //                    if (dr["PostCreationDate"] != DBNull.Value)
+        //                    {
+        //                        item.dStartDate = Convert.ToDateTime(dr["PostCreationDate"]);
+        //                    }
+        //                    else
+        //                    {
+        //                        item.dStartDate = DateTime.MinValue;
+        //                    }
+
+        //                    // Organization ID
+        //                    item.nOrgID = orgID;
+
+        //                    posts.Add(item);
+        //                }
+        //            }
+        //        }
+        //    }
+
+        //    ViewBag.OrgCode = id;
+
+        //    return View(posts);
+        //}
 
         //khushi -- 29-09-2026
 
@@ -6150,7 +6249,7 @@ WHERE nID = @nID
         public IActionResult DriveTracking() => View();
         public IActionResult SharedData() => View();
         public IActionResult History() => View();
-        //public IActionResult EditOrganizationRegistration() => View();
+        public IActionResult EditOrganizationRegistration() => View();
         public IActionResult CreateDrive() => View();
 
 
@@ -6250,132 +6349,6 @@ WHERE nID = @nID
             // 4. Return the organization activity view
             return View("ActivityLog", activities);
         }
-
-
-
-        #region Edit Organization Registration
-
-        // ============================================================
-        // GET - LOAD EXISTING ORGANIZATION REGISTRATION DETAILS
-        // ============================================================
-
-        [HttpGet]
-        [ResponseCache(
-            NoStore = true,
-            Location = ResponseCacheLocation.None)]
-        public IActionResult EditOrganizationRegistration()
-        {
-            int? orgId = HttpContext.Session.GetInt32("OrgID");
-
-            if (!orgId.HasValue || orgId.Value <= 0)
-            {
-                return RedirectToAction(
-                    "OrganizationLogin",
-                    "Account");
-            }
-
-            try
-            {
-                // Fetch saved details using existing repository
-                EditOrganizationRegistrationM? model =
-                    _repository.GetOrganizationRegistrationForEdit(
-                        orgId.Value);
-
-                if (model == null)
-                {
-                    return NotFound(
-                        "Organization registration details not found.");
-                }
-
-                return View("EditOrganizationRegistration", model);
-            }
-            catch (Exception ex)
-            {
-                Console.Error.WriteLine(
-                    "Edit Organization Registration GET Error: " + ex);
-
-                TempData["Error"] =
-                    "Unable to load organization registration details.";
-
-                return RedirectToAction("Dashboard", "Organization");
-            }
-        }
-
-
-        // ============================================================
-        // POST - UPDATE ORGANIZATION REGISTRATION DETAILS
-        // ============================================================
-
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public IActionResult EditOrganizationRegistration(
-            EditOrganizationRegistrationM model)
-        {
-            int? orgId = HttpContext.Session.GetInt32("OrgID");
-
-            if (!orgId.HasValue || orgId.Value <= 0)
-            {
-                return RedirectToAction(
-                    "OrganizationLogin",
-                    "Account");
-            }
-
-            if (!ModelState.IsValid)
-            {
-                return View("EditOrganizationRegistration", model);
-            }
-
-            try
-            {
-                bool updated =
-                    _repository.UpdateOrganizationRegistration(
-                        orgId.Value,
-                        model);
-
-                if (updated)
-                {
-                    HttpContext.Session.SetString(
-                        "OrgName",
-                        model.sOrgName?.Trim() ?? "");
-
-                    HttpContext.Session.SetString(
-                        "OrgEmail",
-                        model.sEmail?.Trim() ?? "");
-
-                    TempData["Success"] =
-                        "Organization registration updated successfully.";
-
-                    return RedirectToAction(
-                        nameof(EditOrganizationRegistration));
-                }
-
-                ModelState.AddModelError(
-                    "",
-                    "Organization registration could not be updated.");
-
-                return View("EditOrganizationRegistration", model);
-            }
-            catch (InvalidOperationException ex)
-            {
-                ModelState.AddModelError("", ex.Message);
-
-                return View("EditOrganizationRegistration", model);
-            }
-            catch (Exception ex)
-            {
-                Console.Error.WriteLine(
-                    "Edit Organization Registration POST Error: " + ex);
-
-                ModelState.AddModelError(
-                    "",
-                    "Unable to update organization registration. Please try again.");
-
-                return View("EditOrganizationRegistration", model);
-            }
-        }
-
-        #endregion
-
 
 
 

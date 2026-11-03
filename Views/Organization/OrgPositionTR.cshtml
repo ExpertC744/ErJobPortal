@@ -29,12 +29,11 @@
         </div>
 
         <!-- BACK BUTTON -->
+        <a asp-controller="Organization"
+           asp-action="Dashboard"
+           class="master-back-btn"
+           title="Back to Dashboard">
 
-        <a href="@Url.Action(
-                            "Dashboard",
-                            "Organization",
-                            new { id = ViewBag.OrgCode })"
-           class="master-back-btn">
             <i class="fas fa-arrow-left"></i>
 
         </a>

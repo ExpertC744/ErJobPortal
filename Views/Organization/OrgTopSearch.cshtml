@@ -1,5 +1,8 @@
 ﻿@* Radhika30-09 *@
-<link rel="stylesheet" href="~/css/OrgTopSearch.css" asp-append-version="true" />
+
+<link rel="stylesheet"
+      href="~/css/OrgTopSearch.css"
+      asp-append-version="true" />
 
 @{
     Layout = "~/Views/Shared/_DashboardLayout.cshtml";
@@ -12,13 +15,22 @@
 <div class="organization-charts-page">
 
     <!-- PAGE HEADER -->
-    <div class="charts-header">
+    <div class="master-table-title">
+
         <div>
-            <h1>Charts & Statistics</h1>
+            <h1>Charts &amp; Statistics</h1>
             <p>At738034692839</p>
         </div>
-    </div>
 
+        <!-- BACK TO DASHBOARD -->
+        <a asp-controller="Organization"
+           asp-action="Dashboard"
+           class="master-back-btn"
+           title="Back to Dashboard">
+            <i class="fas fa-arrow-left"></i>
+        </a>
+
+    </div>
 
     <!-- ================= TOP ROW ================= -->
 

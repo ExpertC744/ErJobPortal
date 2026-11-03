@@ -248,8 +248,7 @@ ErrorMessage = "This email address is already registered."
 
 
         [Required(ErrorMessage = "Please select a prefix.")]
-        [RegularExpression(@"^(Mr\.|Ms\.|Mrs\.)$",
-ErrorMessage = "Please select a valid prefix.")]
+       
         public string? sPrefix { get; set; }
 
         public string? sAlternateMobile { get; set; }

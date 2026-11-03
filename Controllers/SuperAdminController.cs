@@ -5,6 +5,8 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Data.SqlClient;
 using System.Data;
 
+
+
 namespace ErJobPortal.Controllers
 {
     public class SuperAdminController : Controller
@@ -4479,10 +4481,259 @@ ORDER BY SAF.nID DESC, OFB.nID DESC;
 
 
         //radhika07
+        //[HttpGet]
+        //public IActionResult SuperAdminTopSkills()
+        //{
+        //    return View();
+        //}
+        //Anam
+
         [HttpGet]
-        public IActionResult SuperAdminTopSkills()
+        [Route("SuperAdmin/SuperAdminTopSkills/{id:int}")]
+        public IActionResult SuperAdminTopSkills(int id)
         {
-            return View();
+            if (id != 1)
+                return NotFound();
+
+            var model = new SATopStatisticsVM();
+
+            string connectionString =
+                _configuration.GetConnectionString("DefaultConnection");
+
+            using (SqlConnection con = new SqlConnection(connectionString))
+            {
+                con.Open();
+
+                // ==========================================
+                // 1. TOP SKILLS
+                // ==========================================
+
+                string skillsQuery = @"
+            WITH SkillSelections AS
+            (
+                SELECT DISTINCT
+                    CP.CandidateID,
+                    TRY_CONVERT(int, LTRIM(RTRIM(S.value))) AS SkillID,
+                    'Technical' AS SkillType
+                FROM tblCandidateProfile CP
+                CROSS APPLY STRING_SPLIT(
+                    ISNULL(CP.sTechnicalSkillIDs, ''), ','
+                ) S
+                WHERE CP.nBit = 1 AND CP.nSABit = 1
+
+                UNION ALL
+
+                SELECT DISTINCT
+                    CP.CandidateID,
+                    TRY_CONVERT(int, LTRIM(RTRIM(S.value))),
+                    'Medical'
+                FROM tblCandidateProfile CP
+                CROSS APPLY STRING_SPLIT(
+                    ISNULL(CP.sMedicalSkillIDs, ''), ','
+                ) S
+                WHERE CP.nBit = 1 AND CP.nSABit = 1
+
+                UNION ALL
+
+                SELECT DISTINCT
+                    CP.CandidateID,
+                    TRY_CONVERT(int, LTRIM(RTRIM(S.value))),
+                    'NonTechnical'
+                FROM tblCandidateProfile CP
+                CROSS APPLY STRING_SPLIT(
+                    ISNULL(CP.sNonTechnicalSkillIDs, ''), ','
+                ) S
+                WHERE CP.nBit = 1 AND CP.nSABit = 1
+            ),
+            SkillNames AS
+            (
+                SELECT
+                    SS.CandidateID,
+                    TS.sTechnicalSkillName AS SkillName
+                FROM SkillSelections SS
+                INNER JOIN tblTechnicalSkills TS
+                    ON SS.SkillID = TS.nTechnicalSkillID
+                WHERE SS.SkillType = 'Technical'
+
+                UNION ALL
+
+                SELECT
+                    SS.CandidateID,
+                    MS.sMedicalSkillName
+                FROM SkillSelections SS
+                INNER JOIN tblMedicalSkills MS
+                    ON SS.SkillID = MS.nMedicalSkillID
+                WHERE SS.SkillType = 'Medical'
+
+                UNION ALL
+
+                SELECT
+                    SS.CandidateID,
+                    NS.sNonTechnicalSkillName
+                FROM SkillSelections SS
+                INNER JOIN tblNonTechnicalSkills NS
+                    ON SS.SkillID = NS.nNonTechnicalSkillID
+                WHERE SS.SkillType = 'NonTechnical'
+            ),
+            SkillCounts AS
+            (
+                SELECT
+                    SkillName,
+                    COUNT(DISTINCT CandidateID) AS Total
+                FROM SkillNames
+                WHERE NULLIF(LTRIM(RTRIM(SkillName)), '') IS NOT NULL
+                GROUP BY SkillName
+            ),
+            CandidateTotal AS
+            (
+                SELECT COUNT(DISTINCT CandidateID) AS Total
+                FROM tblCandidateProfile
+                WHERE nBit = 1 AND nSABit = 1
+            )
+            SELECT TOP 3
+                SC.SkillName AS Name,
+                CAST(
+                    100.0 * SC.Total /
+                    NULLIF(CT.Total, 0)
+                    AS DECIMAL(6,2)
+                ) AS Percentage
+            FROM SkillCounts SC
+            CROSS JOIN CandidateTotal CT
+            ORDER BY SC.Total DESC, SC.SkillName;";
+
+                using (SqlCommand cmd = new SqlCommand(skillsQuery, con))
+                using (SqlDataReader reader = cmd.ExecuteReader())
+                {
+                    while (reader.Read())
+                    {
+                        model.TopSkills.Add(new SAChartItemM
+                        {
+                            Name = reader["Name"].ToString() ?? "",
+                            Percentage = Convert.ToDecimal(
+                                reader["Percentage"])
+                        });
+                    }
+                }
+
+                // ==========================================
+                // 2. TOP CITIES
+                // ==========================================
+
+                string citiesQuery = @"
+            WITH CityCounts AS
+            (
+                SELECT
+                    LTRIM(RTRIM(Preferred_City)) AS Name,
+                    COUNT(DISTINCT CandidateID) AS Total
+                FROM tblCandidateProfile
+                WHERE nBit = 1
+                  AND nSABit = 1
+                  AND NULLIF(
+                      LTRIM(RTRIM(Preferred_City)), ''
+                  ) IS NOT NULL
+                GROUP BY LTRIM(RTRIM(Preferred_City))
+            ),
+            CityTotal AS
+            (
+                SELECT SUM(Total) AS Total
+                FROM CityCounts
+            )
+            SELECT TOP 3
+                CC.Name,
+                CAST(
+                    100.0 * CC.Total /
+                    NULLIF(CT.Total, 0)
+                    AS DECIMAL(6,2)
+                ) AS Percentage
+            FROM CityCounts CC
+            CROSS JOIN CityTotal CT
+            ORDER BY CC.Total DESC, CC.Name;";
+
+                using (SqlCommand cmd = new SqlCommand(citiesQuery, con))
+                using (SqlDataReader reader = cmd.ExecuteReader())
+                {
+                    while (reader.Read())
+                    {
+                        model.TopCities.Add(new SAChartItemM
+                        {
+                            Name = reader["Name"].ToString() ?? "",
+                            Percentage = Convert.ToDecimal(
+                                reader["Percentage"])
+                        });
+                    }
+                }
+
+                // ==========================================
+                // 3. TOP FIELDS
+                // ==========================================
+
+                string fieldsQuery = @"
+            WITH FieldCounts AS
+            (
+                SELECT
+                    'Technical Skill' AS Name,
+                    COUNT(DISTINCT CandidateID) AS Total
+                FROM tblCandidateProfile
+                WHERE nBit = 1 AND nSABit = 1
+                  AND NULLIF(
+                      LTRIM(RTRIM(sTechnicalSkillIDs)), ''
+                  ) IS NOT NULL
+
+                UNION ALL
+
+                SELECT
+                    'Non-Technical Skill',
+                    COUNT(DISTINCT CandidateID)
+                FROM tblCandidateProfile
+                WHERE nBit = 1 AND nSABit = 1
+                  AND NULLIF(
+                      LTRIM(RTRIM(sNonTechnicalSkillIDs)), ''
+                  ) IS NOT NULL
+
+                UNION ALL
+
+                SELECT
+                    'Medical Skill',
+                    COUNT(DISTINCT CandidateID)
+                FROM tblCandidateProfile
+                WHERE nBit = 1 AND nSABit = 1
+                  AND NULLIF(
+                      LTRIM(RTRIM(sMedicalSkillIDs)), ''
+                  ) IS NOT NULL
+            ),
+            CandidateTotal AS
+            (
+                SELECT COUNT(DISTINCT CandidateID) AS Total
+                FROM tblCandidateProfile
+                WHERE nBit = 1 AND nSABit = 1
+            )
+            SELECT
+                FC.Name,
+                CAST(
+                    100.0 * FC.Total /
+                    NULLIF(CT.Total, 0)
+                    AS DECIMAL(6,2)
+                ) AS Percentage
+            FROM FieldCounts FC
+            CROSS JOIN CandidateTotal CT
+            ORDER BY FC.Total DESC, FC.Name;";
+
+                using (SqlCommand cmd = new SqlCommand(fieldsQuery, con))
+                using (SqlDataReader reader = cmd.ExecuteReader())
+                {
+                    while (reader.Read())
+                    {
+                        model.TopFields.Add(new SAChartItemM
+                        {
+                            Name = reader["Name"].ToString() ?? "",
+                            Percentage = Convert.ToDecimal(
+                                reader["Percentage"])
+                        });
+                    }
+                }
+            }
+
+            return View(model);
         }
 
         // View Organization Profile - Master

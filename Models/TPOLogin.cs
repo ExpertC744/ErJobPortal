@@ -8,7 +8,7 @@ namespace ErJobPortal.Models
         // COLLEGE EMAIL
         // =========================================================
 
-        [Required(ErrorMessage = "College Mail ID is required.")]
+        [Required(ErrorMessage = "Please enter your College Mail ID.")]
         [EmailAddress(ErrorMessage = "Enter a valid college email address.")]
         [StringLength(200)]
         public string CollegeMailID { get; set; }
@@ -18,7 +18,7 @@ namespace ErJobPortal.Models
         // PASSWORD
         // =========================================================
 
-        [Required(ErrorMessage = "Password is required.")]
+        [Required(ErrorMessage = "Please enter your password.")]
         [DataType(DataType.Password)]
         [StringLength(
             100,

@@ -14,17 +14,23 @@
     <div class="master-table-container">
 
         <!-- PAGE HEADER -->
-        <div class="page-header mb-4">
+        <div class="master-table-title">
 
-            <h1>
-                Applied Trainees
-            </h1>
+            <div>
+                <h1>Applied Trainees</h1>
+                <p>@ViewBag.OrgCode</p>
+            </div>
 
-            <p>
-                @ViewBag.OrgCode
-            </p>
+            <!-- BACK TO DASHBOARD -->
+            <a asp-controller="Organization"
+               asp-action="Dashboard"
+               class="master-back-btn"
+               title="Back to Dashboard">
+                <i class="fas fa-arrow-left"></i>
+            </a>
 
         </div>
+
 
         <!-- TABLE -->
         <div class="table-responsive">

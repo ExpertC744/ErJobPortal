@@ -18,7 +18,7 @@
 
         public int? nCollegeCode { get; set; }
 
-        public int? nCollegeName { get; set; }
+        //public int? nCollegeName { get; set; }
 
         public string? sPassword { get; set; }
 
@@ -26,10 +26,13 @@
 
         public DateTime? ModDate { get; set; }
 
+        public string CollegeName { get; set; }
+
         public bool nBit { get; set; }
 
         public bool nSABit { get; set; }
 
-        public string? orgCode {get; set; } 
+        public string? orgCode {get; set; }
+        public int TPOCount { get; set; }
     }
 }

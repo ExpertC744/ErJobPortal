@@ -11,24 +11,32 @@
 }
 
 
-
 <div class="internship-edit-page">
 
-    <!-- =====================================================
-         PAGE HEADER
-         ===================================================== -->
+    <!-- PAGE HEADER -->
+    <div class="master-table-title">
 
-    <div class="internship-page-header">
+        <div>
+            <h2>
+                Edit Profile
+            </h2>
 
-        <h1>
-           Edit Profile
-        </h1>
+            <p>
+                Organization ID : @Model.nOrgID
+            </p>
+        </div>
 
-        <p>
-            Organization ID : @Model.nOrgID
-        </p>
+
+        <a asp-controller="Organization"
+           asp-action="Dashboard"
+           class="master-back-btn"
+           title="Back to Dashboard">
+            <i class="fas fa-arrow-left"></i>
+        </a>
 
     </div>
+
+</div>
 
 
     <!-- =====================================================
