@@ -151,28 +151,25 @@
     <!-- MASTER TABLE CARD -->
     <div class="master-table-container">
 
-        <h2 class="page-title">
-            All Post Details
-        </h2>
+        <!-- MASTER TABLE HEADER -->
+        <div class="master-table-title">
+            <div>
+                <h2 class="page-title">
+                    All Post Details
+                </h2>
 
+                <p class="page-subtitle">
+                    @orgCode
+                </p>
+            </div>
 
-        <div class="page-subtitle">
-            @orgCode
+            <a asp-controller="Organization"
+               asp-action="Dashboard"
+               class="master-back-btn"
+               title="Back to Dashboard">
+                <i class="fas fa-arrow-left"></i>
+            </a>
         </div>
-
-
-
-        <!-- MASTER TABLE -->
-        @*    <div class="table-responsive">
-
-            <table id="organizationJobsTable"
-                   class="master-data-table">
-            <thead> *@
-
-        @* 
-        <div class="page-subtitle">
-            At73803469839
-        </div> *@
 
 
 
