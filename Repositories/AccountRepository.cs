@@ -1520,7 +1520,6 @@ public List<BranchM> GetBranches(int departmentId)
         {
             return GetSATraineeList();
         }
-
         public List<SATraineeListM> GetSATraineeList()
         {
             List<SATraineeListM> list = new List<SATraineeListM>();
@@ -1529,28 +1528,42 @@ public List<BranchM> GetBranches(int departmentId)
             {
                 string query = @"
             SELECT
-                nID,
-                sFName,
-                sLName,
-                sMobile,
-                sEmail,
-                DOB,
-                nGender,
-                sProfileImage,
-                nCollegeCode,
-                sCollegeName,
-                sPassword,
-                RegDate,
-                ModDate,
-                nBit,
-                nSABit,
-                sOTP,
-                nBranch,
-                nPassoutYear,
-                nDepartment
-            FROM tblCandidateRegister
-            
-            ORDER BY nID DESC";
+                CR.nID,
+                CR.sFName,
+                CR.sLName,
+                CR.sMobile,
+                CR.sEmail,
+                CR.DOB,
+                CR.nGender,
+                CR.sProfileImage,
+                CR.nCollegeCode,
+
+                C.sCollegeName AS CollegeName,
+                B.sBranch AS BranchName,
+                D.sDepartment AS DepartmentName,
+
+                CR.sPassword,
+                CR.RegDate,
+                CR.ModDate,
+                CR.nBit,
+                CR.nSABit,
+                CR.sOTP,
+                CR.nBranch,
+                CR.nPassoutYear,
+                CR.nDepartment
+
+            FROM tblCandidateRegister CR
+
+            LEFT JOIN tblDepartment D
+                ON CR.nDepartment = D.nID
+
+            LEFT JOIN tblBranch B
+                ON CR.nBranch = B.nID
+
+            LEFT JOIN tblCollege C
+                ON TRY_CONVERT(INT, CR.sCollegeName) = C.nID
+
+            ORDER BY CR.nID DESC";
 
                 using (SqlCommand cmd = new SqlCommand(query, cn))
                 {
@@ -1563,45 +1576,34 @@ public List<BranchM> GetBranches(int departmentId)
                             SATraineeListM model = new SATraineeListM
                             {
                                 nID = dr["nID"] == DBNull.Value
-                                    ? 0
-                                    : Convert.ToInt32(dr["nID"]),
+                                    ? 0 : Convert.ToInt32(dr["nID"]),
 
-                                sFName = dr["sFName"] == DBNull.Value
-                                    ? ""
-                                    : Convert.ToString(dr["sFName"]),
-
-                                sLName = dr["sLName"] == DBNull.Value
-                                    ? ""
-                                    : Convert.ToString(dr["sLName"]),
-
-                                sMobile = dr["sMobile"] == DBNull.Value
-                                    ? ""
-                                    : Convert.ToString(dr["sMobile"]),
-
-                                sEmail = dr["sEmail"] == DBNull.Value
-                                    ? ""
-                                    : Convert.ToString(dr["sEmail"]),
+                                sFName = Convert.ToString(dr["sFName"]) ?? "",
+                                sLName = Convert.ToString(dr["sLName"]) ?? "",
+                                sMobile = Convert.ToString(dr["sMobile"]) ?? "",
+                                sEmail = Convert.ToString(dr["sEmail"]) ?? "",
 
                                 DOB = dr["DOB"] == DBNull.Value
                                     ? (DateTime?)null
                                     : Convert.ToDateTime(dr["DOB"]),
 
                                 nGender = dr["nGender"] == DBNull.Value
-                                    ? 0
-                                    : Convert.ToInt32(dr["nGender"]),
+                                    ? 0 : Convert.ToInt32(dr["nGender"]),
 
-                                sProfileImage = dr["sProfileImage"] == DBNull.Value
-                                    ? ""
-                                    : Convert.ToString(dr["sProfileImage"]),
+                                sProfileImage =
+                                    Convert.ToString(dr["sProfileImage"]) ?? "",
 
                                 nCollegeCode = dr["nCollegeCode"] == DBNull.Value
-                                    ? 0
-                                    : Convert.ToInt32(dr["nCollegeCode"]),
+                                    ? 0 : Convert.ToInt32(dr["nCollegeCode"]),
 
-                                // Actual names from master tables
-                                sCollegeName = Convert.ToString(dr["CollegeName"]),
-                                BranchName = Convert.ToString(dr["BranchName"]),
-                                DepartmentName = Convert.ToString(dr["DepartmentName"]),
+                                sCollegeName =
+                                    Convert.ToString(dr["CollegeName"]) ?? "",
+
+                                BranchName =
+                                    Convert.ToString(dr["BranchName"]) ?? "",
+
+                                DepartmentName =
+                                    Convert.ToString(dr["DepartmentName"]) ?? "",
 
                                 nPassoutYear = dr["nPassoutYear"] == DBNull.Value
                                     ? (int?)null
@@ -1630,6 +1632,115 @@ public List<BranchM> GetBranches(int departmentId)
 
             return list;
         }
+        //public List<SATraineeListM> GetSATraineeList()
+        //{
+        //    List<SATraineeListM> list = new List<SATraineeListM>();
+
+        //    using (SqlConnection cn = _db.GetConnection())
+        //    {
+        //        string query = @"
+        //    SELECT
+        //        nID,
+        //        sFName,
+        //        sLName,
+        //        sMobile,
+        //        sEmail,
+        //        DOB,
+        //        nGender,
+        //        sProfileImage,
+        //        nCollegeCode,
+        //        sCollegeName,
+        //        sPassword,
+        //        RegDate,
+        //        ModDate,
+        //        nBit,
+        //        nSABit,
+        //        sOTP,
+        //        nBranch,
+        //        nPassoutYear,
+        //        nDepartment
+        //    FROM tblCandidateRegister
+
+        //    ORDER BY nID DESC";
+
+        //        using (SqlCommand cmd = new SqlCommand(query, cn))
+        //        {
+        //            cn.Open();
+
+        //            using (SqlDataReader dr = cmd.ExecuteReader())
+        //            {
+        //                while (dr.Read())
+        //                {
+        //                    SATraineeListM model = new SATraineeListM
+        //                    {
+        //                        nID = dr["nID"] == DBNull.Value
+        //                            ? 0
+        //                            : Convert.ToInt32(dr["nID"]),
+
+        //                        sFName = dr["sFName"] == DBNull.Value
+        //                            ? ""
+        //                            : Convert.ToString(dr["sFName"]),
+
+        //                        sLName = dr["sLName"] == DBNull.Value
+        //                            ? ""
+        //                            : Convert.ToString(dr["sLName"]),
+
+        //                        sMobile = dr["sMobile"] == DBNull.Value
+        //                            ? ""
+        //                            : Convert.ToString(dr["sMobile"]),
+
+        //                        sEmail = dr["sEmail"] == DBNull.Value
+        //                            ? ""
+        //                            : Convert.ToString(dr["sEmail"]),
+
+        //                        DOB = dr["DOB"] == DBNull.Value
+        //                            ? (DateTime?)null
+        //                            : Convert.ToDateTime(dr["DOB"]),
+
+        //                        nGender = dr["nGender"] == DBNull.Value
+        //                            ? 0
+        //                            : Convert.ToInt32(dr["nGender"]),
+
+        //                        sProfileImage = dr["sProfileImage"] == DBNull.Value
+        //                            ? ""
+        //                            : Convert.ToString(dr["sProfileImage"]),
+
+        //                        nCollegeCode = dr["nCollegeCode"] == DBNull.Value
+        //                            ? 0
+        //                            : Convert.ToInt32(dr["nCollegeCode"]),
+
+        //                        // Actual names from master tables
+        //                        sCollegeName = Convert.ToString(dr["CollegeName"]),
+        //                        BranchName = Convert.ToString(dr["BranchName"]),
+        //                        DepartmentName = Convert.ToString(dr["DepartmentName"]),
+
+        //                        nPassoutYear = dr["nPassoutYear"] == DBNull.Value
+        //                            ? (int?)null
+        //                            : Convert.ToInt32(dr["nPassoutYear"]),
+
+        //                        RegDate = dr["RegDate"] == DBNull.Value
+        //                            ? (DateTime?)null
+        //                            : Convert.ToDateTime(dr["RegDate"]),
+
+        //                        ModDate = dr["ModDate"] == DBNull.Value
+        //                            ? (DateTime?)null
+        //                            : Convert.ToDateTime(dr["ModDate"]),
+
+        //                        nBit = dr["nBit"] != DBNull.Value &&
+        //                               Convert.ToBoolean(dr["nBit"]),
+
+        //                        nSABit = dr["nSABit"] != DBNull.Value &&
+        //                                 Convert.ToBoolean(dr["nSABit"])
+        //                    };
+
+        //                    list.Add(model);
+        //                }
+        //            }
+        //        }
+        //    }
+
+        //    return list;
+        //}
 
 
 
