@@ -898,7 +898,7 @@
             </div>
 
             <div class="sa-card-number">
-                1800
+                @ViewBag.ObjectiveCount
             </div>
 
             <div class="sa-card-footer">
@@ -920,7 +920,6 @@
             </div>
 
         </div>
-
 
         <!-- =================================================
              ADVERTISEMENT
@@ -1046,7 +1045,7 @@
             </div>
 
             <div class="sa-card-number">
-                1800
+                @ViewBag.FeedbackCount
             </div>
 
             <div class="sa-card-footer">
@@ -1054,27 +1053,27 @@
                 <span class="sa-card-info">
                     User feedback
                 </span>
-                
-                 <a asp-controller="SuperAdmin"
-       asp-action="CandidateFeedback"
-       asp-route-id="1"
-       class="sa-view-btn">
 
-        Trainee Details
+                <a asp-controller="SuperAdmin"
+                   asp-action="CandidateFeedback"
+                   asp-route-id="1"
+                   class="sa-view-btn">
 
-        <i class="fas fa-arrow-right"></i>
+                    Trainee Details
 
-    </a> 
-    <a asp-controller="SuperAdmin"
-       asp-action="OrganizationFeedback"
-       asp-route-id="1"
-       class="sa-view-btn">
+                    <i class="fas fa-arrow-right"></i>
 
-        Org Details
+                </a>
+                <a asp-controller="SuperAdmin"
+                   asp-action="OrganizationFeedback"
+                   asp-route-id="1"
+                   class="sa-view-btn">
 
-        <i class="fas fa-arrow-right"></i>
+                    Org Details
 
-    </a>
+                    <i class="fas fa-arrow-right"></i>
+
+                </a>
 
             </div>
 

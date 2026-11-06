@@ -252,7 +252,7 @@
                 </div>
 
 
-                
+
                 <div class="register-form-group">
 
                     <label asp-for="nDepartment" class="register-label">
@@ -343,9 +343,7 @@
 
 
                 <!-- Department -->
-
                 <!-- Department -->
-
                 @* <div class="register-form-group">
 
                     <label asp-for="nDepartment" class="register-label">
@@ -457,56 +455,55 @@
             ================================================== -->
 
             <div class="otp-section">
-
-                <label class="otp-label">
-                    OTP Verification
-                </label>
+                <label class="otp-label">OTP Verification</label>
 
                 <input asp-for="OTP" type="hidden" id="OTP" />
+                <input asp-for="OTPType" type="hidden" id="SelectedOTPType" />
 
                 <div class="otp-options">
-
-                    <label class="radio-option">
-                        <input type="radio" name="OTPType" value="Mobile" checked />
-                        <span>Mobile No.</span>
+                    <label class="otp-radio-option">
+                        <input type="radio" name="otpMethod" value="Email" checked />
+                        <i class="fa-solid fa-envelope"></i>
+                        Email OTP
                     </label>
 
-                    <label class="radio-option">
-                        <input type="radio" name="OTPType" value="Email" />
-                        <span>College Email</span>
+                    <label class="otp-radio-option">
+                        <input type="radio" name="otpMethod" value="Mobile" />
+                        <i class="fa-solid fa-mobile-screen-button"></i>
+                        Mobile OTP
                     </label>
-
-                    <button type="button"
-                            class="send-otp-btn"
-                            id="btnSendOTP">
-                        <i class="fa-solid fa-paper-plane"></i>
-                        Send OTP
-                    </button>
-
                 </div>
 
                 <div class="otp-box-row">
-
                     <input type="text" maxlength="1" class="org-otp-input" inputmode="numeric" autocomplete="one-time-code" />
                     <input type="text" maxlength="1" class="org-otp-input" inputmode="numeric" />
                     <input type="text" maxlength="1" class="org-otp-input" inputmode="numeric" />
                     <input type="text" maxlength="1" class="org-otp-input" inputmode="numeric" />
                     <input type="text" maxlength="1" class="org-otp-input" inputmode="numeric" />
                     <input type="text" maxlength="1" class="org-otp-input" inputmode="numeric" />
+                </div>
 
+                <div class="otp-action-row">
+                    <button type="button" class="send-otp-btn" id="btnSendOTP">
+                        <i class="fa-solid fa-paper-plane"></i>
+                        <span id="sendOtpText">Send Email OTP</span>
+                    </button>
+
+                    <button type="button" class="send-otp-btn" id="btnVerifyOTP" disabled>
+                        <i class="fa-solid fa-circle-check"></i>
+                        Verify OTP
+                    </button>
                 </div>
 
                 <span class="register-validation org-otp-status"
-                      role="status"
-                      aria-live="polite">
-                    Click Send OTP, then enter the 6-digit OTP.
+                      id="otpStatus" role="status" aria-live="polite">
+                    Enter your email and request an OTP.
                 </span>
 
                 <span asp-validation-for="OTP"
-                      class="text-danger register-validation">
-                </span>
-
+                      class="text-danger register-validation"></span>
             </div>
+
 
 
             <!-- =================================================
@@ -526,15 +523,18 @@
             <!-- =================================================
                  REGISTER BUTTON
             ================================================== -->
+            @* Sanidhya *@
 
             <button type="submit"
                     class="register-main-btn">
-
+                id="btnSubmitTPO"
                 <i class="fa-solid fa-user-tie"></i>
 
                 Submit TPO Registration
 
             </button>
+
+
 
 
             <!-- =================================================
@@ -560,8 +560,12 @@
 
 
 
-@section Scripts
-{
+
+
+
+
+
+@section Scripts {
     @{
         await Html.RenderPartialAsync("_ValidationScriptsPartial");
     }
@@ -577,11 +581,20 @@
             const collegeCodeSelect = $('#CollegeCode');
             const departmentSelect = $('#departmentSelect');
 
-            const otpInputs = document.querySelectorAll('.org-otp-input');
-            const otpHidden = document.getElementById('OTP');
-            const otpStatus = document.querySelector('.org-otp-status');
-            const tpoForm = document.getElementById('tpoRegistrationForm');
-            const sendOtpButton = $('#btnSendOTP');
+            const otpInputs = $('.org-otp-input');
+            const otpHidden = $('#OTP');
+            const otpTypeHidden = $('#SelectedOTPType');
+
+            const sendButton = $('#btnSendOTP');
+            const verifyButton = $('#btnVerifyOTP');
+            const statusBox = $('#otpStatus');
+
+            const tpoForm = $('#tpoRegistrationForm');
+            const submitButton = $('#btnSubmitTPO');
+
+            let otpSent = false;
+            let otpVerified = false;
+            let isSubmitting = false;
 
             // =====================================================
             // BASIC INPUT SPACE HANDLING
@@ -590,9 +603,11 @@
             $('input[type="text"], input[type="email"], input[type="url"], input[type="tel"], input[type="password"], textarea')
                 .not('.org-otp-input')
                 .on('keydown', function (e) {
+
                     if (e.key === ' ' && this.value.length === 0) {
                         e.preventDefault();
                     }
+
                 })
                 .on('input', function () {
                     this.value = this.value.replace(/^\s+/, '');
@@ -601,55 +616,70 @@
                     this.value = this.value.trim();
                 });
 
+
             // =====================================================
             // MOBILE NUMBER - ONLY 10 DIGITS
             // =====================================================
 
             $('#MobileNo').on('input', function () {
+
                 this.value = this.value.replace(/\D/g, '').substring(0, 10);
+
             });
 
+
             // =====================================================
-            // HELPER: HANDLE AJAX RESPONSE
+            // COMMON AJAX HELPERS
             // =====================================================
 
-            function getArrayResponse(data) {
-                if (Array.isArray(data)) {
-                    return data;
+            function getArrayResponse(response) {
+
+                if (Array.isArray(response)) {
+                    return response;
                 }
 
-                if (data && Array.isArray(data.data)) {
-                    return data.data;
+                if (response && Array.isArray(response.data)) {
+                    return response.data;
                 }
 
                 return [];
             }
 
+
             function getProperty(object, propertyNames) {
+
                 for (const propertyName of propertyNames) {
-                    if (object && object[propertyName] !== undefined &&
-                        object[propertyName] !== null) {
+
+                    if (
+                        object &&
+                        object[propertyName] !== undefined &&
+                        object[propertyName] !== null
+                    ) {
                         return object[propertyName];
                     }
+
                 }
 
                 return '';
             }
 
+
             function resetDropdown(dropdown, placeholder) {
+
                 dropdown.empty();
+
                 dropdown.append(
                     $('<option>', {
                         value: '',
                         text: placeholder
                     })
                 );
+
             }
+
 
             // =====================================================
             // LOAD COLLEGES
-            // Endpoint must return an array containing nID and
-            // sCollegeName (or equivalent property names).
             // =====================================================
 
             function loadColleges() {
@@ -665,6 +695,7 @@
                 );
 
                 $.ajax({
+
                     url: '@Url.Action("GetColleges", "Account")',
                     type: 'GET',
                     dataType: 'json',
@@ -672,14 +703,9 @@
 
                     success: function (response) {
 
+                        console.log('College Response:', response);
+
                         const colleges = getArrayResponse(response);
-
-                        console.log('Colleges response:', response);
-
-                        if (colleges.length === 0) {
-                            console.warn('No colleges returned by GetColleges.');
-                            return;
-                        }
 
                         $.each(colleges, function (index, college) {
 
@@ -694,10 +720,7 @@
                             );
 
                             if (collegeId === '' || collegeName === '') {
-                                console.warn(
-                                    'College record is missing an ID or name:',
-                                    college
-                                );
+                                console.warn('Invalid college:', college);
                                 return;
                             }
 
@@ -707,24 +730,25 @@
                                     text: collegeName
                                 })
                             );
+
                         });
+
                     },
 
                     error: function (xhr, status, error) {
-                        console.error(
-                            'College loading failed:',
-                            status,
-                            error,
-                            xhr.responseText
-                        );
+
+                        console.error('College loading error:', error);
+                        console.error(xhr.responseText);
+
                     }
+
                 });
+
             }
+
 
             // =====================================================
             // LOAD DEPARTMENTS
-            // Endpoint must return an array containing nID and
-            // sDepartment (or equivalent property names).
             // =====================================================
 
             function loadDepartments() {
@@ -735,6 +759,7 @@
                 );
 
                 $.ajax({
+
                     url: '@Url.Action("GetDepartments", "Account")',
                     type: 'GET',
                     dataType: 'json',
@@ -742,16 +767,9 @@
 
                     success: function (response) {
 
+                        console.log('Department Response:', response);
+
                         const departments = getArrayResponse(response);
-
-                        console.log('Departments response:', response);
-
-                        if (departments.length === 0) {
-                            console.warn(
-                                'No departments returned by GetDepartments.'
-                            );
-                            return;
-                        }
 
                         $.each(departments, function (index, department) {
 
@@ -765,36 +783,35 @@
                                 ['sDepartment', 'departmentName', 'DepartmentName']
                             );
 
-                            if (departmentName === '') {
-                                console.warn(
-                                    'Department record is missing its name:',
-                                    department
-                                );
+                            if (departmentId === '' || departmentName === '') {
                                 return;
                             }
 
-                                    departmentSelect.append(
-            $('<option>', {
-                value: Number(departmentId),
-                text: departmentName
-            })
-        );
+                            departmentSelect.append(
+                                $('<option>', {
+                                    value: departmentId,
+                                    text: departmentName
+                                })
+                            );
+
                         });
+
                     },
 
                     error: function (xhr, status, error) {
-                        console.error(
-                            'Department loading failed:',
-                            status,
-                            error,
-                            xhr.responseText
-                        );
+
+                        console.error('Department loading error:', error);
+                        console.error(xhr.responseText);
+
                     }
+
                 });
+
             }
 
+
             // =====================================================
-            // LOAD COLLEGE CODES WHEN COLLEGE CHANGES
+            // LOAD COLLEGE CODES
             // =====================================================
 
             collegeNameSelect.on('change', function () {
@@ -811,27 +828,32 @@
                 }
 
                 $.ajax({
+
                     url: '@Url.Action("GetCollegeCodes", "Account")',
                     type: 'GET',
                     dataType: 'json',
+
                     data: {
                         collegeId: collegeId
                     },
+
                     cache: false,
 
                     success: function (response) {
 
+                        console.log('College Code Response:', response);
+
                         const codes = getArrayResponse(response);
 
-                        console.log('College codes response:', response);
-
                         if (codes.length === 0) {
+
                             collegeCodeSelect.append(
                                 $('<option>', {
                                     value: '',
                                     text: 'No College Code Available'
                                 })
                             );
+
                             return;
                         }
 
@@ -843,10 +865,6 @@
                             );
 
                             if (code === '') {
-                                console.warn(
-                                    'College code record is missing its code:',
-                                    item
-                                );
                                 return;
                             }
 
@@ -856,293 +874,550 @@
                                     text: code
                                 })
                             );
+
                         });
+
                     },
 
                     error: function (xhr, status, error) {
-                        console.error(
-                            'College code loading failed:',
-                            status,
-                            error,
-                            xhr.responseText
-                        );
+
+                        console.error('College code error:', error);
+                        console.error(xhr.responseText);
+
                     }
+
                 });
+
             });
+
 
             // =====================================================
             // OTP HELPERS
             // =====================================================
 
-            function getOtp() {
-                return Array.from(otpInputs)
-                    .map(function (input) {
-                        return input.value;
-                    })
-                    .join('');
+            function getOtpMethod() {
+
+                return $('input[name="otpMethod"]:checked').val() || 'Email';
+
             }
 
-            function syncOtp() {
-                if (otpHidden) {
-                    otpHidden.value = getOtp();
-                }
+
+            function getEnteredOTP() {
+
+                return otpInputs.map(function () {
+                    return this.value;
+                }).get().join('');
+
             }
+
 
             function showOtpStatus(message, success) {
 
-                if (!otpStatus) {
-                    console.log(message);
-                    return;
+                statusBox
+                    .text(message)
+                    .removeClass('success error')
+                    .addClass(success ? 'success' : 'error');
+
+            }
+
+
+            function resetOTP() {
+
+                otpSent = false;
+                otpVerified = false;
+
+                otpHidden.val('');
+
+                otpInputs
+                    .val('')
+                    .prop('readonly', false);
+
+                verifyButton
+                    .prop('disabled', true)
+                    .html('<i class="fa-solid fa-circle-check"></i> Verify OTP');
+
+                sendButton.prop('disabled', false);
+
+                $('#sendOtpText').text(
+                    getOtpMethod() === 'Email'
+                        ? 'Send Email OTP'
+                        : 'Send Mobile OTP'
+                );
+
+            }
+
+
+            // =====================================================
+            // OTP METHOD CHANGE
+            // =====================================================
+
+            $('input[name="otpMethod"]').on('change', function () {
+
+                resetOTP();
+
+                const method = getOtpMethod();
+
+                otpTypeHidden.val(method);
+
+                if (method === 'Email') {
+
+                    showOtpStatus(
+                        'Enter your college email and request an OTP.',
+                        false
+                    );
+
+                } else {
+
+                    showOtpStatus(
+                        'Mobile OTP is currently not supported. Please select Email OTP.',
+                        false
+                    );
+
                 }
 
-                otpStatus.textContent = message;
-                otpStatus.classList.remove('success', 'error');
-                otpStatus.classList.add(success ? 'success' : 'error');
-            }
-
-            // =====================================================
-            // OTP INPUT: DIGITS, AUTO-FOCUS, BACKSPACE, PASTE
-            // =====================================================
-
-            otpInputs.forEach(function (input, index) {
-
-                input.setAttribute('inputmode', 'numeric');
-                input.setAttribute('maxlength', '1');
-                input.setAttribute('autocomplete', 'one-time-code');
-
-                input.addEventListener('input', function () {
-
-                    this.value = this.value.replace(/\D/g, '').substring(0, 1);
-
-                    if (this.value && index < otpInputs.length - 1) {
-                        otpInputs[index + 1].focus();
-                    }
-
-                    syncOtp();
-                });
-
-                input.addEventListener('keydown', function (e) {
-
-                    if (
-                        e.key === 'Backspace' &&
-                        this.value === '' &&
-                        index > 0
-                    ) {
-                        otpInputs[index - 1].focus();
-                    }
-
-                    if (e.key === 'ArrowLeft' && index > 0) {
-                        otpInputs[index - 1].focus();
-                    }
-
-                    if (
-                        e.key === 'ArrowRight' &&
-                        index < otpInputs.length - 1
-                    ) {
-                        otpInputs[index + 1].focus();
-                    }
-                });
-
-                input.addEventListener('paste', function (e) {
-
-                    e.preventDefault();
-
-                    const clipboard = e.clipboardData ||
-                        window.clipboardData;
-
-                    const pasted = clipboard
-                        .getData('text')
-                        .replace(/\D/g, '')
-                        .substring(0, otpInputs.length);
-
-                    otpInputs.forEach(function (otpInput) {
-                        otpInput.value = '';
-                    });
-
-                    pasted.split('').forEach(function (digit, i) {
-                        if (otpInputs[i]) {
-                            otpInputs[i].value = digit;
-                        }
-                    });
-
-                    if (pasted.length > 0) {
-                        otpInputs[
-                            Math.min(pasted.length, otpInputs.length) - 1
-                        ].focus();
-                    }
-
-                    syncOtp();
-                });
             });
 
+
             // =====================================================
-            // VALIDATE OTP BEFORE FORM SUBMISSION
+            // OTP INPUT - AUTO FOCUS
             // =====================================================
 
-            if (tpoForm) {
+            otpInputs.on('input', function () {
 
-                tpoForm.addEventListener('submit', function (e) {
+                this.value = this.value.replace(/\D/g, '').slice(0, 1);
 
-                    syncOtp();
+                const index = otpInputs.index(this);
 
-                    if (otpInputs.length > 0 && getOtp().length !== 6) {
+                if (this.value && index < otpInputs.length - 1) {
+                    otpInputs.eq(index + 1).trigger('focus');
+                }
 
-                        e.preventDefault();
+                otpHidden.val(getEnteredOTP());
 
-                        showOtpStatus(
-                            'Please enter the complete 6-digit OTP.',
-                            false
-                        );
+            });
 
-                        if (otpInputs[0]) {
-                            otpInputs[0].focus();
-                        }
 
-                        return false;
+            // =====================================================
+            // OTP BACKSPACE
+            // =====================================================
+
+            otpInputs.on('keydown', function (e) {
+
+                if (e.key === 'Backspace' && !this.value) {
+
+                    const index = otpInputs.index(this);
+
+                    if (index > 0) {
+                        otpInputs.eq(index - 1).trigger('focus');
                     }
+
+                }
+
+            });
+
+
+            // =====================================================
+            // OTP PASTE
+            // =====================================================
+
+            otpInputs.first().on('paste', function (e) {
+
+                e.preventDefault();
+
+                const clipboard = (
+                    e.originalEvent.clipboardData ||
+                    window.clipboardData
+                );
+
+                const pasted = clipboard
+                    .getData('text')
+                    .replace(/\D/g, '')
+                    .slice(0, otpInputs.length);
+
+                otpInputs.each(function (index) {
+
+                    $(this).val(pasted[index] || '');
+
                 });
-            }
+
+                otpHidden.val(getEnteredOTP());
+
+                if (pasted.length > 0) {
+
+                    otpInputs
+                        .eq(pasted.length - 1)
+                        .trigger('focus');
+
+                }
+
+            });
+
+
+            // =====================================================
+            // RESET OTP WHEN EMAIL OR MOBILE CHANGES
+            // =====================================================
+
+            $('#CollegeMailID, #MobileNo').on('input', function () {
+
+                if (otpSent || otpVerified) {
+
+                    resetOTP();
+
+                    showOtpStatus(
+                        'Contact details changed. Please request a new OTP.',
+                        false
+                    );
+
+                }
+
+            });
+
 
             // =====================================================
             // SEND OTP
             // =====================================================
 
-            sendOtpButton.on('click', function (e) {
+            sendButton.on('click', function (e) {
 
                 e.preventDefault();
 
-                const otpType = $('input[name="OTPType"]:checked').val();
-                const email = ($('#CollegeMailID').val() || '').trim();
-                const mobile = ($('#MobileNo').val() || '').trim();
+                const method = getOtpMethod();
 
-                if (!otpType) {
+                const email = $('#CollegeMailID').val().trim();
+
+                const mobile = $('#MobileNo').val().trim();
+
+                if (method !== 'Email') {
+
                     showOtpStatus(
-                        'Please select Email or Mobile OTP.',
+                        'Mobile OTP is currently not supported. Please select Email OTP.',
                         false
                     );
+
                     return;
                 }
 
-                if (otpType === 'Email' && !email) {
+                if (!email) {
+
                     showOtpStatus(
-                        'Please enter College Mail ID.',
+                        'Please enter your college email address.',
                         false
                     );
-                    $('#CollegeMailID').focus();
+
+                    $('#CollegeMailID').trigger('focus');
+
                     return;
                 }
 
-                if (otpType === 'Mobile' && !mobile) {
+                if (!/^[^\s@@]+@@[^\s@@]+\.[^\s@@]+$/.test(email)) {
+
                     showOtpStatus(
-                        'Please enter Mobile Number.',
+                        'Please enter a valid email address.',
                         false
                     );
-                    $('#MobileNo').focus();
+
                     return;
                 }
 
-                if (otpType === 'Mobile' && !/^\d{10}$/.test(mobile)) {
-                    showOtpStatus(
-                        'Please enter a valid 10-digit mobile number.',
-                        false
-                    );
-                    $('#MobileNo').focus();
-                    return;
-                }
+                resetOTP();
 
-                const originalButtonHtml = sendOtpButton.html();
+                otpTypeHidden.val(method);
 
-                sendOtpButton
-                    .prop('disabled', true)
-                    .html(
-                        '<i class="fa-solid fa-spinner fa-spin"></i> Sending...'
-                    );
+                sendButton.prop('disabled', true);
+
+                $('#sendOtpText').text('Sending...');
+
+                const token = $('input[name="__RequestVerificationToken"]').val();
 
                 $.ajax({
+
                     url: '@Url.Action("SendTPOOTP", "Account")',
+
                     type: 'POST',
+
                     dataType: 'json',
 
-                    // If the controller requires anti-forgery validation,
-                    // add the token here and ensure the form contains
-                    // @Html.AntiForgeryToken().
                     data: {
                         email: email,
                         mobile: mobile,
-                        otpType: otpType
+                        otpType: method,
+                        __RequestVerificationToken: token
+                    },
+
+                    headers: {
+                        'RequestVerificationToken': token
                     },
 
                     success: function (response) {
 
-                        console.log('Send OTP response:', response);
+                        console.log('Send OTP Response:', response);
 
-                        const success = response &&
-                            (
-                                response.success === true ||
-                                response.success === 'true'
+                        if (response && response.success === true) {
+
+                            otpSent = true;
+                            otpVerified = false;
+
+                            otpInputs
+                                .val('')
+                                .prop('readonly', false);
+
+                            otpHidden.val('');
+
+                            verifyButton
+                                .prop('disabled', false)
+                                .html('<i class="fa-solid fa-circle-check"></i> Verify OTP');
+
+                            $('#sendOtpText').text('OTP Sent');
+
+                            showOtpStatus(
+                                response.message || 'OTP sent successfully. Please check your email.',
+                                true
                             );
 
-                        const message = response && response.message
-                            ? response.message
-                            : (
-                                success
-                                    ? 'OTP sent successfully.'
-                                    : 'Unable to send OTP.'
-                            );
-
-                        showOtpStatus(message, success);
-
-                        if (success) {
-
-                            sendOtpButton.html(
-                                '<i class="fa-solid fa-check"></i> OTP Sent'
-                            );
-
-                            if (otpInputs.length > 0) {
-                                otpInputs[0].focus();
-                            }
+                            otpInputs.first().trigger('focus');
 
                         } else {
 
-                            sendOtpButton
-                                .prop('disabled', false)
-                                .html(originalButtonHtml);
+                            resetOTP();
+
+                            showOtpStatus(
+                                response?.message || 'Unable to send OTP.',
+                                false
+                            );
+
                         }
+
                     },
 
                     error: function (xhr, status, error) {
 
-                        console.error(
-                            'OTP sending failed:',
-                            status,
-                            error,
-                            xhr.responseText
-                        );
+                        console.error('Send OTP Error:', xhr.status, error);
+                        console.error(xhr.responseText);
+
+                        resetOTP();
 
                         let message = 'Unable to send OTP. Please try again.';
 
-                        if (xhr.responseJSON && xhr.responseJSON.message) {
-                            message = xhr.responseJSON.message;
+                        if (xhr.status === 400) {
+
+                            message = 'Invalid request or security token. Refresh the page and try again.';
+
+                        } else if (xhr.status === 404) {
+
+                            message = 'SendTPOOTP action not found.';
+
+                        } else if (xhr.status === 500) {
+
+                            message = 'Server error while sending OTP. Check server logs and email configuration.';
+
                         }
 
                         showOtpStatus(message, false);
 
-                        sendOtpButton
-                            .prop('disabled', false)
-                            .html(originalButtonHtml);
                     }
+
                 });
+
             });
 
+
             // =====================================================
-            // INITIALIZE DROPDOWNS ONCE
+            // VERIFY OTP
             // =====================================================
 
+            verifyButton.on('click', function (e) {
+
+                e.preventDefault();
+
+                const otp = getEnteredOTP();
+
+                const email = $('#CollegeMailID').val().trim();
+
+                const mobile = $('#MobileNo').val().trim();
+
+                const method = getOtpMethod();
+
+                if (!otpSent) {
+
+                    showOtpStatus(
+                        'Please request an OTP first.',
+                        false
+                    );
+
+                    return;
+                }
+
+                if (otp.length !== 6) {
+
+                    showOtpStatus(
+                        'Please enter all 6 digits of OTP.',
+                        false
+                    );
+
+                    return;
+                }
+
+                verifyButton
+                    .prop('disabled', true)
+                    .text('Verifying...');
+
+                const token = $('input[name="__RequestVerificationToken"]').val();
+
+                $.ajax({
+
+                    url: '@Url.Action("VerifyTPOOTP", "Account")',
+
+                    type: 'POST',
+
+                    dataType: 'json',
+
+                    data: {
+                        email: email,
+                        mobile: mobile,
+                        otp: otp,
+                        otpType: method,
+                        __RequestVerificationToken: token
+                    },
+
+                    headers: {
+                        'RequestVerificationToken': token
+                    },
+
+                    success: function (response) {
+
+                        console.log('Verify OTP Response:', response);
+
+                        if (response && response.success === true) {
+
+                            otpVerified = true;
+
+                            otpHidden.val(otp);
+
+                            otpTypeHidden.val(method);
+
+                            otpInputs.prop('readonly', true);
+
+                            verifyButton
+                                .prop('disabled', true)
+                                .html('<i class="fa-solid fa-check"></i> Verified ✓');
+
+                            sendButton.prop('disabled', true);
+
+                            showOtpStatus(
+                                response.message || 'OTP verified successfully!',
+                                true
+                            );
+
+                        } else {
+
+                            otpVerified = false;
+
+                            otpHidden.val('');
+
+                            verifyButton
+                                .prop('disabled', false)
+                                .html('<i class="fa-solid fa-circle-check"></i> Verify OTP');
+
+                            showOtpStatus(
+                                response?.message || 'Invalid OTP. Please try again.',
+                                false
+                            );
+
+                        }
+
+                    },
+
+                    error: function (xhr, status, error) {
+
+                        console.error('Verify OTP Error:', xhr.status, error);
+                        console.error(xhr.responseText);
+
+                        verifyButton
+                            .prop('disabled', false)
+                            .html('<i class="fa-solid fa-circle-check"></i> Verify OTP');
+
+                        showOtpStatus(
+                            'Unable to verify OTP. Please try again.',
+                            false
+                        );
+
+                    }
+
+                });
+
+            });
+
+
+            // =====================================================
+            // FORM SUBMISSION
+            // =====================================================
+
+            tpoForm.on('submit', function (e) {
+
+                // Prevent duplicate submissions.
+                if (isSubmitting) {
+                    e.preventDefault();
+                    return false;
+                }
+
+                // Check form validation.
+                if (!$(this).valid()) {
+                    return;
+                }
+
+                // OTP verification is mandatory.
+                if (!otpVerified) {
+
+                    e.preventDefault();
+
+                    showOtpStatus(
+                        'Please send and verify your email OTP before registration.',
+                        false
+                    );
+
+                    return false;
+                }
+
+                // Check verified OTP.
+                if (!otpHidden.val() || otpHidden.val().length !== 6) {
+
+                    e.preventDefault();
+
+                    showOtpStatus(
+                        'OTP verification is incomplete. Please verify again.',
+                        false
+                    );
+
+                    return false;
+                }
+
+                // Set OTP type.
+                otpTypeHidden.val(getOtpMethod());
+
+                // Disable submit button.
+                isSubmitting = true;
+
+                submitButton
+                    .prop('disabled', true)
+                    .html('<i class="fa-solid fa-spinner fa-spin"></i> Submitting...');
+
+                return true;
+
+            });
+
+
+            // =====================================================
+            // INITIALIZE
+            // =====================================================
+
+            otpTypeHidden.val(getOtpMethod());
+
+            verifyButton.prop('disabled', true);
+
             loadColleges();
+
             loadDepartments();
 
         });
     </script>
-}
-
 }

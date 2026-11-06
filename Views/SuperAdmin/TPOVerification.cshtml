@@ -178,35 +178,38 @@
                                 <td class="tv-actions-column tv-actions-cell" style="min-width: 230px;">
                                     <div class="tv-actions-panel">
 
-                                        <form asp-controller="SuperAdmin"
-                                              asp-action="ApproveTPO"
-                                              asp-route-id="1"
+                                        <!-- APPROVE FORM -->
+                                        <form action="@Url.Action("ApproveTPO", "SuperAdmin", new { id = tpo.TPOID })"
                                               method="post"
                                               class="tv-approve-form">
+
                                             @Html.AntiForgeryToken()
-                                            <input type="hidden" name="id" value="@tpo.TPOID" />
 
                                             <button type="submit"
                                                     class="btn btn-success btn-sm tv-action-btn tv-approve-btn"
                                                     onclick="return confirm('Approve this registration?');">
+
                                                 <i class="bi bi-check-circle"></i>
                                                 Approve
+
                                             </button>
                                         </form>
 
+                                        @* -------- RejectTPO ------- *@
+
                                         <div class="tv-reject-panel">
+
                                             <div class="tv-reject-heading">
                                                 <i class="bi bi-x-circle"></i>
                                                 Reject Registration
                                             </div>
 
-                                            <form asp-controller="SuperAdmin"
-                                                  asp-action="RejectTPO"
-                                                  asp-route-id="1"
-                                                  method="post"
-                                                  class="tv-reject-form">
+                                            <form action="@Url.Action("RejectTPO", "SuperAdmin",
+                                                                                       new { id = tpo.TPOID })"
+                                          method="post"
+                                          class="tv-reject-form">
+
                                                 @Html.AntiForgeryToken()
-                                                <input type="hidden" name="id" value="@tpo.TPOID" />
 
                                                 <input type="text"
                                                        name="rejectionReason"
@@ -218,9 +221,12 @@
                                                 <button type="submit"
                                                         class="btn btn-danger btn-sm tv-action-btn tv-reject-btn"
                                                         onclick="return confirm('Reject this registration?');">
+
                                                     <i class="bi bi-x-lg"></i>
                                                     Reject
+
                                                 </button>
+
                                             </form>
                                         </div>
 

@@ -616,6 +616,20 @@ appliedTraineePosts.Sum(x => x.MatchingTraineeCount);
             return View(organization);
         }
 
+
+        //Sanidhya 4-11-2026
+
+        [HttpGet]
+        public IActionResult TPOListByCollege(int collegeCode)
+        {
+            var tpos = _repository.GetTPOListByCollege(collegeCode);
+
+            ViewBag.CollegeCode = collegeCode;
+
+            return View(tpos);
+        }
+        //End Sanidhya 4-11-2026
+
         // =========================================================
         // EDIT PROFILE - GET
         // =========================================================

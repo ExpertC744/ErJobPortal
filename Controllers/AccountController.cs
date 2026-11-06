@@ -1737,59 +1737,227 @@ namespace ErJobPortal.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
+        public async Task<IActionResult> SendTPOOTP(
+    string email,
+    string mobile,
+    string otpType)
+        {
+            if (!string.Equals(
+                    otpType,
+                    "Email",
+                    StringComparison.OrdinalIgnoreCase))
+            {
+                return Json(new
+                {
+                    success = false,
+                    message = "Please select Email OTP."
+                });
+            }
+
+            email = email?.Trim() ?? "";
+
+            if (string.IsNullOrWhiteSpace(email) ||
+                !new EmailAddressAttribute().IsValid(email))
+            {
+                return Json(new
+                {
+                    success = false,
+                    message = "Please enter a valid college email address."
+                });
+            }
+
+            string otp = RandomNumberGenerator
+                .GetInt32(100000, 1000000)
+                .ToString();
+
+            string normalizedEmail = email.ToLowerInvariant();
+
+            string otpKey = "TPO_EMAIL_OTP_" + normalizedEmail;
+            string verifiedKey = "TPO_EMAIL_VERIFIED_" + normalizedEmail;
+
+            try
+            {
+                // Send the email before marking the OTP as active.
+                await _emailService.SendTPOOtpEmailAsync(email, otp);
+
+                // Store OTP for 10 minutes.
+                _memoryCache.Set(
+                    otpKey,
+                    otp,
+                    TimeSpan.FromMinutes(10));
+
+                // A newly sent OTP requires fresh verification.
+                _memoryCache.Remove(verifiedKey);
+
+                return Json(new
+                {
+                    success = true,
+                    message = "OTP sent successfully. Please check your inbox and Spam folder."
+                });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(
+                    ex,
+                    "Failed to send TPO OTP email to {Email}",
+                    email);
+
+                _memoryCache.Remove(otpKey);
+
+                return Json(new
+                {
+                    success = false,
+                    message = "Unable to send OTP email. Please check your email configuration and try again."
+                });
+            }
+        }
+
+
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public IActionResult VerifyTPOOTP(
+    string email,
+    string otp,
+    string otpType)
+        {
+            if (!string.Equals(
+                    otpType,
+                    "Email",
+                    StringComparison.OrdinalIgnoreCase))
+            {
+                return Json(new
+                {
+                    success = false,
+                    message = "Only Email OTP verification is supported."
+                });
+            }
+
+            email = email?.Trim() ?? "";
+            otp = otp?.Trim() ?? "";
+
+            if (string.IsNullOrWhiteSpace(email) ||
+                !new EmailAddressAttribute().IsValid(email))
+            {
+                return Json(new
+                {
+                    success = false,
+                    message = "Please enter a valid college email address."
+                });
+            }
+
+            if (otp.Length != 6 || !otp.All(char.IsDigit))
+            {
+                return Json(new
+                {
+                    success = false,
+                    message = "Please enter the six-digit OTP."
+                });
+            }
+
+            string normalizedEmail = email.ToLowerInvariant();
+
+            string otpKey = "TPO_EMAIL_OTP_" + normalizedEmail;
+            string verifiedKey = "TPO_EMAIL_VERIFIED_" + normalizedEmail;
+
+            if (!_memoryCache.TryGetValue(otpKey, out string? storedOtp) ||
+                string.IsNullOrWhiteSpace(storedOtp))
+            {
+                return Json(new
+                {
+                    success = false,
+                    message = "OTP has expired or was not requested. Please request a new OTP."
+                });
+            }
+
+            if (!string.Equals(storedOtp, otp, StringComparison.Ordinal))
+            {
+                return Json(new
+                {
+                    success = false,
+                    message = "Invalid OTP. Please check your email and try again."
+                });
+            }
+
+            // OTP is valid: consume it so it cannot be reused.
+            _memoryCache.Remove(otpKey);
+
+            // Store the verification marker for 30 minutes.
+            _memoryCache.Set(
+                verifiedKey,
+                true,
+                TimeSpan.FromMinutes(30));
+
+            return Json(new
+            {
+                success = true,
+                message = "Email verified successfully. You can now submit your registration."
+            });
+        }
+
+
+
+        // ==========================================================
+        // TPO REGISTRATION - POST
+        // OTP VERIFICATION TEMPORARILY DISABLED
+        // ==========================================================
+        [HttpPost]
+        [ValidateAntiForgeryToken]
         public async Task<IActionResult> TPORegister(TPORegistration model)
         {
             string uploadDirectory = Path.Combine(
                 _environment.WebRootPath,
                 "uploads",
-                "tpo");
+                "tpo"
+            );
 
             var savedFiles = new List<string>();
 
-            string email = model.CollegeMailID?.Trim() ?? "";
-
-            string verifiedKey =
-                "TPO_EMAIL_VERIFIED_" + email.ToLowerInvariant();
-
             try
             {
-                model.CollegeMailID = email;
+                // Normalize input.
+                model.FullName = model.FullName?.Trim() ?? "";
+                model.CollegeMailID = model.CollegeMailID?.Trim() ?? "";
                 model.MobileNo = model.MobileNo?.Trim() ?? "";
+                model.CollegeEmployeeID = model.CollegeEmployeeID?.Trim() ?? "";
+                model.CollegeAddress = model.CollegeAddress?.Trim() ?? "";
+                model.Designation = model.Designation?.Trim() ?? "";
+                model.CollegeCode = model.CollegeCode?.Trim() ?? "";
 
-                // ============================================
+                // ==================================================
                 // 1. DUPLICATE EMAIL CHECK
-                // ============================================
-
+                // ==================================================
                 if (!string.IsNullOrWhiteSpace(model.CollegeMailID) &&
                     _accountRepository.TPOEmailExists(model.CollegeMailID))
                 {
                     ModelState.AddModelError(
                         nameof(model.CollegeMailID),
-                        "This college email is already registered.");
+                        "This college email is already registered."
+                    );
                 }
 
-                // ============================================
+                // ==================================================
                 // 2. DUPLICATE MOBILE CHECK
-                // ============================================
-
+                // ==================================================
                 if (!string.IsNullOrWhiteSpace(model.MobileNo) &&
                     _accountRepository.TPOMobileExists(model.MobileNo))
                 {
                     ModelState.AddModelError(
                         nameof(model.MobileNo),
-                        "This mobile number is already registered.");
+                        "This mobile number is already registered."
+                    );
                 }
 
-                // ============================================
-                // 3. REQUIRED FILES
-                // ============================================
-
+                // ==================================================
+                // 3. REQUIRED FILE VALIDATION
+                // ==================================================
                 if (model.SupportingDocument1File == null ||
                     model.SupportingDocument1File.Length == 0)
                 {
                     ModelState.AddModelError(
                         nameof(model.SupportingDocument1File),
-                        "Supporting Document 1 is required.");
+                        "Supporting Document 1 is required."
+                    );
                 }
 
                 if (model.SupportingDocument2File == null ||
@@ -1797,7 +1965,8 @@ namespace ErJobPortal.Controllers
                 {
                     ModelState.AddModelError(
                         nameof(model.SupportingDocument2File),
-                        "Supporting Document 2 is required.");
+                        "Supporting Document 2 is required."
+                    );
                 }
 
                 if (model.ProfilePhotoFile == null ||
@@ -1805,22 +1974,24 @@ namespace ErJobPortal.Controllers
                 {
                     ModelState.AddModelError(
                         nameof(model.ProfilePhotoFile),
-                        "Profile photo is required.");
+                        "Profile photo is required."
+                    );
                 }
 
-                // ============================================
+                // ==================================================
                 // 4. FILE TYPE AND SIZE VALIDATION
-                // ============================================
+                // ==================================================
+
 
                 string[] documentExtensions =
                 {
-                    ".pdf", ".jpg", ".jpeg", ".png"
-                };
+            ".pdf", ".jpg", ".jpeg", ".png"
+        };
 
                 string[] photoExtensions =
                 {
-                    ".jpg", ".jpeg", ".png"
-                };
+            ".jpg", ".jpeg", ".png"
+        };
 
                 bool IsAllowedFile(
                     IFormFile? file,
@@ -1833,8 +2004,8 @@ namespace ErJobPortal.Controllers
                     string extension =
                         Path.GetExtension(file.FileName).ToLowerInvariant();
 
-                    return allowedExtensions.Contains(extension)
-                           && file.Length <= maxSizeBytes;
+                    return allowedExtensions.Contains(extension) &&
+                           file.Length <= maxSizeBytes;
                 }
 
                 if (model.SupportingDocument1File != null &&
@@ -1846,7 +2017,8 @@ namespace ErJobPortal.Controllers
                 {
                     ModelState.AddModelError(
                         nameof(model.SupportingDocument1File),
-                        "Document 1 must be PDF, JPG, JPEG or PNG and not exceed 10 MB.");
+                        "Document 1 must be PDF, JPG, JPEG or PNG and not exceed 10 MB."
+                    );
                 }
 
                 if (model.SupportingDocument2File != null &&
@@ -1858,7 +2030,8 @@ namespace ErJobPortal.Controllers
                 {
                     ModelState.AddModelError(
                         nameof(model.SupportingDocument2File),
-                        "Document 2 must be PDF, JPG, JPEG or PNG and not exceed 10 MB.");
+                        "Document 2 must be PDF, JPG, JPEG or PNG and not exceed 10 MB."
+                    );
                 }
 
                 if (model.ProfilePhotoFile != null &&
@@ -1870,47 +2043,28 @@ namespace ErJobPortal.Controllers
                 {
                     ModelState.AddModelError(
                         nameof(model.ProfilePhotoFile),
-                        "Profile photo must be JPG, JPEG or PNG and not exceed 5 MB.");
+                        "Profile photo must be JPG, JPEG or PNG and not exceed 5 MB."
+                    );
                 }
 
-                // ============================================
-                // 5. CHECK SERVER-SIDE EMAIL VERIFICATION
-                // ============================================
+                // ==================================================
+                // 5. SKIP OTP VERIFICATION
+                // ==================================================
+                model.OTPVerified = false;
+                model.OTP = null;
+                model.OTPType = null;
 
-                if (string.IsNullOrWhiteSpace(email))
-                {
-                    ModelState.AddModelError(
-                        nameof(model.CollegeMailID),
-                        "College email is required.");
-
-                    return View(model);
-                }
-
-                if (!_memoryCache.TryGetValue(
-                        verifiedKey,
-                        out bool isVerified) ||
-                    !isVerified)
-                {
-                    ModelState.AddModelError(
-                        nameof(model.OTP),
-                        "Please verify your college email using OTP before registering.");
-
-                    return View(model);
-                }
-
-                // Do not check the OTP again here.
-                // VerifyTPOOTP has already validated and consumed it.
-                // Keep the verification marker if other fields are invalid.
-
+                // ==================================================
+                // 6. CHECK MODEL VALIDATION
+                // ==================================================
                 if (!ModelState.IsValid)
                 {
                     return View(model);
                 }
 
-                // ============================================
-                // 6. SAVE UPLOADED FILES
-                // ============================================
-
+                // ==================================================
+                // 7. SAVE UPLOADED FILES
+                // ==================================================
                 Directory.CreateDirectory(uploadDirectory);
 
                 async Task<string> SaveFileAsync(IFormFile file)
@@ -1935,7 +2089,6 @@ namespace ErJobPortal.Controllers
 
                     savedFiles.Add(fullPath);
 
-                    // Save relative paths in the database.
                     return Path.Combine("uploads", "tpo", fileName)
                         .Replace("\\", "/");
                 }
@@ -1949,29 +2102,24 @@ namespace ErJobPortal.Controllers
                 model.ProfilePhoto =
                     await SaveFileAsync(model.ProfilePhotoFile!);
 
-                // ============================================
-                // 7. SET SERVER-VERIFIED REGISTRATION VALUES
-                // ============================================
-
-                model.OTPVerified = true;
+                // ==================================================
+                // 8. SET REGISTRATION STATUS
+                // ==================================================
+                model.OTPVerified = false;
                 model.OTP = null;
-                model.OTPType = "Email";
+                model.OTPType = null;
 
                 model.Status = "Pending";
                 model.IsApproved = false;
                 model.IsActive = false;
 
-                // ============================================
-                // 8. SAVE REGISTRATION
-                // ============================================
-
+                // ==================================================
+                // 9. SAVE REGISTRATION IN DATABASE
+                // ==================================================
                 int result = _accountRepository.RegisterTPO(model);
 
                 if (result > 0)
                 {
-                    // Prevent reuse of this email verification.
-                    _memoryCache.Remove(verifiedKey);
-
                     TempData["Success"] =
                         "TPO registration submitted successfully. Your account is pending Super Admin approval.";
 
@@ -1980,16 +2128,8 @@ namespace ErJobPortal.Controllers
 
                 ModelState.AddModelError(
                     string.Empty,
-                    "TPO registration failed. Please try again.");
-
-                // Clean up files if database insertion fails.
-                foreach (string path in savedFiles)
-                {
-                    if (System.IO.File.Exists(path))
-                    {
-                        System.IO.File.Delete(path);
-                    }
-                }
+                    "TPO registration failed. Please try again."
+                );
 
                 return View(model);
             }
@@ -1997,29 +2137,38 @@ namespace ErJobPortal.Controllers
             {
                 _logger.LogError(ex, "Error during TPO registration.");
 
-                // Clean up uploaded files if registration throws an exception.
-                foreach (string path in savedFiles)
-                {
-                    try
-                    {
-                        if (System.IO.File.Exists(path))
-                        {
-                            System.IO.File.Delete(path);
-                        }
-                    }
-                    catch (Exception cleanupException)
-                    {
-                        _logger.LogWarning(
-                            cleanupException,
-                            "Unable to clean up a TPO registration upload.");
-                    }
-                }
-
                 ModelState.AddModelError(
                     string.Empty,
-                    "An error occurred during registration. Please try again.");
+                    "An error occurred during registration. Please try again."
+                );
 
                 return View(model);
+            }
+            finally
+            {
+                // Delete uploaded files if registration did not redirect successfully.
+                // Files are retained after successful registration.
+                // The redirect is detected using TempData success state.
+                if (TempData["Success"] == null)
+                {
+                    foreach (string path in savedFiles)
+                    {
+                        try
+                        {
+                            if (System.IO.File.Exists(path))
+                            {
+                                System.IO.File.Delete(path);
+                            }
+                        }
+                        catch (Exception cleanupException)
+                        {
+                            _logger.LogWarning(
+                                cleanupException,
+                                "Unable to clean up a TPO registration upload."
+                            );
+                        }
+                    }
+                }
             }
         }
         // ==========================================================
@@ -3702,6 +3851,36 @@ namespace ErJobPortal.Controllers
             return Json(!exists);
         }
 
+
+
+
+
+        //Sanidhya start 
+
+        // TPO email availability (used by [Remote] validation)
+        [AcceptVerbs("GET", "POST")]
+        public IActionResult CheckTPOEmail(string? CollegeMailID)
+        {
+            if (string.IsNullOrWhiteSpace(CollegeMailID))
+                return Json(true);
+
+            bool exists = _accountRepository.TPOEmailExists(CollegeMailID.Trim());
+            return Json(!exists);
+        }
+
+        // TPO mobile availability (used by [Remote] validation)
+        [AcceptVerbs("GET", "POST")]
+        public IActionResult CheckTPOMobile(string? MobileNo)
+        {
+            if (string.IsNullOrWhiteSpace(MobileNo))
+                return Json(true);
+
+            bool exists = _accountRepository.TPOMobileExists(MobileNo.Trim());
+            return Json(!exists);
+        }
+
+
+        //Sanidhya end 
 
 
 

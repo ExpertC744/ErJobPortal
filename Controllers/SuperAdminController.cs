@@ -25,13 +25,12 @@ namespace ErJobPortal.Controllers
         [HttpGet]
         [Route("SuperAdmin/Dashboard")]
         [Route("SuperAdmin/Dashboard/{id:int}")]
-        public IActionResult Dashboard(int id = 1)
+        public IActionResult Dashboard(int id)
         {
             if (id != 1)
             {
                 return NotFound();
             }
-
 
             int traineeRegistrationCount = 0;
             int organizationRegistrationCount = 0;
@@ -39,6 +38,10 @@ namespace ErJobPortal.Controllers
             int traineeProfileCount = 0;
             int organizationProfileCount = 0;
 
+            int objectiveCount = 0;
+            //int advertisementCount = 0;
+            //int topSearchCount = 0;
+            int feedbackCount = 0;
 
             string connectionString =
                 _configuration.GetConnectionString("DefaultConnection");
@@ -48,23 +51,34 @@ namespace ErJobPortal.Controllers
                 con.Open();
 
                 string query = @"
-SELECT
+               SELECT
 
-   -- TRAINEE REGISTRATION COUNT
-   (SELECT COUNT(nID)
-    FROM tblCandidateRegister) AS CandidateCount,
+                  -- TRAINEE REGISTRATION COUNT
+                  (SELECT COUNT(nID)
+                   FROM tblCandidateRegister) AS CandidateCount,
 
-   -- ORGANIZATION REGISTRATION COUNT
-   (SELECT COUNT(nID)
-    FROM tblOrgRegistration) AS OrganizationCount,
+                  -- ORGANIZATION REGISTRATION COUNT
+                  (SELECT COUNT(nID)
+                   FROM tblOrgRegistration) AS OrganizationCount,
 
-   -- TRAINEE PROFILE COUNT
-   (SELECT COUNT(nID)
-    FROM tblCandidateProfile) AS TraineeProfileCount,
+                  -- TRAINEE PROFILE COUNT
+                  (SELECT COUNT(nID)
+                   FROM tblCandidateProfile) AS TraineeProfileCount,
 
-   -- ORGANIZATION PROFILE COUNT
-   (SELECT COUNT(nID)
-    FROM tblOrgProfile) AS OrganizationProfileCount;";
+                  -- ORGANIZATION PROFILE COUNT
+                  (SELECT COUNT(nID)
+                   FROM tblOrgProfile) AS OrganizationProfileCount,
+
+                  -- OBJECTIVE COUNT
+                        (SELECT COUNT(nID)
+                         FROM tblObjective) AS ObjectiveCount,
+
+                -- TOTAL FEEDBACK COUNT (TRAINEE + ORGANIZATION)
+                (
+                    (SELECT COUNT(nID) FROM tblCandidateRegister)
+                    +
+                    (SELECT COUNT(nID) FROM tblOrgRegistration)
+                ) AS FeedbackCount";
 
                 using (SqlCommand cmd = new SqlCommand(query, con))
                 using (SqlDataReader dr = cmd.ExecuteReader())
@@ -83,6 +97,11 @@ SELECT
                         organizationProfileCount =
                             Convert.ToInt32(dr["OrganizationProfileCount"]);
 
+                        objectiveCount =
+                            Convert.ToInt32(dr["ObjectiveCount"]);
+
+                        feedbackCount =
+                            Convert.ToInt32(dr["FeedbackCount"]);
                     }
                 }
             }
@@ -106,6 +125,10 @@ SELECT
 
             ViewBag.OrganizationProfileCount =
                 organizationProfileCount;
+
+            ViewBag.ObjectiveCount = objectiveCount;
+
+            ViewBag.FeedbackCount = feedbackCount;
 
             ViewBag.Trainees = trainees;
 
@@ -4796,7 +4819,7 @@ ORDER BY SAF.nID DESC, OFB.nID DESC;
         [HttpPost]
         [ValidateAntiForgeryToken]
         [Route("SuperAdmin/ApproveTPO/{id:int}")]
-        public IActionResult ApproveTPO(int id)
+        public async Task<IActionResult> ApproveTPO(int id)
         {
             string? saId = HttpContext.Session.GetString("SAID");
             string? saRole = HttpContext.Session.GetString("SARole");
@@ -4804,20 +4827,78 @@ ORDER BY SAF.nID DESC, OFB.nID DESC;
             if (string.IsNullOrEmpty(saId) ||
                 !int.TryParse(saId, out int superAdminId) ||
                 superAdminId != 1 ||
-                !string.Equals(
-                    saRole, "SuperAdmin",
+                !string.Equals(saRole, "SuperAdmin",
                     StringComparison.OrdinalIgnoreCase))
             {
                 return RedirectToAction("Index", "SALogin");
             }
 
-            bool approved =
-                _repository.ApproveTPORegistration(id, superAdminId);
+            try
+            {
+                // 1. Get TPO details BEFORE updating status
+                var tpo = _repository.GetTPOById(id);
 
-            TempData[approved ? "SuccessMessage" : "ErrorMessage"] =
-                approved
-                    ? "TPO registration approved successfully."
-                    : "Approval failed. The registration may no longer be pending.";
+                if (tpo == null)
+                {
+                    TempData["ErrorMessage"] = "TPO registration not found.";
+
+                    return RedirectToAction(
+                        nameof(TPOVerification),
+                        new { id = superAdminId });
+                }
+
+                if (string.IsNullOrWhiteSpace(tpo.CollegeMailID))
+                {
+                    TempData["ErrorMessage"] =
+                        "TPO email address is missing.";
+
+                    return RedirectToAction(
+                        nameof(TPOVerification),
+                        new { id = superAdminId });
+                }
+
+                // 2. Update approval status
+                bool approved = _repository.ApproveTPORegistration(
+                    id,
+                    superAdminId);
+
+                if (!approved)
+                {
+                    TempData["ErrorMessage"] =
+                        "Approval failed. Registration may already be processed.";
+
+                    return RedirectToAction(
+                        nameof(TPOVerification),
+                        new { id = superAdminId });
+                }
+
+                // 3. Determine TPO type
+                string fullName = tpo.FullName ?? "TPO";
+
+                string tpoType = tpo.SubTpoBit == true
+                    ? "Sub-TPO"
+                    : "TPO";
+
+                // 4. Send approval email
+                await _emailService.SendTPOApprovalEmailAsync(
+                    tpo.CollegeMailID,
+                    fullName,
+                    tpoType
+                );
+
+                // 5. Success message
+                TempData["SuccessMessage"] =
+                    $" {tpoType} approved successfully! Approval email sent to {tpo.CollegeMailID}.";
+
+            }
+            catch (Exception ex)
+            {
+                // Log complete exception
+                Console.WriteLine("TPO Approval Error: " + ex);
+
+                TempData["ErrorMessage"] =
+                    "TPO approval was processed, but the email could not be sent. Please check the email configuration and server logs.";
+            }
 
             return RedirectToAction(
                 nameof(TPOVerification),
@@ -4827,7 +4908,10 @@ ORDER BY SAF.nID DESC, OFB.nID DESC;
         [HttpPost]
         [ValidateAntiForgeryToken]
         [Route("SuperAdmin/RejectTPO/{id:int}")]
-        public IActionResult RejectTPO(int id, string rejectionReason)
+
+        public async Task<IActionResult> RejectTPO(
+    int id,
+    string rejectionReason)
         {
             string? saId = HttpContext.Session.GetString("SAID");
             string? saRole = HttpContext.Session.GetString("SARole");
@@ -4835,8 +4919,7 @@ ORDER BY SAF.nID DESC, OFB.nID DESC;
             if (string.IsNullOrEmpty(saId) ||
                 !int.TryParse(saId, out int superAdminId) ||
                 superAdminId != 1 ||
-                !string.Equals(
-                    saRole, "SuperAdmin",
+                !string.Equals(saRole, "SuperAdmin",
                     StringComparison.OrdinalIgnoreCase))
             {
                 return RedirectToAction("Index", "SALogin");
@@ -4862,13 +4945,53 @@ ORDER BY SAF.nID DESC, OFB.nID DESC;
                     new { id = superAdminId });
             }
 
-            bool rejected = _repository.RejectTPORegistration(
-                id, superAdminId, rejectionReason);
+            try
+            {
+                // 1. Update TPO rejection status
+                bool rejected = _repository.RejectTPORegistration(
+                    id,
+                    superAdminId,
+                    rejectionReason.Trim());
 
-            TempData[rejected ? "SuccessMessage" : "ErrorMessage"] =
-                rejected
-                    ? "TPO registration rejected."
-                    : "Rejection failed. The registration may no longer be pending.";
+                if (!rejected)
+                {
+                    TempData["ErrorMessage"] =
+                        "Rejection failed. The registration may no longer be pending.";
+
+                    return RedirectToAction(
+                        nameof(TPOVerification),
+                        new { id = superAdminId });
+                }
+
+                // 2. Get TPO details
+                var tpo = _repository.GetTPOById(id);
+
+                // 3. Send rejection email
+                if (tpo != null &&
+                    !string.IsNullOrWhiteSpace(tpo.CollegeMailID))
+                {
+                    string fullName = tpo.FullName ?? "TPO";
+
+                    string tpoType =
+                        (bool)tpo.SubTpoBit ? "Sub-TPO" : "TPO";
+
+                    await _emailService.SendTPORejectionEmailAsync(
+                        tpo.CollegeMailID,
+                        fullName,
+                        tpoType,
+                        rejectionReason.Trim());
+                }
+
+                TempData["SuccessMessage"] =
+                    "TPO registration rejected successfully. Rejection email sent.";
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("TPO Rejection Error: " + ex.ToString());
+
+                TempData["ErrorMessage"] =
+                    "TPO rejection was processed, but an error occurred. Please check the registration status.";
+            }
 
             return RedirectToAction(
                 nameof(TPOVerification),
@@ -4876,7 +4999,7 @@ ORDER BY SAF.nID DESC, OFB.nID DESC;
         }
 
 
-       
+
         // =====================================================
         // TPO AND SUB-TPO APPROVED / REJECTED LIST
         // =====================================================

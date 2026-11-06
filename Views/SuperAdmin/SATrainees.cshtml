@@ -22,25 +22,25 @@
         min-width: 90px;
     }
 
-    .status.enabled {
-        background: #d1e7dd;
-        color: #0f5132;
-    }
+        .status.enabled {
+            background: #d1e7dd;
+            color: #0f5132;
+        }
 
-    .status.enabled:hover {
-        background: #198754;
-        color: #fff;
-    }
+            .status.enabled:hover {
+                background: #198754;
+                color: #fff;
+            }
 
-    .status.disabled {
-        background: #f8d7da;
-        color: #842029;
-    }
+        .status.disabled {
+            background: #f8d7da;
+            color: #842029;
+        }
 
-    .status.disabled:hover {
-        background: #dc3545;
-        color: #fff;
-    }
+            .status.disabled:hover {
+                background: #dc3545;
+                color: #fff;
+            }
 
 </style>
 
@@ -72,7 +72,7 @@
                class="master-back-btn"
                title="Back to SuperAdmin Dashboard">
                 <i class="fas fa-arrow-left"></i>
-                
+
             </a>
 
         </div>
@@ -194,8 +194,8 @@
                                 <!-- DOB -->
                                 <td>
                                     @(item.DOB.HasValue
-                                        ? item.DOB.Value.ToString("dd-MM-yyyy")
-                                        : "-")
+                                                                ? item.DOB.Value.ToString("dd-MM-yyyy")
+                                                                : "-")
                                 </td>
 
 
@@ -213,15 +213,15 @@
                                     {
                                         <span>Other</span>
                                     }
-                                </td>
+                        </td>
 
 
-                                <!-- COLLEGE CODE -->
-                                <td>
-                                    @item.nCollegeCode
-                                </td>
+                        <!-- COLLEGE CODE -->
+                        <td>
+                            @item.nCollegeCode
+                        </td>
 
-                                @* Sanidhya 30-10-2026 *@
+                        @* Sanidhya 30-10-2026 *@
 
                         <!-- COLLEGE NAME -->
                         <td>
@@ -238,23 +238,23 @@
                             @(item.nPassoutYear.HasValue
                                                         ? item.nPassoutYear.Value.ToString()
                                                         : "-")
-                                                          </td>
+                                </td>
 
-                        <!-- DEPARTMENT NAME -->
-                        <td>
-                            @item.DepartmentName
-                        </td>
+                                <!-- DEPARTMENT NAME -->
+                                <td>
+                                    @item.DepartmentName
+                                </td>
 
 
                                 <!-- REGISTRATION DATE -->
                                 <td>
                                     @(item.RegDate.HasValue
-                                        ? item.RegDate.Value.ToString("dd-MM-yyyy HH:mm")
-                                        : "-")
+                                                                ? item.RegDate.Value.ToString("dd-MM-yyyy HH:mm")
+                                                                : "-")
                                 </td>
 
 
-                               <!-- STATUS -->
+                                <!-- STATUS -->
                                 <td>
 
                                     <button type="button"
@@ -273,16 +273,16 @@
                                 <!-- ACTION -->
                                 <td>
 
-                                   
-                                     <a asp-controller="SuperAdmin"
-                                   asp-action="ViewTraineeResume"
-                                   asp-route-id="@item.nID"
-                                   class="resume-view-btn"
-                                   title="View Resume">
 
-                                    <i class="fas fa-eye"></i>
+                                    <a asp-controller="SuperAdmin"
+                                       asp-action="ViewTraineeResume"
+                                       asp-route-id="@item.nID"
+                                       class="resume-view-btn"
+                                       title="View Resume">
 
-                                </a>
+                                        <i class="fas fa-eye"></i>
+
+                                    </a>
 
                                 </td>
 
@@ -313,7 +313,6 @@
         <!-- PAGE INFORMATION -->
         <div id="candidatePageInfo"
              class="master-page-info text-center d-none">
-
         </div>
 
     </div>

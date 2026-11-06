@@ -11,6 +11,7 @@ builder.Services.AddControllersWithViews();
 // Services
 builder.Services.AddScoped<EmailService>();
 builder.Services.AddScoped<VisitorTrackingService>();
+builder.Services.AddMemoryCache();
 
 // Database
 builder.Services.AddScoped<DbConnection>();

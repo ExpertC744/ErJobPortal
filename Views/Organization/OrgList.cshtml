@@ -9,6 +9,23 @@
 }
 
 
+
+@* //Sanidhya 4-11-2026 *@
+<style>
+    .tpo-count-badge {
+        display: inline-block;
+        min-width: 35px;
+        padding: 5px 10px;
+        border-radius: 20px;
+        background: #e6f4ef;
+        color: #1e7b67;
+        font-weight: 600;
+        text-align: center;
+    }
+</style>
+
+@* //End Sanidhya 4-11-2026 *@
+
 <div class="container-fluid">
 
     <!-- MASTER TABLE CARD -->
@@ -48,6 +65,7 @@
                         <th>Email</th>
                         <th>College Code</th>
                         <th>College Name</th>
+                        <th>TPO Count</th>
                         <th>Registration Date</th>
                         <th>Action</th>
                     </tr>
@@ -122,9 +140,24 @@
 
                                 </td>
 
-                                @* <td>
-                                    @item.nCollegeName
-                                </td> *@
+                                @* //Sanidhya 4-11-2026 *@
+
+                                <td>
+                                    @item.CollegeName
+                                </td>
+
+
+
+                                <td>
+                                    <a asp-controller="Organization"
+                                       asp-action="TPOListByCollege"
+                                       asp-route-collegeCode="@item.nCollegeCode"
+                                       class="tpo-count-badge"
+                                       title="View TPOs from this college">
+                                        @item.TPOCount
+                                    </a>
+                                </td>
+                                @* //End Sanidhya 4-11-2026 *@
 
 
                                 <td>
