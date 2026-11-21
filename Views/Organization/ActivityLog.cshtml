@@ -8,8 +8,10 @@
 
     Layout = "~/Views/Shared/_DashboardLayout.cshtml";
 
-    var records = Model ??
-        new List<ErJobPortal.Models.CandidateActivityLogViewModel>();
+    var records = (Model ??
+        new List<ErJobPortal.Models.CandidateActivityLogViewModel>())
+        .OrderByDescending(x => x.VisitDateTime)
+        .ToList();
 
     var totalVisits = records.Count;
     var successfulLogins = records.Count(x => x.IsLoggedIn);

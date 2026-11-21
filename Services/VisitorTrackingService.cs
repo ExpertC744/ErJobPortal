@@ -155,7 +155,7 @@ VALUES
     @ReferrerUrl,
     @RequestPath,
     @PageName,
-    SYSUTCDATETIME(),
+    GETDATE(),
     @IsLoggedIn
 );";
 

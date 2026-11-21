@@ -770,21 +770,21 @@ namespace ErJobPortal.Controllers
 
 
         //khushi 27-10
+
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult OrganizationLogin(OrganizationLogin model)
+        public async Task<IActionResult> OrganizationLogin(OrganizationLogin model)
         {
-            // Validate email and password fields
+            // 1. Validate email and password fields
             if (!ModelState.IsValid)
             {
                 return View(model);
             }
 
-            // Get organization by email
+            // 2. Get organization by email
             OrganizationUser? user =
                 _accountRepository.LoginOrganization(model);
 
-            // Email not registered
             if (user == null)
             {
                 ModelState.AddModelError(
@@ -795,7 +795,7 @@ namespace ErJobPortal.Controllers
                 return View(model);
             }
 
-            // Verify entered password against stored password hash
+            // 3. Verify entered password
             var passwordHasher = new PasswordHasher<OrganizationUser>();
 
             PasswordVerificationResult passwordResult;
@@ -816,7 +816,6 @@ namespace ErJobPortal.Controllers
                 return View(model);
             }
 
-            // Incorrect password
             if (passwordResult == PasswordVerificationResult.Failed)
             {
                 ModelState.AddModelError(
@@ -827,7 +826,7 @@ namespace ErJobPortal.Controllers
                 return View(model);
             }
 
-            // Block organizations disabled by Super Admin
+            // 4. Check Super Admin status
             if (!user.nSABit)
             {
                 TempData["Error"] =
@@ -836,7 +835,7 @@ namespace ErJobPortal.Controllers
                 return View(model);
             }
 
-            // Create organization sessions
+            // 5. Create organization sessions
             HttpContext.Session.SetInt32("OrgID", user.nID);
 
             HttpContext.Session.SetString(
@@ -849,21 +848,20 @@ namespace ErJobPortal.Controllers
                 user.sEmail ?? ""
             );
 
-            // Store organization name for the shared header
             HttpContext.Session.SetString(
                 "sOrgName",
                 user.sOrgName ?? ""
             );
 
-            // Get organization logo from database
+            // 6. Get organization logo
             string? companyLogo = null;
 
             string logoQuery = @"
-   SELECT TOP 1 sCompanyLogo
-   FROM tblOrgProfile
-   WHERE nOrgID = @nOrgID
-     AND nBit = 1
-   ORDER BY nID DESC;";
+        SELECT TOP 1 sCompanyLogo
+        FROM tblOrgProfile
+        WHERE nOrgID = @nOrgID
+          AND nBit = 1
+        ORDER BY nID DESC;";
 
             using (SqlConnection con = new SqlConnection(
                 _configuration.GetConnectionString("DefaultConnection")))
@@ -881,15 +879,42 @@ namespace ErJobPortal.Controllers
                 }
             }
 
-            // Store organization logo filename in Session
             HttpContext.Session.SetString(
                 "OrganizationLogo",
                 companyLogo ?? ""
             );
 
-            // Redirect after successful login
+            // 7. TRACK SUCCESSFUL ORGANIZATION LOGIN
+            try
+            {
+                await _visitorTrackingService.TrackVisitAsync(
+                    HttpContext,
+                    panelType: "Organization",
+                    pageName: "Organization Login",
+                    userId: user.nID,
+                    userType: "Organization",
+                    isLoggedIn: true
+                );
+
+                _logger.LogInformation(
+                    "Organization login activity tracked successfully for UserID {UserID}",
+                    user.nID
+                );
+            }
+            catch (Exception ex)
+            {
+                // Tracking failure should not prevent successful login.
+                _logger.LogError(
+                    ex,
+                    "Organization login succeeded but activity tracking failed for UserID {UserID}",
+                    user.nID
+                );
+            }
+
+            // 8. Redirect after successful login
             return RedirectToAction("Dashboard", "Organization");
         }
+
         //[HttpPost]
         //[ValidateAntiForgeryToken]
         //public IActionResult OrganizationLogin(OrganizationLogin model)
