@@ -12,6 +12,7 @@
 
   <ItemGroup>
     <PackageReference Include="Microsoft.Data.SqlClient" Version="7.0.2" />
+    <PackageReference Include="NullDesk.Extensions.Mailer.SendGrid" Version="8.0.0" />
   </ItemGroup>
 
   <ItemGroup>

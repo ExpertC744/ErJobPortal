@@ -12,6 +12,7 @@ using System.Data;
 using System.Net;
 using System.Net.Mail;
 using System.Security.Cryptography;
+using System.Text.RegularExpressions;
 
 
 namespace ErJobPortal.Controllers
@@ -762,28 +763,12 @@ namespace ErJobPortal.Controllers
         //    }
         //}
 
-        //[HttpGet]
-        //public IActionResult OrganizationLogin()
-        //{
-        //    return View();
-        //}
-        //anam 
         [HttpGet]
         public IActionResult OrganizationLogin()
         {
-            var model = new OrganizationLogin();
-
-            // Read remembered organization email from cookie
-            if (Request.Cookies.TryGetValue(
-                "OrganizationRememberEmail", out string? savedEmail))
-            {
-                model.sEmail = savedEmail;
-                model.RememberMe = true;
-            }
-
-            return View(model);
+            return View();
         }
-        //anam end
+
 
         //khushi 27-10
 
@@ -850,36 +835,6 @@ namespace ErJobPortal.Controllers
 
                 return View(model);
             }
-
-            //anam 
-            // REMEMBER ME - SAVE ORGANIZATION EMAIL
-            if (model.RememberMe)
-            {
-                var cookieOptions = new CookieOptions
-                {
-                    Expires = DateTimeOffset.UtcNow.AddDays(30),
-                    HttpOnly = true,
-                    Secure = Request.IsHttps,
-                    SameSite = SameSiteMode.Lax,
-                    IsEssential = true,
-                    Path = "/"
-                };
-
-                Response.Cookies.Append(
-                    "OrganizationRememberEmail",
-                    model.sEmail?.Trim() ?? "",
-                    cookieOptions
-                );
-            }
-            else
-            {
-                Response.Cookies.Delete(
-                    "OrganizationRememberEmail",
-                    new CookieOptions { Path = "/" }
-                );
-            }
-            //anam end
-
 
             // 5. Create organization sessions
             HttpContext.Session.SetInt32("OrgID", user.nID);
@@ -1047,30 +1002,14 @@ namespace ErJobPortal.Controllers
 
         // candidate login
 
-        //[HttpGet]
-        //public IActionResult CandidateLogin()
-        //{
-        //    return View();
-        //}
-        //anam
         [HttpGet]
         public IActionResult CandidateLogin()
         {
-            var model = new CandidateLogin();
-
-            // Read remembered email from browser cookie
-            if (Request.Cookies.TryGetValue(
-                "CandidateRememberEmail", out string? savedEmail))
-            {
-                model.sEmail = savedEmail;
-                model.RememberMe = true;
-            }
-
-            return View(model);
+            return View();
         }
-        //anam end
 
 
+      
         [HttpPost]
         [ValidateAntiForgeryToken]
         public IActionResult CandidateLogin(CandidateLogin model)
@@ -1121,38 +1060,6 @@ namespace ErJobPortal.Controllers
 
                 return View(model);
             }
-            //anam
-            // ==========================================
-            // REMEMBER ME - SAVE EMAIL
-            // ==========================================
-
-            if (model.RememberMe)
-            {
-                var cookieOptions = new CookieOptions
-                {
-                    Expires = DateTimeOffset.UtcNow.AddDays(30),
-                    HttpOnly = true,
-                    Secure = Request.IsHttps,
-                    SameSite = SameSiteMode.Lax,
-                    IsEssential = true,
-                    Path = "/"
-                };
-
-                Response.Cookies.Append(
-                    "CandidateRememberEmail",
-                    model.sEmail?.Trim() ?? "",
-                    cookieOptions
-                );
-            }
-            else
-            {
-                // Remove previously remembered email
-                Response.Cookies.Delete(
-                    "CandidateRememberEmail",
-                    new CookieOptions { Path = "/" }
-                );
-            }
-            //anam end
 
             // Set session
             HttpContext.Session.SetInt32("CandidateID", user.nID);
@@ -1524,16 +1431,16 @@ namespace ErJobPortal.Controllers
         }
 
 
+
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> SendOrganizationResetOTP(
-            [FromForm] string sEmail)
+             [FromForm] string sEmail)
         {
             string email = sEmail?.Trim() ?? "";
 
             if (string.IsNullOrWhiteSpace(email) ||
-                !new System.ComponentModel.DataAnnotations.EmailAddressAttribute()
-                    .IsValid(email))
+                !new EmailAddressAttribute().IsValid(email))
             {
                 return Json(new
                 {
@@ -1544,6 +1451,10 @@ namespace ErJobPortal.Controllers
 
             try
             {
+                // Clear any previous OTP or verification.
+                ClearOrganizationResetOtpSession();
+
+                // Check organization account.
                 OrganizationLogin? organization =
                     _accountRepository.GetOrganizationLoginDetails(email);
 
@@ -1556,27 +1467,30 @@ namespace ErJobPortal.Controllers
                     });
                 }
 
+                // Generate six-digit OTP.
                 string otp = RandomNumberGenerator
                     .GetInt32(100000, 1000000)
                     .ToString();
 
-                // Send email first. Store OTP only after sending succeeds.
+                // Send OTP through SendGrid.
                 await _emailService.SendOrganizationOtpEmailAsync(
                     email,
                     otp,
                     "password-reset");
 
-                // Store OTP and expiry on the server.
+                // Store OTP only after successful SendGrid acceptance.
                 HttpContext.Session.SetString("OrgResetOtp", otp);
-                HttpContext.Session.SetString("OrgResetOtpEmail", email);
+
+                HttpContext.Session.SetString(
+                    "OrgResetOtpEmail",
+                    email);
 
                 HttpContext.Session.SetString(
                     "OrgResetOtpExpiry",
-                    DateTimeOffset.UtcNow.AddMinutes(10)
-                        .ToUnixTimeSeconds().ToString());
-
-                // A newly sent OTP invalidates any earlier verification.
-                HttpContext.Session.Remove("OrgResetVerifiedEmail");
+                    DateTimeOffset.UtcNow
+                        .AddMinutes(10)
+                        .ToUnixTimeSeconds()
+                        .ToString());
 
                 return Json(new
                 {
@@ -1586,7 +1500,9 @@ namespace ErJobPortal.Controllers
             }
             catch (Exception ex)
             {
-                Console.WriteLine("Send Organization Reset OTP Error: " + ex);
+                _logger.LogError(
+                    ex,
+                    "SendOrganizationResetOTP failed.");
 
                 return Json(new
                 {
@@ -1597,11 +1513,12 @@ namespace ErJobPortal.Controllers
         }
 
 
+
         [HttpPost]
         [ValidateAntiForgeryToken]
         public IActionResult VerifyOrganizationResetOTP(
-                [FromForm] string sEmail,
-                [FromForm] string otp)
+    [FromForm] string sEmail,
+    [FromForm] string otp)
         {
             string email = sEmail?.Trim() ?? "";
             string enteredOtp = otp?.Trim() ?? "";
@@ -1628,7 +1545,9 @@ namespace ErJobPortal.Controllers
             }
 
             if (!string.Equals(
-                email, savedEmail, StringComparison.OrdinalIgnoreCase))
+                email,
+                savedEmail,
+                StringComparison.OrdinalIgnoreCase))
             {
                 return Json(new
                 {
@@ -1648,10 +1567,11 @@ namespace ErJobPortal.Controllers
                 });
             }
 
-            if (!System.Text.RegularExpressions.Regex.IsMatch(
-                    enteredOtp, @"^\d{6}$") ||
+            if (!Regex.IsMatch(enteredOtp, @"^\d{6}$") ||
                 !string.Equals(
-                    enteredOtp, savedOtp, StringComparison.Ordinal))
+                    enteredOtp,
+                    savedOtp,
+                    StringComparison.Ordinal))
             {
                 return Json(new
                 {
@@ -1660,11 +1580,12 @@ namespace ErJobPortal.Controllers
                 });
             }
 
-            // Keep verified email on the server.
+            // Store verified email on server.
             HttpContext.Session.SetString(
-                "OrgResetVerifiedEmail", savedEmail);
+                "OrgResetVerifiedEmail",
+                savedEmail);
 
-            // Make the OTP one-time use.
+            // OTP can only be used once.
             HttpContext.Session.Remove("OrgResetOtp");
             HttpContext.Session.Remove("OrgResetOtpExpiry");
 
@@ -1689,7 +1610,7 @@ namespace ErJobPortal.Controllers
         [HttpPost]
         [ValidateAntiForgeryToken]
         public IActionResult OrganizationResetPassword(
-                            OrganizationResetPassword model)
+            OrganizationResetPassword model)
         {
             string email = model.sEmail?.Trim() ?? "";
 
@@ -1733,9 +1654,10 @@ namespace ErJobPortal.Controllers
                     return View(model);
                 }
 
-                bool updated = _accountRepository.ResetOrganizationPassword(
-                    email,
-                    model.NewPassword);
+                bool updated =
+                    _accountRepository.ResetOrganizationPassword(
+                        email,
+                        model.NewPassword);
 
                 if (!updated)
                 {
@@ -1746,7 +1668,6 @@ namespace ErJobPortal.Controllers
                     return View(model);
                 }
 
-                // Clear verification after a successful password reset.
                 ClearOrganizationResetOtpSession();
 
                 TempData["Success"] =
@@ -1756,8 +1677,9 @@ namespace ErJobPortal.Controllers
             }
             catch (Exception ex)
             {
-                Console.WriteLine(
-                    "Organization Reset Password Error: " + ex);
+                _logger.LogError(
+                    ex,
+                    "Organization password reset failed.");
 
                 ModelState.AddModelError(
                     "",
@@ -2315,28 +2237,12 @@ namespace ErJobPortal.Controllers
         // TPO LOGIN - GET
         // ==========================================================
 
-        //[HttpGet]
-        //public IActionResult TPOLogin()
-        //{
-        //    return View();
-        //}
-        //anam
         [HttpGet]
         public IActionResult TPOLogin()
         {
-            var model = new TPOLogin();
-
-            // Read remembered TPO email from cookie
-            if (Request.Cookies.TryGetValue(
-                "TPORememberEmail", out string? savedEmail))
-            {
-                model.CollegeMailID = savedEmail;
-                model.RememberMe = true;
-            }
-
-            return View(model);
+            return View();
         }
-        //anam end
+
 
         // =========================================================
         // TPO LOGIN - POST
