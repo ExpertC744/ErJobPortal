@@ -3,6 +3,8 @@ using System.Net.Mail;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using ErJobPortal.Services;
+using SendGrid;
+using SendGrid.Helpers.Mail;
 
 namespace ErJobPortal.Services
 {
@@ -17,148 +19,232 @@ namespace ErJobPortal.Services
             _logger = logger;
         }
 
-        public async Task SendSuperAdminLoginDetailsAsync(
-    string email,
-    string password)
+
+
+
+
+
+
+        private async Task SendViaSendGridAsync(MailMessage message)
         {
-            string smtpServer =
-                _configuration["EmailSettings:SmtpServer"] ?? "";
+            ArgumentNullException.ThrowIfNull(message);
 
-            int port =
-                Convert.ToInt32(
-                    _configuration["EmailSettings:Port"] ?? "587");
-
-            string username =
-                _configuration["EmailSettings:Username"] ?? "";
-
-            string smtpPassword =
-                _configuration["EmailSettings:Password"] ?? "";
+            // Read configuration from the SendGrid section.
+            string apiKey =
+                _configuration["SendGrid:ApiKey"] ?? "";
 
             string fromEmail =
-                _configuration["EmailSettings:FromEmail"]
-                ?? username;
+                _configuration["SendGrid:FromEmail"] ?? "";
 
             string fromName =
-                _configuration["EmailSettings:FromName"]
-                ?? "Er Job Portal";
+                _configuration["SendGrid:FromName"] ?? "Er Job Portal";
 
-            using MailMessage message =
-                new MailMessage();
+            if (string.IsNullOrWhiteSpace(apiKey))
+                throw new InvalidOperationException(
+                    "SendGrid API key is missing. Check SendGrid:ApiKey in appsettings.json.");
 
-            message.From =
-                new MailAddress(
-                    fromEmail,
-                    fromName);
+            if (string.IsNullOrWhiteSpace(fromEmail))
+                throw new InvalidOperationException(
+                    "SendGrid sender email is missing.");
 
-            message.To.Add(email);
+            if (message.To.Count == 0)
+                throw new InvalidOperationException(
+                    "Recipient email is missing.");
 
-            message.Subject =
-                "Your Er Job Portal Super Admin Login Details";
+            var client = new SendGridClient(apiKey);
 
-            message.Body = $@"
-Dear Super Admin,
+            var sendGridMessage = new SendGridMessage
+            {
+                Subject = message.Subject ?? ""
+            };
 
-You requested your login details for your Er Job Portal Super Admin account.
+            sendGridMessage.SetFrom(
+                new EmailAddress(fromEmail, fromName));
 
-Your login details are:
+            sendGridMessage.AddTos(
+                message.To.Select(x =>
+                    new EmailAddress(x.Address, x.DisplayName)).ToList());
 
-Email ID: {email}
-Password: {password}
+            if (!string.IsNullOrWhiteSpace(message.Body))
+            {
+                if (message.IsBodyHtml)
+                {
+                    sendGridMessage.HtmlContent = message.Body;
+                }
+                else
+                {
+                    sendGridMessage.PlainTextContent = message.Body;
+                }
+            }
 
-You can use these credentials to login to the Super Admin panel.
+            Response response =
+                await client.SendEmailAsync(sendGridMessage);
 
-Regards,
+            if (!response.IsSuccessStatusCode)
+            {
+                string error =
+                    await response.Body.ReadAsStringAsync();
 
-Er Job Portal Team
-";
+                _logger.LogError(
+                    "SendGrid failed. Status: {Status}, Response: {Error}",
+                    response.StatusCode,
+                    error);
 
-            message.IsBodyHtml = false;
+                throw new InvalidOperationException(
+                    $"SendGrid email failed: {response.StatusCode}");
+            }
 
-            using SmtpClient smtp =
-                new SmtpClient(
-                    smtpServer,
-                    port);
+            _logger.LogInformation(
+                "SendGrid accepted email. Status: {Status}",
+                response.StatusCode);
+        }
 
-            smtp.EnableSsl = true;
 
-            smtp.Credentials =
-                new NetworkCredential(
-                    username,
-                    smtpPassword);
 
-            await smtp.SendMailAsync(message);
+
+
+        public async Task SendSuperAdminLoginDetailsAsync(
+            string email,
+            string password)
+                {
+                    string smtpServer =
+                        _configuration["EmailSettings:SmtpServer"] ?? "";
+
+                    int port =
+                        Convert.ToInt32(
+                            _configuration["EmailSettings:Port"] ?? "587");
+
+                    string username =
+                        _configuration["EmailSettings:Username"] ?? "";
+
+                    string smtpPassword =
+                        _configuration["EmailSettings:Password"] ?? "";
+
+                    string fromEmail =
+                        _configuration["EmailSettings:FromEmail"]
+                        ?? username;
+
+                    string fromName =
+                        _configuration["EmailSettings:FromName"]
+                        ?? "Er Job Portal";
+
+                    using MailMessage message =
+                        new MailMessage();
+
+                    message.From =
+                        new MailAddress(
+                            fromEmail,
+                            fromName);
+
+                    message.To.Add(email);
+
+                    message.Subject =
+                        "Your Er Job Portal Super Admin Login Details";
+
+                    message.Body = $@"
+        Dear Super Admin,
+
+        You requested your login details for your Er Job Portal Super Admin account.
+
+        Your login details are:
+
+        Email ID: {email}
+        Password: {password}
+
+        You can use these credentials to login to the Super Admin panel.
+
+        Regards,
+
+        Er Job Portal Team
+        ";
+
+                    message.IsBodyHtml = false;
+
+                    using SmtpClient smtp =
+                        new SmtpClient(
+                            smtpServer,
+                            port);
+
+                    smtp.EnableSsl = true;
+
+                    smtp.Credentials =
+                        new NetworkCredential(
+                            username,
+                            smtpPassword);
+
+            await SendViaSendGridAsync(message);
         }
 
         public async Task SendOrganizationLoginDetailsAsync(
-    string email,
-    string password)
-        {
-            string smtpServer =
-                _configuration["EmailSettings:SmtpServer"] ?? "";
+            string email,
+            string password)
+                {
+                    string smtpServer =
+                        _configuration["EmailSettings:SmtpServer"] ?? "";
 
-            int port =
-                Convert.ToInt32(
-                    _configuration["EmailSettings:Port"] ?? "587");
+                    int port =
+                        Convert.ToInt32(
+                            _configuration["EmailSettings:Port"] ?? "587");
 
-            string username =
-                _configuration["EmailSettings:Username"] ?? "";
+                    string username =
+                        _configuration["EmailSettings:Username"] ?? "";
 
-            string smtpPassword =
-                _configuration["EmailSettings:Password"] ?? "";
+                    string smtpPassword =
+                        _configuration["EmailSettings:Password"] ?? "";
 
-            string fromEmail =
-                _configuration["EmailSettings:FromEmail"]
-                ?? username;
+                    string fromEmail =
+                        _configuration["EmailSettings:FromEmail"]
+                        ?? username;
 
-            string fromName =
-                _configuration["EmailSettings:FromName"]
-                ?? "Er Job Portal";
+                    string fromName =
+                        _configuration["EmailSettings:FromName"]
+                        ?? "Er Job Portal";
 
-            using MailMessage message =
-                new MailMessage();
+                    using MailMessage message =
+                        new MailMessage();
 
-            message.From =
-                new MailAddress(
-                    fromEmail,
-                    fromName);
+                    message.From =
+                        new MailAddress(
+                            fromEmail,
+                            fromName);
 
-            message.To.Add(email);
+                    message.To.Add(email);
 
-            message.Subject =
-                "Your Er Job Portal Organization Login Details";
+                    message.Subject =
+                        "Your Er Job Portal Organization Login Details";
 
-            message.Body = $@"
-Dear Organization,
+                    message.Body = $@"
+        Dear Organization,
 
-You requested your login details for your Er Job Portal organization account.
+        You requested your login details for your Er Job Portal organization account.
 
-Your login details are:
+        Your login details are:
 
-Email ID: {email}
-Password: {password}
+        Email ID: {email}
+        Password: {password}
 
-You can use these credentials to login to your organization account.
+        You can use these credentials to login to your organization account.
 
-Regards,
+        Regards,
 
-Er Job Portal Team
-";
+        Er Job Portal Team
+        ";
 
-            message.IsBodyHtml = false;
+                    message.IsBodyHtml = false;
 
-            using SmtpClient smtp =
-                new SmtpClient(
-                    smtpServer,
-                    port);
+                    using SmtpClient smtp =
+                        new SmtpClient(
+                            smtpServer,
+                            port);
 
-            smtp.EnableSsl = true;
+                    smtp.EnableSsl = true;
 
-            smtp.Credentials =
-                new NetworkCredential(
-                    username,
-                    smtpPassword);
+                    smtp.Credentials =
+                        new NetworkCredential(
+                            username,
+                            smtpPassword);
 
-            await smtp.SendMailAsync(message);
+            await SendViaSendGridAsync(message);
         }
 
         public async Task SendCandidateLoginDetailsAsync(
@@ -230,7 +316,7 @@ Er Job Portal Team
                     username,
                     smtpPassword);
 
-            await smtp.SendMailAsync(message);
+            await SendViaSendGridAsync(message);
         }
 
         // =========================================================
@@ -478,7 +564,7 @@ Er Job Portal Team
                         username,
                         smtpPassword);
 
-                await smtp.SendMailAsync(message);
+                await SendViaSendGridAsync(message);
             }
             catch (SmtpException ex)
             {
@@ -510,87 +596,87 @@ Er Job Portal Team
         //TPO FORGOT PASSWORD
 
         public async Task SendTPOLoginDetailsAsync(
-    string email,
-    string password)
-        {
-            string smtpServer =
-                _configuration["EmailSettings:SmtpServer"] ?? "";
+            string email,
+            string password)
+                {
+                    string smtpServer =
+                        _configuration["EmailSettings:SmtpServer"] ?? "";
 
-            int port =
-                Convert.ToInt32(
-                    _configuration["EmailSettings:Port"] ?? "587");
+                    int port =
+                        Convert.ToInt32(
+                            _configuration["EmailSettings:Port"] ?? "587");
 
-            string username =
-                _configuration["EmailSettings:Username"] ?? "";
+                    string username =
+                        _configuration["EmailSettings:Username"] ?? "";
 
-            string smtpPassword =
-                _configuration["EmailSettings:Password"] ?? "";
+                    string smtpPassword =
+                        _configuration["EmailSettings:Password"] ?? "";
 
-            string fromEmail =
-                _configuration["EmailSettings:FromEmail"]
-                ?? username;
+                    string fromEmail =
+                        _configuration["EmailSettings:FromEmail"]
+                        ?? username;
 
-            string fromName =
-                _configuration["EmailSettings:FromName"]
-                ?? "Er Job Portal";
-
-
-            using MailMessage message =
-                new MailMessage();
+                    string fromName =
+                        _configuration["EmailSettings:FromName"]
+                        ?? "Er Job Portal";
 
 
-            message.From =
-                new MailAddress(
-                    fromEmail,
-                    fromName);
+                    using MailMessage message =
+                        new MailMessage();
 
 
-            message.To.Add(email);
+                    message.From =
+                        new MailAddress(
+                            fromEmail,
+                            fromName);
 
 
-            message.Subject =
-                "Your Er Job Portal TPO Login Credentials";
+                    message.To.Add(email);
 
 
-            message.Body = $@"
-Dear TPO,
-
-You requested your login credentials for your Er Job Portal TPO account.
-
-Your login details are:
-
-College Email ID: {email}
-Temporary Password: {password}
-
-You can use these credentials to login to your TPO account.
-
-For security reasons, please change your password after logging in.
-
-Regards,
-
-Er Job Portal Team
-";
+                    message.Subject =
+                        "Your Er Job Portal TPO Login Credentials";
 
 
-            message.IsBodyHtml = false;
+                    message.Body = $@"
+        Dear TPO,
+
+        You requested your login credentials for your Er Job Portal TPO account.
+
+        Your login details are:
+
+        College Email ID: {email}
+        Temporary Password: {password}
+
+        You can use these credentials to login to your TPO account.
+
+        For security reasons, please change your password after logging in.
+
+        Regards,
+
+        Er Job Portal Team
+        ";
 
 
-            using SmtpClient smtp =
-                new SmtpClient(
-                    smtpServer,
-                    port);
+                    message.IsBodyHtml = false;
 
 
-            smtp.EnableSsl = true;
+                    using SmtpClient smtp =
+                        new SmtpClient(
+                            smtpServer,
+                            port);
 
 
-            smtp.Credentials =
-                new NetworkCredential(
-                    username,
-                    smtpPassword);
+                    smtp.EnableSsl = true;
 
 
-            await smtp.SendMailAsync(message);
+                    smtp.Credentials =
+                        new NetworkCredential(
+                            username,
+                            smtpPassword);
+
+
+            await SendViaSendGridAsync(message);
         }
 
         // shrirang 10/10/26
@@ -636,7 +722,7 @@ Er Job Portal Team
                 Credentials = new NetworkCredential(username, smtpPassword)
             };
 
-            await smtp.SendMailAsync(message);
+            await SendViaSendGridAsync(message);
         }
 
 
@@ -766,7 +852,7 @@ Er Job Portal Team
                 Timeout = 30000
             };
 
-            await smtp.SendMailAsync(message);
+            await SendViaSendGridAsync(message);
 
             _logger.LogInformation(
                 "Application email sent to {Email} with subject {Subject}.",
@@ -867,7 +953,7 @@ Er Job Portal Team
                     Timeout = 30000
                 };
 
-                await smtp.SendMailAsync(message);
+                await SendViaSendGridAsync(message);
 
                 _logger.LogInformation(
                     "Status email accepted by SMTP for recipient {Email}.",
@@ -900,81 +986,230 @@ Er Job Portal Team
         }
 
 
-        public async Task SendOrganizationProfileStatusEmailAsync(
-string email,
-string organizationName,
-bool isEnabled)
+
+
+
+        public async Task SendOrganizationStatusEmailAsync(
+            string email,
+            string organizationName,
+            bool isEnabled)
         {
+            if (string.IsNullOrWhiteSpace(email))
+                throw new ArgumentException(
+                    "Organization email is required.", nameof(email));
+
             string smtpServer = _configuration["EmailSettings:SmtpServer"] ?? "";
             int port = Convert.ToInt32(_configuration["EmailSettings:Port"] ?? "587");
             string username = _configuration["EmailSettings:Username"] ?? "";
-            string password = _configuration["EmailSettings:Password"] ?? "";
+            string smtpPassword = _configuration["EmailSettings:Password"] ?? "";
             string fromEmail = _configuration["EmailSettings:FromEmail"] ?? username;
-            string fromName = _configuration["EmailSettings:FromName"] ?? "ErJobPortal";
+            string fromName = _configuration["EmailSettings:FromName"] ?? "Er Job Portal";
 
-            if (string.IsNullOrWhiteSpace(email))
-            {
-                throw new ArgumentException(
-                    "Organization email is required.", nameof(email));
-            }
+            // Email subject
+            string subject = isEnabled
+                ? "Your Er Job Portal Organization Account Has Been Enabled"
+                : "Your Er Job Portal Organization Account Has Been Disabled";
 
-            if (string.IsNullOrWhiteSpace(smtpServer) ||
-                string.IsNullOrWhiteSpace(fromEmail) ||
-                string.IsNullOrWhiteSpace(username) ||
-                string.IsNullOrWhiteSpace(password))
-            {
-                throw new InvalidOperationException(
-                    "Email SMTP settings are missing in appsettings.json.");
-            }
-
+            // Secure organization name
             string safeName = WebUtility.HtmlEncode(
-                string.IsNullOrWhiteSpace(organizationName)
-                    ? "Organization"
-                    : organizationName);
+                organizationName ?? "Organization");
 
-            string statusText = isEnabled ? "Enabled" : "Disabled";
+            // Status message
+            string statusMessage = isEnabled
+                ? "Your organization account has been enabled by the Super Admin. You can now access your Er Job Portal organization account and continue using the available services."
+                : "Your organization account has been disabled by the Super Admin. Access to your organization account and related services may now be restricted.";
+
+            string safeMessage = WebUtility.HtmlEncode(statusMessage);
+
+            // Additional message
+            string additionalMessage = isEnabled
+                ? "Thank you for being part of Er Job Portal. We look forward to continuing our association with your organization."
+                : "If you believe this action was taken by mistake, please contact the Er Job Portal administration team for further assistance.";
+
+            string safeAdditionalMessage =
+                WebUtility.HtmlEncode(additionalMessage);
 
             using var message = new MailMessage();
 
             message.From = new MailAddress(fromEmail, fromName);
             message.To.Add(email.Trim());
-
-            message.Subject = isEnabled
-                ? "ErJobPortal - Organization Profile Enabled"
-                : "ErJobPortal - Organization Profile Disabled";
-
+            message.Subject = subject;
             message.IsBodyHtml = true;
 
+            // HTML Email Template
             message.Body = $@"
 <!DOCTYPE html>
 <html>
-<body style='font-family:Arial,sans-serif;color:#333;'>
-    <div style='max-width:600px;margin:auto;padding:20px;border:1px solid #ddd;border-radius:8px;'>
-        <h2 style='color:#2457a7;'>ErJobPortal</h2>
+<head>
+    <meta charset='UTF-8'>
+</head>
 
-        <p>Hello {safeName},</p>
+<body style='margin:0;padding:20px;background:#f5f7fa;
+             font-family:Arial,Helvetica,sans-serif;'>
 
-        <p>Your organization profile status has been updated.</p>
+    <div style='max-width:600px;margin:auto;background:#fff;
+                border:1px solid #e2e8f0;border-radius:10px;overflow:hidden;'>
 
-        <p>Current status: <strong>{statusText}</strong></p>
+        <div style='background:#0d9488;padding:22px;text-align:center;'>
+            <h2 style='color:#fff;margin:0;'>Er Job Portal</h2>
+        </div>
 
-        {(isEnabled
-                    ? "<p>Your organization profile is now enabled.</p>"
-                    : "<p>Your organization profile is now disabled. Please contact the administrator if you believe this is an error.</p>")}
+        <div style='padding:28px;'>
 
-        <p>Regards,<br/>ErJobPortal Team</p>
+            <p>Dear <strong>{safeName}</strong>,</p>
+
+            <h3 style='color:{(isEnabled ? "#198754" : "#dc3545")};'>
+                Organization Account {(isEnabled ? "Enabled" : "Disabled")}
+            </h3>
+
+            <p style='color:#555;font-size:14px;line-height:1.8;'>
+                {safeMessage}
+            </p>
+
+            <p style='color:#555;font-size:14px;line-height:1.8;'>
+                {safeAdditionalMessage}
+            </p>
+
+            <p>
+                Regards,<br>
+                <strong>Er Job Portal Team</strong>
+            </p>
+
+        </div>
+
+        <div style='background:#f8fafc;padding:14px;text-align:center;'>
+            <p style='margin:0;color:#888;font-size:12px;'>
+                This is an automated email. Please do not reply directly.
+            </p>
+        </div>
+
     </div>
+
 </body>
 </html>";
 
-            using var smtp = new SmtpClient(smtpServer, port)
+            try
             {
-                EnableSsl = true,
-                UseDefaultCredentials = false,
-                Credentials = new NetworkCredential(username, password)
-            };
+                using var smtp = new SmtpClient(smtpServer, port)
+                {
+                    EnableSsl = bool.TryParse(
+                        _configuration["EmailSettings:EnableSsl"],
+                        out bool enableSsl) && enableSsl,
 
-            await smtp.SendMailAsync(message);
+                    UseDefaultCredentials = false,
+                    Credentials = new NetworkCredential(username, smtpPassword),
+                    DeliveryMethod = SmtpDeliveryMethod.Network,
+                    Timeout = 30000
+                };
+
+                // Send email using existing SendGrid method
+                await SendViaSendGridAsync(message);
+
+                _logger.LogInformation(
+                    "Organization status email accepted for recipient {Email}.",
+                    email);
+            }
+            catch (SmtpException ex)
+            {
+                _logger.LogError(
+                    ex,
+                    "SMTP error sending organization status email to {Email}. StatusCode: {StatusCode}; Details: {Details}",
+                    email,
+                    ex.StatusCode,
+                    ex.Message);
+
+                throw;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(
+                    ex,
+                    "Unexpected error sending organization status email to {Email}.",
+                    email);
+
+                throw;
+            }
+        }
+
+
+
+
+
+        public async Task SendOrganizationProfileStatusEmailAsync(
+            string email,
+            string organizationName,
+            bool isEnabled)
+                    {
+                        string smtpServer = _configuration["EmailSettings:SmtpServer"] ?? "";
+                        int port = Convert.ToInt32(_configuration["EmailSettings:Port"] ?? "587");
+                        string username = _configuration["EmailSettings:Username"] ?? "";
+                        string password = _configuration["EmailSettings:Password"] ?? "";
+                        string fromEmail = _configuration["EmailSettings:FromEmail"] ?? username;
+                        string fromName = _configuration["EmailSettings:FromName"] ?? "ErJobPortal";
+
+                        if (string.IsNullOrWhiteSpace(email))
+                        {
+                            throw new ArgumentException(
+                                "Organization email is required.", nameof(email));
+                        }
+
+                        if (string.IsNullOrWhiteSpace(smtpServer) ||
+                            string.IsNullOrWhiteSpace(fromEmail) ||
+                            string.IsNullOrWhiteSpace(username) ||
+                            string.IsNullOrWhiteSpace(password))
+                        {
+                            throw new InvalidOperationException(
+                                "Email SMTP settings are missing in appsettings.json.");
+                        }
+
+                        string safeName = WebUtility.HtmlEncode(
+                            string.IsNullOrWhiteSpace(organizationName)
+                                ? "Organization"
+                                : organizationName);
+
+                        string statusText = isEnabled ? "Enabled" : "Disabled";
+
+                        using var message = new MailMessage();
+
+                        message.From = new MailAddress(fromEmail, fromName);
+                        message.To.Add(email.Trim());
+
+                        message.Subject = isEnabled
+                            ? "ErJobPortal - Organization Profile Enabled"
+                            : "ErJobPortal - Organization Profile Disabled";
+
+                        message.IsBodyHtml = true;
+
+                        message.Body = $@"
+            <!DOCTYPE html>
+            <html>
+            <body style='font-family:Arial,sans-serif;color:#333;'>
+                <div style='max-width:600px;margin:auto;padding:20px;border:1px solid #ddd;border-radius:8px;'>
+                    <h2 style='color:#2457a7;'>ErJobPortal</h2>
+
+                    <p>Hello {safeName},</p>
+
+                    <p>Your organization profile status has been updated.</p>
+
+                    <p>Current status: <strong>{statusText}</strong></p>
+
+                    {(isEnabled
+                                ? "<p>Your organization profile is now enabled.</p>"
+                                : "<p>Your organization profile is now disabled. Please contact the administrator if you believe this is an error.</p>")}
+
+                    <p>Regards,<br/>ErJobPortal Team</p>
+                </div>
+            </body>
+            </html>";
+
+                        using var smtp = new SmtpClient(smtpServer, port)
+                        {
+                            EnableSsl = true,
+                            UseDefaultCredentials = false,
+                            Credentials = new NetworkCredential(username, password)
+                        };
+
+            await SendViaSendGridAsync(message);
         }
 
 
@@ -1075,7 +1310,7 @@ bool isEnabled)
                     "Sending candidate OTP email to {Email}.",
                     email);
 
-                await smtp.SendMailAsync(message);
+                await SendViaSendGridAsync(message);
 
                 _logger.LogInformation(
                     "Candidate OTP email sent successfully to {Email}.",
@@ -1105,51 +1340,34 @@ bool isEnabled)
 
 
         // khushi 16-10-26
+
+
         public async Task SendOrganizationOtpEmailAsync(
-       string email,
-       string otp,
-       string purpose = "registration")
+            string email,
+            string otp,
+            string purpose = "registration")
         {
-            string smtpServer =
-                _configuration["EmailSettings:SmtpServer"] ?? "";
+            if (string.IsNullOrWhiteSpace(email))
+                throw new ArgumentException("Recipient email is required.");
 
-            string portValue =
-                _configuration["EmailSettings:Port"] ?? "587";
+            if (string.IsNullOrWhiteSpace(otp))
+                throw new ArgumentException("OTP is required.");
 
-            string username =
-                _configuration["EmailSettings:Username"] ?? "";
-
-            string password =
-                _configuration["EmailSettings:Password"] ?? "";
-
-            string fromEmail =
-                _configuration["EmailSettings:FromEmail"] ?? "";
-
-            string fromName =
-                _configuration["EmailSettings:FromName"] ?? "Er Job Portal";
-
-            if (string.IsNullOrWhiteSpace(smtpServer) ||
-                string.IsNullOrWhiteSpace(username) ||
-                string.IsNullOrWhiteSpace(password) ||
-                string.IsNullOrWhiteSpace(fromEmail))
-            {
-                throw new InvalidOperationException(
-                    "EmailSettings are missing or incomplete in configuration.");
-            }
-
-            if (!int.TryParse(portValue, out int port))
-            {
-                throw new InvalidOperationException(
-                    "EmailSettings:Port must be a valid number.");
-            }
-
-            bool isPasswordReset =
-                string.Equals(
-                    purpose,
-                    "password-reset",
-                    StringComparison.OrdinalIgnoreCase);
+            bool isPasswordReset = string.Equals(
+                purpose,
+                "password-reset",
+                StringComparison.OrdinalIgnoreCase);
 
             using var message = new MailMessage();
+
+            string fromEmail =
+                _configuration["EmailSettings:FromEmail"]
+                ?? throw new InvalidOperationException(
+                    "Sender email is not configured.");
+
+            string fromName =
+                _configuration["EmailSettings:FromName"]
+                ?? "Er Job Portal";
 
             message.From = new MailAddress(fromEmail, fromName);
             message.To.Add(new MailAddress(email));
@@ -1162,40 +1380,19 @@ bool isEnabled)
                 ? "Dear Organization,\n\n" +
                   $"Your OTP to reset your organization account password is: {otp}\n\n" +
                   "This OTP is valid for 10 minutes. Please do not share it with anyone.\n\n" +
-                  "If you did not request a password reset, you can ignore this email.\n\n" +
+                  "If you did not request a password reset, ignore this email.\n\n" +
                   "Regards,\nEr Job Portal Team"
                 : "Dear Organization,\n\n" +
                   $"Your OTP for verifying your organization email address is: {otp}\n\n" +
                   "This OTP is valid for 10 minutes. Please do not share it with anyone.\n\n" +
-                  "Enter this OTP on the organization registration page to complete your email verification.\n\n" +
                   "Regards,\nEr Job Portal Team";
 
-            using var smtp = new SmtpClient(smtpServer, port)
-            {
-                Credentials = new NetworkCredential(username, password),
-                EnableSsl = true,
-                DeliveryMethod = SmtpDeliveryMethod.Network,
-                Timeout = 20000
-            };
+            message.IsBodyHtml = false;
 
-            try
-            {
-                _logger.LogInformation(
-                    "Sending organization OTP email to {Email}", email);
-
-                await smtp.SendMailAsync(message);
-
-                _logger.LogInformation(
-                    "Organization OTP email sent successfully to {Email}", email);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(
-                    ex, "Failed to send organization OTP email to {Email}", email);
-
-                throw;
-            }
+            // Send email through SendGrid (not SMTP).
+            await SendViaSendGridAsync(message);
         }
+
 
 
 
@@ -1272,16 +1469,8 @@ bool isEnabled)
             <small>Er Job Portal — Authorized Super Admin Access</small>
         </div>";
 
-            using var client = new System.Net.Mail.SmtpClient(
-                smtpServer, port);
-
-            client.EnableSsl = true;
-            client.Credentials =
-                new System.Net.NetworkCredential(username, password);
-
-            await client.SendMailAsync(message);
+            await SendViaSendGridAsync(message);
         }
-
 
 
         public async Task SendTPOOtpEmailAsync(string email, string otp)
@@ -1354,7 +1543,7 @@ bool isEnabled)
                 _logger.LogInformation(
                     "Sending TPO OTP email to {Email}", email);
 
-                await smtp.SendMailAsync(message);
+                await SendViaSendGridAsync(message);
 
                 _logger.LogInformation(
                     "TPO OTP email sent successfully to {Email}", email);
@@ -1608,72 +1797,30 @@ bool isEnabled)
         // =========================================================
         // COMMON SMTP SENDER FOR TPO EMAILS
         // =========================================================
+
         private async Task SendTPOEmailMessageAsync(
             MailMessage message,
             string recipientEmail)
         {
-            string smtpServer =
-                _configuration["EmailSettings:SmtpServer"] ?? "";
-
-            string username =
-                _configuration["EmailSettings:Username"] ?? "";
-
-            string smtpPassword =
-                _configuration["EmailSettings:Password"] ?? "";
-
-            string portValue =
-                _configuration["EmailSettings:Port"] ?? "587";
-
-            bool enableSsl = bool.TryParse(
-                _configuration["EmailSettings:EnableSsl"],
-                out bool configuredSsl)
-                ? configuredSsl
-                : true;
-
-            if (string.IsNullOrWhiteSpace(smtpServer) ||
-                string.IsNullOrWhiteSpace(username) ||
-                string.IsNullOrWhiteSpace(smtpPassword))
-            {
-                throw new InvalidOperationException(
-                    "SMTP settings are missing. Check EmailSettings in configuration.");
-            }
-
-            if (!int.TryParse(portValue, out int port) ||
-                port < 1 || port > 65535)
-            {
-                throw new InvalidOperationException(
-                    "EmailSettings:Port must be a valid port number.");
-            }
-
-            using var smtpClient = new SmtpClient(smtpServer, port)
-            {
-                EnableSsl = enableSsl,
-                UseDefaultCredentials = false,
-                Credentials = new NetworkCredential(
-                    username,
-                    smtpPassword),
-                DeliveryMethod = SmtpDeliveryMethod.Network,
-                Timeout = 30000
-            };
-
             try
             {
-                await smtpClient.SendMailAsync(message);
+                await SendViaSendGridAsync(message);
 
                 _logger.LogInformation(
-                    "TPO notification email sent to {RecipientEmail}.",
+                    "TPO email accepted by SendGrid for {Email}",
                     recipientEmail);
             }
             catch (Exception ex)
             {
                 _logger.LogError(
                     ex,
-                    "Failed to send TPO notification email to {RecipientEmail}.",
+                    "SendGrid failed for TPO email: {Email}",
                     recipientEmail);
 
                 throw;
             }
         }
+
 
 
 
