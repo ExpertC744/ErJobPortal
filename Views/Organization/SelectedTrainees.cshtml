@@ -9,13 +9,27 @@
     string orgCode = ViewBag.OrgCode?.ToString() ?? "";
 }
 
+<!-- FONT AWESOME -->
+<link rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
+
+<!-- DATATABLE CSS -->
+<link rel="stylesheet"
+      href="https://cdn.datatables.net/1.13.8/css/jquery.dataTables.min.css" />
+
+
 <div class="container-fluid selected-trainees-page">
 
     <div class="master-table-container">
 
-        <!-- PAGE HEADER -->
+        <!-- =================================
+             PAGE HEADER
+        ================================== -->
+
         <div class="master-table-title">
+
             <div>
+
                 <h1>
                     Selected Trainees
                 </h1>
@@ -23,68 +37,56 @@
                 <p>
                     @orgCode
                 </p>
+
             </div>
 
             <a asp-controller="Organization"
                asp-action="Dashboard"
                class="master-back-btn"
                title="Back to Dashboard">
+
                 <i class="fas fa-arrow-left"></i>
+
             </a>
+
         </div>
 
-        <!-- TABLE AREA -->
-        <div class="table-responsive">
 
-            <!-- Your existing table code here -->
+        <!-- =================================
+             TABLE WRAPPER
+        ================================== -->
 
+        <div class="selected-trainees-table-wrapper">
 
-    
-
-
-
-
-            <!-- TABLE -->
             <table id="selectedTraineesTable"
-                   class="master-data-table">
+                   class="master-data-table"
+                   style="width:100%;">
 
+                <!-- TABLE HEADER -->
                 <thead>
 
                     <tr>
 
-                        <th>
-                            Sr. No
-                        </th>
+                        <th>Sr. No</th>
 
-                        <th>
-                            Post Date
-                        </th>
+                        <th>Post Date</th>
 
-                        <th>
-                            Position
-                        </th>
+                        <th>Position</th>
 
-                        <th>
-                            Name
-                        </th>
+                        <th>Name</th>
 
-                        <th>
-                            Email ID
-                        </th>
+                        <th>Email ID</th>
 
-                        <th>
-                            Skills
-                        </th>
+                        <th>Skills</th>
 
-                        <th>
-                            View Resume
-                        </th>
+                        <th>View Resume</th>
 
                     </tr>
 
                 </thead>
 
 
+                <!-- TABLE BODY -->
                 <tbody>
 
                     @if (Model != null && Model.Any())
@@ -93,87 +95,76 @@
                         {
                             <tr>
 
-                                <!-- Sr. No -->
+                                <!-- SR NO -->
                                 <td class="master-id text-center">
+
                                     @item.SrNo
+
                                 </td>
 
 
-                                <!-- Post Date -->
+                                <!-- POST DATE -->
                                 <td>
-                                    @if (item.PostDate.HasValue)
-                                    {
-                                        @item.PostDate.Value.ToString("dd-MM-yyyy")
-                                    }
-                                    else
-                                    {
-                                        <span>NA</span>
-                                    }
+
+                                    @(item.PostDate.HasValue
+                                                                ? item.PostDate.Value.ToString("dd-MM-yyyy")
+                                                                : "NA")
+
                                 </td>
 
 
-                                <!-- Position -->
+                                <!-- POSITION -->
                                 <td>
-                                    @if (!string.IsNullOrWhiteSpace(item.PositionName))
-                                    {
-                                        @item.PositionName
-                                    }
-                                    else
-                                    {
-                                        <span>NA</span>
-                                    }
+
+                                    @(string.IsNullOrWhiteSpace(item.PositionName)
+                                                                ? "NA"
+                                                                : item.PositionName)
+
                                 </td>
 
 
-                                <!-- Candidate Name -->
+                                <!-- CANDIDATE NAME -->
                                 <td>
-                                    @if (!string.IsNullOrWhiteSpace(item.TraineeName))
-                                    {
-                                        @item.TraineeName
-                                    }
-                                    else
-                                    {
-                                        <span>NA</span>
-                                    }
+
+                                    @(string.IsNullOrWhiteSpace(item.TraineeName)
+                                                                ? "NA"
+                                                                : item.TraineeName)
+
                                 </td>
 
 
-                                <!-- Email -->
+                                <!-- EMAIL -->
                                 <td>
-                                    @if (!string.IsNullOrWhiteSpace(item.EmailID))
-                                    {
-                                        @item.EmailID
-                                    }
-                                    else
-                                    {
-                                        <span>NA</span>
-                                    }
+
+                                    @(string.IsNullOrWhiteSpace(item.EmailID)
+                                                                ? "NA"
+                                                                : item.EmailID)
+
                                 </td>
 
 
-                                <!-- Skills -->
+                                <!-- SKILLS -->
                                 <td>
-                                    @if (!string.IsNullOrWhiteSpace(item.TraineeSkills))
-                                    {
-                                        @item.TraineeSkills
-                                    }
-                                    else
-                                    {
-                                        <span>NA</span>
-                                    }
-                                </td>
+
+                                    @(string.IsNullOrWhiteSpace(item.TraineeSkills)
+                                                                ? "NA"
+                                                                : item.TraineeSkills)
+
+                        </td>
 
 
-                                <!-- View Resume -->
+                                <!-- VIEW RESUME -->
                                 <td class="resume-column text-center">
 
-                                    @if (item.ResumeCandidateID > 0)
+                            @if (item.ResumeCandidateID > 0)
                                     {
                                         <a asp-controller="Resume"
                                            asp-action="Resume"
                                            asp-route-id="@item.ResumeCandidateID"
                                            class="resume-view-btn"
-                                           title="View Resume">
+                                           title="View Resume"
+                                           target="_blank"
+                                           rel="noopener noreferrer">
 
                                             <i class="fas fa-eye"></i>
 
@@ -189,19 +180,6 @@
                             </tr>
                         }
                     }
-                    else
-                    {
-                        <tr>
-
-                            <td colspan="7"
-                                class="text-center">
-
-                                No selected trainees found.
-
-                            </td>
-
-                        </tr>
-                    }
 
                 </tbody>
 
@@ -210,9 +188,12 @@
         </div>
 
 
-        <!-- PAGE INFORMATION -->
+        <!-- =================================
+             PAGE INFORMATION
+        ================================== -->
+
         <div id="selectedTraineesPageInfo"
-             class="master-page-info d-none">
+             class="master-page-info text-center d-none">
         </div>
 
     </div>
@@ -220,66 +201,287 @@
 </div>
 
 
-<script>
+<!-- ==========================================
+     CUSTOM CSS
+========================================== -->
 
-    $(document).ready(function () {
+<style>
 
-        $('#selectedTraineesTable').DataTable({
+    /* MAIN CONTAINER */
+    .selected-trainees-page {
+        width: 100%;
+    }
 
-            pageLength: 25,
+    /* TABLE WRAPPER */
+    .selected-trainees-table-wrapper {
+        width: 100%;
+        max-width: 100%;
+        overflow-x: auto;
+    }
 
-            lengthMenu: [
-                [10, 25, 50, 100],
-                [10, 25, 50, 100]
-            ],
+    /* DATATABLE MAIN WRAPPER */
+    #selectedTraineesTable_wrapper {
+        width: 100%;
+        max-width: 100%;
+    }
 
-            searching: true,
+    /* TABLE */
+    #selectedTraineesTable {
+        width: 100% !important;
+        border-collapse: separate !important;
+        border-spacing: 0 8px !important;
+        table-layout: auto;
+    }
 
-            ordering: true,
+        /* TABLE HEADER */
+        #selectedTraineesTable thead th {
+            text-align: center;
+            vertical-align: middle;
+            white-space: nowrap;
+            padding: 15px 12px;
+        }
 
-            paging: true,
+        /* TABLE BODY */
+        #selectedTraineesTable tbody td {
+            text-align: center;
+            vertical-align: middle;
+            padding: 15px 12px;
+        }
 
-            info: true,
+            /* EMPTY TABLE MESSAGE */
+            #selectedTraineesTable tbody td.dataTables_empty {
+                background: #f1f7f5 !important;
+                color: #333 !important;
+                text-align: center !important;
+                padding: 25px !important;
+                border: none !important;
+                font-size: 16px;
+                border-radius: 0 0 8px 8px;
+            }
 
-            autoWidth: false,
+        /* EMPTY ROW */
+        #selectedTraineesTable tbody tr:has(td.dataTables_empty) {
+            background: transparent !important;
+            box-shadow: none !important;
+        }
 
-            responsive: true,
+            /* REMOVE EXTRA ROW BACKGROUND */
+            #selectedTraineesTable tbody tr:has(td.dataTables_empty):hover {
+                background: transparent !important;
+            }
 
-            columnDefs: [
+    /* RESUME BUTTON */
+    .resume-view-btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 36px;
+        height: 36px;
+        border-radius: 6px;
+        color: #197d68;
+        text-decoration: none;
+        transition: 0.2s ease;
+    }
 
-                {
-                    targets: 0,
-                    className: "text-center"
-                },
+        .resume-view-btn:hover {
+            background: #e5f4ef;
+            color: #116653;
+        }
 
-                {
-                    targets: 6,
-                    className: "text-center",
-                    orderable: false
-                }
+    /* SEARCH BOX */
+    #selectedTraineesTable_wrapper .dataTables_filter input {
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        padding: 9px 12px;
+        outline: none;
+        margin-left: 8px;
+    }
 
-            ],
+        #selectedTraineesTable_wrapper .dataTables_filter input:focus {
+            border-color: #197d68;
+        }
 
-            language: {
+    /* ENTRIES DROPDOWN */
+    #selectedTraineesTable_wrapper .dataTables_length select {
+        border: 1px solid #ddd;
+        border-radius: 7px;
+        padding: 7px;
+    }
 
-                search: "",
+    /* PAGINATION */
+    #selectedTraineesTable_wrapper .dataTables_paginate {
+        margin-top: 10px;
+    }
 
-                searchPlaceholder: "Search...",
+    /* PAGE INFO */
+    #selectedTraineesTable_wrapper .dataTables_info {
+        padding-top: 15px;
+    }
 
-                lengthMenu: "_MENU_ entries per page",
+    @@media (max-width: 768px) {
 
-                emptyTable: "No selected trainees found",
+        .selected-trainees-table-wrapper {
+            overflow-x: auto;
+        }
 
-                zeroRecords: "No matching records found",
+        #selectedTraineesTable {
+            min-width: 850px !important;
+        }
 
-                info: "Showing _START_ to _END_ of _TOTAL_ entries",
+        #selectedTraineesTable_wrapper .dataTables_filter {
+            float: none;
+            text-align: left;
+            margin-bottom: 12px;
+        }
 
-                infoEmpty: "Showing 0 to 0 of 0 entries"
+        #selectedTraineesTable_wrapper .dataTables_length {
+            float: none;
+            margin-bottom: 12px;
+        }
+    }
+  </style>
+
+
+<!-- ==========================================
+     DATATABLE JAVASCRIPT
+========================================== -->
+@section Scripts {
+
+    <!--
+       IMPORTANT:
+       jQuery should already be loaded in _DashboardLayout.cshtml.
+       Do not load jQuery again here.
+    -->
+
+    <script src="https://cdn.datatables.net/1.13.8/js/jquery.dataTables.min.js"></script>
+
+
+    <script>
+
+        $(document).ready(function () {
+
+            // CHECK JQUERY
+            if (typeof jQuery === "undefined") {
+
+                console.error("jQuery is not loaded.");
+
+                return;
+            }
+
+
+            // CHECK DATATABLE
+            if (!$.fn.DataTable) {
+
+                console.error("DataTables is not loaded.");
+
+                return;
+            }
+
+
+            // PREVENT DUPLICATE INITIALIZATION
+            if ($.fn.DataTable.isDataTable('#selectedTraineesTable')) {
+
+                $('#selectedTraineesTable')
+                    .DataTable()
+                    .destroy();
 
             }
 
+
+            // INITIALIZE DATATABLE
+            $('#selectedTraineesTable').DataTable({
+
+                // BASIC SETTINGS
+                paging: true,
+
+                searching: true,
+
+                ordering: true,
+
+                info: true,
+
+                autoWidth: false,
+
+                // NO DUPLICATE HEADER
+                scrollX: false,
+
+                responsive: false,
+
+                // PAGINATION
+                pageLength: 10,
+
+                lengthMenu: [
+                    [10, 25, 50, 100],
+                    [10, 25, 50, 100]
+                ],
+
+                // DEFAULT ORDER
+                order: [],
+
+                // COLUMN SETTINGS
+                columnDefs: [
+
+                    {
+                        targets: 0,
+                        orderable: false,
+                        className: "text-center"
+                    },
+
+                    {
+                        targets: 6,
+                        orderable: false,
+                        searchable: false,
+                        className: "text-center"
+                    }
+
+                ],
+
+                // LANGUAGE
+                language: {
+
+                    search: "",
+
+                    searchPlaceholder: "Search...",
+
+                    lengthMenu: "_MENU_ entries per page",
+
+                    emptyTable: "No selected trainees found.",
+
+                    zeroRecords: "No matching trainees found.",
+
+                    info: "Showing _START_ to _END_ of _TOTAL_ entries",
+
+                    infoEmpty: "Showing 0 to 0 of 0 entries",
+
+                    paginate: {
+
+                        previous: "<",
+
+                        next: ">"
+
+                    }
+
+                },
+
+                // INITIALIZATION
+                initComplete: function () {
+
+                    this.api().columns.adjust();
+
+                },
+
+                // AFTER EACH DRAW
+                drawCallback: function () {
+
+                    this.api().columns.adjust();
+
+                }
+
+            });
+
+
         });
 
-    });
+    </script>
 
-</script>
+}

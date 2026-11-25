@@ -171,6 +171,33 @@ namespace ErJobPortal.Controllers
             }
 
             // =========================================================
+            // OPEN JOB OPENINGS COUNT - ANAM
+            // =========================================================
+
+            int totalJobOpenings = 0;
+
+            using (SqlConnection con = new SqlConnection(connectionString))
+            {
+                string query = @"
+SELECT COUNT(nID)
+FROM dbo.tblPost
+WHERE ISNULL(nBit, 1) = 1
+AND ISNULL(nSABit, 1) = 1;";
+
+                using (SqlCommand cmd = new SqlCommand(query, con))
+                {
+                    con.Open();
+
+                    totalJobOpenings = Convert.ToInt32(
+                        cmd.ExecuteScalar()
+                    );
+                }
+            }
+
+            ViewBag.TotalJobOpenings = totalJobOpenings;
+            //anam end OPEN JOB OPENINGS COUNT 
+
+            // =========================================================
             // ORGANIZATION LIST
             // =========================================================
 
@@ -3454,6 +3481,10 @@ namespace ErJobPortal.Controllers
             return View(model);
         }
 
+
+
+
+
         // shrirang 29/09/26
         // =========================================================
         // GET CAREER OBJECTIVE DRAFTS
@@ -4432,6 +4463,100 @@ ORDER BY
 
             return posts;
         }
+
+        // =============================================================
+        // GET ALL ACTIVE ORGANIZATION POSTS FOR CANDIDATE//anam
+        // =============================================================
+
+        [HttpGet]
+
+
+        private List<OrgPostM> GetAllOrganizationPostsForCandidate()
+        {
+            List<OrgPostM> posts = new List<OrgPostM>();
+
+            string connectionString =
+                _configuration.GetConnectionString("DefaultConnection")!;
+
+            using (SqlConnection con = new SqlConnection(connectionString))
+            {
+                string query = @"
+     SELECT
+         p.nID AS PostID,
+         p.nOrgID AS OrgID,
+
+         org.sOrgName AS OrganizationName,
+
+         pos.sName AS PositionName,
+
+         p.sCountryName AS Country,
+         p.sStateName AS State,
+         p.nCityName AS City,
+
+         typ.sName AS InternshipFellowshipType,
+
+         p.sFacilities AS Facilities
+
+     FROM dbo.tblPost AS p
+
+     LEFT JOIN dbo.tblOrgRegistration AS org
+         ON org.nID = p.nOrgID
+
+     LEFT JOIN dbo.tblPositions AS pos
+         ON pos.nId = p.nPositionID
+
+     LEFT JOIN dbo.tblInternshipFellowshipType AS typ
+         ON typ.nID = p.nInternshipFellowshipTypeID
+
+     WHERE
+         ISNULL(p.nBit, 1) = 1
+         AND ISNULL(p.nSABit, 1) = 1
+
+     ORDER BY p.nID DESC;
+ ";
+
+                using (SqlCommand cmd = new SqlCommand(query, con))
+                {
+                    con.Open();
+
+                    using (SqlDataReader dr = cmd.ExecuteReader())
+                    {
+                        while (dr.Read())
+                        {
+                            OrgPostM post = new OrgPostM();
+
+                            post.nID = dr["PostID"] != DBNull.Value
+                                ? Convert.ToInt32(dr["PostID"])
+                                : 0;
+
+                            post.nOrgID = dr["OrgID"] != DBNull.Value
+                                ? Convert.ToInt32(dr["OrgID"])
+                                : 0;
+
+                            post.sName = dr["OrganizationName"]?.ToString() ?? "";
+
+                            post.sPositionName = dr["PositionName"]?.ToString() ?? "";
+
+                            post.sCountryName = dr["Country"]?.ToString() ?? "";
+
+                            post.sStateName = dr["State"]?.ToString() ?? "";
+
+                            post.nCityName = dr["City"]?.ToString() ?? "";
+
+                            post.sInternshipFellowshipTypeName =
+                                dr["InternshipFellowshipType"]?.ToString() ?? "";
+
+                            post.sFacilities = dr["Facilities"]?.ToString() ?? "";
+
+                            posts.Add(post);
+                        }
+                    }
+                }
+            }
+
+            return posts;
+        }
+        //anam end  ACTIVE ORGANIZATION POSTS
 
 
         // shrirang 03/10/26
@@ -5966,13 +6091,27 @@ ORDER BY
 
         // radhika07-10
 
+        //anam total opening
+
+
         [HttpGet]
         public IActionResult TotalOpening()
         {
-            return View();
+            int? candidateId =
+                HttpContext.Session.GetInt32("CandidateID");
+
+            if (candidateId == null || candidateId <= 0)
+            {
+                return RedirectToAction("CandidateLogin", "Account");
+            }
+
+            List<OrgPostM> openings =
+                GetAllOrganizationPostsForCandidate();
+
+            return View(openings);
         }
 
-        [HttpGet]
+        //anam endtotal opening
         public IActionResult TopSearch()
         {
             // Check candidate session
@@ -6042,28 +6181,75 @@ ORDER BY
                 ?? throw new InvalidOperationException(
                     "DefaultConnection is missing.");
 
+            //anam query for activity loging of candidate
             const string sql = @"
-                SELECT TOP (500)
-                    VisitID,
-                    IPAddress,
-                    ISP,
-                    Country,
-                    Region,
-                    City,
-                    TimeZone,
-                    BrowserName,
-                    BrowserVersion,
-                    OperatingSystem,
-                    DeviceType,
-                    RequestPath,
-                    PageName,
-                    ReferrerUrl,
-                    VisitDateTime,
-                    IsLoggedIn
-                FROM dbo.tblLoginPageVisits
-                WHERE UserID = @CandidateID
-                  AND PanelType = @PanelType
-                ORDER BY VisitDateTime DESC;";
+    SELECT TOP (500)
+        VisitID,
+        IPAddress,
+        ISP,
+        Country,
+        Region,
+        City,
+        TimeZone,
+        BrowserName,
+        BrowserVersion,
+        OperatingSystem,
+        DeviceType,
+        RequestPath,
+        PageName,
+        ReferrerUrl,
+        VisitDateTime,
+        IsLoggedIn
+    FROM
+    (
+        -- New tracking records
+        SELECT
+            VisitID,
+            IPAddress,
+            ISP,
+            Country,
+            Region,
+            City,
+            TimeZone,
+            BrowserName,
+            BrowserVersion,
+            OperatingSystem,
+            DeviceType,
+            RequestPath,
+            PageName,
+            ReferrerUrl,
+            VisitDateTime,
+            IsLoggedIn
+        FROM dbo.tblLoginPageVisits
+        WHERE UserID = @CandidateID
+          AND PanelType = @PanelType
+
+        UNION ALL
+
+        -- Older candidate activity records
+        SELECT
+            ActivityLogID AS VisitID,
+            IPAddress,
+            CAST(NULL AS NVARCHAR(200)) AS ISP,
+            CAST(NULL AS NVARCHAR(100)) AS Country,
+            CAST(NULL AS NVARCHAR(100)) AS Region,
+            Location AS City,
+            CAST(NULL AS NVARCHAR(100)) AS TimeZone,
+            AccessType AS BrowserName,
+            CAST(NULL AS NVARCHAR(50)) AS BrowserVersion,
+            CAST(NULL AS NVARCHAR(100)) AS OperatingSystem,
+            CAST(NULL AS NVARCHAR(30)) AS DeviceType,
+            CAST(NULL AS NVARCHAR(300)) AS RequestPath,
+            CAST('CandidateLogin' AS NVARCHAR(100)) AS PageName,
+            CAST(NULL AS NVARCHAR(500)) AS ReferrerUrl,
+            DateTime AS VisitDateTime,
+            CAST(1 AS BIT) AS IsLoggedIn
+        FROM dbo.tblCandidateActivityLog
+        WHERE CandidateID = @CandidateID
+    ) AS CombinedActivities
+    ORDER BY VisitDateTime DESC;";
+            //anam end query for activity loging of candidate
+
 
             await using var connection =
                 new SqlConnection(connectionString);

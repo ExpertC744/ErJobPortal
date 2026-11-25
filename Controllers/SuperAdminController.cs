@@ -4530,100 +4530,70 @@ ORDER BY SAF.nID DESC, OFB.nID DESC;
                 // ==========================================
                 // 1. TOP SKILLS
                 // ==========================================
-
+                //anam 
                 string skillsQuery = @"
-            WITH SkillSelections AS
-            (
-                SELECT DISTINCT
-                    CP.CandidateID,
-                    TRY_CONVERT(int, LTRIM(RTRIM(S.value))) AS SkillID,
-                    'Technical' AS SkillType
-                FROM tblCandidateProfile CP
-                CROSS APPLY STRING_SPLIT(
-                    ISNULL(CP.sTechnicalSkillIDs, ''), ','
-                ) S
-                WHERE CP.nBit = 1 AND CP.nSABit = 1
+;WITH CandidateSkills AS
+(
+    SELECT
+        CP.CandidateID,
+        TS.sTechnicalSkillName AS SkillName
+    FROM tblCandidateProfile CP
+    CROSS APPLY STRING_SPLIT(
+        ISNULL(CP.sTechnicalSkillIDs, ''), ','
+    ) S
+    INNER JOIN tblTechnicalSkills TS
+        ON TS.nTechnicalSkillID =
+           TRY_CONVERT(INT, LTRIM(RTRIM(S.value)))
+    WHERE (CP.nBit = 1 OR CP.nBit IS NULL)
 
-                UNION ALL
+    UNION
 
-                SELECT DISTINCT
-                    CP.CandidateID,
-                    TRY_CONVERT(int, LTRIM(RTRIM(S.value))),
-                    'Medical'
-                FROM tblCandidateProfile CP
-                CROSS APPLY STRING_SPLIT(
-                    ISNULL(CP.sMedicalSkillIDs, ''), ','
-                ) S
-                WHERE CP.nBit = 1 AND CP.nSABit = 1
+    SELECT
+        CP.CandidateID,
+        MS.sMedicalSkillName AS SkillName
+    FROM tblCandidateProfile CP
+    CROSS APPLY STRING_SPLIT(
+        ISNULL(CP.sMedicalSkillIDs, ''), ','
+    ) S
+    INNER JOIN tblMedicalSkills MS
+        ON MS.nMedicalSkillID =
+           TRY_CONVERT(INT, LTRIM(RTRIM(S.value)))
+    WHERE (CP.nBit = 1 OR CP.nBit IS NULL)
 
-                UNION ALL
+    UNION
 
-                SELECT DISTINCT
-                    CP.CandidateID,
-                    TRY_CONVERT(int, LTRIM(RTRIM(S.value))),
-                    'NonTechnical'
-                FROM tblCandidateProfile CP
-                CROSS APPLY STRING_SPLIT(
-                    ISNULL(CP.sNonTechnicalSkillIDs, ''), ','
-                ) S
-                WHERE CP.nBit = 1 AND CP.nSABit = 1
-            ),
-            SkillNames AS
-            (
-                SELECT
-                    SS.CandidateID,
-                    TS.sTechnicalSkillName AS SkillName
-                FROM SkillSelections SS
-                INNER JOIN tblTechnicalSkills TS
-                    ON SS.SkillID = TS.nTechnicalSkillID
-                WHERE SS.SkillType = 'Technical'
-
-                UNION ALL
-
-                SELECT
-                    SS.CandidateID,
-                    MS.sMedicalSkillName
-                FROM SkillSelections SS
-                INNER JOIN tblMedicalSkills MS
-                    ON SS.SkillID = MS.nMedicalSkillID
-                WHERE SS.SkillType = 'Medical'
-
-                UNION ALL
-
-                SELECT
-                    SS.CandidateID,
-                    NS.sNonTechnicalSkillName
-                FROM SkillSelections SS
-                INNER JOIN tblNonTechnicalSkills NS
-                    ON SS.SkillID = NS.nNonTechnicalSkillID
-                WHERE SS.SkillType = 'NonTechnical'
-            ),
-            SkillCounts AS
-            (
-                SELECT
-                    SkillName,
-                    COUNT(DISTINCT CandidateID) AS Total
-                FROM SkillNames
-                WHERE NULLIF(LTRIM(RTRIM(SkillName)), '') IS NOT NULL
-                GROUP BY SkillName
-            ),
-            CandidateTotal AS
-            (
-                SELECT COUNT(DISTINCT CandidateID) AS Total
-                FROM tblCandidateProfile
-                WHERE nBit = 1 AND nSABit = 1
-            )
-            SELECT TOP 3
-                SC.SkillName AS Name,
-                CAST(
-                    100.0 * SC.Total /
-                    NULLIF(CT.Total, 0)
-                    AS DECIMAL(6,2)
-                ) AS Percentage
-            FROM SkillCounts SC
-            CROSS JOIN CandidateTotal CT
-            ORDER BY SC.Total DESC, SC.SkillName;";
-
+    SELECT
+        CP.CandidateID,
+        NS.sNonTechnicalSkillName AS SkillName
+    FROM tblCandidateProfile CP
+    CROSS APPLY STRING_SPLIT(
+        ISNULL(CP.sNonTechnicalSkillIDs, ''), ','
+    ) S
+    INNER JOIN tblNonTechnicalSkills NS
+        ON NS.nNonTechnicalSkillID =
+           TRY_CONVERT(INT, LTRIM(RTRIM(S.value)))
+    WHERE (CP.nBit = 1 OR CP.nBit IS NULL)
+),
+SkillCounts AS
+(
+    SELECT
+        SkillName,
+        COUNT(DISTINCT CandidateID) AS TotalCandidates
+    FROM CandidateSkills
+    WHERE NULLIF(LTRIM(RTRIM(SkillName)), '') IS NOT NULL
+    GROUP BY SkillName
+)
+SELECT TOP 10
+    SkillName AS Name,
+    TotalCandidates,
+    CAST(
+        TotalCandidates * 100.0 /
+        NULLIF(SUM(TotalCandidates) OVER(), 0)
+        AS DECIMAL(10,2)
+    ) AS Percentage
+FROM SkillCounts
+ORDER BY TotalCandidates DESC, SkillName;";
+                //anam end
                 using (SqlCommand cmd = new SqlCommand(skillsQuery, con))
                 using (SqlDataReader reader = cmd.ExecuteReader())
                 {
@@ -4641,37 +4611,40 @@ ORDER BY SAF.nID DESC, OFB.nID DESC;
                 // ==========================================
                 // 2. TOP CITIES
                 // ==========================================
-
+                //anam 
                 string citiesQuery = @"
-            WITH CityCounts AS
-            (
-                SELECT
-                    LTRIM(RTRIM(Preferred_City)) AS Name,
-                    COUNT(DISTINCT CandidateID) AS Total
-                FROM tblCandidateProfile
-                WHERE nBit = 1
-                  AND nSABit = 1
-                  AND NULLIF(
-                      LTRIM(RTRIM(Preferred_City)), ''
-                  ) IS NOT NULL
-                GROUP BY LTRIM(RTRIM(Preferred_City))
-            ),
-            CityTotal AS
-            (
-                SELECT SUM(Total) AS Total
-                FROM CityCounts
-            )
-            SELECT TOP 3
-                CC.Name,
-                CAST(
-                    100.0 * CC.Total /
-                    NULLIF(CT.Total, 0)
-                    AS DECIMAL(6,2)
-                ) AS Percentage
-            FROM CityCounts CC
-            CROSS JOIN CityTotal CT
-            ORDER BY CC.Total DESC, CC.Name;";
-
+WITH CandidateCityList AS
+(
+    SELECT
+        CP.CandidateID,
+        LTRIM(RTRIM(S.value)) AS CityName
+    FROM tblCandidateProfile CP
+    CROSS APPLY STRING_SPLIT(CP.Preferred_City, ',') S
+    WHERE
+        (CP.nBit = 1 OR CP.nBit IS NULL)
+        AND CP.Preferred_City IS NOT NULL
+        AND LTRIM(RTRIM(S.value)) <> ''
+),
+CityCounts AS
+(
+    SELECT
+        UPPER(CityName) AS CityKey,
+        MIN(CityName) AS CityName,
+        COUNT(DISTINCT CandidateID) AS TotalCandidates
+    FROM CandidateCityList
+    GROUP BY UPPER(CityName)
+)
+SELECT TOP 10
+    CityName AS Name,
+    TotalCandidates,
+    CAST(
+        TotalCandidates * 100.0 /
+        NULLIF(SUM(TotalCandidates) OVER(), 0)
+        AS DECIMAL(10,2)
+    ) AS Percentage
+FROM CityCounts
+ORDER BY TotalCandidates DESC;";
+                //anam end
                 using (SqlCommand cmd = new SqlCommand(citiesQuery, con))
                 using (SqlDataReader reader = cmd.ExecuteReader())
                 {
@@ -4689,57 +4662,57 @@ ORDER BY SAF.nID DESC, OFB.nID DESC;
                 // ==========================================
                 // 3. TOP FIELDS
                 // ==========================================
-
+                //anam 
                 string fieldsQuery = @"
-            WITH FieldCounts AS
-            (
-                SELECT
-                    'Technical Skill' AS Name,
-                    COUNT(DISTINCT CandidateID) AS Total
-                FROM tblCandidateProfile
-                WHERE nBit = 1 AND nSABit = 1
-                  AND NULLIF(
-                      LTRIM(RTRIM(sTechnicalSkillIDs)), ''
-                  ) IS NOT NULL
+;WITH FieldCounts AS
+(
+    SELECT
+        'Technical Skill' AS Name,
+        COUNT(DISTINCT CandidateID) AS TotalCandidates
+    FROM tblCandidateProfile
+    WHERE
+        (nBit = 1 OR nBit IS NULL)
+        AND NULLIF(
+            LTRIM(RTRIM(sTechnicalSkillIDs)), ''
+        ) IS NOT NULL
 
-                UNION ALL
+    UNION ALL
 
-                SELECT
-                    'Non-Technical Skill',
-                    COUNT(DISTINCT CandidateID)
-                FROM tblCandidateProfile
-                WHERE nBit = 1 AND nSABit = 1
-                  AND NULLIF(
-                      LTRIM(RTRIM(sNonTechnicalSkillIDs)), ''
-                  ) IS NOT NULL
+    SELECT
+        'Non-Technical Skill',
+        COUNT(DISTINCT CandidateID)
+    FROM tblCandidateProfile
+    WHERE
+        (nBit = 1 OR nBit IS NULL)
+        AND NULLIF(
+            LTRIM(RTRIM(sNonTechnicalSkillIDs)), ''
+        ) IS NOT NULL
 
-                UNION ALL
+    UNION ALL
 
-                SELECT
-                    'Medical Skill',
-                    COUNT(DISTINCT CandidateID)
-                FROM tblCandidateProfile
-                WHERE nBit = 1 AND nSABit = 1
-                  AND NULLIF(
-                      LTRIM(RTRIM(sMedicalSkillIDs)), ''
-                  ) IS NOT NULL
-            ),
-            CandidateTotal AS
-            (
-                SELECT COUNT(DISTINCT CandidateID) AS Total
-                FROM tblCandidateProfile
-                WHERE nBit = 1 AND nSABit = 1
-            )
-            SELECT
-                FC.Name,
-                CAST(
-                    100.0 * FC.Total /
-                    NULLIF(CT.Total, 0)
-                    AS DECIMAL(6,2)
-                ) AS Percentage
-            FROM FieldCounts FC
-            CROSS JOIN CandidateTotal CT
-            ORDER BY FC.Total DESC, FC.Name;";
+    SELECT
+        'Medical Skill',
+        COUNT(DISTINCT CandidateID)
+    FROM tblCandidateProfile
+    WHERE
+        (nBit = 1 OR nBit IS NULL)
+        AND NULLIF(
+            LTRIM(RTRIM(sMedicalSkillIDs)), ''
+        ) IS NOT NULL
+)
+SELECT
+    Name,
+    TotalCandidates,
+    CAST(
+        TotalCandidates * 100.0 /
+        NULLIF(SUM(TotalCandidates) OVER(), 0)
+        AS DECIMAL(10,2)
+    ) AS Percentage
+FROM FieldCounts
+WHERE TotalCandidates > 0
+ORDER BY TotalCandidates DESC;";
+
+                //anam end
 
                 using (SqlCommand cmd = new SqlCommand(fieldsQuery, con))
                 using (SqlDataReader reader = cmd.ExecuteReader())

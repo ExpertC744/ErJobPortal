@@ -26,5 +26,6 @@ namespace ErJobPortal.Models
             ErrorMessage = "Password must be at least 6 characters."
         )]
         public string Password { get; set; }
+        public bool RememberMe { get; set; }//anam
     }
 }

@@ -48,35 +48,27 @@
 
                     foreach (var item in Model.TopSkills)
                     {
-                        decimal percentage = Math.Clamp(
-                        item.Percentage, 0m, 100m);
+                        decimal percentage = Math.Clamp(item.Percentage, 0m, 100m);
 
                         <div class="chart-item">
-
                             <div class="chart-item-top">
-                                <span class="rank">
-                                    @rank.ToString("D2")
-                                </span>
+                                <span class="rank">@rank.ToString("D2")</span>
 
-                                <span class="item-name">
-                                    @item.Name
-                                </span>
+                                <span class="item-name">@item.Name</span>
 
                                 <span class="percentage">
-                                    @item.Percentage.ToString("0.##")%
+                                    @percentage.ToString("0.##")%
                                 </span>
                             </div>
 
                             <div class="progress-track">
                                 <div class="progress-fill"
-                                     style="width: @percentage.ToString(
-                                                                              System.Globalization.CultureInfo.InvariantCulture)%;">
-                        </div>
-                    </div>
-
+                                     style="width: @percentage.ToString(System.Globalization.CultureInfo.InvariantCulture)%;">
+                                </div>
+                            </div>
                         </div>
 
-                                rank++;
+                        rank++;
                     }
                 }
                 else

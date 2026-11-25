@@ -230,10 +230,11 @@
                 <!-- =================================================
                      LOGIN FORM
                 ================================================== -->
-
+               @*  //anam *@
                 <form asp-controller="Account"
                       asp-action="OrganizationLogin"
-                      method="post">
+                      method="post"
+                      autocomplete="on">
 
 
                     <!-- =================================================
@@ -324,6 +325,17 @@
                         <span asp-validation-for="sPassword"
                               class="org-field-validation">
                         </span>
+                        @* anam *@
+                        <div class="org-remember-me">
+                            <label>
+                                <input asp-for="RememberMe"
+                                       class="form-check-input"
+                                       id="orgRememberMe" />
+                                <span>Remember Me</span>
+                            </label>
+                        </div>
+
+                        @* anam end*@
 
                     </div>
 

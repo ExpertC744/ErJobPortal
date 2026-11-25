@@ -22,6 +22,8 @@ namespace ErJobPortal.Models
         [DataType(DataType.Password)]
         public string sPassword { get; set; }
 
+        public bool RememberMe { get; set; }//anam
+
         public DateTime RegDate { get; set; }
 
         public DateTime? ModDate { get; set; }

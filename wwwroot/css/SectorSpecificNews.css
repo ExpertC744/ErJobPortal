@@ -537,42 +537,45 @@
 
 
         /* =========================================================
-   NEWS LIST
+   NEWS LIST anam
    ========================================================= */
 
+
+        /* NEWS LIST */
         .sector-news-page .sector-news-list {
+            list-style: none !important;
             margin: 0;
-            padding-left: 22px;
+            padding: 0 !important;
         }
 
-
-            /* =========================================================
-   LIST ITEM
-   ========================================================= */
-
+            /* LIST ITEMS */
             .sector-news-page .sector-news-list li {
-                margin-bottom: 12px;
-                padding-left: 5px;
+                position: relative;
+                padding-left: 24px !important;
+                margin-bottom: 14px;
                 color: #536174;
                 font-size: 15px;
                 line-height: 1.8;
                 text-align: justify;
-                transition: transform .3s ease, color .3s ease;
             }
 
-
-                /* =========================================================
-   LIST MARKER
-   ========================================================= */
-
-                .sector-news-page
-                .sector-news-list
-                li::marker {
-                    color: #14b8a6;
-                    font-size: 17px;
+                /* CUSTOM TEAL BULLET */
+                .sector-news-page .sector-news-list li::before {
+                    content: "";
+                    position: absolute;
+                    left: 5px;
+                    top: 11px;
+                    width: 7px;
+                    height: 7px;
+                    border-radius: 50%;
+                    background: #14b8a6;
                 }
 
-
+                /* Disable default bullet */
+                .sector-news-page .sector-news-list li::marker {
+                    content: "";
+                }
+/*anam end*/
                 /* =========================================================
    LIST HOVER
    ========================================================= */

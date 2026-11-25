@@ -1,4 +1,6 @@
-﻿@* Radhika30-09 *@
+﻿@model ErJobPortal.Models.OrganizationStatisticsVM
+
+@* Radhika30-09 *@
 
 <link rel="stylesheet"
       href="~/css/OrgTopSearch.css"
@@ -53,66 +55,41 @@
 
             </div>
 
-
             <div class="chart-list">
 
-                <!-- SKILL 1 -->
-                <div class="chart-item">
+                @if (Model.TopSkills != null && Model.TopSkills.Any())
+                {
+                    int rank = 1;
 
-                    <div class="chart-item-top">
-                        <span class="rank">01</span>
-                        <span class="item-name">C / C++</span>
-                        <span class="percentage">39.26%</span>
-                    </div>
+                    foreach (var skill in Model.TopSkills)
+                    {
+                        <div class="chart-item">
 
-                    <div class="progress-track">
-                        <div class="progress-fill"
-                             style="width:39.26%;">
+                            <div class="chart-item-top">
+                                <span class="rank">@rank.ToString("00")</span>
+                                <span class="item-name">@skill.Name</span>
+                                <span class="percentage">@skill.Percentage.ToString("0.00")%</span>
+                            </div>
+
+                            <div class="progress-track">
+                                <div class="progress-fill"
+                                     style="width:@skill.Percentage.ToString("0.##", System.Globalization.CultureInfo.InvariantCulture)%;">
+                                </div>
+                            </div>
+
                         </div>
-                    </div>
 
-                </div>
-
-
-                <!-- SKILL 2 -->
-                <div class="chart-item">
-
-                    <div class="chart-item-top">
-                        <span class="rank">02</span>
-                        <span class="item-name">HTML</span>
-                        <span class="percentage">33.73%</span>
-                    </div>
-
-                    <div class="progress-track">
-                        <div class="progress-fill"
-                             style="width:33.73%;">
-                        </div>
-                    </div>
-
-                </div>
-
-
-                <!-- SKILL 3 -->
-                <div class="chart-item">
-
-                    <div class="chart-item-top">
-                        <span class="rank">03</span>
-                        <span class="item-name">JAVA</span>
-                        <span class="percentage">27.01%</span>
-                    </div>
-
-                    <div class="progress-track">
-                        <div class="progress-fill"
-                             style="width:27.01%;">
-                        </div>
-                    </div>
-
-                </div>
+                        rank++;
+                    }
+                }
+                else
+                {
+                    <p>No skill data available.</p>
+                }
 
             </div>
 
         </div>
-
 
 
         <!-- TOP CITIES -->
@@ -131,58 +108,98 @@
 
             </div>
 
-
             <div class="chart-list">
 
-                <!-- CITY 1 -->
-                <div class="chart-item">
+                @if (Model.TopCities != null && Model.TopCities.Any())
+                {
+                    int rank = 1;
 
-                    <div class="chart-item-top">
-                        <span class="rank">01</span>
-                        <span class="item-name">Nagpur</span>
-                        <span class="percentage">63%</span>
+                    foreach (var city in Model.TopCities)
+                    {
+                        <div class="chart-item">
+
+                            <div class="chart-item-top">
+                                <span class="rank">@rank.ToString("00")</span>
+                                <span class="item-name">@city.Name</span>
+                                <span class="percentage">@city.Percentage.ToString("0.00")%</span>
+                            </div>
+
+                            <div class="progress-track">
+                                <div class="progress-fill"
+                                     style="width:@city.Percentage.ToString("0.##", System.Globalization.CultureInfo.InvariantCulture)%;">
+                                </div>
+                            </div>
+
+                        </div>
+
+                        rank++;
+                    }
+                }
+                else
+                {
+                    <p>No city data available.</p>
+                }
+
+            </div>
+
+        </div>
+
+
+
+        <!-- ================= BOTTOM CARD ================= -->
+
+        <div class="fields-wrapper">
+
+            <div class="chart-card fields-card">
+
+                <div class="chart-card-header">
+
+                    <div class="chart-icon">
+                        <i class="fas fa-layer-group"></i>
                     </div>
 
-                    <div class="progress-track">
-                        <div class="progress-fill"
-                             style="width:63%;">
-                        </div>
+                    <div>
+                        <h3>Top Fields</h3>
+                        <p>Most selected candidate skill categories</p>
                     </div>
 
                 </div>
 
 
-                <!-- CITY 2 -->
-                <div class="chart-item">
+                <div class="chart-list">
 
-                    <div class="chart-item-top">
-                        <span class="rank">02</span>
-                        <span class="item-name">Mumbai</span>
-                        <span class="percentage">48%</span>
-                    </div>
+                    <div class="chart-list">
 
-                    <div class="progress-track">
-                        <div class="progress-fill"
-                             style="width:48%;">
-                        </div>
-                    </div>
+                        @if (Model.TopFields != null && Model.TopFields.Any())
+                        {
+                            int rank = 1;
 
-                </div>
+                            foreach (var field in Model.TopFields)
+                            {
+                                <div class="chart-item">
 
+                                    <div class="chart-item-top">
+                                        <span class="rank">@rank.ToString("00")</span>
+                                        <span class="item-name">@field.Name</span>
+                                        <span class="percentage">@field.Percentage.ToString("0.00")%</span>
+                                    </div>
 
-                <!-- CITY 3 -->
-                <div class="chart-item">
+                                    <div class="progress-track">
+                                        <div class="progress-fill"
+                                             style="width:@field.Percentage.ToString("0.##", System.Globalization.CultureInfo.InvariantCulture)%;">
+                                        </div>
+                                    </div>
 
-                    <div class="chart-item-top">
-                        <span class="rank">03</span>
-                        <span class="item-name">Pune</span>
-                        <span class="percentage">36%</span>
-                    </div>
+                                </div>
 
-                    <div class="progress-track">
-                        <div class="progress-fill"
-                             style="width:36%;">
-                        </div>
+                                rank++;
+                            }
+                        }
+                        else
+                        {
+                            <p>No field data available.</p>
+                        }
+
                     </div>
 
                 </div>
@@ -192,90 +209,5 @@
         </div>
 
     </div>
-
-
-
-    <!-- ================= BOTTOM CARD ================= -->
-
-    <div class="fields-wrapper">
-
-        <div class="chart-card fields-card">
-
-            <div class="chart-card-header">
-
-                <div class="chart-icon">
-                    <i class="fas fa-layer-group"></i>
-                </div>
-
-                <div>
-                    <h3>Top Fields</h3>
-                    <p>Most selected candidate skill categories</p>
-                </div>
-
-            </div>
-
-
-            <div class="chart-list">
-
-                <!-- FIELD 1 -->
-                <div class="chart-item">
-
-                    <div class="chart-item-top">
-                        <span class="rank">01</span>
-                        <span class="item-name">Technical Skill</span>
-                        <span class="percentage">71.82%</span>
-                    </div>
-
-                    <div class="progress-track">
-                        <div class="progress-fill"
-                             style="width:71.82%;">
-                        </div>
-                    </div>
-
-                </div>
-
-
-                <!-- FIELD 2 -->
-                <div class="chart-item">
-
-                    <div class="chart-item-top">
-                        <span class="rank">02</span>
-                        <span class="item-name">Non-Technical Skill</span>
-                        <span class="percentage">14.62%</span>
-                    </div>
-
-                    <div class="progress-track">
-                        <div class="progress-fill"
-                             style="width:14.62%;">
-                        </div>
-                    </div>
-
-                </div>
-
-
-                <!-- FIELD 3 -->
-                <div class="chart-item">
-
-                    <div class="chart-item-top">
-                        <span class="rank">03</span>
-                        <span class="item-name">Medical Skill</span>
-                        <span class="percentage">13.56%</span>
-                    </div>
-
-                    <div class="progress-track">
-                        <div class="progress-fill"
-                             style="width:13.56%;">
-                        </div>
-                    </div>
-
-                </div>
-
-            </div>
-
-        </div>
-
-    </div>
-
-</div>
 
 

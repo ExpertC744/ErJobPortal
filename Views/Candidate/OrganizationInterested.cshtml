@@ -6,12 +6,19 @@
     ViewData["Title"] = "Organization Interested";
     ViewData["Panel"] = "Candidate";
     ViewData["UserName"] = "Candidate";
+
+    int srNo = 1;
 }
+
+<link rel="stylesheet"
+      href="https://cdn.datatables.net/1.13.8/css/jquery.dataTables.min.css" />
 
 <div class="container-fluid">
 
     <div class="master-table-container">
-          <div style="text-align: right; margin-bottom: 15px;">
+
+        <!-- BACK BUTTON -->
+        <div style="text-align:right; margin-bottom:15px;">
             <a asp-controller="Candidate"
                asp-action="Dashboard"
                class="master-back-btn"
@@ -19,130 +26,98 @@
                 <i class="fas fa-arrow-left"></i>
             </a>
         </div>
+
         <!-- PAGE HEADING -->
         <div class="mb-4">
-
-            <h1 class="mb-2">
-                Organization Interested
-            </h1>
+            <h1 class="mb-2">Organization Interested</h1>
 
             <p class="mb-0 text-muted">
                 @ViewBag.CandidateCode
             </p>
-
         </div>
 
-        <!-- TABLE -->
-        <div class="table-responsive">
+        <!-- TABLE SCROLL WRAPPER -->
+        <div class="candidate-table-wrapper">
 
             <table id="candidateTable"
-                   class="master-data-table">
+                   class="master-data-table"
+                   style="width:100%; min-width:1100px;">
 
                 <thead>
-
                     <tr>
-
-                        <th>
-                            Sr. No
-                        </th>
-
-                        <th>
-                            Organization Name
-                        </th>
-
-                        <th>
-                            Organization Url
-                        </th>
-
-                        <th>
-                            Contact Person Name
-                        </th>
-
-                        <th>
-                            Designation
-                        </th>
-
-                        <th>
-                            Apply Status
-                        </th>
-
+                        <th>Sr. No</th>
+                        <th>Organization Name</th>
+                        <th>Organization URL</th>
+                        <th>Contact Person Name</th>
+                        <th>Designation</th>
+                        <th>Apply Status</th>
                     </tr>
-
                 </thead>
 
                 <tbody>
 
-                    @if (Model != null && Model.Count > 0)
+                    @if (Model != null && Model.Any())
                     {
-                        int srNo = 1;
-
                         foreach (var item in Model)
                         {
                             <tr>
 
                                 <!-- SR NO -->
-                                <td class="master-id">
+                                <td class="master-id text-center">
                                     @srNo
                                 </td>
 
                                 <!-- ORGANIZATION NAME -->
                                 <td>
-                                    @item.OrganizationName
-                                </td>
+                                    @(string.IsNullOrWhiteSpace(item.OrganizationName)
+                                                                ? "-"
+                                                                : item.OrganizationName)
+                        </td>
 
                                 <!-- ORGANIZATION URL -->
                                 <td>
-
-                                    @if (!string.IsNullOrWhiteSpace(
-                                                                item.OrganizationUrl))
+                            @if (!string.IsNullOrWhiteSpace(item.OrganizationUrl))
                                     {
-                                        string organizationUrl =
-                                        item.OrganizationUrl;
+                                        var organizationUrl = item.OrganizationUrl.Trim();
 
-                                        if (!organizationUrl.StartsWith("http://") &&
-                                        !organizationUrl.StartsWith("https://"))
+                                        if (!organizationUrl.StartsWith(
+                                        "http://", StringComparison.OrdinalIgnoreCase) &&
+                                        !organizationUrl.StartsWith(
+                                        "https://", StringComparison.OrdinalIgnoreCase))
                                         {
-                                            organizationUrl =
-                                            "https://" + organizationUrl;
+                                            organizationUrl = "https://" + organizationUrl;
                                         }
 
                                         <a href="@organizationUrl"
                                            target="_blank"
                                            rel="noopener noreferrer"
                                            class="master-link">
-
                                             Visit
-
                                         </a>
                                     }
                                     else
                                     {
                                         <span>-</span>
                                     }
-
                         </td>
 
                         <!-- CONTACT PERSON -->
                         <td>
-                            @(!string.IsNullOrWhiteSpace(
-                                                        item.ContactPersonName)
-                                                        ? item.ContactPersonName
-                                                        : "-")
-                                </td>
+                            @(string.IsNullOrWhiteSpace(item.ContactPersonName)
+                                                        ? "-"
+                                                        : item.ContactPersonName)
+                                                                             </td>
 
-                                <!-- DESIGNATION -->
-                                <td>
-                                    @(!string.IsNullOrWhiteSpace(
-                                                                item.Designation)
-                                                                ? item.Designation
-                                                                : "-")
-                                </td>
+                        <!-- DESIGNATION -->
+                        <td>
+                            @(string.IsNullOrWhiteSpace(item.Designation)
+                                                        ? "-"
+                                                        : item.Designation)
+                        </td>
 
                                 <!-- APPLY STATUS -->
                                 <td>
-
-                                    @if (!string.IsNullOrWhiteSpace(
-                                                                item.ApplyStatus))
+                            @if (!string.IsNullOrWhiteSpace(item.ApplyStatus))
                                     {
                                         <span class="master-status">
                                             @item.ApplyStatus
@@ -152,26 +127,12 @@
                                     {
                                         <span>-</span>
                                     }
-
                                 </td>
 
                             </tr>
 
                             srNo++;
                         }
-                    }
-                    else
-                    {
-                        <tr>
-
-                            <td colspan="6"
-                                class="text-center">
-
-                                No organization has shown interest yet.
-
-                            </td>
-
-                        </tr>
                     }
 
                 </tbody>
@@ -180,11 +141,188 @@
 
         </div>
 
-        <!-- PAGE INFO -->
-        <div id="candidatePageInfo"
-             class="master-page-info text-center d-none">
-        </div>
-
     </div>
 
 </div>
+
+
+<!-- CUSTOM SCROLLING CSS -->
+<style>
+
+    /* MAIN TABLE WRAPPER */
+    .candidate-table-wrapper {
+        width: 100%;
+        max-width: 100%;
+        overflow-x: auto !important;
+        overflow-y: hidden;
+        scrollbar-width: thin;
+        scrollbar-color: #19816c #e9efed;
+    }
+
+        /* TABLE WIDTH */
+        .candidate-table-wrapper #candidateTable {
+            min-width: 1100px !important;
+            width: 1100px;
+            table-layout: auto;
+            border-collapse: separate;
+        }
+
+    /* KEEP HEADER AND DATA ALIGNED */
+    #candidateTable th,
+    #candidateTable td {
+        box-sizing: border-box;
+        vertical-align: middle;
+    }
+
+    /* HEADER */
+    #candidateTable thead th {
+        white-space: nowrap;
+        text-align: center;
+    }
+
+    /* BODY */
+    #candidateTable tbody td {
+        text-align: center;
+        min-width: 130px;
+    }
+
+    /* SCROLLBAR */
+    .candidate-table-wrapper::-webkit-scrollbar {
+        height: 9px;
+    }
+
+    .candidate-table-wrapper::-webkit-scrollbar-track {
+        background: #e9efed;
+        border-radius: 10px;
+    }
+
+    .candidate-table-wrapper::-webkit-scrollbar-thumb {
+        background: #19816c;
+        border-radius: 10px;
+    }
+
+        .candidate-table-wrapper::-webkit-scrollbar-thumb:hover {
+            background: #116653;
+        }
+
+    /* DATATABLE WRAPPER */
+    #candidateTable_wrapper {
+        width: 100%;
+    }
+
+        /* SEARCH */
+        #candidateTable_wrapper .dataTables_filter input {
+            padding: 8px 12px;
+            border: 1px solid #ddd;
+            border-radius: 7px;
+            outline: none;
+        }
+
+        /* LENGTH */
+        #candidateTable_wrapper .dataTables_length select {
+            padding: 7px;
+            border: 1px solid #ddd;
+            border-radius: 7px;
+        }
+
+        /* PAGINATION */
+        #candidateTable_wrapper .dataTables_paginate {
+            margin-top: 12px;
+        }
+
+    /* MOBILE */
+    @@media (max-width: 768px) {
+
+        .candidate-table-wrapper {
+            overflow-x: auto !important;
+        }
+
+            .candidate-table-wrapper #candidateTable {
+                min-width: 1100px !important;
+            }
+    }
+</style>
+
+
+@section Scripts {
+
+    <script src="https://cdn.datatables.net/1.13.8/js/jquery.dataTables.min.js"></script>
+
+    <script>
+
+        $(document).ready(function () {
+
+            // PREVENT DUPLICATE INITIALIZATION
+            if ($.fn.DataTable.isDataTable('#candidateTable')) {
+                $('#candidateTable').DataTable().destroy();
+            }
+
+            // INITIALIZE DATATABLE
+            $('#candidateTable').DataTable({
+
+                paging: true,
+
+                searching: true,
+
+                ordering: true,
+
+                info: true,
+
+                autoWidth: false,
+
+                // IMPORTANT: CSS handles horizontal scrolling
+                scrollX: false,
+
+                responsive: false,
+
+                pageLength: 10,
+
+                lengthMenu: [
+                    [5, 10, 25, 50, 100],
+                    [5, 10, 25, 50, 100]
+                ],
+
+                order: [],
+
+                columnDefs: [
+                    {
+                        targets: 0,
+                        orderable: false,
+                        searchable: false
+                    }
+                ],
+
+                language: {
+
+                    search: "",
+
+                    searchPlaceholder: "Search...",
+
+                    lengthMenu: "Show _MENU_ entries",
+
+                    emptyTable: "No organization has shown interest yet.",
+
+                    zeroRecords: "No matching organizations found.",
+
+                    info: "Showing _START_ to _END_ of _TOTAL_ entries",
+
+                    infoEmpty: "Showing 0 to 0 of 0 entries",
+
+                    paginate: {
+                        previous: "<",
+                        next: ">"
+                    }
+
+                },
+
+                initComplete: function () {
+                    this.api().columns.adjust();
+                }
+
+            });
+
+        });
+
+    </script>
+
+}

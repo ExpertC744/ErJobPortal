@@ -1,0 +1,242 @@
+﻿
+/*page by anam
+*/
+.page-title {
+    margin: 25px 18px 4px;
+    font-size: 28px;
+    font-weight: 600;
+}
+
+.page-subtitle {
+    margin-left: 18px;
+    color: #999;
+    margin-bottom: 22px;
+}
+
+.post-box {
+    margin: 0 18px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    overflow: visible;
+}
+
+.post-header {
+    padding: 9px 14px;
+    background: #f7f7f7;
+    border-bottom: 1px solid #ddd;
+}
+
+    .post-header i {
+        margin-right: 8px;
+    }
+
+.table-area {
+    padding: 20px 14px;
+    overflow-x: auto;
+}
+
+/* =========================================================
+       ORGANIZATION JOBS TABLE - COLUMN WIDTH
+       ========================================================= */
+
+#organizationJobsTable {
+    width: 2430px !important;
+    min-width: 2430px !important;
+    max-width: none !important;
+    table-layout: fixed !important;
+}
+
+/* Horizontal scrolling */
+.master-table-container .table-responsive {
+    width: 100% !important;
+    overflow-x: auto !important;
+    overflow-y: hidden !important;
+}
+
+/* Column widths */
+
+/* Sr. No */
+#organizationJobsTable th:nth-child(1),
+#organizationJobsTable td:nth-child(1) {
+    width: 65px !important;
+}
+
+/* Post Creation Date */
+#organizationJobsTable th:nth-child(2),
+#organizationJobsTable td:nth-child(2) {
+    width: 115px !important;
+}
+
+/* Position */
+#organizationJobsTable th:nth-child(3),
+#organizationJobsTable td:nth-child(3) {
+    width: 160px !important;
+}
+
+/* Action */
+#organizationJobsTable th:nth-child(4),
+#organizationJobsTable td:nth-child(4) {
+    width: 90px !important;
+}
+
+/* Required Trainee */
+#organizationJobsTable th:nth-child(5),
+#organizationJobsTable td:nth-child(5) {
+    width: 115px !important;
+}
+
+/* Eligible Trainee */
+#organizationJobsTable th:nth-child(6),
+#organizationJobsTable td:nth-child(6) {
+    width: 115px !important;
+}
+
+/* Gender */
+#organizationJobsTable th:nth-child(7),
+#organizationJobsTable td:nth-child(7) {
+    width: 100px !important;
+}
+
+/* Minimum Qualification */
+#organizationJobsTable th:nth-child(8),
+#organizationJobsTable td:nth-child(8) {
+    width: 170px !important;
+}
+
+/* Location */
+#organizationJobsTable th:nth-child(9),
+#organizationJobsTable td:nth-child(9) {
+    width: 170px !important;
+}
+
+/* Working Hours */
+#organizationJobsTable th:nth-child(10),
+#organizationJobsTable td:nth-child(10) {
+    width: 120px !important;
+}
+
+/* Weekly Working Days */
+#organizationJobsTable th:nth-child(11),
+#organizationJobsTable td:nth-child(11) {
+    width: 140px !important;
+}
+
+/* Internship Type */
+#organizationJobsTable th:nth-child(12),
+#organizationJobsTable td:nth-child(12) {
+    width: 140px !important;
+}
+
+/* Internship / Fellowship Type */
+#organizationJobsTable th:nth-child(13),
+#organizationJobsTable td:nth-child(13) {
+    width: 180px !important;
+}
+
+/* Training Involved */
+#organizationJobsTable th:nth-child(14),
+#organizationJobsTable td:nth-child(14) {
+    width: 130px !important;
+}
+
+/* Internship Duration */
+#organizationJobsTable th:nth-child(15),
+#organizationJobsTable td:nth-child(15) {
+    width: 130px !important;
+}
+
+/* Facilities */
+#organizationJobsTable th:nth-child(16),
+#organizationJobsTable td:nth-child(16) {
+    width: 150px !important;
+}
+
+/* Internship Mode */
+#organizationJobsTable th:nth-child(17),
+#organizationJobsTable td:nth-child(17) {
+    width: 120px !important;
+}
+
+/* Divyang Allowed */
+#organizationJobsTable th:nth-child(18),
+#organizationJobsTable td:nth-child(18) {
+    width: 110px !important;
+}
+
+/* Status */
+#organizationJobsTable th:nth-child(19),
+#organizationJobsTable td:nth-child(19) {
+    width: 110px !important;
+}
+
+.action {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 8px;
+}
+
+    .action a {
+        color: #1677ff;
+        text-decoration: none;
+        font-size: 15px;
+    }
+
+        .action a:hover {
+            color: #0056d6;
+        }
+
+.location {
+    line-height: 1.5;
+    white-space: normal;
+}
+
+.days {
+    line-height: 1.5;
+    white-space: normal;
+}
+
+.trainee {
+    color: #1677ff;
+    text-decoration: none;
+}
+
+    .trainee:hover {
+        text-decoration: underline;
+    }
+
+.wifi {
+    font-size: 22px;
+    cursor: pointer;
+}
+
+.status-form {
+    margin: 0;
+    padding: 0;
+    display: inline-block;
+}
+
+.status {
+    color: white;
+    padding: 7px 12px;
+    border: none;
+    border-radius: 6px;
+    display: inline-block;
+    font-size: 12px;
+    cursor: pointer;
+    min-width: 75px;
+}
+
+.enabled {
+    background: #198754;
+}
+
+.disabled {
+    background: #dc3545;
+}
+
+.status:hover {
+    opacity: 0.9;
+}
+
+ 

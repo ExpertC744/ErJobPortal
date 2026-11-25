@@ -1,24 +1,38 @@
-﻿/* =========================================================
-           TRANSFORMATION PAGE
-           ========================================================= */
-.transformation-page {
-    width: 100%;
-    margin-top: 100px;
-    padding: 0 15px 70px;
-    background: #f8fafc;
-    color: #1f2937;
+﻿
+/* =========================================================
+   TRANSFORMATION PAGE - BASE
+   ========================================================= */
+
+* {
+    box-sizing: border-box;
 }
 
+.transformation-page {
+    width: 100%;
+    max-width: 100%;
+    margin-top: 100px;
+    padding: 0 20px 70px;
+    background: #f8fafc;
+    color: #1f2937;
+    overflow-x: hidden;
+}
+
+    .transformation-page img {
+        max-width: 100%;
+        height: auto;
+    }
+
 /* =========================================================
-           HERO / MAIN HEADING
-           ========================================================= */
+   HERO SECTION
+   ========================================================= */
 
 .transformation-hero {
     position: relative;
     overflow: hidden;
+    width: 100%;
     max-width: 1180px;
     margin: 0 auto 35px;
-    padding: 45px 40px;
+    padding: clamp(28px, 4vw, 45px) clamp(20px, 3.5vw, 40px);
     border-radius: 22px;
     background: linear-gradient(135deg, #0d9488, #0f766e);
     box-shadow: 0 15px 35px rgba(13, 148, 136, .16);
@@ -33,6 +47,7 @@
         top: -100px;
         border-radius: 50%;
         background: rgba(255,255,255,.08);
+        pointer-events: none;
     }
 
     .transformation-hero::after {
@@ -44,17 +59,21 @@
         bottom: -80px;
         border-radius: 50%;
         background: rgba(255,255,255,.06);
+        pointer-events: none;
     }
 
 .transformation-hero-content {
     position: relative;
     z-index: 2;
+    width: 100%;
     max-width: 850px;
 }
 
 .transformation-badge {
     display: inline-flex;
     align-items: center;
+    justify-content: center;
+    flex-wrap: wrap;
     gap: 7px;
     margin-bottom: 13px;
     padding: 7px 13px;
@@ -73,9 +92,10 @@
 .transformation-hero h1 {
     margin: 0 0 12px;
     color: #ffffff !important;
-    font-size: 34px;
+    font-size: clamp(25px, 3vw, 34px);
     font-weight: 800;
     line-height: 1.2;
+    overflow-wrap: break-word;
 }
 
 .transformation-hero p {
@@ -84,36 +104,37 @@
     color: rgba(255,255,255,.90);
     font-size: 15px;
     line-height: 1.75;
+    overflow-wrap: break-word;
 }
 
-
 /* =========================================================
-           CONTENT WRAPPER
-           ========================================================= */
+   CONTENT WRAPPER
+   ========================================================= */
 
 .transformation-content {
+    width: 100%;
     max-width: 1180px;
     margin: 0 auto;
 }
 
-
 /* =========================================================
-           CONTENT GRID
-           ========================================================= */
+   CONTENT GRID
+   ========================================================= */
 
 .transformation-grid {
     display: grid;
+    width: 100%;
     grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 22px;
 }
 
-
 /* =========================================================
-           CONTENT CARD
-           ========================================================= */
+   CONTENT CARD
+   ========================================================= */
 
 .transformation-card {
     position: relative;
+    min-width: 0;
     overflow: hidden;
     padding: 25px;
     background: #ffffff;
@@ -129,15 +150,15 @@
         box-shadow: 0 15px 32px rgba(15,42,39,.09);
     }
 
-
 /* =========================================================
-           CARD TOP
-           ========================================================= */
+   CARD TOP
+   ========================================================= */
 
 .transformation-card-top {
     display: flex;
     align-items: center;
     gap: 14px;
+    min-width: 0;
     margin-bottom: 18px;
 }
 
@@ -156,17 +177,18 @@
 }
 
 .transformation-card h2 {
+    min-width: 0;
     margin: 0;
     color: #172033;
     font-size: 19px;
     font-weight: 750;
     line-height: 1.35;
+    overflow-wrap: anywhere;
 }
 
-
 /* =========================================================
-           CARD CONTENT
-           ========================================================= */
+   CARD CONTENT
+   ========================================================= */
 
 .transformation-card p {
     margin: 0;
@@ -176,14 +198,18 @@
 }
 
 .transformation-point {
+    display: block;
+    min-width: 0;
     margin-top: 13px;
     padding: 12px 14px;
     border-left: 3px solid #0d9488;
     border-radius: 0 8px 8px 0;
     background: #f7fbfa;
+    overflow-wrap: break-word;
 }
 
     .transformation-point strong {
+        display: inline;
         color: #0f766e;
         font-size: 14px;
         font-weight: 700;
@@ -193,23 +219,23 @@
         color: #667085;
         font-size: 13.5px;
         line-height: 1.65;
+        overflow-wrap: anywhere;
     }
 
-
 /* =========================================================
-           FULL WIDTH CARDS
-           ========================================================= */
+   FULL WIDTH CARD
+   ========================================================= */
 
 .transformation-card.full-width {
     grid-column: 1 / -1;
 }
 
-
 /* =========================================================
-           CONCLUSION
-           ========================================================= */
+   CONCLUSION
+   ========================================================= */
 
 .transformation-conclusion {
+    width: 100%;
     margin-top: 25px;
     padding: 25px 28px;
     border-radius: 16px;
@@ -223,6 +249,7 @@
         color: #0d9488;
         font-size: 20px;
         font-weight: 750;
+        line-height: 1.4;
     }
 
     .transformation-conclusion p {
@@ -232,25 +259,26 @@
         line-height: 1.75;
     }
 
+/* =========================================================
+   LARGE LAPTOPS - 1200px
+   ========================================================= */
+
+@media (min-width: 1200px) {
+    .transformation-page {
+        padding-right: 25px;
+        padding-left: 25px;
+    }
+}
 
 /* =========================================================
-           TABLET
-           ========================================================= */
+   LAPTOPS - 992px TO 1199px
+   ========================================================= */
 
-@@media (max-width: 991px) {
-
-    .transformation-page {
-        margin-top: 100px;
-        padding: 0 20px 55px;
+@media (max-width: 1199px) {
+    .transformation-hero,
+    .transformation-content {
+        max-width: 100%;
     }
-
-    .transformation-hero {
-        padding: 38px 30px;
-    }
-
-        .transformation-hero h1 {
-            font-size: 30px;
-        }
 
     .transformation-grid {
         gap: 18px;
@@ -261,60 +289,117 @@
     }
 }
 
-
 /* =========================================================
-           MOBILE
-           ========================================================= */
+   TABLETS - 768px TO 991px
+   ========================================================= */
 
-@@media (max-width: 767px) {
-
+@media (max-width: 991px) {
     .transformation-page {
         margin-top: 100px;
-        padding: 0 14px 45px;
+        padding: 0 20px 55px;
     }
 
     .transformation-hero {
-        margin-bottom: 25px;
-        padding: 30px 22px;
-        border-radius: 17px;
+        padding: 35px 28px;
+        margin-bottom: 28px;
     }
 
         .transformation-hero h1 {
-            font-size: 26px;
-        }
-
-        .transformation-hero p {
-            font-size: 13px;
-            line-height: 1.65;
+            font-size: 30px;
         }
 
     .transformation-grid {
-        grid-template-columns: 1fr;
-        gap: 15px;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 16px;
     }
 
     .transformation-card {
         padding: 20px;
     }
 
-        .transformation-card h2 {
-            font-size: 17px;
+    .transformation-card-top {
+        gap: 11px;
+    }
+
+    .transformation-card h2 {
+        font-size: 17px;
+    }
+
+    .transformation-number {
+        flex-basis: 38px;
+        width: 38px;
+        height: 38px;
+    }
+}
+
+/* =========================================================
+   MOBILE - UP TO 767px
+   ========================================================= */
+
+@media (max-width: 767px) {
+    .transformation-page {
+        margin-top: 100px;
+        padding: 0 15px 45px;
+    }
+
+    .transformation-hero {
+        padding: 30px 22px;
+        margin-bottom: 24px;
+        border-radius: 17px;
+    }
+
+        .transformation-hero h1 {
+            font-size: 27px;
         }
 
-        .transformation-card p {
+        .transformation-hero p {
             font-size: 13px;
+            line-height: 1.7;
         }
 
-    .transformation-point span {
+    .transformation-grid {
+        grid-template-columns: 1fr;
+        gap: 16px;
+    }
+
+    .transformation-card,
+    .transformation-card.full-width {
+        grid-column: auto;
+        padding: 21px;
+    }
+
+    .transformation-card-top {
+        gap: 12px;
+        margin-bottom: 15px;
+    }
+
+    .transformation-card h2 {
+        font-size: 18px;
+    }
+
+    .transformation-card p {
         font-size: 13px;
     }
 
+    .transformation-point {
+        padding: 11px 13px;
+    }
+
+        .transformation-point strong {
+            font-size: 13px;
+        }
+
+        .transformation-point span {
+            font-size: 13px;
+        }
+
     .transformation-conclusion {
-        padding: 20px;
+        margin-top: 20px;
+        padding: 21px;
     }
 
         .transformation-conclusion h2 {
-            font-size: 18px;
+            font-size: 19px;
         }
 
         .transformation-conclusion p {
@@ -322,16 +407,14 @@
         }
 }
 
-
 /* =========================================================
-           SMALL MOBILE
-           ========================================================= */
+   SMALL MOBILE - UP TO 480px
+   ========================================================= */
 
-@@media (max-width: 480px) {
-
+@media (max-width: 480px) {
     .transformation-page {
         margin-top: 100px;
-        padding: 0 10px 35px;
+        padding: 0 12px 35px;
     }
 
     .transformation-hero {
@@ -340,26 +423,34 @@
     }
 
     .transformation-badge {
-        font-size: 10px;
+        gap: 6px;
+        margin-bottom: 11px;
         padding: 6px 10px;
+        font-size: 10px;
     }
 
     .transformation-hero h1 {
-        font-size: 23px;
+        font-size: 24px;
     }
 
     .transformation-hero p {
-        font-size: 12px;
+        font-size: 12.5px;
+        line-height: 1.65;
     }
 
-    .transformation-card {
+    .transformation-grid {
+        gap: 13px;
+    }
+
+    .transformation-card,
+    .transformation-card.full-width {
         padding: 17px;
         border-radius: 13px;
     }
 
     .transformation-card-top {
         gap: 10px;
-        margin-bottom: 14px;
+        margin-bottom: 13px;
     }
 
     .transformation-number {
@@ -372,20 +463,87 @@
 
     .transformation-card h2 {
         font-size: 16px;
+        line-height: 1.4;
     }
 
-    .transformation-card p,
-    .transformation-point span {
-        font-size: 12px;
+    .transformation-point {
+        margin-top: 11px;
+        padding: 10px 11px;
     }
 
-    .transformation-point strong {
-        font-size: 12px;
-    }
+        .transformation-point strong {
+            font-size: 12px;
+        }
+
+        .transformation-point span {
+            font-size: 12px;
+            line-height: 1.6;
+        }
 
     .transformation-conclusion {
+        margin-top: 16px;
         padding: 17px;
+        border-radius: 13px;
+    }
+
+        .transformation-conclusion h2 {
+            font-size: 17px;
+        }
+
+        .transformation-conclusion p {
+            font-size: 12px;
+        }
+}
+
+/* =========================================================
+   EXTRA SMALL MOBILE - UP TO 359px
+   ========================================================= */
+
+@media (max-width: 359px) {
+    .transformation-page {
+        padding-right: 9px;
+        padding-left: 9px;
+    }
+
+    .transformation-hero {
+        padding: 22px 15px;
+    }
+
+        .transformation-hero h1 {
+            font-size: 22px;
+        }
+
+    .transformation-card,
+    .transformation-card.full-width {
+        padding: 14px;
+    }
+
+    .transformation-card-top {
+        gap: 8px;
+    }
+
+    .transformation-number {
+        flex-basis: 32px;
+        width: 32px;
+        height: 32px;
+        font-size: 12px;
+    }
+
+    .transformation-card h2 {
+        font-size: 15px;
     }
 }
 
+/* =========================================================
+   ACCESSIBILITY
+   ========================================================= */
 
+@media (prefers-reduced-motion: reduce) {
+    .transformation-card {
+        transition: none;
+    }
+
+        .transformation-card:hover {
+            transform: none;
+        }
+}
