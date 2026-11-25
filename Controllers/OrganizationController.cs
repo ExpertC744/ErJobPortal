@@ -3634,12 +3634,128 @@ WHERE nID = @nID
         }
 
 
-
+        ///anam  OrgTopSearch
         [HttpGet]
         public IActionResult OrgTopSearch()
         {
-            return View();
+            List<TraineeProfileListM> trainees = new List<TraineeProfileListM>();
+
+            string connectionString = _configuration.GetConnectionString("DefaultConnection");
+
+            using (SqlConnection con = new SqlConnection(connectionString))
+            using (SqlCommand cmd = new SqlCommand("SP_GetOrganizationTraineeProfiles", con))
+            {
+                cmd.CommandType = CommandType.StoredProcedure;
+                con.Open();
+
+                using (SqlDataReader reader = cmd.ExecuteReader())
+                {
+                    while (reader.Read())
+                    {
+                        trainees.Add(new TraineeProfileListM
+                        {
+                            SrNo = reader["SrNo"] == DBNull.Value ? 0 : Convert.ToInt32(reader["SrNo"]),
+                            CandidateID = reader["CandidateID"] == DBNull.Value ? 0 : Convert.ToInt32(reader["CandidateID"]),
+                            CandidateName = reader["CandidateName"]?.ToString() ?? "",
+                            Photo = reader["Photo"]?.ToString() ?? "",
+                            TechnicalSkill = reader["TechnicalSkill"]?.ToString() ?? "",
+                            NonTechnicalSkill = reader["NonTechnicalSkill"]?.ToString() ?? "",
+                            MedicalSkill = reader["MedicalSkill"]?.ToString() ?? "",
+                            Country = reader["Country"]?.ToString() ?? "",
+                            State = reader["State"]?.ToString() ?? "",
+                            City = reader["City"]?.ToString() ?? ""
+                        });
+                    }
+                }
+            }
+
+
+
+            //anam start statics
+            var model = new OrganizationStatisticsVM();
+
+            // TOP CITIES
+            model.TopCities = trainees
+                .Where(x => !string.IsNullOrWhiteSpace(x.City))
+                .GroupBy(x => x.City.Trim())
+                .Select(g => new ChartItemVM
+                {
+                    Name = g.Key,
+                    Count = g.Count(),
+                    Percentage = trainees.Count == 0
+                        ? 0
+                        : Math.Round((double)g.Count() / trainees.Count * 100, 2)
+                })
+                .OrderByDescending(x => x.Count)
+                .Take(3)
+                .ToList();
+
+            // TOP SKILLS
+            var allSkills = trainees
+                .SelectMany(x => new[]
+                {
+        x.TechnicalSkill,
+        x.NonTechnicalSkill,
+        x.MedicalSkill
+                })
+                .Where(x => !string.IsNullOrWhiteSpace(x))
+                .SelectMany(x => x.Split(',', StringSplitOptions.RemoveEmptyEntries))
+                .Select(x => x.Trim())
+                .Where(x => !string.IsNullOrWhiteSpace(x))
+                .ToList();
+
+            model.TopSkills = allSkills
+                .GroupBy(x => x, StringComparer.OrdinalIgnoreCase)
+                .Select(g => new ChartItemVM
+                {
+                    Name = g.Key,
+                    Count = g.Count(),
+                    Percentage = allSkills.Count == 0
+                        ? 0
+                        : Math.Round((double)g.Count() / allSkills.Count * 100, 2)
+                })
+                .OrderByDescending(x => x.Count)
+                .Take(3)
+                .ToList();
+
+            // TOP FIELDS
+            var fieldCounts = new List<ChartItemVM>
+{
+    new ChartItemVM
+    {
+        Name = "Technical Skill",
+        Count = trainees.Count(x => !string.IsNullOrWhiteSpace(x.TechnicalSkill))
+    },
+    new ChartItemVM
+    {
+        Name = "Non-Technical Skill",
+        Count = trainees.Count(x => !string.IsNullOrWhiteSpace(x.NonTechnicalSkill))
+    },
+    new ChartItemVM
+    {
+        Name = "Medical Skill",
+        Count = trainees.Count(x => !string.IsNullOrWhiteSpace(x.MedicalSkill))
+    }
+};
+
+            int totalFields = fieldCounts.Sum(x => x.Count);
+
+            model.TopFields = fieldCounts
+                .Select(x => new ChartItemVM
+                {
+                    Name = x.Name,
+                    Count = x.Count,
+                    Percentage = totalFields == 0
+                        ? 0
+                        : Math.Round((double)x.Count / totalFields * 100, 2)
+                })
+                .ToList();
+
+            return View(model);
+            ///anam end statics
         }
+
+
 
         [HttpGet]
         [Route("Organization/AppliedTrainees/{id}")]
@@ -6478,30 +6594,101 @@ WHERE nID = @nID
                 ?? throw new InvalidOperationException(
                     "DefaultConnection is missing from configuration.");
 
+
+            //    // 3. Fetch only the currently logged-in organization's records
+            //    const string query = @"
+            //SELECT
+            //    VisitID,
+            //    IPAddress,
+            //    ISP,
+            //    Country,
+            //    Region,
+            //    City,
+            //    TimeZone,
+            //    BrowserName,
+            //    BrowserVersion,
+            //    OperatingSystem,
+            //    DeviceType,
+            //    RequestPath,
+            //    PageName,
+            //    ReferrerUrl,
+            //    VisitDateTime,
+            //    IsLoggedIn
+            //FROM dbo.tblLoginPageVisits
+            //WHERE UserID = @OrgID
+            //  AND UserType = @UserType
+            //  AND PanelType = @PanelType
+            //ORDER BY VisitDateTime DESC;";
             // 3. Fetch only the currently logged-in organization's records
+            //anam Fetch only the currently logged-in organization's records
             const string query = @"
-        SELECT
-            VisitID,
-            IPAddress,
-            ISP,
-            Country,
-            Region,
-            City,
-            TimeZone,
-            BrowserName,
-            BrowserVersion,
-            OperatingSystem,
-            DeviceType,
-            RequestPath,
-            PageName,
-            ReferrerUrl,
-            VisitDateTime,
-            IsLoggedIn
-        FROM dbo.tblLoginPageVisits
-        WHERE UserID = @OrgID
-          AND UserType = @UserType
-          AND PanelType = @PanelType
-        ORDER BY VisitDateTime DESC;";
+SELECT TOP (500)
+    VisitID,
+    IPAddress,
+    ISP,
+    Country,
+    Region,
+    City,
+    TimeZone,
+    BrowserName,
+    BrowserVersion,
+    OperatingSystem,
+    DeviceType,
+    RequestPath,
+    PageName,
+    ReferrerUrl,
+    VisitDateTime,
+    IsLoggedIn
+FROM
+(
+    -- New tracking records
+    SELECT
+        VisitID,
+        IPAddress,
+        ISP,
+        Country,
+        Region,
+        City,
+        TimeZone,
+        BrowserName,
+        BrowserVersion,
+        OperatingSystem,
+        DeviceType,
+        RequestPath,
+        PageName,
+        ReferrerUrl,
+        VisitDateTime,
+        IsLoggedIn
+    FROM dbo.tblLoginPageVisits
+    WHERE UserID = @OrgID
+      AND UserType = @UserType
+      AND PanelType = @PanelType
+
+    UNION ALL
+
+    -- Older organization activity records
+    SELECT
+        ActivityLogID AS VisitID,
+        IPAddress,
+        CAST(NULL AS NVARCHAR(200)) AS ISP,
+        CAST(NULL AS NVARCHAR(100)) AS Country,
+        CAST(NULL AS NVARCHAR(100)) AS Region,
+        CAST(NULL AS NVARCHAR(100)) AS City,
+        CAST(NULL AS NVARCHAR(100)) AS TimeZone,
+        AccessType AS BrowserName,
+        CAST(NULL AS NVARCHAR(50)) AS BrowserVersion,
+        CAST(NULL AS NVARCHAR(100)) AS OperatingSystem,
+        CAST(NULL AS NVARCHAR(30)) AS DeviceType,
+        CAST(NULL AS NVARCHAR(300)) AS RequestPath,
+        CAST('OrganizationLogin' AS NVARCHAR(100)) AS PageName,
+        CAST(NULL AS NVARCHAR(500)) AS ReferrerUrl,
+        DateTime AS VisitDateTime,
+        CAST(1 AS BIT) AS IsLoggedIn
+    FROM dbo.tblOrganizationActivityLog
+    WHERE OrgID = @OrgID
+) AS CombinedActivities
+ORDER BY VisitDateTime DESC;";
+            //anam end Fetch only the currently logged-in organization's records
 
             await using var connection =
                 new SqlConnection(connectionString);

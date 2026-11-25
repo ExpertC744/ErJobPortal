@@ -37,15 +37,24 @@
         --ink: #0e2431
     }
 
-    .resume-sheet[data-theme="teal"] {
+/*    .resume-sheet[data-theme="teal"] {
         --primary: #9a3d78;
         --primary-dark: #6d2454;
         --soft: #f9edf5;
         --soft-border: #ead0e1;
         --accent: #e9a8ce;
         --ink: #0a2a29
+    }*/
+/*anam*/
+    .resume-sheet[data-theme="teal"] {
+        --primary: #0F766E;
+        --primary-dark: #115E59;
+        --soft: #E8F5F3;
+        --soft-border: #B2DFDB;
+        --accent: #5BBFB3;
+        --ink: #173B38;
     }
-
+    /*anam end*/
     .resume-sheet[data-theme="slate"] {
         --primary: #465064;
         --primary-dark: #2d3545;

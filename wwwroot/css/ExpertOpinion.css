@@ -365,6 +365,7 @@
 
 @media (max-width: 991px) {
 
+  
     .expert-page-header {
         width: calc(100% - 6%);
         min-height: 210px;
@@ -558,3 +559,213 @@
         height: 210px;
     }
 }
+/*anam start*/
+
+/* =========================================================
+   EXPERT OPINION HEADER - DESIGN FIX
+   ========================================================= */
+
+.expert-page-header {
+    width: calc(100% - 3%);
+    max-width: 1600px;
+    min-height: 338px;
+    margin: 28px auto 0;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    position: relative;
+    overflow: hidden;
+    background: linear-gradient(110deg, #071d35 0%, #0b4858 48%, #08766e 100%);
+    border-bottom: 3px solid #36e6ce;
+    box-sizing: border-box;
+}
+
+    .expert-page-header .container {
+        width: 100%;
+        max-width: none;
+        padding: 0 13px;
+        position: relative;
+        z-index: 2;
+    }
+
+    .expert-page-header .row {
+        width: 100%;
+        margin: 0;
+    }
+
+.expert-header-title-text {
+    margin: 12px 0 14px;
+    color: #f4f7ff;
+    font-family: Arial, sans-serif;
+    font-size: 50px;
+    line-height: 1.15;
+    font-weight: 700;
+    letter-spacing: 1.5px;
+}
+
+.expert-small-title {
+    display: inline-block;
+    padding: 11px 17px;
+    border: 1px solid rgba(140, 255, 242, 0.45);
+    border-radius: 30px;
+    background: rgba(255, 255, 255, 0.10);
+    color: #55f2df;
+    font-size: 14px;
+    font-weight: 700;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+}
+
+.expert-title-line {
+    width: 115px;
+    height: 4px;
+    margin: 0 0 17px;
+    border-radius: 5px;
+    background: #55c6ff;
+}
+
+.expert-header-subtitle {
+    max-width: 580px;
+    margin: 0;
+    color: #e1eaf5;
+    font-size: 17px;
+    line-height: 1.7;
+}
+
+.expert-page-header .expert-breadcrumb {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 16px;
+    padding: 10px 15px;
+    border: 1px solid rgba(85, 242, 223, 0.55);
+    border-radius: 50px;
+    background: rgba(255, 255, 255, 0.10);
+}
+
+.expert-page-header .expert-home-btn,
+.expert-page-header .expert-current-btn {
+    min-height: 52px;
+    padding: 0 23px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 9px;
+    border: 1px solid rgba(85, 242, 223, 0.5);
+    border-radius: 35px;
+    background: rgba(255, 255, 255, 0.08);
+    color: #ffffff;
+    font-size: 16px;
+    font-weight: 600;
+    text-decoration: none;
+}
+
+    .expert-page-header .expert-home-btn:hover {
+        background: rgba(85, 242, 223, 0.2);
+        color: #ffffff;
+    }
+
+.expert-page-header .expert-current-btn {
+    border-color: transparent;
+    background: transparent;
+}
+
+.expert-page-header .expert-arrow {
+    color: #65f3e2;
+    font-size: 19px;
+}
+
+/* Decorative circles */
+.expert-page-header .expert-shape {
+    position: absolute;
+    display: block;
+    border: 1px solid rgba(105, 231, 220, 0.25);
+    border-radius: 50%;
+    pointer-events: none;
+}
+
+.expert-page-header .expert-shape-1 {
+    width: 390px;
+    height: 390px;
+    top: -140px;
+    right: -110px;
+    box-shadow: 0 0 0 45px rgba(105, 231, 220, 0.07);
+}
+
+.expert-page-header .expert-shape-2 {
+    width: 205px;
+    height: 205px;
+    bottom: -115px;
+    left: 7%;
+}
+
+/* Responsive header */
+@media (max-width: 767px) {
+    .expert-page-header {
+        width: calc(100% - 30px);
+        min-height: auto;
+        margin-top: 20px;
+    }
+
+        .expert-page-header .container {
+            padding: 35px 12px;
+        }
+
+    .expert-header-title-text {
+        font-size: 31px;
+    }
+
+    .expert-header-subtitle {
+        font-size: 15px;
+    }
+
+    .expert-page-header .expert-breadcrumb {
+        flex-wrap: wrap;
+        gap: 8px;
+        margin-top: 20px;
+    }
+
+    .expert-page-header .expert-home-btn,
+    .expert-page-header .expert-current-btn {
+        min-height: 43px;
+        padding: 0 14px;
+        font-size: 14px;
+    }
+}
+
+@media (max-width: 480px) {
+    .expert-header-title-text {
+        font-size: 26px;
+    }
+
+    .expert-small-title {
+        font-size: 11px;
+        letter-spacing: 2px;
+    }
+}
+/*anam*//**/
+/* Change blue accents to teal green */
+.expert-section-title::before,
+.expert-topic-title::before {
+    background: #009688 !important;
+}
+
+/* Heading underline */
+.expert-section-title::after {
+    background: #009688 !important;
+}
+
+/* Heading accent line */
+.expert-title-line {
+    background: #55e6d2 !important;
+}
+
+/* Links and list bullets */
+.expert-main-content a {
+    color: #008f83;
+}
+
+.expert-list li::marker {
+    color: #009688;
+}
+

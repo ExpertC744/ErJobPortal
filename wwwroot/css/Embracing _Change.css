@@ -1,29 +1,38 @@
 ﻿
 /* =========================================================
-           1TRAINEE - EMBRACING CHANGE PAGE
-           TEAL + WHITE PROFESSIONAL THEME
-           ========================================================= */
+   1TRAINEE - EMBRACING CHANGE PAGE
+   RESPONSIVE TEAL + WHITE THEME
+   ========================================================= */
+
 body.site-modern .embracing-page {
+    box-sizing: border-box;
     width: 100%;
+    max-width: 100%;
     margin-top: 100px;
     padding-bottom: 70px;
     background: #f5faf9;
     color: #172033;
     overflow: hidden;
-    border-radius: 30px 30px 30px 30px;
+    border-radius: 30px;
 }
 
+    body.site-modern .embracing-page *,
+    body.site-modern .embracing-page *::before,
+    body.site-modern .embracing-page *::after {
+        box-sizing: border-box;
+    }
 
 /* =========================================================
-           HERO
-           ========================================================= */
+   HERO
+   ========================================================= */
 
 body.site-modern .embracing-hero {
     position: relative;
     overflow: hidden;
-    padding: 65px 25px 85px;
+    width: 100%;
+    padding: clamp(38px, 5vw, 65px) 25px clamp(55px, 6vw, 85px);
     background: linear-gradient( 135deg, #0d9488 0%, #0f766e 55%, #115e59 100% );
-    border-radius: 30px 30px 30px 30px;
+    border-radius: 30px;
     text-align: center;
 }
 
@@ -36,6 +45,7 @@ body.site-modern .embracing-hero {
         top: -190px;
         right: -80px;
         background: rgba(255,255,255,.07);
+        pointer-events: none;
     }
 
     body.site-modern .embracing-hero::after {
@@ -47,12 +57,12 @@ body.site-modern .embracing-hero {
         bottom: -170px;
         left: -90px;
         background: rgba(255,255,255,.05);
+        pointer-events: none;
     }
 
-
 /* =========================================================
-           HERO CONTENT
-           ========================================================= */
+   HERO CONTENT
+   ========================================================= */
 
 body.site-modern .embracing-hero-inner {
     position: relative;
@@ -66,7 +76,9 @@ body.site-modern .embracing-badge {
     display: inline-flex;
     align-items: center;
     justify-content: center;
+    flex-wrap: wrap;
     gap: 8px;
+    max-width: 100%;
     padding: 7px 16px;
     margin-bottom: 18px;
     border: 1px solid rgba(255,255,255,.25);
@@ -83,40 +95,40 @@ body.site-modern .embracing-badge {
     }
 
 body.site-modern .embracing-hero h1 {
-    margin: 0 auto;
+    width: 100%;
     max-width: 850px;
+    margin: 0 auto;
     color: #fff !important;
-    font-size: 38px;
-    line-height: 1.25;
+    font-size: clamp(25px, 3.2vw, 38px);
+    line-height: 1.3;
     font-weight: 800;
+    overflow-wrap: break-word;
 }
 
-
 /* =========================================================
-           MAIN CONTAINER
-           ========================================================= */
+   MAIN CONTAINER
+   ========================================================= */
 
 body.site-modern .embracing-container {
+    position: relative;
+    z-index: 5;
     width: 100%;
     max-width: 1180px;
     margin: -45px auto 0;
     padding: 0 20px;
-    position: relative;
-    z-index: 5;
 }
 
-
 /* =========================================================
-           INTRO
-           ========================================================= */
+   INTRODUCTION
+   ========================================================= */
 
 body.site-modern .embracing-intro {
     width: 100%;
+    padding: 28px 32px;
+    margin-bottom: 35px;
     background: #fff;
     border: 1px solid #e1ecea;
     border-radius: 20px;
-    padding: 28px 32px;
-    margin-bottom: 35px;
     box-shadow: 0 15px 40px rgba(15,42,39,.07);
 }
 
@@ -125,36 +137,36 @@ body.site-modern .embracing-intro {
         color: #596671;
         font-size: 14px;
         line-height: 1.8;
+        overflow-wrap: break-word;
     }
 
-
 /* =========================================================
-           TWO COLUMN AREA
-           ========================================================= */
+   TWO COLUMN AREA
+   ========================================================= */
 
 body.site-modern .embracing-columns {
     display: grid;
+    width: 100%;
     grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 25px;
-    width: 100%;
     margin-bottom: 35px;
     align-items: stretch;
 }
 
-
 /* =========================================================
-           MAIN SECTION CARD
-           ========================================================= */
+   MAIN SECTION CARD
+   ========================================================= */
 
 body.site-modern .embracing-section {
     position: relative;
     display: flex;
     flex-direction: column;
+    min-width: 0;
     height: 100%;
+    padding: 28px;
     background: #fff;
     border: 1px solid #e0ecea;
     border-radius: 20px;
-    padding: 28px;
     box-shadow: 0 10px 30px rgba(15,42,39,.05);
     overflow: hidden;
 }
@@ -169,15 +181,15 @@ body.site-modern .embracing-section {
         background: #0d9488;
     }
 
-
 /* =========================================================
-           SECTION HEADER
-           ========================================================= */
+   SECTION HEADER
+   ========================================================= */
 
 body.site-modern .embracing-section-header {
     display: flex;
     align-items: center;
     gap: 14px;
+    min-width: 0;
     padding-bottom: 23px;
     margin-bottom: 4px;
     border-bottom: 1px solid #edf3f2;
@@ -197,20 +209,22 @@ body.site-modern .embracing-icon {
 }
 
 body.site-modern .embracing-section-header h2 {
+    min-width: 0;
     margin: 0;
     color: #172033;
     font-size: 20px;
-    line-height: 1.35;
+    line-height: 1.4;
     font-weight: 800;
+    overflow-wrap: anywhere;
 }
 
-
 /* =========================================================
-           CONTENT ITEMS
-           ========================================================= */
+   CONTENT ITEMS
+   ========================================================= */
 
 body.site-modern .embracing-item {
     position: relative;
+    min-width: 0;
     padding: 20px 0 20px 27px;
     border-left: 2px solid #dcefeb;
 }
@@ -236,7 +250,7 @@ body.site-modern .embracing-item {
         margin-bottom: 6px;
         color: #172033;
         font-size: 14px;
-        line-height: 1.4;
+        line-height: 1.5;
         font-weight: 750;
     }
 
@@ -245,19 +259,19 @@ body.site-modern .embracing-item {
         color: #65727d;
         font-size: 13.5px;
         line-height: 1.75;
+        overflow-wrap: break-word;
     }
 
-
 /* =========================================================
-           POWER OF CHANGE
-           ========================================================= */
+   POWER OF CHANGE
+   ========================================================= */
 
 body.site-modern .power-change {
     position: relative;
     width: 100%;
     padding: 38px 40px;
     border-radius: 22px;
-    background: linear-gradient( 135deg, #0d9488, #0f766e );
+    background: linear-gradient(135deg, #0d9488, #0f766e);
     overflow: hidden;
 }
 
@@ -270,6 +284,7 @@ body.site-modern .power-change {
         right: -100px;
         top: -120px;
         background: rgba(255,255,255,.06);
+        pointer-events: none;
     }
 
     body.site-modern .power-change::after {
@@ -281,11 +296,13 @@ body.site-modern .power-change {
         left: -100px;
         bottom: -100px;
         background: rgba(255,255,255,.04);
+        pointer-events: none;
     }
 
 body.site-modern .power-change-content {
     position: relative;
     z-index: 2;
+    width: 100%;
     max-width: 950px;
     margin: 0 auto;
 }
@@ -305,15 +322,15 @@ body.site-modern .power-change p {
     line-height: 1.8;
 }
 
-
 /* =========================================================
-           REMEMBER BOX
-           ========================================================= */
+   REMEMBER BOX
+   ========================================================= */
 
 body.site-modern .remember-box {
     display: flex;
     align-items: center;
     gap: 15px;
+    min-width: 0;
     margin-top: 25px;
     padding: 17px 20px;
     border-radius: 14px;
@@ -335,9 +352,11 @@ body.site-modern .remember-box {
     }
 
     body.site-modern .remember-box span {
+        min-width: 0;
         color: #fff;
         font-size: 14px;
-        line-height: 1.6;
+        line-height: 1.7;
+        overflow-wrap: break-word;
     }
 
     body.site-modern .remember-box strong {
@@ -345,12 +364,11 @@ body.site-modern .remember-box {
         font-weight: 800;
     }
 
-
 /* =========================================================
-           LARGE TABLET
-           ========================================================= */
+   LARGE LAPTOP - 1100px
+   ========================================================= */
 
-@@media only screen and (max-width: 1100px) {
+@media only screen and (max-width: 1100px) {
 
     body.site-modern .embracing-hero h1 {
         font-size: 34px;
@@ -367,21 +385,25 @@ body.site-modern .remember-box {
     body.site-modern .embracing-section-header h2 {
         font-size: 19px;
     }
+
+    body.site-modern .embracing-columns {
+        gap: 20px;
+    }
 }
 
-
 /* =========================================================
-           TABLET
-           ========================================================= */
+   TABLET - 768px TO 991px
+   ========================================================= */
 
-@@media only screen and (max-width: 991px) {
+@media only screen and (max-width: 991px) {
 
     body.site-modern .embracing-page {
         margin-top: 100px;
+        padding-bottom: 55px;
     }
 
     body.site-modern .embracing-hero {
-        padding: 55px 25px 75px;
+        padding: 50px 25px 70px;
     }
 
         body.site-modern .embracing-hero h1 {
@@ -389,16 +411,41 @@ body.site-modern .remember-box {
         }
 
     body.site-modern .embracing-container {
+        max-width: 850px;
         padding: 0 18px;
     }
 
+    body.site-modern .embracing-intro {
+        padding: 25px;
+    }
+
     body.site-modern .embracing-columns {
-        grid-template-columns: 1fr;
-        gap: 20px;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 16px;
     }
 
     body.site-modern .embracing-section {
-        height: auto;
+        height: 100%;
+        padding: 20px;
+    }
+
+    body.site-modern .embracing-section-header {
+        gap: 10px;
+    }
+
+    body.site-modern .embracing-icon {
+        flex-basis: 42px;
+        width: 42px;
+        height: 42px;
+        font-size: 17px;
+    }
+
+    body.site-modern .embracing-section-header h2 {
+        font-size: 17px;
+    }
+
+    body.site-modern .embracing-item {
+        padding-left: 22px;
     }
 
     body.site-modern .power-change {
@@ -406,36 +453,39 @@ body.site-modern .remember-box {
     }
 }
 
-
 /* =========================================================
-           MOBILE
-           ========================================================= */
+   MOBILE - UP TO 767px
+   ========================================================= */
 
-@@media only screen and (max-width: 767px) {
+@media only screen and (max-width: 767px) {
 
     body.site-modern .embracing-page {
         margin-top: 100px;
         padding-bottom: 45px;
+        border-radius: 0;
     }
 
     body.site-modern .embracing-hero {
-        padding: 45px 18px 65px;
-        border-radius: 0 0 28px 28px;
+        padding: 45px 20px 65px;
+        border-radius: 0 0 25px 25px;
     }
 
     body.site-modern .embracing-badge {
-        font-size: 11px;
+        gap: 7px;
         padding: 6px 13px;
+        margin-bottom: 15px;
+        font-size: 11px;
     }
 
     body.site-modern .embracing-hero h1 {
         font-size: 27px;
-        line-height: 1.3;
+        line-height: 1.35;
     }
 
     body.site-modern .embracing-container {
+        max-width: 600px;
         margin-top: -28px;
-        padding: 0 14px;
+        padding: 0 15px;
     }
 
     body.site-modern .embracing-intro {
@@ -450,12 +500,14 @@ body.site-modern .remember-box {
         }
 
     body.site-modern .embracing-columns {
+        grid-template-columns: 1fr;
         gap: 18px;
         margin-bottom: 25px;
     }
 
     body.site-modern .embracing-section {
-        padding: 21px;
+        height: auto;
+        padding: 22px;
         border-radius: 17px;
     }
 
@@ -490,7 +542,7 @@ body.site-modern .remember-box {
         }
 
     body.site-modern .power-change {
-        padding: 26px 21px;
+        padding: 27px 22px;
         border-radius: 18px;
     }
 
@@ -504,6 +556,7 @@ body.site-modern .remember-box {
 
     body.site-modern .remember-box {
         align-items: flex-start;
+        gap: 12px;
         padding: 15px;
     }
 
@@ -512,65 +565,177 @@ body.site-modern .remember-box {
         }
 }
 
-
 /* =========================================================
-           SMALL MOBILE
-           ========================================================= */
+   SMALL MOBILE - UP TO 480px
+   ========================================================= */
 
-@@media only screen and (max-width: 480px) {
+@media only screen and (max-width: 480px) {
 
     body.site-modern .embracing-page {
         margin-top: 100px;
+        padding-bottom: 35px;
     }
 
     body.site-modern .embracing-hero {
-        padding: 38px 14px 55px;
+        padding: 38px 15px 55px;
     }
 
-        body.site-modern .embracing-hero h1 {
-            font-size: 23px;
-        }
+    body.site-modern .embracing-badge {
+        font-size: 10px;
+        padding: 6px 11px;
+    }
+
+    body.site-modern .embracing-hero h1 {
+        font-size: 23px;
+        line-height: 1.35;
+    }
 
     body.site-modern .embracing-container {
-        padding: 0 10px;
+        padding: 0 11px;
     }
 
     body.site-modern .embracing-intro {
         padding: 18px;
+        border-radius: 15px;
     }
+
+        body.site-modern .embracing-intro p {
+            font-size: 12.5px;
+            line-height: 1.7;
+        }
 
     body.site-modern .embracing-section {
         padding: 18px;
+        border-radius: 15px;
+    }
+
+    body.site-modern .embracing-section-header {
+        gap: 10px;
+        padding-bottom: 15px;
+    }
+
+    body.site-modern .embracing-icon {
+        flex-basis: 38px;
+        width: 38px;
+        height: 38px;
+        border-radius: 10px;
+        font-size: 15px;
     }
 
     body.site-modern .embracing-section-header h2 {
-        font-size: 17px;
+        font-size: 16px;
+        line-height: 1.4;
     }
 
     body.site-modern .embracing-item {
-        padding-left: 21px;
+        padding: 16px 0 16px 21px;
     }
+
+        body.site-modern .embracing-item strong {
+            font-size: 13px;
+        }
 
         body.site-modern .embracing-item p {
             font-size: 12.5px;
+            line-height: 1.7;
         }
 
     body.site-modern .power-change {
-        padding: 22px 17px;
+        padding: 23px 17px;
+        border-radius: 16px;
     }
 
         body.site-modern .power-change h2 {
-            font-size: 22px;
+            font-size: 21px;
+        }
+
+        body.site-modern .power-change p {
+            font-size: 12.5px;
+            line-height: 1.7;
         }
 
     body.site-modern .remember-box {
         gap: 10px;
+        margin-top: 18px;
+        padding: 13px;
     }
 
         body.site-modern .remember-box > i {
             flex: 0 0 36px;
             width: 36px;
             height: 36px;
+            font-size: 15px;
+        }
+
+        body.site-modern .remember-box span {
+            font-size: 12px;
         }
 }
 
+/* =========================================================
+   EXTRA SMALL MOBILE - UP TO 359px
+   ========================================================= */
+
+@media only screen and (max-width: 359px) {
+
+    body.site-modern .embracing-hero {
+        padding: 32px 12px 48px;
+    }
+
+        body.site-modern .embracing-hero h1 {
+            font-size: 21px;
+        }
+
+    body.site-modern .embracing-container {
+        padding: 0 9px;
+    }
+
+    body.site-modern .embracing-intro {
+        padding: 15px;
+    }
+
+    body.site-modern .embracing-section {
+        padding: 15px;
+    }
+
+    body.site-modern .embracing-section-header {
+        gap: 8px;
+    }
+
+    body.site-modern .embracing-icon {
+        flex-basis: 34px;
+        width: 34px;
+        height: 34px;
+    }
+
+    body.site-modern .embracing-section-header h2 {
+        font-size: 15px;
+    }
+
+    body.site-modern .embracing-item {
+        padding-left: 18px;
+    }
+
+    body.site-modern .power-change {
+        padding: 20px 14px;
+    }
+
+    body.site-modern .remember-box {
+        gap: 8px;
+        padding: 11px;
+    }
+}
+
+/* =========================================================
+   ACCESSIBILITY
+   ========================================================= */
+
+@media (prefers-reduced-motion: reduce) {
+    body.site-modern .embracing-page *,
+    body.site-modern .embracing-page *::before,
+    body.site-modern .embracing-page *::after {
+        scroll-behavior: auto !important;
+        animation: none !important;
+        transition: none !important;
+    }
+}

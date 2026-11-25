@@ -1,4 +1,4 @@
-﻿ 
+﻿ /*anam all*/
 /* =========================================================
    UPDATE STATUS BUTTON
 ========================================================= */
@@ -117,4 +117,157 @@
         box-shadow: 0 4px 10px rgba(15, 118, 110, 0.18);
     }
 
- 
+
+
+/* =========================================
+   ELIGIBLE TRAINEES - MASTER TABLE FIX
+   ========================================= */
+
+.eligible-trainees-page .master-table-container {
+    width: 100% !important;
+    max-width: 100% !important;
+    overflow: hidden !important;
+    box-sizing: border-box;
+}
+
+    /* Horizontal scrolling */
+    .eligible-trainees-page .master-table-container .table-responsive {
+        width: 100% !important;
+        max-width: 100% !important;
+        overflow-x: auto !important;
+        overflow-y: hidden !important;
+        box-sizing: border-box;
+    }
+
+/* DataTables scroll container */
+.eligible-trainees-page .dataTables_scroll {
+    width: 100% !important;
+    max-width: 100% !important;
+}
+
+.eligible-trainees-page .dataTables_scrollHead {
+    width: 100% !important;
+    overflow: hidden !important;
+}
+
+.eligible-trainees-page .dataTables_scrollBody {
+    width: 100% !important;
+    overflow-x: auto !important;
+    overflow-y: auto !important;
+}
+
+/* Keep header and body table widths identical */
+.eligible-trainees-page #eligibleTraineesTable,
+.eligible-trainees-page .dataTables_scrollHeadInner table {
+    width: 1800px !important;
+    min-width: 1800px !important;
+    max-width: none !important;
+    table-layout: fixed !important;
+    border-collapse: separate !important;
+    border-spacing: 0 8px !important;
+}
+
+    /* Apply same column widths to header and body */
+    .eligible-trainees-page #eligibleTraineesTable th:nth-child(1),
+    .eligible-trainees-page #eligibleTraineesTable td:nth-child(1) {
+        width: 70px !important;
+    }
+
+    .eligible-trainees-page #eligibleTraineesTable th:nth-child(2),
+    .eligible-trainees-page #eligibleTraineesTable td:nth-child(2) {
+        width: 140px !important;
+    }
+
+    .eligible-trainees-page #eligibleTraineesTable th:nth-child(3),
+    .eligible-trainees-page #eligibleTraineesTable td:nth-child(3) {
+        width: 110px !important;
+    }
+
+    .eligible-trainees-page #eligibleTraineesTable th:nth-child(4),
+    .eligible-trainees-page #eligibleTraineesTable td:nth-child(4) {
+        width: 210px !important;
+    }
+
+    .eligible-trainees-page #eligibleTraineesTable th:nth-child(5),
+    .eligible-trainees-page #eligibleTraineesTable td:nth-child(5) {
+        width: 90px !important;
+    }
+
+    .eligible-trainees-page #eligibleTraineesTable th:nth-child(6),
+    .eligible-trainees-page #eligibleTraineesTable td:nth-child(6) {
+        width: 120px !important;
+    }
+
+    .eligible-trainees-page #eligibleTraineesTable th:nth-child(7),
+    .eligible-trainees-page #eligibleTraineesTable td:nth-child(7) {
+        width: 240px !important;
+    }
+
+    .eligible-trainees-page #eligibleTraineesTable th:nth-child(8),
+    .eligible-trainees-page #eligibleTraineesTable td:nth-child(8) {
+        width: 130px !important;
+    }
+
+    .eligible-trainees-page #eligibleTraineesTable th:nth-child(9),
+    .eligible-trainees-page #eligibleTraineesTable td:nth-child(9) {
+        width: 180px !important;
+    }
+
+    .eligible-trainees-page #eligibleTraineesTable th:nth-child(10),
+    .eligible-trainees-page #eligibleTraineesTable td:nth-child(10) {
+        width: 180px !important;
+    }
+
+    .eligible-trainees-page #eligibleTraineesTable th:nth-child(11),
+    .eligible-trainees-page #eligibleTraineesTable td:nth-child(11) {
+        width: 210px !important;
+    }
+
+    .eligible-trainees-page #eligibleTraineesTable th:nth-child(12),
+    .eligible-trainees-page #eligibleTraineesTable td:nth-child(12) {
+        width: 120px !important;
+    }
+
+    /* Common header and cell alignment */
+    .eligible-trainees-page #eligibleTraineesTable th,
+    .eligible-trainees-page #eligibleTraineesTable td {
+        box-sizing: border-box !important;
+        vertical-align: middle !important;
+        text-align: center;
+        overflow-wrap: anywhere;
+    }
+
+    /* Header */
+    .eligible-trainees-page #eligibleTraineesTable thead th {
+        white-space: normal !important;
+        text-align: center !important;
+    }
+
+    /* Table body */
+    .eligible-trainees-page #eligibleTraineesTable tbody td {
+        white-space: normal !important;
+        padding: 12px 10px !important;
+    }
+
+        /* Skills column */
+        .eligible-trainees-page #eligibleTraineesTable tbody td:nth-child(7) {
+            white-space: normal !important;
+            overflow-wrap: break-word !important;
+            line-height: 1.8;
+        }
+
+    /* Dropdowns */
+    .eligible-trainees-page #eligibleTraineesTable .candidate-status,
+    .eligible-trainees-page #eligibleTraineesTable .final-result-select,
+    .eligible-trainees-page #eligibleTraineesTable .comment-select {
+        width: 100% !important;
+        min-width: 0 !important;
+        max-width: 100% !important;
+        box-sizing: border-box !important;
+    }
+
+    /* Update button */
+    .eligible-trainees-page #eligibleTraineesTable .master-action-btn {
+        white-space: nowrap !important;
+        max-width: 100%;
+    }

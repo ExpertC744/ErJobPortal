@@ -228,9 +228,15 @@
                      LOGIN FORM
                 ================================================== -->
 
+                @* <form asp-controller="Account"
+                      asp-action="TPOLogin"
+                      method="post"> *@
+                @*   anam *@
                 <form asp-controller="Account"
                       asp-action="TPOLogin"
-                      method="post">
+                      method="post"
+                      autocomplete="on">
+                @* anam end *@
 
 
                     @Html.AntiForgeryToken()
@@ -330,7 +336,17 @@
                         </span>
 
                     </div>
-
+                    @*   anam *@
+                    <!-- REMEMBER ME -->
+                    <div class="candidate-remember-me">
+                        <label>
+                            <input asp-for="RememberMe"
+                                   class="form-check-input"
+                                   id="tpoRememberMe" />
+                            <span>Remember Me</span>
+                        </label>
+                    </div>
+                    @* anam end *@
                     <div class="candidate-password-actions">
 
                         <a asp-controller="Account"

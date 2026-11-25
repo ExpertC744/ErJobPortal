@@ -8,77 +8,50 @@
     ViewData["UserName"] = "Candidate";
 }
 
-
 <div class="container-fluid">
-
-    <!-- MASTER TABLE CARD -->
 
     <div class="master-table-container">
 
         <!-- MASTER TABLE HEADER -->
-
         <div class="master-table-title">
 
             <div>
-
-                <h2>
-                    Organization Registration List
-                </h2>
-
-                <p>
-                    View and manage registered organizations
-                </p>
-
+                <h2>Organization Registration List</h2>
+                <p>View and manage registered organizations</p>
             </div>
-
 
             <a asp-controller="Candidate"
                asp-action="Dashboard"
                class="master-back-btn"
                title="Back to Dashboard">
+
                 <i class="fas fa-arrow-left"></i>
+
             </a>
 
         </div>
 
-
-        <!-- MASTER TABLE -->
-
-        <div class="table-responsive">
-
+        <div class="candidate-table-wrapper">
             <table id="candidateTable"
-                   class="master-data-table">
+                   class="master-data-table"
+                   style="width:1560px;">
+        
 
                 <thead>
-
                     <tr>
-
                         <th>ID</th>
-
                         <th>Organization</th>
-
                         <th>URL</th>
-
                         <th>Name</th>
-
                         <th>Designation</th>
-
                         <th>Mobile</th>
-
                         <th>Email</th>
-
                         <th>College Code</th>
-
                         <th>College Name</th>
-
                         <th>Registration Date</th>
-
                         <th>Action</th>
-
                     </tr>
-
                 </thead>
-
 
                 <tbody>
 
@@ -89,133 +62,98 @@
                             <tr>
 
                                 <!-- ID -->
-
                                 <td class="master-id">
-
                                     @item.nID
-
                                 </td>
-
 
                                 <!-- ORGANIZATION -->
-
                                 <td>
-
-                                    @item.sOrgName
-
-                                </td>
-
+                                    @(string.IsNullOrWhiteSpace(item.sOrgName)
+                                                                ? "-"
+                                                                : item.sOrgName)
+                        </td>
 
                                 <!-- URL -->
-
                                 <td>
-
-                                    @if (!string.IsNullOrEmpty(item.sOrgUrl))
+                            @if (!string.IsNullOrWhiteSpace(item.sOrgUrl))
                                     {
-                                        <a href="@item.sOrgUrl"
+                                        var orgUrl = item.sOrgUrl.Trim();
+
+                                        if (!orgUrl.StartsWith("http://",
+                                        StringComparison.OrdinalIgnoreCase) &&
+                                        !orgUrl.StartsWith("https://",
+                                        StringComparison.OrdinalIgnoreCase))
+                                        {
+                                            orgUrl = "https://" + orgUrl;
+                                        }
+
+                                        <a href="@orgUrl"
                                            target="_blank"
+                                           rel="noopener noreferrer"
                                            class="master-link">
-
                                             Visit
-
                                         </a>
                                     }
+                                    else
+                                    {
+                                        <span>-</span>
+                                    }
+                        </td>
 
-                                </td>
+                        <!-- NAME -->
+                        <td>
+                            @(string.IsNullOrWhiteSpace(item.sName)
+                                                        ? "-"
+                                                        : item.sName)
+                                                                 </td>
 
+                        <!-- DESIGNATION -->
+                        <td>
+                            @(string.IsNullOrWhiteSpace(item.sDesignation)
+                                                        ? "-"
+                                                        : item.sDesignation)
+                                                                        </td>
 
-                                <!-- NAME -->
+                        <!-- MOBILE -->
+                        <td>
+                            @(string.IsNullOrWhiteSpace(item.sMobile)
+                                                        ? "-"
+                                                        : item.sMobile)
+                                                                   </td>
 
-                                <td>
-
-                                    @item.sName
-
-                                </td>
-
-
-                                <!-- DESIGNATION -->
-
-                                <td>
-
-                                    @item.sDesignation
-
-                                </td>
-
-
-                                <!-- MOBILE -->
-
-                                <td>
-
-                                    @item.sMobile
-
-                                </td>
-
-
-                                <!-- EMAIL -->
-
-                                <td>
-
-                                    @item.sEmail
-
-                                </td>
-
+                        <!-- EMAIL -->
+                        <td>
+                            @(string.IsNullOrWhiteSpace(item.sEmail)
+                                                        ? "-"
+                                                        : item.sEmail)
+                        </td>
 
                                 <!-- COLLEGE CODE -->
-
                                 <td>
-
                                     @item.nCollegeCode
-
                                 </td>
-
 
                                 <!-- COLLEGE NAME -->
-
-                                @* <td>
-
-                                    @item.nCollegeName
-
-                                </td> *@
-
-
-                                <!-- REGISTRATION DATE -->
-
                                 <td>
-
-                                    @item.RegDate?.ToString("dd-MM-yyyy")
-
+                                    -
                                 </td>
 
+                                <!-- REGISTRATION DATE -->
+                                <td>
+                                    @(item.RegDate?.ToString("dd-MM-yyyy") ?? "-")
+                                </td>
 
                                 <!-- ACTION -->
-
                                 <td>
-
                                     <button type="button"
                                             class="master-view-btn"
                                             data-id="@item.nID">
-
                                         View
-
                                     </button>
-
                                 </td>
 
                             </tr>
-                        }
-                    }
-                    else
-                    {
-                        <tr>
-
-                            <td colspan="11"
-                                class="text-center">
-
-                                No organization registrations found.
-
-                            </td>
-
-                        </tr>
+                                        }
                     }
 
                 </tbody>
@@ -224,9 +162,7 @@
 
         </div>
 
-
         <!-- MASTER PAGE INFO -->
-
         <div id="candidatePageInfo"
              class="master-page-info text-center d-none">
         </div>
@@ -234,3 +170,188 @@
     </div>
 
 </div>
+
+@section Scripts {
+
+    <script>
+        $(document).ready(function () {
+
+            // Initialize DataTable only once
+            if ($.fn.DataTable.isDataTable('#candidateTable')) {
+                $('#candidateTable').DataTable().destroy();
+            }
+
+            var table = $('#candidateTable').DataTable({
+
+                paging: true,
+                searching: true,
+                ordering: true,
+                info: true,
+                autoWidth: false,
+
+                pageLength: 10,
+                lengthMenu: [5, 10, 25, 50],
+
+                order: [],
+
+                columnDefs: [
+                    {
+                        targets: [0, 10],
+                        orderable: false,
+                        searchable: false
+                    }
+                ],
+
+                language: {
+                    emptyTable: "No organization registrations found.",
+                    zeroRecords: "No matching organizations found.",
+                    search: "Search:",
+                    lengthMenu: "Show _MENU_ entries",
+                    info: "Showing _START_ to _END_ of _TOTAL_ organizations",
+                    infoEmpty: "Showing 0 to 0 of 0 organizations",
+                    paginate: {
+                        previous: "Previous",
+                        next: "Next"
+                    }
+                },
+
+                drawCallback: function () {
+
+                    var info = this.api().page.info();
+
+                    if (info.recordsTotal > 0) {
+
+                        $('#candidatePageInfo')
+                            .removeClass('d-none')
+                            .text(
+                                'Showing ' +
+                                (info.start + 1) +
+                                ' to ' +
+                                info.end +
+                                ' of ' +
+                                info.recordsDisplay +
+                                ' organizations'
+                            );
+
+                    } else {
+
+                        $('#candidatePageInfo')
+                            .addClass('d-none')
+                            .text('');
+
+                    }
+                }
+
+            });
+
+        });
+
+
+
+
+        $(document).ready(function () {
+
+            if ($.fn.DataTable.isDataTable('#candidateTable')) {
+                $('#candidateTable').DataTable().destroy();
+            }
+
+            var table = $('#candidateTable').DataTable({
+
+                paging: true,
+                searching: true,
+                ordering: true,
+                info: true,
+
+                scrollX: true,
+                scrollCollapse: false,
+
+                autoWidth: false,
+
+                pageLength: 10,
+                lengthMenu: [5, 10, 25, 50],
+
+                order: [],
+
+                // Maintain consistent widths for all 11 columns
+                columnDefs: [
+                    { targets: 0, width: '80px', orderable: false },
+                    { targets: 1, width: '190px' },
+                    { targets: 2, width: '100px' },
+                    { targets: 3, width: '180px' },
+                    { targets: 4, width: '150px' },
+                    { targets: 5, width: '130px' },
+                    { targets: 6, width: '220px' },
+                    { targets: 7, width: '110px' },
+                    { targets: 8, width: '160px' },
+                    { targets: 9, width: '140px' },
+                    { targets: 10, width: '100px',
+                      orderable: false,
+                      searchable: false }
+                ],
+
+                language: {
+                    emptyTable: "No organization registrations found.",
+                    zeroRecords: "No matching organizations found.",
+                    search: "Search:",
+                    lengthMenu: "Show _MENU_ entries",
+                    info: "Showing _START_ to _END_ of _TOTAL_ organizations",
+                    infoEmpty: "Showing 0 to 0 of 0 organizations",
+                    paginate: {
+                        previous: "Previous",
+                        next: "Next"
+                    }
+                },
+
+                initComplete: function () {
+
+                    var api = this.api();
+
+                    // Recalculate header and body widths
+                    api.columns.adjust();
+
+                },
+
+                drawCallback: function () {
+
+                    var api = this.api();
+
+                    api.columns.adjust();
+
+                    var info = api.page.info();
+
+                    if (info.recordsTotal > 0) {
+
+                        $('#candidatePageInfo')
+                            .removeClass('d-none')
+                            .text(
+                                'Showing ' +
+                                (info.start + 1) +
+                                ' to ' +
+                                info.end +
+                                ' of ' +
+                                info.recordsDisplay +
+                                ' organizations'
+                            );
+
+                    } else {
+
+                        $('#candidatePageInfo')
+                            .addClass('d-none')
+                            .text('');
+
+                    }
+                }
+
+            });
+
+            // Recalculate widths when browser size changes
+            $(window).on('resize.candidateTable', function () {
+                table.columns.adjust();
+            });
+
+        });
+
+
+    </script>
+
+}

@@ -12,7 +12,7 @@ namespace ErJobPortal.Models
         [Required(ErrorMessage = "Please enter your password.")]
         [DataType(DataType.Password)]
         public string? sPassword { get; set; }
-
+        public bool RememberMe { get; set; }//anam
         public bool IsDisabledBySuperAdmin { get; set; }
 
 

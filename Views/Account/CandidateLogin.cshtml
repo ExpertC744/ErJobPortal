@@ -228,10 +228,15 @@
                      LOGIN FORM
                 ================================================== -->
 
+                @* <form asp-controller="Account"
+                      asp-action="CandidateLogin"
+                      method="post"> *@
+                     @* anam *@
                 <form asp-controller="Account"
                       asp-action="CandidateLogin"
-                      method="post">
-
+                      method="post"
+                      autocomplete="on">
+                     @* anam end *@
 
                     <!-- =================================================
                          VALIDATION SUMMARY
@@ -262,11 +267,18 @@
                             <i class="fas fa-envelope candidate-input-icon"></i>
 
 
+                           @*  <input asp-for="sEmail"
+                                   class="candidate-input"
+                                   type="email"
+                                   placeholder="Email address"
+                                   autocomplete="username" /> *@
+                                   @* anam *@
                             <input asp-for="sEmail"
                                    class="candidate-input"
                                    type="email"
                                    placeholder="Email address"
                                    autocomplete="username" />
+                                   @* anam end *@
 
 
                         </div>
@@ -299,12 +311,20 @@
                             <i class="fas fa-lock candidate-input-icon"></i>
 
 
+                            @* <input asp-for="sPassword"
+                                   id="candidatePassword"
+                                   class="candidate-input"
+                                   type="password"
+                                   placeholder="Password"
+                                   autocomplete="current-password" /> *@
+                                   @* anam *@
                             <input asp-for="sPassword"
                                    id="candidatePassword"
                                    class="candidate-input"
                                    type="password"
                                    placeholder="Password"
                                    autocomplete="current-password" />
+                            @* anam end *@
 
 
                             <!-- PASSWORD TOGGLE -->
@@ -327,6 +347,20 @@
                         </span>
 
                     </div>
+                @*     anam *@
+                    <!-- REMEMBER ME -->
+                    <div class="candidate-remember-me">
+
+                        <label>
+                            <input asp-for="RememberMe"
+                                   class="form-check-input"
+                                   id="rememberMe" />
+
+                            <span>Remember Me</span>
+                        </label>
+
+                    </div>
+                @*     anam end *@
 
                     <div class="candidate-password-actions">
 

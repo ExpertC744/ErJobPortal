@@ -230,39 +230,81 @@
 
 
 /* =========================================================
-   HERO TITLE
+   HERO TITLE - LEFT ALIGNMENT anam
    ========================================================= */
 
 .success-title-wrapper {
     position: relative;
+    width: 100%;
+    text-align: left !important;
+    margin-left: 0;
+    padding-left: 0;
 }
 
+/* 1TRAINEE */
 
 .success-small-title {
-    display: inline-block;
-    margin-bottom: 8px;
+    display: block;
+    width: fit-content;
+    margin: 0 0 8px 0 !important;
+    padding: 0;
     color: #5eead4;
     font-size: 12px;
     font-weight: 700;
     letter-spacing: 3px;
+    text-align: left !important;
     opacity: 0;
     animation: successFadeUp .8s ease forwards;
 }
 
+/* SUCCESS STORIES */
 
 .success-title {
+    display: block;
+    width: 100%;
     margin: 0 !important;
+    padding: 0;
     color: whitesmoke !important;
     font-size: 42px;
     font-weight: 700;
     line-height: 1.2;
     letter-spacing: 1px;
     text-transform: uppercase;
+    text-align: left !important;
     opacity: 0;
     animation: successTitleReveal 1s cubic-bezier(.16,1,.3,1) .15s forwards;
 }
 
+/* TITLE LINE */
 
+.success-title-line {
+    width: 0;
+    height: 3px;
+    margin: 13px 0 0 0 !important;
+    border-radius: 10px;
+    background: linear-gradient(90deg, #2dd4bf, #60a5fa);
+    animation: successLineReveal .8s ease .8s forwards;
+}
+
+/* DESCRIPTION */
+/* =========================================================
+   HERO SUBTITLE
+   ========================================================= */
+
+.success-subtitle {
+    display: block;
+    width: 100%;
+    max-width: 520px;
+    margin: 14px 0 0 0 !important;
+    padding: 0;
+    color: rgba(255,255,255,.76);
+    font-size: 15px;
+    line-height: 1.7;
+    text-align: left !important;
+    opacity: 0;
+    animation: successFadeUp .8s ease .55s forwards;
+}
+/*anam end*/
 /* =========================================================
    TITLE LINE
    ========================================================= */
@@ -277,11 +319,9 @@
 }
 
 
-/* =========================================================
-   HERO SUBTITLE
-   ========================================================= */
 
-.success-subtitle {
+
+/*.success-subtitle {
     max-width: 470px;
     margin-top: 14px;
     margin-bottom: 0;
@@ -291,7 +331,7 @@
     opacity: 0;
     animation: successFadeUp .8s ease .55s forwards;
 }
-
+*/
 
 /* =========================================================
    BREADCRUMB

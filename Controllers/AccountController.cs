@@ -762,12 +762,28 @@ namespace ErJobPortal.Controllers
         //    }
         //}
 
+        //[HttpGet]
+        //public IActionResult OrganizationLogin()
+        //{
+        //    return View();
+        //}
+        //anam 
         [HttpGet]
         public IActionResult OrganizationLogin()
         {
-            return View();
-        }
+            var model = new OrganizationLogin();
 
+            // Read remembered organization email from cookie
+            if (Request.Cookies.TryGetValue(
+                "OrganizationRememberEmail", out string? savedEmail))
+            {
+                model.sEmail = savedEmail;
+                model.RememberMe = true;
+            }
+
+            return View(model);
+        }
+        //anam end
 
         //khushi 27-10
 
@@ -834,6 +850,36 @@ namespace ErJobPortal.Controllers
 
                 return View(model);
             }
+
+            //anam 
+            // REMEMBER ME - SAVE ORGANIZATION EMAIL
+            if (model.RememberMe)
+            {
+                var cookieOptions = new CookieOptions
+                {
+                    Expires = DateTimeOffset.UtcNow.AddDays(30),
+                    HttpOnly = true,
+                    Secure = Request.IsHttps,
+                    SameSite = SameSiteMode.Lax,
+                    IsEssential = true,
+                    Path = "/"
+                };
+
+                Response.Cookies.Append(
+                    "OrganizationRememberEmail",
+                    model.sEmail?.Trim() ?? "",
+                    cookieOptions
+                );
+            }
+            else
+            {
+                Response.Cookies.Delete(
+                    "OrganizationRememberEmail",
+                    new CookieOptions { Path = "/" }
+                );
+            }
+            //anam end
+
 
             // 5. Create organization sessions
             HttpContext.Session.SetInt32("OrgID", user.nID);
@@ -1001,14 +1047,30 @@ namespace ErJobPortal.Controllers
 
         // candidate login
 
+        //[HttpGet]
+        //public IActionResult CandidateLogin()
+        //{
+        //    return View();
+        //}
+        //anam
         [HttpGet]
         public IActionResult CandidateLogin()
         {
-            return View();
+            var model = new CandidateLogin();
+
+            // Read remembered email from browser cookie
+            if (Request.Cookies.TryGetValue(
+                "CandidateRememberEmail", out string? savedEmail))
+            {
+                model.sEmail = savedEmail;
+                model.RememberMe = true;
+            }
+
+            return View(model);
         }
+        //anam end
 
 
-      
         [HttpPost]
         [ValidateAntiForgeryToken]
         public IActionResult CandidateLogin(CandidateLogin model)
@@ -1059,6 +1121,38 @@ namespace ErJobPortal.Controllers
 
                 return View(model);
             }
+            //anam
+            // ==========================================
+            // REMEMBER ME - SAVE EMAIL
+            // ==========================================
+
+            if (model.RememberMe)
+            {
+                var cookieOptions = new CookieOptions
+                {
+                    Expires = DateTimeOffset.UtcNow.AddDays(30),
+                    HttpOnly = true,
+                    Secure = Request.IsHttps,
+                    SameSite = SameSiteMode.Lax,
+                    IsEssential = true,
+                    Path = "/"
+                };
+
+                Response.Cookies.Append(
+                    "CandidateRememberEmail",
+                    model.sEmail?.Trim() ?? "",
+                    cookieOptions
+                );
+            }
+            else
+            {
+                // Remove previously remembered email
+                Response.Cookies.Delete(
+                    "CandidateRememberEmail",
+                    new CookieOptions { Path = "/" }
+                );
+            }
+            //anam end
 
             // Set session
             HttpContext.Session.SetInt32("CandidateID", user.nID);
@@ -2221,12 +2315,28 @@ namespace ErJobPortal.Controllers
         // TPO LOGIN - GET
         // ==========================================================
 
+        //[HttpGet]
+        //public IActionResult TPOLogin()
+        //{
+        //    return View();
+        //}
+        //anam
         [HttpGet]
         public IActionResult TPOLogin()
         {
-            return View();
-        }
+            var model = new TPOLogin();
 
+            // Read remembered TPO email from cookie
+            if (Request.Cookies.TryGetValue(
+                "TPORememberEmail", out string? savedEmail))
+            {
+                model.CollegeMailID = savedEmail;
+                model.RememberMe = true;
+            }
+
+            return View(model);
+        }
+        //anam end
 
         // =========================================================
         // TPO LOGIN - POST

@@ -22,12 +22,23 @@ namespace ErJobPortal.Controllers
         // SUPER ADMIN LOGIN - GET
         // ==========================================================
 
+        //anam
         [HttpGet]
         public IActionResult Index()
         {
-            return View();
-        }
+            var model = new SALoginModel();
 
+            // Read remembered Super Admin email from cookie
+            if (Request.Cookies.TryGetValue(
+                "SARememberEmail", out string? savedEmail))
+            {
+                model.sEmail = savedEmail;
+                model.RememberMe = true;
+            }
+
+            return View(model);
+        }
+        // anam end 
 
         // ==========================================================
         // SUPER ADMIN LOGIN - POST
@@ -76,6 +87,34 @@ namespace ErJobPortal.Controllers
                 ViewBag.Error = "Invalid Email or Password";
                 return View(model);
             }
+
+            // REMEMBER ME - SAVE SUPER ADMIN EMAIL-anam
+            if (model.RememberMe)
+            {
+                var cookieOptions = new CookieOptions
+                {
+                    Expires = DateTimeOffset.UtcNow.AddDays(30),
+                    HttpOnly = true,
+                    Secure = Request.IsHttps,
+                    SameSite = SameSiteMode.Lax,
+                    IsEssential = true,
+                    Path = "/"
+                };
+
+                Response.Cookies.Append(
+                    "SARememberEmail",
+                    model.sEmail?.Trim() ?? "",
+                    cookieOptions
+                );
+            }
+            else
+            {
+                Response.Cookies.Delete(
+                    "SARememberEmail",
+                    new CookieOptions { Path = "/" }
+                );
+            }
+            // anam end 
 
             // Store Super Admin details in session
             HttpContext.Session.SetString(
