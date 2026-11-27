@@ -8,20 +8,24 @@ var builder = WebApplication.CreateBuilder(args);
 // MVC
 builder.Services.AddControllersWithViews();
 
-// Services
+// HTTP Client
+builder.Services.AddHttpClient();
+
+// Application Services
 builder.Services.AddScoped<EmailService>();
 builder.Services.AddScoped<VisitorTrackingService>();
+
+// Memory Cache
 builder.Services.AddMemoryCache();
 
 // Database
 builder.Services.AddScoped<DbConnection>();
 
-// Repository
+// Repositories
 builder.Services.AddScoped<AccountRepository>();
 builder.Services.AddScoped<CandidateProfileRepository>();
-
-// Register HttpClientFactory
-builder.Services.AddHttpClient();
+builder.Services.AddScoped<OrgQuestionBankRepository>();
+builder.Services.AddScoped<TPOSchedulerRepository>();
 
 // Session
 builder.Services.AddDistributedMemoryCache();
@@ -35,22 +39,9 @@ builder.Services.AddSession(options =>
 
 builder.Services.AddHttpContextAccessor();
 
-// Services
-builder.Services.AddScoped<EmailService>();
-builder.Services.AddScoped<VisitorTrackingService>();
-
-// Database
-builder.Services.AddScoped<DbConnection>();
-
-// Repositories
-builder.Services.AddScoped<AccountRepository>();
-builder.Services.AddScoped<CandidateProfileRepository>();
-builder.Services.AddScoped<OrgQuestionBankRepository>();
-builder.Services.AddScoped<TPOSchedulerRepository>();
-
 var app = builder.Build();
 
-// Exception handling
+// Exception Handling
 if (!app.Environment.IsDevelopment())
 {
     app.UseExceptionHandler("/Home/Error");
@@ -58,12 +49,15 @@ if (!app.Environment.IsDevelopment())
 }
 
 // Middleware
+app.UseHttpsRedirection();
 app.UseStaticFiles();
+
 app.UseRouting();
+
 app.UseSession();
 app.UseAuthorization();
 
-// Route
+// Default Route
 app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Home}/{action=Index}/{id?}");
