@@ -700,3 +700,52 @@ input[type="date"] {
         font-size: 12px;
     }
 }
+/*anam*/
+
+/* =========================================
+   EDIT TRAINEE REGISTRATION - ICON THEME
+   ========================================= */
+
+/* Section heading icons */
+.candidate-section-heading i {
+    color: #0d9488 !important;
+    margin-right: 7px;
+}
+
+/* Main registration icon */
+.register-icon i {
+    color: #0d9488 !important;
+}
+
+/* Information notice icon */
+.edit-candidate-notice i {
+    color: #0d9488 !important;
+}
+
+/* Reset button icon */
+.candidate-edit-btn-reset i {
+    color: #0d9488 !important;
+}
+
+/* Back to dashboard icon */
+.edit-candidate-cancel-btn i {
+    color: #0d9488 !important;
+}
+
+/* Icons inside input fields */
+.register-field i {
+    color: #0d9488 !important;
+}
+
+/* Alert icons */
+.register-alert i {
+    color: #0d9488;
+}
+
+/* Preserve white icons on teal buttons */
+.master-back-btn i,
+.register-main-btn i,
+.send-otp-btn i {
+    color: #ffffff !important;
+}
+

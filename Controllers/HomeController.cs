@@ -627,11 +627,12 @@ namespace ErJobPortal.Controllers
 
                 ModelState.Clear();
 
-                TempData["ContactUs"] =
-                    "Thank you for contacting us! " +
-                    "Your message has been sent successfully.";
+                // SUCCESS anam
+                TempData["ContactUs"] = "Thank you for contacting us! Your message has been sent successfully.";
 
-                return RedirectToAction("Index", "Home");
+                return RedirectToAction("Contact", "Home");
+                //return RedirectToAction("Index", "Home");
+              
             }
             catch (Exception ex)
             {

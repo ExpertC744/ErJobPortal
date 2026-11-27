@@ -3743,3 +3743,206 @@ body.site-modern .image-decoration {
             transform: none;
         }
 }
+/*anam*/
+
+/* =========================================================
+   5. PARTNER LOGOS SECTION
+========================================================= */
+
+/* Main section */
+body.site-modern .partner-logo {
+    width: 100%;
+    padding: 45px 0;
+}
+
+    /* Main card */
+    body.site-modern .partner-logo .part_bg {
+        display: flex !important;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        width: 100%;
+        margin: 0 auto;
+        padding: 45px 35px;
+        background: #ffffff;
+        border: 1px solid #e2e8f0;
+        border-radius: 28px;
+        box-shadow: 0 4px 14px rgba(15, 23, 42, 0.05);
+    }
+
+        /* Heading column */
+        body.site-modern .partner-logo .part_bg > .col-lg-4 {
+            width: 100%;
+            max-width: 850px;
+            flex: 0 0 100%;
+            padding: 0;
+            margin: 0 auto 25px;
+            text-align: center;
+        }
+
+        /* Logo column */
+        body.site-modern .partner-logo .part_bg > .col-lg-8 {
+            width: 100%;
+            max-width: 100%;
+            flex: 0 0 100%;
+            padding: 0;
+            margin: 0 auto;
+            text-align: center;
+        }
+
+    /* Heading */
+    body.site-modern .partner-logo .partner_title {
+        width: 100%;
+        text-align: center;
+        margin: 0 auto;
+    }
+
+        body.site-modern .partner-logo .partner_title h3 {
+            font-size: 28px;
+            font-weight: 700;
+            line-height: 1.5;
+            color: #0f172a;
+            text-align: center;
+            margin: 0;
+        }
+
+            body.site-modern .partner-logo .partner_title h3 span {
+                color: #0f766e !important;
+            }
+
+    /* Logo wrapper */
+    body.site-modern .partner-logo .partner {
+        display: flex !important;
+        flex-wrap: wrap;
+        justify-content: center;
+        align-items: center;
+        width: 100%;
+        gap: 30px 34px;
+        margin: 0 auto;
+    }
+
+        /* Individual logo */
+        body.site-modern .partner-logo .partner a {
+            display: flex;
+            flex: 0 0 calc((100% - 170px) / 6);
+            max-width: 170px;
+            min-width: 0;
+            height: 65px;
+            align-items: center;
+            justify-content: center;
+            text-decoration: none;
+            animation: gentleSway 4.5s ease-in-out infinite;
+        }
+
+            body.site-modern .partner-logo .partner a:nth-child(2n) {
+                animation-delay: .4s;
+            }
+
+            body.site-modern .partner-logo .partner a:nth-child(3n) {
+                animation-delay: .8s;
+            }
+
+            /* Logo image */
+            body.site-modern .partner-logo .partner a img {
+                display: block;
+                max-width: 150px;
+                max-height: 55px;
+                width: auto;
+                height: auto;
+                object-fit: contain;
+                filter: grayscale(1);
+                opacity: .60;
+                transition: all .35s ease;
+            }
+
+            /* Hover effect */
+            body.site-modern .partner-logo .partner a:hover img {
+                filter: grayscale(0);
+                opacity: 1;
+                transform: translateY(-4px) scale(1.05);
+            }
+
+/* =========================================================
+   TABLET RESPONSIVE
+========================================================= */
+
+@media only screen and (max-width: 991px) {
+
+    body.site-modern .partner-logo .part_bg {
+        padding: 40px 25px;
+    }
+
+    body.site-modern .partner-logo .partner {
+        gap: 25px 20px;
+    }
+
+        body.site-modern .partner-logo .partner a {
+            flex: 0 0 calc((100% - 40px) / 3);
+            max-width: 160px;
+        }
+
+    body.site-modern .partner-logo .partner_title h3 {
+        font-size: 25px;
+    }
+}
+
+/* =========================================================
+   MOBILE RESPONSIVE
+========================================================= */
+
+@media only screen and (max-width: 767px) {
+
+    body.site-modern .partner-logo {
+        padding: 25px 12px;
+    }
+
+        body.site-modern .partner-logo .part_bg {
+            padding: 30px 15px;
+            border-radius: 20px;
+        }
+
+            body.site-modern .partner-logo .part_bg > .col-lg-4 {
+                margin-bottom: 22px;
+            }
+
+        body.site-modern .partner-logo .partner_title h3 {
+            font-size: 21px;
+            line-height: 1.45;
+        }
+
+        body.site-modern .partner-logo .partner {
+            gap: 20px 12px;
+        }
+
+            body.site-modern .partner-logo .partner a {
+                flex: 0 0 calc((100% - 12px) / 2);
+                max-width: 140px;
+                height: 55px;
+            }
+
+                body.site-modern .partner-logo .partner a img {
+                    max-width: 115px;
+                    max-height: 45px;
+                }
+}
+
+/* Add spacing between heading and partner logos */
+
+body.site-modern .partner-logo .part_bg > .col-lg-4 {
+    margin-bottom: 45px !important;
+}
+
+body.site-modern .partner-logo .partner_title {
+    margin-bottom: 0 !important;
+}
+
+body.site-modern .partner-logo .partner {
+    margin-top: 10px !important;
+}
+
+/* Mobile spacing */
+@media (max-width: 767px) {
+    body.site-modern .partner-logo .part_bg > .col-lg-4 {
+        margin-bottom: 30px !important;
+    }
+}
