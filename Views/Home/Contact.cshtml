@@ -94,7 +94,21 @@
 
 
 			<!-- ================= FORM ================= -->
+			
 			<div class="contact-form-section">
+				@* anam *@
+				@if (TempData["ContactUs"] != null)
+{
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+        <i class="bi bi-check-circle-fill"></i>
+        @TempData["ContactUs"]
+
+        <button type="button" class="btn-close"
+                data-bs-dismiss="alert"
+                aria-label="Close"></button>
+					</div>@* anam *@
+}
+
 
 				<div class="contact-heading">
 					<span>Send Message</span>

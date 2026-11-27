@@ -932,5 +932,36 @@ body {
     white-space: nowrap;
     line-height: normal;
 }
+/* HERO BACK BUTTON */
+.candidate-profile-hero {
+    position: relative;
+}
+
+.profile-back-button {
+    position: absolute;
+    top: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 42px;
+    height: 42px;
+    padding: 0;
+    background: transparent;
+    color: #ffffff;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    z-index: 5;
+}
+
+    .profile-back-button:hover {
+        background: rgba(255, 255, 255, 0.12);
+    }
+
+    .profile-back-button svg {
+        display: block;
+    }
 
 
